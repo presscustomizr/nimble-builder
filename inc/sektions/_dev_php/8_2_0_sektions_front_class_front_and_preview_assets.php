@@ -14,7 +14,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             //wp_enqueue_style( 'google-material-icons', '//fonts.googleapis.com/icon?family=Material+Icons', array(), null, 'all' );
          /*   wp_register_style(
                 'sek-bootstrap',
-                PC_AC_BASE_URL . '/inc/sektions/assets/front/css/custom-bootstrap.css',
+                NIMBLE_BASE_URL . '/inc/sektions/assets/front/css/custom-bootstrap.css',
                 array(),
                 time(),
                 'all'
@@ -22,21 +22,21 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             //base custom CSS bootstrap inspired
             wp_enqueue_style(
                 'sek-base',
-                PC_AC_BASE_URL . '/inc/sektions/assets/front/css/sek-base.css',
+                NIMBLE_BASE_URL . '/inc/sektions/assets/front/css/sek-base.css',
                 array(),
                 time(),
                 'all'
             );
             wp_enqueue_style(
                 'sek-main',
-                PC_AC_BASE_URL . '/inc/sektions/assets/front/css/sek-main.css',
+                NIMBLE_BASE_URL . '/inc/sektions/assets/front/css/sek-main.css',
                 array( 'sek-base' ),
                 time(),
                 'all'
             );
             wp_enqueue_style(
                 'font-awesome',
-                PC_AC_BASE_URL . '/inc/sektions/assets/front/fonts/css/fontawesome-all.min.css',
+                NIMBLE_BASE_URL . '/inc/sektions/assets/front/fonts/css/fontawesome-all.min.css',
                 array(),
                 time(),
                 $media = 'all'
@@ -44,14 +44,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
             wp_register_script(
                 'sek-front-fmk-js',
-                PC_AC_BASE_URL . '/inc/sektions/assets/front/js/_front_js_fmk.js',
+                NIMBLE_BASE_URL . '/inc/sektions/assets/front/js/_front_js_fmk.js',
                 array( 'jquery', 'underscore'),
                 time(),
                 true
             );
             wp_enqueue_script(
                 'sek-main-js',
-                PC_AC_BASE_URL . '/inc/sektions/assets/front/js/sek-main.js',
+                NIMBLE_BASE_URL . '/inc/sektions/assets/front/js/sek-main.js',
                 array( 'jquery', 'sek-front-fmk-js'),
                 time(),
                 true
@@ -75,7 +75,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
             wp_enqueue_style(
                 'sek-preview',
-                PC_AC_BASE_URL . '/inc/sektions/assets/czr/css/sek-preview.css',
+                NIMBLE_BASE_URL . '/inc/sektions/assets/czr/css/sek-preview.css',
                 array( 'sek-main' ),
                 time(),
                 'all'
@@ -84,7 +84,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             // Communication between preview and customizer panel
             wp_enqueue_script(
                 'sek-customize-preview',
-                PC_AC_BASE_URL . '/inc/sektions/assets/czr/js/sek-preview.js',
+                NIMBLE_BASE_URL . '/inc/sektions/assets/czr/js/sek-preview.js',
                 array( 'customize-preview', 'underscore'),
                 time(),
                 true

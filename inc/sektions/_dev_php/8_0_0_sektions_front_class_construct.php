@@ -63,7 +63,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             }
 
             // Does it return a 200 code ?
-            $url = PC_AC_BASE_URL . '/inc/sektions'. $relative_path;
+            $url = NIMBLE_BASE_URL . '/inc/sektions'. $relative_path;
             //error_log('$url' .$url );
             $url_content = wp_safe_remote_get( $url );
             if ( '404' == $url_content['response']['code'] ) {

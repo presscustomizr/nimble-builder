@@ -1,12 +1,12 @@
 {
-  "name": "advanced-customizer",
+  "name": "nimble-builder",
   "version": "1.0.0-alpha",
-  "description": "Enhanced Customizer for WordPress",
+  "description": "Live Page Builder for the WordPress Customizer",
   "author": "nikeo",
   "license": "GNU GPL v3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/presscustomizr/super-customizer"
+    "url": "https://github.com/presscustomizr/nimble-builder"
   },
   "devDependencies": {
     "autoprefixer": "^8.2.0",

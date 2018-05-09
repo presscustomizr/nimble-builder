@@ -15,7 +15,7 @@ if ( ! class_exists( 'Flat_Skop_Base' ) ) :
         }
         function __construct( $params = array() ) {
             $defaults = array(
-                'base_url_path' => ''//PC_AC_BASE_URL . '/inc/czr-skope/'
+                'base_url_path' => ''//NIMBLE_BASE_URL . '/inc/czr-skope/'
             );
             $params = wp_parse_args( $params, $defaults );
             if ( ! defined( 'SKOPE_BASE_URL' ) ) { define( 'SKOPE_BASE_URL' , $params['base_url_path'] ); }

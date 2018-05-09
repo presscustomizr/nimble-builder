@@ -38,21 +38,19 @@ module.exports = {
   //     // 'watch:czr_customizr_preview_js'
   //   ]
   // }
-  ac_dev : {
+  nimble_dev : {
     tasks : [
       // 'watch:front_js',
       // 'watch:php',
       // 'watch:skop_php',
       //
       'watch:flat_skop_php',
-      'watch:czr_contextualizer_php',
 
       // 'watch:global_js',
       //
       'watch:czr_concat_control_css',
       'watch:czr_control_js',
       'watch:czr_flat_skope_js',
-      'watch:czr_contextualizer_js',
 
       // 'watch:czr_preview_js',
       // 'watch:czr_customizr_concat_control_css',

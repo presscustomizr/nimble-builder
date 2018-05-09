@@ -32,7 +32,7 @@ function sek_enqueue_controls_js_css() {
         //dev / debug mode mode?
         sprintf(
             '%1$s/inc/sektions/assets/czr/js/%2$s' ,
-            PC_AC_BASE_URL,
+            NIMBLE_BASE_URL,
             'ccat-sektions.js'
         ),
         array( 'czr-skope-base' , 'jquery', 'underscore' ),
@@ -44,7 +44,7 @@ function sek_enqueue_controls_js_css() {
         //dev / debug mode mode?
         sprintf(
             '%1$s/inc/sektions/assets/czr/js/libs/%2$s' ,
-            PC_AC_BASE_URL,
+            NIMBLE_BASE_URL,
             'dragdrop.js'
         ),
         array( 'jquery' ),
@@ -56,7 +56,7 @@ function sek_enqueue_controls_js_css() {
         //dev / debug mode mode?
         sprintf(
             '%1$s/inc/sektions/assets/czr/js/libs/%2$s' ,
-            PC_AC_BASE_URL,
+            NIMBLE_BASE_URL,
             'czr-color-picker.js'
         ),
         array( 'jquery' ),
@@ -154,7 +154,7 @@ function sek_enqueue_controls_js_css() {
 
     wp_enqueue_style(
         'sek-control',
-        PC_AC_BASE_URL . '/inc/sektions/assets/czr/css/sek-control.css',
+        NIMBLE_BASE_URL . '/inc/sektions/assets/czr/css/sek-control.css',
         array(),
         time(),
         'all'
