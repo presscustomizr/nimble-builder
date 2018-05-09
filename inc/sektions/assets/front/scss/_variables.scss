@@ -1,0 +1,86 @@
+$project-base: 'sek' !default;
+$project-prefix: $project-base + '-' !default;
+
+$enable-grid-classes: true !default;
+
+// Grid breakpoints
+//
+// Define the minimum dimensions at which your layout will change,
+// adapting to different screen sizes, for use in media queries.
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px
+) !default;
+
+@include _assert-ascending($grid-breakpoints, "$grid-breakpoints");
+@include _assert-starts-at-zero($grid-breakpoints);
+
+// Sek grid breakpoints
+// Define the minimum dimensions at which your layout will change,
+// adapting to different screen sizes, for use in media queries.
+$sek-grid-breakpoints: (
+  xs: 0,
+  md: 768px,
+) !default;
+
+@include _assert-ascending($sek-grid-breakpoints, "$sek-grid-breakpoints");
+@include _assert-starts-at-zero($sek-grid-breakpoints);
+
+
+// Grid Columns (see elementor)
+// we thought about allowing layouts from 1 to 12 columns
+// elementor, though, allows, some other column widths like 30%, 40%, 60%, 66% (1/3, 2/3 ) etc etc.,
+// in order to create more "complex" layouts
+$sek-column-sizes: (
+   //col suffix: percentage
+     8: 8.333,     //12 columns
+     9: 9.090909,  //11 columns
+    10: 10,        //10 columns
+    11: 11.111,    //9 columns
+    12: 12.5,      //8 columns
+    14: 14.285,    //7 columns
+    16: 16.666,    //6 columns
+    20: 20,        //5 columns
+    25: 25,        //4 columns
+    30: 30,
+    33: 33.333,    //3 columns
+    40: 40,
+    50: 50,        //2 columns
+    60: 60,
+    66: 66.666,
+    70: 70,
+    75: 75,
+    80: 80,
+    83: 83.333,
+    90: 90,
+    100: 100       //1 column
+);
+
+@include _assert-ascending($sek-column-sizes, "$sek-column-sizes");
+
+
+// Grid containers
+//
+// Define the maximum width of `.container` for different screen sizes.
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px
+) !default;
+
+@include _assert-ascending($container-max-widths, "$container-max-widths");
+
+
+// Grid columns
+//
+// Set the number of columns and specify the width of the gutters.
+
+$grid-columns:                12 !default;
+$grid-gutter-width:           30px !default;
+
+$is_rtl: false !default;

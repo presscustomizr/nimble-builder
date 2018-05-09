@@ -1,0 +1,235 @@
+<?php
+// SEKTION POST
+register_post_type( SEK_CPT , array(
+    'labels' => array(
+      'name'          => __( 'Sektion settings', 'text_domain_to_be_replaced' ),
+      'singular_name' => __( 'Sektion settings', 'text_domain_to_be_replaced' ),
+    ),
+    'public'           => false,
+    'hierarchical'     => false,
+    'rewrite'          => false,
+    'query_var'        => false,
+    'delete_with_user' => false,
+    'can_export'       => true,
+    '_builtin'         => true, /* internal use only. don't use this when registering your own post type. */
+    'supports'         => array( 'title', 'revisions' ),
+    'capabilities'     => array(
+      'delete_posts'           => 'edit_theme_options',
+      'delete_post'            => 'edit_theme_options',
+      'delete_published_posts' => 'edit_theme_options',
+      'delete_private_posts'   => 'edit_theme_options',
+      'delete_others_posts'    => 'edit_theme_options',
+      'edit_post'              => 'edit_theme_options',
+      'edit_posts'             => 'edit_theme_options',
+      'edit_others_posts'      => 'edit_theme_options',
+      'edit_published_posts'   => 'edit_theme_options',
+      'read_post'              => 'read',
+      'read_private_posts'     => 'read',
+      'publish_posts'          => 'edit_theme_options',
+    )
+) );
+
+
+
+
+
+
+
+/**
+ * Fetch the `sek_post_type` post for a given {skope_id}
+ *
+ * @since 4.7.0
+ *
+ * @param string $stylesheet Optional. A theme object stylesheet name. Defaults to the current theme.
+ * @return WP_Post|null The skope post or null if none exists.
+ */
+function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
+    //error_log('skope_id in sek_get_seks_post => ' . $skope_id );
+    if ( empty( $skope_id ) ) {
+        $skope_id = skp_get_skope_id( $skope_level );
+    }
+    // if ( empty( $location ) ) {
+    //     $location = 'loop_start';
+    // }
+    $sek_post_query_vars = array(
+        'post_type'              => SEK_CPT,
+        'post_status'            => get_post_stati(),
+        'name'                   => sanitize_title( SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        'posts_per_page'         => 1,
+        'no_found_rows'          => true,
+        'cache_results'          => true,
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
+        'lazy_load_term_meta'    => false,
+    );
+
+    $post = null;
+
+    $option_name = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+
+    // $seks_options = get_option( $option_name );
+    // $seks_options = is_array( $seks_options ) ? $seks_options : array();
+
+    // $post_id = array_key_exists( $skope_id, $seks_options ) ? $seks_options : -1;
+
+    $post_id = (int)get_option( $option_name );
+    // if the options has not been set yet, it will return (int) 0
+    // id #1 is already taken by the 'Hello World' post.
+    if ( 1 > $post_id ) {
+        //error_log( 'sek_get_seks_post => post_id is not valid for options => ' . $option_name );
+        return;
+    }
+
+    if ( ! is_int( $post_id ) ) {
+        error_log( 'sek_get_seks_post => post_id ! is_int() for options => ' . $option_name );
+    }
+
+    if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
+        $post = get_post( $post_id );
+    }
+
+    // `-1` indicates no post exists; no query necessary.
+    if ( ! $post && -1 !== $post_id ) {
+        $query = new WP_Query( $sek_post_query_vars );
+        $post = $query->post;
+        $post_id = $post ? $post->ID : -1;
+        /*
+         * Cache the lookup. See sek_update_sek_post().
+         * @todo This should get cleared if a skope post is added/removed.
+         */
+        update_option( $option_name, (int)$post_id );
+    }
+
+    return $post;
+}
+
+/**
+ * Fetch the saved collection of sektion for a given skope_id / location
+ *
+ * @since 4.7.0
+ *
+ * @param string $stylesheet Optional. A theme object stylesheet name. Defaults to the current theme.
+ * @return array => the skope setting items
+ */
+function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'local' ) {
+    // if ( empty( $location ) ) {
+    //     $location = 'loop_start';
+    // }
+    if ( empty( $skope_id ) ) {
+        $skope_id = skp_get_skope_id( $skope_level );
+    }
+    // use the cached value when NOT in a customization scenario
+    if ( ! skp_is_customizing() && did_action('wp') && 'not_cached' != SEK_Front()->local_seks ) {
+        $seks_data = SEK_Front()->local_seks;
+    } else {
+        $seks_data = array();
+        $post = sek_get_seks_post( $skope_id );
+        // error_log( '<sek_get_skoped_seks() => $post>');
+        // error_log( print_r( $post, true ) );
+        // error_log( '</sek_get_skoped_seks() => $post>');
+        if ( $post ) {
+            $seks_data = maybe_unserialize( $post->post_content );
+        }
+        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        // cache now
+        SEK_Front()->local_seks = $seks_data;
+    }
+
+    // when customizing, let us filter the value with the 'customized' ones
+    $seks_data = apply_filters(
+        'sek_get_skoped_seks',
+        $seks_data,
+        $skope_id,
+        $location
+    );
+
+    // normalizes
+    $seks_data = wp_parse_args( $seks_data, sek_get_default_sektions_value() );
+
+    // error_log( '<sek_get_skoped_seks()>');
+    // error_log('location => ' . $location .  array_key_exists( 'collection', $seks_data ));
+    // error_log( print_r( $seks_data, true ) );
+    // error_log( '</sek_get_skoped_seks()>');
+    // if a location is specified, return specifically the sections of this location
+    if ( array_key_exists( 'collection', $seks_data ) && ! empty( $location ) ) {
+        if ( ! in_array( $location, sek_get_locations() ) ) {
+            error_log('Error => location ' . $location . ' is not registered in the available locations' );
+        } else {
+            $seks_data = sek_get_level_model( $location, $seks_data['collection'] );
+        }
+    }
+    return $seks_data;
+}
+
+
+
+/**
+ * Update the `sek_post_type` post for a given "{$skope_id}"
+ *
+ * Inserts a `sek_post_type` post when one doesn't yet exist.
+ *
+ * @since 4.7.0
+ *
+ * }
+ * @return WP_Post|WP_Error Post on success, error on failure.
+ */
+function sek_update_sek_post( $seks_data, $args = array() ) {
+    $args = wp_parse_args( $args, array(
+        'skope_id' => ''
+    ) );
+
+    if ( ! is_array( $seks_data ) ) {
+        error_log( 'sek_update_sek_post => $seks_data is not an array' );
+        return new WP_Error( 'sek_update_sek_post => $seks_data is not an array');
+    }
+
+    $skope_id = $args['skope_id'];
+    if ( empty( $skope_id ) ) {
+        error_log( 'sek_update_sek_post => empty skope_id' );
+        return new WP_Error( 'sek_update_sek_post => empty skope_id');
+    }
+
+    $post_title = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+    //$post_title = "{$location}_{$skope_id}";// as defined in sek_get_seks_post
+
+    $post_data = array(
+        'post_title' => $post_title,
+        'post_name' => sanitize_title( $post_title ),
+        'post_type' => SEK_CPT,
+        'post_status' => 'publish',
+        'post_content' => maybe_serialize( $seks_data )
+    );
+
+    // Update post if it already exists, otherwise create a new one.
+    $post = sek_get_seks_post( $skope_id );
+
+    if ( $post ) {
+        $post_data['ID'] = $post->ID;
+        $r = wp_update_post( wp_slash( $post_data ), true );
+    } else {
+        $r = wp_insert_post( wp_slash( $post_data ), true );
+
+        if ( ! is_wp_error( $r ) ) {
+            //$option_name = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $location;
+            $option_name = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+            //$seks_options = get_option( $option_name );
+            //$seks_options = is_array( $seks_options ) ? $seks_options : array();
+            //$seks_options[$skope_id] = $r;//$r is the post ID
+            $post_id = $r;//$r is the post ID
+
+            update_option( $option_name, (int)$post_id );
+
+            // Trigger creation of a revision. This should be removed once #30854 is resolved.
+            if ( 0 === count( wp_get_post_revisions( $r ) ) ) {
+                wp_save_post_revision( $r );
+            }
+        }
+    }
+
+    if ( is_wp_error( $r ) ) {
+        return $r;
+    }
+    return get_post( $r );
+}
+
+?>

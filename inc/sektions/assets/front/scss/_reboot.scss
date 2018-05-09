@@ -1,0 +1,22 @@
+//this is the scoped version of
+// *,
+// *::before,
+// *::after {
+//  box-sizing: border-box;
+// }
+.#{$project-base} {
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+    img {
+        max-width: 100%;
+        vertical-align: middle;
+        border-style: none; // Remove the border on images inside links in IE 10-.
+    }
+    svg:not(:root) {
+        overflow: hidden; // Hide the overflow in IE
+    }
+}
+//consider to extend this with other rules from bs _reboot.scss

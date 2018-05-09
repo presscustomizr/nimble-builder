@@ -1,0 +1,65 @@
+// Framework specific SEK grid generation
+// inspired by Bootstrap, this uses only one breakpoint though
+
+// Used only by Sektions to generate the correct number of grid classes given
+// any value of `$grid-columns`.
+
+@mixin make-sek-grid-columns($columns: $grid-columns, $gutter: $grid-gutter-width, $breakpoints: $sek-grid-breakpoints) {
+  // Common properties for all breakpoints
+  %grid-column {
+    position: relative;
+    width: 100%;
+    min-height: 1px; // Prevent columns from collapsing when empty
+    padding-right: ($gutter / 2);
+    padding-left: ($gutter / 2);
+  }
+
+  // Allow columns to stretch full width below their breakpoints
+  @each $sek-column in map-keys($sek-column-sizes) {
+    .#{$project-prefix}col-#{$sek-column} {
+      @extend %grid-column;
+    }
+  }
+
+  .#{$project-prefix}col-base,
+  .#{$project-prefix}col,
+  .#{$project-prefix}col-auto {
+    @extend %grid-column;
+  }
+
+  //Provide base column width class which will always stretch the width to 100%
+  .#{$project-prefix}col-base {
+    @include make-col(100,100);
+  }
+  // Provide basic `.sek-col-{bp}` classes for equal-width flexbox columns
+  .#{$project-prefix}col {
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 100%;
+  }
+  .#{$project-prefix}col-auto {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 100%; // Reset earlier grid tiers
+  }
+
+
+  @include media-breakpoint-up( 'md', $breakpoints) {
+
+      @each $sek-column-key, $sek-column-size in $sek-column-sizes {
+        .#{$project-prefix}col-#{$sek-column-key} {
+          @include make-col($sek-column-size,100);
+        }
+      }
+
+      .#{$project-prefix}order-first { order: -1; }
+
+      .#{$project-prefix}order-last { order: $columns + 1; }
+
+      @for $i from 0 through $columns {
+        .#{$project-prefix}order-#{$i} { order: $i; }
+      }
+
+      //no offsets
+  }
+}

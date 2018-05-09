@@ -1,0 +1,269 @@
+/* @see https://github.com/google/material-design-icons/blob/master/iconfont/material-icons.css */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/material-icons/MaterialIcons-Regular.eot'); /* For IE6-8 */
+  src: local('Material Icons'),
+       local('MaterialIcons-Regular'),
+       url('../fonts/material-icons/MaterialIcons-Regular.woff2') format('woff2'),
+       url('../fonts/material-icons/MaterialIcons-Regular.woff') format('woff'),
+       url('../fonts/material-icons/MaterialIcons-Regular.ttf') format('truetype');
+}
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+/* OVERRIDE WP CUSTOMIZER */
+ul[id*="sub-accordion-section-__sek__"] {
+    background: #F2F2F2!important;
+}
+
+
+
+
+/* SPACING INPUT */
+
+.Spacing-spacingContainer-12n {
+    font-size: 12px;
+    display: flex;
+    margin: 10px auto 0px auto;
+    flex-direction: column;
+    padding: 0;
+    background-color: #e7eff2;
+    border: 1px solid #CED6D9;
+    height: 192px;
+    width: 232px;
+    justify-content: space-between;
+    transition: background-color 0.2s ease;
+}
+.Spacing-spacingRow-K2n {
+    height: 46px;
+    display: flex;
+    justify-content: center;
+}
+.SmartTextLabel-main-22n {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+}
+.SmartTextLabel-label-12n {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.SmartTextLabel-label-12n, .SmartTextLabel-input-12n .textBox--input {
+    flex: 1 1 auto;
+    display: block;
+    margin: auto 3px;
+    box-sizing: border-box;
+    padding: 1px 3px;
+    font-size: 12px;
+    font-weight: 300;
+    min-width: 34px;
+    min-height: 20px;
+    color: #313131;
+}
+.Spacing-spacingRow--large-32n {
+    display: flex;
+    height: 100px;
+}
+
+.Spacing-col-outer-right-22n, .Spacing-col-outer-left-32n {
+    width: 46px;
+}
+.Spacing-attr-padding-T2n .Spacing-innerSpacingContainer-22n {
+    background-color: #e7eff2;
+}
+.Spacing-innerSpacingContainer-22n {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border: 1px solid #CED6D9;
+    height: 100px;
+    width: 140px;
+    justify-content: space-between;
+    padding: 5px;
+    transition: background-color 0.2s ease;
+    box-sizing: border-box;
+    margin: auto;
+}
+.Flex-main-32n {
+    min-height: 0;
+    min-width: 0;
+        display: flex;
+    justify-content: center;
+}
+.SmartTextLabel-selected-R2n {
+    cursor: pointer;
+}
+.TextBox-container-32n {
+   /* width: 100%;*/
+    position: relative;
+    display: flex;
+}
+.SmartTextLabel-input-12n .textBox--input {
+    min-height: 25px;
+    min-width: 40px;
+    background-color: white;
+}
+.SmartTextLabel-label-12n, .SmartTextLabel-input-12n .textBox--input {
+    flex: 1 1 auto;
+    display: block;
+    margin: auto 3px!important;
+    box-sizing: border-box;
+    padding: 1px 3px;
+    font-size: 12px;
+    font-weight: 300;
+    min-width: 34px;
+    min-height: 20px;
+    color: #313131;
+    width: 40px!important;
+    text-align: center;
+}
+
+.TextBox-layout-small-22n {
+    width: 35px;
+    height: 15px;
+    padding: 0;
+    text-align: center;
+}
+.TextBox-main-22n {
+    font-family: Source Sans Pro;
+    padding: 5px;
+    border-radius: 3px;
+    text-align: left;
+    font-size: 13px;
+    outline: none;
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.15);
+    border: 1px solid #CED6D9;
+    /*width: 200px;*/
+}
+
+.Spacing-innerSpacingContainer-22n label {
+    margin: 0;
+}
+.Spacing-spacingContainer-12n label {
+    flex: 0;
+}
+.reset-spacing-wrap {
+    padding: 10px;
+    font-size: 0.8em;
+    text-decoration: underline;
+    cursor: pointer;
+    text-align: center;
+}
+.reset-spacing-wrap:hover {
+  color: #006799;
+}
+
+
+
+
+
+
+/* BACKGROUND POSITION INPUT */
+.sek-bg-pos-wrapper {
+    padding: 10px;
+    text-align: center;
+}
+.sek-bg-pos-wrapper div.items {
+    display: inline-block;
+    width: 90px;
+    height: 90px;
+}
+.sek-bg-pos-wrapper div.items label.item {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    margin: 3px;
+    float: left;
+}
+.sek-bg-pos-wrapper div.items input[type="radio"] {
+    display: none;
+}
+.sek-bg-pos-wrapper div.items label.item span {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    background: #e6e6e6 no-repeat center;
+    transition: background-color 0.2s ease;
+}
+
+/* hover*/
+.sek-bg-pos-wrapper div.items label.item span:hover {
+    background-color: #33b3db;
+}
+
+.sek-bg-pos-wrapper div.items label.item span:hover svg {
+    visibility: visible;
+}
+/* checked */
+.sek-bg-pos-wrapper div.items label.item input[type="radio"]:checked + span {
+    background-color: #33b3db;
+}
+.sek-bg-pos-wrapper div.items label.item input[type="radio"]:checked + span svg {
+    visibility: visible;
+}
+
+.sek-bg-pos-wrapper div.items label.item span svg {
+    visibility: hidden;
+    shape-rendering: crispEdges;
+}
+
+
+.sek-bg-pos-wrapper .cls-5 {
+    fill: #fff;
+}
+
+
+/* H and V ALIGNMENT INPUT */
+div[data-sek-align] {
+    margin: 0 5px;
+    padding: 4px;
+    display: inline-flex;
+    align-items: flex-end;
+    position: relative;
+    text-align: center;
+    width: 23px;
+    height: 24px;
+    top: -4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.sek-h-align-wrapper .sek-align-icons {
+  float: right
+}
+
+div[data-sek-align]:hover {
+    box-shadow: inset 0 0 0 1px #555d66, inset 0 0 0 2px #fff;
+}
+div[data-sek-align].selected {
+    outline: none;
+    color: #fff;
+    box-shadow: none;
+    background: #555d66;
+}
