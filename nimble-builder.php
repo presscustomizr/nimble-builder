@@ -25,7 +25,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
 if ( ! defined( 'NIMBLE_VERSION' ) ) { define( 'NIMBLE_VERSION' , '1.0.0' ); }
 if ( ! defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
 if ( ! defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
-
+if ( ! defined( 'NIMBLE_BASE_PATH' ) ) { define( 'NIMBLE_BASE_PATH' , dirname( __FILE__ ) ); }
 
 
 

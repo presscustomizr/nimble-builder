@@ -31,7 +31,7 @@ function sek_enqueue_controls_js_css() {
         'czr-sektions',
         //dev / debug mode mode?
         sprintf(
-            '%1$s/inc/sektions/assets/czr/js/%2$s' ,
+            '%1$s/assets/czr/sek/js/%2$s' ,
             NIMBLE_BASE_URL,
             'ccat-sektions.js'
         ),
@@ -43,7 +43,7 @@ function sek_enqueue_controls_js_css() {
         'sek-drag-n-drop',
         //dev / debug mode mode?
         sprintf(
-            '%1$s/inc/sektions/assets/czr/js/libs/%2$s' ,
+            '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
             'dragdrop.js'
         ),
@@ -55,7 +55,7 @@ function sek_enqueue_controls_js_css() {
         'czr-color-picker',
         //dev / debug mode mode?
         sprintf(
-            '%1$s/inc/sektions/assets/czr/js/libs/%2$s' ,
+            '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
             'czr-color-picker.js'
         ),
@@ -154,7 +154,7 @@ function sek_enqueue_controls_js_css() {
 
     wp_enqueue_style(
         'sek-control',
-        NIMBLE_BASE_URL . '/inc/sektions/assets/czr/css/sek-control.css',
+        NIMBLE_BASE_URL . '/assets/czr/sek/css/sek-control.css',
         array(),
         time(),
         'all'

@@ -288,7 +288,7 @@ function sek_register_modules() {
                 )
             )
         ),
-        'render_tmpl_path' => dirname( __FILE__ ) . "/tmpl/modules/simple_html_module_tmpl.php",
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/simple_html_module_tmpl.php",
         'placeholder_icon' => 'code'
     ));
 
@@ -313,7 +313,7 @@ function sek_register_modules() {
                 )
             )
         ),
-        'render_tmpl_path' => dirname( __FILE__ ) . "/tmpl/modules/tinymce_editor_module_tmpl.php",
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/tinymce_editor_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     ));
 
@@ -371,7 +371,7 @@ function sek_register_modules() {
                 ),
             )
         ),
-        'render_tmpl_path' => dirname( __FILE__ ) . "/tmpl/modules/image_module_tmpl.php",
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     ));
 
@@ -443,7 +443,7 @@ function sek_register_modules() {
                 )
             )
         ),
-        'render_tmpl_path' => dirname( __FILE__ ) . "/tmpl/modules/featured_pages_module_tmpl.php",
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/featured_pages_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     ));
 }//sek_register_modules()

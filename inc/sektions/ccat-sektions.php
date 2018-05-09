@@ -412,7 +412,7 @@ function sek_enqueue_controls_js_css() {
         'czr-sektions',
         //dev / debug mode mode?
         sprintf(
-            '%1$s/inc/sektions/assets/czr/js/%2$s' ,
+            '%1$s/assets/czr/sek/js/%2$s' ,
             NIMBLE_BASE_URL,
             'ccat-sektions.js'
         ),
@@ -424,7 +424,7 @@ function sek_enqueue_controls_js_css() {
         'sek-drag-n-drop',
         //dev / debug mode mode?
         sprintf(
-            '%1$s/inc/sektions/assets/czr/js/libs/%2$s' ,
+            '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
             'dragdrop.js'
         ),
@@ -436,7 +436,7 @@ function sek_enqueue_controls_js_css() {
         'czr-color-picker',
         //dev / debug mode mode?
         sprintf(
-            '%1$s/inc/sektions/assets/czr/js/libs/%2$s' ,
+            '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
             'czr-color-picker.js'
         ),
@@ -535,7 +535,7 @@ function sek_enqueue_controls_js_css() {
 
     wp_enqueue_style(
         'sek-control',
-        NIMBLE_BASE_URL . '/inc/sektions/assets/czr/css/sek-control.css',
+        NIMBLE_BASE_URL . '/assets/czr/sek/css/sek-control.css',
         array(),
         time(),
         'all'
@@ -1016,7 +1016,7 @@ function sek_register_modules() {
                 )
             )
         ),
-        'render_tmpl_path' => dirname( __FILE__ ) . "/tmpl/modules/simple_html_module_tmpl.php",
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/simple_html_module_tmpl.php",
         'placeholder_icon' => 'code'
     ));
 
@@ -1041,7 +1041,7 @@ function sek_register_modules() {
                 )
             )
         ),
-        'render_tmpl_path' => dirname( __FILE__ ) . "/tmpl/modules/tinymce_editor_module_tmpl.php",
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/tinymce_editor_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     ));
 
@@ -1099,7 +1099,7 @@ function sek_register_modules() {
                 ),
             )
         ),
-        'render_tmpl_path' => dirname( __FILE__ ) . "/tmpl/modules/image_module_tmpl.php",
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     ));
 
@@ -1171,7 +1171,7 @@ function sek_register_modules() {
                 )
             )
         ),
-        'render_tmpl_path' => dirname( __FILE__ ) . "/tmpl/modules/featured_pages_module_tmpl.php",
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/featured_pages_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     ));
 }//sek_register_modules()
@@ -3755,21 +3755,21 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             //base custom CSS bootstrap inspired
             wp_enqueue_style(
                 'sek-base',
-                NIMBLE_BASE_URL . '/inc/sektions/assets/front/css/sek-base.css',
+                NIMBLE_BASE_URL . '/assets/front/css/sek-base.css',
                 array(),
                 time(),
                 'all'
             );
             wp_enqueue_style(
                 'sek-main',
-                NIMBLE_BASE_URL . '/inc/sektions/assets/front/css/sek-main.css',
+                NIMBLE_BASE_URL . '/assets/front/css/sek-main.css',
                 array( 'sek-base' ),
                 time(),
                 'all'
             );
             wp_enqueue_style(
                 'font-awesome',
-                NIMBLE_BASE_URL . '/inc/sektions/assets/front/fonts/css/fontawesome-all.min.css',
+                NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
                 array(),
                 time(),
                 $media = 'all'
@@ -3777,14 +3777,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
             wp_register_script(
                 'sek-front-fmk-js',
-                NIMBLE_BASE_URL . '/inc/sektions/assets/front/js/_front_js_fmk.js',
+                NIMBLE_BASE_URL . '/assets/front/js/_front_js_fmk.js',
                 array( 'jquery', 'underscore'),
                 time(),
                 true
             );
             wp_enqueue_script(
                 'sek-main-js',
-                NIMBLE_BASE_URL . '/inc/sektions/assets/front/js/sek-main.js',
+                NIMBLE_BASE_URL . '/assets/front/js/sek-main.js',
                 array( 'jquery', 'sek-front-fmk-js'),
                 time(),
                 true
@@ -3808,7 +3808,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
             wp_enqueue_style(
                 'sek-preview',
-                NIMBLE_BASE_URL . '/inc/sektions/assets/czr/css/sek-preview.css',
+                NIMBLE_BASE_URL . '/assets/czr/sek/css/sek-preview.css',
                 array( 'sek-main' ),
                 time(),
                 'all'
@@ -3817,7 +3817,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             // Communication between preview and customizer panel
             wp_enqueue_script(
                 'sek-customize-preview',
-                NIMBLE_BASE_URL . '/inc/sektions/assets/czr/js/sek-preview.js',
+                NIMBLE_BASE_URL . '/assets/czr/sek/js/sek-preview.js',
                 array( 'customize-preview', 'underscore'),
                 time(),
                 true
