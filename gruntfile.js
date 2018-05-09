@@ -16,6 +16,8 @@ module.exports = function(grunt) {
             // front_js : 'addons/assets/front/js/',
             // back_js : 'addons/assets/back/js/',
             czr_assets : 'assets/czr/',
+            front_assets : 'assets/front/',
+
             lang : 'lang/',
 
             //flat skope

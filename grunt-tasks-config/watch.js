@@ -161,7 +161,7 @@ module.exports = {
       livereload : true
     },
     files : [
-      '<%= paths.sektions %>assets/czr/js/_dev_control/**/*.js'
+      '<%= paths.czr_assets %>sek/js/_dev_control/**/*.js'
     ],
     tasks : [
       'jshint:those',
@@ -176,7 +176,7 @@ module.exports = {
       livereload : true
     },
     files : [
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/**/*.js'
+      '<%= paths.czr_assets %>sek/js/_dev_preview/**/*.js'
     ],
     tasks : [
       'jshint:those',
@@ -191,19 +191,19 @@ module.exports = {
       livereload : true
     },
     files : [
-      '<%= paths.sektions %>assets/czr/css/**/*.css'
+      '<%= paths.czr_assets %>sek/czr/css/**/*.css'
     ],
     tasks : [],
   },
 
-  sektions_font_main_js : {
+  sektions_front_main_js : {
     options: {
       spawn : false,
       // Start a live reload server on the default port 35729
       livereload : true
     },
     files : [
-      '<%= paths.sektions %>assets/front/js/sek-main.js'
+      '<%= paths.front_assets %>js/sek-main.js'
     ],
     tasks : [],
   },
@@ -215,7 +215,7 @@ module.exports = {
       livereload : true
     },
     files : [
-      '<%= paths.sektions %>assets/front/js/_front_js_fmk/**/*.js'
+      '<%= paths.front_assets %>js/_front_js_fmk/**/*.js'
     ],
     tasks : [
       'jshint:those',
@@ -240,7 +240,7 @@ module.exports = {
       livereload : true
     },
     files : [
-      '<%= paths.sektions %>assets/front/scss/**/*.scss'
+      '<%= paths.front_assets %>scss/**/*.scss'
     ],
     tasks : [
       'sass:sek_main',

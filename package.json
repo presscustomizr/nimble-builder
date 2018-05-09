@@ -1,6 +1,6 @@
 {
   "name": "nimble-builder",
-  "version": "1.0.0-alpha",
+  "version": "0.1.0-alpha",
   "description": "Live Page Builder for the WordPress Customizer",
   "author": "nikeo",
   "license": "GNU GPL v3.0",

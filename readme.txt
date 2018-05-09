@@ -1,7 +1,7 @@
-=== Advanced Customizer ===
+=== Nimble Builder ===
 Contributors: nikeo
 Author URI: https://presscustomizr.com
-Plugin URI: https://wordpress.org/plugins/advanced-customizer/
+Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: customizer
 Requires at least: 3.4
 Tested up to: 4.9.4

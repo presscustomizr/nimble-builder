@@ -178,68 +178,54 @@ module.exports = {
 
   czr_sektions_customizer_js : {
     src: [
-      '<%= paths.sektions %>assets/czr/js/_dev_control/_1_0_sektions_itinialize.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/_1_5_sektions_setup_collection_setting.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/_1_6_sektions_generate_UI.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/_1_7_sektions_update_API_setting.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/_4_0_sektions_react_to_preview.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/_4_1_sektions_setup_and_react_to_drop.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/_6_0_sektions_register_utils.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/_7_0_sektions_various_utils.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/_7_1_sektions_tinyMceEditor.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/_8_0_sektions_instantiate.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_0_sektions_itinialize.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_5_sektions_setup_collection_setting.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_sektions_generate_UI.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_sektions_update_API_setting.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_4_0_sektions_react_to_preview.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_4_1_sektions_setup_and_react_to_drop.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_6_0_sektions_register_utils.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_7_0_sektions_various_utils.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_7_1_sektions_tinyMceEditor.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_8_0_sektions_instantiate.js',
 
-      '<%= paths.sektions %>assets/czr/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_layout_bg_module.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/modules/ui/_9_0_1_UI_spacing.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/modules/ui/_9_0_2_UI_module_picker.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/modules/ui/_9_0_3_UI_section_picker.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_layout_bg_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_1_UI_spacing.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_2_UI_module_picker.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_3_UI_section_picker.js',
 
-      '<%= paths.sektions %>assets/czr/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/modules/front/_9_1_1_FRONT_tiny_mce_editor.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/modules/front/_9_1_2_FRONT_simple_html.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_control/modules/front/_9_1_3_FRONT_featured_pages.js'
-
-      // DEPRECATED
-      //'<%= paths.sektions %>assets/czr/js/_dev/_1_3_sektions_setup_server_collection.js',
-      //'<%= paths.sektions %>assets/czr/js/_dev/_1_8_sektions_update_UI.js',
-      // '<%= paths.sektions %>assets/czr/js/_dev/_3_0_sektions_add_new_sektion.js',
-      // '<%= paths.sektions %>assets/czr/js/_dev/_3_1_sektions_add_new_column.js',
-      // '<%= paths.sektions %>assets/czr/js/_dev/_3_2_sektions_add_new_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_1_FRONT_tiny_mce_editor.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_2_FRONT_simple_html.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_3_FRONT_featured_pages.js'
     ],
-    dest: '<%= paths.sektions %>assets/czr/js/ccat-sektions.js',
+    dest: '<%= paths.czr_assets %>sek/js/ccat-sektions.js',
   },
 
   czr_sektions_customizer_preview_js : {
      src: [
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_1_0_preview_itinialize.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_2_0_preview_sortable_setup.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_2_1_preview_resizable_setup.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_2_2_preview_ui_hover_visibility_setup.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_2_3_preview_ui_click_actions_setup.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_4_0_preview_panel_react_ajax_setup.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_4_1_preview_panel_ajax_sections.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_4_2_preview_panel_ajax_columns.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_4_3_preview_panel_ajax_modules.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_4_4_preview_panel_react_dynamic_style.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_9_0_preview_utilities.js',
-      '<%= paths.sektions %>assets/czr/js/_dev_preview/_9_9_preview_instantiate.js'
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_1_0_preview_itinialize.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_2_0_preview_sortable_setup.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_2_1_preview_resizable_setup.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_2_2_preview_ui_hover_visibility_setup.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_2_3_preview_ui_click_actions_setup.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_4_0_preview_panel_react_ajax_setup.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_4_1_preview_panel_ajax_sections.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_4_2_preview_panel_ajax_columns.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_4_3_preview_panel_ajax_modules.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_4_4_preview_panel_react_dynamic_style.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_9_0_preview_utilities.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_9_9_preview_instantiate.js'
     ],
-    dest: '<%= paths.sektions %>assets/czr/js/sek-preview.js',
+    dest: '<%= paths.czr_assets %>sek/js/sek-preview.js',
   },
 
   czr_sektions_front_fmk_js : {
     src: [
-      '<%= paths.sektions %>assets/front/js/_front_js_fmk/_main_base_0_utilities.part.js',
-      '<%= paths.sektions %>assets/front/js/_front_js_fmk/_main_base_1_fmk.part.js',
-      '<%= paths.sektions %>assets/front/js/_front_js_fmk/_main_xfire_0.part.js',
-
-      // DEPRECATED
-      //'<%= paths.sektions %>assets/czr/js/_dev/_1_3_sektions_setup_server_collection.js',
-      //'<%= paths.sektions %>assets/czr/js/_dev/_1_8_sektions_update_UI.js',
-      // '<%= paths.sektions %>assets/czr/js/_dev/_3_0_sektions_add_new_sektion.js',
-      // '<%= paths.sektions %>assets/czr/js/_dev/_3_1_sektions_add_new_column.js',
-      // '<%= paths.sektions %>assets/czr/js/_dev/_3_2_sektions_add_new_module.js',
+      '<%= paths.front_assets %>js/_front_js_fmk/_main_base_0_utilities.part.js',
+      '<%= paths.front_assets %>js/_front_js_fmk/_main_base_1_fmk.part.js',
+      '<%= paths.front_assets %>js/_front_js_fmk/_main_xfire_0.part.js',
     ],
-    dest: '<%= paths.sektions %>assets/front/js/_front_js_fmk.js',
+    dest: '<%= paths.front_assets %>js/_front_js_fmk.js',
   }
 };
