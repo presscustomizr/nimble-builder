@@ -117,6 +117,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         api.previewer.trigger( 'sek-pick-module', {});
                                   }
                             },
+
                             'sek-move' : {
                                   callback  : function( params ) {
                                         uiParams = {};
@@ -126,7 +127,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           action : 'sek-move-section',
                                                           id : params.id,
                                                           is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
-                                                          newOrder : params.newOrder
+                                                          newOrder : params.newOrder,
+                                                          from_location : params.from_location,
+                                                          to_location : params.to_location
                                                     };
                                               break;
                                               case 'column' :

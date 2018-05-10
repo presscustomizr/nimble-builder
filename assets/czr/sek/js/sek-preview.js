@@ -38,32 +38,41 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   // FIRE SORTABLE ON DOM READY
                   // ROOT SEKTIONS
-                  var from_sektion, to_sektion, from_column, to_column, startOrder = [], newOrder = [], $targetSektion, $targetColumn, defaults;
+                  var from_location, to_location, from_sektion, to_sektion, from_column, to_column, startOrder = [], newOrder = [], $targetSektion, $targetColumn, defaults;
                   $('.sektion-wrapper').each( function() {
-                      defaults = $.extend( true, {}, self.sortableDefaultParams );
-                      $(this).sortable( _.extend( defaults, {
-                          handle : '.sek-move-section',
-                          start: function( event, ui ) {
-                              // store the startOrder
-                              $('.sektion-wrapper').children( '[data-sek-level="section"]' ).each( function() {
-                                    startOrder.push( $(this).data('sek-id') );
-                              });
-                              //console.log('column moved from', from_sektion, ui );
-                          },
-                          stop : function( event, ui ) {
-                              newOrder = [];
-                              // Restrict to the direct children
-                              $('.sektion-wrapper').children( '[data-sek-level="section"]' ).each( function() {
-                                    newOrder.push( $(this).data('sek-id') );
-                              });
+                        defaults = $.extend( true, {}, self.sortableDefaultParams );
+                        $(this).sortable( _.extend( defaults, {
+                              handle : '.sek-move-section',
+                              connectWith : '.sektion-wrapper',
+                              start: function( event, ui ) {
+                                    $sourceLocation = ui.item.closest('div[data-sek-level="location"]');
+                                    from_location = $sourceLocation.data('sek-id');
 
-                              api.preview.send( 'sek-move', {
-                                    id : ui.item.data('sek-id'),
-                                    level : 'section',
-                                    newOrder : newOrder
-                              });
-                          }
-                      }));
+                                    // store the startOrder
+                                    $sourceLocation.children( '[data-sek-level="section"]' ).each( function() {
+                                          startOrder.push( $(this).data('sek-id') );
+                                    });
+                                    //console.log('column moved from', from_sektion, ui );
+                              },
+                              stop : function( event, ui ) {
+                                    newOrder = [];
+                                    $targetLocation = ui.item.closest('div[data-sek-level="location"]');
+                                    to_location = $targetLocation.data('sek-id');
+
+                                    // Restrict to the direct children
+                                    $targetLocation.children( '[data-sek-level="section"]' ).each( function() {
+                                          newOrder.push( $(this).data('sek-id') );
+                                    });
+
+                                    api.preview.send( 'sek-move', {
+                                          id : ui.item.data('sek-id'),
+                                          level : 'section',
+                                          newOrder : newOrder,
+                                          from_location : from_location,
+                                          to_location : to_location
+                                    });
+                              }
+                        }));
                   });
 
 
@@ -72,8 +81,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
                   // COLUMNS
-                  $('.sektion-wrapper').find( 'div[data-sek-level="section"]' ).each( function() {
-                        self.makeColumnsSortableInSektion( $(this).data('sek-id') );
+                  $('.sektion-wrapper').each( function() {
+                        $(this).find( 'div[data-sek-level="section"]' ).each( function() {
+                              self.makeColumnsSortableInSektion( $(this).data('sek-id') );
+                        });
                   });
                   // Delegate instantiation
                   $('.sektion-wrapper').on( 'sek-columns-refreshed sek-section-added', 'div[data-sek-level="section"]', function() {
@@ -86,8 +97,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
                   // MODULE
-                  $('.sektion-wrapper').find( 'div[data-sek-level="column"]' ).each( function() {
-                        self.makeModulesSortableInColumn( $(this).data('sek-id') );
+                  $('.sektion-wrapper').each( function() {
+                        $(this).find( 'div[data-sek-level="column"]' ).each( function() {
+                              self.makeModulesSortableInColumn( $(this).data('sek-id') );
+                        });
                   });
                   // Delegate instantiation
                   $('.sektion-wrapper').on( 'sek-modules-refreshed', 'div[data-sek-level="column"]', function() {
@@ -524,11 +537,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         var clickedOn = '',
                             $el = $(evt.target),
-                            $hook_location = $el.closest('div[data-sek-location]'),
-                            $closestLevelWrapper = $el.closest('div[data-sek-level]'),
-                            $closestActionIcon = $el.closest('div[data-sek-action]'),
+                            $hook_location = $el.closest('[data-sek-level="location"]'),
+                            $closestLevelWrapper = $el.closest('[data-sek-level]'),
+                            $closestActionIcon = $el.closest('[data-sek-action]'),
                             _action,
-                            _location = $hook_location.data('sek-location'),
+                            _location = $hook_location.data('sek-id'),
                             _level = $closestLevelWrapper.data('sek-level'),
                             _id = $closestLevelWrapper.data('sek-id');
                         if ( 'add-content' == $el.data('sek-action') || ( $el.closest('[data-sek-action]').length > 0 && 'add-content' == $el.closest('[data-sek-action]').data('sek-action') ) ) {
@@ -953,15 +966,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     // When a section has been created by adding a module ( @see sek-add-content-in-new-sektion )
                                     // we need to append it to a specific location
                                     // otherwise, we append it at the end of the section collection
-                                    $beforeCandidate = $( '.sektion-wrapper[data-sek-location="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.before_section + '"]' );
-                                    $afterCandidate = $( '.sektion-wrapper[data-sek-location="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.after_section + '"]' );
+                                    $beforeCandidate = $( '.sektion-wrapper[data-sek-id="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.before_section + '"]' );
+                                    $afterCandidate = $( '.sektion-wrapper[data-sek-id="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.after_section + '"]' );
 
                                     if ( ! _.isEmpty( params.apiParams.before_section ) && $beforeCandidate.length > 0 ) {
                                           $beforeCandidate.before( _r_.data );
                                     } else if ( ! _.isEmpty( params.apiParams.after_section ) && $afterCandidate.length > 0 ) {
                                           $afterCandidate.after( _r_.data );
                                     } else {
-                                          $( '.sektion-wrapper[data-sek-location="' + params.apiParams.location + '"]').first().find('.sek-add-button-wrapper').before( _r_.data );
+                                          $( '.sektion-wrapper[data-sek-id="' + params.apiParams.location + '"]').first().find('.sek-add-button-wrapper').before( _r_.data );
                                     }
                               }
                         }

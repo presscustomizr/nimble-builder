@@ -1172,15 +1172,53 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
                               case 'sek-move-section' :
+                                    //console.log('PARAMS in sek-move-section', params );
+                                    var toLocationCandidate = self.getLevelModel( params.to_location, newSetValue.collection ),
+                                        movedSektionCandidate,
+                                        copyOfMovedSektionCandidate;
+
+                                    if ( _.isEmpty( toLocationCandidate ) || 'no_match' == toLocationCandidate ) {
+                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
+                                    }
+
+                                    // MOVED CROSS LOCATIONS
+                                    // - make a copy of the moved sektion
+                                    // - remove the moved sektion from the source location
+                                    if ( params.from_location != params.to_location ) {
+                                          // Remove the moved sektion from the source location
+                                          var fromLocationCandidate = self.getLevelModel( params.from_location, newSetValue.collection );
+                                          if ( _.isEmpty( fromLocationCandidate ) || 'no_match' == fromLocationCandidate ) {
+                                                throw new Error( 'updateAPISetting => ' + params.action + ' => missing source location' );
+                                          }
+
+                                          fromLocationCandidate.collection =  _.isArray( fromLocationCandidate.collection ) ? fromLocationCandidate.collection : [];
+                                          // Make a copy of the sektion candidate now, before removing it
+                                          movedSektionCandidate = self.getLevelModel( params.id, fromLocationCandidate.collection );
+                                          copyOfMovedSektionCandidate = $.extend( true, {}, movedSektionCandidate );
+                                          // remove the sektion from its previous sektion
+                                          fromLocationCandidate.collection = _.filter( fromLocationCandidate.collection, function( sektion ) {
+                                                return sektion.id != params.id;
+                                          });
+                                    }
+
+                                    // UPDATE THE TARGET LOCATION
+                                    toLocationCandidate.collection =  _.isArray( toLocationCandidate.collection ) ? toLocationCandidate.collection : [];
+                                    originalCollection = $.extend( true, [], toLocationCandidate.collection );
                                     reorderedCollection = [];
                                     _.each( params.newOrder, function( _id_ ) {
-                                          var sektionCandidate = self.getLevelModel( _id_, newSetValue.collection );//_.findWhere( originalCollection, { id : _id_ } );
-                                          if ( _.isEmpty( sektionCandidate ) || 'no_match' == sektionCandidate ) {
-                                                throw new Error( 'updateAPISetting => ' + params.action + ' => missing sektionCandidate' );
+                                          // in the case of a cross location movement, we need to add the moved sektion to the target location
+                                          if ( params.from_location != params.to_location && _id_ == copyOfMovedSektionCandidate.id ) {
+                                                reorderedCollection.push( copyOfMovedSektionCandidate );
+                                          } else {
+                                                sektionCandidate = self.getLevelModel( _id_, originalCollection );
+                                                if ( _.isEmpty( sektionCandidate ) || 'no_match' == sektionCandidate ) {
+                                                      throw new Error( 'updateAPISetting => move section => missing section candidate' );
+                                                }
+                                                reorderedCollection.push( sektionCandidate );
                                           }
-                                          reorderedCollection.push( sektionCandidate );
                                     });
-                                    newSetValue.collection = reorderedCollection;
+                                    toLocationCandidate.collection = reorderedCollection;
+
                               break;
 
 
@@ -1873,6 +1911,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         api.previewer.trigger( 'sek-pick-module', {});
                                   }
                             },
+
                             'sek-move' : {
                                   callback  : function( params ) {
                                         uiParams = {};
@@ -1882,7 +1921,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           action : 'sek-move-section',
                                                           id : params.id,
                                                           is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
-                                                          newOrder : params.newOrder
+                                                          newOrder : params.newOrder,
+                                                          from_location : params.from_location,
+                                                          to_location : params.to_location
                                                     };
                                               break;
                                               case 'column' :
@@ -2320,7 +2361,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // console.log('onDropping element => ', $(self) );
                                     api.czr_sektions.trigger( 'sek-content-dropped', {
                                           drop_target_element : $(this),
-                                          location : $(this).closest('.sektion-wrapper').data('sek-location'),
+                                          location : $(this).closest('[data-sek-level="location"]').data('sek-id'),
                                           position : _position,
                                           before_section : $(this).data('sek-before-section'),
                                           after_section : $(this).data('sek-after-section'),
