@@ -10,11 +10,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         var clickedOn = '',
                             $el = $(evt.target),
-                            $hook_location = $el.closest('div[data-sek-location]'),
-                            $closestLevelWrapper = $el.closest('div[data-sek-level]'),
-                            $closestActionIcon = $el.closest('div[data-sek-action]'),
+                            $hook_location = $el.closest('[data-sek-level="location"]'),
+                            $closestLevelWrapper = $el.closest('[data-sek-level]'),
+                            $closestActionIcon = $el.closest('[data-sek-action]'),
                             _action,
-                            _location = $hook_location.data('sek-location'),
+                            _location = $hook_location.data('sek-id'),
                             _level = $closestLevelWrapper.data('sek-level'),
                             _id = $closestLevelWrapper.data('sek-id');
                         if ( 'add-content' == $el.data('sek-action') || ( $el.closest('[data-sek-action]').length > 0 && 'add-content' == $el.closest('[data-sek-action]').data('sek-action') ) ) {

@@ -41,15 +41,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     // When a section has been created by adding a module ( @see sek-add-content-in-new-sektion )
                                     // we need to append it to a specific location
                                     // otherwise, we append it at the end of the section collection
-                                    $beforeCandidate = $( '.sektion-wrapper[data-sek-location="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.before_section + '"]' );
-                                    $afterCandidate = $( '.sektion-wrapper[data-sek-location="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.after_section + '"]' );
+                                    $beforeCandidate = $( '.sektion-wrapper[data-sek-id="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.before_section + '"]' );
+                                    $afterCandidate = $( '.sektion-wrapper[data-sek-id="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.after_section + '"]' );
 
                                     if ( ! _.isEmpty( params.apiParams.before_section ) && $beforeCandidate.length > 0 ) {
                                           $beforeCandidate.before( _r_.data );
                                     } else if ( ! _.isEmpty( params.apiParams.after_section ) && $afterCandidate.length > 0 ) {
                                           $afterCandidate.after( _r_.data );
                                     } else {
-                                          $( '.sektion-wrapper[data-sek-location="' + params.apiParams.location + '"]').first().find('.sek-add-button-wrapper').before( _r_.data );
+                                          $( '.sektion-wrapper[data-sek-id="' + params.apiParams.location + '"]').first().find('.sek-add-button-wrapper').before( _r_.data );
                                     }
                               }
                         }

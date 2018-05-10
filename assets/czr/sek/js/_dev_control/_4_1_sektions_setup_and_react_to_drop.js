@@ -40,7 +40,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // console.log('onDropping element => ', $(self) );
                                     api.czr_sektions.trigger( 'sek-content-dropped', {
                                           drop_target_element : $(this),
-                                          location : $(this).closest('.sektion-wrapper').data('sek-location'),
+                                          location : $(this).closest('[data-sek-level="location"]').data('sek-id'),
                                           position : _position,
                                           before_section : $(this).data('sek-before-section'),
                                           after_section : $(this).data('sek-after-section'),

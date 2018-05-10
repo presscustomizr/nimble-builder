@@ -98,7 +98,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             switch ( $level ) {
                 case 'location' :
                     ?>
-                      <div class="sektion-wrapper" data-sek-location="<?php echo $location ?>">
+                      <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $location ?>">
                         <?php
                           $this -> parent_model = $model;
                           foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
