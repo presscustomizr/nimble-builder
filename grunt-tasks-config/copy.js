@@ -1,5 +1,5 @@
 module.exports = {
-
+  // Since may 2018 => not done from the advanced-customizer plugin anymore but from here
   czr_base_fmk_in_customizr_theme : {
     expand: true,
     flatten: false,
@@ -18,14 +18,16 @@ module.exports = {
     dest: '../wordpress-font-customizer/back/czr-base-fmk/'
   },
 
-  czr_social_links_module_in_customizr_theme : {
-    expand: true,
-    flatten: false,
-    //filter:'isFile',
-    cwd : '<%= paths.social_links_module %>',
-    src: [ '**' ],
-    dest: '../../themes/customizr/core/czr-modules/social-links/'
-  }
+
+
+  // czr_social_links_module_in_customizr_theme : {
+  //   expand: true,
+  //   flatten: false,
+  //   //filter:'isFile',
+  //   cwd : '<%= paths.social_links_module %>',
+  //   src: [ '**' ],
+  //   dest: '../../themes/customizr/core/czr-modules/social-links/'
+  // }
 
   //
   // to_hueman_addons: {
