@@ -34,9 +34,16 @@
   /* Support for IE. */
   font-feature-settings: 'liga';
 }
+
+
+
 /* OVERRIDE WP CUSTOMIZER */
 ul[id*="sub-accordion-section-__sek__"] {
     background: #F2F2F2!important;
+}
+/* No sliding transition needed when switching from a section to another when generating the UI's */
+#customize-theme-controls .customize-pane-child[id*="__sek__"] {
+    transition: unset;
 }
 
 
