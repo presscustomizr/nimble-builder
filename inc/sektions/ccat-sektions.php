@@ -1244,11 +1244,9 @@ function sek_set_input_tmpl___module_picker( $html, $input_id, $input_data ) {
                       if ( $i % 2 == 0 ) {
                         //printf('<div class="sek-module-raw"></div');
                       }
-                      printf('<div draggable="true" style="%1$s" data-sek-content-type="%2$s" data-sek-content-id="%3$s"><p style="%4$s">%5$s</p></div>',
-                          "width: 40%;float: left;padding: 5%;text-align: center;",
+                      printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s"><p>%3$s</p></div>',
                           $_params['content-type'],
                           $_params['content-id'],
-                          "padding: 9%;background: #eee;cursor: move;",
                           $_params['title']
                       );
                       $i++;
@@ -1324,11 +1322,9 @@ function sek_set_input_tmpl___section_picker( $html, $input_id, $input_data ) {
                       )
                   );
                   foreach( $content_collection as $_params) {
-                      printf('<div draggable="true" style="%1$s" data-sek-content-type="%2$s" data-sek-content-id="%3$s"><p style="%4$s">%5$s</p></div>',
-                          "width: 40%;float: left;padding: 5%;text-align: center;",
+                      printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s"><p>%3$s</p></div>',
                           $_params['content-type'],
                           $_params['content-id'],
-                          "padding: 9%;background: #eee;cursor: move;",
                           $_params['title']
                       );
                   }

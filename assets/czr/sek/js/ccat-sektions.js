@@ -3407,15 +3407,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             //console.log('ON DRAG START', $(this), $(this).data('sek-module-type'), event );
                             event.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
                             event.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
-                            api.previewer.send( 'sek-drag-start' );
-                      },
+                            // event.originalEvent.dataTransfer.effectAllowed = "move";
+                            // event.originalEvent.dataTransfer.dropEffect = "move";
 
+                            api.previewer.send( 'sek-drag-start' );
+                            $(event.currentTarget).addClass('sek-grabbing');
+                      },
+                      // onDragEnter : function( event ) {
+                      //       event.originalEvent.dataTransfer.dropEffect = "move";
+                      // },
                       onDragEnd: function( event ) {
                             //console.log('ON DRAG END', $(this), event );
                             api.previewer.send( 'sek-drag-stop' );
+                            // make sure that the sek-grabbing class ( -webkit-grabbing ) gets reset on dragEnd
+                            $(event.currentTarget).removeClass('sek-grabbing');
                       }
                 }).attr('data-sek-drag', true );
 
+                // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
+                input.container.find('[draggable]').each( function() {
+                      $(this).on( 'mousedown mouseup', function( evt ) {
+                            switch( evt.type ) {
+                                  case 'mousedown' :
+                                        $(this).addClass('sek-grabbing');
+                                  break;
+                                  case 'mouseup' :
+                                        $(this).removeClass('sek-grabbing');
+                                  break;
+                            }
+                      });
+                });
                 api.czr_sektions.trigger( 'sek-refresh-sekdrop', { type : 'module_picker' } );
                 //console.log( this.id, input_options );
             }
@@ -3460,14 +3481,29 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               event.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
                               event.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
                               api.previewer.send( 'sek-drag-start' );
+                              $(event.currentTarget).addClass('sek-grabbing');
                         },
 
                         onDragEnd: function( event ) {
                               //console.log('ON DRAG END', $(this), event );
                               api.previewer.send( 'sek-drag-stop' );
+                              $(event.currentTarget).removeClass('sek-grabbing');
                         }
                   }).attr('data-sek-drag', true );
 
+                   // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
+                  input.container.find('[draggable]').each( function() {
+                        $(this).on( 'mousedown mouseup', function( evt ) {
+                              switch( evt.type ) {
+                                    case 'mousedown' :
+                                          $(this).addClass('sek-grabbing');
+                                    break;
+                                    case 'mouseup' :
+                                          $(this).removeClass('sek-grabbing');
+                                    break;
+                              }
+                        });
+                  });
                   api.czr_sektions.trigger( 'sek-refresh-sekdrop', { type : 'section_picker' } );
             }
       });

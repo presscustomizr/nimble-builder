@@ -114,6 +114,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                 helper: "ui-resizable-helper",
                                 handles :'e'
                         });//$(this).resizable({})
+
+                        // Add a resizable icon in the handle
+                        // revealed on section hovering @see sek-preview.css
+                        var $column = $(this);
+                        _.delay( function() {
+                              $column.find('.ui-resizable-handle').append('<i class="fas fa-arrows-alt-h"></i>');
+                        }, 500 );
+
                   });//$directColumnChildren.each()
             }
 

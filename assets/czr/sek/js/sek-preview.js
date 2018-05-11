@@ -418,6 +418,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                 helper: "ui-resizable-helper",
                                 handles :'e'
                         });//$(this).resizable({})
+
+                        // Add a resizable icon in the handle
+                        // revealed on section hovering @see sek-preview.css
+                        var $column = $(this);
+                        _.delay( function() {
+                              $column.find('.ui-resizable-handle').append('<i class="fas fa-arrows-alt-h"></i>');
+                        }, 500 );
+
                   });//$directColumnChildren.each()
             }
 
@@ -432,7 +440,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   var self = this;
                   var tmpl,
                       level,
-                      params;
+                      params,
+                      $levelEl;
+
                   // Level's overlay
                   $('.sektion-wrapper').on( 'mouseenter', '[data-sek-level]', function( evt ) {
                         // if ( $(this).children('.sek-block-overlay').length > 0 )
@@ -469,14 +479,22 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         tmpl = self.parseTemplate( '#sek-tmpl-overlay-ui-' + level );
                         $.when( $(this).prepend( tmpl( params ) ) ).done( function() {
-                              $(this).find('.sek-block-overlay').fadeIn( 300 );
+                              $levelEl = $(this);
+                              $levelEl.find('.sek-block-overlay').stop( true, true ).fadeIn( {
+                                  duration : 300,
+                                  complete : function() {}
+                              } );
                         });
 
                   }).on( 'mouseleave', '[data-sek-level]', function( evt ) {
-                          $(this).children('.sek-block-overlay').fadeOut( {
+                          $levelEl = $(this);
+                          $levelEl.children('.sek-block-overlay').stop( true, true ).fadeOut( {
                                 duration : 200,
-                                complete : function() { $(this).remove(); }
+                                complete : function() {
+                                      $(this).remove();
+                                }
                           });
+
                   });
 
 

@@ -457,8 +457,47 @@
 
 
 /* RESIZABLE */
-.ui-resizable-helper { border: 2px dotted #00F; }
-/*.ui-resizable-handle { background: red; }*/
+.ui-resizable-helper { border: 2px dotted #33b3db; }
+[data-sek-level="column"] .ui-resizable-e {
+  cursor: e-resize;
+  width: 7px;
+  right: -4px;
+  font-size: 0.55em;
+}
+[data-sek-level="column"] .ui-resizable-e i {
+    background: #33b3db;
+    border-radius: 12px;
+    color: white;
+    padding: 2px;
+    display: none;
+}
+[data-sek-level="section"]:hover .ui-resizable-e {
+  background: #d5d5d573;
+  background: rgba(213, 213, 213, 0.42);
+}
+[data-sek-level="section"]:hover .ui-resizable-e i {
+    display: block;
+}
+
+
+
+[data-sek-level="column"] .ui-resizable-handle {
+  /*z-index: 90;*/
+  /* border: 1px dashed #d5dadf; */
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 100%;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
 
 
 
