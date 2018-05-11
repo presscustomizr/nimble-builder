@@ -1,5 +1,7 @@
 /**
  * @https://github.com/StackHive/DragDropInterface
+ * @https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
+ * @https://html.spec.whatwg.org/multipage/dnd.html#dnd
  */
 ;(function( $ ) {
 
