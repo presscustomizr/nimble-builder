@@ -488,7 +488,8 @@
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  height: 100%;
+  height: calc(100% - 26px);/*26px is the padding-top of the .sek-column when previewing to let enough place for the ui icons */
+  top: 26px;/*26px is the padding-top of the .sek-column when previewing to let enough place for the ui icons */
   -webkit-box-align: center;
   -webkit-align-items: center;
   -ms-flex-align: center;

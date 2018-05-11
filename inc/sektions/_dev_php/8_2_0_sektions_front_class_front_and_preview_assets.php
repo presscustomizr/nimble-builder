@@ -147,7 +147,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                       <div class="sek-clear"></div>
                     </div>
                     <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
-                      <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div>
+                      <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
                   </div>
               </script>
@@ -173,7 +173,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                       <div class="sek-clear"></div>
                     </div>
                     <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
-                      <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div>
+                      <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
                   </div>
               </script>
@@ -203,7 +203,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                       <div class="sek-clear"></div>
                     </div>
                     <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
-                      <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div>
+                      <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
                   </div><?php // .sek-block-overlay-header ?>
               </script>
