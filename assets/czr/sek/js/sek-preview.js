@@ -764,13 +764,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
                             // EDITING MODULE AND OPTIONS
-                            // 'sek-set-module-value' is sent when the module setting is being modified
+                            // 'sek-refresh-module-markup' is sent when the module setting is being modified
                             // {
                             //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                             //       moduleId : params.id,
                             //       value : to
                             // }
-                            'sek-set-module-value' : 'ajaxSetModuleValue',
+                            'sek-refresh-module-markup' : 'ajaxRefreshModuleMarkup',
 
                             'sek-move' : function( params ) {
                                   switch ( params.apiParams.action ) {
@@ -1142,16 +1142,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
               },//ajaxRefreshModulesAndNestedSections()
 
 
-              ajaxSetModuleValue : function( params ) {
+              ajaxRefreshModuleMarkup : function( params ) {
                     return czrapp.doAjax( {
                           action : 'sek_get_content',
                           id : params.moduleId,
                           skope_id : params.skope_id,
-                          sek_action : 'sek-set-module-value'
+                          sek_action : 'sek-refresh-module-markup'
                     }).done( function( _r_ ) {
                           var $module = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.moduleId + '"]' );
                           if ( 1 > $module.length ) {
-                                czrapp.errare( 'reactToPanelMsg => sek-set-module-value => no DOM node for module' + params.moduleId );
+                                czrapp.errare( 'reactToPanelMsg => sek-refresh-module-markup => no DOM node for module' + params.moduleId );
                           }
                           var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.moduleId + '"></span>';
                           $module.before( placeholderHtml );

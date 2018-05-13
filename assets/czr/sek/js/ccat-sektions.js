@@ -1252,7 +1252,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // => that's why we check if ! api.has( ... )
                                           api( params.id, function( _setting_ ) {
                                                 _setting_.bind( _.debounce( function( to, from, args ) {
-                                                      console.log('ARGS ?',_setting_.id, args );
+                                                      console.log('sek-generate-module-ui => ARGS ?',_setting_.id, args );
 
                                                       // We don't want to store the default title and id module properties
                                                       var moduleValueCandidate = {};

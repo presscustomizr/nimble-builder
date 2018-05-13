@@ -101,13 +101,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
                             // EDITING MODULE AND OPTIONS
-                            // 'sek-set-module-value' is sent when the module setting is being modified
+                            // 'sek-refresh-module-markup' is sent when the module setting is being modified
                             // {
                             //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                             //       moduleId : params.id,
                             //       value : to
                             // }
-                            'sek-set-module-value' : 'ajaxSetModuleValue',
+                            'sek-refresh-module-markup' : 'ajaxRefreshModuleMarkup',
 
                             'sek-move' : function( params ) {
                                   switch ( params.apiParams.action ) {

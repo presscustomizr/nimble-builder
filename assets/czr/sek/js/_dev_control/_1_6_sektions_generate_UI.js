@@ -151,7 +151,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
                                           api( params.id, function( _setting_ ) {
-                                                _setting_.bind( _.debounce( function( to, from ) {
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      console.log('sek-generate-module-ui => ARGS ?',_setting_.id, args );
+
                                                       // We don't want to store the default title and id module properties
                                                       var moduleValueCandidate = {};
                                                       _.each( to, function( _val, _property ) {
@@ -167,7 +169,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             in_sektion : params.in_sektion
                                                       }).done( function() {
                                                             api.previewer.send(
-                                                                  'sek-set-module-value',
+                                                                  'sek-refresh-module-markup',
                                                                   {
                                                                         skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                                         moduleId : params.id,
