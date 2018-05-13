@@ -486,6 +486,50 @@ function sek_enqueue_controls_js_css() {
                       'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
                   ),
 
+                  // TEXT EDITOR MODULE
+                  'font-weight' => array(
+                      'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
+                      'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
+                      'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
+                      'lighter'   => __( 'lighter', 'text_domain_to_be_replaced' ),
+                      100     => 100,
+                      200     => 200,
+                      300     => 300,
+                      400     => 400,
+                      500     => 500,
+                      600     => 600,
+                      700     => 700,
+                      800     => 800,
+                      900     => 900
+                  ),
+
+                  'font-style' => array(
+                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                      'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
+                      'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
+                      'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
+                  ),
+
+                  'text-decoration' =>  array(
+                      'none'      => __( 'none', 'text_domain_to_be_replaced' ),
+                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                      'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
+                      'overline'    => __( 'overline', 'text_domain_to_be_replaced' ),
+                      'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
+                  ),
+
+                  'text-transform' => array(
+                      'none'      => __( 'none', 'text_domain_to_be_replaced' ),
+                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                      'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
+                      'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
+                      'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
+                  ),
+
+
+
+
+
 
                   // SPACING MODULE
                   'spacingUnits' => array(
@@ -756,7 +800,8 @@ function sek_register_modules() {
             'item-inputs' => array(
                 'module_id' => array(
                     'input_type'  => 'module_picker',
-                    'title'       => __('Pick a module', 'text_domain_to_be_replaced')
+                    'title'       => __('Pick a module', 'text_domain_to_be_replaced'),
+                    'width-100'   => true
                 )
             )
         )
@@ -779,7 +824,8 @@ function sek_register_modules() {
             'item-inputs' => array(
                 'section_id' => array(
                     'input_type'  => 'section_picker',
-                    'title'       => __('Pick a section', 'text_domain_to_be_replaced')
+                    'title'       => __('Pick a section', 'text_domain_to_be_replaced'),
+                    'width-100'   => true
                 )
             )
         )
@@ -806,7 +852,7 @@ function sek_register_modules() {
                         'title' => __('Background', 'text_domain_to_be_replaced'),
                         'inputs' => array(
                             'bg-color' => array(
-                                'input_type'  => 'wp_color_apha',
+                                'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Background color', 'text_domain_to_be_replaced'),
                                 'width-100'   => true
                             ),
@@ -846,7 +892,7 @@ function sek_register_modules() {
                                 'input_width' => 'width-20'
                             ),
                             'bg-color-overlay' => array(
-                                'input_type'  => 'wp_color_apha',
+                                'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Overlay Color', 'text_domain_to_be_replaced'),
                                 'width-100'   => true
                             ),
@@ -865,7 +911,8 @@ function sek_register_modules() {
                         'inputs' => array(
                             'boxed-wide' => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Boxed or full width', 'text_domain_to_be_replaced')
+                                'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
+                                'preview-action' => 'refresh-gfonts'
                             ),
 
                             /* suspended, needs more thoughts
@@ -911,7 +958,7 @@ function sek_register_modules() {
                                 'title'       => __('Border shape', 'text_domain_to_be_replaced')
                             ),
                             'border-color' => array(
-                                'input_type'  => 'wp_color_apha',
+                                'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Border color', 'text_domain_to_be_replaced'),
                                 'width-100'   => true,
                             ),
@@ -1023,6 +1070,11 @@ function sek_register_modules() {
 
 
 
+
+
+
+
+
     /* ------------------------------------------------------------------------- *
      *  LOAD AND REGISTER THE TEXT EDITOR MODULE
     /* ------------------------------------------------------------------------- */
@@ -1035,9 +1087,72 @@ function sek_register_modules() {
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
-                'content' => array(
-                    'input_type'  => 'tiny_mce_editor',
-                    'title'       => __('Content', 'text_domain_to_be_replaced')
+                'tabs' => array(
+                    array(
+                        'title' => __('Content', 'text_domain_to_be_replaced'),
+                        //'attributes' => 'data-sek-device="desktop"',
+                        'inputs' => array(
+                            'content' => array(
+                                'input_type'  => 'tiny_mce_editor',
+                                'title'       => __('Content', 'text_domain_to_be_replaced')
+                            ),
+                            'alignment' => array(
+                                'input_type'  => 'h_text_alignment',
+                                'title'       => __('Alignment', 'text_domain_to_be_replaced')
+                            )
+                        )
+                    ),
+                    array(
+                        'title' => __('Font style', 'text_domain_to_be_replaced'),
+                        'attributes' => 'data-sek-google-font-tab="true"',
+                        'inputs' => array(
+                            'font-family' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __('Font family', 'text_domain_to_be_replaced')
+                            ),
+                            'font-size'       => array(
+                                'input_type'  => 'font_size',
+                                'title'       => __('Font size', 'text_domain_to_be_replaced')
+                            ),//16,//"14px",
+                            'line-height'     => array(
+                                'input_type'  => 'line_height',
+                                'title'       => __('Line height', 'text_domain_to_be_replaced')
+                            ),//24,//"20px",
+                            'font-weight'     => array(
+                                'input_type'  => 'select',
+                                'title'       => __('Font weight', 'text_domain_to_be_replaced')
+                            ),//null,
+                            'font-style'      => array(
+                                'input_type'  => 'select',
+                                'title'       => __('Font style', 'text_domain_to_be_replaced')
+                            ),//null,
+                            'text-decoration' => array(
+                                'input_type'  => 'select',
+                                'title'       => __('Text decoration', 'text_domain_to_be_replaced')
+                            ),//null,
+                            'text-transform'  => array(
+                                'input_type'  => 'select',
+                                'title'       => __('Text transform', 'text_domain_to_be_replaced')
+                            ),//null,
+
+                            'letter-spacing'  => array(
+                                'input_type'  => 'number',
+                                'title'       => __('Letter spacing', 'text_domain_to_be_replaced')
+                            ),//0,
+                            'color'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __('Text color', 'text_domain_to_be_replaced')
+                            ),//"#000000",
+                            'color-hover'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced')
+                            ),//"#000000",
+                            'important'       => array(
+                                'input_type'  => 'gutencheck',
+                                'title'       => __('Make those style options win if other rules are applied.', 'text_domain_to_be_replaced')
+                            ),//false
+                        )
+                    )
                 )
             )
         ),
@@ -1175,559 +1290,500 @@ function sek_register_modules() {
         'placeholder_icon' => 'short_text'
     ));
 }//sek_register_modules()
+
+
+?><?php
+// Set input content
+add_action( 'czr_set_input_tmpl_content', 'sek_set_input_tmpl_content', 10, 3 );
+function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
+    // error_log( print_r( $input_data, true ) );
+    // error_log('$input_type' . $input_type );
+    if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
+         wp_send_json_error( 'sek_set_input_tmpl_content => missing input type for input id : ' . $input_id );
+    }
+    switch( $input_type ) {
+        case 'module_picker' :
+            sek_set_input_tmpl___module_picker( $input_id, $input_data );
+        break;
+        case 'section_picker' :
+            sek_set_input_tmpl___section_picker( $input_id, $input_data );
+        break;
+        case 'spacing' :
+            sek_set_input_tmpl___spacing( $input_id, $input_data );
+        break;
+        case 'bg_position' :
+            sek_set_input_tmpl___bg_position( $input_id, $input_data );
+        break;
+        case 'h_alignment' :
+            sek_set_input_tmpl___h_alignment( $input_id, $input_data );
+        break;
+        case 'v_alignment' :
+            sek_set_input_tmpl___v_alignment( $input_id, $input_data );
+        break;
+        case 'font_picker' :
+          sek_set_input_tmpl___font_picker( $input_id, $input_data );
+        break;
+    }
+}
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  MODULE PICKER INPUT
 /* ------------------------------------------------------------------------- */
 // filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-add_filter( 'czr_set_input_tmpl___module_picker', 'sek_set_input_tmpl___module_picker', 10,3 );
-function sek_set_input_tmpl___module_picker( $html, $input_id, $input_data ) {
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( 'Module Picker => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
-    if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
-         wp_send_json_error( 'ac_get_input_tmpl => missing input type for input id : ' . $input_id );
-         return;
-    }
-    $input_type = $input_data[ 'input_type' ];
-    $css_attr = $CZR_Fmk_Base_fn() -> czr_css_attr;
+//add_filter( 'czr_set_input_tmpl___module_picker', 'sek_set_input_tmpl___module_picker', 10,3 );
+function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
+    ?>
+        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+        <div class="sek-content-type-wrapper">
+          <?php
+            $content_collection = array(
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_tiny_mce_editor_module',
+                  'title' => '@missi18n Text Editor'),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_image_module',
+                  'title' => '@missi18n Image'
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_simple_html_module',
+                  'title' => '@missi18n Html Content'
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_featured_pages_module',
+                  'title' => '@missi18n Featured pages'
+                ),
 
-    ob_start();
-        ?>
-         <?php
-            // <INPUT WRAPPER>
-            printf( '<div class="%1$s %2$s %3$s" data-input-type="%4$s" %5$s>',
-                $css_attr['sub_set_wrapper'],
-                'width-100',//$is_width_100 ? 'width-100' : '',
-                'hidden' === $input_type ? 'hidden' : '',
-                $input_type,
-                ! empty( $input_data['transport'] ) ? 'data-transport="'. $input_data['transport'] .'"' : ''
             );
-
-            printf( '<div class="customize-control-title">%1$s</div>', $input_data['title'] );
-            ?>
-              <?php if ( ! empty( $input_data['notice_before'] ) ) : ?>
-                  <span class="czr-notice"><?php echo $input_data['notice_before']; ?></span>
-              <?php endif; ?>
-            <div class="czr-input">
-              <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-              <div class="sek-content-type-wrapper">
-                <?php
-                  $content_collection = array(
-                      array(
-                        'content-type' => 'module',
-                        'content-id' => 'czr_tiny_mce_editor_module',
-                        'title' => '@missi18n Text Editor'),
-                      array(
-                        'content-type' => 'module',
-                        'content-id' => 'czr_image_module',
-                        'title' => '@missi18n Image'
-                      ),
-                      array(
-                        'content-type' => 'module',
-                        'content-id' => 'czr_simple_html_module',
-                        'title' => '@missi18n Html Content'
-                      ),
-                      array(
-                        'content-type' => 'module',
-                        'content-id' => 'czr_featured_pages_module',
-                        'title' => '@missi18n Featured pages'
-                      ),
-
-                  );
-                  $i = 0;
-                  foreach( $content_collection as $_params) {
-                      if ( $i % 2 == 0 ) {
-                        //printf('<div class="sek-module-raw"></div');
-                      }
-                      printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s"><p>%3$s</p></div>',
-                          $_params['content-type'],
-                          $_params['content-id'],
-                          $_params['title']
-                      );
-                      $i++;
-                  }
-                ?>
-              </div>
-            </div><?php // class="czr-input" ?>
-            <?php if ( ! empty( $input_data['notice_after'] ) ) : ?>
-                <span class="czr-notice"><?php echo $input_data['notice_after']; ?></span>
-            <?php endif; ?>
-          </div> <?php //class="$css_attr['sub_set_wrapper']" ?>
-        <?php
-    return ob_get_clean();
+            $i = 0;
+            foreach( $content_collection as $_params) {
+                if ( $i % 2 == 0 ) {
+                  //printf('<div class="sek-module-raw"></div');
+                }
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s"><p>%3$s</p></div>',
+                    $_params['content-type'],
+                    $_params['content-id'],
+                    $_params['title']
+                );
+                $i++;
+            }
+          ?>
+        </div>
+    <?php
 }
 
-
-
-
-
+?><?php
 
 /* ------------------------------------------------------------------------- *
  *  SECTION PICKER INPUT
 /* ------------------------------------------------------------------------- */
 // filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-add_filter( 'czr_set_input_tmpl___section_picker', 'sek_set_input_tmpl___section_picker', 10, 3 );
-function sek_set_input_tmpl___section_picker( $html, $input_id, $input_data ) {
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( 'Section Picker => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
-    if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
-         wp_send_json_error( 'ac_get_input_tmpl => missing input type for input id : ' . $input_id );
-         return;
-    }
-    $input_type = $input_data[ 'input_type' ];
-    $css_attr = $CZR_Fmk_Base_fn() -> czr_css_attr;
-
-    ob_start();
-        ?>
-         <?php
-            // <INPUT WRAPPER>
-            printf( '<div class="%1$s %2$s %3$s" data-input-type="%4$s" %5$s>',
-                $css_attr['sub_set_wrapper'],
-                'width-100',//$is_width_100 ? 'width-100' : '',
-                'hidden' === $input_type ? 'hidden' : '',
-                $input_type,
-                ! empty( $input_data['transport'] ) ? 'data-transport="'. $input_data['transport'] .'"' : ''
+//add_filter( 'czr_set_input_tmpl___section_picker', 'sek_set_input_tmpl___section_picker', 10, 3 );
+function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
+    ?>
+        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+        <div class="sek-content-type-wrapper">
+          <?php
+            $content_collection = array(
+                array(
+                  'content-type' => 'preset_section',
+                  'content-id' => 'alternate_text_right',
+                  'title' => 'Image + Text'
+                ),
+                array(
+                  'content-type' => 'preset_section',
+                  'content-id' => 'alternate_text_left',
+                  'title' => 'Text + Image'
+                )
             );
-
-            printf( '<div class="customize-control-title">%1$s</div>', $input_data['title'] );
-            ?>
-              <?php if ( ! empty( $input_data['notice_before'] ) ) : ?>
-                  <span class="czr-notice"><?php echo $input_data['notice_before']; ?></span>
-              <?php endif; ?>
-            <# //console.log('DATA IN SECTION PICKER INPUT'); #>
-            <div class="czr-input">
-              <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-              <div class="sek-content-type-wrapper">
-                <?php
-                  $content_collection = array(
-                      array(
-                        'content-type' => 'preset_section',
-                        'content-id' => 'alternate_text_right',
-                        'title' => 'Image + Text'
-                      ),
-                      array(
-                        'content-type' => 'preset_section',
-                        'content-id' => 'alternate_text_left',
-                        'title' => 'Text + Image'
-                      )
-                  );
-                  foreach( $content_collection as $_params) {
-                      printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s"><p>%3$s</p></div>',
-                          $_params['content-type'],
-                          $_params['content-id'],
-                          $_params['title']
-                      );
-                  }
-                ?>
-              </div>
-            </div><?php // class="czr-input" ?>
-            <?php if ( ! empty( $input_data['notice_after'] ) ) : ?>
-                <span class="czr-notice"><?php echo $input_data['notice_after']; ?></span>
-            <?php endif; ?>
-          </div> <?php //class="$css_attr['sub_set_wrapper']" ?>
-        <?php
-    return ob_get_clean();
+            foreach( $content_collection as $_params) {
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s"><p>%3$s</p></div>',
+                    $_params['content-type'],
+                    $_params['content-id'],
+                    $_params['title']
+                );
+            }
+          ?>
+        </div>
+  <?php
 }
 
-
-
-
-
-
-
+?><?php
 
 /* ------------------------------------------------------------------------- *
  *  SPACING INPUT
 /* ------------------------------------------------------------------------- */
 // SPACING INPUT
 // filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-add_filter( 'czr_set_input_tmpl___spacing', 'sek_set_input_tmpl___spacing', 10, 3 );
-function sek_set_input_tmpl___spacing( $html, $input_id, $input_data ) {
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( 'Spacing input => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
-    if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
-         wp_send_json_error( 'ac_get_input_tmpl => missing input type for input id : ' . $input_id );
-         return;
-    }
-    $input_type = $input_data[ 'input_type' ];
-    $css_attr = $CZR_Fmk_Base_fn() -> czr_css_attr;
+//add_filter( 'czr_set_input_tmpl___spacing', 'sek_set_input_tmpl___spacing', 10, 3 );
+function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
+    ?>
+    <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+    <div class="sek-spacing-wrapper">
+        <div class="Spacing-spacingContainer-12n">
+          <div class="Spacing-spacingRow-K2n Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
+            <div class="SmartTextLabel-main-22n SmartTextLabel-selected-R2n" data-sek-spacing="margin-top">
+              <div class="SmartTextLabel-input-12n TextBox-container-32n">
+                <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+              </div>
+            </div>
+          </div>
+          <div class="Spacing-spacingRow--large-32n Flex-main-32n Flex-row-12n" style="display: flex; justify-content: space-between;">
+            <div class="SmartTextLabel-main-22n Spacing-col-outer-left-32n SmartTextLabel-editable-false-22n" data-sek-spacing="margin-left">
+              <div class="SmartTextLabel-input-12n TextBox-container-32n">
+                <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+              </div>
+            </div>
 
-    ob_start();
-        ?>
-         <?php
-            // <INPUT WRAPPER>
-            printf( '<div class="%1$s %2$s %3$s" data-input-type="%4$s" %5$s>',
-                $css_attr['sub_set_wrapper'],
-                'width-100',//$is_width_100 ? 'width-100' : '',
-                'hidden' === $input_type ? 'hidden' : '',
-                $input_type,
-                ! empty( $input_data['transport'] ) ? 'data-transport="'. $input_data['transport'] .'"' : ''
-            );
+            <div class="Spacing-innerSpacingContainer-22n">
+              <div class="Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
+                <div class="SmartTextLabel-main-22n" data-sek-spacing="padding-top">
+                  <div class="SmartTextLabel-input-12n TextBox-container-32n">
+                    <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+                  </div>
+                </div>
+              </div>
+                <div class="Flex-main-32n Flex-row-12n" style="display: flex; justify-content: space-between;">
+                  <div class="SmartTextLabel-main-22n SmartTextLabel-editable-false-22n" data-sek-spacing="padding-left">
+                    <div class="SmartTextLabel-input-12n TextBox-container-32n">
+                      <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+                    </div>
+                  </div>
+                  <div class="SmartTextLabel-main-22n" data-sek-spacing="padding-right">
+                    <div class="SmartTextLabel-input-12n TextBox-container-32n">
+                      <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+                    </div>
+                  </div>
+                </div>
+              <div class="Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
+                <div class="SmartTextLabel-main-22n" data-sek-spacing="padding-bottom">
+                  <div class="SmartTextLabel-input-12n TextBox-container-32n">
+                    <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                printf( '<div class="customize-control-title width-100">%1$s</div>', $input_data['title'] );
-                ?>
-                  <?php if ( ! empty( $input_data['notice_before'] ) ) : ?>
-                      <span class="czr-notice"><?php echo $input_data['notice_before']; ?></span>
-                  <?php endif; ?>
-                <# //console.log('DATA IN SPACING INPUT'); #>
-
-                <div class="czr-input">
-                  <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-                  <div class="sek-spacing-wrapper">
-                      <div class="Spacing-spacingContainer-12n">
-                        <div class="Spacing-spacingRow-K2n Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
-                          <div class="SmartTextLabel-main-22n SmartTextLabel-selected-R2n" data-sek-spacing="margin-top">
-                            <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                              <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
-                            </div>
-                          </div>
-                        </div>
-                        <div class="Spacing-spacingRow--large-32n Flex-main-32n Flex-row-12n" style="display: flex; justify-content: space-between;">
-                          <div class="SmartTextLabel-main-22n Spacing-col-outer-left-32n SmartTextLabel-editable-false-22n" data-sek-spacing="margin-left">
-                            <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                              <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
-                            </div>
-                          </div>
-
-                          <div class="Spacing-innerSpacingContainer-22n">
-                            <div class="Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
-                              <div class="SmartTextLabel-main-22n" data-sek-spacing="padding-top">
-                                <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                                  <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
-                                </div>
-                              </div>
-                            </div>
-                              <div class="Flex-main-32n Flex-row-12n" style="display: flex; justify-content: space-between;">
-                                <div class="SmartTextLabel-main-22n SmartTextLabel-editable-false-22n" data-sek-spacing="padding-left">
-                                  <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                                    <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
-                                  </div>
-                                </div>
-                                <div class="SmartTextLabel-main-22n" data-sek-spacing="padding-right">
-                                  <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                                    <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
-                                  </div>
-                                </div>
-                              </div>
-                            <div class="Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
-                              <div class="SmartTextLabel-main-22n" data-sek-spacing="padding-bottom">
-                                <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                                  <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="SmartTextLabel-main-22n Spacing-col-outer-right-22n" data-sek-spacing="margin-right">
-                            <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                              <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
-                            </div>
-                          </div>
-                        </div>
-                        <div class="Spacing-spacingRow-K2n Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
-                          <div class="SmartTextLabel-main-22n SmartTextLabel-editable-false-22n" data-sek-spacing="margin-bottom">
-                            <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                              <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
-                            </div>
-                          </div>
-                        </div>
-                      </div><?php //Spacing-spacingContainer-12n ?>
-                      <div class="reset-spacing-wrap"><span class="sek-do-reset"><?php _e('Reset all spacing', 'text_domain_to_be_replaced' ); ?></span></div>
-                  </div><?php // sek-spacing-wrapper ?>
-                </div><?php // class="czr-input" ?>
-
-                <?php if ( ! empty( $input_data['notice_after'] ) ) : ?>
-                    <span class="czr-notice"><?php echo $input_data['notice_after']; ?></span>
-                <?php endif; ?>
-
-          </div> <?php //class="$css_attr['sub_set_wrapper']" ?>
-        <?php
-    return ob_get_clean();
+            <div class="SmartTextLabel-main-22n Spacing-col-outer-right-22n" data-sek-spacing="margin-right">
+              <div class="SmartTextLabel-input-12n TextBox-container-32n">
+                <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+              </div>
+            </div>
+          </div>
+          <div class="Spacing-spacingRow-K2n Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
+            <div class="SmartTextLabel-main-22n SmartTextLabel-editable-false-22n" data-sek-spacing="margin-bottom">
+              <div class="SmartTextLabel-input-12n TextBox-container-32n">
+                <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+              </div>
+            </div>
+          </div>
+        </div><?php //Spacing-spacingContainer-12n ?>
+        <div class="reset-spacing-wrap"><span class="sek-do-reset"><?php _e('Reset all spacing', 'text_domain_to_be_replaced' ); ?></span></div>
+    </div><?php // sek-spacing-wrapper ?>
+    <?php
 }
 
-
-
-
-
-
-
-
+?><?php
 
 /* ------------------------------------------------------------------------- *
  *  BACKGROUND POSITION INPUT
 /* ------------------------------------------------------------------------- */
 // filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-add_filter( 'czr_set_input_tmpl___bg_position', 'sek_set_input_tmpl___bg_position', 10, 3 );
-function sek_set_input_tmpl___bg_position( $html, $input_id, $input_data ) {
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( 'Spacing input => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
-    if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
-         wp_send_json_error( 'ac_get_input_tmpl => missing input type for input id : ' . $input_id );
-         return;
-    }
-    $input_type = $input_data[ 'input_type' ];
-    $css_attr = $CZR_Fmk_Base_fn() -> czr_css_attr;
-
-    ob_start();
-        ?>
-         <?php
-            // <INPUT WRAPPER>
-            printf( '<div class="%1$s %2$s %3$s" data-input-type="%4$s" %5$s>',
-                $css_attr['sub_set_wrapper'],
-                'width-100',//$is_width_100 ? 'width-100' : '',
-                'hidden' === $input_type ? 'hidden' : '',
-                $input_type,
-                ! empty( $input_data['transport'] ) ? 'data-transport="'. $input_data['transport'] .'"' : ''
-            );
-
-                printf( '<div class="customize-control-title">%1$s</div>', $input_data['title'] );
-                ?>
-                  <?php if ( ! empty( $input_data['notice_before'] ) ) : ?>
-                      <span class="czr-notice"><?php echo $input_data['notice_before']; ?></span>
-                  <?php endif; ?>
-                <# //console.log('DATA IN SPACING INPUT'); #>
-
-                <div class="czr-input">
-                  <div class="sek-bg-pos-wrapper">
-                    <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-                    <div class="items">
-                      <label class="item">
-                        <input type="radio" name="rb_0" value="top_left">
-                        <span>
-                          <svg class="symbol symbol-alignTypeTopLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                            <path id="path-1" fill-rule="evenodd" d="M14.96 16v-1h-1v-1h-1v-1h-1v-1h-1v-1.001h-1V14h-1v-4-1h5v1h-3v.938h1v.999h1v1h1v1.001h1v1h1V16h-1z" class="cls-5">
-                            </path>
-                          </svg>
-                        </span>
-                      </label>
-                      <label class="item">
-                        <input type="radio" name="rb_0" value="top">
-                        <span>
-                          <svg class="symbol symbol-alignTypeTop" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                            <path id="path-1" fill-rule="evenodd" d="M14.969 12v-1h-1v-1h-1v7h-1v-7h-1v1h-1v1h-1v-1.062h1V9.937h1v-1h1V8h1v.937h1v1h1v1.001h1V12h-1z" class="cls-5">
-                            </path>
-                          </svg>
-                        </span>
-                      </label>
-                      <label class="item">
-                        <input type="radio" name="rb_0" value="top_right">
-                        <span>
-                          <svg class="symbol symbol-alignTypeTopRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                            <path id="path-1" fill-rule="evenodd" d="M9.969 16v-1h1v-1h1v-1h1v-1h1v-1.001h1V14h1v-4-1h-1-4v1h3v.938h-1v.999h-1v1h-1v1.001h-1v1h-1V16h1z" class="cls-5">
-                            </path>
-                          </svg>
-                        </span>
-                      </label>
-                      <label class="item">
-                        <input type="radio" name="rb_0" value="left">
-                        <span>
-                          <svg class="symbol symbol-alignTypeLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                            <path id="path-1" fill-rule="evenodd" d="M11.469 9.5h-1v1h-1v1h7v1h-7v1h1v1h1v1h-1.063v-1h-1v-1h-1v-1h-.937v-1h.937v-1h1v-1h1v-1h1.063v1z" class="cls-5">
-                            </path>
-                          </svg>
-                        </span>
-                      </label>
-                      <label class="item">
-                        <input type="radio" name="rb_0" value="center">
-                        <span>
-                          <svg class="symbol symbol-alignTypeCenter" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                            <path id="path-1" fill-rule="evenodd" d="M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" class="cls-5">
-                            </path>
-                          </svg>
-                        </span>
-                      </label>
-                      <label class="item">
-                        <input type="radio" name="rb_0" value="right">
-                        <span>
-                          <svg class="symbol symbol-alignTypeRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                            <path id="path-1" fill-rule="evenodd" d="M12.469 14.5h1v-1h1v-1h-7v-1h7v-1h-1v-1h-1v-1h1.062v1h1v1h1v1h.938v1h-.938v1h-1v1h-1v1h-1.062v-1z" class="cls-5">
-                            </path>
-                          </svg>
-                        </span>
-                      </label>
-                      <label class="item">
-                        <input type="radio" name="rb_0" value="bottom_left">
-                        <span>
-                          <svg class="symbol symbol-alignTypeBottomLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                            <path id="path-1" fill-rule="evenodd" d="M14.969 9v1h-1v1h-1v1h-1v1h-1v1.001h-1V11h-1v5h5v-1h-3v-.938h1v-.999h1v-1h1v-1.001h1v-1h1V9h-1z" class="cls-5">
-                            </path>
-                          </svg>
-                        </span>
-                      </label>
-                      <label class="item">
-                        <input type="radio" name="rb_0" value="bottom">
-                        <span>
-                          <svg class="symbol symbol-alignTypeBottom" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                            <path id="path-1" fill-rule="evenodd" d="M9.969 13v1h1v1h1V8h1v7h1v-1h1v-1h1v1.063h-1v.999h-1v1.001h-1V17h-1v-.937h-1v-1.001h-1v-.999h-1V13h1z" class="cls-5">
-                            </path>
-                          </svg>
-                        </span>
-                      </label>
-                      <label class="item">
-                        <input type="radio" name="rb_0" value="bottom_right">
-                        <span>
-                          <svg class="symbol symbol-alignTypeBottomRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                            <path id="path-1" fill-rule="evenodd" d="M9.969 9v1h1v1h1v1h1v1h1v1.001h1V11h1v5h-1-4v-1h3v-.938h-1v-.999h-1v-1h-1v-1.001h-1v-1h-1V9h1z" class="cls-5">
-                            </path>
-                          </svg>
-                        </span>
-                      </label>
-                    </div><?php // .items ?>
-                  </div><?php // control-alignment ?>
-                </div><?php // class="czr-input" ?>
-
-                <?php if ( ! empty( $input_data['notice_after'] ) ) : ?>
-                    <span class="czr-notice"><?php echo $input_data['notice_after']; ?></span>
-                <?php endif; ?>
-
-          </div> <?php //class="$css_attr['sub_set_wrapper']" ?>
-        <?php
-    return ob_get_clean();
+//add_filter( 'czr_set_input_tmpl___bg_position', 'sek_set_input_tmpl___bg_position', 10, 3 );
+function sek_set_input_tmpl___bg_position( $input_id, $input_data ) {
+    ?>
+        <div class="sek-bg-pos-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+          <div class="items">
+            <label class="item">
+              <input type="radio" name="rb_0" value="top_left">
+              <span>
+                <svg class="symbol symbol-alignTypeTopLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                  <path id="path-1" fill-rule="evenodd" d="M14.96 16v-1h-1v-1h-1v-1h-1v-1h-1v-1.001h-1V14h-1v-4-1h5v1h-3v.938h1v.999h1v1h1v1.001h1v1h1V16h-1z" class="cls-5">
+                  </path>
+                </svg>
+              </span>
+            </label>
+            <label class="item">
+              <input type="radio" name="rb_0" value="top">
+              <span>
+                <svg class="symbol symbol-alignTypeTop" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                  <path id="path-1" fill-rule="evenodd" d="M14.969 12v-1h-1v-1h-1v7h-1v-7h-1v1h-1v1h-1v-1.062h1V9.937h1v-1h1V8h1v.937h1v1h1v1.001h1V12h-1z" class="cls-5">
+                  </path>
+                </svg>
+              </span>
+            </label>
+            <label class="item">
+              <input type="radio" name="rb_0" value="top_right">
+              <span>
+                <svg class="symbol symbol-alignTypeTopRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                  <path id="path-1" fill-rule="evenodd" d="M9.969 16v-1h1v-1h1v-1h1v-1h1v-1.001h1V14h1v-4-1h-1-4v1h3v.938h-1v.999h-1v1h-1v1.001h-1v1h-1V16h1z" class="cls-5">
+                  </path>
+                </svg>
+              </span>
+            </label>
+            <label class="item">
+              <input type="radio" name="rb_0" value="left">
+              <span>
+                <svg class="symbol symbol-alignTypeLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                  <path id="path-1" fill-rule="evenodd" d="M11.469 9.5h-1v1h-1v1h7v1h-7v1h1v1h1v1h-1.063v-1h-1v-1h-1v-1h-.937v-1h.937v-1h1v-1h1v-1h1.063v1z" class="cls-5">
+                  </path>
+                </svg>
+              </span>
+            </label>
+            <label class="item">
+              <input type="radio" name="rb_0" value="center">
+              <span>
+                <svg class="symbol symbol-alignTypeCenter" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                  <path id="path-1" fill-rule="evenodd" d="M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" class="cls-5">
+                  </path>
+                </svg>
+              </span>
+            </label>
+            <label class="item">
+              <input type="radio" name="rb_0" value="right">
+              <span>
+                <svg class="symbol symbol-alignTypeRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                  <path id="path-1" fill-rule="evenodd" d="M12.469 14.5h1v-1h1v-1h-7v-1h7v-1h-1v-1h-1v-1h1.062v1h1v1h1v1h.938v1h-.938v1h-1v1h-1v1h-1.062v-1z" class="cls-5">
+                  </path>
+                </svg>
+              </span>
+            </label>
+            <label class="item">
+              <input type="radio" name="rb_0" value="bottom_left">
+              <span>
+                <svg class="symbol symbol-alignTypeBottomLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                  <path id="path-1" fill-rule="evenodd" d="M14.969 9v1h-1v1h-1v1h-1v1h-1v1.001h-1V11h-1v5h5v-1h-3v-.938h1v-.999h1v-1h1v-1.001h1v-1h1V9h-1z" class="cls-5">
+                  </path>
+                </svg>
+              </span>
+            </label>
+            <label class="item">
+              <input type="radio" name="rb_0" value="bottom">
+              <span>
+                <svg class="symbol symbol-alignTypeBottom" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                  <path id="path-1" fill-rule="evenodd" d="M9.969 13v1h1v1h1V8h1v7h1v-1h1v-1h1v1.063h-1v.999h-1v1.001h-1V17h-1v-.937h-1v-1.001h-1v-.999h-1V13h1z" class="cls-5">
+                  </path>
+                </svg>
+              </span>
+            </label>
+            <label class="item">
+              <input type="radio" name="rb_0" value="bottom_right">
+              <span>
+                <svg class="symbol symbol-alignTypeBottomRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                  <path id="path-1" fill-rule="evenodd" d="M9.969 9v1h1v1h1v1h1v1h1v1.001h1V11h1v5h-1-4v-1h3v-.938h-1v-.999h-1v-1h-1v-1.001h-1v-1h-1V9h1z" class="cls-5">
+                  </path>
+                </svg>
+              </span>
+            </label>
+          </div><?php // .items ?>
+        </div><?php // control-alignment ?>
+    <?php
 }
 
-
-
-
-
+?><?php
 
 /* ------------------------------------------------------------------------- *
  *  HORIZONTAL ALIGNMENT INPUT
 /* ------------------------------------------------------------------------- */
+// AND
+/* ------------------------------------------------------------------------- *
+ *  HORIZONTAL ALIGNMENT INPUT FOR TEXT => includes the 'justify' icon
+/* ------------------------------------------------------------------------- */
 // filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-add_filter( 'czr_set_input_tmpl___h_alignment', 'sek_set_input_tmpl___h_alignment', 10, 3 );
-function sek_set_input_tmpl___h_alignment( $html, $input_id, $input_data ) {
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( 'Spacing input => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
-    if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
-         wp_send_json_error( 'ac_get_input_tmpl => missing input type for input id : ' . $input_id );
-         return;
-    }
-    $input_type = $input_data[ 'input_type' ];
-    $css_attr = $CZR_Fmk_Base_fn() -> czr_css_attr;
-
-    ob_start();
-        ?>
-         <?php
-            // <INPUT WRAPPER>
-            printf( '<div class="%1$s %2$s %3$s" data-input-type="%4$s" %5$s>',
-                $css_attr['sub_set_wrapper'],
-                '',//$is_width_100 ? 'width-100' : '',
-                'hidden' === $input_type ? 'hidden' : '',
-                $input_type,
-                ! empty( $input_data['transport'] ) ? 'data-transport="'. $input_data['transport'] .'"' : ''
-            );
-
-                printf( '<div class="customize-control-title">%1$s</div>', $input_data['title'] );
-                ?>
-                  <?php if ( ! empty( $input_data['notice_before'] ) ) : ?>
-                      <span class="czr-notice"><?php echo $input_data['notice_before']; ?></span>
-                  <?php endif; ?>
-
-                <div class="czr-input">
-                  <div class="sek-h-align-wrapper">
-                    <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-                    <div class="sek-align-icons">
-                      <div data-sek-align="left" title="<?php _e('Align left','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_left</i></div>
-                      <div data-sek-align="center" title="<?php _e('Align center','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_center</i></div>
-                      <div data-sek-align="right" title="<?php _e('Align right','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_right</i></div>
-                    </div>
-                  </div><?php // sek-h-align-wrapper ?>
-                </div><?php // class="czr-input" ?>
-
-                <?php if ( ! empty( $input_data['notice_after'] ) ) : ?>
-                    <span class="czr-notice"><?php echo $input_data['notice_after']; ?></span>
-                <?php endif; ?>
-
-          </div> <?php //class="$css_attr['sub_set_wrapper']" ?>
-        <?php
-    return ob_get_clean();
+// add_filter( 'czr_set_input_tmpl___h_alignment', 'sek_set_input_tmpl___h_alignment', 10, 3 );
+// add_filter( 'czr_set_input_tmpl___h_text_alignment', 'sek_set_input_tmpl___h_alignment', 10, 3 );
+function sek_set_input_tmpl___h_alignment( $input_id, $input_data ) {
+    ?>
+        <div class="sek-h-align-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+          <div class="sek-align-icons">
+            <div data-sek-align="left" title="<?php _e('Align left','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_left</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_center</i></div>
+            <div data-sek-align="right" title="<?php _e('Align right','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_right</i></div>
+            <?php if ( 'czr_set_input_tmpl___h_text_alignment' == current_filter() ) : ?>
+              <div data-sek-align="justify" title="<?php _e('Justified','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_justify</i></div>
+            <?php endif; ?>
+          </div>
+        </div><?php // sek-h-align-wrapper ?>
+    <?php
 }
 
-
-
-
-
+?><?php
 /* ------------------------------------------------------------------------- *
  *  VERTICAL ALIGNMENT INPUT
 /* ------------------------------------------------------------------------- */
 // filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-add_filter( 'czr_set_input_tmpl___v_alignment', 'sek_set_input_tmpl___v_alignment', 10, 3 );
-function sek_set_input_tmpl___v_alignment( $html, $input_id, $input_data ) {
+//add_filter( 'czr_set_input_tmpl___v_alignment', 'sek_set_input_tmpl___v_alignment', 10, 3 );
+function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
+    ?>
+        <div class="sek-v-align-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+          <div class="sek-align-icons">
+            <div data-sek-align="top" title="<?php _e('Align top','text_domain_to_be_translated'); ?>"><i class="material-icons">vertical_align_top</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center','text_domain_to_be_translated'); ?>"><i class="material-icons">vertical_align_center</i></div>
+            <div data-sek-align="bottom" title="<?php _e('Align bottom','text_domain_to_be_translated'); ?>"><i class="material-icons">vertical_align_bottom</i></div>
+          </div>
+        </div><?php // sek-h-align-wrapper ?>
+    <?php
+}
+
+?><?php
+/* ------------------------------------------------------------------------- *
+ *  FONT PICKER INPUT
+/* ------------------------------------------------------------------------- */
+// filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
+//add_filter( 'czr_set_input_tmpl___font_picker', 'sek_set_input_tmpl___font_picker', 10, 3 );
+function sek_set_input_tmpl___font_picker( $input_id, $input_data ) {
+    ?>
+        <select data-czrtype="<?php echo $input_id; ?>"></select>
+    <?php
+}
+
+
+// this dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
+// It allows us to populate the server response with the relevant module html template
+// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
+add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", 'sek_get_font_list_tmpl', 10, 3 );
+// hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
+// this dynamic filter is declared on wp_ajax_ac_get_template
+// It allows us to populate the server response with the relevant module html template
+// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
+//
+// For czr_tiny_mce_editor_module, we request the font_list tmpl
+function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
+    error_log( print_r( $posted_params, true ) );
     $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
     //czr_fn\czr_register_dynamic_module
     $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
     if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( 'Spacing input => Namespace problem => ' . $CZR_Fmk_Base_fn );
+        error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
         return;
     }
-    if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
-         wp_send_json_error( 'ac_get_input_tmpl => missing input type for input id : ' . $input_id );
-         return;
-    }
-    $input_type = $input_data[ 'input_type' ];
     $css_attr = $CZR_Fmk_Base_fn() -> czr_css_attr;
 
-    ob_start();
-        ?>
-         <?php
-            // <INPUT WRAPPER>
-            printf( '<div class="%1$s %2$s %3$s" data-input-type="%4$s" %5$s>',
-                $css_attr['sub_set_wrapper'],
-                '',//$is_width_100 ? 'width-100' : '',
-                'hidden' === $input_type ? 'hidden' : '',
-                $input_type,
-                ! empty( $input_data['transport'] ) ? 'data-transport="'. $input_data['transport'] .'"' : ''
-            );
+    if ( empty( $requested_tmpl ) ) {
+        wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
+    }
 
-                printf( '<div class="customize-control-title">%1$s</div>', $input_data['title'] );
-                ?>
-                  <?php if ( ! empty( $input_data['notice_before'] ) ) : ?>
-                      <span class="czr-notice"><?php echo $input_data['notice_before']; ?></span>
-                  <?php endif; ?>
+    // ob_start();
+    /*  ?>
 
-                <div class="czr-input">
-                  <div class="sek-v-align-wrapper">
-                    <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-                    <div class="sek-align-icons">
-                      <div data-sek-align="top" title="<?php _e('Align top','text_domain_to_be_translated'); ?>"><i class="material-icons">vertical_align_top</i></div>
-                      <div data-sek-align="center" title="<?php _e('Align center','text_domain_to_be_translated'); ?>"><i class="material-icons">vertical_align_center</i></div>
-                      <div data-sek-align="bottom" title="<?php _e('Align bottom','text_domain_to_be_translated'); ?>"><i class="material-icons">vertical_align_bottom</i></div>
-                    </div>
-                  </div><?php // sek-h-align-wrapper ?>
-                </div><?php // class="czr-input" ?>
+      <?php*/
+    // $html = ob_get_clean();
+    // if ( empty( $html ) ) {
+    //     wp_send_json_error( 'ac_get_all_modules_tmpl => no template was found for tmpl => ' . $requested_tmpl );
+    // }
 
-                <?php if ( ! empty( $input_data['notice_after'] ) ) : ?>
-                    <span class="czr-notice"><?php echo $input_data['notice_after']; ?></span>
-                <?php endif; ?>
+    return wp_json_encode( array(
+        'cfonts' => sek_get_cfonts(),
+        'gfonts' => sek_get_gfonts(),
+    ) );//will be sent by wp_send_json_success() in ::ac_set_ajax_czr_tmpl()
+}
 
-          </div> <?php //class="$css_attr['sub_set_wrapper']" ?>
-        <?php
-    return ob_get_clean();
+
+function sek_get_cfonts() {
+    $cfonts = array();
+    $raw_cfonts = array(
+        'Arial Black,Arial Black,Gadget,sans-serif',
+        'Century Gothic',
+        'Comic Sans MS,Comic Sans MS,cursive',
+        'Courier New,Courier New,Courier,monospace',
+        'Georgia,Georgia,serif',
+        'Helvetica Neue, Helvetica, Arial, sans-serif',
+        'Impact,Charcoal,sans-serif',
+        'Lucida Console,Monaco,monospace',
+        'Lucida Sans Unicode,Lucida Grande,sans-serif',
+        'Palatino Linotype,Book Antiqua,Palatino,serif',
+        'Tahoma,Geneva,sans-serif',
+        'Times New Roman,Times,serif',
+        'Trebuchet MS,Helvetica,sans-serif',
+        'Verdana,Geneva,sans-serif',
+    );
+    foreach ( $raw_cfonts as $font ) {
+      //no subsets for cfonts => epty array()
+      $cfonts[] = array(
+          'name'    => $font ,
+          'subsets'   => array()
+      );
+    }
+    return apply_filters( 'sek_font_picker_cfonts', $cfonts );
+}
+
+
+//retrieves gfonts:
+// 1) from webfonts.json if needed (transient doesn't exists, or is new version => set in TC_wfc ) and decodes them
+// otherwise
+// 2) from the transiet set if it exists
+//
+// => Until June 2017, the webfonts have been stored in 'tc_gfonts' transient
+// => In June 2017, the Google Fonts have been updated with a new webfonts.json
+// generated from : https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyBID8gp8nBOpWyH5MrsF7doP4fczXGaHdA
+//
+// => The transient name is now : czr_gfonts_june_2017
+function sek_retrieve_decoded_gfonts() {
+    if ( false == get_transient( 'sek_gfonts_may_2018' ) ) {
+        $gfont_raw      = @file_get_contents( NIMBLE_BASE_PATH ."/assets/webfonts.json" );
+
+        if ( $gfont_raw === false ) {
+          $gfont_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/webfonts.json" );
+        }
+
+        $gfonts_decoded   = json_decode( $gfont_raw, true );
+        set_transient( 'sek_gfonts_may_2018' , $gfonts_decoded , 60*60*24*3000 );
+    }
+    else {
+      $gfonts_decoded = get_transient( 'sek_gfonts_may_2018' );
+    }
+
+    return $gfonts_decoded;
+}
+
+
+
+//@return the subsets or the google fonts
+function sek_get_gfonts( $what = null ) {
+  //checks if transient exists or has expired
+
+  $gfonts_decoded = sek_retrieve_decoded_gfonts();
+  $gfonts = array();
+  //$subsets = array();
+
+  // $subsets['all-subsets'] = sprintf( '%1$s ( %2$s %3$s )',
+  //   __( 'All languages' , 'text_domain_to_be_replaced' ),
+  //   count($gfonts_decoded['items']) + count( $this -> get_cfonts() ),
+  //   __('fonts' , 'text_domain_to_be_replaced' )
+  // );
+
+  foreach ( $gfonts_decoded['items'] as $font ) {
+    foreach ( $font['variants'] as $variant ) {
+      $name     = str_replace( ' ', '+', $font['family'] );
+      $gfonts[]   = array(
+        'name'    => $name . ':' .$variant ,
+        'subsets'   => $font['subsets']
+      );
+    }
+    //generates subset list : subset => font number
+    // foreach ( $font['subsets'] as $sub ) {
+    //   $subsets[$sub] = isset($subsets[$sub]) ? $subsets[$sub]+1 : 1;
+    // }
+  }
+
+  //finalizes the subset array
+  // foreach ( $subsets as $subset => $font_number ) {
+  //   if ( 'all-subsets' == $subset )
+  //     continue;
+  //   $subsets[$subset] = sprintf('%1$s ( %2$s %3$s )',
+  //     $subset,
+  //     $font_number,
+  //     __('fonts' , 'text_domain_to_be_replaced' )
+  //   );
+  // }
+
+  return ('subsets' == $what) ? apply_filters( 'sek_font_picker_gfonts_subsets ', $subsets ) : apply_filters( 'sek_font_picker_gfonts', $gfonts )  ;
 }
 
 ?><?php
@@ -3394,7 +3450,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                   'sek-remove-module',
                   'sek-duplicate-module',
                   'sek-refresh-modules-in-column',
-                  'sek-set-module-value',
+                  'sek-refresh-module-markup',
 
                   'sek-refresh-stylesheet',
 
@@ -3560,7 +3616,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                     $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
                 break;
 
-                case 'sek-set-module-value' :
+                case 'sek-refresh-module-markup' :
                     //error_log( print_r( $_POST, true ) );
                     if ( ! array_key_exists( 'id', $_POST ) || empty( $_POST['id'] ) ) {
                         wp_send_json_error(  __FUNCTION__ . ' ' . $sek_action .' => missing module id' );
