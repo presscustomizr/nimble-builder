@@ -575,6 +575,533 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
+            // invoked on api('ready') from self::initialize()
+            // update the main setting OR generate a UI in the panel
+            // AND
+            // always send back a confirmation to the preview, so we can fire the ajax actions
+            // the message sent back is used in particular to
+            // - always pass the skope_id, which otherwise would be impossible to get in ajax
+            // - in a duplication case, to pass the the newly generated id of the cloned level
+            reactToPreviewMsg : function() {
+                  var self = this,
+                      apiParams = {},
+                      uiParams = {},
+                      msgCollection = {
+                            // UPDATE THE MAIN SETTING
+                            'sek-add-section' :{
+                                  callback : function( params ) {
+                                        uiParams = {};
+                                        apiParams = {
+                                              action : 'sek-add-section',
+                                              id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                              location : params.location,
+                                              in_sektion : params.in_sektion,
+                                              in_column : params.in_column,
+                                              is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column )
+                                        };
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        // When a section is created ( not duplicated )
+                                        // Send back a msg to the panel to automatically add an initial column in the created sektion
+                                        api.previewer.trigger( 'sek-add-column', {
+                                              in_sektion : params.apiParams.id,
+                                              autofocus : false//<=We want to focus on the section ui in this case, that's why the autofocus is set to false
+                                        });
+                                        api.previewer.trigger( 'sek-pick-module', {});
+                                        api.previewer.send('sek-focus-on', { id : params.apiParams.id });
+                                  }
+                            },
+                            'sek-add-column' : {
+                                  callback : function( params ) {
+                                        uiParams = {};
+                                        apiParams = {
+                                              id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                              action : 'sek-add-column',
+                                              in_sektion : params.in_sektion,
+                                              autofocus : params.autofocus
+                                        };
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        // When adding a section, a nested column is automatically added
+                                        // We want to focus on the module picker in this case, that's why the autofocus is set to false
+                                        // @see 'sek-add-section' action description
+                                        if ( false !== params.apiParams.autofocus ) {
+                                              api.previewer.trigger( 'sek-pick-module', {});
+                                        }
+                                  }
+                            },
+                            'sek-add-module' : {
+                                  callback :function( params ) {
+                                        uiParams = {};
+                                        apiParams = {
+                                              id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                              action : 'sek-add-module',
+                                              in_sektion : params.in_sektion,
+                                              in_column : params.in_column,
+                                              module_type : params.content_id,
+                                              position : params.position
+                                        };
+                                        return  self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        api.previewer.trigger('sek-edit-module', {
+                                              id : params.apiParams.id,
+                                              level : 'module',
+                                              in_sektion : params.apiParams.in_sektion,
+                                              in_column : params.apiParams.in_column
+                                        });
+                                  }
+                            },
+                            'sek-remove' : {
+                                  callback : function( params ) {
+                                        uiParams = {};
+                                        switch( params.level ) {
+                                              case 'section' :
+                                                  apiParams = {
+                                                        action : 'sek-remove-section',
+                                                        id : params.id,
+                                                        location : params.location,
+                                                        in_sektion : params.in_sektion,
+                                                        in_column : params.in_column,
+                                                        is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column )
+                                                  };
+                                              break;
+                                              case 'column' :
+                                                  apiParams = {
+                                                        action : 'sek-remove-column',
+                                                        id : params.id,
+                                                        in_sektion : params.in_sektion
+                                                  };
+                                              break;
+                                              case 'module' :
+                                                  apiParams = {
+                                                        action : 'sek-remove-module',
+                                                        id : params.id,
+                                                        in_sektion : params.in_sektion,
+                                                        in_column : params.in_column
+                                                  };
+                                              break;
+                                        }
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function() {
+                                        api.previewer.trigger( 'sek-pick-module', {});
+                                  }
+                            },
+
+                            'sek-move' : {
+                                  callback  : function( params ) {
+                                        uiParams = {};
+                                        switch( params.level ) {
+                                              case 'section' :
+                                                    apiParams = {
+                                                          action : 'sek-move-section',
+                                                          id : params.id,
+                                                          is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
+                                                          newOrder : params.newOrder,
+                                                          from_location : params.from_location,
+                                                          to_location : params.to_location
+                                                    };
+                                              break;
+                                              case 'column' :
+                                                    apiParams = {
+                                                          action : 'sek-move-column',
+                                                          id : params.id,
+                                                          newOrder : params.newOrder,
+                                                          from_sektion : params.from_sektion,
+                                                          to_sektion : params.to_sektion,
+                                                    };
+                                              break;
+                                              case 'module' :
+                                                    apiParams = {
+                                                          action : 'sek-move-module',
+                                                          id : params.id,
+                                                          newOrder : params.newOrder,
+                                                          from_column : params.from_column,
+                                                          to_column : params.to_column,
+                                                          from_sektion : params.from_sektion,
+                                                          to_sektion : params.to_sektion,
+                                                    };
+                                              break;
+                                        }
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        switch( params.apiParams.action ) {
+                                              case 'sek-move-section' :
+                                                    api.previewer.trigger('sek-edit-options', {
+                                                          id : params.apiParams.id,
+                                                          level : 'section',
+                                                          in_sektion : params.apiParams.id
+                                                    });
+                                              break;
+                                              case 'sek-move-column' :
+                                                    api.previewer.trigger('sek-edit-options', {
+                                                          id : params.apiParams.id,
+                                                          level : 'column',
+                                                          in_sektion : params.apiParams.in_sektion,
+                                                          in_column : params.apiParams.in_column
+                                                    });
+                                              break;
+                                              case 'sek-refresh-modules-in-column' :
+                                                    api.previewer.trigger('sek-edit-module', {
+                                                          id : params.apiParams.id,
+                                                          level : 'module',
+                                                          in_sektion : params.apiParams.in_sektion,
+                                                          in_column : params.apiParams.in_column
+                                                    });
+                                              break;
+                                        }
+                                  }
+                            },//sek-move
+
+
+
+
+                            // the level will be cloned and walked to replace all ids by new one
+                            // then the level clone id will be send back to the preview for the ajax rendering ( this is done in updateAPISetting() promise() )
+                            'sek-duplicate' : {
+                                  callback : function( params ) {
+                                        uiParams = {};
+                                        switch( params.level ) {
+                                              case 'section' :
+                                                    apiParams = {
+                                                          action : 'sek-duplicate-section',
+                                                          id : params.id,
+                                                          location : params.location,
+                                                          in_sektion : params.in_sektion,
+                                                          in_column : params.in_column,
+                                                          is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column )
+                                                    };
+                                              break;
+                                              case 'column' :
+                                                    apiParams = {
+                                                          action : 'sek-duplicate-column',
+                                                          id : params.id,
+                                                          in_sektion : params.in_sektion,
+                                                          in_column : params.in_column
+                                                    };
+                                              break;
+                                              case 'module' :
+                                                    apiParams = {
+                                                          action : 'sek-duplicate-module',
+                                                          id : params.id,
+                                                          in_sektion : params.in_sektion,
+                                                          in_column : params.in_column
+                                                    };
+                                              break;
+                                        }
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        switch( params.apiParams.action ) {
+                                              case 'sek-duplicate-section' :
+                                                    api.previewer.trigger('sek-edit-options', {
+                                                          id : params.apiParams.id,
+                                                          level : 'section',
+                                                          in_sektion : params.apiParams.id
+                                                    });
+                                              break;
+                                              case 'sek-duplicate-column' :
+                                                    api.previewer.trigger('sek-edit-options', {
+                                                          id : params.apiParams.id,
+                                                          level : 'column',
+                                                          in_sektion : params.apiParams.in_sektion,
+                                                          in_column : params.apiParams.in_column
+                                                    });
+                                              break;
+                                              case 'sek-duplicate-module' :
+                                                    api.previewer.trigger('sek-edit-module', {
+                                                          id : params.apiParams.id,
+                                                          level : 'module',
+                                                          in_sektion : params.apiParams.in_sektion,
+                                                          in_column : params.apiParams.in_column
+                                                    });
+                                              break;
+                                        }
+                                        // Refresh the stylesheet to generate the css rules of the clone
+                                        api.previewer.send( 'sek-refresh-stylesheet', {
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        });
+                                        // Focus on the cloned level
+                                        api.previewer.send('sek-focus-on', { id : params.apiParams.id });
+                                  }
+                            },
+                            'sek-resize-columns' : function( params ) {
+                                  uiParams = {};
+                                  //console.log( 'panel => reactToPreviewMsg => ', params );
+                                  apiParams = params;
+                                  return self.updateAPISetting( apiParams );
+                            },
+
+                            // @params {
+                            //       drop_target_element : $(this),
+                            //       position : _position,
+                            //       before_section : $(this).data('sek-before-section'),
+                            //       after_section : $(this).data('sek-after-section'),
+                            //       content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                            //       content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+                            // }
+                            'sek-add-content-in-new-sektion' : {
+                                  callback : function( params ) {
+                                        uiParams = {};
+                                        apiParams = params;
+                                        apiParams.action = 'sek-add-content-in-new-sektion';
+                                        apiParams.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
+                                        switch( params.content_type) {
+                                              // When a module is dropped in a section + column structure to be generated
+                                              case 'module' :
+                                                    apiParams.droppedModuleId = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
+                                              break;
+
+                                              // When a preset section is dropped
+                                              case 'preset_section' :
+
+                                              break;
+                                        }
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        switch( params.content_type) {
+                                              case 'module' :
+                                                    api.previewer.trigger('sek-edit-module', {
+                                                          level : 'module',
+                                                          id : params.apiParams.droppedModuleId
+                                                    });
+                                              break;
+                                        }
+                                  }
+                            },
+
+                            'sek-set-level-options' : {
+                                  callback : function( params ) {
+                                        uiParams = {};
+                                        apiParams = {
+                                              action : 'sek-set-level-options',
+                                              options_type : params.options_type,//'spacing', 'layout_background_border'
+                                              id : params.id,
+                                              value : params.value,
+                                              in_sektion : params.in_sektion,
+                                              in_column : params.in_column
+                                        };
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {}
+                            },
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            // GENERATE UI ELEMENTS
+                            'sek-pick-module' : function( params ) {
+                                  apiParams = {};
+                                  uiParams = {
+                                        action : 'sek-generate-draggable-candidates-picker-ui',
+                                        content_type : 'module'
+                                  };
+                                  return self.generateUI( uiParams );
+                            },
+                            'sek-pick-section' : function( params ) {
+                                  apiParams = {};
+                                  uiParams = {
+                                        action : 'sek-generate-draggable-candidates-picker-ui',
+                                        content_type : 'section'
+                                  };
+                                  return self.generateUI( uiParams );
+                            },
+                            'sek-edit-options' : function( params ) {
+                                  //console.log('IN EDIT OPTIONS ', params );
+                                  apiParams = {};
+                                  if ( _.isEmpty( params.id ) ) {
+                                        return $.Deferred( function() {
+                                              this.reject( 'missing id' );
+                                        });
+                                  }
+                                  uiParams = {
+                                        action : 'sek-generate-level-options-ui',
+                                        level : params.level,
+                                        id : params.id,
+                                        in_sektion : params.in_sektion,
+                                        in_column : params.in_column,
+                                        options : params.options || []
+                                  };
+                                  return self.generateUI( uiParams );
+                            },
+                            'sek-edit-module' : function( params ) {
+                                  apiParams = {};
+                                  uiParams = {
+                                        action : 'sek-generate-module-ui',
+                                        level : params.level,
+                                        id : params.id,
+                                        in_sektion : params.in_sektion,
+                                        in_column : params.in_column,
+                                        options : params.options || []
+                                  };
+                                  return self.generateUI( uiParams );
+                            },
+
+
+                            // OTHER MESSAGE TYPES
+                            // @params {
+                            //  type : info, error, success
+                            //  message : ''
+                            //  duration : in ms
+                            // }
+                            'sek-notify' : function( params ) {
+                                  return $.Deferred(function() {
+                                        api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
+                                              api.notifications.add( new api.Notification( 'sek-notify', {
+                                                    type: params.type || 'info',
+                                                    message:  params.message,
+                                                    dismissible: true
+                                              } ) );
+
+                                              // Removed if not dismissed after 5 seconds
+                                              _.delay( function() {
+                                                    api.notifications.remove( 'sek-notify' );
+                                              }, params.duration || 5000 );
+                                        });
+                                        this.resolve();
+                                  });
+                            },
+
+                            'sek-refresh-level' : function( params ) {
+                                  return $.Deferred(function() {
+                                        apiParams = {
+                                              action : 'sek-refresh-level',
+                                              level : params.level,
+                                              id : params.id
+                                        };
+                                        uiParams = {};
+                                        this.resolve();
+                                  });
+                            }
+
+
+                      };//msgCollection
+
+                  // Schedule
+                  _.each( msgCollection, function( callbackFn, msgId ) {
+                        api.previewer.bind( msgId, function( params ) {
+                              var _cb_;
+                              if ( _.isFunction( callbackFn ) ) {
+                                    _cb_ = callbackFn;
+                              } else if ( _.isFunction( callbackFn.callback ) ) {
+                                    _cb_ = callbackFn.callback;
+                              } else {
+                                   api.errare( '::reactToPreviewMsg => invalid callback for action ' + msgId );
+                                   return;
+                              }
+
+                              try { _cb_( params )
+                                    // the cloneId is passed when resolving the ::updateAPISetting() promise()
+                                    // they are needed on level duplication to get the newly generated level id.
+                                    .done( function( cloneId ) {
+                                          api.previewer.send(
+                                                msgId,
+                                                {
+                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      apiParams : apiParams,
+                                                      uiParams : uiParams,
+                                                      cloneId : ! _.isEmpty( cloneId ) ? cloneId : false
+                                                }
+                                          );
+                                          // say it
+                                          self.trigger( [ msgId, 'done' ].join('_'), params );
+                                    })
+                                    .fail( function( er ) {
+                                          api.errare( 'reactToPreviewMsg => error when firing ' + msgId, er );
+                                          api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
+                                                api.notifications.add( new api.Notification( 'sek-react-to-preview', {
+                                                      type: 'info',
+                                                      message:  er,
+                                                      dismissible: true
+                                                } ) );
+
+                                                // Removed if not dismissed after 5 seconds
+                                                _.delay( function() {
+                                                      api.notifications.remove( 'sek-react-to-preview' );
+                                                }, 5000 );
+                                          });
+
+                                    }); } catch( _er_ ) {
+                                          api.errare( 'reactToPreviewMsg => error when receiving ' + msgId, _er_ );
+                                    }
+                          });
+                  });
+
+
+                  // Schedule actions when callback done msg is sent by the preview
+                  _.each( msgCollection, function( callbackFn, msgId ) {
+                        api.previewer.bind( [msgId, 'done'].join('_'), function( params ) {
+                              if ( _.isFunction( callbackFn.complete ) ) {
+                                    try { callbackFn.complete( params ); } catch( _er_ ) {
+                                          api.errare( 'reactToPreviewMsg done => error when receiving ' + [msgId, 'done'].join('_') , _er_ );
+                                    }
+                              }
+
+
+                        });
+                  });
+            },//reactToPreview();
+
+            // Fired in initialized on api(ready)
+            schedulePrintSectionJson : function() {
+                  var self = this;
+                  var popupCenter = function ( content ) {
+                        w = 400;
+                        h = 300;
+                        // Fixes dual-screen position                         Most browsers      Firefox
+                        var dualScreenLeft = ! _.isUndefined( window.screenLeft ) ? window.screenLeft : window.screenX;
+                        var dualScreenTop = ! _.isUndefined( window.screenTop ) ? window.screenTop : window.screenY;
+
+                        var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+                        var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+                        var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+                        var top = ((height / 2) - (h / 2)) + dualScreenTop;
+                        var newWindow = window.open("about:blank", null, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+                        var doc = newWindow.document;
+                        doc.open("text/html");
+                        doc.write( content );
+                        doc.close();
+                        // Puts focus on the newWindow
+                        if (window.focus) {
+                            newWindow.focus();
+                        }
+                  };
+                  var cleanIds = function( levelData ) {
+                        levelData.id = "";
+                        _.each( levelData.collection, function( levelData ) {
+                              levelData.id = "";
+                              if ( _.isArray( levelData.collection ) ) {
+                                    cleanIds( levelData );
+                              }
+                        });
+                        return levelData;
+                  };
+
+                  api.previewer.bind( 'sek-to-json', function( params ) {
+                        var sectionModel = $.extend( true, {}, self.getLevelModel( params.id ) );
+                        popupCenter( JSON.stringify( cleanIds( sectionModel ) ) );
+                  });
+            }
+      });//$.extend()
+})( wp.customize, jQuery );//global sektionsLocalizedData
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
             // @params = {
             //    action : 'sek-generate-module-ui' / 'sek-generate-level-options-ui'
             //    level : params.level,
@@ -724,7 +1251,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
                                           api( params.id, function( _setting_ ) {
-                                                _setting_.bind( _.debounce( function( to, from ) {
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      console.log('ARGS ?',_setting_.id, args );
+
                                                       // We don't want to store the default title and id module properties
                                                       var moduleValueCandidate = {};
                                                       _.each( to, function( _val, _property ) {
@@ -740,7 +1269,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             in_sektion : params.in_sektion
                                                       }).done( function() {
                                                             api.previewer.send(
-                                                                  'sek-set-module-value',
+                                                                  'sek-refresh-module-markup',
                                                                   {
                                                                         skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                                         moduleId : params.id,
@@ -1796,723 +2325,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // invoked on api('ready') from self::initialize()
-            // update the main setting OR generate a UI in the panel
-            // AND
-            // always send back a confirmation to the preview, so we can fire the ajax actions
-            // the message sent back is used in particular to
-            // - always pass the skope_id, which otherwise would be impossible to get in ajax
-            // - in a duplication case, to pass the the newly generated id of the cloned level
-            reactToPreviewMsg : function() {
-                  var self = this,
-                      apiParams = {},
-                      uiParams = {},
-                      msgCollection = {
-                            // UPDATE THE MAIN SETTING
-                            'sek-add-section' :{
-                                  callback : function( params ) {
-                                        uiParams = {};
-                                        apiParams = {
-                                              action : 'sek-add-section',
-                                              id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
-                                              location : params.location,
-                                              in_sektion : params.in_sektion,
-                                              in_column : params.in_column,
-                                              is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column )
-                                        };
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {
-                                        // When a section is created ( not duplicated )
-                                        // Send back a msg to the panel to automatically add an initial column in the created sektion
-                                        api.previewer.trigger( 'sek-add-column', {
-                                              in_sektion : params.apiParams.id,
-                                              autofocus : false//<=We want to focus on the section ui in this case, that's why the autofocus is set to false
-                                        });
-                                        api.previewer.trigger( 'sek-pick-module', {});
-                                        api.previewer.send('sek-focus-on', { id : params.apiParams.id });
-                                  }
-                            },
-                            'sek-add-column' : {
-                                  callback : function( params ) {
-                                        uiParams = {};
-                                        apiParams = {
-                                              id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
-                                              action : 'sek-add-column',
-                                              in_sektion : params.in_sektion,
-                                              autofocus : params.autofocus
-                                        };
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {
-                                        // When adding a section, a nested column is automatically added
-                                        // We want to focus on the module picker in this case, that's why the autofocus is set to false
-                                        // @see 'sek-add-section' action description
-                                        if ( false !== params.apiParams.autofocus ) {
-                                              api.previewer.trigger( 'sek-pick-module', {});
-                                        }
-                                  }
-                            },
-                            'sek-add-module' : {
-                                  callback :function( params ) {
-                                        uiParams = {};
-                                        apiParams = {
-                                              id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
-                                              action : 'sek-add-module',
-                                              in_sektion : params.in_sektion,
-                                              in_column : params.in_column,
-                                              module_type : params.content_id,
-                                              position : params.position
-                                        };
-                                        return  self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {
-                                        api.previewer.trigger('sek-edit-module', {
-                                              id : params.apiParams.id,
-                                              level : 'module',
-                                              in_sektion : params.apiParams.in_sektion,
-                                              in_column : params.apiParams.in_column
-                                        });
-                                  }
-                            },
-                            'sek-remove' : {
-                                  callback : function( params ) {
-                                        uiParams = {};
-                                        switch( params.level ) {
-                                              case 'section' :
-                                                  apiParams = {
-                                                        action : 'sek-remove-section',
-                                                        id : params.id,
-                                                        location : params.location,
-                                                        in_sektion : params.in_sektion,
-                                                        in_column : params.in_column,
-                                                        is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column )
-                                                  };
-                                              break;
-                                              case 'column' :
-                                                  apiParams = {
-                                                        action : 'sek-remove-column',
-                                                        id : params.id,
-                                                        in_sektion : params.in_sektion
-                                                  };
-                                              break;
-                                              case 'module' :
-                                                  apiParams = {
-                                                        action : 'sek-remove-module',
-                                                        id : params.id,
-                                                        in_sektion : params.in_sektion,
-                                                        in_column : params.in_column
-                                                  };
-                                              break;
-                                        }
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function() {
-                                        api.previewer.trigger( 'sek-pick-module', {});
-                                  }
-                            },
-
-                            'sek-move' : {
-                                  callback  : function( params ) {
-                                        uiParams = {};
-                                        switch( params.level ) {
-                                              case 'section' :
-                                                    apiParams = {
-                                                          action : 'sek-move-section',
-                                                          id : params.id,
-                                                          is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
-                                                          newOrder : params.newOrder,
-                                                          from_location : params.from_location,
-                                                          to_location : params.to_location
-                                                    };
-                                              break;
-                                              case 'column' :
-                                                    apiParams = {
-                                                          action : 'sek-move-column',
-                                                          id : params.id,
-                                                          newOrder : params.newOrder,
-                                                          from_sektion : params.from_sektion,
-                                                          to_sektion : params.to_sektion,
-                                                    };
-                                              break;
-                                              case 'module' :
-                                                    apiParams = {
-                                                          action : 'sek-move-module',
-                                                          id : params.id,
-                                                          newOrder : params.newOrder,
-                                                          from_column : params.from_column,
-                                                          to_column : params.to_column,
-                                                          from_sektion : params.from_sektion,
-                                                          to_sektion : params.to_sektion,
-                                                    };
-                                              break;
-                                        }
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {
-                                        switch( params.apiParams.action ) {
-                                              case 'sek-move-section' :
-                                                    api.previewer.trigger('sek-edit-options', {
-                                                          id : params.apiParams.id,
-                                                          level : 'section',
-                                                          in_sektion : params.apiParams.id
-                                                    });
-                                              break;
-                                              case 'sek-move-column' :
-                                                    api.previewer.trigger('sek-edit-options', {
-                                                          id : params.apiParams.id,
-                                                          level : 'column',
-                                                          in_sektion : params.apiParams.in_sektion,
-                                                          in_column : params.apiParams.in_column
-                                                    });
-                                              break;
-                                              case 'sek-refresh-modules-in-column' :
-                                                    api.previewer.trigger('sek-edit-module', {
-                                                          id : params.apiParams.id,
-                                                          level : 'module',
-                                                          in_sektion : params.apiParams.in_sektion,
-                                                          in_column : params.apiParams.in_column
-                                                    });
-                                              break;
-                                        }
-                                  }
-                            },//sek-move
-
-
-
-
-                            // the level will be cloned and walked to replace all ids by new one
-                            // then the level clone id will be send back to the preview for the ajax rendering ( this is done in updateAPISetting() promise() )
-                            'sek-duplicate' : {
-                                  callback : function( params ) {
-                                        uiParams = {};
-                                        switch( params.level ) {
-                                              case 'section' :
-                                                    apiParams = {
-                                                          action : 'sek-duplicate-section',
-                                                          id : params.id,
-                                                          location : params.location,
-                                                          in_sektion : params.in_sektion,
-                                                          in_column : params.in_column,
-                                                          is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column )
-                                                    };
-                                              break;
-                                              case 'column' :
-                                                    apiParams = {
-                                                          action : 'sek-duplicate-column',
-                                                          id : params.id,
-                                                          in_sektion : params.in_sektion,
-                                                          in_column : params.in_column
-                                                    };
-                                              break;
-                                              case 'module' :
-                                                    apiParams = {
-                                                          action : 'sek-duplicate-module',
-                                                          id : params.id,
-                                                          in_sektion : params.in_sektion,
-                                                          in_column : params.in_column
-                                                    };
-                                              break;
-                                        }
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {
-                                        switch( params.apiParams.action ) {
-                                              case 'sek-duplicate-section' :
-                                                    api.previewer.trigger('sek-edit-options', {
-                                                          id : params.apiParams.id,
-                                                          level : 'section',
-                                                          in_sektion : params.apiParams.id
-                                                    });
-                                              break;
-                                              case 'sek-duplicate-column' :
-                                                    api.previewer.trigger('sek-edit-options', {
-                                                          id : params.apiParams.id,
-                                                          level : 'column',
-                                                          in_sektion : params.apiParams.in_sektion,
-                                                          in_column : params.apiParams.in_column
-                                                    });
-                                              break;
-                                              case 'sek-duplicate-module' :
-                                                    api.previewer.trigger('sek-edit-module', {
-                                                          id : params.apiParams.id,
-                                                          level : 'module',
-                                                          in_sektion : params.apiParams.in_sektion,
-                                                          in_column : params.apiParams.in_column
-                                                    });
-                                              break;
-                                        }
-                                        // Refresh the stylesheet to generate the css rules of the clone
-                                        api.previewer.send( 'sek-refresh-stylesheet', {
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                        });
-                                        // Focus on the cloned level
-                                        api.previewer.send('sek-focus-on', { id : params.apiParams.id });
-                                  }
-                            },
-                            'sek-resize-columns' : function( params ) {
-                                  uiParams = {};
-                                  //console.log( 'panel => reactToPreviewMsg => ', params );
-                                  apiParams = params;
-                                  return self.updateAPISetting( apiParams );
-                            },
-
-                            // @params {
-                            //       drop_target_element : $(this),
-                            //       position : _position,
-                            //       before_section : $(this).data('sek-before-section'),
-                            //       after_section : $(this).data('sek-after-section'),
-                            //       content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                            //       content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                            // }
-                            'sek-add-content-in-new-sektion' : {
-                                  callback : function( params ) {
-                                        uiParams = {};
-                                        apiParams = params;
-                                        apiParams.action = 'sek-add-content-in-new-sektion';
-                                        apiParams.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
-                                        switch( params.content_type) {
-                                              // When a module is dropped in a section + column structure to be generated
-                                              case 'module' :
-                                                    apiParams.droppedModuleId = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
-                                              break;
-
-                                              // When a preset section is dropped
-                                              case 'preset_section' :
-
-                                              break;
-                                        }
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {
-                                        switch( params.content_type) {
-                                              case 'module' :
-                                                    api.previewer.trigger('sek-edit-module', {
-                                                          level : 'module',
-                                                          id : params.apiParams.droppedModuleId
-                                                    });
-                                              break;
-                                        }
-                                  }
-                            },
-
-                            'sek-set-level-options' : {
-                                  callback : function( params ) {
-                                        uiParams = {};
-                                        apiParams = {
-                                              action : 'sek-set-level-options',
-                                              options_type : params.options_type,//'spacing', 'layout_background_border'
-                                              id : params.id,
-                                              value : params.value,
-                                              in_sektion : params.in_sektion,
-                                              in_column : params.in_column
-                                        };
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {}
-                            },
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            // GENERATE UI ELEMENTS
-                            'sek-pick-module' : function( params ) {
-                                  apiParams = {};
-                                  uiParams = {
-                                        action : 'sek-generate-draggable-candidates-picker-ui',
-                                        content_type : 'module'
-                                  };
-                                  return self.generateUI( uiParams );
-                            },
-                            'sek-pick-section' : function( params ) {
-                                  apiParams = {};
-                                  uiParams = {
-                                        action : 'sek-generate-draggable-candidates-picker-ui',
-                                        content_type : 'section'
-                                  };
-                                  return self.generateUI( uiParams );
-                            },
-                            'sek-edit-options' : function( params ) {
-                                  //console.log('IN EDIT OPTIONS ', params );
-                                  apiParams = {};
-                                  if ( _.isEmpty( params.id ) ) {
-                                        return $.Deferred( function() {
-                                              this.reject( 'missing id' );
-                                        });
-                                  }
-                                  uiParams = {
-                                        action : 'sek-generate-level-options-ui',
-                                        level : params.level,
-                                        id : params.id,
-                                        in_sektion : params.in_sektion,
-                                        in_column : params.in_column,
-                                        options : params.options || []
-                                  };
-                                  return self.generateUI( uiParams );
-                            },
-                            'sek-edit-module' : function( params ) {
-                                  apiParams = {};
-                                  uiParams = {
-                                        action : 'sek-generate-module-ui',
-                                        level : params.level,
-                                        id : params.id,
-                                        in_sektion : params.in_sektion,
-                                        in_column : params.in_column,
-                                        options : params.options || []
-                                  };
-                                  return self.generateUI( uiParams );
-                            },
-
-
-                            // OTHER MESSAGE TYPES
-                            // @params {
-                            //  type : info, error, success
-                            //  message : ''
-                            //  duration : in ms
-                            // }
-                            'sek-notify' : function( params ) {
-                                  return $.Deferred(function() {
-                                        api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
-                                              api.notifications.add( new api.Notification( 'sek-notify', {
-                                                    type: params.type || 'info',
-                                                    message:  params.message,
-                                                    dismissible: true
-                                              } ) );
-
-                                              // Removed if not dismissed after 5 seconds
-                                              _.delay( function() {
-                                                    api.notifications.remove( 'sek-notify' );
-                                              }, params.duration || 5000 );
-                                        });
-                                        this.resolve();
-                                  });
-                            },
-
-                            'sek-refresh-level' : function( params ) {
-                                  return $.Deferred(function() {
-                                        apiParams = {
-                                              action : 'sek-refresh-level',
-                                              level : params.level,
-                                              id : params.id
-                                        };
-                                        uiParams = {};
-                                        this.resolve();
-                                  });
-                            }
-
-
-                      };//msgCollection
-
-                  // Schedule
-                  _.each( msgCollection, function( callbackFn, msgId ) {
-                        api.previewer.bind( msgId, function( params ) {
-                              var _cb_;
-                              if ( _.isFunction( callbackFn ) ) {
-                                    _cb_ = callbackFn;
-                              } else if ( _.isFunction( callbackFn.callback ) ) {
-                                    _cb_ = callbackFn.callback;
-                              } else {
-                                   api.errare( '::reactToPreviewMsg => invalid callback for action ' + msgId );
-                                   return;
-                              }
-
-                              try { _cb_( params )
-                                    // the cloneId is passed when resolving the ::updateAPISetting() promise()
-                                    // they are needed on level duplication to get the newly generated level id.
-                                    .done( function( cloneId ) {
-                                          api.previewer.send(
-                                                msgId,
-                                                {
-                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                                      apiParams : apiParams,
-                                                      uiParams : uiParams,
-                                                      cloneId : ! _.isEmpty( cloneId ) ? cloneId : false
-                                                }
-                                          );
-                                          // say it
-                                          self.trigger( [ msgId, 'done' ].join('_'), params );
-                                    })
-                                    .fail( function( er ) {
-                                          api.errare( 'reactToPreviewMsg => error when firing ' + msgId, er );
-                                          api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
-                                                api.notifications.add( new api.Notification( 'sek-react-to-preview', {
-                                                      type: 'info',
-                                                      message:  er,
-                                                      dismissible: true
-                                                } ) );
-
-                                                // Removed if not dismissed after 5 seconds
-                                                _.delay( function() {
-                                                      api.notifications.remove( 'sek-react-to-preview' );
-                                                }, 5000 );
-                                          });
-
-                                    }); } catch( _er_ ) {
-                                          api.errare( 'reactToPreviewMsg => error when receiving ' + msgId, _er_ );
-                                    }
-                          });
-                  });
-
-
-                  // Schedule actions when callback done msg is sent by the preview
-                  _.each( msgCollection, function( callbackFn, msgId ) {
-                        api.previewer.bind( [msgId, 'done'].join('_'), function( params ) {
-                              if ( _.isFunction( callbackFn.complete ) ) {
-                                    try { callbackFn.complete( params ); } catch( _er_ ) {
-                                          api.errare( 'reactToPreviewMsg done => error when receiving ' + [msgId, 'done'].join('_') , _er_ );
-                                    }
-                              }
-
-
-                        });
-                  });
-            },//reactToPreview();
-
-            // Fired in initialized on api(ready)
-            schedulePrintSectionJson : function() {
-                  var self = this;
-                  var popupCenter = function ( content ) {
-                        w = 400;
-                        h = 300;
-                        // Fixes dual-screen position                         Most browsers      Firefox
-                        var dualScreenLeft = ! _.isUndefined( window.screenLeft ) ? window.screenLeft : window.screenX;
-                        var dualScreenTop = ! _.isUndefined( window.screenTop ) ? window.screenTop : window.screenY;
-
-                        var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-                        var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
-
-                        var left = ((width / 2) - (w / 2)) + dualScreenLeft;
-                        var top = ((height / 2) - (h / 2)) + dualScreenTop;
-                        var newWindow = window.open("about:blank", null, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-                        var doc = newWindow.document;
-                        doc.open("text/html");
-                        doc.write( content );
-                        doc.close();
-                        // Puts focus on the newWindow
-                        if (window.focus) {
-                            newWindow.focus();
-                        }
-                  };
-                  var cleanIds = function( levelData ) {
-                        levelData.id = "";
-                        _.each( levelData.collection, function( levelData ) {
-                              levelData.id = "";
-                              if ( _.isArray( levelData.collection ) ) {
-                                    cleanIds( levelData );
-                              }
-                        });
-                        return levelData;
-                  };
-
-                  api.previewer.bind( 'sek-to-json', function( params ) {
-                        var sectionModel = $.extend( true, {}, self.getLevelModel( params.id ) );
-                        popupCenter( JSON.stringify( cleanIds( sectionModel ) ) );
-                  });
-            }
-      });//$.extend()
-})( wp.customize, jQuery );//global sektionsLocalizedData
-var CZRSeksPrototype = CZRSeksPrototype || {};
-(function ( api, $ ) {
-      $.extend( CZRSeksPrototype, {
-            // fired in ::initialize, on 'sek-refresh-sekdrop' AND on previewer('ready') each time the previewer is refreshed
-            // 'sek-refresh-sekdrop' is emitted by the section and the module picker modules with param { type : 'section_picker' || 'module_picker'}
-            // @param type 'section_picker' || 'module_picker'
-            // @param $el = $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
-            setupSekDrop : function( type, $el ) {
-                  if ( $el.length < 1 ) {
-                        throw new Error( 'setupSekDrop => invalid Dom element');
-                  }
-
-                  // this is the jQuery element instance on which sekDrop shall be fired
-                  var instantiateSekDrop = function() {
-                        if ( $(this).length < 1 ) {
-                              throw new Error( 'instantiateSekDrop => invalid Dom element');
-                        }
-                        //console.log('instantiateSekDrop', type, $el );
-                        var baseOptions = {
-                              axis: [ 'vertical' ],
-                              isDroppingAllowed: function() { return true; }, //self.isDroppingAllowed.bind( self ),
-                              placeholderClass: 'sortable-placeholder',
-                              onDragEnter : function( side, event) {
-                                 // console.log('On drag enter', event, side , $(event.currentTarget));
-                                  //$(event.currentTarget).closest('div[data-sek-level="section"]').trigger('mouseenter');
-                                  //console.log('closest column id ?', $(event.currentTarget).closest('div[data-sek-level="column"]').data('sek-id') );
-                              },
-                              // onDragLeave : function( event, ui) {
-                              //     console.log('On drag enter', event, ui );
-                              //     $(event.currentTarget).find('[data-sek-action="pick-module"]').show();
-                              // },
-                              //onDragOver : function( side, event) {},
-                              onDropping: function( side, event ) {
-                                    event.stopPropagation();
-                                    var _position = 'bottom' === side ? $(this).index() + 1 : $(this).index();
-                                    //console.log('ON DROPPING', event.originalEvent.dataTransfer.getData( "module-params" ), $(self) );
-
-                                    // console.log('onDropping params', side, event );
-                                    // console.log('onDropping element => ', $(self) );
-                                    api.czr_sektions.trigger( 'sek-content-dropped', {
-                                          drop_target_element : $(this),
-                                          location : $(this).closest('[data-sek-level="location"]').data('sek-id'),
-                                          position : _position,
-                                          before_section : $(this).data('sek-before-section'),
-                                          after_section : $(this).data('sek-after-section'),
-                                          content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                                          content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                                    });
-                              }
-                        };
-
-                        var options = {};
-                        switch ( type ) {
-                              case 'module_picker' :
-                                    options = {
-                                          items: [
-                                                '.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                                                '.sek-module',// the drop zone when there is at least one module
-                                                '.sek-column > .sek-module-wrapper sek-section',// the drop zone when there is at least one nested section
-                                                '.sek-content-drop-zone'//between sections
-                                          ].join(','),
-                                          placeholderContent : function( evt ) {
-                                                var $target = $( evt.currentTarget ),
-                                                    html = '@missi18n Insert Here';
-
-                                                if ( $target.length > 0 ) {
-                                                    if ( 'between-sections' == $target.data('sek-location') ) {
-                                                          html = '@missi18n Insert in a new section';
-                                                    }
-                                                }
-                                                return '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
-                                          },
-
-                                    };
-                              break;
-
-                              case 'section_picker' :
-                                    options = {
-                                          items: [
-                                                '.sek-content-drop-zone'//between sections
-                                          ].join(','),
-                                          placeholderContent : function( evt ) {
-                                                $target = $( evt.currentTarget );
-                                                var html = '@missi18n Insert a new section here';
-                                                return '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
-                                          },
-                                    };
-                              break;
-
-                              default :
-                                    api.errare( '::setupSekDrop => missing picker type' );
-                              break;
-                        }
-
-                        var _opts_ = $.extend( true, {}, baseOptions );
-                        options = _.extend( _opts_, options );
-                        $(this).sekDrop( options ).attr('data-sek-droppable-type', type );
-                  };//instantiateSekDrop()
-
-                  //console.log("$( api.previewer.targetWindow().document ).find( '.sektion-wrapper')", $( api.previewer.targetWindow().document ).find( '.sektion-wrapper') );
-
-                  if ( ! _.isUndefined( $el.data('sekDrop') ) ) {
-                        $el.sekDrop( 'destroy' );
-                  }
-
-                  try {
-                        instantiateSekDrop.call( $el );
-                  } catch( er ) {
-                        api.errare( '::setupSekDrop => Error when firing instantiateSekDrop', er );
-                  }
-            },//setupSekDrop()
-
-
-            // invoked on api('ready') from self::initialize()
-            reactToDrop : function() {
-                  var self = this;
-                  // @param {
-                  //    drop_target_element : $(el) in which the content has been dropped
-                  //    position : 'bottom' or 'top' compared to the drop-zone
-                  //    content_type : single module, empty layout, preset module template
-                  // }
-                  var _do_ = function( params ) {
-                        if ( ! _.isObject( params ) ) {
-                              throw new Error( 'Invalid params provided' );
-                        }
-                        if ( params.drop_target_element.length < 1 ) {
-                              throw new Error( 'Invalid drop_target_element' );
-                        }
-
-                        var dropCase = 'content-in-column';
-                        if ( 'between-sections' === params.drop_target_element.data('sek-location') ) {
-                              dropCase = 'content-in-new-section';
-                        }
-                        if ( 'between-columns' === params.drop_target_element.data('sek-location') ) {
-                              dropCase = 'content-in-new-column';
-                        }
-                        var focusOnAddedContentEditor;
-                        switch( dropCase ) {
-                              case 'content-in-column' :
-                                    //console.log('PPPPPPPPoooorrams', params );
-                                    var $closestLevelWrapper = params.drop_target_element.closest('div[data-sek-level]');
-                                    if ( 1 > $closestLevelWrapper.length ) {
-                                        throw new Error( 'No valid level dom element found' );
-                                    }
-                                    var _level = $closestLevelWrapper.data( 'sek-level' ),
-                                        _id = $closestLevelWrapper.data('sek-id');
-
-                                    if ( _.isEmpty( _level ) || _.isEmpty( _id ) ) {
-                                        throw new Error( 'No valid level id found' );
-                                    }
-
-                                    api.previewer.trigger( 'sek-add-module', {
-                                          level : _level,
-                                          id : _id,
-                                          in_column : params.drop_target_element.closest('div[data-sek-level="column"]').data( 'sek-id'),
-                                          in_sektion : params.drop_target_element.closest('div[data-sek-level="section"]').data( 'sek-id'),
-                                          position : params.position,
-                                          content_type : params.content_type,
-                                          content_id : params.content_id
-                                    });
-                              break;
-
-                              case 'content-in-new-section' :
-                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
-                              break;
-
-                              case 'content-in-new-column' :
-
-                              break;
-                        }
-                  };
-
-                  // @see module picker or section picker modules
-                  // api.czr_sektions.trigger( 'sek-content-dropped', {
-                  //       drop_target_element : $(this),
-                  //       position : _position,
-                  //       before_section : $(this).data('sek-before-section'),
-                  //       after_section : $(this).data('sek-after-section'),
-                  //       content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                  //       content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                  // });
-                  this.bind( 'sek-content-dropped', function( params ) {
-                        //console.log('sek-content-dropped', params );
-                        try { _do_( params ); } catch( er ) {
-                              api.errare( 'error when reactToDrop', er );
-                        }
-                  });
-            }//reactToDrop
-      });//$.extend()
-})( wp.customize, jQuery );//global sektionsLocalizedData
-var CZRSeksPrototype = CZRSeksPrototype || {};
-(function ( api, $ ) {
-      $.extend( CZRSeksPrototype, {
             register : function( params ) {
                   if ( ! _.has( params, 'id' ) ){
                         api.errare( 'register => missing id ', params );
@@ -2866,6 +2678,485 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
+            // fired in ::initialize, on 'sek-refresh-sekdrop' AND on previewer('ready') each time the previewer is refreshed
+            // 'sek-refresh-sekdrop' is emitted by the section and the module picker modules with param { type : 'section_picker' || 'module_picker'}
+            // @param type 'section_picker' || 'module_picker'
+            // @param $el = $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
+            setupSekDrop : function( type, $el ) {
+                  if ( $el.length < 1 ) {
+                        throw new Error( 'setupSekDrop => invalid Dom element');
+                  }
+
+                  // this is the jQuery element instance on which sekDrop shall be fired
+                  var instantiateSekDrop = function() {
+                        if ( $(this).length < 1 ) {
+                              throw new Error( 'instantiateSekDrop => invalid Dom element');
+                        }
+                        //console.log('instantiateSekDrop', type, $el );
+                        var baseOptions = {
+                              axis: [ 'vertical' ],
+                              isDroppingAllowed: function() { return true; }, //self.isDroppingAllowed.bind( self ),
+                              placeholderClass: 'sortable-placeholder',
+                              onDragEnter : function( side, event) {
+                                 // console.log('On drag enter', event, side , $(event.currentTarget));
+                                  //$(event.currentTarget).closest('div[data-sek-level="section"]').trigger('mouseenter');
+                                  //console.log('closest column id ?', $(event.currentTarget).closest('div[data-sek-level="column"]').data('sek-id') );
+                              },
+                              // onDragLeave : function( event, ui) {
+                              //     console.log('On drag enter', event, ui );
+                              //     $(event.currentTarget).find('[data-sek-action="pick-module"]').show();
+                              // },
+                              //onDragOver : function( side, event) {},
+                              onDropping: function( side, event ) {
+                                    event.stopPropagation();
+                                    var _position = 'bottom' === side ? $(this).index() + 1 : $(this).index();
+                                    //console.log('ON DROPPING', event.originalEvent.dataTransfer.getData( "module-params" ), $(self) );
+
+                                    // console.log('onDropping params', side, event );
+                                    // console.log('onDropping element => ', $(self) );
+                                    api.czr_sektions.trigger( 'sek-content-dropped', {
+                                          drop_target_element : $(this),
+                                          location : $(this).closest('[data-sek-level="location"]').data('sek-id'),
+                                          position : _position,
+                                          before_section : $(this).data('sek-before-section'),
+                                          after_section : $(this).data('sek-after-section'),
+                                          content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                                          content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+                                    });
+                              }
+                        };
+
+                        var options = {};
+                        switch ( type ) {
+                              case 'module_picker' :
+                                    options = {
+                                          items: [
+                                                '.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
+                                                '.sek-module',// the drop zone when there is at least one module
+                                                '.sek-column > .sek-module-wrapper sek-section',// the drop zone when there is at least one nested section
+                                                '.sek-content-drop-zone'//between sections
+                                          ].join(','),
+                                          placeholderContent : function( evt ) {
+                                                var $target = $( evt.currentTarget ),
+                                                    html = '@missi18n Insert Here';
+
+                                                if ( $target.length > 0 ) {
+                                                    if ( 'between-sections' == $target.data('sek-location') ) {
+                                                          html = '@missi18n Insert in a new section';
+                                                    }
+                                                }
+                                                return '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
+                                          },
+
+                                    };
+                              break;
+
+                              case 'section_picker' :
+                                    options = {
+                                          items: [
+                                                '.sek-content-drop-zone'//between sections
+                                          ].join(','),
+                                          placeholderContent : function( evt ) {
+                                                $target = $( evt.currentTarget );
+                                                var html = '@missi18n Insert a new section here';
+                                                return '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
+                                          },
+                                    };
+                              break;
+
+                              default :
+                                    api.errare( '::setupSekDrop => missing picker type' );
+                              break;
+                        }
+
+                        var _opts_ = $.extend( true, {}, baseOptions );
+                        options = _.extend( _opts_, options );
+                        $(this).sekDrop( options ).attr('data-sek-droppable-type', type );
+                  };//instantiateSekDrop()
+
+                  //console.log("$( api.previewer.targetWindow().document ).find( '.sektion-wrapper')", $( api.previewer.targetWindow().document ).find( '.sektion-wrapper') );
+
+                  if ( ! _.isUndefined( $el.data('sekDrop') ) ) {
+                        $el.sekDrop( 'destroy' );
+                  }
+
+                  try {
+                        instantiateSekDrop.call( $el );
+                  } catch( er ) {
+                        api.errare( '::setupSekDrop => Error when firing instantiateSekDrop', er );
+                  }
+            },//setupSekDrop()
+
+
+            // invoked on api('ready') from self::initialize()
+            reactToDrop : function() {
+                  var self = this;
+                  // @param {
+                  //    drop_target_element : $(el) in which the content has been dropped
+                  //    position : 'bottom' or 'top' compared to the drop-zone
+                  //    content_type : single module, empty layout, preset module template
+                  // }
+                  var _do_ = function( params ) {
+                        if ( ! _.isObject( params ) ) {
+                              throw new Error( 'Invalid params provided' );
+                        }
+                        if ( params.drop_target_element.length < 1 ) {
+                              throw new Error( 'Invalid drop_target_element' );
+                        }
+
+                        var dropCase = 'content-in-column';
+                        if ( 'between-sections' === params.drop_target_element.data('sek-location') ) {
+                              dropCase = 'content-in-new-section';
+                        }
+                        if ( 'between-columns' === params.drop_target_element.data('sek-location') ) {
+                              dropCase = 'content-in-new-column';
+                        }
+                        var focusOnAddedContentEditor;
+                        switch( dropCase ) {
+                              case 'content-in-column' :
+                                    //console.log('PPPPPPPPoooorrams', params );
+                                    var $closestLevelWrapper = params.drop_target_element.closest('div[data-sek-level]');
+                                    if ( 1 > $closestLevelWrapper.length ) {
+                                        throw new Error( 'No valid level dom element found' );
+                                    }
+                                    var _level = $closestLevelWrapper.data( 'sek-level' ),
+                                        _id = $closestLevelWrapper.data('sek-id');
+
+                                    if ( _.isEmpty( _level ) || _.isEmpty( _id ) ) {
+                                        throw new Error( 'No valid level id found' );
+                                    }
+
+                                    api.previewer.trigger( 'sek-add-module', {
+                                          level : _level,
+                                          id : _id,
+                                          in_column : params.drop_target_element.closest('div[data-sek-level="column"]').data( 'sek-id'),
+                                          in_sektion : params.drop_target_element.closest('div[data-sek-level="section"]').data( 'sek-id'),
+                                          position : params.position,
+                                          content_type : params.content_type,
+                                          content_id : params.content_id
+                                    });
+                              break;
+
+                              case 'content-in-new-section' :
+                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
+                              break;
+
+                              case 'content-in-new-column' :
+
+                              break;
+                        }
+                  };
+
+                  // @see module picker or section picker modules
+                  // api.czr_sektions.trigger( 'sek-content-dropped', {
+                  //       drop_target_element : $(this),
+                  //       position : _position,
+                  //       before_section : $(this).data('sek-before-section'),
+                  //       after_section : $(this).data('sek-after-section'),
+                  //       content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                  //       content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+                  // });
+                  this.bind( 'sek-content-dropped', function( params ) {
+                        //console.log('sek-content-dropped', params );
+                        try { _do_( params ); } catch( er ) {
+                              api.errare( 'error when reactToDrop', er );
+                        }
+                  });
+            }//reactToDrop
+      });//$.extend()
+})( wp.customize, jQuery );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            spacing : function( input_options ) {
+                  var input = this,
+                      $wrapper = $('.sek-spacing-wrapper', input.container );
+
+                  // Listen to user actions on the inputs and set the input value
+                  $wrapper.on( 'change', 'input[type="number"]', function(evt) {
+                        var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
+                            _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                        _newInputVal[ _type_ ] = $(this).val();
+                        input( _newInputVal );
+                  });
+                  $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
+                        evt.preventDefault();
+                        $wrapper.find('input[type="number"]').each( function() {
+                              $(this).val(0);
+                        });
+                  });
+
+                  // Synchronize on init
+                  if ( _.isObject( input() ) ) {
+                        _.each( input(), function( _val_, _key_ ) {
+                              $( '[data-sek-spacing="' + _key_ +'"]', $wrapper ).find( 'input[type="number"]' ).val( _val_ );
+                        });
+                  }
+            },
+            bg_position : function( input_options ) {
+                  var input = this;
+                  // Listen to user actions on the inputs and set the input value
+                  $('.sek-bg-pos-wrapper', input.container ).on( 'change', 'input[type="radio"]', function(evt) {
+                        input( $(this).val() );
+                  });
+
+                  // Synchronize on init
+                  if ( ! _.isEmpty( input() ) ) {
+                        input.container.find('input[value="'+ input() +'"]').attr('checked', true).trigger('click');
+                  }
+            },
+            v_alignment : function( input_options ) {
+                  var input = this,
+                      $wrapper = $('.sek-v-align-wrapper', input.container );
+                  // on init
+                  $wrapper.find( 'div[data-sek-align="' + input() +'"]' ).addClass('selected');
+
+                  // on click
+                  $wrapper.on( 'click', '[data-sek-align]', function(evt) {
+                        evt.preventDefault();
+                        $wrapper.find('.selected').removeClass('selected');
+                        $.when( $(this).addClass('selected') ).done( function() {
+                              input( $(this).data('sek-align') );
+                        });
+                  });
+            },
+
+            // FONT PICKER
+            font_picker : function( input_options ) {
+                  var input = this,
+                      item = input.input_parent;
+
+                  var _getFontCollections = function() {
+                        var dfd = $.Deferred();
+                        if ( ! _.isEmpty( input.sek_fontCollections ) ) {
+                              dfd.resolve( input.sek_fontCollections );
+                        } else {
+                              // This utility handles a cached version of the font_list once fetched the first time
+                              // @see api.CZR_Helpers.czr_cachedTmpl
+                              api.CZR_Helpers.getModuleTmpl( {
+                                    tmpl : 'font_list',
+                                    module_type: 'font_picker_input',
+                                    module_id : input.module.id
+                              } ).done( function( _serverTmpl_ ) {
+                                    // Ensure we have a string that's JSON.parse-able
+                                    if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '{' ) {
+                                          throw new Error( 'font_picker => server list is not JSON.parse-able');
+                                    }
+                                    input.sek_fontCollections = JSON.parse( _serverTmpl_ );
+                                    dfd.resolve( input.sek_fontCollections );
+                              }).fail( function( _r_ ) {
+                                    dfd.reject( _r_ );
+                              });
+                        }
+                        return dfd.promise();
+                  };
+                  var _preprocessSelect2ForFontFamily = function() {
+                        /*
+                        * Override select2 Results Adapter in order to select on highlight
+                        * deferred needed cause the selects needs to be instantiated when this override is complete
+                        * selec2.amd.require is asynchronous
+                        */
+                        var selectFocusResults = $.Deferred();
+                        if ( 'undefined' !== typeof $.fn.select2 && 'undefined' !== typeof $.fn.select2.amd && 'function' === typeof $.fn.select2.amd.require ) {
+                              $.fn.select2.amd.require(['select2/results', 'select2/utils'], function (Result, Utils) {
+                                    var ResultsAdapter = function($element, options, dataAdapter) {
+                                      ResultsAdapter.__super__.constructor.call(this, $element, options, dataAdapter);
+                                    };
+                                    Utils.Extend(ResultsAdapter, Result);
+                                    ResultsAdapter.prototype.bind = function (container, $container) {
+                                      var _self = this;
+                                      container.on('results:focus', function (params) {
+                                        if ( params.element.attr('aria-selected') != 'true') {
+                                          _self.trigger('select', {
+                                              data: params.data
+                                          });
+                                        }
+                                      });
+                                      ResultsAdapter.__super__.bind.call(this, container, $container);
+                                    };
+                                    selectFocusResults.resolve( ResultsAdapter );
+                              });
+                        }
+                        else {
+                              selectFocusResults.resolve( false );
+                        }
+
+                        return selectFocusResults.promise();
+
+                  };//_preprocessSelect2ForFontFamily
+
+                  // @return void();
+                  // Instantiates a select2 select input
+                  // http://ivaynberg.github.io/select2/#documentation
+                  var _setupSelectForFontFamilySelector = function( customResultsAdapter, fontCollections ) {
+                        var _model = item(),
+                            _googleFontsFilteredBySubset = function() {
+                                  var subset = item.czr_Input('subset')(),
+                                      filtered = _.filter( fontCollections.gfonts, function( data ) {
+                                            return data.subsets && _.contains( data.subsets, subset );
+                                      });
+
+                                  if ( ! _.isUndefined( subset ) && ! _.isNull( subset ) && 'all-subsets' != subset ) {
+                                        return filtered;
+                                  } else {
+                                        return fontCollections.gfonts;
+                                  }
+
+                            },
+                            $fontSelectElement = $( 'select[data-czrtype="' + input.id + '"]', input.container );
+
+                        // generates the options
+                        // @param type = cfont or gfont
+                        var _generateFontOptions = function( fontList, type ) {
+                              var _html_ = '';
+                              _.each( fontList , function( font_data ) {
+                                    var _value = font_data.name,
+                                        optionTitle = _.isString( _value ) ? _value.replace(/[+|:]/g, ' ' ) : _value,
+                                        _setFontTypePrefix = function( val, type ) {
+                                              return _.isString( val ) ? [ '[', type, ']', val ].join('') : '';//<= Example : [gfont]Aclonica:regular
+                                        };
+
+                                    _value = _setFontTypePrefix( _value, type );
+
+                                    if ( _value == _model['font-family'] ) {
+                                          _html_ += '<option selected="selected" value="' + _value + '">' + optionTitle + '</option>';
+                                    } else {
+                                          _html_ += '<option value="' + _value + '">' + optionTitle + '</option>';
+                                    }
+                              });
+                              return _html_;
+                        };
+
+                        //add the first option
+                        if ( _.isNull( _model['font-family'] ) || _.isEmpty( _model['font-family'] ) ) {
+                              $fontSelectElement.append( '<option value="none" selected="selected">' + '@missi18n Select a font family' + '</option>' );
+                        } else {
+                              $fontSelectElement.append( '<option value="none">' + '@missi18n Select a font family' + '</option>' );
+                        }
+
+
+                        // generate the cfont and gfont html
+                        _.each( [
+                              {
+                                    title : '@missi18n Web Safe Fonts',
+                                    type : 'cfont',
+                                    list : fontCollections.cfonts
+                              },
+                              {
+                                    title : '@missi18n Google Fonts',
+                                    type : 'gfont',
+                                    list : fontCollections.gfonts//_googleFontsFilteredBySubset()
+                              }
+                        ], function( fontData ) {
+                              var $optGroup = $('<optgroup>', { label : fontData.title , html : _generateFontOptions( fontData.list, fontData.type ) });
+                              $fontSelectElement.append( $optGroup );
+                        });
+
+                        var _fonts_select2_params = {
+                                //minimumResultsForSearch: -1, //no search box needed
+                            //templateResult: paintFontOptionElement,
+                            //templateSelection: paintFontOptionElement,
+                            escapeMarkup: function(m) { return m; },
+                        };
+                        /*
+                        * Maybe use custom adapter
+                        */
+                        if ( customResultsAdapter ) {
+                              $.extend( _fonts_select2_params, {
+                                    resultsAdapter: customResultsAdapter,
+                                    closeOnSelect: false,
+                              } );
+                        }
+
+                        //http://ivaynberg.github.io/select2/#documentation
+                        //FONTS
+                        $fontSelectElement.select2( _fonts_select2_params );
+                        $( '.select2-selection__rendered', input.container ).css( getInlineFontStyle( input() ) );
+
+                  };//_setupSelectForFontFamilySelector
+
+                  // @return {} used to set $.css()
+                  // @param font {string}.
+                  // Example : Aclonica:regular
+                  // Example : Helvetica Neue, Helvetica, Arial, sans-serif
+                  var getInlineFontStyle = function( _fontFamily_ ){
+                        // the font is set to 'none' when "Select a font family" option is picked
+                        if ( ! _.isString( _fontFamily_ ) || _.isEmpty( _fontFamily_ ) )
+                          return {};
+
+                        //always make sure we remove the prefix.
+                        _fontFamily_ = _fontFamily_.replace('[gfont]', '').replace('[cfont]', '');
+
+                        var module = this,
+                            split = _fontFamily_.split(':'), font_family, font_weight, font_style;
+
+                        font_family       = getFontFamilyName( _fontFamily_ );
+
+                        font_weight       = split[1] ? split[1].replace( /[^0-9.]+/g , '') : 400; //removes all characters
+                        font_weight       = _.isNumber( font_weight ) ? font_weight : 400;
+                        font_style        = ( split[1] && -1 != split[1].indexOf('italic') ) ? 'italic' : '';
+
+
+                        return {
+                              'font-family' : 'none' == font_family ? 'inherit' : font_family.replace(/[+|:]/g, ' '),//removes special characters
+                              'font-weight' : font_weight || 400,
+                              'font-style'  : font_style || 'normal'
+                        };
+                  };
+
+                  // @return the font family name only from a pre Google formated
+                  // Example : input is Inknut+Antiqua:regular
+                  // Should return Inknut Antiqua
+                  var getFontFamilyName = function( rawFontFamily ) {
+                        if ( ! _.isString( rawFontFamily ) || _.isEmpty( rawFontFamily ) )
+                            return rawFontFamily;
+
+                        rawFontFamily = rawFontFamily.replace('[gfont]', '').replace('[cfont]', '');
+                        var split         = rawFontFamily.split(':');
+                        return _.isString( split[0] ) ? split[0].replace(/[+|:]/g, ' ') : '';//replaces special characters ( + ) by space
+                  };
+
+
+
+                  // defer the loading of the fonts when the font tab gets switched to
+                  // then fetch the google fonts from the server
+                  // and instantiate the select input when done
+                  // @see this.trigger( 'tab-switch', { id : tabIdSwitchedTo } ); in Item::initialize()
+                  item.bind( 'tab-switch', function( params ) {
+                        // try { var isGFontTab = 'sek-google-font-tab' = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
+                        //       api.errare( 'spacing input => error when binding the tab switch event', er );
+                        // }
+                        console.log( 'ALORS ????', item.container.find('[data-tab-id="' + params.id + '"]').data('sek-google-font-tab'), input.module );
+                        // $.when( _getFontCollections() ).done( function( fontCollections ) {
+                        //       console.log('FONT COLLECTION ?', fontCollections );
+                        // }).fail( function( _r_ ) {
+                        //       api.errare( 'font_picker => fail response =>', _r_ );
+                        // });
+
+                  });
+
+                  $.when( _getFontCollections() ).done( function( fontCollections ) {
+                        console.log('FONT COLLECTION ?', fontCollections );
+                        _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
+                              _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
+                        });
+                  }).fail( function( _r_ ) {
+                        api.errare( 'font_picker => fail response =>', _r_ );
+                  });
+            }//font_picker()
+      });//$.extend( api.czrInputMap, {})
+
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
@@ -3599,6 +3890,57 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
+            var TinyMceEditorModuleConstructor = {
+            initialize: function( id, options ) {
+                    //console.log('INITIALIZING IMAGE MODULE', id, options );
+                    var module = this;
+                    //run the parent initialize
+                    api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                    module.inputConstructor = api.CZRInput.extend( module.CZRTextEditorInputMths || {} );
+                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                    // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+            },//initialize
+
+            CZRTextEditorInputMths : {
+                    // initialize : function( name, options ) {
+                    //       var input = this;
+                    //       api.CZRInput.prototype.initialize.call( input, name, options );
+                    // },
+
+                    setupSelect : function() {
+                            var input  = this,
+                                  item   = input.input_parent,
+                                  module = input.module,
+                                  _options_ = {};
+
+                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in image module');
+                                  return;
+                            } else {
+                                  //generates the options
+                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
+                                        var _attributes = {
+                                                  value : value,
+                                                  html: title
+                                            };
+                                        if ( value == input() ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        } else if ( 'px' === value ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        }
+                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                  });
+                                  $( 'select[data-czrtype]', input.container ).selecter();
+                            }
+                    }
+            },//CZRTextEditorInputMths
+
+            // CZRSocialsItem : { },//CZRSocialsItem
+      };//TinyMceEditorModuleConstructor
+
+
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -3610,7 +3952,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_tiny_mce_editor_module : {
-                  //mthds : TinyMceEditorModuleConstructor,
+                  mthds : TinyMceEditorModuleConstructor,
                   crud : false,
                   name : 'Text Editor',
                   has_mod_opt : false,
