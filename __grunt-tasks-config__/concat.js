@@ -154,6 +154,16 @@ module.exports = {
 
 
 
+
+
+
+
+
+
+  //
+  //------------------------- SEKTIONS
+  //
+
   czr_sektions_php : {
     src: [
       '<%= paths.sektions %>_dev_php/0_5_0_sektions_functions_definitions.php',
@@ -161,11 +171,22 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/1_0_0_sektions_customizer_assets.php',
       '<%= paths.sektions %>_dev_php/2_0_0_sektions_customizer_dynamic_registration.php',
       '<%= paths.sektions %>_dev_php/3_0_0_sektions_register_modules_after_setup_theme_50.php',
-      '<%= paths.sektions %>_dev_php/3_0_1_sektions_add_input_templates.php',
 
+      // INPUT TEMPLATES
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_1_sek_input_tmpl_base_filter.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_1_sek_input_tmpl_module_picker.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_2_sek_input_tmpl_sektion_picker.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_3_sek_input_tmpl_spacing.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_4_sek_input_tmpl_bg_position.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_5_sek_input_tmpl_horizontal_alignment.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_6_sek_input_tmpl_vertical_alignment.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_7_sek_input_tmpl_font_picker.php',
+
+      // DYN CSS
       '<%= paths.sektions %>_dev_php/5_0_0_class-sek-dyn-css-builder.php',
       '<%= paths.sektions %>_dev_php/5_0_1_class-sek-dyn-css-handler.php',
 
+      // SEK_Front_Render()
       '<%= paths.sektions %>_dev_php/8_0_0_sektions_front_class_construct.php',
       '<%= paths.sektions %>_dev_php/8_0_1_sektions_front_class_ajax.php',
       '<%= paths.sektions %>_dev_php/8_2_0_sektions_front_class_front_and_preview_assets.php',
@@ -179,13 +200,14 @@ module.exports = {
   czr_sektions_customizer_js : {
     src: [
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_0_sektions_itinialize.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/_1_5_sektions_setup_collection_setting.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_2_sektions_setup_collection_setting.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_4_sektions_react_to_preview.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_sektions_generate_UI.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_sektions_update_API_setting.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/_4_0_sektions_react_to_preview.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_2_0_sektions_register_utils.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_2_1_sektions_various_utils.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_4_1_sektions_setup_and_react_to_drop.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/_6_0_sektions_register_utils.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/_7_0_sektions_various_utils.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_7_0_sektions_add_inputs_to_api.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_7_1_sektions_tinyMceEditor.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_8_0_sektions_instantiate.js',
 
