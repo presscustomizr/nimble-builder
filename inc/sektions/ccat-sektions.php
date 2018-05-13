@@ -1317,6 +1317,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'h_alignment' :
             sek_set_input_tmpl___h_alignment( $input_id, $input_data );
         break;
+         case 'h_text_alignment' :
+            sek_set_input_tmpl___h_text_alignment( $input_id, $input_data );
+        break;
         case 'v_alignment' :
             sek_set_input_tmpl___v_alignment( $input_id, $input_data );
         break;
@@ -1329,8 +1332,7 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  MODULE PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-//add_filter( 'czr_set_input_tmpl___module_picker', 'sek_set_input_tmpl___module_picker', 10,3 );
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
     ?>
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
@@ -1380,8 +1382,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  SECTION PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-//add_filter( 'czr_set_input_tmpl___section_picker', 'sek_set_input_tmpl___section_picker', 10, 3 );
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
     ?>
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
@@ -1416,9 +1417,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  SPACING INPUT
 /* ------------------------------------------------------------------------- */
-// SPACING INPUT
-// filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-//add_filter( 'czr_set_input_tmpl___spacing', 'sek_set_input_tmpl___spacing', 10, 3 );
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
     ?>
     <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
@@ -1491,8 +1490,7 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  BACKGROUND POSITION INPUT
 /* ------------------------------------------------------------------------- */
-// filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-//add_filter( 'czr_set_input_tmpl___bg_position', 'sek_set_input_tmpl___bg_position', 10, 3 );
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___bg_position( $input_id, $input_data ) {
     ?>
         <div class="sek-bg-pos-wrapper">
@@ -1593,9 +1591,7 @@ function sek_set_input_tmpl___bg_position( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  HORIZONTAL ALIGNMENT INPUT FOR TEXT => includes the 'justify' icon
 /* ------------------------------------------------------------------------- */
-// filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-// add_filter( 'czr_set_input_tmpl___h_alignment', 'sek_set_input_tmpl___h_alignment', 10, 3 );
-// add_filter( 'czr_set_input_tmpl___h_text_alignment', 'sek_set_input_tmpl___h_alignment', 10, 3 );
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___h_alignment( $input_id, $input_data ) {
     ?>
         <div class="sek-h-align-wrapper">
@@ -1612,12 +1608,24 @@ function sek_set_input_tmpl___h_alignment( $input_id, $input_data ) {
     <?php
 }
 
+function sek_set_input_tmpl___h_text_alignment( $input_id, $input_data ) {
+    ?>
+        <div class="sek-h-align-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+          <div class="sek-align-icons">
+            <div data-sek-align="left" title="<?php _e('Align left','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_left</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_center</i></div>
+            <div data-sek-align="right" title="<?php _e('Align right','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_right</i></div>
+            <div data-sek-align="justify" title="<?php _e('Justified','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_justify</i></div>
+          </div>
+        </div><?php // sek-h-align-wrapper ?>
+    <?php
+}
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  VERTICAL ALIGNMENT INPUT
 /* ------------------------------------------------------------------------- */
-// filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-//add_filter( 'czr_set_input_tmpl___v_alignment', 'sek_set_input_tmpl___v_alignment', 10, 3 );
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
     ?>
         <div class="sek-v-align-wrapper">
@@ -1635,8 +1643,7 @@ function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  FONT PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-//add_filter( 'czr_set_input_tmpl___font_picker', 'sek_set_input_tmpl___font_picker', 10, 3 );
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___font_picker( $input_id, $input_data ) {
     ?>
         <select data-czrtype="<?php echo $input_id; ?>"></select>

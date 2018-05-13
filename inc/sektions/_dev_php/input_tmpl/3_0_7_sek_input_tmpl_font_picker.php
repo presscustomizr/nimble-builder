@@ -2,8 +2,7 @@
 /* ------------------------------------------------------------------------- *
  *  FONT PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-//add_filter( 'czr_set_input_tmpl___font_picker', 'sek_set_input_tmpl___font_picker', 10, 3 );
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___font_picker( $input_id, $input_data ) {
     ?>
         <select data-czrtype="<?php echo $input_id; ?>"></select>

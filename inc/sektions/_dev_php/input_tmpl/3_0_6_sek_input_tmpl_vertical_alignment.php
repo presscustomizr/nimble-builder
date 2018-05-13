@@ -2,8 +2,7 @@
 /* ------------------------------------------------------------------------- *
  *  VERTICAL ALIGNMENT INPUT
 /* ------------------------------------------------------------------------- */
-// filter declared in CZR_Fmk_Base_Tmpl_Builder::ac_get_default_input_tmpl
-//add_filter( 'czr_set_input_tmpl___v_alignment', 'sek_set_input_tmpl___v_alignment', 10, 3 );
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
     ?>
         <div class="sek-v-align-wrapper">
