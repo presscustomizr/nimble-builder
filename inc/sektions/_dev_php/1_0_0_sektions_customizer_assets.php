@@ -105,6 +105,50 @@ function sek_enqueue_controls_js_css() {
                       'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
                   ),
 
+                  // TEXT EDITOR MODULE
+                  'font-weight' => array(
+                      'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
+                      'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
+                      'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
+                      'lighter'   => __( 'lighter', 'text_domain_to_be_replaced' ),
+                      100     => 100,
+                      200     => 200,
+                      300     => 300,
+                      400     => 400,
+                      500     => 500,
+                      600     => 600,
+                      700     => 700,
+                      800     => 800,
+                      900     => 900
+                  ),
+
+                  'font-style' => array(
+                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                      'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
+                      'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
+                      'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
+                  ),
+
+                  'text-decoration' =>  array(
+                      'none'      => __( 'none', 'text_domain_to_be_replaced' ),
+                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                      'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
+                      'overline'    => __( 'overline', 'text_domain_to_be_replaced' ),
+                      'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
+                  ),
+
+                  'text-transform' => array(
+                      'none'      => __( 'none', 'text_domain_to_be_replaced' ),
+                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                      'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
+                      'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
+                      'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
+                  ),
+
+
+
+
+
 
                   // SPACING MODULE
                   'spacingUnits' => array(

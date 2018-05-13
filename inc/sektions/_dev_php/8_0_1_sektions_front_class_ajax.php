@@ -24,7 +24,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                   'sek-remove-module',
                   'sek-duplicate-module',
                   'sek-refresh-modules-in-column',
-                  'sek-set-module-value',
+                  'sek-refresh-module-markup',
 
                   'sek-refresh-stylesheet',
 
@@ -190,7 +190,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                     $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
                 break;
 
-                case 'sek-set-module-value' :
+                case 'sek-refresh-module-markup' :
                     //error_log( print_r( $_POST, true ) );
                     if ( ! array_key_exists( 'id', $_POST ) || empty( $_POST['id'] ) ) {
                         wp_send_json_error(  __FUNCTION__ . ' ' . $sek_action .' => missing module id' );
