@@ -60,7 +60,6 @@ class Sek_Dyn_CSS_Builder {
 
         $stylesheet = is_null( $stylesheet ) ? $this->stylesheet : $stylesheet;
         $rules = array();
-        //$collection = empty( $level[ 'collection' ] ) ? array() : $level[ 'collection' ];
 
         foreach ( $level as $key => $entry ) {
             // Populate rules for sections / columns / modules
@@ -68,10 +67,13 @@ class Sek_Dyn_CSS_Builder {
                 // build rules for level options => section / column / module
                 $rules = apply_filters( 'sek_add_css_rules_for_level_options', $rules, $entry );
             }
+
+            // populate rules for modules values
             if ( !empty( $entry[ 'level' ] ) && 'module' === $entry['level'] ) {
                 // build rules for modules
                 $rules = apply_filters( 'sek_add_css_rules_for_modules', $rules, $entry );
             }
+
             // When we are inside the associative arrays of the module 'value' or the level 'options' entries
             // the keys are not integer.
             // We want to filter each input
@@ -92,16 +94,18 @@ class Sek_Dyn_CSS_Builder {
                 }
             }
 
-            // if ( !empty( $level[ 'collection' ] ) ) {
-            //     $this->sek_css_rules_sniffer_walker( $level, $stylesheet );
-            // }
+            // keep walking if the current $entry is an array
+            // make sure that the parent_level is set right before jumping down the next level
             if ( is_array( $entry ) ) {
                 if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
                     $this -> parent_level = $entry;
                 }
                 $this->sek_css_rules_sniffer_walker( $entry, $stylesheet );
+                // Reset the parent level after walking the sublevels
+                if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
+                    $this -> parent_level = $entry;
+                }
             }
-
         }
     }
 
