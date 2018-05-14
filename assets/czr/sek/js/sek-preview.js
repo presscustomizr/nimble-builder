@@ -763,6 +763,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   });
                             },
 
+                            //'sek-set-level-options' : 'ajaxRefreshStylesheet',
+                            'sek-refresh-stylesheet' : 'ajaxRefreshStylesheet',
 
 
 
@@ -835,8 +837,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             'sek-resize-columns' : 'ajaxResizeColumns',
 
-                            //'sek-set-level-options' : 'ajaxRefreshStylesheet',
-                            'sek-refresh-stylesheet' : 'ajaxRefreshStylesheet',
+
 
 
                             // GENERATE UI ELEMENTS

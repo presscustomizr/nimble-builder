@@ -17,7 +17,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // _.debounce param when updating the UI setting
                   // prevent hammering server
-                  self.SETTING_UPDATE_BUFFER = 200;
+                  self.SETTING_UPDATE_BUFFER = 50;
 
                   // Define a default value for the sektion setting value, used when no server value has been sent
                   // @see php function
@@ -1520,10 +1520,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // The action to trigger is determined by the changed input
                   // For the options of a level, the default action is to refresh the stylesheet.
                   // But we might need to refresh the markup in some cases. Like for example when a css class is added.
-                  if ( _.isEmpty( params.settingParams.args.inputRegistrationParams ) ) {
-                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing inputRegistrationParams in passed params. No action can be triggered to the api.previewer.', params );
-                        return;
-                  }
                   if ( _.isEmpty( params.defaultPreviewAction ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing defaultPreviewAction in passed params. No action can be triggered to the api.previewer.', params );
                         return;
@@ -1534,16 +1530,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       refresh_fonts = 'refresh_fonts' === params.defaultPreviewAction;
 
                   // Maybe set the input based value
-                  if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_stylesheet ) ) {
-                        refresh_stylesheet = Boolean( params.settingParams.args.inputRegistrationParams.refresh_stylesheet );
+                  // Note : the inputRegistrationParams are passed in the args only when an module input is changed
+                  // Example : For a crud module, when an item is added, there are no inputRegistrationParams, so we fallback on the default 'refresh_markup'
+                  if ( ! _.isEmpty( params.settingParams.args.inputRegistrationParams ) ) {
+                        if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_stylesheet ) ) {
+                              refresh_stylesheet = Boolean( params.settingParams.args.inputRegistrationParams.refresh_stylesheet );
+                        }
+                        if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_markup ) ) {
+                              refresh_markup = Boolean( params.settingParams.args.inputRegistrationParams.refresh_markup );
+                        }
+                        if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_fonts ) ) {
+                              refresh_fonts = Boolean( params.settingParams.args.inputRegistrationParams.refresh_fonts );
+                        }
                   }
-                  if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_markup ) ) {
-                        refresh_markup = Boolean( params.settingParams.args.inputRegistrationParams.refresh_markup );
-                  }
-                  if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_fonts ) ) {
-                        refresh_fonts = Boolean( params.settingParams.args.inputRegistrationParams.refresh_fonts );
-                  }
-
 
                   self.updateAPISetting({
                         action : params.uiParams.action,
