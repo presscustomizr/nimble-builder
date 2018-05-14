@@ -30,7 +30,7 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___v_alignment( $input_id, $input_data );
         break;
         case 'font_picker' :
-          sek_set_input_tmpl___font_picker( $input_id, $input_data );
+            sek_set_input_tmpl___font_picker( $input_id, $input_data );
         break;
     }
 }

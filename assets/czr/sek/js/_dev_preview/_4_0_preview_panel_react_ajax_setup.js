@@ -69,12 +69,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             // Re-print a level
                             // Can be invoked when setting the section layout option boxed / wide, when we need to add a css class server side
+                            // @params {
+                            //   action : 'sek-refresh-level',
+                            //   level : params.level,
+                            //   id : params.id
+                            // }
                             'sek-refresh-level' : function( params ) {
                                   czrapp.doAjax( {
+                                        skope_id : params.skope_id,
                                         action : 'sek_get_content',
                                         id : params.apiParams.id,
                                         level : params.apiParams.level,
-                                        skope_id : params.skope_id,
                                         sek_action : params.apiParams.action
                                   }).fail( function( _r_ ) {
                                         czrapp.errare( 'ERROR reactToPanelMsg => sek-refresh-level => ' , _r_ );
@@ -101,14 +106,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
                             // EDITING MODULE AND OPTIONS
-                            // 'sek-refresh-module-markup' is sent when the module setting is being modified
-                            // {
-                            //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                            //       moduleId : params.id,
-                            //       value : to
-                            // }
-                            'sek-refresh-module-markup' : 'ajaxRefreshModuleMarkup',
-
                             'sek-move' : function( params ) {
                                   switch ( params.apiParams.action ) {
                                         case 'sek-move-module' :
@@ -175,7 +172,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             'sek-resize-columns' : 'ajaxResizeColumns',
 
-                            'sek-set-level-options' : 'ajaxRefreshStylesheet',
+                            //'sek-set-level-options' : 'ajaxRefreshStylesheet',
                             'sek-refresh-stylesheet' : 'ajaxRefreshStylesheet',
 
 

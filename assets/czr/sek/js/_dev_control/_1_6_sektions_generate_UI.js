@@ -151,34 +151,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
                                           api( params.id, function( _setting_ ) {
-                                                _setting_.bind( _.debounce( function( to, from, args ) {
-                                                      console.log('sek-generate-module-ui => ARGS ?',_setting_.id, args );
 
-                                                      // We don't want to store the default title and id module properties
-                                                      var moduleValueCandidate = {};
-                                                      _.each( to, function( _val, _property ) {
-                                                            if ( ! _.contains( ['title', 'id' ], _property ) ) {
-                                                                  moduleValueCandidate[ _property ] = _val;
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      self.updateAPISettingAndExecutePreviewActions({
+                                                            defaultPreviewAction : 'refresh_markup',
+                                                            uiParams : _.extend( params, { action : 'sek-set-module-value' } ),
+                                                            //options_type : 'spacing',
+                                                            settingParams : {
+                                                                  to : to,
+                                                                  from : from,
+                                                                  args : args
                                                             }
                                                       });
-                                                      self.updateAPISetting({
-                                                            action : 'sek-set-module-value',
-                                                            moduleId : params.id,
-                                                            value : moduleValueCandidate,
-                                                            in_column : params.in_column,
-                                                            in_sektion : params.in_sektion
-                                                      }).done( function() {
-                                                            api.previewer.send(
-                                                                  'sek-refresh-module-markup',
-                                                                  {
-                                                                        skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                                                        moduleId : params.id,
-                                                                        value : moduleValueCandidate
-                                                                  }
-                                                            );
-                                                      });
-                                                }, 100 ) );
+                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                           });
+
                                           self.register({
                                                 level : params.level,
                                                 what : 'setting',
@@ -273,23 +260,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
                                           api( layoutBgBorderOptionsSetId, function( _setting_ ) {
-                                                _setting_.bind( _.debounce( function( to, from ) {
-                                                      // We don't want to store the default title and id module properties
-                                                      var moduleValueCandidate = {};
-                                                      _.each( to, function( _val, _property ) {
-                                                            if ( ! _.contains( ['title', 'id' ], _property ) ) {
-                                                                  moduleValueCandidate[ _property ] = _val;
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      self.updateAPISettingAndExecutePreviewActions({
+                                                            defaultPreviewAction : 'refresh_stylesheet',
+                                                            uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                            options_type : 'layout_background_border',
+                                                            settingParams : {
+                                                                  to : to,
+                                                                  from : from,
+                                                                  args : args
                                                             }
                                                       });
-                                                      api.previewer.trigger( 'sek-set-level-options', {
-                                                            options_type : 'layout_background_border',
-                                                            id : params.id,
-                                                            value : moduleValueCandidate,
-                                                            in_sektion : params.in_sektion,
-                                                            in_column : params.in_column
-                                                      });
-                                                }, 100 ) );
-                                          });
+                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          });//api( layoutBgBorderOptionsSetId, function( _setting_ ) {})
+
+
                                           self.register( {
                                                 level : params.level,
                                                 what : 'setting',
@@ -299,7 +284,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 transport : 'postMessage',// 'refresh',
                                                 type : '_no_intended_to_be_saved_' //sekData.settingType
                                           });
-                                    }
+                                    }//if( ! api.has( layoutBgBorderOptionsSetId ) ) {
 
                                     self.register( {
                                           level : params.level,
@@ -329,23 +314,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
                                           api( spacingOptionsSetId, function( _setting_ ) {
-                                                _setting_.bind( _.debounce( function( to, from ) {
-                                                      // We don't want to store the default title and id module properties
-                                                      var moduleValueCandidate = {};
-                                                      _.each( to, function( _val, _property ) {
-                                                            if ( ! _.contains( ['title', 'id' ], _property ) ) {
-                                                                  moduleValueCandidate[ _property ] = _val;
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      self.updateAPISettingAndExecutePreviewActions({
+                                                            defaultPreviewAction : 'refresh_stylesheet',
+                                                            uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                            options_type : 'spacing',
+                                                            settingParams : {
+                                                                  to : to,
+                                                                  from : from,
+                                                                  args : args
                                                             }
                                                       });
-                                                      api.previewer.trigger( 'sek-set-level-options', {
-                                                            options_type : 'spacing',
-                                                            id : params.id,
-                                                            value : moduleValueCandidate,
-                                                            in_sektion : params.in_sektion,
-                                                            in_column : params.in_column
-                                                      });
-                                                }, 100 ) );
-                                          });
+                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          });//api( layoutBgBorderOptionsSetId, function( _setting_ ) {})
+
+
                                           self.register( {
                                                 level : params.level,
                                                 what : 'setting',
@@ -395,8 +378,110 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }//switch
 
                   return 'pending' == dfd.state() ? dfd.resolve().promise() : dfd.promise();//<= we might want to resolve on focus.completeCallback ?
-            },
+            },//generateUI()
 
+
+
+
+            // @params = {
+            //     uiParams : params,
+            //     options_type : 'layout_background_border',
+            //     settingParams : {
+            //           to : to,
+            //           from : from,
+            //           args : args
+            //     }
+            // }
+            //
+            // @param settingParams.args = {
+            //  inputRegistrationParams : {
+            //     id :,
+            //     type :
+            //     refresh_markup : bool
+            //     refresh_stylesheet : bool
+            //     refresh_fonts : bool
+            //  }
+            //  input_changed : input_id
+            //  input_transport : 'inherit'/'postMessage',
+            //  module : { items : [...]}
+            //  module_id :
+            //  not_preview_sent : bool
+            //}
+            updateAPISettingAndExecutePreviewActions : function( params ) {
+                  console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
+                  var self = this;
+                  //console.log('sek-generate-level-options-ui => ARGS ?',_setting_.id, args );
+                  // We don't want to store the default title and id module properties
+                  var moduleValueCandidate = {};
+                  _.each( params.settingParams.to, function( _val, _property ) {
+                        if ( ! _.contains( ['title', 'id' ], _property ) ) {
+                              moduleValueCandidate[ _property ] = _val;
+                        }
+                  });
+
+                  // What to do in the preview ?
+                  // The action to trigger is determined by the changed input
+                  // For the options of a level, the default action is to refresh the stylesheet.
+                  // But we might need to refresh the markup in some cases. Like for example when a css class is added.
+                  if ( _.isEmpty( params.settingParams.args.inputRegistrationParams ) ) {
+                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing inputRegistrationParams in passed params. No action can be triggered to the api.previewer.', params );
+                        return;
+                  }
+                  if ( _.isEmpty( params.defaultPreviewAction ) ) {
+                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing defaultPreviewAction in passed params. No action can be triggered to the api.previewer.', params );
+                        return;
+                  }
+                  // Set the default value
+                  var refresh_stylesheet = 'refresh_stylesheet' === params.defaultPreviewAction,//<= default action for level options
+                      refresh_markup = 'refresh_markup' === params.defaultPreviewAction,//<= default action for module options
+                      refresh_fonts = 'refresh_fonts' === params.defaultPreviewAction;
+
+                  // Maybe set the input based value
+                  if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_stylesheet ) ) {
+                        refresh_stylesheet = Boolean( params.settingParams.args.inputRegistrationParams.refresh_stylesheet );
+                  }
+                  if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_markup ) ) {
+                        refresh_markup = Boolean( params.settingParams.args.inputRegistrationParams.refresh_markup );
+                  }
+                  if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_fonts ) ) {
+                        refresh_fonts = Boolean( params.settingParams.args.inputRegistrationParams.refresh_fonts );
+                  }
+
+
+                  self.updateAPISetting({
+                        action : params.uiParams.action,
+                        id : params.uiParams.id,
+                        value : moduleValueCandidate,
+                        in_column : params.uiParams.in_column,
+                        in_sektion : params.uiParams.in_sektion,
+
+                        // specific for level options
+                        options_type : params.options_type,//'spacing', 'layout_background_border'
+
+                  }).done( function( ) {
+                        console.log('updateAPISettingAndExecutePreviewActions => updateAPISetting done');
+                        // STYLESHEET => default action when modifying the level options
+                        if ( true === refresh_stylesheet ) {
+                              api.previewer.send( 'sek-refresh-stylesheet', {
+                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                              });
+                        }
+
+                        // MARKUP
+                        if ( true === refresh_markup ) {
+                              api.previewer.send( 'sek-refresh-level', {
+                                    apiParams : {
+                                          action : 'sek-refresh-level',
+                                          id : params.uiParams.id,
+                                          level : params.uiParams.level
+                                    },
+                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                              });
+                        }
+
+                        // FONTS
+                  });//self.updateAPISetting()
+            },//updateAPISettingAndExecutePreviewActions
 
 
 

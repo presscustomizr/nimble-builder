@@ -15,6 +15,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Max possible number of columns in a section
                   self.MAX_NUMBER_OF_COLUMNS = 12;
 
+                  // _.debounce param when updating the UI setting
+                  // prevent hammering server
+                  self.SETTING_UPDATE_BUFFER = 200;
+
                   // Define a default value for the sektion setting value, used when no server value has been sent
                   // @see php function
                   // function sek_get_default_sektions_value() {
@@ -151,9 +155,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // });
 
                   });//api.bind( 'ready' )
-
-
-
             },// initialize()
 
 
@@ -586,10 +587,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this,
                       apiParams = {},
                       uiParams = {},
+                      sendToPreview = true, //<= the default behaviour is to send a message to the preview when the setting has been changed
                       msgCollection = {
                             // UPDATE THE MAIN SETTING
                             'sek-add-section' :{
                                   callback : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         apiParams = {
                                               action : 'sek-add-section',
@@ -614,6 +617,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
                             'sek-add-column' : {
                                   callback : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         apiParams = {
                                               id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
@@ -634,6 +638,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
                             'sek-add-module' : {
                                   callback :function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         apiParams = {
                                               id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
@@ -656,6 +661,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
                             'sek-remove' : {
                                   callback : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         switch( params.level ) {
                                               case 'section' :
@@ -693,6 +699,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             'sek-move' : {
                                   callback  : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         switch( params.level ) {
                                               case 'section' :
@@ -764,6 +771,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // then the level clone id will be send back to the preview for the ajax rendering ( this is done in updateAPISetting() promise() )
                             'sek-duplicate' : {
                                   callback : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         switch( params.level ) {
                                               case 'section' :
@@ -830,6 +838,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   }
                             },
                             'sek-resize-columns' : function( params ) {
+                                  sendToPreview = true;
                                   uiParams = {};
                                   //console.log( 'panel => reactToPreviewMsg => ', params );
                                   apiParams = params;
@@ -846,6 +855,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // }
                             'sek-add-content-in-new-sektion' : {
                                   callback : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         apiParams = params;
                                         apiParams.action = 'sek-add-content-in-new-sektion';
@@ -875,36 +885,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   }
                             },
 
-                            'sek-set-level-options' : {
-                                  callback : function( params ) {
-                                        uiParams = {};
-                                        apiParams = {
-                                              action : 'sek-set-level-options',
-                                              options_type : params.options_type,//'spacing', 'layout_background_border'
-                                              id : params.id,
-                                              value : params.value,
-                                              in_sektion : params.in_sektion,
-                                              in_column : params.in_column
-                                        };
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {}
-                            },
-
-
-
-
-
-
-
-
-
 
 
 
 
                             // GENERATE UI ELEMENTS
                             'sek-pick-module' : function( params ) {
+                                  sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
@@ -913,6 +900,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return self.generateUI( uiParams );
                             },
                             'sek-pick-section' : function( params ) {
+                                  sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
@@ -922,6 +910,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
                             'sek-edit-options' : function( params ) {
                                   //console.log('IN EDIT OPTIONS ', params );
+                                  sendToPreview = true;
                                   apiParams = {};
                                   if ( _.isEmpty( params.id ) ) {
                                         return $.Deferred( function() {
@@ -939,6 +928,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return self.generateUI( uiParams );
                             },
                             'sek-edit-module' : function( params ) {
+                                  sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-module-ui',
@@ -959,6 +949,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             //  duration : in ms
                             // }
                             'sek-notify' : function( params ) {
+                                  sendToPreview = false;
                                   return $.Deferred(function() {
                                         api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                               api.notifications.add( new api.Notification( 'sek-notify', {
@@ -977,6 +968,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
 
                             'sek-refresh-level' : function( params ) {
+                                  sendToPreview = true;
                                   return $.Deferred(function() {
                                         apiParams = {
                                               action : 'sek-refresh-level',
@@ -991,7 +983,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                       };//msgCollection
 
-                  // Schedule
+                  // Schedule the reactions
+                  // May be send a message to the preview
                   _.each( msgCollection, function( callbackFn, msgId ) {
                         api.previewer.bind( msgId, function( params ) {
                               var _cb_;
@@ -1008,15 +1001,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // the cloneId is passed when resolving the ::updateAPISetting() promise()
                                     // they are needed on level duplication to get the newly generated level id.
                                     .done( function( cloneId ) {
-                                          api.previewer.send(
-                                                msgId,
-                                                {
-                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                                      apiParams : apiParams,
-                                                      uiParams : uiParams,
-                                                      cloneId : ! _.isEmpty( cloneId ) ? cloneId : false
-                                                }
-                                          );
+                                          // Send to the preview
+                                          if ( sendToPreview ) {
+                                                api.previewer.send(
+                                                      msgId,
+                                                      {
+                                                            skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                            apiParams : apiParams,
+                                                            uiParams : uiParams,
+                                                            cloneId : ! _.isEmpty( cloneId ) ? cloneId : false
+                                                      }
+                                                );
+                                          } else {
+                                                // if nothing was sent to the preview, trigger the '*_done' action so we can execute the 'complete' callback
+                                                api.previewer.trigger( [msgId, 'done'].join('_'), { apiParams : apiParams, uiParams : uiParams } );
+                                          }
                                           // say it
                                           self.trigger( [ msgId, 'done' ].join('_'), params );
                                     })
@@ -1050,8 +1049,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           api.errare( 'reactToPreviewMsg done => error when receiving ' + [msgId, 'done'].join('_') , _er_ );
                                     }
                               }
-
-
                         });
                   });
             },//reactToPreview();
@@ -1251,34 +1248,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
                                           api( params.id, function( _setting_ ) {
-                                                _setting_.bind( _.debounce( function( to, from, args ) {
-                                                      console.log('sek-generate-module-ui => ARGS ?',_setting_.id, args );
 
-                                                      // We don't want to store the default title and id module properties
-                                                      var moduleValueCandidate = {};
-                                                      _.each( to, function( _val, _property ) {
-                                                            if ( ! _.contains( ['title', 'id' ], _property ) ) {
-                                                                  moduleValueCandidate[ _property ] = _val;
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      self.updateAPISettingAndExecutePreviewActions({
+                                                            defaultPreviewAction : 'refresh_markup',
+                                                            uiParams : _.extend( params, { action : 'sek-set-module-value' } ),
+                                                            //options_type : 'spacing',
+                                                            settingParams : {
+                                                                  to : to,
+                                                                  from : from,
+                                                                  args : args
                                                             }
                                                       });
-                                                      self.updateAPISetting({
-                                                            action : 'sek-set-module-value',
-                                                            moduleId : params.id,
-                                                            value : moduleValueCandidate,
-                                                            in_column : params.in_column,
-                                                            in_sektion : params.in_sektion
-                                                      }).done( function() {
-                                                            api.previewer.send(
-                                                                  'sek-refresh-module-markup',
-                                                                  {
-                                                                        skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                                                        moduleId : params.id,
-                                                                        value : moduleValueCandidate
-                                                                  }
-                                                            );
-                                                      });
-                                                }, 100 ) );
+                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                           });
+
                                           self.register({
                                                 level : params.level,
                                                 what : 'setting',
@@ -1373,23 +1357,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
                                           api( layoutBgBorderOptionsSetId, function( _setting_ ) {
-                                                _setting_.bind( _.debounce( function( to, from ) {
-                                                      // We don't want to store the default title and id module properties
-                                                      var moduleValueCandidate = {};
-                                                      _.each( to, function( _val, _property ) {
-                                                            if ( ! _.contains( ['title', 'id' ], _property ) ) {
-                                                                  moduleValueCandidate[ _property ] = _val;
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      self.updateAPISettingAndExecutePreviewActions({
+                                                            defaultPreviewAction : 'refresh_stylesheet',
+                                                            uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                            options_type : 'layout_background_border',
+                                                            settingParams : {
+                                                                  to : to,
+                                                                  from : from,
+                                                                  args : args
                                                             }
                                                       });
-                                                      api.previewer.trigger( 'sek-set-level-options', {
-                                                            options_type : 'layout_background_border',
-                                                            id : params.id,
-                                                            value : moduleValueCandidate,
-                                                            in_sektion : params.in_sektion,
-                                                            in_column : params.in_column
-                                                      });
-                                                }, 100 ) );
-                                          });
+                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          });//api( layoutBgBorderOptionsSetId, function( _setting_ ) {})
+
+
                                           self.register( {
                                                 level : params.level,
                                                 what : 'setting',
@@ -1399,7 +1381,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 transport : 'postMessage',// 'refresh',
                                                 type : '_no_intended_to_be_saved_' //sekData.settingType
                                           });
-                                    }
+                                    }//if( ! api.has( layoutBgBorderOptionsSetId ) ) {
 
                                     self.register( {
                                           level : params.level,
@@ -1429,23 +1411,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
                                           api( spacingOptionsSetId, function( _setting_ ) {
-                                                _setting_.bind( _.debounce( function( to, from ) {
-                                                      // We don't want to store the default title and id module properties
-                                                      var moduleValueCandidate = {};
-                                                      _.each( to, function( _val, _property ) {
-                                                            if ( ! _.contains( ['title', 'id' ], _property ) ) {
-                                                                  moduleValueCandidate[ _property ] = _val;
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      self.updateAPISettingAndExecutePreviewActions({
+                                                            defaultPreviewAction : 'refresh_stylesheet',
+                                                            uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                            options_type : 'spacing',
+                                                            settingParams : {
+                                                                  to : to,
+                                                                  from : from,
+                                                                  args : args
                                                             }
                                                       });
-                                                      api.previewer.trigger( 'sek-set-level-options', {
-                                                            options_type : 'spacing',
-                                                            id : params.id,
-                                                            value : moduleValueCandidate,
-                                                            in_sektion : params.in_sektion,
-                                                            in_column : params.in_column
-                                                      });
-                                                }, 100 ) );
-                                          });
+                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          });//api( layoutBgBorderOptionsSetId, function( _setting_ ) {})
+
+
                                           self.register( {
                                                 level : params.level,
                                                 what : 'setting',
@@ -1495,8 +1475,110 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }//switch
 
                   return 'pending' == dfd.state() ? dfd.resolve().promise() : dfd.promise();//<= we might want to resolve on focus.completeCallback ?
-            },
+            },//generateUI()
 
+
+
+
+            // @params = {
+            //     uiParams : params,
+            //     options_type : 'layout_background_border',
+            //     settingParams : {
+            //           to : to,
+            //           from : from,
+            //           args : args
+            //     }
+            // }
+            //
+            // @param settingParams.args = {
+            //  inputRegistrationParams : {
+            //     id :,
+            //     type :
+            //     refresh_markup : bool
+            //     refresh_stylesheet : bool
+            //     refresh_fonts : bool
+            //  }
+            //  input_changed : input_id
+            //  input_transport : 'inherit'/'postMessage',
+            //  module : { items : [...]}
+            //  module_id :
+            //  not_preview_sent : bool
+            //}
+            updateAPISettingAndExecutePreviewActions : function( params ) {
+                  console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
+                  var self = this;
+                  //console.log('sek-generate-level-options-ui => ARGS ?',_setting_.id, args );
+                  // We don't want to store the default title and id module properties
+                  var moduleValueCandidate = {};
+                  _.each( params.settingParams.to, function( _val, _property ) {
+                        if ( ! _.contains( ['title', 'id' ], _property ) ) {
+                              moduleValueCandidate[ _property ] = _val;
+                        }
+                  });
+
+                  // What to do in the preview ?
+                  // The action to trigger is determined by the changed input
+                  // For the options of a level, the default action is to refresh the stylesheet.
+                  // But we might need to refresh the markup in some cases. Like for example when a css class is added.
+                  if ( _.isEmpty( params.settingParams.args.inputRegistrationParams ) ) {
+                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing inputRegistrationParams in passed params. No action can be triggered to the api.previewer.', params );
+                        return;
+                  }
+                  if ( _.isEmpty( params.defaultPreviewAction ) ) {
+                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing defaultPreviewAction in passed params. No action can be triggered to the api.previewer.', params );
+                        return;
+                  }
+                  // Set the default value
+                  var refresh_stylesheet = 'refresh_stylesheet' === params.defaultPreviewAction,//<= default action for level options
+                      refresh_markup = 'refresh_markup' === params.defaultPreviewAction,//<= default action for module options
+                      refresh_fonts = 'refresh_fonts' === params.defaultPreviewAction;
+
+                  // Maybe set the input based value
+                  if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_stylesheet ) ) {
+                        refresh_stylesheet = Boolean( params.settingParams.args.inputRegistrationParams.refresh_stylesheet );
+                  }
+                  if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_markup ) ) {
+                        refresh_markup = Boolean( params.settingParams.args.inputRegistrationParams.refresh_markup );
+                  }
+                  if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_fonts ) ) {
+                        refresh_fonts = Boolean( params.settingParams.args.inputRegistrationParams.refresh_fonts );
+                  }
+
+
+                  self.updateAPISetting({
+                        action : params.uiParams.action,
+                        id : params.uiParams.id,
+                        value : moduleValueCandidate,
+                        in_column : params.uiParams.in_column,
+                        in_sektion : params.uiParams.in_sektion,
+
+                        // specific for level options
+                        options_type : params.options_type,//'spacing', 'layout_background_border'
+
+                  }).done( function( ) {
+                        console.log('updateAPISettingAndExecutePreviewActions => updateAPISetting done');
+                        // STYLESHEET => default action when modifying the level options
+                        if ( true === refresh_stylesheet ) {
+                              api.previewer.send( 'sek-refresh-stylesheet', {
+                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                              });
+                        }
+
+                        // MARKUP
+                        if ( true === refresh_markup ) {
+                              api.previewer.send( 'sek-refresh-level', {
+                                    apiParams : {
+                                          action : 'sek-refresh-level',
+                                          id : params.uiParams.id,
+                                          level : params.uiParams.level
+                                    },
+                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                              });
+                        }
+
+                        // FONTS
+                  });//self.updateAPISetting()
+            },//updateAPISettingAndExecutePreviewActions
 
 
 
@@ -1529,7 +1611,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
             // user action => this utility must be used to set the main setting value
-            // the 'params' is an object passed as 3rd params ( @see api.Value override in base fmk api.Value.prototype.set() )
             // params = {
             //    action : 'sek-add-section', 'sek-add-column', 'sek-add-module',...
             //    in_sektion
@@ -2105,8 +2186,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               break;
 
+
                               case 'sek-set-module-value' :
-                                    moduleCandidate = self.getLevelModel( params.moduleId, newSetValue.collection );
+                                    moduleCandidate = self.getLevelModel( params.id, newSetValue.collection );
                                     var _value_ = {};
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
@@ -2150,6 +2232,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             return;
                                           _valueCandidate[ _key_ ] = _val_;
                                     });
+                                    if ( _.isEmpty( params.options_type ) ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
+                                    }
                                     switch( params.options_type ) {
                                           case 'layout_background_border' :
                                                 _candidate_.options.lbb = _valueCandidate;
@@ -3491,36 +3576,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//initialize
 
             CZRLBBInputMths : {
-                    initialize : function( name, options ) {
-                          var input = this;
-                          api.CZRInput.prototype.initialize.call( input, name, options );
-
-                          // trigger a level refresh when some specific inputs are changed
-                          if ( 'boxed-wide' == input.id ) {
-                                input.bind( function( to, from ) {
-                                      var registrationParams = input.input_parent.control.params.sek_registration_params,
-                                          level = registrationParams.level,
-                                          level_id = registrationParams.level_id;
-
-                                      var refreshLevelMarkupWhenDone = function( params ) {
-                                            api.previewer.trigger('sek-refresh-level', {
-                                                  level : level,
-                                                  id : level_id
-                                            });
-                                            // this has to be unbound each time, otherwise the binding will be cumulated and fired the number of time this input has been changed
-                                            api.previewer.unbind('sek-set-level-options_done', refreshLevelMarkupWhenDone );
-                                      };
-                                      // modifying the option module triggers a "sek-set-level-options" action on the previewer
-                                      // @see ::generateUI => case sek-generate-level-options-ui
-                                      // which is followed by a modification of the main section setting and a ajaxRefreshStylesheet
-                                      // @see preview => ::schedulePanelMsgReactions => case "sek-set-level-options"
-                                      // we receive in return the 'sek-set-level-options_done' action.
-                                      // This way we are sure that the input change has been taken into account in the api setting and in the preview css.
-                                      api.previewer.bind('sek-set-level-options_done', refreshLevelMarkupWhenDone );
-                                });
-                          }
-                    },
-
                     setupSelect : function() {
                             var input  = this,
                                   item   = input.input_parent,

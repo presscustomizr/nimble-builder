@@ -15,6 +15,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Max possible number of columns in a section
                   self.MAX_NUMBER_OF_COLUMNS = 12;
 
+                  // _.debounce param when updating the UI setting
+                  // prevent hammering server
+                  self.SETTING_UPDATE_BUFFER = 200;
+
                   // Define a default value for the sektion setting value, used when no server value has been sent
                   // @see php function
                   // function sek_get_default_sektions_value() {
@@ -151,9 +155,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // });
 
                   });//api.bind( 'ready' )
-
-
-
             },// initialize()
 
 

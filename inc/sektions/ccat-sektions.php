@@ -912,7 +912,8 @@ function sek_register_modules() {
                             'boxed-wide' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
-                                'preview-action' => 'refresh-gfonts'
+                                'refresh-markup' => true,
+                                'refresh-stylesheet' => false
                             ),
 
                             /* suspended, needs more thoughts
@@ -999,7 +1000,9 @@ function sek_register_modules() {
                         'inputs' => array(
                             'desktop_pad_marg' => array(
                                 'input_type'  => 'spacing',
-                                'title'       => __('Set padding and margin for Desktop', 'text_domain_to_be_replaced')
+                                'title'       => __('Set padding and margin for Desktop', 'text_domain_to_be_replaced'),
+                                'title_width' => 'width-100',
+                                'width-100'   => true
                             ),
                             'desktop_unit' =>  array(
                                 'input_type'  => 'select',
@@ -1013,7 +1016,9 @@ function sek_register_modules() {
                         'inputs' => array(
                             'tablet_pad_marg' => array(
                                 'input_type'  => 'spacing',
-                                'title'       => __('Set padding and margin for tablet devices', 'text_domain_to_be_replaced')
+                                'title'       => __('Set padding and margin for tablet devices', 'text_domain_to_be_replaced'),
+                                'title_width' => 'width-100',
+                                'width-100'   => true
                             ),
                             'tablet_unit' =>  array(
                                 'input_type'  => 'select',
@@ -1029,6 +1034,7 @@ function sek_register_modules() {
                                 'input_type'  => 'spacing',
                                 'title'       => __('Set padding and margin for mobile devices', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-100',
+                                'width-100'   => true
                             ),
                             'mobile_unit' =>  array(
                                 'input_type'  => 'select',
@@ -1324,7 +1330,7 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___v_alignment( $input_id, $input_data );
         break;
         case 'font_picker' :
-          sek_set_input_tmpl___font_picker( $input_id, $input_data );
+            sek_set_input_tmpl___font_picker( $input_id, $input_data );
         break;
     }
 }
@@ -3457,7 +3463,6 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                   'sek-remove-module',
                   'sek-duplicate-module',
                   'sek-refresh-modules-in-column',
-                  'sek-refresh-module-markup',
 
                   'sek-refresh-stylesheet',
 
@@ -3467,9 +3472,9 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
         // hook : 'wp_ajax_sek_get_html_for_injection'
         function sek_get_level_content_for_injection( $params ) {
-            // error_log('<ajax sek_get_level_content_for_injection>');
-            // error_log( print_r( $_POST, true ) );
-            // error_log('</ajax sek_get_level_content_for_injection>');
+            error_log('<ajax sek_get_level_content_for_injection>');
+            error_log( print_r( $_POST, true ) );
+            error_log('</ajax sek_get_level_content_for_injection>');
             if ( ! is_user_logged_in() ) {
                 wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
             }
@@ -3621,16 +3626,6 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                         $this -> parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
                     }
                     $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
-                break;
-
-                case 'sek-refresh-module-markup' :
-                    //error_log( print_r( $_POST, true ) );
-                    if ( ! array_key_exists( 'id', $_POST ) || empty( $_POST['id'] ) ) {
-                        wp_send_json_error(  __FUNCTION__ . ' ' . $sek_action .' => missing module id' );
-                        break;
-                    }
-
-                    $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                 break;
 
                 case 'sek-resize-columns' :

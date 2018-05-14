@@ -3,7 +3,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
             // user action => this utility must be used to set the main setting value
-            // the 'params' is an object passed as 3rd params ( @see api.Value override in base fmk api.Value.prototype.set() )
             // params = {
             //    action : 'sek-add-section', 'sek-add-column', 'sek-add-module',...
             //    in_sektion
@@ -579,8 +578,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               break;
 
+
                               case 'sek-set-module-value' :
-                                    moduleCandidate = self.getLevelModel( params.moduleId, newSetValue.collection );
+                                    moduleCandidate = self.getLevelModel( params.id, newSetValue.collection );
                                     var _value_ = {};
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
@@ -624,6 +624,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             return;
                                           _valueCandidate[ _key_ ] = _val_;
                                     });
+                                    if ( _.isEmpty( params.options_type ) ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
+                                    }
                                     switch( params.options_type ) {
                                           case 'layout_background_border' :
                                                 _candidate_.options.lbb = _valueCandidate;

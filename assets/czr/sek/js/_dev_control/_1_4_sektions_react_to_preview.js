@@ -13,10 +13,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this,
                       apiParams = {},
                       uiParams = {},
+                      sendToPreview = true, //<= the default behaviour is to send a message to the preview when the setting has been changed
                       msgCollection = {
                             // UPDATE THE MAIN SETTING
                             'sek-add-section' :{
                                   callback : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         apiParams = {
                                               action : 'sek-add-section',
@@ -41,6 +43,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
                             'sek-add-column' : {
                                   callback : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         apiParams = {
                                               id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
@@ -61,6 +64,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
                             'sek-add-module' : {
                                   callback :function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         apiParams = {
                                               id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
@@ -83,6 +87,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
                             'sek-remove' : {
                                   callback : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         switch( params.level ) {
                                               case 'section' :
@@ -120,6 +125,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             'sek-move' : {
                                   callback  : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         switch( params.level ) {
                                               case 'section' :
@@ -191,6 +197,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // then the level clone id will be send back to the preview for the ajax rendering ( this is done in updateAPISetting() promise() )
                             'sek-duplicate' : {
                                   callback : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         switch( params.level ) {
                                               case 'section' :
@@ -257,6 +264,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   }
                             },
                             'sek-resize-columns' : function( params ) {
+                                  sendToPreview = true;
                                   uiParams = {};
                                   //console.log( 'panel => reactToPreviewMsg => ', params );
                                   apiParams = params;
@@ -273,6 +281,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // }
                             'sek-add-content-in-new-sektion' : {
                                   callback : function( params ) {
+                                        sendToPreview = true;
                                         uiParams = {};
                                         apiParams = params;
                                         apiParams.action = 'sek-add-content-in-new-sektion';
@@ -302,36 +311,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   }
                             },
 
-                            'sek-set-level-options' : {
-                                  callback : function( params ) {
-                                        uiParams = {};
-                                        apiParams = {
-                                              action : 'sek-set-level-options',
-                                              options_type : params.options_type,//'spacing', 'layout_background_border'
-                                              id : params.id,
-                                              value : params.value,
-                                              in_sektion : params.in_sektion,
-                                              in_column : params.in_column
-                                        };
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {}
-                            },
-
-
-
-
-
-
-
-
-
 
 
 
 
                             // GENERATE UI ELEMENTS
                             'sek-pick-module' : function( params ) {
+                                  sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
@@ -340,6 +326,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return self.generateUI( uiParams );
                             },
                             'sek-pick-section' : function( params ) {
+                                  sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
@@ -349,6 +336,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
                             'sek-edit-options' : function( params ) {
                                   //console.log('IN EDIT OPTIONS ', params );
+                                  sendToPreview = true;
                                   apiParams = {};
                                   if ( _.isEmpty( params.id ) ) {
                                         return $.Deferred( function() {
@@ -366,6 +354,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return self.generateUI( uiParams );
                             },
                             'sek-edit-module' : function( params ) {
+                                  sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-module-ui',
@@ -386,6 +375,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             //  duration : in ms
                             // }
                             'sek-notify' : function( params ) {
+                                  sendToPreview = false;
                                   return $.Deferred(function() {
                                         api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                               api.notifications.add( new api.Notification( 'sek-notify', {
@@ -404,6 +394,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
 
                             'sek-refresh-level' : function( params ) {
+                                  sendToPreview = true;
                                   return $.Deferred(function() {
                                         apiParams = {
                                               action : 'sek-refresh-level',
@@ -418,7 +409,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                       };//msgCollection
 
-                  // Schedule
+                  // Schedule the reactions
+                  // May be send a message to the preview
                   _.each( msgCollection, function( callbackFn, msgId ) {
                         api.previewer.bind( msgId, function( params ) {
                               var _cb_;
@@ -435,15 +427,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // the cloneId is passed when resolving the ::updateAPISetting() promise()
                                     // they are needed on level duplication to get the newly generated level id.
                                     .done( function( cloneId ) {
-                                          api.previewer.send(
-                                                msgId,
-                                                {
-                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                                      apiParams : apiParams,
-                                                      uiParams : uiParams,
-                                                      cloneId : ! _.isEmpty( cloneId ) ? cloneId : false
-                                                }
-                                          );
+                                          // Send to the preview
+                                          if ( sendToPreview ) {
+                                                api.previewer.send(
+                                                      msgId,
+                                                      {
+                                                            skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                            apiParams : apiParams,
+                                                            uiParams : uiParams,
+                                                            cloneId : ! _.isEmpty( cloneId ) ? cloneId : false
+                                                      }
+                                                );
+                                          } else {
+                                                // if nothing was sent to the preview, trigger the '*_done' action so we can execute the 'complete' callback
+                                                api.previewer.trigger( [msgId, 'done'].join('_'), { apiParams : apiParams, uiParams : uiParams } );
+                                          }
                                           // say it
                                           self.trigger( [ msgId, 'done' ].join('_'), params );
                                     })
@@ -477,8 +475,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           api.errare( 'reactToPreviewMsg done => error when receiving ' + [msgId, 'done'].join('_') , _er_ );
                                     }
                               }
-
-
                         });
                   });
             },//reactToPreview();

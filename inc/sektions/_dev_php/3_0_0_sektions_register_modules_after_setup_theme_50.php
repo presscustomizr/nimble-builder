@@ -140,7 +140,8 @@ function sek_register_modules() {
                             'boxed-wide' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
-                                'preview-action' => 'refresh-gfonts'
+                                'refresh-markup' => true,
+                                'refresh-stylesheet' => false
                             ),
 
                             /* suspended, needs more thoughts
@@ -227,7 +228,9 @@ function sek_register_modules() {
                         'inputs' => array(
                             'desktop_pad_marg' => array(
                                 'input_type'  => 'spacing',
-                                'title'       => __('Set padding and margin for Desktop', 'text_domain_to_be_replaced')
+                                'title'       => __('Set padding and margin for Desktop', 'text_domain_to_be_replaced'),
+                                'title_width' => 'width-100',
+                                'width-100'   => true
                             ),
                             'desktop_unit' =>  array(
                                 'input_type'  => 'select',
@@ -241,7 +244,9 @@ function sek_register_modules() {
                         'inputs' => array(
                             'tablet_pad_marg' => array(
                                 'input_type'  => 'spacing',
-                                'title'       => __('Set padding and margin for tablet devices', 'text_domain_to_be_replaced')
+                                'title'       => __('Set padding and margin for tablet devices', 'text_domain_to_be_replaced'),
+                                'title_width' => 'width-100',
+                                'width-100'   => true
                             ),
                             'tablet_unit' =>  array(
                                 'input_type'  => 'select',
@@ -257,6 +262,7 @@ function sek_register_modules() {
                                 'input_type'  => 'spacing',
                                 'title'       => __('Set padding and margin for mobile devices', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-100',
+                                'width-100'   => true
                             ),
                             'mobile_unit' =>  array(
                                 'input_type'  => 'select',

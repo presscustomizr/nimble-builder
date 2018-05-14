@@ -15,36 +15,6 @@
             },//initialize
 
             CZRLBBInputMths : {
-                    initialize : function( name, options ) {
-                          var input = this;
-                          api.CZRInput.prototype.initialize.call( input, name, options );
-
-                          // trigger a level refresh when some specific inputs are changed
-                          if ( 'boxed-wide' == input.id ) {
-                                input.bind( function( to, from ) {
-                                      var registrationParams = input.input_parent.control.params.sek_registration_params,
-                                          level = registrationParams.level,
-                                          level_id = registrationParams.level_id;
-
-                                      var refreshLevelMarkupWhenDone = function( params ) {
-                                            api.previewer.trigger('sek-refresh-level', {
-                                                  level : level,
-                                                  id : level_id
-                                            });
-                                            // this has to be unbound each time, otherwise the binding will be cumulated and fired the number of time this input has been changed
-                                            api.previewer.unbind('sek-set-level-options_done', refreshLevelMarkupWhenDone );
-                                      };
-                                      // modifying the option module triggers a "sek-set-level-options" action on the previewer
-                                      // @see ::generateUI => case sek-generate-level-options-ui
-                                      // which is followed by a modification of the main section setting and a ajaxRefreshStylesheet
-                                      // @see preview => ::schedulePanelMsgReactions => case "sek-set-level-options"
-                                      // we receive in return the 'sek-set-level-options_done' action.
-                                      // This way we are sure that the input change has been taken into account in the api setting and in the preview css.
-                                      api.previewer.bind('sek-set-level-options_done', refreshLevelMarkupWhenDone );
-                                });
-                          }
-                    },
-
                     setupSelect : function() {
                             var input  = this,
                                   item   = input.input_parent,

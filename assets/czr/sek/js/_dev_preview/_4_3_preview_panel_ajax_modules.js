@@ -34,30 +34,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                     }).fail( function( _r_ ) {
                           czrapp.errare( 'ERROR reactToPanelMsg => sek-add-module => ' , _r_ );
                     });
-              },//ajaxRefreshModulesAndNestedSections()
-
-
-              ajaxRefreshModuleMarkup : function( params ) {
-                    return czrapp.doAjax( {
-                          action : 'sek_get_content',
-                          id : params.moduleId,
-                          skope_id : params.skope_id,
-                          sek_action : 'sek-refresh-module-markup'
-                    }).done( function( _r_ ) {
-                          var $module = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.moduleId + '"]' );
-                          if ( 1 > $module.length ) {
-                                czrapp.errare( 'reactToPanelMsg => sek-refresh-module-markup => no DOM node for module' + params.moduleId );
-                          }
-                          var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.moduleId + '"></span>';
-                          $module.before( placeholderHtml );
-                          // remove and re-render the module
-                          $module.remove();
-                          $( '.sektion-wrapper').find( '[data-sek-placeholder-for="' + params.moduleId + '"]' ).after( _r_.data );
-                          $( '.sektion-wrapper').find( '[data-sek-placeholder-for="' + params.moduleId + '"]' ).remove();
-
-                    }).fail( function( _r_ ) {
-                          czrapp.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
-                    });
-            }//ajaxSetModuleValue
+              }//ajaxRefreshModulesAndNestedSections()
       });//$.extend()
 })( wp.customize, jQuery, _ );
