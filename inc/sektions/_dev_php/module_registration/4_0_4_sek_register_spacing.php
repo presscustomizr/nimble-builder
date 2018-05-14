@@ -69,4 +69,86 @@ function sek_get_module_params_for_sek_spacing_module() {
     );
 }
 
+/* ------------------------------------------------------------------------- *
+ *  SCHEDULE CSS RULES FILTERING
+/* ------------------------------------------------------------------------- */
+add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_spacing', 10, 3 );
+// hook : sek_dyn_css_builder_rules
+// @return array() of css rules
+function sek_add_css_rules_for_spacing( array $rules, array $level ) {
+
+    $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
+
+    //spacing
+    if ( empty( $options[ 'spacing' ] ) )
+      return $rules;
+
+
+    $default_unit = 'px';
+
+    //not mobile first
+    $_desktop_rules = $_mobile_rules = $_tablet_rules = null;
+
+    if ( !empty( $options[ 'spacing' ][ 'desktop_pad_marg' ] ) ) {
+         $_desktop_rules = array( 'rules' => $options[ 'spacing' ][ 'desktop_pad_marg' ] );
+    }
+
+    $_pad_marg = array(
+        'desktop' => array(),
+        'tablet' => array(),
+        'mobile' => array()
+    );
+
+    foreach( array_keys( $_pad_marg ) as $device  ) {
+        if ( !empty( $options[ 'spacing' ][ "{$device}_pad_marg" ] ) ) {
+            $_pad_marg[ $device ] = array( 'rules' => $options[ 'spacing' ][ "{$device}_pad_marg" ] );
+
+            //add unit and sanitize padding (cannot have negative padding)
+            $unit                 = !empty( $options[ 'spacing' ][ "{$device}_unit" ] ) ? $options[ 'spacing' ][ "{$device}_unit" ] : $default_unit;
+            $unit                 = 'percent' == $unit ? '%' : $unit;
+            array_walk( $_pad_marg[ $device ][ 'rules' ],
+                function( &$val, $key, $unit ) {
+                    //make sure paddings are positive values
+                    if ( FALSE !== strpos( 'padding', $key ) ) {
+                        $val = abs( $val );
+                    }
+
+                    $val .= $unit;
+            }, $unit );
+        }
+    }
+
+
+    /*
+    * TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
+    */
+    if ( ! empty( $_pad_marg[ 'desktop' ] ) ) {
+        $_pad_marg[ 'desktop' ][ 'mq' ] = null;
+    }
+
+    if ( ! empty( $_pad_marg[ 'tablet' ] ) ) {
+        $_pad_marg[ 'tablet' ][ 'mq' ]  = array( 'max' => (int)( Sek_Dyn_CSS_Builder::$breakpoints['lg'] - 1 ) ); //max-width: 991
+    }
+
+    if ( ! empty( $_pad_marg[ 'mobile' ] ) ) {
+        $_pad_marg[ 'mobile' ][ 'mq' ]  = array( 'max' => (int)( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) ); //max-width: 575
+    }
+
+    foreach( array_filter( $_pad_marg ) as $_spacing_rules ) {
+        $style_rules = implode(';',
+            array_map( function( $key, $value ) {
+                return "$key:{$value}";
+            }, array_keys( $_spacing_rules[ 'rules' ] ), array_values( $_spacing_rules[ 'rules' ] )
+        ) );
+
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$level['id'].'"]',
+            'style_rules' => $style_rules,
+            'mq' =>$_spacing_rules[ 'mq' ]
+        );
+    }
+
+    return $rules;
+}
+
 ?>

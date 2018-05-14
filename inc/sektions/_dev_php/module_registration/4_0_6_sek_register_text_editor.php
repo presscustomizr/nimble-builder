@@ -33,7 +33,10 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                         'inputs' => array(
                             'font-family' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __('Font family', 'text_domain_to_be_replaced')
+                                'title'       => __('Font family', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true,
+                                'refresh-fonts' => true,
                             ),
                             'font-size'       => array(
                                 'input_type'  => 'font_size',
@@ -85,5 +88,6 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
         'placeholder_icon' => 'short_text'
     );
 }
+
 
 ?>
