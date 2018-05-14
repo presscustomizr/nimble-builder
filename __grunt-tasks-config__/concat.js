@@ -183,8 +183,9 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_7_sek_input_tmpl_font_picker.php',
 
       // DYN CSS
-      '<%= paths.sektions %>_dev_php/5_0_0_class-sek-dyn-css-builder.php',
-      '<%= paths.sektions %>_dev_php/5_0_1_class-sek-dyn-css-handler.php',
+      '<%= paths.sektions %>_dev_php/5_0_0_class-sek-dyn-css-stylesheet.php',
+      '<%= paths.sektions %>_dev_php/5_0_1_class-sek-dyn-css-builder.php',
+      '<%= paths.sektions %>_dev_php/5_0_2_class-sek-dyn-css-handler.php',
 
       // SEK_Front_Render()
       '<%= paths.sektions %>_dev_php/8_0_0_sektions_front_class_construct.php',
@@ -196,6 +197,8 @@ module.exports = {
     ],
     dest: '<%= paths.sektions %>ccat-sektions.php',
   },
+
+
 
   czr_sektions_customizer_js : {
     src: [

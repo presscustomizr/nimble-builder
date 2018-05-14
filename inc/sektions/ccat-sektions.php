@@ -1804,6 +1804,151 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
+class Sek_Stylesheet {
+
+    private $rules = array();
+
+
+    public function sek_add_rule( $selector, $style_rules, array $mq = null ) {
+
+        if ( ! is_string( $selector ) )
+            return;
+
+        if ( ! is_string( $style_rules ) )
+            return;
+
+        //TODO: allowed media query?
+        $mq_hash = 'all';
+
+        if ( $mq ) {
+            $mq_hash = $this->sek_mq_to_hash( $mq );
+        }
+
+        if ( !isset( $this->rules[ $mq_hash ] ) ) {
+            $this->sek_add_mq_hash( $mq_hash );
+        }
+
+        if ( !isset( $this->rules[ $mq_hash ][ $selector ] ) ) {
+            $this->rules[ $mq_hash ][ $selector ] = array();
+        }
+
+        $this->rules[ $mq_hash ][ $selector ][] = $style_rules;
+    }
+
+
+    //totally Elementor inpired
+    //add and sort media queries
+    private function sek_add_mq_hash( $mq_hash ) {
+        $this->rules[ $mq_hash ] = array();
+
+        //TODO: test and probably improve ordering: need to think about convoluted use cases
+        uksort(
+            $this->rules, function( $a, $b ) {
+                if ( 'all' === $a ) {
+                    return -1;
+                }
+
+                if ( 'all' === $b ) {
+                    return 1;
+                }
+
+                $a_query = $this->sek_hash_to_mq( $a );
+
+                $b_query = $this->sek_hash_to_mq( $b );
+
+                if ( isset( $a_query['min'] ) xor isset( $b_query['min'] ) ) {
+                    return 1;
+                }
+
+                if ( isset( $a_query['min'] ) ) {
+                    return $a_query['min'] - $b_query['min'];
+                }
+
+                return $b_query['max'] - $a_query['max'];
+            }
+        );
+    }
+
+
+    //totally Elementor inpired
+    private function sek_mq_to_hash( array $mq ) {
+        $hash = [];
+
+        foreach ( $mq as $min_max => $value ) {
+            $hash[] = $min_max . '_' . $value;
+        }
+
+        return implode( '-', $hash );
+    }
+
+
+    //totally Elementor inpired
+    private function sek_hash_to_mq( $mq_hash ) {
+        $mq = [];
+
+        $mq_hash = array_filter( explode( '-', $mq_hash ) );
+
+        foreach ( $mq_hash as $single_mq ) {
+            $single_mq_parts = explode( '_', $single_mq );
+
+            $mq[ $single_mq_parts[0] ] = $single_mq_parts[1];
+
+        }
+
+        return $mq;
+    }
+
+
+    private function sek_maybe_wrap_in_media_query( $css,  $mq_hash = 'all' ) {
+        if ( 'all' === $mq_hash ) {
+            return $css;
+        }
+
+        $mq           = $this->sek_hash_to_mq( $mq_hash );
+
+        return '@media ' . implode( ' and ', array_map(
+                function( $min_max, $value ) {
+                    return "({$min_max}-width:{$value}px)";
+                },
+                array_keys( $mq ),
+                array_values( $mq )
+            )
+        ) . '{' . $css . '}';
+    }
+
+
+
+    private function sek_parse_rules( $selector, $style_rules = array() ) {
+        $style_rules = is_array( $style_rules ) ? implode( ';', $style_rules ) : $style_rules;
+        return $selector . '{' . $style_rules . '}';
+    }
+
+
+
+
+    //stringify the stylesheet object
+    public function __toString() {
+        $css = '';
+        foreach ( $this->rules as $mq_hash => $selectors ) {
+            $_css = '';
+            foreach ( $selectors as $selector => $style_rules ) {
+                $_css .=  $this->sek_parse_rules( $selector, $style_rules );
+            }
+            $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_hash );
+            $css .= $_css;
+        }
+
+        return $css;
+    }
+
+
+}//end class
+
+?><?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly.
+}
+
 
 /**
  *  Sek Dyn CSS Builder: class responsible for building Stylesheet from a sek model
@@ -2247,345 +2392,6 @@ class Sek_Dyn_CSS_Builder {
 
 
 }//end class
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class Sek_Stylesheet {
-
-    private $rules = array();
-
-
-    public function sek_add_rule( $selector, $style_rules, array $mq = null ) {
-
-        if ( ! is_string( $selector ) )
-            return;
-
-        if ( ! is_string( $style_rules ) )
-            return;
-
-        //TODO: allowed media query?
-        $mq_hash = 'all';
-
-        if ( $mq ) {
-            $mq_hash = $this->sek_mq_to_hash( $mq );
-        }
-
-        if ( !isset( $this->rules[ $mq_hash ] ) ) {
-            $this->sek_add_mq_hash( $mq_hash );
-        }
-
-        if ( !isset( $this->rules[ $mq_hash ][ $selector ] ) ) {
-            $this->rules[ $mq_hash ][ $selector ] = array();
-        }
-
-        $this->rules[ $mq_hash ][ $selector ][] = $style_rules;
-    }
-
-
-    //totally Elementor inpired
-    //add and sort media queries
-    private function sek_add_mq_hash( $mq_hash ) {
-        $this->rules[ $mq_hash ] = array();
-
-        //TODO: test and probably improve ordering: need to think about convoluted use cases
-        uksort(
-            $this->rules, function( $a, $b ) {
-                if ( 'all' === $a ) {
-                    return -1;
-                }
-
-                if ( 'all' === $b ) {
-                    return 1;
-                }
-
-                $a_query = $this->sek_hash_to_mq( $a );
-
-                $b_query = $this->sek_hash_to_mq( $b );
-
-                if ( isset( $a_query['min'] ) xor isset( $b_query['min'] ) ) {
-                    return 1;
-                }
-
-                if ( isset( $a_query['min'] ) ) {
-                    return $a_query['min'] - $b_query['min'];
-                }
-
-                return $b_query['max'] - $a_query['max'];
-            }
-        );
-    }
-
-
-    //totally Elementor inpired
-    private function sek_mq_to_hash( array $mq ) {
-        $hash = [];
-
-        foreach ( $mq as $min_max => $value ) {
-            $hash[] = $min_max . '_' . $value;
-        }
-
-        return implode( '-', $hash );
-    }
-
-
-    //totally Elementor inpired
-    private function sek_hash_to_mq( $mq_hash ) {
-        $mq = [];
-
-        $mq_hash = array_filter( explode( '-', $mq_hash ) );
-
-        foreach ( $mq_hash as $single_mq ) {
-            $single_mq_parts = explode( '_', $single_mq );
-
-            $mq[ $single_mq_parts[0] ] = $single_mq_parts[1];
-
-        }
-
-        return $mq;
-    }
-
-
-    private function sek_maybe_wrap_in_media_query( $css,  $mq_hash = 'all' ) {
-        if ( 'all' === $mq_hash ) {
-            return $css;
-        }
-
-        $mq           = $this->sek_hash_to_mq( $mq_hash );
-
-        return '@media ' . implode( ' and ', array_map(
-                function( $min_max, $value ) {
-                    return "({$min_max}-width:{$value}px)";
-                },
-                array_keys( $mq ),
-                array_values( $mq )
-            )
-        ) . '{' . $css . '}';
-    }
-
-
-
-    private function sek_parse_rules( $selector, $style_rules = array() ) {
-        $style_rules = is_array( $style_rules ) ? implode( ';', $style_rules ) : $style_rules;
-        return $selector . '{' . $style_rules . '}';
-    }
-
-
-
-
-    //stringify the stylesheet object
-    public function __toString() {
-        $css = '';
-        foreach ( $this->rules as $mq_hash => $selectors ) {
-            $_css = '';
-            foreach ( $selectors as $selector => $style_rules ) {
-                $_css .=  $this->sek_parse_rules( $selector, $style_rules );
-            }
-            $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_hash );
-            $css .= $_css;
-        }
-
-        return $css;
-    }
-
-
-}//end class
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-array(
-    //Section 1
-    array(
-        id => 1
-        collection => array(
-            //column 1
-            array(
-                id => 12
-                collection => array(
-                      //module 1
-                      array(
-                            id => 123,
-                            options => array()
-                      ),
-                      // module 2
-                      array(),
-                      ...
-                ),
-                options => array(),
-                width => ''
-            ),
-            //column 2
-            array(),
-            ...
-        ),
-        options => array(
-            // layout, background, border
-            lbb => array(
-                bg-img = ''
-                bg-color = ''
-            ),
-            // spacing
-            spacing => array(
-
-            )
-        )
-    ),
-
-    //Section  2
-    array(),
-    ...
-)
-*/
-// $_sektions = array(
-//     'collection' => array(
-
-//         array(
-//                 'id' => '__sek__db36a8b7642a7a5a2a19e1f6',
-//                 'level' => 'section',
-//                 'collection' => array(
-//                         array(
-//                                 'id' => '__sek__5af332dc6784ce1f1e17a3ba',
-//                                 'level' => 'column',
-//                                 'collection' => array(),
-//                                 'options' => array(
-//                                         'lbb' => array(
-//                                                 'bg-color' => '#dd9933'
-//                                         ),
-//                                         'spacing' => array(
-//                                             'desktop_pad_marg' => array(
-//                                                 'padding-top' => 10,
-//                                             ),
-//                                         )
-//                                 ),
-//                         ),
-//                 ),
-
-//         ),//end sek-1
-
-//         array(
-//                 'id' => '__sek__659b99908c05fd55d7a09401',
-//                 'level' => 'section',
-//                 'collection' => array(
-//                         array(
-//                                 'id' => '__sek__da7fe9822690cc0fd0f843e9',
-//                                 'level' => 'column',
-//                                 'collection' => array(),
-//                                 'options' => array(
-//                                         'spacing' => array(
-//                                             'desktop_pad_marg' => array(
-//                                                 'padding-top' => 10,
-//                                                 'padding-bottom' => 10,
-//                                                 'margin-top' => 10,
-//                                             ),
-//                                             'tablet_pad_marg' => array(
-//                                                 'padding-top' => 20
-//                                             )
-//                                         )
-
-//                                 )
-//                         )
-//                 )
-
-//         )//end sek-2
-//     )//end sek collection
-// );
-
-
-
-
-
-
-
-
-
-
-//TEST
-// require_once( 'class-sek-dyn-css-handler.php' );
-// add_action( 'wp_head', function() use ( $_sektions ) {
-
-//     $skope_id = skp_build_skope_id();
-
-//     /*
-//     * Once this file is required, the whole code below can be
-//     * placed in SEK_Front_Render::print_dyn_inline_stylesheet()
-//     * after
-//             if ( is_null( $skope_id ) ) {
-//                 $skope_id = skp_build_skope_id();
-//             }
-//     * in place of :
-    /*?>
-        <style id="sek-<?php echo $skope_id; ?>" type="text/css">
-            <?php // COLUMN WIDTH ?>
-            @media (min-width: 768px) { <?php echo $this -> print_custom_width_styles( $skope_id ); ?> }
-            <?php // SECTION BACKGROUND ?>
-            <?php echo $this -> print_level_background( $skope_id ); ?>
-        </style>
-    <?php*/
-
-//     Also remember to uncomment the very line below
-//     */
-//     //$_sektions = sek_get_skoped_seks( $skope_id );
-
-//     //build stylesheet
-//     $stylesheet = new Sek_Stylesheet();
-//     $builder    = new Sek_Dyn_CSS_Builder( $_sektions, $stylesheet );
-//     $builder->sek_dyn_css_builder_build_stylesheet();
-
-
-//     //enqueuing
-//     $dyn_css_handler_params = array(
-//         'id'             => $skope_id,
-//         'mode'           => Sek_Dyn_CSS_Handler::MODE_FILE,
-//         //these are taken in account only when 'mode' is 'file'
-//         'force_write'    => true, //<- write if the file doesn't exist
-
-//         //TEMPORARY: we actually need to refresh the file on customize_save only when needed
-//         'force_rewrite'  => true, //<- write even if the file exists
-//     );
-
-//     $_is_preview     = is_customize_preview();
-
-//     if ( $_is_preview ) {
-//         $dyn_css_handler_params = array_merge( $dyn_css_handler_params, array(
-//             'mode'       => Sek_Dyn_CSS_Handler::MODE_INLINE,
-//         ) );
-//     }
-
-//     //Init the enqueuer
-//     $dyn_css_handler = new Sek_Dyn_CSS_Handler( $dyn_css_handler_params );
-//     $dyn_css_handler->sek_dyn_css_set_css( (string)$stylesheet );
-
-//     //finally enqueue
-//     $dyn_css_handler->sek_dyn_css_enqueue();
-// });
 
 ?><?php
 if ( ! defined( 'ABSPATH' ) ) {
