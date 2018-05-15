@@ -1,5 +1,6 @@
 $project-base: 'sek' !default;
 $project-prefix: $project-base + '-' !default;
+$project-base-wrapper: 'sektion-wrapper' !default;
 
 $enable-grid-classes: true !default;
 

@@ -1,0 +1,157 @@
+// Responsive wrappers
+[class*=sek__r-w] {
+  position: relative;
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+[class*=sek__r-w]::before {
+  display: block;
+  content: "";
+}
+
+// Various responsive ratios
+.sek__r-wFP::before {
+  padding-top: 92.592593%; // default fp aspect ratio
+}
+
+
+.sek-fp-widget {
+  text-align: center;
+  margin: auto!important;
+
+  h2 {
+    font-size: 1.6em;
+    margin: 10px 0;
+    font-weight: 700;
+    line-height: 1.55em;
+    text-shadow: 0 1px 0 #FFF;
+    text-align: center
+  }
+  > p {
+    line-height: 1.55em;
+    > a {
+      padding: 0!important;
+      display: inline!important;
+      line-height: 1em!important;
+    }
+  }
+
+  .sek-fp-thumb-wrapper {
+    /* this actually depends on the thumb size */
+    max-width: 270px;
+    margin: 8px auto;
+  }
+
+  img {
+    transform: translate3d(0, 0, 0);
+    -ms-transform: translate(0, 0);
+
+    transform-style: preserve-3d;
+
+    backface-visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+
+  .js-center-images-disabled & img {
+    // temporary CSS centering
+
+    // fallback for those browsers w/o translate3d transform property
+    transform: translate(-50%, -50%);
+
+    transform: translate3d(-50%, -50%, 0);
+    -ms-transform: translate(-50%, -50%);
+
+    top: 50%;
+    left: 50%;
+    max-width: 100%;
+    min-height: 100%;
+  }
+
+
+  // JS IMAGE CENTERING
+  img.h-centered {
+    width: auto!important;
+    max-width: none!important;
+    position: relative;
+  }
+  img.v-centered {
+    height: auto!important;
+    max-height: none!important;
+    max-width: none!important;
+    vertical-align: top;
+    position: relative;
+  }
+}
+
+.sek-link-mask {
+  position: absolute;
+  border-color: white;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: 1;
+
+  &.no-effect {
+    border: none
+  }
+
+
+  &::before {
+    position: absolute;
+    width: 63%;
+    //
+    // this refers to the parent width, allowing us to have a perfect square despite the parent
+    // as it has the same element's width percentage value.
+    //
+    padding-bottom: 63%;
+    content: '';
+    z-index: 1;
+    // Centering
+    left: 50%;
+    top: 50%;
+    // fallback for those browsers w/o translate3d transform property
+    transform: translate(-50%, -50%);
+    transform: translate3d(-50%, -50%, 0);
+    /* end of centering */
+
+    border: 150px solid;
+    border-color: inherit;
+    box-sizing: content-box;
+    transition: all .3s ease;
+  }
+
+  .round &::before {
+    border-radius: 50%;
+  }
+
+  .sek-link-mask-p:hover &::before {
+    transform: translate(-50%, -50%) scale(1.4);
+    /* fallback for those browsers w/o translate3d transform property*/
+    transform: translate3d(-50%, -50%, 0) scale(1.4);
+    -ms-transform: translate(-50%, -50%) scale(1.4);
+  }
+
+}
+
+//needs modernizr
+.no-cssanimations {
+  .sek-link-mask {
+    border: transparent;
+  }
+  .sek-fp-thumb-wrapper {
+    opacity: .7
+  }
+  .sek-fp-thumb-wrapper:hover {
+    opacity: 1
+  }
+}
