@@ -1140,7 +1140,9 @@ add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", 'sek_get_font_list_tmpl'
 //
 // For czr_tiny_mce_editor_module, we request the font_list tmpl
 function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
-    error_log( print_r( $posted_params, true ) );
+    // error_log('<' . __FUNCTION__ . ' => ajax posted params>');
+    // error_log( print_r( $posted_params, true ) );
+    // error_log('<' . __FUNCTION__ . ' => ajax posted params>');
     $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
     //czr_fn\czr_register_dynamic_module
     $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
@@ -2363,6 +2365,7 @@ class Sek_Dyn_CSS_Builder {
     private $stylesheet;
     private $sek_model;
     private $parent_level = array();
+    //public $gfonts = array();
 
     public function __construct( $sek_model = array(), Sek_Stylesheet $stylesheet ) {
         $this->stylesheet = $stylesheet;
@@ -2377,7 +2380,7 @@ class Sek_Dyn_CSS_Builder {
          *  SCHEDULE CSS RULES FILTERING
         /* ------------------------------------------------------------------------- */
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
-        add_filter( 'sek_add_css_rules_for_font-family', array( $this, 'sek_add_rules_for_font_families' ), 10, 3 );
+        add_filter( 'sek_add_css_rules_for_font-family', array( $this, 'sek_handle_rules_and_font_list_for_font_families' ), 10, 3 );
         $this->sek_css_rules_sniffer_walker();
     }
 
@@ -2463,21 +2466,57 @@ class Sek_Dyn_CSS_Builder {
 
     // hook : sek_dyn_css_builder_rules
     // @return array() of css rules
-    public function sek_add_rules_for_font_families( array $rules, $value, array $parent_level ) {
-        error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => $parent_level>');
-        error_log( print_r( $parent_level, true ) );
-        error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => $parent_level>');
-        error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => $value>');
-        error_log( print_r( $value, true ) );
-        error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => $value>');
-        $font_family = str_replace('[cfont]', '', $value );
+    public function sek_handle_rules_and_font_list_for_font_families( array $rules, $value, array $parent_level ) {
+        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => $parent_level>');
+        // error_log( print_r( $parent_level, true ) );
+        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => $parent_level>');
+        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => $value>');
+        // error_log( print_r( $value, true ) );
+        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => $value>');
+
+        $family = $value;
+        $properties_to_render = array();
+        $style_rules = '';
+        // Preprocess the selected font family
+        //font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
+        //special treatment for font-family
+        if ( false != strstr( $value, '[gfont]') ) {
+            $split = explode(":", $family);
+            $family = $split[0];
+            //only numbers for font-weight. 400 is default
+            $properties_to_render['font-weight']    = $split[1] ? preg_replace('/\D/', '', $split[1]) : '';
+            $properties_to_render['font-weight']    = empty($properties_to_render['font-weight']) ? 400 : $properties_to_render['font-weight'];
+            $properties_to_render['font-style']     = ( $split[1] && strstr($split[1], 'italic') ) ? 'italic' : 'normal';
+        }
+
+        $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
+        $properties_to_render['font-family'] = false != strstr( $value, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
+
+        foreach ($properties_to_render as $prop => $prop_val) {
+            $style_rules .=   sprintf( '%1$s : %2$s;', $prop, $prop_val );
+        }//end foreach
+
+
+        // Create the css rules
         $rules[] = array(
             'selector'      => '[data-sek-id="'.$parent_level['id'].'"]',
-            'style_rules'   => 'font-family:' . $font_family,
+            'style_rules'   => $style_rules,
             'mq'            => null
         );
+
+        // If the family is a gfont, populate the list
+        // if ( false != strstr( $value, '[gfont]') ) {
+        //     $gfonts = is_array( $this->gfonts ) ? $this->gfonts : [];
+        //     $candidate = str_replace( '[gfont]', '' , $value);
+        //     if ( ! in_array( $candidate, $gfonts ) ) {
+        //         $gfonts[] = $candidate;
+        //     }
+        //     $this->gfonts = $gfonts;
+        // }
+
         return $rules;
     }
+
 }//end class
 
 ?><?php
@@ -2517,6 +2556,7 @@ class Sek_Dyn_CSS_Handler {
      *
      * Holds the CSS resource ID
      * Will be used to generate both the file name and the CSS handle when enqueued_or_printed
+     * Usually set to skope_id
      *
      * @access private
      * @var string
@@ -2614,7 +2654,7 @@ class Sek_Dyn_CSS_Handler {
      * @access private
      * @var bool
      */
-    private $write_only = false;
+    private $customizer_save = false;
 
 
     /**
@@ -2713,7 +2753,9 @@ class Sek_Dyn_CSS_Handler {
      */
     private $uri;
 
+    private $builder;//will hold the Sek_Dyn_CSS_Builder instance
 
+    private $sek_model = 'no_set';
 
 
     /**
@@ -2735,7 +2777,7 @@ class Sek_Dyn_CSS_Handler {
             'dep'                             => $this->dep,
             'hook'                            => '',
             'priority'                        => $this->priority,
-            'write_only'                      => false,//<= used when writing the css file on Sek_Customizer_Setting::update()
+            'customizer_save'                 => false,//<= used when saving the customizer settins => we want to write the css file on Sek_Customizer_Setting::update()
             'force_write'                     => $this->force_write,
             'force_rewrite'                   => $this->force_rewrite
         );
@@ -2759,34 +2801,41 @@ class Sek_Dyn_CSS_Handler {
         }
 
         //build no parameterized properties
-        $this->_sek_dyn_css_build_properties();
+        $this->_sek_dyn_css_set_properties();
 
         // Possible scenarios :
         // 1) customizing :
         //    the css is always printed inline. If there's already an existing css file for this skope_id, it's not enqueued.
         // 2) saving in the customizer :
         //    the css file is written in a "force_rewrite" mode, meaning that any existing css file gets re-written.
-        //    There's no enqueing scheduled, 'write_only' mode.
+        //    There's no enqueing scheduled, 'customizer_save' mode.
         // 3) front, user logged in + 'customize' capabilities :
         //    the css file is re-written on each page load + enqueued. If writing a css file is not possible, we fallback on inline printing.
         // 4) front, user not logged in :
         //    the normal behaviour is that the css file is enqueued.
         //    It should have been written when saving in the customizer. If no file available, we try to write it. If writing a css file is not possible, we fallback on inline printing.
-        if ( is_customize_preview() || ! $this->_sek_dyn_css_file_exists() || $this->force_rewrite ) {
-            $_sektions = sek_get_skoped_seks( $this -> skope_id );
+        if ( is_customize_preview() || ! $this->_sek_dyn_css_file_exists() || $this->force_rewrite || $this->customizer_save ) {
+            $this->sek_model = sek_get_skoped_seks( $this -> skope_id );
 
             //build stylesheet
             $stylesheet = new Sek_Stylesheet();
-            $builder    = new Sek_Dyn_CSS_Builder( $_sektions, $stylesheet );
-            //Already done in the constructor
-            //$builder->sek_dyn_css_builder_build_stylesheet();
-            $this->sek_dyn_css_set_css( (string)$stylesheet );
+            $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $stylesheet );
+            // now that the stylesheet is ready let's cache it
+            $this->css_string_to_enqueue_or_print = (string)$stylesheet;
         }
 
+        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$args>');
+        // error_log( print_r( $args, true ) );
+        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$args>');
+
         //hook setup for printing or enqueuing
-        //bail if "write_only" == true, typically when saving the customizer settings @see Sek_Customizer_Setting::update()
-        if ( ! $this->write_only ) {
-            $this->_schedule_css_enqueuing_or_printing_maybe_on_custom_hook();
+        //bail if "customizer_save" == true, typically when saving the customizer settings @see Sek_Customizer_Setting::update()
+        if ( ! $this->customizer_save ) {
+            $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
+        } else {
+            if ( $this->css_string_to_enqueue_or_print ) {
+                $this->sek_dyn_css_maybe_write_css_file();
+            }
         }
     }//__construct
 
@@ -2806,7 +2855,7 @@ class Sek_Dyn_CSS_Handler {
      * @access private
      *
      */
-    private function _sek_dyn_css_build_properties() {
+    private function _sek_dyn_css_set_properties() {
         $this->_sek_dyn_css_require_wp_filesystem();
 
         $this->relative_base_path   = $this->_sek_dyn_css_build_relative_base_path();
@@ -2835,15 +2884,14 @@ class Sek_Dyn_CSS_Handler {
      * @access private
      *
      */
-    private function _schedule_css_enqueuing_or_printing_maybe_on_custom_hook() {
+    private function _schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook() {
         if ( $this->hook ) {
-            add_action( $this->hook, array( $this, 'sek_dyn_css_enqueue_or_print' ), $this->priority );
+            add_action( $this->hook, array( $this, 'sek_dyn_css_enqueue_or_print_and_google_gonts_print' ), $this->priority );
         } else {
             //enqueue or print
-            $this->sek_dyn_css_enqueue_or_print();
+            $this->sek_dyn_css_enqueue_or_print_and_google_gonts_print();
         }
     }
-
 
 
 
@@ -2857,9 +2905,12 @@ class Sek_Dyn_CSS_Handler {
      * This method can also write the file under some circumstances (see when the object force_write || force_rewrite are enabled)
      *
      * @access public
+     * @return void()
      */
-    public function sek_dyn_css_enqueue_or_print() {
-        //case enqueue file
+    public function sek_dyn_css_enqueue_or_print_and_google_gonts_print() {
+        //error_log( __FUNCTION__ . ' current_filter() => ' . current_filter() );
+        // CSS FILE
+        //case enqueue file : front end + user with customize caps not logged in
         if ( self::MODE_FILE == $this->mode ) {
             //in case we need to write the file before enqueuing
             //1) $this->css_string_to_enqueue_or_print must exists
@@ -2888,10 +2939,10 @@ class Sek_Dyn_CSS_Handler {
                 }
 
                 $this->enqueued_or_printed = true;
-                return true;
             }
 
-        }
+        }// if ( self::MODE_FILE )
+
 
         //if $this->mode != 'file' or the file enqueuing didn't go through (fall back)
         //print inline style
@@ -2907,13 +2958,44 @@ class Sek_Dyn_CSS_Handler {
 
             $this->mode     = self::MODE_INLINE;
             $this->enqueued_or_printed = true;
-            return true;
         }
 
-        return false;
+        // GOOGLE FONTS
+        // When customizing
+        if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+            $this -> sek_maybe_gfont_print();
+        } else {
+            if ( in_array( current_filter(), array( 'wp_footer', 'wp_head' ) ) ) {
+                $this -> sek_maybe_gfont_print();
+            } else {
+                add_action( 'wp_head', array( $this, 'sek_maybe_gfont_print' ), $this->priority );
+            }
+        }
     }
 
+    // hook : wp_head
+    // or fired directly when ajaxing
+    // When ajaxing, the link#sek-gfonts-{$this->id} gets removed from the dom and replaced by this string
+    function sek_maybe_gfont_print() {
+        // in a front end, not logged in scenario, the sek_model is 'not set', because the stylesheet has not been re-built in the constructor
+        $sektions = 'no_set' === $this->sek_model ? sek_get_skoped_seks( $this -> skope_id ) : $this->sek_model;
 
+        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => REGISTERED GOOGLE FONTS>');
+        // error_log( print_r( $sektions['font'], true ) );
+        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => REGISTERED GOOGLE FONTS>');
+
+        if ( !empty( $sektions['fonts'] ) && is_array( $sektions['fonts'] ) ) {
+            $ffamilies = implode( "|", $sektions['fonts'] );
+            $print_candidates = str_replace( '|', '%7C', $ffamilies );
+            $print_candidates = str_replace( '[gfont]', '' , $print_candidates );
+            if ( ! empty( $print_candidates ) ) {
+                printf('<link rel="stylesheet" id="sek-gfonts-%1$s" href="%2$s">',
+                    $this->id,
+                    "//fonts.googleapis.com/css?family={$print_candidates}"
+                );
+            }
+        }
+    }
 
 
     /*
@@ -2963,69 +3045,6 @@ class Sek_Dyn_CSS_Handler {
 
         //return whether or not the writing succeeded
         return $this->file_exists;
-    }
-
-
-
-    /*
-    * Public Getters
-    */
-
-    /**
-     *
-     * Retrieve the enqueuing status
-     *
-     * @access public
-     *
-     * @return bool TRUE if the style has been enqueued_or_printed, FALSE otherwise
-     */
-    public function sek_dyn_css_get_enqueued_or_printed_status() {
-        return $this->enqueued_or_printed;
-    }
-
-
-    /**
-     *
-     * Get the mode
-     *
-     * Retrieve the functioning mode
-     *
-     * @access public
-     *
-     * @return string MODE_INLINE or MODE_FILE
-     */
-    public function sek_dyn_css_get_mode() {
-        return $this->mode;
-    }
-
-
-    /**
-     *
-     * Retrieve the file_exists property
-     *
-     *
-     * @access public
-     *
-     * @return bool TRUE if the CSS file exists, FALSE otherwise
-     */
-    public function sek_dyn_css_file_exists() {
-        return $this->file_exists;
-    }
-
-
-    /*
-    * Setters
-    */
-    /**
-     *
-     * Set CSS file from the disk, if it exists
-     *
-     * @access public
-     *
-     * @return void()
-     */
-    public function sek_dyn_css_set_css( $css ) {
-        $this->css_string_to_enqueue_or_print = $css;
     }
 
 
@@ -3365,9 +3384,9 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
         // hook : 'wp_ajax_sek_get_html_for_injection'
         function sek_get_level_content_for_injection( $params ) {
-            error_log('<ajax sek_get_level_content_for_injection>');
-            error_log( print_r( $_POST, true ) );
-            error_log('</ajax sek_get_level_content_for_injection>');
+            // error_log('<ajax sek_get_level_content_for_injection>');
+            // error_log( print_r( $_POST, true ) );
+            // error_log('</ajax sek_get_level_content_for_injection>');
             if ( ! is_user_logged_in() ) {
                 wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
             }

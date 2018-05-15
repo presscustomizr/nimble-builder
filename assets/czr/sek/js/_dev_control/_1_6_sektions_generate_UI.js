@@ -151,7 +151,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
                                           api( params.id, function( _setting_ ) {
-
                                                 _setting_.bind( _.debounce( function( to, from, args ) {
                                                       self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_markup',
@@ -447,39 +446,69 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   }
 
-                  self.updateAPISetting({
-                        action : params.uiParams.action,
-                        id : params.uiParams.id,
-                        value : moduleValueCandidate,
-                        in_column : params.uiParams.in_column,
-                        in_sektion : params.uiParams.in_sektion,
+                  var _doUpdateWithRequestedAction = function() {
+                        self.updateAPISetting({
+                              action : params.uiParams.action,
+                              id : params.uiParams.id,
+                              value : moduleValueCandidate,
+                              in_column : params.uiParams.in_column,
+                              in_sektion : params.uiParams.in_sektion,
 
-                        // specific for level options
-                        options_type : params.options_type,//'spacing', 'layout_background_border'
+                              // specific for level options
+                              options_type : params.options_type,//'spacing', 'layout_background_border'
 
-                  }).done( function( ) {
-                        console.log('updateAPISettingAndExecutePreviewActions => updateAPISetting done');
-                        // STYLESHEET => default action when modifying the level options
-                        if ( true === refresh_stylesheet ) {
-                              api.previewer.send( 'sek-refresh-stylesheet', {
-                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                              });
+                        }).done( function( ) {
+                              console.log('updateAPISettingAndExecutePreviewActions => updateAPISetting done');
+                              // STYLESHEET => default action when modifying the level options
+                              if ( true === refresh_stylesheet ) {
+                                    api.previewer.send( 'sek-refresh-stylesheet', {
+                                          skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                    });
+                              }
+
+                              // MARKUP
+                              if ( true === refresh_markup ) {
+                                    api.previewer.send( 'sek-refresh-level', {
+                                          apiParams : {
+                                                action : 'sek-refresh-level',
+                                                id : params.uiParams.id,
+                                                level : params.uiParams.level
+                                          },
+                                          skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                    });
+                              }
+                        });//self.updateAPISetting()
+                  };//_doUpdateWithRequestedAction
+
+                  // if the changed input is a google font modifier, we want to first refresh the google font collection, and then proceed to the requested action
+                  // this way we make sure that the customized value used when ajaxing will take into account when writing the google font http request link
+                  if ( true === refresh_fonts ) {
+                        var _getChangedFontFamily = function() {
+                              if ( 'font-family' != params.settingParams.args.input_changed ) {
+                                    api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts => the input id is not font-family', params );
+                                    return;
+                              } else {
+                                    return params.settingParams.args.input_value;
+                              }
+                        };
+                        var newFontFamily = '';
+                        try { newFontFamily = _getChangedFontFamily(); } catch( er) {
+                              api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts', er );
                         }
-
-                        // MARKUP
-                        if ( true === refresh_markup ) {
-                              api.previewer.send( 'sek-refresh-level', {
-                                    apiParams : {
-                                          action : 'sek-refresh-level',
-                                          id : params.uiParams.id,
-                                          level : params.uiParams.level
-                                    },
-                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                        // add it only if gfont
+                        if ( newFontFamily.indexOf('gfont') > -1 ) {
+                              self.updateAPISetting({
+                                    action : 'sek-update-fonts',
+                                    font_family : newFontFamily
+                              }).done( function( ) {
+                                    _doUpdateWithRequestedAction();
                               });
+                        } else {
+                             _doUpdateWithRequestedAction();
                         }
-
-                        // FONTS
-                  });//self.updateAPISetting()
+                  } else {
+                        _doUpdateWithRequestedAction();
+                  }
             },//updateAPISettingAndExecutePreviewActions
 
 

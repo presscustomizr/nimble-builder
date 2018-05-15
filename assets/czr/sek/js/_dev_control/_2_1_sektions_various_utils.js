@@ -155,6 +155,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   return defaultItemModem;
-            }
+            },
+
+            // Walk the main sektion setting and populate an array of google fonts
+            // This method is used when processing the 'sek-update-fonts' action to update the .fonts property
+            // To be a candidate for sniffing, a google font should meet 2 criteria :
+            // 1) be the value of a 'font-family' property
+            // 2) start with [gfont]
+            // @return array
+            sniffGFonts : function( gfonts, level ) {
+                  var self = this;
+                  gfonts = gfonts || [];
+
+                  if ( _.isUndefined( level ) ) {
+                        var currentSektionSettingValue = api( self.sekCollectionSettingId() )();
+                        level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
+                  }
+                  _.each( level, function( levelData, _key_ ) {
+                        if ( 'font-family' == _key_ ) {
+                              if ( levelData.indexOf('gfont') > -1 ) {
+                                    gfonts.push( levelData );
+                              }
+                        }
+
+                        if ( _.isArray( levelData ) || _.isObject( levelData ) ) {
+                              self.sniffGFonts( gfonts, levelData );
+                        }
+                  });
+                  return gfonts;
+            },
       });//$.extend()
 })( wp.customize, jQuery );

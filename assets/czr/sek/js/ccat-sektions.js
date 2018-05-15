@@ -1248,7 +1248,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
                                           api( params.id, function( _setting_ ) {
-
                                                 _setting_.bind( _.debounce( function( to, from, args ) {
                                                       self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_markup',
@@ -1544,39 +1543,69 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   }
 
-                  self.updateAPISetting({
-                        action : params.uiParams.action,
-                        id : params.uiParams.id,
-                        value : moduleValueCandidate,
-                        in_column : params.uiParams.in_column,
-                        in_sektion : params.uiParams.in_sektion,
+                  var _doUpdateWithRequestedAction = function() {
+                        self.updateAPISetting({
+                              action : params.uiParams.action,
+                              id : params.uiParams.id,
+                              value : moduleValueCandidate,
+                              in_column : params.uiParams.in_column,
+                              in_sektion : params.uiParams.in_sektion,
 
-                        // specific for level options
-                        options_type : params.options_type,//'spacing', 'layout_background_border'
+                              // specific for level options
+                              options_type : params.options_type,//'spacing', 'layout_background_border'
 
-                  }).done( function( ) {
-                        console.log('updateAPISettingAndExecutePreviewActions => updateAPISetting done');
-                        // STYLESHEET => default action when modifying the level options
-                        if ( true === refresh_stylesheet ) {
-                              api.previewer.send( 'sek-refresh-stylesheet', {
-                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                              });
+                        }).done( function( ) {
+                              console.log('updateAPISettingAndExecutePreviewActions => updateAPISetting done');
+                              // STYLESHEET => default action when modifying the level options
+                              if ( true === refresh_stylesheet ) {
+                                    api.previewer.send( 'sek-refresh-stylesheet', {
+                                          skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                    });
+                              }
+
+                              // MARKUP
+                              if ( true === refresh_markup ) {
+                                    api.previewer.send( 'sek-refresh-level', {
+                                          apiParams : {
+                                                action : 'sek-refresh-level',
+                                                id : params.uiParams.id,
+                                                level : params.uiParams.level
+                                          },
+                                          skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                    });
+                              }
+                        });//self.updateAPISetting()
+                  };//_doUpdateWithRequestedAction
+
+                  // if the changed input is a google font modifier, we want to first refresh the google font collection, and then proceed to the requested action
+                  // this way we make sure that the customized value used when ajaxing will take into account when writing the google font http request link
+                  if ( true === refresh_fonts ) {
+                        var _getChangedFontFamily = function() {
+                              if ( 'font-family' != params.settingParams.args.input_changed ) {
+                                    api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts => the input id is not font-family', params );
+                                    return;
+                              } else {
+                                    return params.settingParams.args.input_value;
+                              }
+                        };
+                        var newFontFamily = '';
+                        try { newFontFamily = _getChangedFontFamily(); } catch( er) {
+                              api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts', er );
                         }
-
-                        // MARKUP
-                        if ( true === refresh_markup ) {
-                              api.previewer.send( 'sek-refresh-level', {
-                                    apiParams : {
-                                          action : 'sek-refresh-level',
-                                          id : params.uiParams.id,
-                                          level : params.uiParams.level
-                                    },
-                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                        // add it only if gfont
+                        if ( newFontFamily.indexOf('gfont') > -1 ) {
+                              self.updateAPISetting({
+                                    action : 'sek-update-fonts',
+                                    font_family : newFontFamily
+                              }).done( function( ) {
+                                    _doUpdateWithRequestedAction();
                               });
+                        } else {
+                             _doUpdateWithRequestedAction();
                         }
-
-                        // FONTS
-                  });//self.updateAPISetting()
+                  } else {
+                        _doUpdateWithRequestedAction();
+                  }
             },//updateAPISettingAndExecutePreviewActions
 
 
@@ -2329,8 +2358,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }//switch( params.content_type)
                               break;
-                        }// switch
 
+
+
+                              //-------------------------------------------------------------------------------------------------
+                              //-- POPULATE GOOGLE FONTS
+                              //-------------------------------------------------------------------------------------------------
+                              //@params {
+                              //       action : 'sek-update-fonts',
+                              //       font_family : newFontFamily,
+                              // }
+                              case 'sek-update-fonts' :
+                                    //console.log('PARAMS in sek-add-fonts', params );
+                                    if ( _.isEmpty( params.font_family ) ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => missing font_family' );
+                                          break;
+                                    }
+                                    if ( params.font_family.indexOf('gfont') < 0 ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
+                                          break;
+                                    }
+                                    // Get the gfonts from the level options and modules values
+                                    var currentGfonts = self.sniffGFonts();
+                                    if ( ! _.contains( currentGfonts, params.font_family ) ) {
+                                         currentGfonts.push( params.font_family );
+                                    }
+                                    // update the global gfonts
+                                    //console.log('currentGfonts ', currentGfonts );
+                                    newSetValue.fonts = currentGfonts;
+                              break;
+                        }// switch
 
 
 
@@ -2341,6 +2398,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // if we did not already rejected the request, let's check if the setting object has actually been modified
                         // at this point it should have been.
                         if ( 'pending' == dfd.state() ) {
+                              //console.log('ALORS ?', currentSetValue, newSetValue );
                               if ( _.isEqual( currentSetValue, newSetValue ) ) {
                                     dfd.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                               } else {
@@ -2759,7 +2817,35 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   return defaultItemModem;
-            }
+            },
+
+            // Walk the main sektion setting and populate an array of google fonts
+            // This method is used when processing the 'sek-update-fonts' action to update the .fonts property
+            // To be a candidate for sniffing, a google font should meet 2 criteria :
+            // 1) be the value of a 'font-family' property
+            // 2) start with [gfont]
+            // @return array
+            sniffGFonts : function( gfonts, level ) {
+                  var self = this;
+                  gfonts = gfonts || [];
+
+                  if ( _.isUndefined( level ) ) {
+                        var currentSektionSettingValue = api( self.sekCollectionSettingId() )();
+                        level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
+                  }
+                  _.each( level, function( levelData, _key_ ) {
+                        if ( 'font-family' == _key_ ) {
+                              if ( levelData.indexOf('gfont') > -1 ) {
+                                    gfonts.push( levelData );
+                              }
+                        }
+
+                        if ( _.isArray( levelData ) || _.isObject( levelData ) ) {
+                              self.sniffGFonts( gfonts, levelData );
+                        }
+                  });
+                  return gfonts;
+            },
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
@@ -3219,23 +3305,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // try { var isGFontTab = 'sek-google-font-tab' = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
                         //       api.errare( 'spacing input => error when binding the tab switch event', er );
                         // }
-                        console.log( 'ALORS ????', item.container.find('[data-tab-id="' + params.id + '"]').data('sek-google-font-tab'), input.module );
+                        //console.log( 'ALORS ????', item.container.find('[data-tab-id="' + params.id + '"]').data('sek-google-font-tab'), input.module );
                         // $.when( _getFontCollections() ).done( function( fontCollections ) {
                         //       console.log('FONT COLLECTION ?', fontCollections );
                         // }).fail( function( _r_ ) {
                         //       api.errare( 'font_picker => fail response =>', _r_ );
                         // });
-
-                  });
-
-                  $.when( _getFontCollections() ).done( function( fontCollections ) {
-                        console.log('FONT COLLECTION ?', fontCollections );
-                        _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
-                              _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
+                        $.when( _getFontCollections() ).done( function( fontCollections ) {
+                              console.log('FONT COLLECTION ?', fontCollections );
+                              _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
+                                    _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
+                              });
+                        }).fail( function( _r_ ) {
+                              api.errare( 'font_picker => fail response =>', _r_ );
                         });
-                  }).fail( function( _r_ ) {
-                        api.errare( 'font_picker => fail response =>', _r_ );
+
                   });
+
+
             }//font_picker()
       });//$.extend( api.czrInputMap, {})
 

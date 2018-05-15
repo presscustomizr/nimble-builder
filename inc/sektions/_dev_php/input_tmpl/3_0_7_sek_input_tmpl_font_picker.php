@@ -21,7 +21,9 @@ add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", 'sek_get_font_list_tmpl'
 //
 // For czr_tiny_mce_editor_module, we request the font_list tmpl
 function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
-    error_log( print_r( $posted_params, true ) );
+    // error_log('<' . __FUNCTION__ . ' => ajax posted params>');
+    // error_log( print_r( $posted_params, true ) );
+    // error_log('<' . __FUNCTION__ . ' => ajax posted params>');
     $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
     //czr_fn\czr_register_dynamic_module
     $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';

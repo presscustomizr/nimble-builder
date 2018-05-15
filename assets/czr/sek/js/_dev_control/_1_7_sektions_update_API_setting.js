@@ -722,8 +722,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }//switch( params.content_type)
                               break;
-                        }// switch
 
+
+
+                              //-------------------------------------------------------------------------------------------------
+                              //-- POPULATE GOOGLE FONTS
+                              //-------------------------------------------------------------------------------------------------
+                              //@params {
+                              //       action : 'sek-update-fonts',
+                              //       font_family : newFontFamily,
+                              // }
+                              case 'sek-update-fonts' :
+                                    //console.log('PARAMS in sek-add-fonts', params );
+                                    if ( _.isEmpty( params.font_family ) ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => missing font_family' );
+                                          break;
+                                    }
+                                    if ( params.font_family.indexOf('gfont') < 0 ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
+                                          break;
+                                    }
+                                    // Get the gfonts from the level options and modules values
+                                    var currentGfonts = self.sniffGFonts();
+                                    if ( ! _.contains( currentGfonts, params.font_family ) ) {
+                                         currentGfonts.push( params.font_family );
+                                    }
+                                    // update the global gfonts
+                                    //console.log('currentGfonts ', currentGfonts );
+                                    newSetValue.fonts = currentGfonts;
+                              break;
+                        }// switch
 
 
 
@@ -734,6 +762,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // if we did not already rejected the request, let's check if the setting object has actually been modified
                         // at this point it should have been.
                         if ( 'pending' == dfd.state() ) {
+                              //console.log('ALORS ?', currentSetValue, newSetValue );
                               if ( _.isEqual( currentSetValue, newSetValue ) ) {
                                     dfd.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                               } else {

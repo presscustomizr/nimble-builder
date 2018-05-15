@@ -147,7 +147,7 @@ final class Sek_Customizer_Setting extends WP_Customize_Setting {
           'id'             => $this->skope_id,
           'skope_id'       => $this->skope_id,
           'mode'           => Sek_Dyn_CSS_Handler::MODE_FILE,
-          'write_only' => true,//<= we only want to write the css file, not schedule the enqueuing
+          'customizer_save' => true,//<= indicating that we are in a customizer_save scenario will tell the dyn css class to only write the css file + save the google fonts, not schedule the enqueuing
           'force_rewrite'  => true //<- write even if the file exists
       ) );
 

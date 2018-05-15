@@ -1160,13 +1160,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             },
 
             appendDynStyleSheet : function( skope_id, styleMarkup ) {
-                var _stylesheet_id_ = '#sek-' + skope_id;
+                var _stylesheet_id_ = '#sek-' + skope_id,//@see php Sek_Dyn_CSS_Handler
+                    _gfonts_id_ = '#sek-gfonts-' + skope_id;//@see php Sek_Dyn_CSS_Handler
 
                 //console.log('IN APPEND DYN STYLESHEET', styleMarkup, _stylesheet_id_, $('head').find( _stylesheet_id_ ) );
 
                 // Remove a dynamic inline stylesheet if already printed
                 if ( 0 < $('head').find( _stylesheet_id_ ).length ) {
                       $('head').find( _stylesheet_id_ ).remove();
+                }
+                if ( 0 < $('head').find( _gfonts_id_ ).length ) {
+                      $('head').find( _gfonts_id_ ).remove();
                 }
                 $('head').append( styleMarkup );
                 // if we have something to print ( styleMarkup not empty ), there should be a dom element
