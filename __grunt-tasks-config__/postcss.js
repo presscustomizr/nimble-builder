@@ -10,6 +10,6 @@ module.exports = {
 				require('postcss-calc')() // fix issues with calc: postcss-calc uses reduce-css-calc to reduce CSS calc() function. see https://github.com/twbs/bootstrap/pull/26328
 			]
 		},
-		src: '<%= paths.sektions %>assets/front/css/sek-base.css'
+		src: '<%= paths.front_assets %>css/sek-base.css'
 	}
 };
