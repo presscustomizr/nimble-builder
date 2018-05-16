@@ -300,6 +300,10 @@ class Sek_Dyn_CSS_Handler {
             $stylesheet = new Sek_Stylesheet();
             $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $stylesheet );
 
+            // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->rules>');
+            // error_log( print_r( $stylesheet->rules, true ) );
+            // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->rules>');
+
             // now that the stylesheet is ready let's cache it
             $this->css_string_to_enqueue_or_print = (string)$stylesheet -> get_stylesheet();
         }

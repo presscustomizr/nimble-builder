@@ -6,38 +6,37 @@ function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, st
     //error_log( $input_id );
     //error_log( print_r( $parent_level, true ) );
     $selector = '[data-sek-id="'.$parent_level['id'].'"]';
-    $style_rules = '';
     $mq = null;
+    $properties_to_render = array();
 
     switch( $input_id ) {
         case 'font_weight_css' :
-            $style_rules = 'font-weight:'.$value;
+            $properties_to_render['font-weight'] = $value;
         break;
         case 'font_style_css' :
-            $style_rules = 'font-style:'.$value;
+            $properties_to_render['font-style'] = $value;
         break;
         case 'text_decoration_css' :
-            $style_rules = 'text-decoration:'.$value;
+            $properties_to_render['text-decoration'] = $value;
         break;
         case 'text_transform_css' :
-            $style_rules = 'text-transform:'.$value;
+            $properties_to_render['text-transform'] = $value;
         break;
         case 'letter_spacing_css' :
-            $style_rules = 'letter-spacing:'.$value . 'px';
+            $properties_to_render['letter-spacing'] = $value . 'px';
         break;
         case 'color_css' :
-            $style_rules = 'color:'.$value;
+            $properties_to_render['color'] = $value;
         break;
         case 'color_hover_css' :
             $selector = '[data-sek-id="'.$parent_level['id'].'"]:hover';
-            $style_rules = 'color:'.$value;
+            $properties_to_render['color'] = $value;
         break;
         case 'h_alignment_css' :
-            $style_rules = 'text-align:'.$value;
+            $properties_to_render['text-align'] = $value;
         break;
         case 'font_family_css' :
             $family = $value;
-            $properties_to_render = array();
             // Preprocess the selected font family
             //font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
             //special treatment for font-family
@@ -52,19 +51,27 @@ function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, st
 
             $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
             $properties_to_render['font-family'] = false != strstr( $value, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
-
-            foreach ($properties_to_render as $prop => $prop_val) {
-                $style_rules .=   sprintf( '%1$s : %2$s;', $prop, $prop_val );
-            }//end foreach
         break;
-
     }//switch
 
-    $rules[] = array(
-        'selector'      => $selector,
-        'style_rules'   => $style_rules,
-        'mq'            => $mq
-    );
+    if ( ! empty( $properties_to_render ) ) {
+        // is the important flag on ?
+        $important = false;
+        if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) && !empty( $parent_level['value']['important_css'] ) ) {
+            $important = (bool)sek_is_checked( $parent_level['value']['important_css'] );
+        }
+
+        $style_rules = '';
+        foreach ($properties_to_render as $prop => $prop_val) {
+            $style_rules .= sprintf( '%1$s:%2$s%3$s;', $prop, $prop_val, $important ? '!important' : '' );
+        }//end foreach
+
+        $rules[] = array(
+            'selector'      => $selector,
+            'style_rules'   => $style_rules,
+            'mq'            => $mq
+        );
+    }
     return $rules;
 }
 ?>

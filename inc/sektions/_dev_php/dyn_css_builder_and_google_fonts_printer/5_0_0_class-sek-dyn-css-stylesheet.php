@@ -4,15 +4,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Sek_Stylesheet {
-
-    private $rules = array();
-
-
+    public $rules = array();
     public function sek_add_rule( $selector, $style_rules, array $mq = null ) {
-
         if ( ! is_string( $selector ) )
             return;
-
         if ( ! is_string( $style_rules ) )
             return;
 
