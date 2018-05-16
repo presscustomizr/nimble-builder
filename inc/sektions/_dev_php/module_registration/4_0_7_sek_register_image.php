@@ -21,10 +21,12 @@ function sek_get_module_params_for_czr_image_module() {
                     'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
                     'default'     => 'large'
                 ),
-                'alignment' => array(
+                'h_alignment_css' => array(
                     'input_type'  => 'h_alignment',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
-                    'default'     => 'center'
+                    'default'     => 'center',
+                    'refresh-markup' => false,
+                    'refresh-stylesheet' => true
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',

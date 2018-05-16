@@ -446,13 +446,22 @@ class Sek_Dyn_CSS_Handler {
 
         // GOOGLE FONTS
         // When customizing
-        if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-            $this -> sek_maybe_gfont_print();
-        } else {
-            if ( in_array( current_filter(), array( 'wp_footer', 'wp_head' ) ) ) {
-                $this -> sek_maybe_gfont_print();
+        $print_candidates = $this->sek_get_gfont_print_candidates();
+        if ( !empty( $print_candidates ) ) {
+            if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+                $this -> sek_gfont_print( $print_candidates );
             } else {
-                add_action( 'wp_head', array( $this, 'sek_maybe_gfont_print' ), $this->priority );
+                if ( in_array( current_filter(), array( 'wp_footer', 'wp_head' ) ) ) {
+                    $this -> sek_gfont_print( $print_candidates );
+                } else {
+                    wp_enqueue_style(
+                        'sek-gfonts-'.$this->id,
+                        sprintf( '//fonts.googleapis.com/css?family=%s', $print_candidates ),
+                        array(),
+                        null,
+                        'all'
+                    );
+                }
             }
         }
     }
@@ -460,10 +469,20 @@ class Sek_Dyn_CSS_Handler {
     // hook : wp_head
     // or fired directly when ajaxing
     // When ajaxing, the link#sek-gfonts-{$this->id} gets removed from the dom and replaced by this string
-    function sek_maybe_gfont_print() {
+    function sek_gfont_print( $print_candidates ) {
+       if ( ! empty( $print_candidates ) ) {
+            printf('<link rel="stylesheet" id="sek-gfonts-%1$s" href="%2$s">',
+                $this->id,
+                "//fonts.googleapis.com/css?family={$print_candidates}"
+            );
+        }
+    }
+
+    //@return string
+    private function sek_get_gfont_print_candidates() {
         // in a front end, not logged in scenario, the sek_model is 'not set', because the stylesheet has not been re-built in the constructor
         $sektions = 'no_set' === $this->sek_model ? sek_get_skoped_seks( $this -> skope_id ) : $this->sek_model;
-
+        $print_candidates = '';
         // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => REGISTERED GOOGLE FONTS>');
         // error_log( print_r( $sektions['font'], true ) );
         // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => REGISTERED GOOGLE FONTS>');
@@ -472,13 +491,8 @@ class Sek_Dyn_CSS_Handler {
             $ffamilies = implode( "|", $sektions['fonts'] );
             $print_candidates = str_replace( '|', '%7C', $ffamilies );
             $print_candidates = str_replace( '[gfont]', '' , $print_candidates );
-            if ( ! empty( $print_candidates ) ) {
-                printf('<link rel="stylesheet" id="sek-gfonts-%1$s" href="%2$s">',
-                    $this->id,
-                    "//fonts.googleapis.com/css?family={$print_candidates}"
-                );
-            }
         }
+        return $print_candidates;
     }
 
 
