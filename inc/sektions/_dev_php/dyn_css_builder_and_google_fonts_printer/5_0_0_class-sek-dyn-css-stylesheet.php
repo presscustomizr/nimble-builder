@@ -117,21 +117,14 @@ class Sek_Stylesheet {
 
 
 
-    private function sek_parse_rules( $selector, $style_rules = array() ) {
-        $style_rules = is_array( $style_rules ) ? implode( ';', $style_rules ) : $style_rules;
-        return $selector . '{' . $style_rules . '}';
-    }
-
-
-
-
-    //stringify the stylesheet object
-    public function __toString() {
+    //@returns a stringified stylesheet
+    function get_stylesheet() {
         $css = '';
         foreach ( $this->rules as $mq_hash => $selectors ) {
             $_css = '';
             foreach ( $selectors as $selector => $style_rules ) {
-                $_css .=  $this->sek_parse_rules( $selector, $style_rules );
+                $style_rules = is_array( $style_rules ) ? implode( ';', $style_rules ) : $style_rules;
+                $_css .=  $selector . '{' . $style_rules . '}';
             }
             $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_hash );
             $css .= $_css;

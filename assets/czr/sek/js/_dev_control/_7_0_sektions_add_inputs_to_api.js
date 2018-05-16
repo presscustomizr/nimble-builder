@@ -158,7 +158,7 @@
 
                                     _value = _setFontTypePrefix( _value, type );
 
-                                    if ( _value == _model['font-family'] ) {
+                                    if ( _value == input() ) {
                                           _html_ += '<option selected="selected" value="' + _value + '">' + optionTitle + '</option>';
                                     } else {
                                           _html_ += '<option value="' + _value + '">' + optionTitle + '</option>';
@@ -168,7 +168,7 @@
                         };
 
                         //add the first option
-                        if ( _.isNull( _model['font-family'] ) || _.isEmpty( _model['font-family'] ) ) {
+                        if ( _.isNull( input() ) || _.isEmpty( input() ) ) {
                               $fontSelectElement.append( '<option value="none" selected="selected">' + '@missi18n Select a font family' + '</option>' );
                         } else {
                               $fontSelectElement.append( '<option value="none">' + '@missi18n Select a font family' + '</option>' );

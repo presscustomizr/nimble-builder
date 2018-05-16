@@ -1577,12 +1577,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//self.updateAPISetting()
                   };//_doUpdateWithRequestedAction
 
-                  // if the changed input is a google font modifier, we want to first refresh the google font collection, and then proceed to the requested action
+                  // if the changed input is a google font modifier ( <=> font_family_css input)
+                  // => we want to first refresh the google font collection, and then proceed to the requested action
                   // this way we make sure that the customized value used when ajaxing will take into account when writing the google font http request link
                   if ( true === refresh_fonts ) {
                         var _getChangedFontFamily = function() {
-                              if ( 'font-family' != params.settingParams.args.input_changed ) {
-                                    api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts => the input id is not font-family', params );
+                              if ( 'font_family_css' != params.settingParams.args.input_changed ) {
+                                    api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts => the input id is not font_family_css', params );
                                     return;
                               } else {
                                     return params.settingParams.args.input_value;
@@ -1591,6 +1592,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var newFontFamily = '';
                         try { newFontFamily = _getChangedFontFamily(); } catch( er) {
                               api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts', er );
+                              return;
+                        }
+                        if ( ! _.isString( newFontFamily ) ) {
+                              api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', er );
+                              return;
                         }
                         // add it only if gfont
                         if ( newFontFamily.indexOf('gfont') > -1 ) {
@@ -2822,7 +2828,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Walk the main sektion setting and populate an array of google fonts
             // This method is used when processing the 'sek-update-fonts' action to update the .fonts property
             // To be a candidate for sniffing, a google font should meet 2 criteria :
-            // 1) be the value of a 'font-family' property
+            // 1) be the value of a 'font_family_css' property
             // 2) start with [gfont]
             // @return array
             sniffGFonts : function( gfonts, level ) {
@@ -2834,7 +2840,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
                   }
                   _.each( level, function( levelData, _key_ ) {
-                        if ( 'font-family' == _key_ ) {
+                        if ( 'font_family_css' == _key_ ) {
                               if ( levelData.indexOf('gfont') > -1 ) {
                                     gfonts.push( levelData );
                               }
@@ -3197,7 +3203,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     _value = _setFontTypePrefix( _value, type );
 
-                                    if ( _value == _model['font-family'] ) {
+                                    if ( _value == input() ) {
                                           _html_ += '<option selected="selected" value="' + _value + '">' + optionTitle + '</option>';
                                     } else {
                                           _html_ += '<option value="' + _value + '">' + optionTitle + '</option>';
@@ -3207,7 +3213,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         };
 
                         //add the first option
-                        if ( _.isNull( _model['font-family'] ) || _.isEmpty( _model['font-family'] ) ) {
+                        if ( _.isNull( input() ) || _.isEmpty( input() ) ) {
                               $fontSelectElement.append( '<option value="none" selected="selected">' + '@missi18n Select a font family' + '</option>' );
                         } else {
                               $fontSelectElement.append( '<option value="none">' + '@missi18n Select a font family' + '</option>' );

@@ -21,9 +21,11 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'input_type'  => 'tiny_mce_editor',
                                 'title'       => __('Content', 'text_domain_to_be_replaced')
                             ),
-                            'alignment' => array(
+                            'h_alignment_css' => array(
                                 'input_type'  => 'h_text_alignment',
-                                'title'       => __('Alignment', 'text_domain_to_be_replaced')
+                                'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             )
                         )
                     ),
@@ -31,51 +33,69 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                         'title' => __('Font style', 'text_domain_to_be_replaced'),
                         'attributes' => 'data-sek-google-font-tab="true"',
                         'inputs' => array(
-                            'font-family' => array(
+                            'font_family_css' => array(
                                 'input_type'  => 'font_picker',
                                 'title'       => __('Font family', 'text_domain_to_be_replaced'),
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true,
                                 'refresh-fonts' => true,
                             ),
-                            'font-size'       => array(
+                            'font_size_css'       => array(
                                 'input_type'  => 'font_size',
-                                'title'       => __('Font size', 'text_domain_to_be_replaced')
+                                'title'       => __('Font size', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//16,//"14px",
-                            'line-height'     => array(
+                            'line_height_css'     => array(
                                 'input_type'  => 'line_height',
-                                'title'       => __('Line height', 'text_domain_to_be_replaced')
+                                'title'       => __('Line height', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//24,//"20px",
-                            'font-weight'     => array(
+                            'font_weight_css'     => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Font weight', 'text_domain_to_be_replaced')
+                                'title'       => __('Font weight', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//null,
-                            'font-style'      => array(
+                            'font_style_css'      => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Font style', 'text_domain_to_be_replaced')
+                                'title'       => __('Font style', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true,
                             ),//null,
-                            'text-decoration' => array(
+                            'text_decoration_css' => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Text decoration', 'text_domain_to_be_replaced')
+                                'title'       => __('Text decoration', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//null,
-                            'text-transform'  => array(
+                            'text_transform_css'  => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Text transform', 'text_domain_to_be_replaced')
+                                'title'       => __('Text transform', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//null,
 
-                            'letter-spacing'  => array(
+                            'letter_spacing_css'  => array(
                                 'input_type'  => 'number',
-                                'title'       => __('Letter spacing', 'text_domain_to_be_replaced')
+                                'title'       => __('Letter spacing', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//0,
-                            'color'           => array(
+                            'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Text color', 'text_domain_to_be_replaced')
+                                'title'       => __('Text color', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//"#000000",
-                            'color-hover'     => array(
+                            'color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced')
+                                'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//"#000000",
-                            'important'       => array(
+                            'important_css'       => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Make those style options win if other rules are applied.', 'text_domain_to_be_replaced')
                             ),//false

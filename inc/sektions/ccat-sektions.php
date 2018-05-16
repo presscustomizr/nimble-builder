@@ -486,8 +486,8 @@ function sek_enqueue_controls_js_css() {
                       'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
                   ),
 
-                  // TEXT EDITOR MODULE
-                  'font-weight' => array(
+                  // GENERIC CSS MODIFIERS INPUT TYPES
+                  'font_weight_css' => array(
                       'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
                       'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
                       'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
@@ -503,14 +503,14 @@ function sek_enqueue_controls_js_css() {
                       900     => 900
                   ),
 
-                  'font-style' => array(
+                  'font_style_css' => array(
                       'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
                       'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
                       'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
                       'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
                   ),
 
-                  'text-decoration' =>  array(
+                  'text_decoration_css' =>  array(
                       'none'      => __( 'none', 'text_domain_to_be_replaced' ),
                       'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
                       'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
@@ -518,7 +518,7 @@ function sek_enqueue_controls_js_css() {
                       'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
                   ),
 
-                  'text-transform' => array(
+                  'text_transform_css' => array(
                       'none'      => __( 'none', 'text_domain_to_be_replaced' ),
                       'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
                       'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
@@ -1988,9 +1988,11 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'input_type'  => 'tiny_mce_editor',
                                 'title'       => __('Content', 'text_domain_to_be_replaced')
                             ),
-                            'alignment' => array(
+                            'h_alignment_css' => array(
                                 'input_type'  => 'h_text_alignment',
-                                'title'       => __('Alignment', 'text_domain_to_be_replaced')
+                                'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             )
                         )
                     ),
@@ -1998,51 +2000,69 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                         'title' => __('Font style', 'text_domain_to_be_replaced'),
                         'attributes' => 'data-sek-google-font-tab="true"',
                         'inputs' => array(
-                            'font-family' => array(
+                            'font_family_css' => array(
                                 'input_type'  => 'font_picker',
                                 'title'       => __('Font family', 'text_domain_to_be_replaced'),
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true,
                                 'refresh-fonts' => true,
                             ),
-                            'font-size'       => array(
+                            'font_size_css'       => array(
                                 'input_type'  => 'font_size',
-                                'title'       => __('Font size', 'text_domain_to_be_replaced')
+                                'title'       => __('Font size', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//16,//"14px",
-                            'line-height'     => array(
+                            'line_height_css'     => array(
                                 'input_type'  => 'line_height',
-                                'title'       => __('Line height', 'text_domain_to_be_replaced')
+                                'title'       => __('Line height', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//24,//"20px",
-                            'font-weight'     => array(
+                            'font_weight_css'     => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Font weight', 'text_domain_to_be_replaced')
+                                'title'       => __('Font weight', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//null,
-                            'font-style'      => array(
+                            'font_style_css'      => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Font style', 'text_domain_to_be_replaced')
+                                'title'       => __('Font style', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true,
                             ),//null,
-                            'text-decoration' => array(
+                            'text_decoration_css' => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Text decoration', 'text_domain_to_be_replaced')
+                                'title'       => __('Text decoration', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//null,
-                            'text-transform'  => array(
+                            'text_transform_css'  => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Text transform', 'text_domain_to_be_replaced')
+                                'title'       => __('Text transform', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//null,
 
-                            'letter-spacing'  => array(
+                            'letter_spacing_css'  => array(
                                 'input_type'  => 'number',
-                                'title'       => __('Letter spacing', 'text_domain_to_be_replaced')
+                                'title'       => __('Letter spacing', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//0,
-                            'color'           => array(
+                            'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Text color', 'text_domain_to_be_replaced')
+                                'title'       => __('Text color', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//"#000000",
-                            'color-hover'     => array(
+                            'color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced')
+                                'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//"#000000",
-                            'important'       => array(
+                            'important_css'       => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Make those style options win if other rules are applied.', 'text_domain_to_be_replaced')
                             ),//false
@@ -2304,21 +2324,14 @@ class Sek_Stylesheet {
 
 
 
-    private function sek_parse_rules( $selector, $style_rules = array() ) {
-        $style_rules = is_array( $style_rules ) ? implode( ';', $style_rules ) : $style_rules;
-        return $selector . '{' . $style_rules . '}';
-    }
-
-
-
-
-    //stringify the stylesheet object
-    public function __toString() {
+    //@returns a stringified stylesheet
+    function get_stylesheet() {
         $css = '';
         foreach ( $this->rules as $mq_hash => $selectors ) {
             $_css = '';
             foreach ( $selectors as $selector => $style_rules ) {
-                $_css .=  $this->sek_parse_rules( $selector, $style_rules );
+                $style_rules = is_array( $style_rules ) ? implode( ';', $style_rules ) : $style_rules;
+                $_css .=  $selector . '{' . $style_rules . '}';
             }
             $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_hash );
             $css .= $_css;
@@ -2380,7 +2393,9 @@ class Sek_Dyn_CSS_Builder {
          *  SCHEDULE CSS RULES FILTERING
         /* ------------------------------------------------------------------------- */
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
-        add_filter( 'sek_add_css_rules_for_font-family', array( $this, 'sek_handle_rules_and_font_list_for_font_families' ), 10, 3 );
+
+        do_action('sek_dyn_css_builder_initialized');
+
         $this->sek_css_rules_sniffer_walker();
     }
 
@@ -2392,9 +2407,8 @@ class Sek_Dyn_CSS_Builder {
         $level      = is_array( $level ) ? $level : array();
 
         $stylesheet = is_null( $stylesheet ) ? $this->stylesheet : $stylesheet;
-        $rules = array();
-
         foreach ( $level as $key => $entry ) {
+             $rules = array();
             // Populate rules for sections / columns / modules
             if ( !empty( $entry[ 'level' ] ) && ( !empty( $entry[ 'options' ] ) || !empty( $entry[ 'width' ] ) ) ) {
                 // build rules for level options => section / column / module
@@ -2412,19 +2426,44 @@ class Sek_Dyn_CSS_Builder {
             // We want to filter each input
             // which makes it possible to target for example the font-family. Either in module values or in level options
             if ( empty( $entry[ 'level' ] ) && is_string( $key ) && 1 < strlen( $key ) ) {
-                $rules = apply_filters( "sek_add_css_rules_for_{$key}", $rules, $entry, $this -> parent_level );
+                // we need to have a parent level set
+                if ( !empty( $this -> parent_level ) ) {
+                    // the input_id candidate to filter is the $key
+                    $input_id_candidate = $key;
+                    // let's skip the $key that are reserved for the structure of the sektion tree
+                    if ( ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options'] ) ) {
+                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level );
+                    }
+                }
             }
 
             //fill the stylesheet
             if ( !empty( $rules ) ) {
+                /*error_log('<ALOORS RULE ?>');
+                error_log(print_r( $rules, true ) );
+                error_log('<ALOORS RULE ?>');*/
                 //TODO: MAKE SURE RULE ARE NORMALIZED
                 foreach( $rules as $rule ) {
+                    if ( ! is_array( $rule ) ) {
+                        error_log( '<' . __CLASS__ . '::' . __FUNCTION__ . '>');
+                        error_log( ' => a css rule should be represented by an array' );
+                        error_log( print_r( $rule, true ) );
+                        error_log( '</' . __CLASS__ . '::' . __FUNCTION__ . '>');
+                        continue;
+                    }
+                    if ( empty( $rule['selector']) ) {
+                        error_log( '<' . __CLASS__ . '::' . __FUNCTION__ . '>');
+                        error_log( ' => a css rule is missing the selector param' );
+                        error_log( print_r( $rule, true ) );
+                        error_log( '</' . __CLASS__ . '::' . __FUNCTION__ . '>');
+                        continue;
+                    }
                     $this->stylesheet->sek_add_rule(
                         $rule[ 'selector' ],
                         $rule[ 'style_rules' ],
                         $rule[ 'mq' ]
                     );
-                }
+                }//foreach
             }
 
             // keep walking if the current $entry is an array
@@ -2439,10 +2478,8 @@ class Sek_Dyn_CSS_Builder {
                     $this -> parent_level = $entry;
                 }
             }
-        }
+        }//foreach
     }
-
-
 
 
     // hook : sek_add_css_rules_for_level_options
@@ -2459,60 +2496,6 @@ class Sek_Dyn_CSS_Builder {
             'style_rules'   => $style_rules,
             'mq'            => array( 'min' => self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] )
         );
-
-        return $rules;
-    }
-
-
-    // hook : sek_dyn_css_builder_rules
-    // @return array() of css rules
-    public function sek_handle_rules_and_font_list_for_font_families( array $rules, $value, array $parent_level ) {
-        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => $parent_level>');
-        // error_log( print_r( $parent_level, true ) );
-        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => $parent_level>');
-        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => $value>');
-        // error_log( print_r( $value, true ) );
-        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => $value>');
-
-        $family = $value;
-        $properties_to_render = array();
-        $style_rules = '';
-        // Preprocess the selected font family
-        //font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
-        //special treatment for font-family
-        if ( false != strstr( $value, '[gfont]') ) {
-            $split = explode(":", $family);
-            $family = $split[0];
-            //only numbers for font-weight. 400 is default
-            $properties_to_render['font-weight']    = $split[1] ? preg_replace('/\D/', '', $split[1]) : '';
-            $properties_to_render['font-weight']    = empty($properties_to_render['font-weight']) ? 400 : $properties_to_render['font-weight'];
-            $properties_to_render['font-style']     = ( $split[1] && strstr($split[1], 'italic') ) ? 'italic' : 'normal';
-        }
-
-        $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
-        $properties_to_render['font-family'] = false != strstr( $value, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
-
-        foreach ($properties_to_render as $prop => $prop_val) {
-            $style_rules .=   sprintf( '%1$s : %2$s;', $prop, $prop_val );
-        }//end foreach
-
-
-        // Create the css rules
-        $rules[] = array(
-            'selector'      => '[data-sek-id="'.$parent_level['id'].'"]',
-            'style_rules'   => $style_rules,
-            'mq'            => null
-        );
-
-        // If the family is a gfont, populate the list
-        // if ( false != strstr( $value, '[gfont]') ) {
-        //     $gfonts = is_array( $this->gfonts ) ? $this->gfonts : [];
-        //     $candidate = str_replace( '[gfont]', '' , $value);
-        //     if ( ! in_array( $candidate, $gfonts ) ) {
-        //         $gfonts[] = $candidate;
-        //     }
-        //     $this->gfonts = $gfonts;
-        // }
 
         return $rules;
     }
@@ -2820,8 +2803,9 @@ class Sek_Dyn_CSS_Handler {
             //build stylesheet
             $stylesheet = new Sek_Stylesheet();
             $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $stylesheet );
+
             // now that the stylesheet is ready let's cache it
-            $this->css_string_to_enqueue_or_print = (string)$stylesheet;
+            $this->css_string_to_enqueue_or_print = (string)$stylesheet -> get_stylesheet();
         }
 
         // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$args>');
@@ -3229,6 +3213,75 @@ class Sek_Dyn_CSS_Handler {
 
 }
 
+?><?php
+// filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
+// $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
+add_filter( "sek_add_css_rules_for_input_id", 'sek_add_css_rules_for_generic_css_input_types', 10, 4 );
+function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, string $input_id, array $parent_level ) {
+    //error_log( $input_id );
+    //error_log( print_r( $parent_level, true ) );
+    $selector = '[data-sek-id="'.$parent_level['id'].'"]';
+    $style_rules = '';
+    $mq = null;
+
+    switch( $input_id ) {
+        case 'font_weight_css' :
+            $style_rules = 'font-weight:'.$value;
+        break;
+        case 'font_style_css' :
+            $style_rules = 'font-style:'.$value;
+        break;
+        case 'text_decoration_css' :
+            $style_rules = 'text-decoration:'.$value;
+        break;
+        case 'text_transform_css' :
+            $style_rules = 'text-transform:'.$value;
+        break;
+        case 'letter_spacing_css' :
+            $style_rules = 'letter-spacing:'.$value . 'px';
+        break;
+        case 'color_css' :
+            $style_rules = 'color:'.$value;
+        break;
+        case 'color_hover_css' :
+            $selector = '[data-sek-id="'.$parent_level['id'].'"]:hover';
+            $style_rules = 'color:'.$value;
+        break;
+        case 'h_alignment_css' :
+            $style_rules = 'text-align:'.$value;
+        break;
+        case 'font_family_css' :
+            $family = $value;
+            $properties_to_render = array();
+            // Preprocess the selected font family
+            //font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
+            //special treatment for font-family
+            if ( false != strstr( $value, '[gfont]') ) {
+                $split = explode(":", $family);
+                $family = $split[0];
+                //only numbers for font-weight. 400 is default
+                $properties_to_render['font-weight']    = $split[1] ? preg_replace('/\D/', '', $split[1]) : '';
+                $properties_to_render['font-weight']    = empty($properties_to_render['font-weight']) ? 400 : $properties_to_render['font-weight'];
+                $properties_to_render['font-style']     = ( $split[1] && strstr($split[1], 'italic') ) ? 'italic' : 'normal';
+            }
+
+            $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
+            $properties_to_render['font-family'] = false != strstr( $value, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
+
+            foreach ($properties_to_render as $prop => $prop_val) {
+                $style_rules .=   sprintf( '%1$s : %2$s;', $prop, $prop_val );
+            }//end foreach
+        break;
+
+    }//switch
+
+    $rules[] = array(
+        'selector'      => $selector,
+        'style_rules'   => $style_rules,
+        'mq'            => $mq
+    );
+    return $rules;
+}
 ?><?php
 ////////////////////////////////////////////////////////////////
 // FLAT SKOPE BASE

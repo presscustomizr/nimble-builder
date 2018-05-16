@@ -105,8 +105,8 @@ function sek_enqueue_controls_js_css() {
                       'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
                   ),
 
-                  // TEXT EDITOR MODULE
-                  'font-weight' => array(
+                  // GENERIC CSS MODIFIERS INPUT TYPES
+                  'font_weight_css' => array(
                       'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
                       'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
                       'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
@@ -122,14 +122,14 @@ function sek_enqueue_controls_js_css() {
                       900     => 900
                   ),
 
-                  'font-style' => array(
+                  'font_style_css' => array(
                       'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
                       'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
                       'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
                       'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
                   ),
 
-                  'text-decoration' =>  array(
+                  'text_decoration_css' =>  array(
                       'none'      => __( 'none', 'text_domain_to_be_replaced' ),
                       'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
                       'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
@@ -137,7 +137,7 @@ function sek_enqueue_controls_js_css() {
                       'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
                   ),
 
-                  'text-transform' => array(
+                  'text_transform_css' => array(
                       'none'      => __( 'none', 'text_domain_to_be_replaced' ),
                       'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
                       'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),

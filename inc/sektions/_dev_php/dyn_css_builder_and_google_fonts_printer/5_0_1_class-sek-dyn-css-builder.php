@@ -48,7 +48,9 @@ class Sek_Dyn_CSS_Builder {
          *  SCHEDULE CSS RULES FILTERING
         /* ------------------------------------------------------------------------- */
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
-        add_filter( 'sek_add_css_rules_for_font-family', array( $this, 'sek_handle_rules_and_font_list_for_font_families' ), 10, 3 );
+
+        do_action('sek_dyn_css_builder_initialized');
+
         $this->sek_css_rules_sniffer_walker();
     }
 
@@ -60,9 +62,8 @@ class Sek_Dyn_CSS_Builder {
         $level      = is_array( $level ) ? $level : array();
 
         $stylesheet = is_null( $stylesheet ) ? $this->stylesheet : $stylesheet;
-        $rules = array();
-
         foreach ( $level as $key => $entry ) {
+             $rules = array();
             // Populate rules for sections / columns / modules
             if ( !empty( $entry[ 'level' ] ) && ( !empty( $entry[ 'options' ] ) || !empty( $entry[ 'width' ] ) ) ) {
                 // build rules for level options => section / column / module
@@ -80,19 +81,44 @@ class Sek_Dyn_CSS_Builder {
             // We want to filter each input
             // which makes it possible to target for example the font-family. Either in module values or in level options
             if ( empty( $entry[ 'level' ] ) && is_string( $key ) && 1 < strlen( $key ) ) {
-                $rules = apply_filters( "sek_add_css_rules_for_{$key}", $rules, $entry, $this -> parent_level );
+                // we need to have a parent level set
+                if ( !empty( $this -> parent_level ) ) {
+                    // the input_id candidate to filter is the $key
+                    $input_id_candidate = $key;
+                    // let's skip the $key that are reserved for the structure of the sektion tree
+                    if ( ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options'] ) ) {
+                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level );
+                    }
+                }
             }
 
             //fill the stylesheet
             if ( !empty( $rules ) ) {
+                /*error_log('<ALOORS RULE ?>');
+                error_log(print_r( $rules, true ) );
+                error_log('<ALOORS RULE ?>');*/
                 //TODO: MAKE SURE RULE ARE NORMALIZED
                 foreach( $rules as $rule ) {
+                    if ( ! is_array( $rule ) ) {
+                        error_log( '<' . __CLASS__ . '::' . __FUNCTION__ . '>');
+                        error_log( ' => a css rule should be represented by an array' );
+                        error_log( print_r( $rule, true ) );
+                        error_log( '</' . __CLASS__ . '::' . __FUNCTION__ . '>');
+                        continue;
+                    }
+                    if ( empty( $rule['selector']) ) {
+                        error_log( '<' . __CLASS__ . '::' . __FUNCTION__ . '>');
+                        error_log( ' => a css rule is missing the selector param' );
+                        error_log( print_r( $rule, true ) );
+                        error_log( '</' . __CLASS__ . '::' . __FUNCTION__ . '>');
+                        continue;
+                    }
                     $this->stylesheet->sek_add_rule(
                         $rule[ 'selector' ],
                         $rule[ 'style_rules' ],
                         $rule[ 'mq' ]
                     );
-                }
+                }//foreach
             }
 
             // keep walking if the current $entry is an array
@@ -107,10 +133,8 @@ class Sek_Dyn_CSS_Builder {
                     $this -> parent_level = $entry;
                 }
             }
-        }
+        }//foreach
     }
-
-
 
 
     // hook : sek_add_css_rules_for_level_options
@@ -127,60 +151,6 @@ class Sek_Dyn_CSS_Builder {
             'style_rules'   => $style_rules,
             'mq'            => array( 'min' => self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] )
         );
-
-        return $rules;
-    }
-
-
-    // hook : sek_dyn_css_builder_rules
-    // @return array() of css rules
-    public function sek_handle_rules_and_font_list_for_font_families( array $rules, $value, array $parent_level ) {
-        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => $parent_level>');
-        // error_log( print_r( $parent_level, true ) );
-        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => $parent_level>');
-        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => $value>');
-        // error_log( print_r( $value, true ) );
-        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => $value>');
-
-        $family = $value;
-        $properties_to_render = array();
-        $style_rules = '';
-        // Preprocess the selected font family
-        //font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
-        //special treatment for font-family
-        if ( false != strstr( $value, '[gfont]') ) {
-            $split = explode(":", $family);
-            $family = $split[0];
-            //only numbers for font-weight. 400 is default
-            $properties_to_render['font-weight']    = $split[1] ? preg_replace('/\D/', '', $split[1]) : '';
-            $properties_to_render['font-weight']    = empty($properties_to_render['font-weight']) ? 400 : $properties_to_render['font-weight'];
-            $properties_to_render['font-style']     = ( $split[1] && strstr($split[1], 'italic') ) ? 'italic' : 'normal';
-        }
-
-        $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
-        $properties_to_render['font-family'] = false != strstr( $value, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
-
-        foreach ($properties_to_render as $prop => $prop_val) {
-            $style_rules .=   sprintf( '%1$s : %2$s;', $prop, $prop_val );
-        }//end foreach
-
-
-        // Create the css rules
-        $rules[] = array(
-            'selector'      => '[data-sek-id="'.$parent_level['id'].'"]',
-            'style_rules'   => $style_rules,
-            'mq'            => null
-        );
-
-        // If the family is a gfont, populate the list
-        // if ( false != strstr( $value, '[gfont]') ) {
-        //     $gfonts = is_array( $this->gfonts ) ? $this->gfonts : [];
-        //     $candidate = str_replace( '[gfont]', '' , $value);
-        //     if ( ! in_array( $candidate, $gfonts ) ) {
-        //         $gfonts[] = $candidate;
-        //     }
-        //     $this->gfonts = $gfonts;
-        // }
 
         return $rules;
     }

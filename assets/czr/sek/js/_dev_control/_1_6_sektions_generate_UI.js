@@ -480,12 +480,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//self.updateAPISetting()
                   };//_doUpdateWithRequestedAction
 
-                  // if the changed input is a google font modifier, we want to first refresh the google font collection, and then proceed to the requested action
+                  // if the changed input is a google font modifier ( <=> font_family_css input)
+                  // => we want to first refresh the google font collection, and then proceed to the requested action
                   // this way we make sure that the customized value used when ajaxing will take into account when writing the google font http request link
                   if ( true === refresh_fonts ) {
                         var _getChangedFontFamily = function() {
-                              if ( 'font-family' != params.settingParams.args.input_changed ) {
-                                    api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts => the input id is not font-family', params );
+                              if ( 'font_family_css' != params.settingParams.args.input_changed ) {
+                                    api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts => the input id is not font_family_css', params );
                                     return;
                               } else {
                                     return params.settingParams.args.input_value;
@@ -494,6 +495,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var newFontFamily = '';
                         try { newFontFamily = _getChangedFontFamily(); } catch( er) {
                               api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts', er );
+                              return;
+                        }
+                        if ( ! _.isString( newFontFamily ) ) {
+                              api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', er );
+                              return;
                         }
                         // add it only if gfont
                         if ( newFontFamily.indexOf('gfont') > -1 ) {
