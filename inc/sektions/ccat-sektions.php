@@ -2064,7 +2064,9 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             ),//"#000000",
                             'important_css'       => array(
                                 'input_type'  => 'gutencheck',
-                                'title'       => __('Make those style options win if other rules are applied.', 'text_domain_to_be_replaced')
+                                'title'       => __('Make those style options win if other rules are applied.', 'text_domain_to_be_replaced'),
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
                             ),//false
                         )
                     )
