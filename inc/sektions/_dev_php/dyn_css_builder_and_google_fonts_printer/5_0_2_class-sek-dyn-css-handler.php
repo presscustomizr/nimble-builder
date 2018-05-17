@@ -297,15 +297,14 @@ class Sek_Dyn_CSS_Handler {
             $this->sek_model = sek_get_skoped_seks( $this -> skope_id );
 
             //build stylesheet
-            $stylesheet = new Sek_Stylesheet();
-            $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $stylesheet );
+            $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model );
 
-            // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->rules>');
-            // error_log( print_r( $stylesheet->rules, true ) );
-            // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->rules>');
+            // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->collection>');
+            // error_log( print_r( $stylesheet->collection, true ) );
+            // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->collection>');
 
             // now that the stylesheet is ready let's cache it
-            $this->css_string_to_enqueue_or_print = (string)$stylesheet -> get_stylesheet();
+            $this->css_string_to_enqueue_or_print = (string)$this->builder-> get_stylesheet();
         }
 
         // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$args>');

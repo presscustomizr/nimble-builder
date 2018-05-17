@@ -20,7 +20,7 @@ class Sek_Dyn_CSS_Builder {
 
     we could have a constant array since php 5.6
     */
-    private static $breakpoints = [
+    public static $breakpoints = [
         'xs' => 0,
         'sm' => 576,
         'md' => 768,
@@ -30,13 +30,11 @@ class Sek_Dyn_CSS_Builder {
 
     const COLS_MOBILE_BREAKPOINT  = 'md';
 
-    private $stylesheet;
+    private $collections;//the collection of css rules
     private $sek_model;
     private $parent_level = array();
-    //public $gfonts = array();
 
-    public function __construct( $sek_model = array(), Sek_Stylesheet $stylesheet ) {
-        $this->stylesheet = $stylesheet;
+    public function __construct( $sek_model = array() ) {
         $this->sek_model  = $sek_model;
 
         // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>saved sektions>');
@@ -49,19 +47,16 @@ class Sek_Dyn_CSS_Builder {
         /* ------------------------------------------------------------------------- */
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
 
-        do_action('sek_dyn_css_builder_initialized');
-
         $this->sek_css_rules_sniffer_walker();
     }
 
 
     // Fired in the constructor
     // Walk the level tree and build rules when needed
-    public function sek_css_rules_sniffer_walker( $level = null, $stylesheet = null ) {
+    public function sek_css_rules_sniffer_walker( $level = null ) {
         $level      = is_null( $level ) ? $this->sek_model : $level;
         $level      = is_array( $level ) ? $level : array();
 
-        $stylesheet = is_null( $stylesheet ) ? $this->stylesheet : $stylesheet;
         foreach ( $level as $key => $entry ) {
              $rules = array();
             // Populate rules for sections / columns / modules
@@ -92,7 +87,7 @@ class Sek_Dyn_CSS_Builder {
                 }
             }
 
-            //fill the stylesheet
+            // populates the rules collection
             if ( !empty( $rules ) ) {
                 /*error_log('<ALOORS RULE ?>');
                 error_log(print_r( $rules, true ) );
@@ -113,9 +108,9 @@ class Sek_Dyn_CSS_Builder {
                         error_log( '</' . __CLASS__ . '::' . __FUNCTION__ . '>');
                         continue;
                     }
-                    $this->stylesheet->sek_add_rule(
+                    $this->sek_populate(
                         $rule[ 'selector' ],
-                        $rule[ 'style_rules' ],
+                        $rule[ 'css_rules' ],
                         $rule[ 'mq' ]
                     );
                 }//foreach
@@ -127,7 +122,7 @@ class Sek_Dyn_CSS_Builder {
                 if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
                     $this -> parent_level = $entry;
                 }
-                $this->sek_css_rules_sniffer_walker( $entry, $stylesheet );
+                $this->sek_css_rules_sniffer_walker( $entry);
                 // Reset the parent level after walking the sublevels
                 if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
                     $this -> parent_level = $entry;
@@ -135,6 +130,95 @@ class Sek_Dyn_CSS_Builder {
             }
         }//foreach
     }
+
+
+
+    // @return void()
+    public function sek_populate( $selector, $css_rules, string $mq = null ) {
+        if ( ! is_string( $selector ) )
+            return;
+        if ( ! is_string( $css_rules ) )
+            return;
+
+        // Assign a default media device
+        //TODO: allowed media query?
+        $mq_device = 'all_devices';
+
+        // If a media query is requested, build it
+        if ( !empty( $mq ) ) {
+            if ( false === strpos($mq, 'max') ) {
+                error_log( __FUNCTION__ . ' ' . __CLASS__ . ' => the media queries only accept max-width rules');
+            } else {
+                $mq_device = $mq;
+            }
+        }
+
+        // if the media query for this device is not yet added, add it
+        if ( !isset( $this->collection[ $mq_device ] ) ) {
+            $this->collection[ $mq_device ] = array();
+        }
+
+        if ( !isset( $this->collection[ $mq_device ][ $selector ] ) ) {
+            $this->collection[ $mq_device ][ $selector ] = array();
+        }
+
+        $this->collection[ $mq_device ][ $selector ][] = $css_rules;
+    }
+
+    // @return string
+    private function sek_maybe_wrap_in_media_query( $css,  $mq_device = 'all_devices' ) {
+        if ( 'all_devices' === $mq_device ) {
+            return $css;
+        }
+        return sprintf( '@media(%1$s){%2$s}', $mq_device, $css);
+    }
+
+    // sorts the max-width media queries from all_devices to the smallest
+    // @return integer
+    private function user_defined_array_key_sort_fn($a, $b) {
+        if ( 'all_devices' === $a ) {
+            return -1;
+        }
+        if ( 'all_devices' === $b ) {
+            return 1;
+        }
+        $a_int = (int)preg_replace('/[^0-9]/', '', $a) * 1;
+        $b_int = (int)preg_replace('/[^0-9]/', '', $b) * 1;
+
+        return $b_int - $a_int;
+    }
+
+    //@returns a stringified stylesheet
+    public function get_stylesheet() {
+        $css = '';
+        // error_log('<mq collection>');
+        // error_log( print_r( $this->collection, true ) );
+        // error_log('</mq collection>');
+        if ( ! is_array( $this->collection ) || empty( $this->collection ) )
+          return $css;
+        // Sort the collection by media queries
+        uksort( $this->collection, array( $this, 'user_defined_array_key_sort_fn' ) );
+
+        // process
+        foreach ( $this->collection as $mq_device => $selectors ) {
+            $_css = '';
+            foreach ( $selectors as $selector => $css_rules ) {
+                $css_rules = is_array( $css_rules ) ? implode( ';', $css_rules ) : $css_rules;
+                $_css .=  $selector . '{' . $css_rules . '}';
+            }
+            $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_device );
+            $css .= $_css;
+        }
+        return $css;
+    }
+
+
+
+
+
+
+
+
 
 
     // hook : sek_add_css_rules_for_level_options
@@ -145,10 +229,10 @@ class Sek_Dyn_CSS_Builder {
         if ( empty( $width ) )
           return $rules;
 
-        $style_rules = sprintf( '-ms-flex: 0 0 %1$s%%;flex: 0 0 %1$s%%;max-width: %1$s%%', $width );
+        $css_rules = sprintf( '-ms-flex: 0 0 %1$s%%;flex: 0 0 %1$s%%;max-width: %1$s%%', $width );
         $rules[] = array(
             'selector'      => '.sek-column[data-sek-id="'.$level['id'].'"]',
-            'style_rules'   => $style_rules,
+            'css_rules'   => $css_rules,
             'mq'            => array( 'min' => self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] )
         );
 

@@ -61,14 +61,14 @@ function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, st
             $important = (bool)sek_is_checked( $parent_level['value']['important_css'] );
         }
 
-        $style_rules = '';
+        $css_rules = '';
         foreach ($properties_to_render as $prop => $prop_val) {
-            $style_rules .= sprintf( '%1$s:%2$s%3$s;', $prop, $prop_val, $important ? '!important' : '' );
+            $css_rules .= sprintf( '%1$s:%2$s%3$s;', $prop, $prop_val, $important ? '!important' : '' );
         }//end foreach
 
         $rules[] = array(
             'selector'      => $selector,
-            'style_rules'   => $style_rules,
+            'css_rules'   => $css_rules,
             'mq'            => $mq
         );
     }

@@ -193,7 +193,6 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/4_0_8_sek_register_featured_pages.php',
 
       // DYN CSS
-      '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_0_class-sek-dyn-css-stylesheet.php',
       '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_1_class-sek-dyn-css-builder.php',
       '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_2_class-sek-dyn-css-handler.php',
       '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_3_add_rules_for_generic_input_types.php',

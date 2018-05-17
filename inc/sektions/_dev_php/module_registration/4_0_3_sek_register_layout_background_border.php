@@ -236,14 +236,14 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
 
     //build background rule
     if ( ! empty( $background_properties ) ) {
-        $background_style_rules      = "background:" . implode( ' ', array_filter( $background_properties ) );
+        $background_css_rules      = "background:" . implode( ' ', array_filter( $background_properties ) );
 
         //do we need to add the background-size property separately?
-        $background_style_rules      = isset( $background_size ) ? $style_rules . ';background-size:' . $background_size : $background_style_rules;
+        $background_css_rules      = isset( $background_size ) ? $css_rules . ';background-size:' . $background_size : $background_css_rules;
 
         $rules[] = array(
             'selector' => '[data-sek-id="'.$level['id'].'"]',
-            'style_rules' => $background_style_rules,
+            'css_rules' => $background_css_rules,
             'mq' =>null
         );
     }
@@ -254,7 +254,7 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
         $bg_color_overlay = isset( $options[ 'lbb' ][ 'bg-color-overlay' ] ) ? $options[ 'lbb' ][ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
             //overlay pseudo element
-            $bg_overlay_style_rules = 'content:"";display:block;position:absolute;top:0;left:0;right:0;bottom:0;background-color:'.$bg_color_overlay;
+            $bg_overlay_css_rules = 'content:"";display:block;position:absolute;top:0;left:0;right:0;bottom:0;background-color:'.$bg_color_overlay;
 
             //opacity
             //validate/sanitize
@@ -263,11 +263,11 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
             ) : FALSE;
             $bg_overlay_opacity     = FALSE !== $bg_overlay_opacity ? filter_var( $bg_overlay_opacity / 100, FILTER_VALIDATE_FLOAT ) : $bg_overlay_opacity;
 
-            $bg_overlay_style_rules = FALSE !== $bg_overlay_opacity ? $bg_overlay_style_rules . ';opacity:' . $bg_overlay_opacity : $bg_overlay_style_rules;
+            $bg_overlay_css_rules = FALSE !== $bg_overlay_opacity ? $bg_overlay_css_rules . ';opacity:' . $bg_overlay_opacity : $bg_overlay_css_rules;
 
             $rules[]     = array(
                     'selector' => '[data-sek-id="'.$level['id'].'"]::before',
-                    'style_rules' => $bg_overlay_style_rules,
+                    'css_rules' => $bg_overlay_css_rules,
                     'mq' =>null
             );
             //we have to also:
@@ -275,7 +275,7 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
             // 2) make any '[data-sek-id="'.$level['id'].'"] first child to be relative (not to the resizable handle div)
             $rules[]     = array(
                     'selector' => '[data-sek-id="'.$level['id'].'"]',
-                    'style_rules' => 'position:relative',
+                    'css_rules' => 'position:relative',
                     'mq' => null
             );
 
@@ -289,7 +289,7 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
             }
             $rules[]     = array(
                 'selector' => $first_child_selector,
-                'style_rules' => 'position:relative',
+                'css_rules' => 'position:relative',
                 'mq' =>null
             );
         }
@@ -335,7 +335,7 @@ function sek_add_css_rules_for_lbb_border( array $rules, array $level ) {
         //append border rules
         $rules[]     = array(
                 'selector' => '[data-sek-id="'.$level['id'].'"]',
-                'style_rules' => "border:" . implode( ' ', array_filter( $border_properties ) ),
+                'css_rules' => "border:" . implode( ' ', array_filter( $border_properties ) ),
                 'mq' =>null
         );
     }
@@ -362,11 +362,11 @@ function sek_add_css_rules_for_lbb_boxshadow( array $rules, array $level ) {
       return $rules;
 
     if ( !empty( $options[ 'lbb' ][ 'shadow' ] ) &&  sek_is_checked( $options['lbb'][ 'shadow'] ) ) {
-        $style_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
+        $css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
 
         $rules[]     = array(
                 'selector' => '[data-sek-id="'.$level['id'].'"]',
-                'style_rules' => $style_rules,
+                'css_rules' => $css_rules,
                 'mq' =>null
         );
     }
@@ -398,27 +398,27 @@ function sek_add_css_rules_for_lbb_height( array $rules, array $level ) {
                 array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
         $height = $height_value;
     }
-    $style_rules = '';
+    $css_rules = '';
     if ( isset( $height ) && FALSE !== $height ) {
-        $style_rules .= 'height:' . $height . 'vh;';
+        $css_rules .= 'height:' . $height . 'vh;';
     }
     if ( !empty( $options[ 'lbb' ][ 'v-alignment' ]) ) {
         switch( $options[ 'lbb' ][ 'v-alignment' ] ) {
             case 'top' :
-                $style_rules .= "align-items: flex-start;";
+                $css_rules .= "align-items: flex-start;";
             break;
             case 'center' :
-                $style_rules .= "align-items: center;";
+                $css_rules .= "align-items: center;";
             break;
             case 'bottom' :
-                $style_rules .= "align-items: flex-end;";
+                $css_rules .= "align-items: flex-end;";
             break;
         }
     }
-    if ( !empty( $style_rules ) ) {
+    if ( !empty( $css_rules ) ) {
         $rules[]     = array(
                 'selector' => '[data-sek-id="'.$level['id'].'"]',
-                'style_rules' => $style_rules,
+                'css_rules' => $css_rules,
                 'mq' =>null
         );
     }

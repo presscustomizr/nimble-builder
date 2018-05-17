@@ -122,20 +122,27 @@ function sek_add_css_rules_for_spacing( array $rules, array $level ) {
     /*
     * TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
     */
+    // Sek_Dyn_CSS_Builder::$breakpoints = [
+    //     'xs' => 0,
+    //     'sm' => 576,
+    //     'md' => 768,
+    //     'lg' => 992,
+    //     'xl' => 1200
+    // ];
     if ( ! empty( $_pad_marg[ 'desktop' ] ) ) {
         $_pad_marg[ 'desktop' ][ 'mq' ] = null;
     }
 
     if ( ! empty( $_pad_marg[ 'tablet' ] ) ) {
-        $_pad_marg[ 'tablet' ][ 'mq' ]  = array( 'max' => (int)( Sek_Dyn_CSS_Builder::$breakpoints['lg'] - 1 ) ); //max-width: 991
+        $_pad_marg[ 'tablet' ][ 'mq' ]  = 'max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['lg'] - 1 ) . 'px'; //max-width: 991
     }
 
     if ( ! empty( $_pad_marg[ 'mobile' ] ) ) {
-        $_pad_marg[ 'mobile' ][ 'mq' ]  = array( 'max' => (int)( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) ); //max-width: 575
+        $_pad_marg[ 'mobile' ][ 'mq' ]  = 'max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px'; //max-width: 575
     }
 
     foreach( array_filter( $_pad_marg ) as $_spacing_rules ) {
-        $style_rules = implode(';',
+        $css_rules = implode(';',
             array_map( function( $key, $value ) {
                 return "$key:{$value}";
             }, array_keys( $_spacing_rules[ 'rules' ] ), array_values( $_spacing_rules[ 'rules' ] )
@@ -143,7 +150,7 @@ function sek_add_css_rules_for_spacing( array $rules, array $level ) {
 
         $rules[] = array(
             'selector' => '[data-sek-id="'.$level['id'].'"]',
-            'style_rules' => $style_rules,
+            'css_rules' => $css_rules,
             'mq' =>$_spacing_rules[ 'mq' ]
         );
     }
