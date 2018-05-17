@@ -180,6 +180,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_5_sek_input_tmpl_horizontal_alignment.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_6_sek_input_tmpl_vertical_alignment.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_7_sek_input_tmpl_font_picker.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_8_sek_input_tmpl_font_size_line_height.php',
 
       // MODULE REGISTRATION
       '<%= paths.sektions %>_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php',
@@ -188,7 +189,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/4_0_3_sek_register_layout_background_border.php',
       '<%= paths.sektions %>_dev_php/module_registration/4_0_4_sek_register_spacing.php',
       '<%= paths.sektions %>_dev_php/module_registration/4_0_5_sek_register_simple_html.php',
-      '<%= paths.sektions %>_dev_php/module_registration/4_0_6_sek_register_text_editor.php',
+      '<%= paths.sektions %>_dev_php/module_registration/4_0_6_sek_register_tiny_mce_editor.php',
       '<%= paths.sektions %>_dev_php/module_registration/4_0_7_sek_register_image.php',
       '<%= paths.sektions %>_dev_php/module_registration/4_0_8_sek_register_featured_pages.php',
 
