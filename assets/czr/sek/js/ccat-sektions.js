@@ -694,6 +694,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   },
                                   complete : function() {
                                         api.previewer.trigger( 'sek-pick-module', {});
+                                        // always update the root fonts property after a removal
+                                        // because the removed level(s) might had registered fonts
+                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
                                   }
                             },
 
@@ -979,8 +982,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         this.resolve();
                                   });
                             }
-
-
                       };//msgCollection
 
                   // Schedule the reactions
@@ -1504,9 +1505,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //  not_preview_sent : bool
             //}
             updateAPISettingAndExecutePreviewActions : function( params ) {
-                  console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
+                  //console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
                   var self = this;
-                  //console.log('sek-generate-level-options-ui => ARGS ?',_setting_.id, args );
                   // We don't want to store the default title and id module properties
                   var moduleValueCandidate = {};
                   _.each( params.settingParams.to, function( _val, _property ) {
@@ -1544,7 +1544,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   var _doUpdateWithRequestedAction = function() {
-                        self.updateAPISetting({
+                        return self.updateAPISetting({
                               action : params.uiParams.action,
                               id : params.uiParams.id,
                               value : moduleValueCandidate,
@@ -1555,7 +1555,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               options_type : params.options_type,//'spacing', 'layout_background_border'
 
                         }).done( function( ) {
-                              console.log('updateAPISettingAndExecutePreviewActions => updateAPISetting done');
                               // STYLESHEET => default action when modifying the level options
                               if ( true === refresh_stylesheet ) {
                                     api.previewer.send( 'sek-refresh-stylesheet', {
@@ -1604,7 +1603,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     action : 'sek-update-fonts',
                                     font_family : newFontFamily
                               }).done( function( ) {
-                                    _doUpdateWithRequestedAction();
+                                    _doUpdateWithRequestedAction().then( function() {
+                                          // always refresh again after
+                                          // Why ?
+                                          // Because the first refresh was done before actually setting the new font family, so based on a previous set of fonts
+                                          // which leads to have potentially an additional google fonts that we don't need after the first refresh
+                                          // that's why this second refresh is required. It wont trigger any preview ajax actions. Simply refresh the root fonts property of the main api setting.
+                                          self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                    });
                               });
                         } else {
                              _doUpdateWithRequestedAction();
@@ -2376,21 +2382,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // }
                               case 'sek-update-fonts' :
                                     //console.log('PARAMS in sek-add-fonts', params );
-                                    if ( _.isEmpty( params.font_family ) ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => missing font_family' );
-                                          break;
-                                    }
-                                    if ( params.font_family.indexOf('gfont') < 0 ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
-                                          break;
-                                    }
                                     // Get the gfonts from the level options and modules values
                                     var currentGfonts = self.sniffGFonts();
-                                    if ( ! _.contains( currentGfonts, params.font_family ) ) {
-                                         currentGfonts.push( params.font_family );
+                                    if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
+                                          if ( params.font_family.indexOf('gfont') < 0 ) {
+                                                api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
+                                                break;
+                                          }
+                                          currentGfonts.push( params.font_family );
                                     }
-                                    // update the global gfonts
-                                    //console.log('currentGfonts ', currentGfonts );
+                                    // update the global gfonts collection
+                                    // this is then used server side in Sek_Dyn_CSS_Handler::sek_get_gfont_print_candidates to build the Google Fonts request
                                     newSetValue.fonts = currentGfonts;
                               break;
                         }// switch
@@ -2841,7 +2843,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   _.each( level, function( levelData, _key_ ) {
                         if ( 'font_family_css' == _key_ ) {
-                              if ( levelData.indexOf('gfont') > -1 ) {
+                              if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
                                     gfonts.push( levelData );
                               }
                         }

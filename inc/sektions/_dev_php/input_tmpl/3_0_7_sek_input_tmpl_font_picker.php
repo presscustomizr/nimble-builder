@@ -112,7 +112,7 @@ function sek_retrieve_decoded_gfonts() {
 
 
 
-//@return the subsets or the google fonts
+//@return the google fonts
 function sek_get_gfonts( $what = null ) {
   //checks if transient exists or has expired
 
@@ -130,8 +130,8 @@ function sek_get_gfonts( $what = null ) {
     foreach ( $font['variants'] as $variant ) {
       $name     = str_replace( ' ', '+', $font['family'] );
       $gfonts[]   = array(
-        'name'    => $name . ':' .$variant ,
-        'subsets'   => $font['subsets']
+          'name'    => $name . ':' .$variant
+          //'subsets'   => $font['subsets']
       );
     }
     //generates subset list : subset => font number
