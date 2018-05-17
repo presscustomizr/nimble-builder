@@ -30,7 +30,7 @@ class Sek_Dyn_CSS_Builder {
 
     const COLS_MOBILE_BREAKPOINT  = 'md';
 
-    private $collections;//the collection of css rules
+    private $collection;//the collection of css rules
     private $sek_model;
     private $parent_level = array();
 
