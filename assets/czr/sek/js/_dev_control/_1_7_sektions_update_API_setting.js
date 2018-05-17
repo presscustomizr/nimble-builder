@@ -734,21 +734,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // }
                               case 'sek-update-fonts' :
                                     //console.log('PARAMS in sek-add-fonts', params );
-                                    if ( _.isEmpty( params.font_family ) ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => missing font_family' );
-                                          break;
-                                    }
-                                    if ( params.font_family.indexOf('gfont') < 0 ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
-                                          break;
-                                    }
                                     // Get the gfonts from the level options and modules values
                                     var currentGfonts = self.sniffGFonts();
-                                    if ( ! _.contains( currentGfonts, params.font_family ) ) {
-                                         currentGfonts.push( params.font_family );
+                                    if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
+                                          if ( params.font_family.indexOf('gfont') < 0 ) {
+                                                api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
+                                                break;
+                                          }
+                                          currentGfonts.push( params.font_family );
                                     }
-                                    // update the global gfonts
-                                    //console.log('currentGfonts ', currentGfonts );
+                                    // update the global gfonts collection
+                                    // this is then used server side in Sek_Dyn_CSS_Handler::sek_get_gfont_print_candidates to build the Google Fonts request
                                     newSetValue.fonts = currentGfonts;
                               break;
                         }// switch

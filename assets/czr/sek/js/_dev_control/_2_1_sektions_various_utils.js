@@ -173,7 +173,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   _.each( level, function( levelData, _key_ ) {
                         if ( 'font_family_css' == _key_ ) {
-                              if ( levelData.indexOf('gfont') > -1 ) {
+                              if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
                                     gfonts.push( levelData );
                               }
                         }

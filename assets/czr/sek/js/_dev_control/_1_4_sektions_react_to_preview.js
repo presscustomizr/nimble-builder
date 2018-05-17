@@ -120,6 +120,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   },
                                   complete : function() {
                                         api.previewer.trigger( 'sek-pick-module', {});
+                                        // always update the root fonts property after a removal
+                                        // because the removed level(s) might had registered fonts
+                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
                                   }
                             },
 
@@ -405,8 +408,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         this.resolve();
                                   });
                             }
-
-
                       };//msgCollection
 
                   // Schedule the reactions

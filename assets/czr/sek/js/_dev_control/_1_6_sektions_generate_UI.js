@@ -407,9 +407,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //  not_preview_sent : bool
             //}
             updateAPISettingAndExecutePreviewActions : function( params ) {
-                  console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
+                  //console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
                   var self = this;
-                  //console.log('sek-generate-level-options-ui => ARGS ?',_setting_.id, args );
                   // We don't want to store the default title and id module properties
                   var moduleValueCandidate = {};
                   _.each( params.settingParams.to, function( _val, _property ) {
@@ -447,7 +446,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   var _doUpdateWithRequestedAction = function() {
-                        self.updateAPISetting({
+                        return self.updateAPISetting({
                               action : params.uiParams.action,
                               id : params.uiParams.id,
                               value : moduleValueCandidate,
@@ -458,7 +457,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               options_type : params.options_type,//'spacing', 'layout_background_border'
 
                         }).done( function( ) {
-                              console.log('updateAPISettingAndExecutePreviewActions => updateAPISetting done');
                               // STYLESHEET => default action when modifying the level options
                               if ( true === refresh_stylesheet ) {
                                     api.previewer.send( 'sek-refresh-stylesheet', {
@@ -507,7 +505,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     action : 'sek-update-fonts',
                                     font_family : newFontFamily
                               }).done( function( ) {
-                                    _doUpdateWithRequestedAction();
+                                    _doUpdateWithRequestedAction().then( function() {
+                                          // always refresh again after
+                                          // Why ?
+                                          // Because the first refresh was done before actually setting the new font family, so based on a previous set of fonts
+                                          // which leads to have potentially an additional google fonts that we don't need after the first refresh
+                                          // that's why this second refresh is required. It wont trigger any preview ajax actions. Simply refresh the root fonts property of the main api setting.
+                                          self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                    });
                               });
                         } else {
                              _doUpdateWithRequestedAction();
