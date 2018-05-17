@@ -60,6 +60,38 @@
                         });
                   });
             },
+            font_size : function( obj ) {
+                  var input      = this,
+                      $wrapper = $('.sek-font-size-wrapper', input.container ),
+                      unit = 'px';
+
+                  $wrapper.find( 'input[type="number"]').on('change', function() {
+                        input( $(this).val() + unit );
+                  }).stepper();
+
+            },
+
+            line_height : function( obj ) {
+                  var input      = this,
+                      $wrapper = $('.sek-line-height-wrapper', input.container ),
+                      unit = 'px';
+
+                  $wrapper.find( 'input[type="number"]').on('change', function() {
+                        input( $(this).val() + unit );
+                  }).stepper();
+            },
+
+
+
+
+
+
+
+
+
+
+
+
 
             // FONT PICKER
             font_picker : function( input_options ) {
@@ -282,8 +314,6 @@
                         });
 
                   });
-
-
             }//font_picker()
       });//$.extend( api.czrInputMap, {})
 

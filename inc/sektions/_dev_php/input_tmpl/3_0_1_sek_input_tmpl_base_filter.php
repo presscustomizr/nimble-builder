@@ -32,6 +32,12 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'font_picker' :
             sek_set_input_tmpl___font_picker( $input_id, $input_data );
         break;
+        case 'font_size' :
+            sek_set_input_tmpl___font_size( $input_id, $input_data );
+        break;
+        case 'line_height' :
+            sek_set_input_tmpl___line_height( $input_id, $input_data );
+        break;
     }
 }
 ?>

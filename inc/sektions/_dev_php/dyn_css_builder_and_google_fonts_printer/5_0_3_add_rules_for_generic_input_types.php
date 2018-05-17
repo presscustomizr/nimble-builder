@@ -10,6 +10,12 @@ function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, st
     $properties_to_render = array();
 
     switch( $input_id ) {
+        case 'font_size_css' :
+            $properties_to_render['font-size'] = $value;
+        break;
+        case 'line_height_css' :
+            $properties_to_render['line-height'] = $value;
+        break;
         case 'font_weight_css' :
             $properties_to_render['font-weight'] = $value;
         break;
@@ -67,9 +73,9 @@ function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, st
         }//end foreach
 
         $rules[] = array(
-            'selector'      => $selector,
+            'selector'    => $selector,
             'css_rules'   => $css_rules,
-            'mq'            => $mq
+            'mq'          => $mq
         );
     }
     return $rules;
