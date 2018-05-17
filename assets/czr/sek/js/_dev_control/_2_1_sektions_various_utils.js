@@ -184,5 +184,35 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   return gfonts;
             },
+
+
+            // @return a mixed type default value
+            // @param input_id string
+            // @param module_type string
+            // @param level array || object
+            getInputDefaultValue : function( input_id, module_type, level ) {
+                  var self = this;
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
+                        api.errare( 'getInputDefaultValue => missing sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( _.isUndefined( level ) ) {
+                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                  }
+                  var _defaultVal_ = 'no_match';
+                  _.each( level, function( levelData, _key_ ) {
+                        // we found a match skip next levels
+                        if ( 'no_match' !== _defaultVal_ )
+                          return;
+                        if ( input_id === _key_ && ! _.isUndefined( levelData.default ) ) {
+                              _defaultVal_ = levelData.default;
+                        }
+                        // if we have still no match, and the data are sniffable, let's go ahead recursively
+                        if ( 'no_match' === _defaultVal_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
+                              _defaultVal_ = self.getInputDefaultValue( input_id, module_type, levelData );
+                        }
+                  });
+                  return _defaultVal_;
+            }
       });//$.extend()
 })( wp.customize, jQuery );

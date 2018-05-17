@@ -1250,7 +1250,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // => that's why we check if ! api.has( ... )
                                           api( params.id, function( _setting_ ) {
                                                 _setting_.bind( _.debounce( function( to, from, args ) {
-                                                      self.updateAPISettingAndExecutePreviewActions({
+                                                      try { self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_markup',
                                                             uiParams : _.extend( params, { action : 'sek-set-module-value' } ),
                                                             //options_type : 'spacing',
@@ -1259,7 +1259,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   from : from,
                                                                   args : args
                                                             }
-                                                      });
+                                                      }); } catch( er ) {
+                                                            api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                                      }
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                           });
 
@@ -1358,7 +1360,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // => that's why we check if ! api.has( ... )
                                           api( layoutBgBorderOptionsSetId, function( _setting_ ) {
                                                 _setting_.bind( _.debounce( function( to, from, args ) {
-                                                      self.updateAPISettingAndExecutePreviewActions({
+                                                      try { self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_stylesheet',
                                                             uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
                                                             options_type : 'layout_background_border',
@@ -1367,7 +1369,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   from : from,
                                                                   args : args
                                                             }
-                                                      });
+                                                      }); } catch( er ) {
+                                                            api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                                      }
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                           });//api( layoutBgBorderOptionsSetId, function( _setting_ ) {})
 
@@ -1412,7 +1416,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // => that's why we check if ! api.has( ... )
                                           api( spacingOptionsSetId, function( _setting_ ) {
                                                 _setting_.bind( _.debounce( function( to, from, args ) {
-                                                      self.updateAPISettingAndExecutePreviewActions({
+                                                      try { self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_stylesheet',
                                                             uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
                                                             options_type : 'spacing',
@@ -1421,7 +1425,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   from : from,
                                                                   args : args
                                                             }
-                                                      });
+                                                      }); } catch( er ) {
+                                                            api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                                      }
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                           });//api( layoutBgBorderOptionsSetId, function( _setting_ ) {})
 
@@ -1507,18 +1513,30 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             updateAPISettingAndExecutePreviewActions : function( params ) {
                   //console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
                   var self = this;
-                  // We don't want to store the default title and id module properties
-                  var moduleValueCandidate = {};
-                  _.each( params.settingParams.to, function( _val, _property ) {
-                        if ( ! _.contains( ['title', 'id' ], _property ) ) {
-                              moduleValueCandidate[ _property ] = _val;
+                  // 1) We don't want to store the default title and id module properties
+                  // 2) We don't want to write in db the properties that are set to their default values
+                  var moduleValueCandidate = {},
+                      parentModuleType = params.settingParams.args.inputRegistrationParams.module.module_type,
+                      inputDefaultValue;
+
+                  _.each( params.settingParams.to, function( _val, input_id ) {
+                        if ( _.contains( ['title', 'id' ], input_id ) )
+                          return;
+                        inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
+
+                        if ( _val === inputDefaultValue ) {
+                              return;
+                        } else {
+                              moduleValueCandidate[ input_id ] = _val;
                         }
+
                   });
+
 
                   // What to do in the preview ?
                   // The action to trigger is determined by the changed input
                   // For the options of a level, the default action is to refresh the stylesheet.
-                  // But we might need to refresh the markup in some cases. Like for example when a css class is added.
+                  // But we might need to refresh the markup in some cases. Like for example when a css class is added. @see the boxed-wide layout example
                   if ( _.isEmpty( params.defaultPreviewAction ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing defaultPreviewAction in passed params. No action can be triggered to the api.previewer.', params );
                         return;
@@ -2854,6 +2872,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   return gfonts;
             },
+
+
+            // @return a mixed type default value
+            // @param input_id string
+            // @param module_type string
+            // @param level array || object
+            getInputDefaultValue : function( input_id, module_type, level ) {
+                  var self = this;
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
+                        api.errare( 'getInputDefaultValue => missing sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( _.isUndefined( level ) ) {
+                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                  }
+                  var _defaultVal_ = 'no_match';
+                  _.each( level, function( levelData, _key_ ) {
+                        // we found a match skip next levels
+                        if ( 'no_match' !== _defaultVal_ )
+                          return;
+                        if ( input_id === _key_ && ! _.isUndefined( levelData.default ) ) {
+                              _defaultVal_ = levelData.default;
+                        }
+                        // if we have still no match, and the data are sniffable, let's go ahead recursively
+                        if ( 'no_match' === _defaultVal_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
+                              _defaultVal_ = self.getInputDefaultValue( input_id, module_type, levelData );
+                        }
+                  });
+                  return _defaultVal_;
+            }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};

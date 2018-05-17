@@ -1998,6 +1998,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'h_alignment_css' => array(
                                 'input_type'  => 'h_text_alignment',
                                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                                'default'     => is_rtl() ? 'right' : 'left',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true
                             )
@@ -2029,18 +2030,21 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'font_weight_css'     => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Font weight', 'text_domain_to_be_replaced'),
+                                'default'     => 400,
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true
                             ),//null,
                             'font_style_css'      => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Font style', 'text_domain_to_be_replaced'),
+                                'default'     => 'inherit',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true,
                             ),//null,
                             'text_decoration_css' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Text decoration', 'text_domain_to_be_replaced'),
+                                'default'     => 'none',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true
                             ),//null,
@@ -2054,6 +2058,9 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'letter_spacing_css'  => array(
                                 'input_type'  => 'number',
                                 'title'       => __('Letter spacing', 'text_domain_to_be_replaced'),
+                                'default'     => 0,
+                                'min'         => 0,
+                                'step'        => 1,
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true
                             ),//0,
@@ -2072,6 +2079,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'important_css'       => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Make those style options win if other rules are applied.', 'text_domain_to_be_replaced'),
+                                'default'     => 0,
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true
                             ),//false
@@ -2248,7 +2256,7 @@ class Sek_Dyn_CSS_Builder {
 
     const COLS_MOBILE_BREAKPOINT  = 'md';
 
-    private $collections;//the collection of css rules
+    private $collection;//the collection of css rules
     private $sek_model;
     private $parent_level = array();
 
