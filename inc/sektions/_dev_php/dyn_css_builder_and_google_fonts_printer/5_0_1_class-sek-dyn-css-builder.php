@@ -146,8 +146,8 @@ class Sek_Dyn_CSS_Builder {
 
         // If a media query is requested, build it
         if ( !empty( $mq ) ) {
-            if ( false === strpos($mq, 'max') ) {
-                error_log( __FUNCTION__ . ' ' . __CLASS__ . ' => the media queries only accept max-width rules');
+            if ( false === strpos($mq, 'max') && false === strpos($mq, 'min')) {
+                error_log( __FUNCTION__ . ' ' . __CLASS__ . ' => the media queries only accept max-width and min-width rules');
             } else {
                 $mq_device = $mq;
             }
@@ -232,8 +232,8 @@ class Sek_Dyn_CSS_Builder {
         $css_rules = sprintf( '-ms-flex: 0 0 %1$s%%;flex: 0 0 %1$s%%;max-width: %1$s%%', $width );
         $rules[] = array(
             'selector'      => '.sek-column[data-sek-id="'.$level['id'].'"]',
-            'css_rules'   => $css_rules,
-            'mq'            => array( 'min' => self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] )
+            'css_rules'     => $css_rules,
+            'mq'            => 'min-width:' . self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] .'px'
         );
 
         return $rules;
