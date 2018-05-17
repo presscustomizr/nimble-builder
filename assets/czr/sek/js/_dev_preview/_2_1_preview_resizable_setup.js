@@ -119,7 +119,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         // revealed on section hovering @see sek-preview.css
                         var $column = $(this);
                         _.delay( function() {
-                              $column.find('.ui-resizable-handle').append('<i class="fas fa-arrows-alt-h"></i>');
+                              var $resizableHandle = $column.find('.ui-resizable-handle');
+                              if ( $resizableHandle.find('.fa-arrows-alt-h').length < 1 ) {
+                                    $column.find('.ui-resizable-handle').append('<i class="fas fa-arrows-alt-h"></i>');
+                              }
                         }, 500 );
 
                   });//$directColumnChildren.each()
