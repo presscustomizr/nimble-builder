@@ -169,6 +169,18 @@ module.exports = {
     ],
   },
 
+  sektions_customizer_libs_js : {
+    options: {
+      spawn : false,
+      // Start a live reload server on the default port 35729
+      livereload : true
+    },
+    files : [
+      '<%= paths.czr_assets %>sek/js/libs/**/*.js'
+    ],
+    tasks : [],
+  },
+
   sektions_preview_js : {
     options: {
       spawn : false,

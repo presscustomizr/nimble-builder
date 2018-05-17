@@ -804,6 +804,12 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'font_picker' :
             sek_set_input_tmpl___font_picker( $input_id, $input_data );
         break;
+        case 'font_size' :
+            sek_set_input_tmpl___font_size( $input_id, $input_data );
+        break;
+        case 'line_height' :
+            sek_set_input_tmpl___line_height( $input_id, $input_data );
+        break;
     }
 }
 ?><?php
@@ -1078,9 +1084,6 @@ function sek_set_input_tmpl___h_alignment( $input_id, $input_data ) {
             <div data-sek-align="left" title="<?php _e('Align left','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_left</i></div>
             <div data-sek-align="center" title="<?php _e('Align center','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_center</i></div>
             <div data-sek-align="right" title="<?php _e('Align right','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_right</i></div>
-            <?php if ( 'czr_set_input_tmpl___h_text_alignment' == current_filter() ) : ?>
-              <div data-sek-align="justify" title="<?php _e('Justified','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_justify</i></div>
-            <?php endif; ?>
           </div>
         </div><?php // sek-h-align-wrapper ?>
     <?php
@@ -1273,6 +1276,45 @@ function sek_get_gfonts( $what = null ) {
   return ('subsets' == $what) ? apply_filters( 'sek_font_picker_gfonts_subsets ', $subsets ) : apply_filters( 'sek_font_picker_gfonts', $gfonts )  ;
 }
 
+?><?php
+
+/* ------------------------------------------------------------------------- *
+ *  HORIZONTAL ALIGNMENT INPUT
+/* ------------------------------------------------------------------------- */
+// AND
+/* ------------------------------------------------------------------------- *
+ *  HORIZONTAL ALIGNMENT INPUT FOR TEXT => includes the 'justify' icon
+/* ------------------------------------------------------------------------- */
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
+function sek_set_input_tmpl___font_size( $input_id, $input_data ) {
+    ?>
+        <div class="sek-font-size-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+          <?php
+              printf( '<input type="number" %1$s %2$s %3$s value="16" />',
+                  ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
+                  ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : '',
+                  ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
+                );
+          ?>
+        </div><?php // sek-font-size-wrapper ?>
+    <?php
+}
+
+function sek_set_input_tmpl___line_height( $input_id, $input_data ) {
+    ?>
+        <div class="sek-line-height-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+          <?php
+              printf( '<input type="number" %1$s %2$s %3$s value="24" />',
+                  ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
+                  ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : '',
+                  ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
+                );
+          ?>
+        </div><?php // sek-line-height-wrapper ?>
+    <?php
+}
 ?><?php
 // The base fmk is loaded on after_setup_theme before 50
 add_action( 'after_setup_theme', 'sek_register_modules', 50 );
@@ -2017,13 +2059,15 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             ),
                             'font_size_css'       => array(
                                 'input_type'  => 'font_size',
-                                'title'       => __('Font size', 'text_domain_to_be_replaced'),
+                                'title'       => __('Font size in pixels', 'text_domain_to_be_replaced'),
+                                'default'     => '16px',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true
                             ),//16,//"14px",
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
-                                'title'       => __('Line height', 'text_domain_to_be_replaced'),
+                                'title'       => __('Line height in pixels', 'text_domain_to_be_replaced'),
+                                'default'     => '24px',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true
                             ),//24,//"20px",
@@ -2372,8 +2416,8 @@ class Sek_Dyn_CSS_Builder {
 
         // If a media query is requested, build it
         if ( !empty( $mq ) ) {
-            if ( false === strpos($mq, 'max') ) {
-                error_log( __FUNCTION__ . ' ' . __CLASS__ . ' => the media queries only accept max-width rules');
+            if ( false === strpos($mq, 'max') && false === strpos($mq, 'min')) {
+                error_log( __FUNCTION__ . ' ' . __CLASS__ . ' => the media queries only accept max-width and min-width rules');
             } else {
                 $mq_device = $mq;
             }
@@ -2458,8 +2502,8 @@ class Sek_Dyn_CSS_Builder {
         $css_rules = sprintf( '-ms-flex: 0 0 %1$s%%;flex: 0 0 %1$s%%;max-width: %1$s%%', $width );
         $rules[] = array(
             'selector'      => '.sek-column[data-sek-id="'.$level['id'].'"]',
-            'css_rules'   => $css_rules,
-            'mq'            => array( 'min' => self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] )
+            'css_rules'     => $css_rules,
+            'mq'            => 'min-width:' . self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] .'px'
         );
 
         return $rules;
@@ -3207,6 +3251,12 @@ function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, st
     $properties_to_render = array();
 
     switch( $input_id ) {
+        case 'font_size_css' :
+            $properties_to_render['font-size'] = $value;
+        break;
+        case 'line_height_css' :
+            $properties_to_render['line-height'] = $value;
+        break;
         case 'font_weight_css' :
             $properties_to_render['font-weight'] = $value;
         break;
@@ -3264,9 +3314,9 @@ function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, st
         }//end foreach
 
         $rules[] = array(
-            'selector'      => $selector,
+            'selector'    => $selector,
             'css_rules'   => $css_rules,
-            'mq'            => $mq
+            'mq'          => $mq
         );
     }
     return $rules;
