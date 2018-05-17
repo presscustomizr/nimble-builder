@@ -12,7 +12,7 @@ add_action('loop_end', function() {
     /* if ( is_array(') )
       array_walk_recursive(', function(&$v) { $v = htmlspecialchars($v); }); */
     ?>
-      <pre>
+      <pre style="font-size: 0.6em;overflow:visible;">
         <?php print_r( sek_get_skoped_seks( $skope_id )  ); ?>
       </pre>
     <?php
