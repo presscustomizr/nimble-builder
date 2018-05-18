@@ -24,16 +24,42 @@
   text-align: center;
   margin: auto!important;
 
-  h2 {
-    font-size: 1.6em;
-    margin: 10px 0;
-    font-weight: 700;
-    line-height: 1.55em;
-    text-shadow: 0 1px 0 #FFF;
-    text-align: center
+  .sek-fp-button-holder,.sek-fp-title,.sek-fp-text {
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
   }
-  > p {
+  .sek-fp-title {
+    color: #5a5a5a;
+    line-height: 1.25em;
+    margin-top: .625em;
+    margin-bottom: 1.25em;
+    word-break: break-word;
+    position: relative;
+    font-weight: 500;
+    font-size: 1.44em;
+    &::after {
+        content: "";
+        position: absolute;
+        width: 1.25em;
+        background: #5a5a5a;
+        height: 2px;
+        top: 100%;
+        left: 0;
+        right: 0;
+        margin: .3125em auto 0;
+        transition: all .6s ease;
+    }
+    @at-root .sek-link-mask-p:hover .sek-fp-title::after {
+      width: 2.5em
+    }
+  }
+
+  .sek-fp-text {
+    color: #777;
     line-height: 1.55em;
+    margin: 1.5em auto;
+    word-wrap: break-word;
     > a {
       padding: 0!important;
       display: inline!important;
@@ -41,8 +67,27 @@
     }
   }
 
+  .sek-fp-btn-link {
+    text-transform: uppercase;
+    margin-bottom: 1.25em;
+    white-space: normal;
+    word-break: break-word;
+    outline: 0;
+    background-color: #3b3b3b;
+    color: #fff;
+    border-color: #3b3b3b;
+
+    font-size: .75em;
+    line-height: 2.5em;
+    padding: 0 2.5em;
+    &:hover, &:focus, &:active {
+      color: #3b3b3b;
+      background: transparent;
+    }
+  }
+
   .sek-fp-thumb-wrapper {
-    /* this actually depends on the thumb size */
+    // this actually depends on the thumb size
     max-width: 270px;
     margin: 8px auto;
   }

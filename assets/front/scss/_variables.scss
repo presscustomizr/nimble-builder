@@ -85,3 +85,9 @@ $grid-columns:                12 !default;
 $grid-gutter-width:           30px !default;
 
 $is_rtl: false !default;
+$enable-hover-media-query:  false !default;
+
+$cursor-disabled  : not-allowed !default;
+
+$monotypeFont : monospace !default;
+$serviceFont  : sans-serif !default;

@@ -98,6 +98,30 @@ function sek_fp_is_wp_page( array $fp ) {
     return is_numeric( $fp[ 'page-id' ]['id'] );
 }
 
+function sek_fp_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
+    if ( ! $text )
+        return '';
+
+    if ( $strip_tags )
+        $text       = strip_tags( $text );
+
+    if ( ! $max_text_length )
+        return $text;
+
+    $end_substr = $text_length = strlen( $text );
+    if ( $text_length > $max_text_length ) {
+        $text      .= ' ';
+        $end_substr = strpos( $text, ' ' , $max_text_length);
+        $end_substr = ( FALSE !== $end_substr ) ? $end_substr : $max_text_length;
+        $text       = trim( substr( $text , 0 , $end_substr ) );
+    }
+
+    if ( $more && $end_substr < $text_length )
+        return $text . ' ' .$more;
+
+    return $text;
+}
+
 // print the module content if not empty
 if ( is_null( $value ) || ! is_array( $value ) ) :
     sek_fp_temporary_placeholder();
@@ -124,8 +148,30 @@ else :
                     sek_fp_temporary_placeholder();
                 else :
                     //TEST
-                    $featured_page_id = $fp[ 'page-id' ]['id'];
+                    $featured_page_id = $fp[ 'page-id' ][ 'id' ];
                     $fp_image         = get_the_post_thumbnail( $featured_page_id, $fp['img-size'] );
+                    $fp_title         = $fp[ 'page-id' ][ 'title' ];
+
+                    switch ( $fp[ 'content-type' ] ) {
+                        case 'custom': $fp_text = $fp[ 'content-custom-text' ]; break;
+                        case 'none'  : $fp_text = '';
+                        default      :
+                            $page     = get_post($featured_page_id);
+                            $fp_text  = !post_password_required($featured_page_id) ? strip_tags(apply_filters( 'the_content' , $page->post_excerpt )) : '' ;
+                            $fp_text  = ( empty($fp_text) && !post_password_required($featured_page_id) ) ? strip_tags(apply_filters( 'the_content' , $page->post_content )) : $fp_text;
+                    }
+
+                    if ( $fp_text ) {
+                        //trim
+                        //limit text to 200 car
+                        $default_fp_text_length         = apply_filters( 'sek_fp_text_length', '250' );
+                        $fp_text                        = sek_fp_text_truncate( $fp_text, $default_fp_text_length, $more = '...', $strip_tags = false ); //tags already stripped
+                    }
+
+                    //button
+                    $fp_button        = $fp[ 'btn-display' ];
+                    $fp_button_text   = $fp[ 'btn-custom-text' ];
+
                     if ( $fp_image ) : /* FP IMAGE */?>
                     <div class="sek-fp-thumb-wrapper sek__r-wFP">
                         <a class="sek-link-mask" href="<?php esc_url( $fp_link ) ?>" title="<?php echo esc_attr( strip_tags( $fp_title ) ) ?>"></a>
