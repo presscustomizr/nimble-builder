@@ -149,7 +149,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( _.isEmpty( _level ) || _.isEmpty( _id ) ) {
                                         throw new Error( 'No valid level id found' );
                                     }
-
+                                    console.log('drop content-in-column', params );
                                     api.previewer.trigger( 'sek-add-module', {
                                           level : _level,
                                           id : _id,
@@ -181,7 +181,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
                   // });
                   this.bind( 'sek-content-dropped', function( params ) {
-                        //console.log('sek-content-dropped', params );
+                        console.log('sek-content-dropped', params );
                         try { _do_( params ); } catch( er ) {
                               api.errare( 'error when reactToDrop', er );
                         }

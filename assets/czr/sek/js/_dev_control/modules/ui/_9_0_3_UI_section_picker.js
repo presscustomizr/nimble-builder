@@ -29,11 +29,46 @@
       //the callback can receive specific params define in each module constructor
       //For example, a content picker can be given params to display only taxonomies
       $.extend( api.czrInputMap, {
+            // section_picker : function( input_options ) {
+            //       var input = this;
+            //       input.container.find( '[draggable]').sekDrag({
+            //             // $(this) is the dragged element
+            //             onDragStart: function( event ) {
+            //                   //console.log('ON DRAG START', $(this), $(this).data('sek-module-type'), event );
+            //                   event.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
+            //                   event.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
+            //                   api.previewer.send( 'sek-drag-start' );
+            //                   $(event.currentTarget).addClass('sek-grabbing');
+            //             },
+
+            //             onDragEnd: function( event ) {
+            //                   //console.log('ON DRAG END', $(this), event );
+            //                   api.previewer.send( 'sek-drag-stop' );
+            //                   $(event.currentTarget).removeClass('sek-grabbing');
+            //             }
+            //       }).attr('data-sek-drag', true );
+
+            //        // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
+            //       input.container.find('[draggable]').each( function() {
+            //             $(this).on( 'mousedown mouseup', function( evt ) {
+            //                   switch( evt.type ) {
+            //                         case 'mousedown' :
+            //                               $(this).addClass('sek-grabbing');
+            //                         break;
+            //                         case 'mouseup' :
+            //                               $(this).removeClass('sek-grabbing');
+            //                         break;
+            //                   }
+            //             });
+            //       });
+            //       api.czr_sektions.trigger( 'sek-refresh-sekdrop', { type : 'section_picker' } );
+            // }
             section_picker : function( input_options ) {
                   var input = this;
-                  input.container.find( '[draggable]').sekDrag({
+                  input.container.find( '[draggable]').nimbleZones({
+                        // DRAG OPTIONS
                         // $(this) is the dragged element
-                        onDragStart: function( event ) {
+                        onStart: function( event ) {
                               //console.log('ON DRAG START', $(this), $(this).data('sek-module-type'), event );
                               event.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
                               event.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
@@ -41,10 +76,38 @@
                               $(event.currentTarget).addClass('sek-grabbing');
                         },
 
-                        onDragEnd: function( event ) {
+                        onEnd: function( event ) {
                               //console.log('ON DRAG END', $(this), event );
                               api.previewer.send( 'sek-drag-stop' );
                               $(event.currentTarget).removeClass('sek-grabbing');
+                        },
+
+
+                        // DROP OPTIONS
+                        dropZones : $( api.previewer.targetWindow().document ).find( '.sektion-wrapper'),
+                        placeholderClass: 'sortable-placeholder',
+                        onDrop: function( position, event ) {
+                              event.stopPropagation();
+                              var _position = 'after' === position ? $(this).index() + 1 : $(this).index();
+                              //console.log('ON DROPPING', event.originalEvent.dataTransfer.getData( "module-params" ), $(self) );
+
+                              // console.log('onDropping params', position, event );
+                              // console.log('onDropping element => ', $(self) );
+                              api.czr_sektions.trigger( 'sek-content-dropped', {
+                                    drop_target_element : $(this),
+                                    location : $(this).closest('[data-sek-level="location"]').data('sek-id'),
+                                    position : _position,
+                                    before_section : $(this).data('sek-before-section'),
+                                    after_section : $(this).data('sek-after-section'),
+                                    content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                                    content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+                              });
+                        },
+                        dropSelectors: ['.sek-content-drop-zone'].join(','),//between sections
+                        placeholderContent : function( evt ) {
+                              $target = $( evt.currentTarget );
+                              var html = '@missi18n Insert a new section here';
+                              return '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
                         }
                   }).attr('data-sek-drag', true );
 

@@ -149,7 +149,7 @@ module.exports = {
       livereload : true
     },
     files : [
-      '<%= paths.sektions %>tmpl/**/*.php'
+      '<%= paths.tmpl %>**/*.php'
     ],
     tasks : [],
   },

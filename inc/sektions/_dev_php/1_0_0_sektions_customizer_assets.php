@@ -45,7 +45,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
-            'dragdrop.js'
+            'nimbleZones.js'//'dragdrop.js'
         ),
         array( 'jquery' ),
         ( defined('WP_DEBUG') && true === WP_DEBUG ) ? time() :  wp_get_theme() -> version,

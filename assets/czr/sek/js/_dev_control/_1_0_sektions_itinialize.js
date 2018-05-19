@@ -78,32 +78,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // setup $.sekDrop for $( api.previewer.targetWindow().document ).find( '.sektion-wrapper')
                         // emitted by the module_picker or the section_picker module
                         // @params { type : 'section_picker' || 'module_picker' }
-                        self.bind( 'sek-refresh-sekdrop', function( params ) {
-                              var $sekDropEl = $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
-                              if ( $sekDropEl.length > 0 ) {
-                                    self.setupSekDrop( params.type, $sekDropEl );//<= module or section picker
-                              } else {
-                                    api.errare('control panel => api.czr_sektions => no .sektion-wrapper found when setting up the drop zones.');
-                              }
-                        });
+                        // self.bind( 'sek-refresh-sekdrop', function( params ) {
+                        //       var $sekDropEl = $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
+                        //       if ( $sekDropEl.length > 0 ) {
+                        //             self.setupSekDrop( params.type, $sekDropEl );//<= module or section picker
+                        //       } else {
+                        //             api.errare('control panel => api.czr_sektions => no .sektion-wrapper found when setting up the drop zones.');
+                        //       }
+                        // });
 
                         // on previewer refresh
-                        api.previewer.bind( 'ready', function() {
-                              var $sekDropEl = $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
-                              // if the module_picker or the section_picker is currently a registered ui control,
-                              // => re-instantiate sekDrop on the new preview frame
-                              // the registered() ui levels look like :
-                              // [
-                              //   { what: "control", id: "__sek___sek_draggable_sections_ui", label: "@missi18n Section Picker", type: "czr_module", module_type: "sek_section_picker_module", …}
-                              //   { what: "setting", id: "__sek___sek_draggable_sections_ui", dirty: false, value: "", transport: "postMessage", … }
-                              //   { what: "section", id: "__sek___sek_draggable_sections_ui", title: "@missi18n Section Picker", panel: "__sektions__", priority: 30}
-                              // ]
-                              if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_section_picker_module' } ) ) ) {
-                                    self.setupSekDrop( 'section_picker', $sekDropEl );
-                              } else if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_module_picker_module' } ) ) ) {
-                                    self.setupSekDrop( 'module_picker', $sekDropEl );
-                              }
-                        });
+                        // api.previewer.bind( 'ready', function() {
+                        //       var $sekDropEl = $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
+                        //       // if the module_picker or the section_picker is currently a registered ui control,
+                        //       // => re-instantiate sekDrop on the new preview frame
+                        //       // the registered() ui levels look like :
+                        //       // [
+                        //       //   { what: "control", id: "__sek___sek_draggable_sections_ui", label: "@missi18n Section Picker", type: "czr_module", module_type: "sek_section_picker_module", …}
+                        //       //   { what: "setting", id: "__sek___sek_draggable_sections_ui", dirty: false, value: "", transport: "postMessage", … }
+                        //       //   { what: "section", id: "__sek___sek_draggable_sections_ui", title: "@missi18n Section Picker", panel: "__sektions__", priority: 30}
+                        //       // ]
+                        //       if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_section_picker_module' } ) ) ) {
+                        //             self.setupSekDrop( 'section_picker', $sekDropEl );
+                        //       } else if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_module_picker_module' } ) ) ) {
+                        //             self.setupSekDrop( 'module_picker', $sekDropEl );
+                        //       }
+                        // });
 
                         // React to the *-droped event
                         self.reactToDrop();

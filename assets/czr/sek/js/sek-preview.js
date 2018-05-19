@@ -884,6 +884,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   });
 
                                   $('body').addClass('sek-dragging');
+                                   console.log('dragstart dnd to do => notify user if the drag and drop is not supported.');
+                                  // try { evt.originalEvent.dataTransfer.setData( JSON.stringify( dataContainer ), true ); } catch( er ) {
+                                  //     // here trigger an event to the element => display a notification in the customizer
+                                  // }
                             },
                             'sek-drag-stop' : function( params ) {
                                   $('body').removeClass('sek-dragging');

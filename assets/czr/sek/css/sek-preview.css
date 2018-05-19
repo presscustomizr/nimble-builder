@@ -289,7 +289,7 @@
   cursor: pointer;
 }
 /* hide empty column content when attempting to drop */
-.sekdnd-current-element.sek-module-drop-zone-for-first-module [data-sek-action="pick-module"] {
+.sek-active-drop-zone.sek-module-drop-zone-for-first-module [data-sek-action="pick-module"] {
   display: none;
 }
 .sek-sortable-overing > .sek-no-modules-column { display: none; }
@@ -301,7 +301,7 @@
   -o-transition: all 0.4s ease;
   transition: all 0.4s ease;
 }
-.sekdnd-current-element.sek-content-drop-zone {
+.sek-active-drop-zone.sek-content-drop-zone {
   height: auto!important;
   min-height : 50px;
 }

@@ -32,10 +32,11 @@
       $.extend( api.czrInputMap, {
             module_picker : function( input_options ) {
                 var input = this;
-                input.container.find( '[draggable]').sekDrag({
+                input.container.find( '[draggable]').nimbleZones({
+                      // DRAG OPTIONS
                       // $(this) is the dragged element
-                      onDragStart: function( event ) {
-                            //console.log('ON DRAG START', $(this), $(this).data('sek-module-type'), event );
+                      onStart: function( event ) {
+                            console.log('ON DRAG START', $(this), $(this).data('sek-content-id'), event );
                             event.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
                             event.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
                             // event.originalEvent.dataTransfer.effectAllowed = "move";
@@ -44,15 +45,50 @@
                             api.previewer.send( 'sek-drag-start' );
                             $(event.currentTarget).addClass('sek-grabbing');
                       },
-                      // onDragEnter : function( event ) {
-                      //       event.originalEvent.dataTransfer.dropEffect = "move";
-                      // },
-                      onDragEnd: function( event ) {
-                            //console.log('ON DRAG END', $(this), event );
+                      onEnd: function( event ) {
+                            console.log('ON DRAG END', $(this), event );
                             api.previewer.send( 'sek-drag-stop' );
                             // make sure that the sek-grabbing class ( -webkit-grabbing ) gets reset on dragEnd
                             $(event.currentTarget).removeClass('sek-grabbing');
-                      }
+                      },
+
+                      // DROP OPTIONS
+                      dropZones : $( api.previewer.targetWindow().document ).find( '.sektion-wrapper'),
+                      placeholderClass: 'sortable-placeholder',
+                      onDrop: function( position, event ) {
+                            event.stopPropagation();
+                            var _position = 'after' === position ? $(this).index() + 1 : $(this).index();
+                            console.log('ON DROPPING', position, event.originalEvent.dataTransfer.getData( "sek-content-id" ), $(self) );
+
+                            // console.log('onDropping params', position, event );
+                            // console.log('onDropping element => ', $(self) );
+                            api.czr_sektions.trigger( 'sek-content-dropped', {
+                                  drop_target_element : $(this),
+                                  location : $(this).closest('[data-sek-level="location"]').data('sek-id'),
+                                  position : _position,
+                                  before_section : $(this).data('sek-before-section'),
+                                  after_section : $(this).data('sek-after-section'),
+                                  content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                                  content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+                            });
+                      },
+                      dropSelectors: [
+                            '.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
+                            '.sek-module',// the drop zone when there is at least one module
+                            '.sek-column > .sek-module-wrapper sek-section',// the drop zone when there is at least one nested section
+                            '.sek-content-drop-zone'//between sections
+                      ].join(','),
+                      placeholderContent : function( evt ) {
+                            var $target = $( evt.currentTarget ),
+                                html = '@missi18n Insert Here';
+
+                            if ( $target.length > 0 ) {
+                                if ( 'between-sections' == $target.data('sek-location') ) {
+                                      html = '@missi18n Insert in a new section';
+                                }
+                            }
+                            return '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
+                      },
                 }).attr('data-sek-drag', true );
 
                 // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
