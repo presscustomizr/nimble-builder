@@ -208,7 +208,7 @@ else :
                     $fp_title         = esc_attr( strip_tags( $fp_title ) );
 
                     $fp_link          = esc_url( $fp[ 'page-id' ][ 'url' ] );
-                    $fp_link          = !$fp_link && !is_preview() ? 'javascript:void(0)' : '';
+                    $fp_link          = !$fp_link && !is_preview() ? 'javascript:void(0)' : $fp_link;
 
                     //TEXT
                     switch ( $fp[ 'content-type' ] ) {
@@ -238,14 +238,14 @@ else :
                 <?php /* SINGLE FP RENDERING*/
                     if ( $fp_image ) : /* FP IMAGE */?>
                     <div class="sek-fp-thumb-wrapper sek__r-wFP">
-                        <a class="sek-link-mask" href="<?php esc_url( $fp_link ) ?>" title="<?php echo esc_attr( strip_tags( $fp_title ) ) ?>"></a>
+                        <a class="sek-link-mask" href="<?php echo $fp_link ?>" title="<?php echo $fp_title  ?>"></a>
                         <?php echo $fp_image ?>
                     </div>
                 <?php
                     endif; /* END FP IMAGE*/
                     /* FP TITLE */
                 ?>
-                    <h4 class="sek-fp-title"><?php echo esc_attr( strip_tags( $fp_title ) ) ?></h4>
+                    <h4 class="sek-fp-title"><?php echo $fp_title ?></h4>
                 <?php
                     if ( $fp_text ) :
                 ?>
