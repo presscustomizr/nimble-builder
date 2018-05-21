@@ -33,7 +33,7 @@ The model looks like this
 
                     [img-type] => featured
                     [img-id] =>
-                    [img-size] => large
+                    [img-size] => twentyseventeen-thumbnail-avatar
                     [content-type] => page-excerpt
                     [content-custom-text] => Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.
                     [btn-display] => 1
@@ -46,15 +46,15 @@ The model looks like this
                     [title] =>
                     [page-id] => Array
                         (
-                            [id] => 2479
-                            [type_label] => Page
-                            [title] => test brix
-                            [object_type] => page
-                            [url] => http://customizr-tests.wordpress.test/2479-2/
+                            [id] => _custom_
+                            [type_label] =>
+                            [title] => <span style="font-weight:bold">Set a custom url</span>
+                            [object_type] =>
+                            [url] =>
                         )
 
-                    [img-type] => featured
-                    [img-id] =>
+                    [img-type] => custom
+                    [img-id] => 1783
                     [img-size] => large
                     [content-type] => page-excerpt
                     [content-custom-text] => Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.
@@ -69,32 +69,51 @@ The model looks like this
 TO ASK: We're missing the title input
 */
 
-$model = SEK_Front() -> model;
-$module_type = $model['module_type'];
-$value = array_key_exists( 'value', $model ) ? $model['value'] : null;
-
-
+$model          = SEK_Front() -> model;
+$module_type    = $model['module_type'];
+$value          = array_key_exists( 'value', $model ) ? $model['value'] : null;
 
 /*
-* $value should be an array
-* and at least one [page-id][id] must be numeric or _custom_, and in this case [padge-id][url] must be set?
+* Columns definition
 */
+//should be an option in the future
+$fp_per_row     = '3';
 
+$fp_col_map     = array(
+    //fp_per_row => col suffix
+    '1' => '100',
+    '2' => '50',
+    '3' => '33',
+    '4' => '25'
+);
+
+$fp_col_suffix  = '33';
+$fp_col_suffix  = ( $fp_per_row > 7) ? 1 : $fp_col_suffix;
+$fp_col_suffix  = isset( $fp_col_map[$fp_per_row] ) ? $fp_col_map[$fp_per_row] : $fp_col_suffix;
+
+
+
+//HELPERS
 function sek_fp_temporary_placeholder() {
     echo '<h2>Feature Page temporary placeholder</h2>';
     echo SEK_Front() -> sek_get_input_placeholder_content( 'upload' );
 }
 
+/*
+* $value should be an array
+* and at least one [page-id][id] must be numeric or _custom_, and in this case [padge-id][url] must be set?
+*/
 function sek_fp_is_fp_set( array $fp ) {
     return ( ! empty( $fp[ 'page-id' ]['id'] ) &&
-        ( sek_fp_is_wp_page( $fp ) || sek_fp_is_custom( $fp ) ) );
+        ( sek_fp_can_be_wp_page( $fp ) || sek_fp_is_custom( $fp ) ) );
 }
+
 
 function sek_fp_is_custom( array $fp ) {
-    return ( '_custom_' == $fp[ 'page-id' ]['id'] && esc_url( $fp[ 'page-id' ]['url'] ) );
+    return ( '_custom_' == $fp[ 'page-id' ]['id'] ); // && esc_url( $fp[ 'page-id' ]['url'] ) );
 }
 
-function sek_fp_is_wp_page( array $fp ) {
+function sek_fp_can_be_wp_page( array $fp ) {
     return is_numeric( $fp[ 'page-id' ]['id'] );
 }
 
@@ -122,6 +141,10 @@ function sek_fp_text_truncate( $text, $max_text_length, $more, $strip_tags = tru
     return $text;
 }
 
+
+
+//START BLOCK RENDERING
+
 // print the module content if not empty
 if ( is_null( $value ) || ! is_array( $value ) ) :
     sek_fp_temporary_placeholder();
@@ -141,37 +164,72 @@ else :
         <div class="sek-row marketing js-center-images-disabled">
 
     <?php foreach ( $value as $fp ) : ?>
-            <div class="sek-col-base sek-col-33">
+            <div class="sek-col-base sek-col-<?php echo $fp_col_suffix ?>">
                 <div class="sek-fp-widget sek-link-mask-p round">
             <?php
-                if ( ! sek_fp_is_fp_set( $fp ) ) :
+                $is_custom_url   = false;
+                $is_wp_post_type = false;
+
+                if ( ! empty( $fp[ 'page-id' ]['id'] ) ) {
+                    $is_custom_url    = sek_fp_is_custom( $fp ) ;
+                    $is_wp_post_type  = !$is_custom_url && sek_fp_can_be_wp_page( $fp ) && $page = get_post($fp[ 'page-id' ][ 'id' ]);
+
+                    $featured_page_id = $is_wp_post_type ? $fp[ 'page-id' ][ 'id' ] : '';
+                }
+                if ( empty( $is_custom_url ) && empty( $is_wp_post_type ) ):
                     sek_fp_temporary_placeholder();
                 else :
-                    //TEST
-                    $featured_page_id = $fp[ 'page-id' ][ 'id' ];
-                    $fp_image         = get_the_post_thumbnail( $featured_page_id, $fp['img-size'] );
-                    $fp_title         = $fp[ 'page-id' ][ 'title' ];
+                    //DEFINITION
 
+                    //IMAGE
+                    switch ( $fp[ 'img-type' ] ) {
+                        case 'custom':
+                                    if ( ! empty( $fp[ 'img-id' ] ) ) {
+                                       $fp_image         =  wp_get_attachment_image( $fp[ 'img-id' ], $fp['img-size'] );
+                                       break;
+                                    }
+                        case 'featured'  :
+                                    if ( $is_wp_post_type ) {
+                                        $fp_image        = get_the_post_thumbnail( $fp[ 'page-id' ][ 'id' ], $fp['img-size'] );
+                                        break;
+                                    }
+                        default      : $fp_image = null;
+                    }
+
+
+
+                    $fp_title         = $fp[ 'page-id' ][ 'title' ];
+                    $fp_title         = esc_attr( strip_tags( $fp_title ) );
+
+                    $fp_link          = esc_url( $fp[ 'page-id' ][ 'url' ] );
+                    $fp_link          = !$fp_link && !is_preview() ? 'javascript:void(0)' : '';
+
+                    //TEXT
                     switch ( $fp[ 'content-type' ] ) {
-                        case 'custom': $fp_text = $fp[ 'content-custom-text' ]; break;
-                        case 'none'  : $fp_text = '';
-                        default      :
-                            $page     = get_post($featured_page_id);
-                            $fp_text  = !post_password_required($featured_page_id) ? strip_tags(apply_filters( 'the_content' , $page->post_excerpt )) : '' ;
-                            $fp_text  = ( empty($fp_text) && !post_password_required($featured_page_id) ) ? strip_tags(apply_filters( 'the_content' , $page->post_content )) : $fp_text;
+                        case 'custom': $fp_text = $fp[ 'content-custom-text' ];
+                                       break;
+                        case 'page-excerpt'  :
+                                    if ( $is_wp_post_type ) {
+                                        $fp_text  = !post_password_required($featured_page_id) ? strip_tags(apply_filters( 'the_content' , $page->post_excerpt )) : '' ;
+                                        $fp_text  = ( empty($fp_text) && !post_password_required($featured_page_id) ) ? strip_tags(apply_filters( 'the_content' , $page->post_content )) : $fp_text;
+                                        break;
+                                    }
+                        default      : $fp_text = '';
                     }
 
                     if ( $fp_text ) {
                         //trim
-                        //limit text to 200 car
+                        //limit text to 200 chars?
                         $default_fp_text_length         = apply_filters( 'sek_fp_text_length', '250' );
                         $fp_text                        = sek_fp_text_truncate( $fp_text, $default_fp_text_length, $more = '...', $strip_tags = false ); //tags already stripped
                     }
 
-                    //button
-                    $fp_button        = $fp[ 'btn-display' ];
-                    $fp_button_text   = $fp[ 'btn-custom-text' ];
+                    //BUTTON
+                    $fp_button_text   = esc_attr( strip_tags( $fp[ 'btn-custom-text' ] ) );
+                    $fp_button        = $fp[ 'btn-display' ] && $fp_button_text;
 
+                ?>
+                <?php /* SINGLE FP RENDERING*/
                     if ( $fp_image ) : /* FP IMAGE */?>
                     <div class="sek-fp-thumb-wrapper sek__r-wFP">
                         <a class="sek-link-mask" href="<?php esc_url( $fp_link ) ?>" title="<?php echo esc_attr( strip_tags( $fp_title ) ) ?>"></a>
@@ -190,7 +248,7 @@ else :
                     /* FP BUTTON TEXT */
                     if ( $fp_button ) :
                 ?>
-                    <span class="sek-fp-button-holder"><a class="sek-btn sek-fp-btn-link" href="esc_url( $fp_link )" title="What we do" data-color="skin"><?php echo $fp_button_text ?></a></span>
+                    <span class="sek-fp-button-holder"><a class="sek-btn sek-fp-btn-link" href="<?php echo $fp_link ?>" title="<?php echo $fp_title ?>"><?php echo $fp_button_text ?></a></span>
                 <?php
                     endif;/* END FP BUTTON TEXT*/
                 endif; /* end sek_fp_is_fp_set */
