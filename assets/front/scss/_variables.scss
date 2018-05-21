@@ -1,5 +1,6 @@
 $project-base: 'sek' !default;
 $project-prefix: $project-base + '-' !default;
+$project-base-wrapper: 'sektion-wrapper' !default;
 
 $enable-grid-classes: true !default;
 
@@ -84,3 +85,9 @@ $grid-columns:                12 !default;
 $grid-gutter-width:           30px !default;
 
 $is_rtl: false !default;
+$enable-hover-media-query:  false !default;
+
+$cursor-disabled  : not-allowed !default;
+
+$monotypeFont : monospace !default;
+$serviceFont  : sans-serif !default;
