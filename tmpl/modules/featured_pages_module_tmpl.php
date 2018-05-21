@@ -110,7 +110,7 @@ function sek_fp_is_fp_set( array $fp ) {
 
 
 function sek_fp_is_custom( array $fp ) {
-    return ( '_custom_' == $fp[ 'page-id' ]['id'] ); // && esc_url( $fp[ 'page-id' ]['url'] ) );
+    return ( '_custom_' == $fp[ 'page-id' ]['id'] && esc_url( $fp[ 'page-id' ]['url'] ) );
 }
 
 function sek_fp_can_be_wp_page( array $fp ) {
