@@ -6,7 +6,7 @@ module.exports = {
 			outputStyle: 'expanded'
 		},
 		files : {
-			'<%= paths.sektions %>assets/front/css/sek-base.css' : '<%= paths.sektions %>assets/front/scss/sek-base.scss'
+			'<%= paths.front_assets %>css/sek-base.css' : '<%= paths.front_assets %>scss/sek-base.scss'
 		}
 	}
 };
