@@ -420,18 +420,18 @@ function sek_enqueue_controls_js_css() {
         ( defined('WP_DEBUG') && true === WP_DEBUG ) ? time() :  wp_get_theme() -> version,
         $in_footer = true
     );
-    wp_enqueue_script(
-        'sek-drag-n-drop',
-        //dev / debug mode mode?
-        sprintf(
-            '%1$s/assets/czr/sek/js/libs/%2$s' ,
-            NIMBLE_BASE_URL,
-            'nimbleZones.js'//'dragdrop.js'
-        ),
-        array( 'jquery' ),
-        ( defined('WP_DEBUG') && true === WP_DEBUG ) ? time() :  wp_get_theme() -> version,
-        $in_footer = true
-    );
+    // wp_enqueue_script(
+    //     'sek-drag-n-drop',
+    //     //dev / debug mode mode?
+    //     sprintf(
+    //         '%1$s/assets/czr/sek/js/libs/%2$s' ,
+    //         NIMBLE_BASE_URL,
+    //         'nimbleZones.js'//'dragdrop.js'
+    //     ),
+    //     array( 'jquery' ),
+    //     ( defined('WP_DEBUG') && true === WP_DEBUG ) ? time() :  wp_get_theme() -> version,
+    //     $in_footer = true
+    // );
     wp_enqueue_script(
         'czr-color-picker',
         //dev / debug mode mode?
@@ -462,6 +462,20 @@ function sek_enqueue_controls_js_css() {
             'presetSections' => sek_get_preset_sektions(),
 
             'registeredModules' => $registered_modules,
+
+            // Dnd
+            'preDropElementClass' => 'sortable-placeholder',
+            'dropSelectors' => implode(',', [
+                // 'module' type
+                '.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
+                '.sek-module',// the drop zone when there is at least one module
+                '.sek-column > .sek-module-wrapper sek-section',// the drop zone when there is at least one nested section
+                '.sek-content-module-drop-zone',//between sections
+
+                // 'preset_section' type
+                '.sek-content-preset_section-drop-zone'//between sections
+            ]),
+
 
             'selectOptions' => array(
                   // IMAGE MODULE

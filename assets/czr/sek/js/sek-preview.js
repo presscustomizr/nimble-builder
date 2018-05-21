@@ -864,6 +864,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             //
                             // when the module ui has been generated in the panel, we receive back this msg
                             'sek-generate-module-ui' : function( params ) {},
+
+                            //@params { type : module || preset_section }
                             'sek-drag-start' : function( params ) {
                                   // append the drop zones between sections
                                   var i = 1;
@@ -871,30 +873,26 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         // Always before
                                         if ( $('[data-sek-before-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
                                               $(this).before(
-                                                '<div class="sek-content-drop-zone" data-sek-location="between-sections" data-sek-before-section="' + $(this).data('sek-id') +'"></div>'
+                                                '<div class="sek-content-' + params.type + '-drop-zone sek-drop-zone" data-sek-location="between-sections" data-sek-before-section="' + $(this).data('sek-id') +'"></div>'
                                               );
                                         }
                                         // After the last one
                                         if (  i == $('.sektion-wrapper').children('[data-sek-level="section"]').length ) {
                                               $(this).after(
-                                                '<div class="sek-content-drop-zone" data-sek-location="between-sections" data-sek-after-section="' + $(this).data('sek-id') +'"></div>'
+                                                '<div class="sek-content-' + params.type + '-drop-zone sek-drop-zone" data-sek-location="between-sections" data-sek-after-section="' + $(this).data('sek-id') +'"></div>'
                                               );
                                         }
                                         i++;
                                   });
 
                                   $('body').addClass('sek-dragging');
-                                   console.log('dragstart dnd to do => notify user if the drag and drop is not supported.');
-                                  // try { evt.originalEvent.dataTransfer.setData( JSON.stringify( dataContainer ), true ); } catch( er ) {
-                                  //     // here trigger an event to the element => display a notification in the customizer
-                                  // }
                             },
                             'sek-drag-stop' : function( params ) {
                                   $('body').removeClass('sek-dragging');
                                   // Clean any remaining placeholder
                                   $('.sortable-placeholder').remove();
                                   // Remove the drop zone between sections
-                                  $('.sek-content-drop-zone').remove();
+                                  $('.sek-drop-zone').remove();
                             },
 
 

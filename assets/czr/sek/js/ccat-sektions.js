@@ -72,41 +72,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Communicate with the preview
                         self.reactToPreviewMsg();
 
-                        // INSTANTIATE SEK DROP
-                        // + SCHEDULE RE-INSTANTIATION ON PREVIEW REFRESH
-                        // + SCHEDULE API REACTION TO *drop event
-                        // setup $.sekDrop for $( api.previewer.targetWindow().document ).find( '.sektion-wrapper')
-                        // emitted by the module_picker or the section_picker module
-                        // @params { type : 'section_picker' || 'module_picker' }
-                        // self.bind( 'sek-refresh-sekdrop', function( params ) {
-                        //       var $sekDropEl = $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
-                        //       if ( $sekDropEl.length > 0 ) {
-                        //             self.setupSekDrop( params.type, $sekDropEl );//<= module or section picker
-                        //       } else {
-                        //             api.errare('control panel => api.czr_sektions => no .sektion-wrapper found when setting up the drop zones.');
-                        //       }
-                        // });
-
-                        // on previewer refresh
-                        // api.previewer.bind( 'ready', function() {
-                        //       var $sekDropEl = $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
-                        //       // if the module_picker or the section_picker is currently a registered ui control,
-                        //       // => re-instantiate sekDrop on the new preview frame
-                        //       // the registered() ui levels look like :
-                        //       // [
-                        //       //   { what: "control", id: "__sek___sek_draggable_sections_ui", label: "@missi18n Section Picker", type: "czr_module", module_type: "sek_section_picker_module", …}
-                        //       //   { what: "setting", id: "__sek___sek_draggable_sections_ui", dirty: false, value: "", transport: "postMessage", … }
-                        //       //   { what: "section", id: "__sek___sek_draggable_sections_ui", title: "@missi18n Section Picker", panel: "__sektions__", priority: 30}
-                        //       // ]
-                        //       if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_section_picker_module' } ) ) ) {
-                        //             self.setupSekDrop( 'section_picker', $sekDropEl );
-                        //       } else if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_module_picker_module' } ) ) ) {
-                        //             self.setupSekDrop( 'module_picker', $sekDropEl );
-                        //       }
-                        // });
-
-                        // React to the *-droped event
-                        self.reactToDrop();
+                        // Setup Dnd
+                        self.setupDnd();
 
 
                         // setup the tinyMce editor used for the tiny_mce_editor input
@@ -2670,7 +2637,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( api[ _reg_.what ].has( _reg_.id ) ) {
                                     // fire an event before removal, can be used to clean some jQuery plugin instance for example
                                     if (  _.isFunction( api[ _reg_.what ]( _reg_.id ).trigger ) ) {//<= Section and Panel constructor are not extended with the Event class, that's why we check if this method exists
-                                          api[ _reg_.what ]( _reg_.id ).trigger('czr-pre-removal', _reg_ );
+                                           self.trigger( 'sek-ui-pre-removal', { what : _reg_.what, id : _reg_.id } );
                                     }
                                     $.when( api[ _reg_.what ]( _reg_.id ).container.remove() ).done( function() {
                                           // remove control, section, panel
@@ -2904,119 +2871,368 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
+/**
+ * @https://github.com/StackHive/DragDropInterface
+ * @https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
+ * @https://html.spec.whatwg.org/multipage/dnd.html#dnd
+ * @https://caniuse.com/#feat=dragndrop
+ */
+// EVENTS
+
+// drag  => handler : ondrag  Fired when an element or text selection is being dragged.
+// dragend => handler : ondragend Fired when a drag operation is being ended (for example, by releasing a mouse button or hitting the escape key). (See Finishing a Drag.)
+// dragenter => handler : ondragenter Fired when a dragged element or text selection enters a valid drop target. (See Specifying Drop Targets.)
+// dragexit  => handler : ondragexit  Fired when an element is no longer the drag operation's immediate selection target.
+// dragleave => handler : ondragleave Fired when a dragged element or text selection leaves a valid drop target.
+// dragover  => handler : ondragover  Fired when an element or text selection is being dragged over a valid drop target (every few hundred milliseconds).
+// dragstart => handler : ondragstart Fired when the user starts dragging an element or text selection. (See Starting a Drag Operation.)
+// drop  => handler : ondrop  Fired when an element or text selection is dropped on a valid drop target. (See Performing a Drop.)
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // fired in ::initialize, on 'sek-refresh-sekdrop' AND on previewer('ready') each time the previewer is refreshed
-            // 'sek-refresh-sekdrop' is emitted by the section and the module picker modules with param { type : 'section_picker' || 'module_picker'}
-            // @param type 'section_picker' || 'module_picker'
-            // @param $el = $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
-            setupSekDrop : function( type, $el ) {
-                  if ( $el.length < 1 ) {
-                        throw new Error( 'setupSekDrop => invalid Dom element');
-                  }
+            //-------------------------------------------------------------------------------------------------
+            //-- SETUP DnD
+            //-------------------------------------------------------------------------------------------------
+            //Fired in ::initialize()
+            // INSTANTIATE Dnd ZONES IF SUPPORTED BY THE BROWSER
+            // + SCHEDULE DROP ZONES RE-INSTANTIATION ON PREVIEW REFRESH
+            // + SCHEDULE API REACTION TO *drop event
+            // setup $.sekDrop for $( api.previewer.targetWindow().document ).find( '.sektion-wrapper')
+            setupDnd : function() {
+                  var self = this;
+                  // emitted by the module_picker or the section_picker module
+                  // @params { type : 'section' || 'module', input_container : input.container }
+                  self.bind( 'sek-refresh-dragzones', function( params ) {
+                        if ( 'draggable' in document.createElement('span') ) {
+                              self.setupNimbleDragZones( params.input_container );//<= module or section picker
+                        } else {
+                              api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
+                                    api.notifications.add( new api.Notification( 'drag-drop-support', {
+                                          type: 'error',
+                                          message:  '@missi18n => your browser does not support the drag and drop technology. You might want to customize your site using another browser.',
+                                          dismissible: true
+                                    } ) );
 
-                  // this is the jQuery element instance on which sekDrop shall be fired
-                  var instantiateSekDrop = function() {
-                        if ( $(this).length < 1 ) {
-                              throw new Error( 'instantiateSekDrop => invalid Dom element');
+                                    // Removed if not dismissed after 5 seconds
+                                    _.delay( function() {
+                                          api.notifications.remove( 'drag-drop-support' );
+                                    }, 10000 );
+                              });
                         }
-                        //console.log('instantiateSekDrop', type, $el );
-                        var baseOptions = {
-                              axis: [ 'vertical' ],
-                              isDroppingAllowed: function() { return true; }, //self.isDroppingAllowed.bind( self ),
-                              placeholderClass: 'sortable-placeholder',
-                              onDragEnter : function( side, event) {
-                                 // console.log('On drag enter', event, side , $(event.currentTarget));
-                                  //$(event.currentTarget).closest('div[data-sek-level="section"]').trigger('mouseenter');
-                                  //console.log('closest column id ?', $(event.currentTarget).closest('div[data-sek-level="column"]').data('sek-id') );
-                              },
-                              // onDragLeave : function( event, ui) {
-                              //     console.log('On drag enter', event, ui );
-                              //     $(event.currentTarget).find('[data-sek-action="pick-module"]').show();
-                              // },
-                              //onDragOver : function( side, event) {},
-                              onDropping: function( side, event ) {
-                                    event.stopPropagation();
-                                    var _position = 'bottom' === side ? $(this).index() + 1 : $(this).index();
-                                    //console.log('ON DROPPING', event.originalEvent.dataTransfer.getData( "module-params" ), $(self) );
+                  });
 
-                                    // console.log('onDropping params', side, event );
-                                    // console.log('onDropping element => ', $(self) );
-                                    api.czr_sektions.trigger( 'sek-content-dropped', {
-                                          drop_target_element : $(this),
-                                          location : $(this).closest('[data-sek-level="location"]').data('sek-id'),
-                                          position : _position,
-                                          before_section : $(this).data('sek-before-section'),
-                                          after_section : $(this).data('sek-after-section'),
-                                          content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                                          content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+                  // on previewer refresh
+                  api.previewer.bind( 'ready', function() {
+                        try { self.setupNimbleDropZones();//<= module or section picker
+                        } catch( er ) {
+                              api.errare( '::setupDnd => error on self.setupNimbleDropZones()', er );
+                        }
+                        // if the module_picker or the section_picker is currently a registered ui control,
+                        // => re-instantiate sekDrop on the new preview frame
+                        // the registered() ui levels look like :
+                        // [
+                        //   { what: "control", id: "__sek___sek_draggable_sections_ui", label: "@missi18n Section Picker", type: "czr_module", module_type: "sek_section_picker_module", …}
+                        //   { what: "setting", id: "__sek___sek_draggable_sections_ui", dirty: false, value: "", transport: "postMessage", … }
+                        //   { what: "section", id: "__sek___sek_draggable_sections_ui", title: "@missi18n Section Picker", panel: "__sektions__", priority: 30}
+                        // ]
+                        if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_section_picker_module' } ) ) ) {
+                              self.rootPanelFocus();
+                        } else if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_module_picker_module' } ) ) ) {
+                              self.rootPanelFocus();
+                        }
+                  });
+
+                  // React to the *-droped event
+                  self.reactToDrop();
+
+                  // 'sek-ui-pre-removal' is triggered in ::cleanRegistered
+                  // @params { what : control, id : '' }
+                  self.bind( 'sek-ui-pre-removal', function( params ) {
+                        if ( 'control' == params.what && -1 < params.id.indexOf( 'draggable') ) {
+                              api.control( params.id, function( _ctrl_ ) {
+                                    _ctrl_.container.find( '[draggable]' ).each( function() {
+                                          $(this).off( 'dragstart dragend' );
                                     });
-                              }
-                        };
-
-                        var options = {};
-                        switch ( type ) {
-                              case 'module_picker' :
-                                    options = {
-                                          items: [
-                                                '.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                                                '.sek-module',// the drop zone when there is at least one module
-                                                '.sek-column > .sek-module-wrapper sek-section',// the drop zone when there is at least one nested section
-                                                '.sek-content-drop-zone'//between sections
-                                          ].join(','),
-                                          placeholderContent : function( evt ) {
-                                                var $target = $( evt.currentTarget ),
-                                                    html = '@missi18n Insert Here';
-
-                                                if ( $target.length > 0 ) {
-                                                    if ( 'between-sections' == $target.data('sek-location') ) {
-                                                          html = '@missi18n Insert in a new section';
-                                                    }
-                                                }
-                                                return '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
-                                          },
-
-                                    };
-                              break;
-
-                              case 'section_picker' :
-                                    options = {
-                                          items: [
-                                                '.sek-content-drop-zone'//between sections
-                                          ].join(','),
-                                          placeholderContent : function( evt ) {
-                                                $target = $( evt.currentTarget );
-                                                var html = '@missi18n Insert a new section here';
-                                                return '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
-                                          },
-                                    };
-                              break;
-
-                              default :
-                                    api.errare( '::setupSekDrop => missing picker type' );
-                              break;
+                              });
                         }
+                  });
+            },
 
-                        var _opts_ = $.extend( true, {}, baseOptions );
-                        options = _.extend( _opts_, options );
-                        $(this).sekDrop( options ).attr('data-sek-droppable-type', type );
-                  };//instantiateSekDrop()
+            //-------------------------------------------------------------------------------------------------
+            //--DRAG ZONES SETUP
+            //-------------------------------------------------------------------------------------------------
+            // fired in ::initialize, on 'sek-refresh-nimbleDragDropZones
+            // 'sek-refresh-nimbleDragDropZones' is emitted by the section and the module picker modules with param { type : 'section_picker' || 'module_picker'}
+            setupNimbleDragZones : function( $draggableWrapper ) {
+                  var self = this;
+                  //console.log('instantiate', type );
+                  // $(this) is the dragged element
+                  var _onStart = function( evt ) {
+                        evt.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
+                        evt.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
+                        // evt.originalEvent.dataTransfer.effectAllowed = "move";
+                        // evt.originalEvent.dataTransfer.dropEffect = "move";
+                        // Notify if not supported : https://caniuse.com/#feat=dragndrop
+                        try {
+                              evt.originalEvent.dataTransfer.setData( 'browserSupport', 'browserSupport' );
+                              evt.originalEvent.dataTransfer.setData( 'browserSupport', 'browserSupport' );
+                              evt.originalEvent.dataTransfer.clearData( 'browserSupport' );
+                        } catch ( er ) {
+                              api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
+                                    api.notifications.add( new api.Notification( 'drag-drop-support', {
+                                          type: 'error',
+                                          message:  '@missi18n => your browser does not support the drag and drop technology. You might want to customize your site using another browser.',
+                                          dismissible: true
+                                    } ) );
 
-                  //console.log("$( api.previewer.targetWindow().document ).find( '.sektion-wrapper')", $( api.previewer.targetWindow().document ).find( '.sektion-wrapper') );
+                                    // Removed if not dismissed after 5 seconds
+                                    _.delay( function() {
+                                          api.notifications.remove( 'drag-drop-support' );
+                                    }, 10000 );
+                              });
+                        }
+                        // Set the dragged type property now : module or preset_section
+                        self.dnd_draggedType = $(this).data('sek-content-type');
 
-                  if ( ! _.isUndefined( $el.data('sekDrop') ) ) {
-                        $el.sekDrop( 'destroy' );
+                        api.previewer.send( 'sek-drag-start', { type : self.dnd_draggedType } );//fires the rendering of the dropzones
+                        $(evt.currentTarget).addClass('sek-grabbing');
+                  };
+
+                  var _onEnd = function( evt ) {
+                        api.previewer.send( 'sek-drag-stop' );
+                        // make sure that the sek-grabbing class ( -webkit-grabbing ) gets reset on dragEnd
+                        $(evt.currentTarget).removeClass('sek-grabbing');
+                  };
+
+                  // Schedule
+                  $draggableWrapper.find( '[draggable]' ).each( function() {
+                        $(this).on( 'dragstart', function( evt ) {
+                                    _onStart.call( $(this), evt );
+                              })
+                              .on( 'dragend', function( evt ) {
+                                    _onEnd.call( $(this), evt );
+                              });
+                  });
+            },//setupNimbleZones()
+
+
+
+
+
+
+
+
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //--DRAG ZONES SETUP
+            //-------------------------------------------------------------------------------------------------
+            // Scheduled on previewer('ready') each time the previewer is refreshed
+            setupNimbleDropZones : function() {
+                  var self = this;
+                  this.$dropZones = this.dnd_getDropZonesElements();
+                  this.preDropElement = $( '<div>', {
+                        class: sektionsLocalizedData.preDropElementClass,
+                        html : ''//will be set dynamically
+                  });
+                  if ( this.$dropZones.length < 1 ) {
+                        throw new Error( '::setupNimbleDropZones => invalid Dom element');
                   }
 
-                  try {
-                        instantiateSekDrop.call( $el );
-                  } catch( er ) {
-                        api.errare( '::setupSekDrop => Error when firing instantiateSekDrop', er );
+                  this.$dropZones.each( function() {
+                      var $zone = $(this);
+                      // Make sure we don't delegate an event twice for a given element
+                      if ( true === $zone.data('zone-droppable-setup') )
+                          return;
+
+                      // Delegated to allow reactions on future modules / sections
+                      $zone
+                            .on( 'dragenter dragover', sektionsLocalizedData.dropSelectors, function( evt ) {
+                                  if ( ! self.dnd_canDrop( $(this) ) )
+                                    return;
+
+                                  evt.stopPropagation();
+                                  self.dnd_OnEnterOver( $(this), evt );
+                            })
+                            .on( 'dragleave drop', sektionsLocalizedData.dropSelectors, function( evt ) {
+                                  switch( evt.type ) {
+                                        case 'dragleave' :
+                                              if ( ! self.dnd_isOveringDropTarget( $(this), evt  ) ) {
+                                                    self.dnd_cleanOnLeaveDrop( $(this), evt );
+                                              }
+                                        break;
+                                        case 'drop' :
+                                              if ( ! self.dnd_canDrop( $(this) ) )
+                                                return;
+                                              evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
+                                              self.dnd_onDrop( $(this), evt );
+                                              self.dnd_cleanOnLeaveDrop( $(this), evt );
+                                        break;
+                                  }
+                            })
+                            .data( 'zone-droppable-setup', true );// flag the zone. Will be removed on 'destroy'
+                });//this.dropZones.each()
+            },//setupNimbleDropZones()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- DnD Helpers
+            //-------------------------------------------------------------------------------------------------
+            dnd_getPreDropElementContent : function( evt ) {
+                  var $target = $( evt.currentTarget ),
+                      html,
+                      preDropContent;
+
+                  switch( this.dnd_draggedType ) {
+                        case 'module' :
+                              html = '@missi18n Insert Here';
+                              if ( $target.length > 0 ) {
+                                  if ( 'between-sections' == $target.data('sek-location') ) {
+                                        html = '@missi18n Insert in a new section';
+                                  }
+                              }
+                              preDropContent = '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
+                        break;
+
+                        case 'preset_section' :
+                              html = '@missi18n Insert a new section here';
+                              preDropContent = '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
+                        break;
+
+                        default :
+                              api.errare( '::dnd_getPreDropElementContent => invalid content type provided');
+                        break;
                   }
-            },//setupSekDrop()
+                  return preDropContent;
+            },
+
+            // Scheduled on previewer('ready') each time the previewer is refreshed
+            dnd_getDropZonesElements : function() {
+                  return $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
+            },
+
+            // @return boolean
+            // Note : the class "sek-content-preset_section-drop-zone" is dynamically generated in preview::schedulePanelMsgReactions() sek-drag-start case
+            dnd_canDrop : function( $dropTarget ) {
+                  var isSectionDropZone = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' );
+                  return ( 'preset_section' === this.dnd_draggedType && isSectionDropZone ) || ( 'module' === this.dnd_draggedType && ! isSectionDropZone );
+            },
+
+            // @return void()
+            dnd_OnEnterOver : function( $dropTarget, evt ) {
+                  evt.preventDefault();//@see :https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets
+                  // Bail here if we are in the currently drag entered element
+                  if ( true !== $dropTarget.data( 'is-drag-entered' ) ) {
+                        // Flag now
+                        $dropTarget.data( 'is-drag-entered', true );
+                        $dropTarget.addClass( 'sek-active-drop-zone' );
+                        // Flag the dropEl parent element
+                        this.$dropZones.addClass( 'sek-is-dragging' );
+                  }
+
+                  try { this.dnd_mayBePrintPlaceHolder( $dropTarget, evt ); } catch( er ) {
+                        api.errare('Error when trying to insert the preDrop content', er );
+                  }
+            },
+
+            dnd_onDrop: function( $dropTarget, evt ) {
+                  evt.stopPropagation();
+                  var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
+                  // console.log('onDropping params', position, evt );
+                  // console.log('onDropping element => ', $dropTarget.data('sek-before-section'), $dropTarget );
+                  api.czr_sektions.trigger( 'sek-content-dropped', {
+                        drop_target_element : $dropTarget,
+                        location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
+                        position : _position,
+                        before_section : $dropTarget.data('sek-before-section'),
+                        after_section : $dropTarget.data('sek-after-section'),
+                        content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                        content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
+                  });
+            },
+
+            // @return void()
+            dnd_cleanOnLeaveDrop : function( $dropTarget, evt ) {
+                  this.$dropZones = this.$dropZones || this.dnd_getDropZonesElements();
+                  // Clean up
+                  if ( $dropTarget && $dropTarget.length > 0 ) {
+                        $dropTarget.removeClass( 'sek-active-drop-zone' );
+                  }
+                  this.preDropElement.remove();
+                  this.$dropZones.removeClass( 'sek-is-dragging' );
+                  $( sektionsLocalizedData.dropSelectors, this.$dropZones ).each( function() {
+                        $(this).data( 'is-drag-entered', false );
+                        $(this).data( 'preDrop-position', false );
+                  });
+            },
 
 
+            // @return string after or before
+            dnd_getPosition : function( $dropTarget, evt ) {
+                  var targetRect = $dropTarget[0].getBoundingClientRect(),
+                      targetHeight = targetRect.height;
+
+                  // if the preDrop is already printed, we have to take it into account when calc. the target height
+                  if ( 'before' === $dropTarget.data( 'preDrop-position' ) ) {
+                        targetHeight = targetHeight + this.preDropElement.outerHeight();
+                  } else if ( 'after' === $dropTarget.data( 'preDrop-position' ) ) {
+                        targetHeight = targetHeight - this.preDropElement.outerHeight();
+                  }
+
+                  return evt.originalEvent.clientY - targetRect.top - ( targetHeight / 2 ) > 0  ? 'after' : 'before';
+            },
+
+            // @return void()
+            dnd_mayBePrintPlaceHolder : function( $dropTarget, evt ) {
+                  var self = this,
+                      previousPosition = $dropTarget.data( 'preDrop-position' ),
+                      newPosition = this.dnd_getPosition( $dropTarget, evt  );
+
+                  if ( previousPosition === newPosition )
+                    return;
+
+                  $.when( self.preDropElement.remove() ).done( function(){
+                        $dropTarget[ 'before' === newPosition ? 'prepend' : 'append' ]( self.preDropElement )
+                              .find( '.' + sektionsLocalizedData.preDropElementClass ).html( self.dnd_getPreDropElementContent( evt ) );
+                        $dropTarget.data( 'preDrop-position', newPosition );
+                  });
+            },
+
+            //@return void()
+            dnd_isOveringDropTarget : function( $dropTarget, evt ) {
+                  var targetPos = $dropTarget[0].getBoundingClientRect(),
+                      mouseX = evt.clientX,
+                      mouseY = evt.clientY,
+                      tLeft = targetPos.left,
+                      tRight = targetPos.right,
+                      tTop = targetPos.top,
+                      tBottom = targetPos.bottom,
+                      isXin = mouseX >= tLeft && ( tRight - tLeft ) >= ( mouseX - tLeft),
+                      isYin = mouseY >= tTop && ( tBottom - tTop ) >= ( mouseY - tTop);
+                  return isXin && isYin;
+            },
+
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- SCHEDULE REACTIONS TO 'sek-content-dropped'
+            //-------------------------------------------------------------------------------------------------
             // invoked on api('ready') from self::initialize()
             reactToDrop : function() {
                   var self = this;
@@ -3043,7 +3259,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var focusOnAddedContentEditor;
                         switch( dropCase ) {
                               case 'content-in-column' :
-                                    //console.log('PPPPPPPPoooorrams', params );
                                     var $closestLevelWrapper = params.drop_target_element.closest('div[data-sek-level]');
                                     if ( 1 > $closestLevelWrapper.length ) {
                                         throw new Error( 'No valid level dom element found' );
@@ -3054,7 +3269,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( _.isEmpty( _level ) || _.isEmpty( _id ) ) {
                                         throw new Error( 'No valid level id found' );
                                     }
-                                    console.log('drop content-in-column', params );
                                     api.previewer.trigger( 'sek-add-module', {
                                           level : _level,
                                           id : _id,
@@ -3082,11 +3296,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       position : _position,
                   //       before_section : $(this).data('sek-before-section'),
                   //       after_section : $(this).data('sek-after-section'),
-                  //       content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                  //       content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+                  //       content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                  //       content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
                   // });
                   this.bind( 'sek-content-dropped', function( params ) {
-                        console.log('sek-content-dropped', params );
+                        //console.log('sek-content-dropped', params );
                         try { _do_( params ); } catch( er ) {
                               api.errare( 'error when reactToDrop', er );
                         }
@@ -3919,65 +4133,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( api.czrInputMap, {
             module_picker : function( input_options ) {
                 var input = this;
-                input.container.find( '[draggable]').nimbleZones({
-                      // DRAG OPTIONS
-                      // $(this) is the dragged element
-                      onStart: function( event ) {
-                            console.log('ON DRAG START', $(this), $(this).data('sek-content-id'), event );
-                            event.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
-                            event.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
-                            // event.originalEvent.dataTransfer.effectAllowed = "move";
-                            // event.originalEvent.dataTransfer.dropEffect = "move";
-
-                            api.previewer.send( 'sek-drag-start' );
-                            $(event.currentTarget).addClass('sek-grabbing');
-                      },
-                      onEnd: function( event ) {
-                            console.log('ON DRAG END', $(this), event );
-                            api.previewer.send( 'sek-drag-stop' );
-                            // make sure that the sek-grabbing class ( -webkit-grabbing ) gets reset on dragEnd
-                            $(event.currentTarget).removeClass('sek-grabbing');
-                      },
-
-                      // DROP OPTIONS
-                      dropZones : $( api.previewer.targetWindow().document ).find( '.sektion-wrapper'),
-                      placeholderClass: 'sortable-placeholder',
-                      onDrop: function( position, event ) {
-                            event.stopPropagation();
-                            var _position = 'after' === position ? $(this).index() + 1 : $(this).index();
-                            console.log('ON DROPPING', position, event.originalEvent.dataTransfer.getData( "sek-content-id" ), $(self) );
-
-                            // console.log('onDropping params', position, event );
-                            // console.log('onDropping element => ', $(self) );
-                            api.czr_sektions.trigger( 'sek-content-dropped', {
-                                  drop_target_element : $(this),
-                                  location : $(this).closest('[data-sek-level="location"]').data('sek-id'),
-                                  position : _position,
-                                  before_section : $(this).data('sek-before-section'),
-                                  after_section : $(this).data('sek-after-section'),
-                                  content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                                  content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                            });
-                      },
-                      dropSelectors: [
-                            '.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                            '.sek-module',// the drop zone when there is at least one module
-                            '.sek-column > .sek-module-wrapper sek-section',// the drop zone when there is at least one nested section
-                            '.sek-content-drop-zone'//between sections
-                      ].join(','),
-                      placeholderContent : function( evt ) {
-                            var $target = $( evt.currentTarget ),
-                                html = '@missi18n Insert Here';
-
-                            if ( $target.length > 0 ) {
-                                if ( 'between-sections' == $target.data('sek-location') ) {
-                                      html = '@missi18n Insert in a new section';
-                                }
-                            }
-                            return '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
-                      },
-                }).attr('data-sek-drag', true );
-
                 // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
                 input.container.find('[draggable]').each( function() {
                       $(this).on( 'mousedown mouseup', function( evt ) {
@@ -3991,7 +4146,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             }
                       });
                 });
-                api.czr_sektions.trigger( 'sek-refresh-sekdrop', { type : 'module_picker' } );
+                api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'module', input_container : input.container } );
                 //console.log( this.id, input_options );
             }
       });
@@ -4026,89 +4181,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       //the callback can receive specific params define in each module constructor
       //For example, a content picker can be given params to display only taxonomies
       $.extend( api.czrInputMap, {
-            // section_picker : function( input_options ) {
-            //       var input = this;
-            //       input.container.find( '[draggable]').sekDrag({
-            //             // $(this) is the dragged element
-            //             onDragStart: function( event ) {
-            //                   //console.log('ON DRAG START', $(this), $(this).data('sek-module-type'), event );
-            //                   event.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
-            //                   event.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
-            //                   api.previewer.send( 'sek-drag-start' );
-            //                   $(event.currentTarget).addClass('sek-grabbing');
-            //             },
-
-            //             onDragEnd: function( event ) {
-            //                   //console.log('ON DRAG END', $(this), event );
-            //                   api.previewer.send( 'sek-drag-stop' );
-            //                   $(event.currentTarget).removeClass('sek-grabbing');
-            //             }
-            //       }).attr('data-sek-drag', true );
-
-            //        // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
-            //       input.container.find('[draggable]').each( function() {
-            //             $(this).on( 'mousedown mouseup', function( evt ) {
-            //                   switch( evt.type ) {
-            //                         case 'mousedown' :
-            //                               $(this).addClass('sek-grabbing');
-            //                         break;
-            //                         case 'mouseup' :
-            //                               $(this).removeClass('sek-grabbing');
-            //                         break;
-            //                   }
-            //             });
-            //       });
-            //       api.czr_sektions.trigger( 'sek-refresh-sekdrop', { type : 'section_picker' } );
-            // }
             section_picker : function( input_options ) {
                   var input = this;
-                  input.container.find( '[draggable]').nimbleZones({
-                        // DRAG OPTIONS
-                        // $(this) is the dragged element
-                        onStart: function( event ) {
-                              //console.log('ON DRAG START', $(this), $(this).data('sek-module-type'), event );
-                              event.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
-                              event.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
-                              api.previewer.send( 'sek-drag-start' );
-                              $(event.currentTarget).addClass('sek-grabbing');
-                        },
-
-                        onEnd: function( event ) {
-                              //console.log('ON DRAG END', $(this), event );
-                              api.previewer.send( 'sek-drag-stop' );
-                              $(event.currentTarget).removeClass('sek-grabbing');
-                        },
-
-
-                        // DROP OPTIONS
-                        dropZones : $( api.previewer.targetWindow().document ).find( '.sektion-wrapper'),
-                        placeholderClass: 'sortable-placeholder',
-                        onDrop: function( position, event ) {
-                              event.stopPropagation();
-                              var _position = 'after' === position ? $(this).index() + 1 : $(this).index();
-                              //console.log('ON DROPPING', event.originalEvent.dataTransfer.getData( "module-params" ), $(self) );
-
-                              // console.log('onDropping params', position, event );
-                              // console.log('onDropping element => ', $(self) );
-                              api.czr_sektions.trigger( 'sek-content-dropped', {
-                                    drop_target_element : $(this),
-                                    location : $(this).closest('[data-sek-level="location"]').data('sek-id'),
-                                    position : _position,
-                                    before_section : $(this).data('sek-before-section'),
-                                    after_section : $(this).data('sek-after-section'),
-                                    content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                                    content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                              });
-                        },
-                        dropSelectors: ['.sek-content-drop-zone'].join(','),//between sections
-                        placeholderContent : function( evt ) {
-                              $target = $( evt.currentTarget );
-                              var html = '@missi18n Insert a new section here';
-                              return '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
-                        }
-                  }).attr('data-sek-drag', true );
-
-                   // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
+                  // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
                   input.container.find('[draggable]').each( function() {
                         $(this).on( 'mousedown mouseup', function( evt ) {
                               switch( evt.type ) {
@@ -4121,7 +4196,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   });
-                  api.czr_sektions.trigger( 'sek-refresh-sekdrop', { type : 'section_picker' } );
+                  api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams

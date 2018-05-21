@@ -179,7 +179,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( api[ _reg_.what ].has( _reg_.id ) ) {
                                     // fire an event before removal, can be used to clean some jQuery plugin instance for example
                                     if (  _.isFunction( api[ _reg_.what ]( _reg_.id ).trigger ) ) {//<= Section and Panel constructor are not extended with the Event class, that's why we check if this method exists
-                                          api[ _reg_.what ]( _reg_.id ).trigger('czr-pre-removal', _reg_ );
+                                           self.trigger( 'sek-ui-pre-removal', { what : _reg_.what, id : _reg_.id } );
                                     }
                                     $.when( api[ _reg_.what ]( _reg_.id ).container.remove() ).done( function() {
                                           // remove control, section, panel

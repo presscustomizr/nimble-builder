@@ -294,18 +294,18 @@
 }
 .sek-sortable-overing > .sek-no-modules-column { display: none; }
 
-.sek-content-drop-zone {
+.sek-drop-zone {
   height: 0px;
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
   -o-transition: all 0.4s ease;
   transition: all 0.4s ease;
 }
-.sek-active-drop-zone.sek-content-drop-zone {
+.sek-active-drop-zone.sek-drop-zone {
   height: auto!important;
   min-height : 50px;
 }
-.sek-dragging .sek-content-drop-zone {
+.sek-dragging .sek-drop-zone {
   height : 20px;
   animation: sek-dragging-highlight 2s infinite;
   background: #eee;

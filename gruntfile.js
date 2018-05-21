@@ -27,7 +27,9 @@ module.exports = function(grunt) {
             // the base czr fmk to be used in themes and plugins
             czr_base_fmk : 'inc/czr-base-fmk/',
 
-            sektions: 'inc/sektions/'
+            sektions: 'inc/sektions/',
+
+            tmpl: 'tmpl/'
         },
 			tasks : {
         //'pre_czr' : ['concat:czr_control_css', 'concat:czr_control_js', 'comments:czr_base_control_js', 'lineending:czr_js', 'uglify:czr_control_js', 'uglify:czr_preview_js', 'cssmin:czr_css'],

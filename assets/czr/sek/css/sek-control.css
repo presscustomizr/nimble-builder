@@ -59,7 +59,7 @@ ul[id*="sub-accordion-section-__sek__"] {
   cursor: move;/* fallback */
   cursor: -webkit-grab;
 }
-[data-sek-content-type="section"] {
+[data-sek-content-type="preset_section"] {
   width: 90%;
   float: left;
   padding: 5%;
