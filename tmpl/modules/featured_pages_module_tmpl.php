@@ -94,60 +94,65 @@ $fp_col_suffix  = isset( $fp_col_map[$fp_per_row] ) ? $fp_col_map[$fp_per_row] :
 
 
 //HELPERS
-function sek_fp_temporary_placeholder() {
-    echo '<h2>Feature Page temporary placeholder</h2>';
-    echo SEK_Front() -> sek_get_input_placeholder_content( 'upload' );
-}
 
 /*
 * $value should be an array
 * and at least one [page-id][id] must be numeric or _custom_, and in this case [padge-id][url] must be set?
 */
-function sek_fp_is_fp_set( array $fp ) {
-    return ( ! empty( $fp[ 'page-id' ]['id'] ) &&
-        ( sek_fp_can_be_wp_page( $fp ) || sek_fp_is_custom( $fp ) ) );
-}
 
-
-function sek_fp_is_custom( array $fp ) {
-    return ( '_custom_' == $fp[ 'page-id' ]['id'] && esc_url( $fp[ 'page-id' ]['url'] ) );
-}
-
-function sek_fp_can_be_wp_page( array $fp ) {
-    return is_numeric( $fp[ 'page-id' ]['id'] );
-}
-
-function sek_fp_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
-    if ( ! $text )
-        return '';
-
-    if ( $strip_tags )
-        $text       = strip_tags( $text );
-
-    if ( ! $max_text_length )
-        return $text;
-
-    $end_substr = $text_length = strlen( $text );
-    if ( $text_length > $max_text_length ) {
-        $text      .= ' ';
-        $end_substr = strpos( $text, ' ' , $max_text_length);
-        $end_substr = ( FALSE !== $end_substr ) ? $end_substr : $max_text_length;
-        $text       = trim( substr( $text , 0 , $end_substr ) );
+if ( ! function_exists( 'sek_fp_is_fp_set' ) ) :
+    function sek_fp_is_fp_set( array $fp ) {
+        return ( ! empty( $fp[ 'page-id' ]['id'] ) &&
+            ( sek_fp_can_be_wp_page( $fp ) || sek_fp_is_custom( $fp ) ) );
     }
+endif;
 
-    if ( $more && $end_substr < $text_length )
-        return $text . ' ' .$more;
 
-    return $text;
-}
+if ( ! function_exists( 'sek_fp_is_custom' ) ) :
+    function sek_fp_is_custom( array $fp ) {
+        return ( '_custom_' == $fp[ 'page-id' ]['id'] && esc_url( $fp[ 'page-id' ]['url'] ) );
+    }
+endif;
 
+if ( ! function_exists( 'sek_fp_can_be_wp_page' ) ) :
+    function sek_fp_can_be_wp_page( array $fp ) {
+        return is_numeric( $fp[ 'page-id' ]['id'] );
+    }
+endif;
+
+if ( ! function_exists( 'sek_fp_text_truncate' ) ) :
+    function sek_fp_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
+        if ( ! $text )
+            return '';
+
+        if ( $strip_tags )
+            $text       = strip_tags( $text );
+
+        if ( ! $max_text_length )
+            return $text;
+
+        $end_substr = $text_length = strlen( $text );
+        if ( $text_length > $max_text_length ) {
+            $text      .= ' ';
+            $end_substr = strpos( $text, ' ' , $max_text_length);
+            $end_substr = ( FALSE !== $end_substr ) ? $end_substr : $max_text_length;
+            $text       = trim( substr( $text , 0 , $end_substr ) );
+        }
+
+        if ( $more && $end_substr < $text_length )
+            return $text . ' ' .$more;
+
+        return $text;
+    }
+endif;
 
 
 //START BLOCK RENDERING
 
 // print the module content if not empty
 if ( is_null( $value ) || ! is_array( $value ) ) :
-    sek_fp_temporary_placeholder();
+    echo '<h2>Feature Page temporary placeholder</h2>';
+    echo SEK_Front() -> sek_get_input_placeholder_content( 'upload' );
 else :
     /*
     * We're always in a column which, by default, has right and left padding that we reset with the sek-row below
@@ -177,7 +182,8 @@ else :
                     $featured_page_id = $is_wp_post_type ? $fp[ 'page-id' ][ 'id' ] : '';
                 }
                 if ( empty( $is_custom_url ) && empty( $is_wp_post_type ) ):
-                    sek_fp_temporary_placeholder();
+                    echo '<h2>Feature Page temporary placeholder</h2>';
+                    echo SEK_Front() -> sek_get_input_placeholder_content( 'upload' );
                 else :
                     //DEFINITION
 
