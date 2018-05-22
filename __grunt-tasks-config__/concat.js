@@ -256,11 +256,39 @@ module.exports = {
     dest: '<%= paths.czr_assets %>sek/js/sek-preview.js',
   },
 
+
+
+
+
+
   czr_sektions_front_fmk_js : {
     src: [
+      // LIBS
+      '<%= paths.front_assets %>js/libs/oldBrowserCompat.js',
+
+      '<%= paths.front_assets %>js/libs/jquery-plugins/jqueryimgOriginalSizes.js',
+      '<%= paths.front_assets %>js/libs/jquery-plugins/jqueryimgSmartLoad.js',
+      '<%= paths.front_assets %>js/libs/jquery-plugins/jqueryCenterImages.js',
+      '<%= paths.front_assets %>js/libs/jquery-plugins/jqueryParallax.js',
+
+      '<%= paths.front_assets %>js/libs/requestAnimationFramePolyfill.js',
+      '<%= paths.front_assets %>js/libs/matchMediaPolyfill.js',
+
+      '<%= paths.front_assets %>js/libs/waypoints.js',
+
+      // FMK
       '<%= paths.front_assets %>js/_front_js_fmk/_main_base_0_utilities.part.js',
       '<%= paths.front_assets %>js/_front_js_fmk/_main_base_1_fmk.part.js',
+
+      // APP MAPS CALLBACK
+      '<%= paths.front_assets %>js/_parts/_main_base_2_initialize.part.js',
+      '<%= paths.front_assets %>js/_parts/_main_jquery_plugins.part.js',
+
+      // FMK FIRE
       '<%= paths.front_assets %>js/_front_js_fmk/_main_xfire_0.part.js',
+
+      // APP MAP FIRE
+      '<%= paths.front_assets %>js/_parts/_z_main_xfire_app_map.part.js'
     ],
     dest: '<%= paths.front_assets %>js/_front_js_fmk.js',
   }

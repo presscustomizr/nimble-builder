@@ -227,7 +227,9 @@ module.exports = {
       livereload : true
     },
     files : [
-      '<%= paths.front_assets %>js/_front_js_fmk/**/*.js'
+      '<%= paths.front_assets %>js/_front_js_fmk/**/*.js',
+      '<%= paths.front_assets %>js/_parts/**/*.js',
+      '<%= paths.front_assets %>js/libs/jquery-plugins/**/*.js'
     ],
     tasks : [
       'jshint:those',

@@ -1478,7 +1478,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //  not_preview_sent : bool
             //}
             updateAPISettingAndExecutePreviewActions : function( params ) {
-                  //console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
+                  console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
                   var self = this;
                   // 1) We don't want to store the default title and id module properties
                   // 2) We don't want to write in db the properties that are set to their default values
