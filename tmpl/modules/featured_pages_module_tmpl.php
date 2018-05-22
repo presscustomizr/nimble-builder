@@ -120,32 +120,6 @@ if ( ! function_exists( 'sek_fp_can_be_wp_page' ) ) :
     }
 endif;
 
-if ( ! function_exists( 'sek_fp_text_truncate' ) ) :
-    function sek_fp_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
-        if ( ! $text )
-            return '';
-
-        if ( $strip_tags )
-            $text       = strip_tags( $text );
-
-        if ( ! $max_text_length )
-            return $text;
-
-        $end_substr = $text_length = strlen( $text );
-        if ( $text_length > $max_text_length ) {
-            $text      .= ' ';
-            $end_substr = strpos( $text, ' ' , $max_text_length);
-            $end_substr = ( FALSE !== $end_substr ) ? $end_substr : $max_text_length;
-            $text       = trim( substr( $text , 0 , $end_substr ) );
-        }
-
-        if ( $more && $end_substr < $text_length )
-            return $text . ' ' .$more;
-
-        return $text;
-    }
-endif;
-
 
 //START BLOCK RENDERING
 
@@ -208,7 +182,7 @@ else :
                     $fp_title         = esc_attr( strip_tags( $fp_title ) );
 
                     $fp_link          = esc_url( $fp[ 'page-id' ][ 'url' ] );
-                    $fp_link          = !$fp_link && !is_preview() ? 'javascript:void(0)' : $fp_link;
+                    $fp_link          = ( !$fp_link || skp_is_customizing() ) ? 'javascript:void(0)' : $fp_link;
 
                     //TEXT
                     switch ( $fp[ 'content-type' ] ) {
@@ -227,7 +201,7 @@ else :
                         //trim
                         //limit text to 200 chars?
                         $default_fp_text_length         = apply_filters( 'sek_fp_text_length', '250' );
-                        $fp_text                        = sek_fp_text_truncate( $fp_text, $default_fp_text_length, $more = '...', $strip_tags = false ); //tags already stripped
+                        $fp_text                        = sek_text_truncate( $fp_text, $default_fp_text_length, $more = '...', $strip_tags = false ); //tags already stripped
                     }
 
                     //BUTTON

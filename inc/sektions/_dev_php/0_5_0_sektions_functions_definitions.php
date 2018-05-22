@@ -120,6 +120,9 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
     return $_parent_level_data;
 }
 
+
+
+
 /* HELPER FOR CHECKBOX OPTIONS */
 function sek_is_checked( $val ) {
     //cast to string if array
@@ -144,5 +147,34 @@ function sek_booleanize_checkbox_val( $val ) {
       default : return false;
     }
 }
+
+
+
+function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
+    if ( ! $text )
+        return '';
+
+    if ( $strip_tags )
+        $text       = strip_tags( $text );
+
+    if ( ! $max_text_length )
+        return $text;
+
+    $end_substr = $text_length = strlen( $text );
+    if ( $text_length > $max_text_length ) {
+        $text      .= ' ';
+        $end_substr = strpos( $text, ' ' , $max_text_length);
+        $end_substr = ( FALSE !== $end_substr ) ? $end_substr : $max_text_length;
+        $text       = trim( substr( $text , 0 , $end_substr ) );
+    }
+
+    if ( $more && $end_substr < $text_length )
+        return $text . ' ' .$more;
+
+    return $text;
+}
+
+
+
 
 ?>
