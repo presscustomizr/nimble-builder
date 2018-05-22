@@ -19,7 +19,7 @@ if ( is_null( $value ) || ! array_key_exists('img', $value ) ) {
     echo SEK_Front() -> sek_get_input_placeholder_content( 'upload' );
 } else {
     if ( array_key_exists('img', $value ) ) {
-        echo wp_get_attachment_image( $value['img'], $value['img-size']);
+        echo wp_get_attachment_image( $value['img'], empty( $value['img-size'] ) ? 'large' : $value['img-size']);
     }
 }
 
