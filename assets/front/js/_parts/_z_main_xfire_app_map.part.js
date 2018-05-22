@@ -1,11 +1,11 @@
 var czrapp = czrapp || {};
-//@global CZRParams
+//@global sekFrontLocalized
 /************************************************
 * LET'S DANCE
 *************************************************/
 ( function ( czrapp ) {
       //adds the server params to the app now
-      czrapp.localized = window.CZRParams || {};
+      //czrapp.localized = window.sekFrontLocalized || {};
 
       //THE DEFAULT MAP
       //Other methods can be hooked. @see czrapp.customMap

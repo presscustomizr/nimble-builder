@@ -19,7 +19,7 @@ if ( ! class_exists( 'SEK_customize_ajax_content_picker_actions' ) ) :
 
             // CONTENT PICKER INPUT
             //add the _custom_ item to the content picker retrieved in ajax
-            add_filter( 'content_picker_ajax_items', array( $this, 'sek_add_custom_item_to_ajax_results' ), 10, 3 );
+            //add_filter( 'content_picker_ajax_items', array( $this, 'sek_add_custom_item_to_ajax_results' ), 10, 3 );
       }
 
       // hook : 'content_picker_ajax_items'

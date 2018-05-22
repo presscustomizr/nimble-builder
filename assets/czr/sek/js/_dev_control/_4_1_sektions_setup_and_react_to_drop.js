@@ -72,18 +72,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // React to the *-droped event
                   self.reactToDrop();
-
-                  // 'sek-ui-pre-removal' is triggered in ::cleanRegistered
-                  // @params { what : control, id : '' }
-                  self.bind( 'sek-ui-pre-removal', function( params ) {
-                        if ( 'control' == params.what && -1 < params.id.indexOf( 'draggable') ) {
-                              api.control( params.id, function( _ctrl_ ) {
-                                    _ctrl_.container.find( '[draggable]' ).each( function() {
-                                          $(this).off( 'dragstart dragend' );
-                                    });
-                              });
-                        }
-                  });
             },
 
             //-------------------------------------------------------------------------------------------------

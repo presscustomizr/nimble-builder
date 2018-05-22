@@ -111,6 +111,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.resetCollectionSetting();
                         });
 
+
+                        // CLEAN UI BEFORE REMOVAL
+                        // 'sek-ui-pre-removal' is triggered in ::cleanRegistered
+                        // @params { what : control, id : '' }
+                        self.bind( 'sek-ui-pre-removal', function( params ) {
+                              // CLEAN DRAG N DROP
+                              if ( 'control' == params.what && -1 < params.id.indexOf( 'draggable') ) {
+                                    api.control( params.id, function( _ctrl_ ) {
+                                          _ctrl_.container.find( '[draggable]' ).each( function() {
+                                                $(this).off( 'dragstart dragend' );
+                                          });
+                                    });
+                              }
+
+                              // CLEAN SELECT2
+                              // => we need to destroy the select2 instance, otherwise it can stay open when switching to another ui.
+                              if ( 'control' == params.what ) {
+                                    api.control( params.id, function( _ctrl_ ) {
+                                          _ctrl_.container.find( 'select' ).each( function() {
+                                                if ( ! _.isUndefined( $(this).data('select2') ) ) {
+                                                      $(this).select2('destroy');
+                                                }
+                                          });
+                                    });
+                              }
+                        });
+
                         // TEST
                         // @see php wp_ajax_sek_import_attachment
                         // wp.ajax.post( 'sek_import_attachment', {
@@ -1453,6 +1480,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+            // This method
             // @params = {
             //     uiParams : params,
             //     options_type : 'layout_background_border',
@@ -1477,28 +1505,79 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //  module_id :
             //  not_preview_sent : bool
             //}
+            //
+            // Note 1 : this method must handle two types of modules :
+            // 1) mono item modules, for which the settingParams.to is an object, a single item object
+            // 2) multi-items modules, for which the settingParams.to is an array, a collection of item objects
+            // How do we know that we are a in single / multi item module ?
+            //
+            // Note 2 : we must also handle several scenarios of module value update :
+            // 1) mono-items and multi-items module => input change
+            // 2) crud multi item => item added or removed => in this case some args are not passed, like params.settingParams.args.inputRegistrationParams
             updateAPISettingAndExecutePreviewActions : function( params ) {
                   console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
+                  if ( _.isEmpty( params.settingParams ) || ! _.has( params.settingParams, 'to' ) ) {
+                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.to. The api main setting can not be updated', params );
+                        return;
+                  }
                   var self = this;
+
+                  // NORMALIZE THE VALUE WE WANT TO WRITE IN THE MAIN SETTING
                   // 1) We don't want to store the default title and id module properties
                   // 2) We don't want to write in db the properties that are set to their default values
-                  var moduleValueCandidate = {},
-                      parentModuleType = params.settingParams.args.inputRegistrationParams.module.module_type,
-                      inputDefaultValue;
+                  var rawModuleValue = params.settingParams.to,
+                      moduleValueCandidate,// {} or [] if mono item of multi-item module
+                      inputDefaultValue = null,
+                      parentModuleType = null,
+                      isMultiItemModule = false;
 
-                  _.each( params.settingParams.to, function( _val, input_id ) {
-                        if ( _.contains( ['title', 'id' ], input_id ) )
-                          return;
-                        inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
+                  console.log('module control => ', params.settingParams.args.moduleRegistrationParams.control );
+                  if ( _.isEmpty( params.settingParams.args ) || ! _.has( params.settingParams.args, 'moduleRegistrationParams' ) ) {
+                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.args.moduleRegistrationParams The api main setting can not be updated', params );
+                        return;
+                  }
 
-                        if ( _val === inputDefaultValue ) {
-                              return;
-                        } else {
-                              moduleValueCandidate[ input_id ] = _val;
-                        }
+                  var _ctrl_ = params.settingParams.args.moduleRegistrationParams.control,
+                      _module_id_ = params.settingParams.args.moduleRegistrationParams.id,
+                      parentModuleInstance = _ctrl_.czr_Module( _module_id_ );
 
-                  });
+                  if ( ! _.isEmpty( parentModuleInstance ) ) {
+                        parentModuleType = parentModuleInstance.module_type;
+                        isMultiItemModule = parentModuleInstance.isMultiItem();
+                  }
 
+                  // @return {}
+                  var normalizeSingleItemValue = function( _item_ ) {
+                        var itemCandidate = {};
+                        _.each( _item_, function( _val, input_id ) {
+                              if ( _.contains( ['title', 'id' ], input_id ) )
+                                return;
+
+                              if ( null !== parentModuleType ) {
+                                    inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
+                                    if ( 'no_default_value_specified' === inputDefaultValue ) {
+                                          api.infoLog( '::updateAPISettingAndExecutePreviewActions => missing default value for input ' + input_id + ' in module ' + parentModuleType );
+                                    }
+                              }
+                              if ( _val === inputDefaultValue ) {
+                                    return;
+                              } else {
+                                    itemCandidate[ input_id ] = _val;
+                              }
+                        });
+                        return itemCandidate;
+                  };
+
+                  // The new module value can be an single item object if monoitem module, or an array of item objects if multi-item crud
+                  // Let's normalize it
+                  if ( ! isMultiItemModule && ! _.isObject( rawModuleValue ) ) {
+                        moduleValueCandidate = normalizeSingleItemValue( rawModuleValue );
+                  } else {
+                        moduleValueCandidate = [];
+                        _.each( rawModuleValue, function( item ) {
+                              moduleValueCandidate.push( normalizeSingleItemValue( item ) );
+                        });
+                  }
 
                   // What to do in the preview ?
                   // The action to trigger is determined by the changed input
@@ -2854,16 +2933,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isUndefined( level ) ) {
                         level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
                   }
-                  var _defaultVal_ = 'no_match';
+                  var _defaultVal_ = 'no_default_value_specified';
                   _.each( level, function( levelData, _key_ ) {
                         // we found a match skip next levels
-                        if ( 'no_match' !== _defaultVal_ )
+                        if ( 'no_default_value_specified' !== _defaultVal_ )
                           return;
                         if ( input_id === _key_ && ! _.isUndefined( levelData.default ) ) {
                               _defaultVal_ = levelData.default;
                         }
                         // if we have still no match, and the data are sniffable, let's go ahead recursively
-                        if ( 'no_match' === _defaultVal_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
+                        if ( 'no_default_value_specified' === _defaultVal_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
                               _defaultVal_ = self.getInputDefaultValue( input_id, module_type, levelData );
                         }
                   });
@@ -2944,18 +3023,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // React to the *-droped event
                   self.reactToDrop();
-
-                  // 'sek-ui-pre-removal' is triggered in ::cleanRegistered
-                  // @params { what : control, id : '' }
-                  self.bind( 'sek-ui-pre-removal', function( params ) {
-                        if ( 'control' == params.what && -1 < params.id.indexOf( 'draggable') ) {
-                              api.control( params.id, function( _ctrl_ ) {
-                                    _ctrl_.container.find( '[draggable]' ).each( function() {
-                                          $(this).off( 'dragstart dragend' );
-                                    });
-                              });
-                        }
-                  });
             },
 
             //-------------------------------------------------------------------------------------------------
@@ -4216,16 +4283,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                     //SET THE CONTENT PICKER DEFAULT OPTIONS
                     //@see ::setupContentPicker()
-                    module.bind( 'set_default_content_picker_options', function( defaultContentPickerOption ) {
-                          defaultContentPickerOption = { defaultOption : [ {
+                    module.bind( 'set_default_content_picker_options', function( params ) {
+                          params.defaultContentPickerOption.defaultOption = {
                                 'title'      : '<span style="font-weight:bold">@missi18n Set a custom url</span>',
                                 'type'       : '',
                                 'type_label' : '',
                                 'object'     : '',
                                 'id'         : '_custom_',
                                 'url'        : ''
-                          }]};
-                          return defaultContentPickerOption;
+                          };
+                          return params;
                     });
             },//initialize
 
@@ -4406,17 +4473,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                     //SET THE CONTENT PICKER DEFAULT OPTIONS
                     //@see ::setupContentPicker()
-                    module.bind( 'set_default_content_picker_options', function( defaultContentPickerOption ) {
-                          defaultContentPickerOption = { defaultOption : [ {
-                                'title'      : '<span style="font-weight:bold">@missi18n Set a custom url</span>',
-                                'type'       : '',
-                                'type_label' : '',
-                                'object'     : '',
-                                'id'         : '_custom_',
-                                'url'        : ''
-                          }]};
-                          return defaultContentPickerOption;
-                    });
+                    // module.bind( 'set_default_content_picker_options', function( params ) {
+                    //       params.defaultContentPickerOption.defaultOption = {
+                    //             'title'      : '<span style="font-weight:bold">@missi18n Set a custom url</span>',
+                    //             'type'       : '',
+                    //             'type_label' : '',
+                    //             'object'     : '',
+                    //             'id'         : '_custom_',
+                    //             'url'        : ''
+                    //       };
+                    //       return params;
+                    // });
             },//initialize
 
             CZRFPInputsMths : {
@@ -4469,6 +4536,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             czr_featured_pages_module : {
                   mthds : FeaturedPagesConstruct,
                   crud : true,
+                  hasPreItem : false,//a crud module has a pre item by default
+                  refresh_on_add_item : false,// the preview is refreshed on item add
                   name : 'Featured Pages',
                   has_mod_opt : false,
                   ready_on_section_expanded : true,

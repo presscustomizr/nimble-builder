@@ -483,7 +483,6 @@ fieldset[disabled] a.sek-btn {
 .sek-fp-widget img.h-centered {
   width: auto !important;
   max-width: none !important;
-  position: relative;
 }
 
 .sek-fp-widget img.v-centered {
@@ -491,7 +490,6 @@ fieldset[disabled] a.sek-btn {
   max-height: none !important;
   max-width: none !important;
   vertical-align: top;
-  position: relative;
 }
 
 .sek-link-mask {

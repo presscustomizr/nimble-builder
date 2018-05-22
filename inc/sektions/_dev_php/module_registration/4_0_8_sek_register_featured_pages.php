@@ -22,10 +22,22 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'default'     => 'featured'
                 ),
             ),
+            // 'mod-opt' => array(
+            //     // 'page-id' => array(
+            //     //     'input_type'  => 'content_picker',
+            //     //     'title'       => __('Pick a page', 'text_domain_to_be_replaced')
+            //     // ),
+            //     'mod_opt_test' => array(
+            //         'input_type'  => 'select',
+            //         'title'       => __('Display an image', 'text_domain_to_be_replaced'),
+            //         'default'     => 'featured'
+            //     ),
+            // ),
             'item-inputs' => array(
                 'page-id' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Pick a page', 'text_domain_to_be_replaced')
+                    'title'       => __('Pick a page', 'text_domain_to_be_replaced'),
+                    'default'     => ''
                 ),
                 'img-type' => array(
                     'input_type'  => 'select',
@@ -34,7 +46,8 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 ),
                 'img-id' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_domain_to_be_replaced')
+                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
+                    'default'     => ''
                 ),
                 'img-size' => array(
                     'input_type'  => 'select',

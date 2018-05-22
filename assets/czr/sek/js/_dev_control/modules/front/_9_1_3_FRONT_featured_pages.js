@@ -15,17 +15,17 @@
 
                     //SET THE CONTENT PICKER DEFAULT OPTIONS
                     //@see ::setupContentPicker()
-                    module.bind( 'set_default_content_picker_options', function( defaultContentPickerOption ) {
-                          defaultContentPickerOption = { defaultOption : [ {
-                                'title'      : '<span style="font-weight:bold">@missi18n Set a custom url</span>',
-                                'type'       : '',
-                                'type_label' : '',
-                                'object'     : '',
-                                'id'         : '_custom_',
-                                'url'        : ''
-                          }]};
-                          return defaultContentPickerOption;
-                    });
+                    // module.bind( 'set_default_content_picker_options', function( params ) {
+                    //       params.defaultContentPickerOption.defaultOption = {
+                    //             'title'      : '<span style="font-weight:bold">@missi18n Set a custom url</span>',
+                    //             'type'       : '',
+                    //             'type_label' : '',
+                    //             'object'     : '',
+                    //             'id'         : '_custom_',
+                    //             'url'        : ''
+                    //       };
+                    //       return params;
+                    // });
             },//initialize
 
             CZRFPInputsMths : {
@@ -78,6 +78,8 @@
             czr_featured_pages_module : {
                   mthds : FeaturedPagesConstruct,
                   crud : true,
+                  hasPreItem : false,//a crud module has a pre item by default
+                  refresh_on_add_item : false,// the preview is refreshed on item add
                   name : 'Featured Pages',
                   has_mod_opt : false,
                   ready_on_section_expanded : true,

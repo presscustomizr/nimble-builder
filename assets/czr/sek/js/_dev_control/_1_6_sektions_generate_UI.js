@@ -388,6 +388,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+            // This method
             // @params = {
             //     uiParams : params,
             //     options_type : 'layout_background_border',
@@ -412,28 +413,79 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //  module_id :
             //  not_preview_sent : bool
             //}
+            //
+            // Note 1 : this method must handle two types of modules :
+            // 1) mono item modules, for which the settingParams.to is an object, a single item object
+            // 2) multi-items modules, for which the settingParams.to is an array, a collection of item objects
+            // How do we know that we are a in single / multi item module ?
+            //
+            // Note 2 : we must also handle several scenarios of module value update :
+            // 1) mono-items and multi-items module => input change
+            // 2) crud multi item => item added or removed => in this case some args are not passed, like params.settingParams.args.inputRegistrationParams
             updateAPISettingAndExecutePreviewActions : function( params ) {
                   console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
+                  if ( _.isEmpty( params.settingParams ) || ! _.has( params.settingParams, 'to' ) ) {
+                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.to. The api main setting can not be updated', params );
+                        return;
+                  }
                   var self = this;
+
+                  // NORMALIZE THE VALUE WE WANT TO WRITE IN THE MAIN SETTING
                   // 1) We don't want to store the default title and id module properties
                   // 2) We don't want to write in db the properties that are set to their default values
-                  var moduleValueCandidate = {},
-                      parentModuleType = params.settingParams.args.inputRegistrationParams.module.module_type,
-                      inputDefaultValue;
+                  var rawModuleValue = params.settingParams.to,
+                      moduleValueCandidate,// {} or [] if mono item of multi-item module
+                      inputDefaultValue = null,
+                      parentModuleType = null,
+                      isMultiItemModule = false;
 
-                  _.each( params.settingParams.to, function( _val, input_id ) {
-                        if ( _.contains( ['title', 'id' ], input_id ) )
-                          return;
-                        inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
+                  console.log('module control => ', params.settingParams.args.moduleRegistrationParams.control );
+                  if ( _.isEmpty( params.settingParams.args ) || ! _.has( params.settingParams.args, 'moduleRegistrationParams' ) ) {
+                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.args.moduleRegistrationParams The api main setting can not be updated', params );
+                        return;
+                  }
 
-                        if ( _val === inputDefaultValue ) {
-                              return;
-                        } else {
-                              moduleValueCandidate[ input_id ] = _val;
-                        }
+                  var _ctrl_ = params.settingParams.args.moduleRegistrationParams.control,
+                      _module_id_ = params.settingParams.args.moduleRegistrationParams.id,
+                      parentModuleInstance = _ctrl_.czr_Module( _module_id_ );
 
-                  });
+                  if ( ! _.isEmpty( parentModuleInstance ) ) {
+                        parentModuleType = parentModuleInstance.module_type;
+                        isMultiItemModule = parentModuleInstance.isMultiItem();
+                  }
 
+                  // @return {}
+                  var normalizeSingleItemValue = function( _item_ ) {
+                        var itemCandidate = {};
+                        _.each( _item_, function( _val, input_id ) {
+                              if ( _.contains( ['title', 'id' ], input_id ) )
+                                return;
+
+                              if ( null !== parentModuleType ) {
+                                    inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
+                                    if ( 'no_default_value_specified' === inputDefaultValue ) {
+                                          api.infoLog( '::updateAPISettingAndExecutePreviewActions => missing default value for input ' + input_id + ' in module ' + parentModuleType );
+                                    }
+                              }
+                              if ( _val === inputDefaultValue ) {
+                                    return;
+                              } else {
+                                    itemCandidate[ input_id ] = _val;
+                              }
+                        });
+                        return itemCandidate;
+                  };
+
+                  // The new module value can be an single item object if monoitem module, or an array of item objects if multi-item crud
+                  // Let's normalize it
+                  if ( ! isMultiItemModule && ! _.isObject( rawModuleValue ) ) {
+                        moduleValueCandidate = normalizeSingleItemValue( rawModuleValue );
+                  } else {
+                        moduleValueCandidate = [];
+                        _.each( rawModuleValue, function( item ) {
+                              moduleValueCandidate.push( normalizeSingleItemValue( item ) );
+                        });
+                  }
 
                   // What to do in the preview ?
                   // The action to trigger is determined by the changed input

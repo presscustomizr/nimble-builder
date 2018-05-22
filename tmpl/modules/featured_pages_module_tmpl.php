@@ -71,7 +71,9 @@ TO ASK: We're missing the title input
 
 $model          = SEK_Front() -> model;
 $module_type    = $model['module_type'];
+
 $value          = array_key_exists( 'value', $model ) ? $model['value'] : null;
+
 
 /*
 * Columns definition
@@ -124,10 +126,20 @@ endif;
 //START BLOCK RENDERING
 
 // print the module content if not empty
-if ( is_null( $value ) || ! is_array( $value ) ) :
-    echo '<h2>Feature Page temporary placeholder</h2>';
-    echo SEK_Front() -> sek_get_input_placeholder_content( 'upload' );
-else :
+if ( is_null( $value ) || ! is_array( $value ) ) : ?>
+    <?php echo '<h2>Feature Page temporary placeholder</h2>'; ?>
+    <?php echo SEK_Front() -> sek_get_input_placeholder_content( 'upload' ); ?>
+<?php else : ?>
+    <?php
+    $default_value_model  = sek_get_default_module_model( $module_type );
+
+    error_log('<$default_model>');
+    error_log( print_r( $default_value_model, true ) );
+    error_log('</$default_model>');
+    error_log('<$default_model>');
+    error_log( print_r( $model, true ) );
+    error_log('</$default_model>');
+
     /*
     * We're always in a column which, by default, has right and left padding that we reset with the sek-row below
     * Also: with the flexbox the "row" concept if defined by the width of the inner elements, this means that
@@ -140,12 +152,15 @@ else :
     * little more complicated in js.
     */
 ?>
-        <div class="sek-row marketing js-center-images-disabled">
+        <div class="sek-row marketing"><?php //js-center-images-disabled ?>
 
     <?php foreach ( $value as $fp ) : ?>
             <div class="sek-col-base sek-col-<?php echo $fp_col_suffix ?>">
                 <div class="sek-fp-widget sek-link-mask-p round">
             <?php
+                // normalizes
+                $fp = wp_parse_args( $fp, $default_value_model );
+
                 $is_custom_url   = false;
                 $is_wp_post_type = false;
 
@@ -237,4 +252,5 @@ else :
             </div><!-- end .sek-col-base -->
     <?php endforeach ?>
     </div><!--end .sek-row -->
+
 <?php endif;

@@ -124,14 +124,14 @@
   img.h-centered {
     width: auto!important;
     max-width: none!important;
-    position: relative;
+    // position: relative;
   }
   img.v-centered {
     height: auto!important;
     max-height: none!important;
     max-width: none!important;
     vertical-align: top;
-    position: relative;
+    // position: relative;
   }
 }
 

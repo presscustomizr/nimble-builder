@@ -111,6 +111,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.resetCollectionSetting();
                         });
 
+
+                        // CLEAN UI BEFORE REMOVAL
+                        // 'sek-ui-pre-removal' is triggered in ::cleanRegistered
+                        // @params { what : control, id : '' }
+                        self.bind( 'sek-ui-pre-removal', function( params ) {
+                              // CLEAN DRAG N DROP
+                              if ( 'control' == params.what && -1 < params.id.indexOf( 'draggable') ) {
+                                    api.control( params.id, function( _ctrl_ ) {
+                                          _ctrl_.container.find( '[draggable]' ).each( function() {
+                                                $(this).off( 'dragstart dragend' );
+                                          });
+                                    });
+                              }
+
+                              // CLEAN SELECT2
+                              // => we need to destroy the select2 instance, otherwise it can stay open when switching to another ui.
+                              if ( 'control' == params.what ) {
+                                    api.control( params.id, function( _ctrl_ ) {
+                                          _ctrl_.container.find( 'select' ).each( function() {
+                                                if ( ! _.isUndefined( $(this).data('select2') ) ) {
+                                                      $(this).select2('destroy');
+                                                }
+                                          });
+                                    });
+                              }
+                        });
+
                         // TEST
                         // @see php wp_ajax_sek_import_attachment
                         // wp.ajax.post( 'sek_import_attachment', {

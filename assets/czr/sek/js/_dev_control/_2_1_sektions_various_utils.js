@@ -199,16 +199,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isUndefined( level ) ) {
                         level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
                   }
-                  var _defaultVal_ = 'no_match';
+                  var _defaultVal_ = 'no_default_value_specified';
                   _.each( level, function( levelData, _key_ ) {
                         // we found a match skip next levels
-                        if ( 'no_match' !== _defaultVal_ )
+                        if ( 'no_default_value_specified' !== _defaultVal_ )
                           return;
                         if ( input_id === _key_ && ! _.isUndefined( levelData.default ) ) {
                               _defaultVal_ = levelData.default;
                         }
                         // if we have still no match, and the data are sniffable, let's go ahead recursively
-                        if ( 'no_match' === _defaultVal_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
+                        if ( 'no_default_value_specified' === _defaultVal_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
                               _defaultVal_ = self.getInputDefaultValue( input_id, module_type, levelData );
                         }
                   });

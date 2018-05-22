@@ -1697,6 +1697,24 @@ https://github.com/imakewebthings/waypoints/blob/master/licenses.txt
                   [ 'background:' + args.bgCol, 'color:' + args.textCol, 'display: block;' ].join(';')
             ];
       };
+
+      var _wrapLogInsideTags = function( title, msg, bgColor ) {
+            //fix for IE, because console is only defined when in F12 debugging mode in IE
+            if ( ( _.isUndefined( console ) && typeof window.console.log != 'function' ) )
+              return;
+            if ( czrapp.localized.isDevMode ) {
+                  if ( _.isUndefined( msg ) ) {
+                        console.log.apply( console, _prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ '<' + title + '>' ] } ) );
+                  } else {
+                        console.log.apply( console, _prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ '<' + title + '>' ] } ) );
+                        console.log( msg );
+                        console.log.apply( console, _prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ '</' + title + '>' ] } ) );
+                  }
+            } else {
+                  console.log.apply( console, _prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ title ] } ) );
+            }
+      };
+
       //Dev mode aware and IE compatible czrapp.consoleLog()
       czrapp.consoleLog = function() {
             if ( ! czrapp.localized.isDevMode )
@@ -1719,22 +1737,9 @@ https://github.com/imakewebthings/waypoints/blob/master/licenses.txt
             // }
       };
 
-      czrapp.errare = function( title, error ) {
-            //fix for IE, because console is only defined when in F12 debugging mode in IE
-            if ( ( _.isUndefined( console ) && typeof window.console.log != 'function' ) )
-              return;
-            if ( czrapp.localized.isDevMode ) {
-                  if ( _.isUndefined( error ) ) {
-                        console.log.apply( console, _prettyPrintLog( { bgCol : '#ffd5a0', textCol : '#000', consoleArguments : [ '<' + title + '>' ] } ) );
-                  } else {
-                        console.log.apply( console, _prettyPrintLog( { bgCol : '#ffd5a0', textCol : '#000', consoleArguments : [ '<' + title + '>' ] } ) );
-                        console.log( error );
-                        console.log.apply( console, _prettyPrintLog( { bgCol : '#ffd5a0', textCol : '#000', consoleArguments : [ '</' + title + '>' ] } ) );
-                  }
-            } else {
-                  console.log.apply( console, _prettyPrintLog( { bgCol : '#ffd5a0', textCol : '#000', consoleArguments : [ title ] } ) );
-            }
-      };
+
+      czrapp.errare = function( title, msg ) { _wrapLogInsideTags( title, msg, '#ffd5a0' ); };
+      czrapp.infoLog = function( title, msg ) { _wrapLogInsideTags( title, msg, '#5ed1f5' ); };
 
       //encapsulates a WordPress ajax request in a normalize method
       //@param queryParams = {}
@@ -2529,7 +2534,7 @@ czrapp.methods = {};
       // Create a global events bus
       $.extend( czrapp.Values.prototype, czrapp.Events );
 
-})( jQuery );//@global CZRParams
+})( jQuery );//@global sekFrontLocalized
 var czrapp = czrapp || {};
 /*************************
 * ADD BASE CLASS METHODS
@@ -2541,6 +2546,9 @@ var czrapp = czrapp || {};
             * @return {[type]} [description]
             */
             cacheProp : function() {
+                  if ( "undefined" === typeof( sekFrontLocalized ) || ! sekFrontLocalized ) {
+                        throw new Error( 'czrapp => cacheProp => missing global sekFrontLocalized ');
+                  }
                   var self = this;
                   $.extend( czrapp, {
                         //cache various jQuery el in czrapp obj
@@ -2553,7 +2561,7 @@ var czrapp = czrapp || {};
                         $_header         : $('.tc-header'),
 
                         //various properties definition
-                        localized        : "undefined" != typeof(CZRParams) && CZRParams ? CZRParams : { _disabled: [] },
+                        localized        : "undefined" != typeof( sekFrontLocalized ) && sekFrontLocalized ? sekFrontLocalized : { _disabled: [] },
                         is_responsive    : self.isResponsive(),//store the initial responsive state of the window
                         current_device   : self.getDevice(),//store the initial device
                         isRTL            : $('html').attr('dir') == 'rtl'//is rtl?
@@ -2975,13 +2983,13 @@ var czrapp = czrapp || {};
 
 
 })( czrapp, jQuery, _ );var czrapp = czrapp || {};
-//@global CZRParams
+//@global sekFrontLocalized
 /************************************************
 * LET'S DANCE
 *************************************************/
 ( function ( czrapp ) {
       //adds the server params to the app now
-      czrapp.localized = window.CZRParams || {};
+      //czrapp.localized = window.sekFrontLocalized || {};
 
       //THE DEFAULT MAP
       //Other methods can be hooked. @see czrapp.customMap

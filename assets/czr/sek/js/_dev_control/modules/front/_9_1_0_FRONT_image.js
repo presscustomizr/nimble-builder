@@ -15,16 +15,16 @@
 
                     //SET THE CONTENT PICKER DEFAULT OPTIONS
                     //@see ::setupContentPicker()
-                    module.bind( 'set_default_content_picker_options', function( defaultContentPickerOption ) {
-                          defaultContentPickerOption = { defaultOption : [ {
+                    module.bind( 'set_default_content_picker_options', function( params ) {
+                          params.defaultContentPickerOption.defaultOption = {
                                 'title'      : '<span style="font-weight:bold">@missi18n Set a custom url</span>',
                                 'type'       : '',
                                 'type_label' : '',
                                 'object'     : '',
                                 'id'         : '_custom_',
                                 'url'        : ''
-                          }]};
-                          return defaultContentPickerOption;
+                          };
+                          return params;
                     });
             },//initialize
 

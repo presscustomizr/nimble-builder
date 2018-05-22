@@ -1,4 +1,4 @@
-//@global CZRParams
+//@global sekFrontLocalized
 var czrapp = czrapp || {};
 /*************************
 * ADD BASE CLASS METHODS
@@ -10,6 +10,9 @@ var czrapp = czrapp || {};
             * @return {[type]} [description]
             */
             cacheProp : function() {
+                  if ( "undefined" === typeof( sekFrontLocalized ) || ! sekFrontLocalized ) {
+                        throw new Error( 'czrapp => cacheProp => missing global sekFrontLocalized ');
+                  }
                   var self = this;
                   $.extend( czrapp, {
                         //cache various jQuery el in czrapp obj
@@ -22,7 +25,7 @@ var czrapp = czrapp || {};
                         $_header         : $('.tc-header'),
 
                         //various properties definition
-                        localized        : "undefined" != typeof(CZRParams) && CZRParams ? CZRParams : { _disabled: [] },
+                        localized        : "undefined" != typeof( sekFrontLocalized ) && sekFrontLocalized ? sekFrontLocalized : { _disabled: [] },
                         is_responsive    : self.isResponsive(),//store the initial responsive state of the window
                         current_device   : self.getDevice(),//store the initial device
                         isRTL            : $('html').attr('dir') == 'rtl'//is rtl?

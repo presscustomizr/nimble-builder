@@ -93,6 +93,7 @@ function sek_get_level_model( $id, $collection = array() ) {
     return $_data;
 }
 
+// Recursive helper
 function sek_get_parent_level_model( $child_level_id, $collection = array(), $skope_id = '' ) {
     if ( empty( $collection ) ) {
         if ( empty( $skope_id ) ) {
@@ -123,6 +124,123 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
 
 
 
+
+
+
+
+// @param module_type
+// walk the registered modules tree and generates the module default if not already cached
+// @return array;
+function sek_get_default_module_model( string $module_type ) {
+    $default = array();
+    // Did we already cache it ?
+    $default_models = SEK_Front()->default_models;
+    if ( ! empty( $default_models[ $module_type ] ) ) {
+        $default = $default_models[ $module_type ];
+    } else {
+        $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
+        //czr_fn\czr_register_dynamic_module
+        $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
+        if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
+            error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
+            return array();
+        }
+        $registered_modules = $CZR_Fmk_Base_fn() -> registered_modules;
+
+        // error_log('<registered_modules>');
+        // error_log( print_r( $registered_modules, true ) );
+        // error_log('</registered_modules>');
+        if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+        }
+
+        if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+        }
+        // Build
+        $module_tmpl_data = $registered_modules[ $module_type ][ 'tmpl' ];
+        $default = _sek_build_default_model( $module_tmpl_data );
+
+        // Cache
+        $default_models[ $module_type ] = $default;
+        SEK_Front()->default_models = $default_models;
+        // error_log('<$default_models>');
+        // error_log( print_r( $default_models, true ) );
+        // error_log('</$default_models>');
+    }
+
+    return $default;
+}
+
+// @return array() default model
+// Walk recursively the 'tmpl' property of the module
+// 'tmpl' => array(
+//     'pre-item' => array(
+//         'social-icon' => array(
+//             'input_type'  => 'select',
+//             'title'       => __('Select an icon', 'text_domain_to_be_replaced')
+//         ),
+//     ),
+//     'mod-opt' => array(
+//         'social-size' => array(
+//             'input_type'  => 'number',
+//             'title'       => __('Size in px', 'text_domain_to_be_replaced'),
+//             'step'        => 1,
+//             'min'         => 5,
+//             'transport' => 'postMessage'
+//         )
+//     ),
+//     'item-inputs' => array(
+//         'item-inputs' => array(
+                // 'tabs' => array(
+                //     array(
+                //         'title' => __('Content', 'text_domain_to_be_replaced'),
+                //         //'attributes' => 'data-sek-device="desktop"',
+                //         'inputs' => array(
+                //             'content' => array(
+                //                 'input_type'  => 'tiny_mce_editor',
+                //                 'title'       => __('Content', 'text_domain_to_be_replaced')
+                //             ),
+                //             'h_alignment_css' => array(
+                //                 'input_type'  => 'h_text_alignment',
+                //                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                //                 'default'     => is_rtl() ? 'right' : 'left',
+                //                 'refresh-markup' => false,
+                //                 'refresh-stylesheet' => true
+                //             )
+                //         )
+//         )
+//     )
+// )
+function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
+    $default_model = is_array( $default_model ) ? $default_model : array();
+    foreach( $module_tmpl_data as $key => $data ) {
+        if ( 'pre-item' == $key )
+          continue;
+        if ( array_key_exists( 'input_type', $data ) ) {
+            $default_model[ $key ] = array_key_exists( 'default', $data ) ? $data[ 'default' ] : '';
+        } else if ( is_array( $data ) ) {
+            $default_model = _sek_build_default_model( $data, $default_model );
+        }
+    }
+
+    return $default_model;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* HELPER FOR CHECKBOX OPTIONS */
 function sek_is_checked( $val ) {
     //cast to string if array
@@ -149,7 +267,7 @@ function sek_booleanize_checkbox_val( $val ) {
 }
 
 
-
+/* VARIOUS HELPERS */
 function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
     if ( ! $text )
         return '';
@@ -2268,10 +2386,22 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'default'     => 'featured'
                 ),
             ),
+            // 'mod-opt' => array(
+            //     // 'page-id' => array(
+            //     //     'input_type'  => 'content_picker',
+            //     //     'title'       => __('Pick a page', 'text_domain_to_be_replaced')
+            //     // ),
+            //     'mod_opt_test' => array(
+            //         'input_type'  => 'select',
+            //         'title'       => __('Display an image', 'text_domain_to_be_replaced'),
+            //         'default'     => 'featured'
+            //     ),
+            // ),
             'item-inputs' => array(
                 'page-id' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Pick a page', 'text_domain_to_be_replaced')
+                    'title'       => __('Pick a page', 'text_domain_to_be_replaced'),
+                    'default'     => ''
                 ),
                 'img-type' => array(
                     'input_type'  => 'select',
@@ -2280,7 +2410,8 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 ),
                 'img-id' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_domain_to_be_replaced')
+                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
+                    'default'     => ''
                 ),
                 'img-size' => array(
                     'input_type'  => 'select',
@@ -3377,6 +3508,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $local_seks = 'not_cached';// <= used to cache the sektions for the local skope_id
         public $model = array();//<= when rendering, the current level model
         public $parent_model = array();//<= when rendering, the current parent model
+        public $default_models = array();// <= will be populated and cached when invoking sek_get_default_module_model
         public $ajax_action_map = array();
 
         public static function sek_get_instance( $params ) {
