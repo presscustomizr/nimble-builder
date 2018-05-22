@@ -8,6 +8,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $local_seks = 'not_cached';// <= used to cache the sektions for the local skope_id
         public $model = array();//<= when rendering, the current level model
         public $parent_model = array();//<= when rendering, the current parent model
+        public $default_models = array();// <= will be populated and cached when invoking sek_get_default_module_model
         public $ajax_action_map = array();
 
         public static function sek_get_instance( $params ) {
