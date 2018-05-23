@@ -213,7 +213,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             $module_type = $model['module_type'];
             $render_tmpl_path = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
-            load_template( $render_tmpl_path, false );
+            if ( !empty( $render_tmpl_path ) ) {
+                load_template( $render_tmpl_path, false );
+            } else {
+                error_log( __FUNCTION__ . ' => no template found for module type ' . $module_type  );
+            }
 
             //$placeholder_icon = sek_get_registered_module_type_property( $module_type, 'placeholder_icon' );
 
