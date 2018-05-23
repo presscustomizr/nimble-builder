@@ -134,9 +134,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
             // Extract the default model values from the server localized registered module
+            // Invoked when registrating a module.
+            // For example :
+            // czr_image_module : {
+            //       mthds : ImageModuleConstructor,
+            //       crud : false,
+            //       name : 'Image',
+            //       has_mod_opt : false,
+            //       ready_on_section_expanded : true,
+            //       defaultItemModel : _.extend(
+            //             { id : '', title : '' },
+            //             api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_image_module' )
+            //       )
+            // },
             // @return {}
-            getDefaultItemModelFromRegisteredModuleData : function( moduleId ) {
-                  var data = sektionsLocalizedData.registeredModules[ moduleId ]['tmpl']['item-inputs'],
+            getDefaultItemModelFromRegisteredModuleData : function( moduleType ) {
+                  if ( ! this.isModuleRegistered( moduleType ) ) {
+                      return {};
+                  }
+                  var data = sektionsLocalizedData.registeredModules[ moduleType ]['tmpl']['item-inputs'],
                       defaultItemModem = {},
                       self = this;
 
@@ -156,6 +172,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   return defaultItemModem;
             },
+
+
+            // @return boolean
+            isModuleRegistered : function( moduleType ) {
+                  return sektionsLocalizedData.registeredModules && ! _.isUndefined( sektionsLocalizedData.registeredModules[ moduleType ] );
+            },
+
 
             // Walk the main sektion setting and populate an array of google fonts
             // This method is used when processing the 'sek-update-fonts' action to update the .fonts property
