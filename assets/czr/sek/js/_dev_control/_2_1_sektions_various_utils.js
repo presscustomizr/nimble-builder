@@ -215,6 +215,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @param level array || object
             getInputDefaultValue : function( input_id, module_type, level ) {
                   var self = this;
+
+                  // Do we have a cached default value ?
+                  self.cachedDefaultInputValues = self.cachedDefaultInputValues || {};
+                  self.cachedDefaultInputValues[ module_type ] = self.cachedDefaultInputValues[ module_type ] || {};
+                  if ( _.has( self.cachedDefaultInputValues[ module_type ], input_id ) ) {
+                        return self.cachedDefaultInputValues[ module_type ][ input_id ];
+                  }
+                  //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
                         api.errare( 'getInputDefaultValue => missing sektionsLocalizedData.registeredModules' );
                         return;
@@ -229,6 +237,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           return;
                         if ( input_id === _key_ && ! _.isUndefined( levelData.default ) ) {
                               _defaultVal_ = levelData.default;
+                              // cache it
+                              self.cachedDefaultInputValues[ module_type ][ input_id ] = _defaultVal_;
                         }
                         // if we have still no match, and the data are sniffable, let's go ahead recursively
                         if ( 'no_default_value_specified' === _defaultVal_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
@@ -236,6 +246,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   return _defaultVal_;
+            },
+
+            // @return the item(s) ( array of items if multi-item module ) that we should use when adding the module to the main setting
+            getModuleStartingValue : function( module_type ) {
+                  if ( ! sektionsLocalizedData.registeredModules ) {
+                        api.errare( 'getModuleStartingValue => missing sektionsLocalizedData.registeredModules' );
+                        return 'no_starting_value';
+                  }
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules[ module_type ] ) ) {
+                        api.errare( 'getModuleStartingValue => the module type ' + module_type + ' is not registered' );
+                        return 'no_starting_value';
+                  }
+                  var starting_value = sektionsLocalizedData.registeredModules[ module_type ][ 'starting_value' ];
+                  return _.isEmpty( starting_value ) ? 'no_starting_value' : starting_value;
             }
       });//$.extend()
 })( wp.customize, jQuery );

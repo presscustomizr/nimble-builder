@@ -74,7 +74,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               module_type : params.content_id,
                                               position : params.position
                                         };
-                                        return  self.updateAPISetting( apiParams );
+                                        return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
                                         api.previewer.trigger('sek-edit-module', {
@@ -82,6 +82,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               level : 'module',
                                               in_sektion : params.apiParams.in_sektion,
                                               in_column : params.apiParams.in_column
+                                        });
+                                        // always update the root fonts property after a module addition
+                                        // because there might be a google font specified in the starting value
+                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+
+                                        // Refresh the stylesheet to generate the css rules of the module
+                                        api.previewer.send( 'sek-refresh-stylesheet', {
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         });
                                   }
                             },
@@ -303,11 +311,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        switch( params.content_type) {
+                                        switch( params.apiParams.content_type) {
                                               case 'module' :
                                                     api.previewer.trigger('sek-edit-module', {
                                                           level : 'module',
                                                           id : params.apiParams.droppedModuleId
+                                                    });
+                                                    // always update the root fonts property after a module addition
+                                                    // because there might be a google font specified in the starting value
+                                                    self.updateAPISetting({ action : 'sek-update-fonts' } );
+
+                                                    // Refresh the stylesheet to generate the css rules of the module
+                                                    api.previewer.send( 'sek-refresh-stylesheet', {
+                                                          skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                     });
                                               break;
                                         }

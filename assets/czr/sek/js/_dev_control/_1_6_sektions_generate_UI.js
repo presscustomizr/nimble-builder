@@ -423,7 +423,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 1) mono-items and multi-items module => input change
             // 2) crud multi item => item added or removed => in this case some args are not passed, like params.settingParams.args.inputRegistrationParams
             updateAPISettingAndExecutePreviewActions : function( params ) {
-                  console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
+                  //console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
                   if ( _.isEmpty( params.settingParams ) || ! _.has( params.settingParams, 'to' ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.to. The api main setting can not be updated', params );
                         return;
@@ -439,7 +439,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       parentModuleType = null,
                       isMultiItemModule = false;
 
-                  console.log('module control => ', params.settingParams.args.moduleRegistrationParams.control );
+                  //console.log('module control => ', params.settingParams.args.moduleRegistrationParams.control );
                   if ( _.isEmpty( params.settingParams.args ) || ! _.has( params.settingParams.args, 'moduleRegistrationParams' ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.args.moduleRegistrationParams The api main setting can not be updated', params );
                         return;
@@ -452,6 +452,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( ! _.isEmpty( parentModuleInstance ) ) {
                         parentModuleType = parentModuleInstance.module_type;
                         isMultiItemModule = parentModuleInstance.isMultiItem();
+                  } else {
+                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing parentModuleInstance', params );
                   }
 
                   // @return {}
@@ -476,9 +478,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return itemCandidate;
                   };
 
+                  //console.log('updateAPISettingAndExecutePreviewActions => ', params.settingParams, isMultiItemModule, rawModuleValue,  _.isObject( rawModuleValue ) );
+
                   // The new module value can be an single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
-                  if ( ! isMultiItemModule && ! _.isObject( rawModuleValue ) ) {
+                  if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
                         moduleValueCandidate = normalizeSingleItemValue( rawModuleValue );
                   } else {
                         moduleValueCandidate = [];

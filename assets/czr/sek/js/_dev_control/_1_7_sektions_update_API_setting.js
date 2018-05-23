@@ -33,7 +33,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             originalCollection,
                             reorderedCollection,
                             //duplication variable
-                            cloneId; //will be passed in resolve()
+                            cloneId, //will be passed in resolve()
+                            startingModuleValue;// will be populated by the optional starting value specificied on module registration
 
                         // make sure we have a collection array to populate
                         newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.defaultSektionSettingValue.collection;
@@ -464,12 +465,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                     if ( 'no_match' != columnCandidate ) {
                                           columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                          var _insertionPosition = _.isEmpty( columnCandidate.collection ) ? 0 : params.position;
-                                          columnCandidate.collection.splice( _insertionPosition, 0, {
-                                                id : params.id,
-                                                level : 'module',
-                                                module_type : params.module_type
-                                          });
+                                          var _insertionPosition = _.isEmpty( columnCandidate.collection ) ? 0 : params.position,
+                                              _moduleParams = {
+                                                    id : params.id,
+                                                    level : 'module',
+                                                    module_type : params.module_type
+                                              };
+                                          // Let's add the starting value if provided when registrating the module
+                                          startingModuleValue = self.getModuleStartingValue( params.module_type );
+                                          if ( 'no_starting_value' !== startingModuleValue ) {
+                                                _moduleParams.value = startingModuleValue;
+                                          }
+                                          columnCandidate.collection.splice( _insertionPosition, 0, _moduleParams );
                                     } else {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
                                     }
@@ -681,6 +688,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     switch( params.content_type) {
                                           // When a module is dropped in a section + column structure to be generated
                                           case 'module' :
+                                                // Let's add the starting value if provided when registrating the module
+                                                // Note : params.content_id is the module_type
+                                                startingModuleValue = self.getModuleStartingValue( params.content_id );
+
                                                 // insert the section in the collection at the right place
                                                 locationCandidate.collection.splice( position, 0, {
                                                       id : params.id,
@@ -693,7 +704,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         {
                                                                               id : params.droppedModuleId,
                                                                               level : 'module',
-                                                                              module_type : params.content_id
+                                                                              module_type : params.content_id,
+                                                                              value : 'no_starting_value' !== startingModuleValue ? startingModuleValue : null
                                                                         }
                                                                   ]
                                                             }

@@ -7,7 +7,10 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_tiny_mce_editor_module',
-
+        'starting_value' => array(
+            'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.',
+            'font_family_css' => '[gfont]Ribeye:regular'
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -19,7 +22,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                         'inputs' => array(
                             'content' => array(
                                 'input_type'  => 'tiny_mce_editor',
-                                'title'       => __('Content', 'text_domain_to_be_replaced')
+                                'title'       => __('Content', 'text_domain_to_be_replaced'),
+                                'default'     => ''
                             ),
                             'h_alignment_css' => array(
                                 'input_type'  => 'h_text_alignment',
@@ -37,6 +41,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'font_family_css' => array(
                                 'input_type'  => 'font_picker',
                                 'title'       => __('Font family', 'text_domain_to_be_replaced'),
+                                'default'     => '',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true,
                                 'refresh-fonts' => true,
@@ -79,6 +84,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'text_transform_css'  => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Text transform', 'text_domain_to_be_replaced'),
+                                'default'     => 'none',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true
                             ),//null,
@@ -95,14 +101,18 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Text color', 'text_domain_to_be_replaced'),
+                                'default'     => '',
                                 'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh-stylesheet' => true,
+                                'width-100'   => true
                             ),//"#000000",
                             'color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced'),
+                                'default'     => '',
                                 'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh-stylesheet' => true,
+                                'width-100'   => true
                             ),//"#000000",
                             'important_css'       => array(
                                 'input_type'  => 'gutencheck',

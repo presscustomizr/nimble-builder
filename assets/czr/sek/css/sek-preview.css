@@ -97,6 +97,7 @@
   text-shadow: none;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
+  font-size: 1rem;
 }
 
 /*.sek-builder-col-resizing .sek-block-overlay-actions,
@@ -122,7 +123,7 @@
 /*  filter: alpha(opacity = 80);*/
   text-align: center;
   /*width: 32px !important;*/
-  width: 1.6em;
+  width: 1.7em;
 }
 
 .sek-block-overlay-actions i:hover {

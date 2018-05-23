@@ -305,7 +305,7 @@
                         //       api.errare( 'font_picker => fail response =>', _r_ );
                         // });
                         $.when( _getFontCollections() ).done( function( fontCollections ) {
-                              console.log('FONT COLLECTION ?', fontCollections );
+                              //console.log('FONT COLLECTION ?', fontCollections );
                               _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
                                     _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
                               });

@@ -22,8 +22,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // This is how we can listen here to 'sek-edit-module_done'
                   // The sek-edit-module is fired when clicking on a .sek-module wrapper @see ::scheduleUiClickReactions
                   self.bind( 'sek-edit-module_done', function( params ) {
-
-                        //console.log( 'setupTinyMceEditor => sek-edit-module_done', params );
                         if ( 'tiny_mce_editor' != params.clicked_input_type )
                           return;
 
@@ -69,6 +67,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // 1) make sure the editor is expanded
                   // 2) refresh the editor content with the input() one
                   api.sekEditorSynchronizedInput.bind( function( to, from ) {
+
                         api.sekTinyMceEditor = api.sekTinyMceEditor || tinyMCE.get( 'czr-customize-content_editor' );
 
                         if ( false === self.sekEditorBound ) {
@@ -228,26 +227,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // LISTEN TO USER DRAG ACTIONS => RESIZE EDITOR
-                  self.$editorDragbar.on( 'mousedown mouseup', function( evt ) {
-                        if ( ! api.sekEditorExpanded() )
-                          return;
-                        switch( evt.type ) {
-                              case 'mousedown' :
-                                    $( document ).on( 'mousemove.czr-customize-content_editor', function( event ) {
-                                          event.preventDefault();
-                                          $( document.body ).addClass( 'czr-customize-content_editor-pane-resize' );
-                                          self.$editorFrame.css( 'pointer-events', 'none' );
-                                          self.czrResizeEditor( event.pageY );
-                                    });
-                              break;
+                  // self.$editorDragbar.on( 'mousedown mouseup', function( evt ) {
+                  //       if ( ! api.sekEditorExpanded() )
+                  //         return;
+                  //       switch( evt.type ) {
+                  //             case 'mousedown' :
+                  //                   $( document ).on( 'mousemove.czr-customize-content_editor', function( event ) {
+                  //                         event.preventDefault();
+                  //                         $( document.body ).addClass( 'czr-customize-content_editor-pane-resize' );
+                  //                         self.$editorFrame.css( 'pointer-events', 'none' );
+                  //                         self.czrResizeEditor( event.pageY );
+                  //                   });
+                  //             break;
 
-                              case 'mouseup' :
-                                    $( document ).off( 'mousemove.czr-customize-content_editor' );
-                                    $( document.body ).removeClass( 'czr-customize-content_editor-pane-resize' );
-                                    self.$editorFrame.css( 'pointer-events', '' );
-                              break;
-                        }
-                  });
+                  //             case 'mouseup' :
+                  //                   $( document ).off( 'mousemove.czr-customize-content_editor' );
+                  //                   $( document.body ).removeClass( 'czr-customize-content_editor-pane-resize' );
+                  //                   self.$editorFrame.css( 'pointer-events', '' );
+                  //             break;
+                  //       }
+                  // });
             },
 
 
