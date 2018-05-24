@@ -31,7 +31,7 @@
 .sek-module h4 { color:red;}
 
 
-.sek-column-wrapper{
+.sek-sektion-inner{
     padding: 20px;
 }
 .sek-add-button-wrapper {
@@ -391,7 +391,7 @@
 
 /* SORTABLE */
 .sortable-placeholder {
-  animation: sortable-placeholder-pulse 2s infinite;
+  /*width: 100%;*/
   background: #00A2D7;
   border-radius: 4px;
   color: #fff !important;
@@ -409,19 +409,8 @@
   text-shadow: none;
   text-transform: none;
   white-space: nowrap;
-    overflow: hidden;
-    z-index: 10;
-}
-@keyframes sortable-placeholder-pulse {
-  0% {
-    background-color: #00A2D7;
-  }
-  50% {
-    background-color: #79DEFF;
-  }
-  100% {
-    background-color: #00A2D7;
-  }
+  overflow: hidden;
+  z-index: 10;
 }
 
 

@@ -112,14 +112,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                 case 'section' :
                     $is_nested            = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
-                    $column_wrapper_class = 'sek-container-fluid';
+                    $column_container_class = 'sek-container-fluid';
                     //when boxed use proper container class
                     if ( ! empty( $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) {
-                      $column_wrapper_class = 'sek-container';
+                      $column_container_class = 'sek-container';
                     }
                     ?>
                     <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section">', $id, $is_nested ? 'data-sek-is-nested="true"' : '' ); ?>
-                          <div class="<?php echo $column_wrapper_class ?> sek-column-wrapper">
+                          <div class="<?php echo $column_container_class ?>">
                             <div class="sek-row sek-sektion-inner">
                                 <?php
                                   // Set the parent model now
@@ -154,31 +154,29 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               empty( $collection ) ? 'data-sek-no-modules="true"' : ''
                           );
                       ?>
-                          <div class="sek-module-wrapper">
-                            <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
-                                <?php
-                                  if ( empty( $collection ) ) {
-                                      ?>
-                                      <div class="sek-no-modules-column">
-                                        <div class="sek-module-drop-zone-for-first-module">
-                                          <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="Add Module"></i>
-                                        </div>
-                                      </div>
-                                      <?php
-                                  } else {
-                                      // Set the parent model now
-                                      $this -> parent_model = $model;
-                                      foreach ( $collection as $module_or_nested_section_model ) {
-                                          ?>
-                                          <?php
-                                          $this -> render( $module_or_nested_section_model );
-                                      }
+                        <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
+                            <?php
+                              if ( empty( $collection ) ) {
+                                  ?>
+                                  <div class="sek-no-modules-column">
+                                    <div class="sek-module-drop-zone-for-first-module">
+                                      <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="Add Module"></i>
+                                    </div>
+                                  </div>
+                                  <?php
+                              } else {
+                                  // Set the parent model now
+                                  $this -> parent_model = $model;
+                                  foreach ( $collection as $module_or_nested_section_model ) {
                                       ?>
                                       <?php
+                                      $this -> render( $module_or_nested_section_model );
                                   }
-                                ?>
-                            </div>
-                          </div>
+                                  ?>
+                                  <?php
+                              }
+                            ?>
+                        </div>
                       </div>
                     <?php
                 break;
