@@ -8,8 +8,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
         'dynamic_registration' => true,
         'module_type' => 'czr_tiny_mce_editor_module',
         'starting_value' => array(
-            'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.',
-            'font_family_css' => '[gfont]Ribeye:regular'
+            'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
         ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',

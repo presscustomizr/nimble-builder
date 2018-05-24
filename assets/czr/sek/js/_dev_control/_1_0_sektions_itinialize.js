@@ -197,7 +197,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Clear all previous sektions if we're coming from a previousSkopes
                   if ( ! _.isEmpty( previousSkopes.local ) ) {
-                        api.previewer.trigger('sek-pick-section');
+                        //api.previewer.trigger('sek-pick-section');
+                        api.previewer.trigger('sek-pick-module');
                   }
 
                   // set the sekCollectionSettingId now, and update it on skope change

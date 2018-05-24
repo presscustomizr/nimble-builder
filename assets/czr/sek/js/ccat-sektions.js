@@ -197,7 +197,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Clear all previous sektions if we're coming from a previousSkopes
                   if ( ! _.isEmpty( previousSkopes.local ) ) {
-                        api.previewer.trigger('sek-pick-section');
+                        //api.previewer.trigger('sek-pick-section');
+                        api.previewer.trigger('sek-pick-module');
                   }
 
                   // set the sekCollectionSettingId now, and update it on skope change
@@ -642,7 +643,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               module_type : params.content_id,
                                               position : params.position
                                         };
-                                        return  self.updateAPISetting( apiParams );
+                                        return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
                                         api.previewer.trigger('sek-edit-module', {
@@ -650,6 +651,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               level : 'module',
                                               in_sektion : params.apiParams.in_sektion,
                                               in_column : params.apiParams.in_column
+                                        });
+                                        // always update the root fonts property after a module addition
+                                        // because there might be a google font specified in the starting value
+                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+
+                                        // Refresh the stylesheet to generate the css rules of the module
+                                        api.previewer.send( 'sek-refresh-stylesheet', {
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         });
                                   }
                             },
@@ -871,11 +880,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        switch( params.content_type) {
+                                        switch( params.apiParams.content_type) {
                                               case 'module' :
                                                     api.previewer.trigger('sek-edit-module', {
                                                           level : 'module',
                                                           id : params.apiParams.droppedModuleId
+                                                    });
+                                                    // always update the root fonts property after a module addition
+                                                    // because there might be a google font specified in the starting value
+                                                    self.updateAPISetting({ action : 'sek-update-fonts' } );
+
+                                                    // Refresh the stylesheet to generate the css rules of the module
+                                                    api.previewer.send( 'sek-refresh-stylesheet', {
+                                                          skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                     });
                                               break;
                                         }
@@ -1322,14 +1339,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         case 'sek-generate-level-options-ui' :
                               // Generate the UI for level options
-
-                              var layoutBgBorderOptionsSetId = params.id + '__layoutBgBorder_options',
+                              console.log("PARAMS IN sek-generate-level-options-ui", params );
+                              var bgBorderOptionsSetId = params.id + '__bgBorder_options',
+                                  layoutHeightOptionsSetId = params.id + '__layoutHeight_options',
                                   spacingOptionsSetId = params.id + '__spacing_options';
 
                               // Is the UI currently displayed the one that is being requested ?
-                              // If so, don't generate the ui again, imply focus on it
-                              if ( self.isUIElementCurrentlyGenerated( layoutBgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
-                                    api.control( layoutBgBorderOptionsSetId ).focus({
+                              // If so, don't generate the ui again, simply focus on it
+                              if ( self.isUIElementCurrentlyGenerated( bgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( layoutHeightOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
+                                    api.control( bgBorderOptionsSetId ).focus({
                                           completeCallback : function() {}
                                     });
                                     break;
@@ -1345,19 +1363,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   });
                               optionDBValue = _.isObject( optionDBValue ) ? optionDBValue : {};
                               _do_register_ = function() {
-                                    // REGISTER LAYOUT BACKGROUND BORDER OPTIONS
+                                    // REGISTER BACKGROUND BORDER OPTIONS
                                     // Make sure this setting is bound only once !
-                                    if( ! api.has( layoutBgBorderOptionsSetId ) ) {
+                                    if( ! api.has( bgBorderOptionsSetId ) ) {
                                           // Schedule the binding to synchronize the options with the main collection setting
                                           // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
-                                          api( layoutBgBorderOptionsSetId, function( _setting_ ) {
+                                          api( bgBorderOptionsSetId, function( _setting_ ) {
                                                 _setting_.bind( _.debounce( function( to, from, args ) {
                                                       try { self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_stylesheet',
                                                             uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
-                                                            options_type : 'layout_background_border',
+                                                            options_type : 'bg_border',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
                                                             settingParams : {
                                                                   to : to,
                                                                   from : from,
@@ -1367,38 +1385,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
                                                       }
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
-                                          });//api( layoutBgBorderOptionsSetId, function( _setting_ ) {})
+                                          });//api( bgBorderOptionsSetId, function( _setting_ ) {})
 
 
                                           self.register( {
                                                 level : params.level,
                                                 what : 'setting',
-                                                id : layoutBgBorderOptionsSetId,
+                                                id : bgBorderOptionsSetId,
                                                 dirty : false,
-                                                value : optionDBValue.lbb || {},
+                                                value : optionDBValue.bg_border || {},
                                                 transport : 'postMessage',// 'refresh',
                                                 type : '_no_intended_to_be_saved_' //sekData.settingType
                                           });
-                                    }//if( ! api.has( layoutBgBorderOptionsSetId ) ) {
+                                    }//if( ! api.has( bgBorderOptionsSetId ) ) {
 
                                     self.register( {
                                           level : params.level,
                                           level_id : params.id,
                                           what : 'control',
-                                          id : layoutBgBorderOptionsSetId,
-                                          label : '@missi18n Layout Background and Border',
+                                          id : bgBorderOptionsSetId,
+                                          label : '@missi18n Background and Border',
                                           type : 'czr_module',//sekData.controlType,
-                                          module_type : 'sek_level_layout_bg_module',
+                                          module_type : 'sek_level_bg_border_module',
                                           section : params.id,
                                           priority : 10,
-                                          settings : { default : layoutBgBorderOptionsSetId }
+                                          settings : { default : bgBorderOptionsSetId }
                                     }).done( function() {
-                                          api.control( layoutBgBorderOptionsSetId ).focus({
+                                          api.control( bgBorderOptionsSetId ).focus({
                                                 completeCallback : function() {}
                                           });
                                     });
-
-
 
 
                                     // REGISTER SPAGING OPTIONS
@@ -1413,7 +1429,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       try { self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_stylesheet',
                                                             uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
-                                                            options_type : 'spacing',
+                                                            options_type : 'spacing',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
                                                             settingParams : {
                                                                   to : to,
                                                                   from : from,
@@ -1423,7 +1439,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
                                                       }
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
-                                          });//api( layoutBgBorderOptionsSetId, function( _setting_ ) {})
+                                          });//api( spacingOptionsSetId, function( _setting_ ) {})
 
 
                                           self.register( {
@@ -1455,6 +1471,63 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 completeCallback : function() {}
                                           });
                                     });
+
+
+
+                                    // REGISTER SECTION LAYOUT AND HEIGHT OPTIONS
+                                    // Make sure this setting is bound only once !
+                                    if( ! api.has( layoutHeightOptionsSetId ) ) {
+                                          // Schedule the binding to synchronize the options with the main collection setting
+                                          // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
+                                          // They need to be kept in order to keep track of the changes in the customizer.
+                                          // => that's why we check if ! api.has( ... )
+                                          api( layoutHeightOptionsSetId, function( _setting_ ) {
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      try { self.updateAPISettingAndExecutePreviewActions({
+                                                            defaultPreviewAction : 'refresh_stylesheet',
+                                                            uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                            options_type : 'layout_height',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
+                                                            settingParams : {
+                                                                  to : to,
+                                                                  from : from,
+                                                                  args : args
+                                                            }
+                                                      }); } catch( er ) {
+                                                            api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                                      }
+                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          });//api( layoutHeightOptionsSetId, function( _setting_ ) {})
+
+
+                                          self.register( {
+                                                level : params.level,
+                                                what : 'setting',
+                                                id : layoutHeightOptionsSetId,
+                                                dirty : false,
+                                                value : optionDBValue.layout_height || {},
+                                                transport : 'postMessage',// 'refresh',
+                                                type : '_no_intended_to_be_saved_' //sekData.settingType
+                                          });
+                                    }//if( ! api.has( layoutHeightOptionsSetId ) ) {
+
+                                    self.register( {
+                                          level : params.level,
+                                          level_id : params.id,
+                                          what : 'control',
+                                          id : layoutHeightOptionsSetId,
+                                          label : '@missi18n Layout and Height',
+                                          type : 'czr_module',//sekData.controlType,
+                                          module_type : 'sek_level_section_layout_height_module',
+                                          section : params.id,
+                                          priority : 10,
+                                          settings : { default : layoutHeightOptionsSetId }
+                                    }).done( function() {
+                                          api.control( layoutHeightOptionsSetId ).focus({
+                                                completeCallback : function() {}
+                                          });
+                                    });
+
+
                               };//_do_register_
 
                               // Defer the registration when the parent section gets added to the api
@@ -1483,7 +1556,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // This method
             // @params = {
             //     uiParams : params,
-            //     options_type : 'layout_background_border',
+            //     options_type : 'spacing',
             //     settingParams : {
             //           to : to,
             //           from : from,
@@ -1515,7 +1588,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 1) mono-items and multi-items module => input change
             // 2) crud multi item => item added or removed => in this case some args are not passed, like params.settingParams.args.inputRegistrationParams
             updateAPISettingAndExecutePreviewActions : function( params ) {
-                  console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
+                  //console.log('PARAMS in updateAPISettingAndExecutePreviewActions', params );
                   if ( _.isEmpty( params.settingParams ) || ! _.has( params.settingParams, 'to' ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.to. The api main setting can not be updated', params );
                         return;
@@ -1531,7 +1604,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       parentModuleType = null,
                       isMultiItemModule = false;
 
-                  console.log('module control => ', params.settingParams.args.moduleRegistrationParams.control );
+                  //console.log('module control => ', params.settingParams.args.moduleRegistrationParams.control );
                   if ( _.isEmpty( params.settingParams.args ) || ! _.has( params.settingParams.args, 'moduleRegistrationParams' ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.args.moduleRegistrationParams The api main setting can not be updated', params );
                         return;
@@ -1544,6 +1617,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( ! _.isEmpty( parentModuleInstance ) ) {
                         parentModuleType = parentModuleInstance.module_type;
                         isMultiItemModule = parentModuleInstance.isMultiItem();
+                  } else {
+                        api.errare( 'updateAPISettingAndExecutePreviewActions => missing parentModuleInstance', params );
                   }
 
                   // @return {}
@@ -1568,9 +1643,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return itemCandidate;
                   };
 
+                  //console.log('updateAPISettingAndExecutePreviewActions => ', params.settingParams, isMultiItemModule, rawModuleValue,  _.isObject( rawModuleValue ) );
+
                   // The new module value can be an single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
-                  if ( ! isMultiItemModule && ! _.isObject( rawModuleValue ) ) {
+                  if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
                         moduleValueCandidate = normalizeSingleItemValue( rawModuleValue );
                   } else {
                         moduleValueCandidate = [];
@@ -1616,7 +1693,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               in_sektion : params.uiParams.in_sektion,
 
                               // specific for level options
-                              options_type : params.options_type,//'spacing', 'layout_background_border'
+                              options_type : params.options_type,//'spacing', 'bg_border', 'layout_height'
 
                         }).done( function( ) {
                               // STYLESHEET => default action when modifying the level options
@@ -1745,7 +1822,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             originalCollection,
                             reorderedCollection,
                             //duplication variable
-                            cloneId; //will be passed in resolve()
+                            cloneId, //will be passed in resolve()
+                            startingModuleValue;// will be populated by the optional starting value specificied on module registration
 
                         // make sure we have a collection array to populate
                         newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.defaultSektionSettingValue.collection;
@@ -2176,12 +2254,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                     if ( 'no_match' != columnCandidate ) {
                                           columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                          var _insertionPosition = _.isEmpty( columnCandidate.collection ) ? 0 : params.position;
-                                          columnCandidate.collection.splice( _insertionPosition, 0, {
-                                                id : params.id,
-                                                level : 'module',
-                                                module_type : params.module_type
-                                          });
+                                          var _insertionPosition = _.isEmpty( columnCandidate.collection ) ? 0 : params.position,
+                                              _moduleParams = {
+                                                    id : params.id,
+                                                    level : 'module',
+                                                    module_type : params.module_type
+                                              };
+                                          // Let's add the starting value if provided when registrating the module
+                                          startingModuleValue = self.getModuleStartingValue( params.module_type );
+                                          if ( 'no_starting_value' !== startingModuleValue ) {
+                                                _moduleParams.value = startingModuleValue;
+                                          }
+                                          columnCandidate.collection.splice( _insertionPosition, 0, _moduleParams );
                                     } else {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
                                     }
@@ -2340,10 +2424,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
                                     }
                                     switch( params.options_type ) {
-                                          case 'layout_background_border' :
-                                                _candidate_.options.lbb = _valueCandidate;
+                                          case 'bg_border' :
+                                                _candidate_.options.bg_border = _valueCandidate;
                                           break;
-
+                                          case 'layout_height' :
+                                                _candidate_.options.layout_height = _valueCandidate;
+                                          break;
                                           case 'spacing' :
                                                 _candidate_.options.spacing = _valueCandidate;
                                           break;
@@ -2393,6 +2479,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     switch( params.content_type) {
                                           // When a module is dropped in a section + column structure to be generated
                                           case 'module' :
+                                                // Let's add the starting value if provided when registrating the module
+                                                // Note : params.content_id is the module_type
+                                                startingModuleValue = self.getModuleStartingValue( params.content_id );
+
                                                 // insert the section in the collection at the right place
                                                 locationCandidate.collection.splice( position, 0, {
                                                       id : params.id,
@@ -2405,7 +2495,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         {
                                                                               id : params.droppedModuleId,
                                                                               level : 'module',
-                                                                              module_type : params.content_id
+                                                                              module_type : params.content_id,
+                                                                              value : 'no_starting_value' !== startingModuleValue ? startingModuleValue : null
                                                                         }
                                                                   ]
                                                             }
@@ -2868,9 +2959,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
             // Extract the default model values from the server localized registered module
+            // Invoked when registrating a module.
+            // For example :
+            // czr_image_module : {
+            //       mthds : ImageModuleConstructor,
+            //       crud : false,
+            //       name : 'Image',
+            //       has_mod_opt : false,
+            //       ready_on_section_expanded : true,
+            //       defaultItemModel : _.extend(
+            //             { id : '', title : '' },
+            //             api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_image_module' )
+            //       )
+            // },
             // @return {}
-            getDefaultItemModelFromRegisteredModuleData : function( moduleId ) {
-                  var data = sektionsLocalizedData.registeredModules[ moduleId ]['tmpl']['item-inputs'],
+            getDefaultItemModelFromRegisteredModuleData : function( moduleType ) {
+                  if ( ! this.isModuleRegistered( moduleType ) ) {
+                      return {};
+                  }
+                  var data = sektionsLocalizedData.registeredModules[ moduleType ]['tmpl']['item-inputs'],
                       defaultItemModem = {},
                       self = this;
 
@@ -2890,6 +2997,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   return defaultItemModem;
             },
+
+
+            // @return boolean
+            isModuleRegistered : function( moduleType ) {
+                  return sektionsLocalizedData.registeredModules && ! _.isUndefined( sektionsLocalizedData.registeredModules[ moduleType ] );
+            },
+
 
             // Walk the main sektion setting and populate an array of google fonts
             // This method is used when processing the 'sek-update-fonts' action to update the .fonts property
@@ -2926,6 +3040,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @param level array || object
             getInputDefaultValue : function( input_id, module_type, level ) {
                   var self = this;
+
+                  // Do we have a cached default value ?
+                  self.cachedDefaultInputValues = self.cachedDefaultInputValues || {};
+                  self.cachedDefaultInputValues[ module_type ] = self.cachedDefaultInputValues[ module_type ] || {};
+                  if ( _.has( self.cachedDefaultInputValues[ module_type ], input_id ) ) {
+                        return self.cachedDefaultInputValues[ module_type ][ input_id ];
+                  }
+                  //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
                         api.errare( 'getInputDefaultValue => missing sektionsLocalizedData.registeredModules' );
                         return;
@@ -2940,6 +3062,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           return;
                         if ( input_id === _key_ && ! _.isUndefined( levelData.default ) ) {
                               _defaultVal_ = levelData.default;
+                              // cache it
+                              self.cachedDefaultInputValues[ module_type ][ input_id ] = _defaultVal_;
                         }
                         // if we have still no match, and the data are sniffable, let's go ahead recursively
                         if ( 'no_default_value_specified' === _defaultVal_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
@@ -2947,6 +3071,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   return _defaultVal_;
+            },
+
+            // @return the item(s) ( array of items if multi-item module ) that we should use when adding the module to the main setting
+            getModuleStartingValue : function( module_type ) {
+                  if ( ! sektionsLocalizedData.registeredModules ) {
+                        api.errare( 'getModuleStartingValue => missing sektionsLocalizedData.registeredModules' );
+                        return 'no_starting_value';
+                  }
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules[ module_type ] ) ) {
+                        api.errare( 'getModuleStartingValue => the module type ' + module_type + ' is not registered' );
+                        return 'no_starting_value';
+                  }
+                  var starting_value = sektionsLocalizedData.registeredModules[ module_type ][ 'starting_value' ];
+                  return _.isEmpty( starting_value ) ? 'no_starting_value' : starting_value;
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
@@ -3681,7 +3819,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       api.errare( 'font_picker => fail response =>', _r_ );
                         // });
                         $.when( _getFontCollections() ).done( function( fontCollections ) {
-                              console.log('FONT COLLECTION ?', fontCollections );
+                              //console.log('FONT COLLECTION ?', fontCollections );
                               _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
                                     _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
                               });
@@ -3718,8 +3856,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // This is how we can listen here to 'sek-edit-module_done'
                   // The sek-edit-module is fired when clicking on a .sek-module wrapper @see ::scheduleUiClickReactions
                   self.bind( 'sek-edit-module_done', function( params ) {
-
-                        //console.log( 'setupTinyMceEditor => sek-edit-module_done', params );
                         if ( 'tiny_mce_editor' != params.clicked_input_type )
                           return;
 
@@ -3765,6 +3901,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // 1) make sure the editor is expanded
                   // 2) refresh the editor content with the input() one
                   api.sekEditorSynchronizedInput.bind( function( to, from ) {
+
                         api.sekTinyMceEditor = api.sekTinyMceEditor || tinyMCE.get( 'czr-customize-content_editor' );
 
                         if ( false === self.sekEditorBound ) {
@@ -3924,26 +4061,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // LISTEN TO USER DRAG ACTIONS => RESIZE EDITOR
-                  self.$editorDragbar.on( 'mousedown mouseup', function( evt ) {
-                        if ( ! api.sekEditorExpanded() )
-                          return;
-                        switch( evt.type ) {
-                              case 'mousedown' :
-                                    $( document ).on( 'mousemove.czr-customize-content_editor', function( event ) {
-                                          event.preventDefault();
-                                          $( document.body ).addClass( 'czr-customize-content_editor-pane-resize' );
-                                          self.$editorFrame.css( 'pointer-events', 'none' );
-                                          self.czrResizeEditor( event.pageY );
-                                    });
-                              break;
+                  // self.$editorDragbar.on( 'mousedown mouseup', function( evt ) {
+                  //       if ( ! api.sekEditorExpanded() )
+                  //         return;
+                  //       switch( evt.type ) {
+                  //             case 'mousedown' :
+                  //                   $( document ).on( 'mousemove.czr-customize-content_editor', function( event ) {
+                  //                         event.preventDefault();
+                  //                         $( document.body ).addClass( 'czr-customize-content_editor-pane-resize' );
+                  //                         self.$editorFrame.css( 'pointer-events', 'none' );
+                  //                         self.czrResizeEditor( event.pageY );
+                  //                   });
+                  //             break;
 
-                              case 'mouseup' :
-                                    $( document ).off( 'mousemove.czr-customize-content_editor' );
-                                    $( document.body ).removeClass( 'czr-customize-content_editor-pane-resize' );
-                                    self.$editorFrame.css( 'pointer-events', '' );
-                              break;
-                        }
-                  });
+                  //             case 'mouseup' :
+                  //                   $( document ).off( 'mousemove.czr-customize-content_editor' );
+                  //                   $( document.body ).removeClass( 'czr-customize-content_editor-pane-resize' );
+                  //                   self.$editorFrame.css( 'pointer-events', '' );
+                  //             break;
+                  //       }
+                  // });
             },
 
 
@@ -4015,20 +4152,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize, jQuery );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var LevelBackgroundModuleConstructor = {
+      var Constructor = {
             initialize: function( id, options ) {
                   //console.log('INITIALIZING SEKTION OPTIONS', id, options );
                   var module = this;
-                  //run the parent initialize
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
 
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRLBBInputMths || {} );
+                  module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+
+                  //run the parent initialize
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
-            CZRLBBInputMths : {
+            CZRInputMths : {
                     setupSelect : function() {
                             var input  = this,
                                   item   = input.input_parent,
@@ -4036,7 +4174,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   _options_ = {};
 
                             if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in lbb module');
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.module_type );
                                   return;
                             } else {
                                   //generates the options
@@ -4055,7 +4193,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   $( 'select[data-czrtype]', input.container ).selecter();
                             }
                     },
-            },//CZRLBBInputMths
+            },//CZRInputMths
 
             // CZRSocialsItem : { },//CZRSocialsItem
       };
@@ -4071,15 +4209,86 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            sek_level_layout_bg_module : {
-                  mthds : LevelBackgroundModuleConstructor,
+            sek_level_bg_border_module : {
+                  mthds : Constructor,
                   crud : false,
-                  name : 'Layout Background Border Options',
+                  name : 'Background Border Options',
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_layout_bg_module' )
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_bg_border_module' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                  module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
+                  //run the parent initialize
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+            },//initialize
+
+            CZRInputMths : {
+                    setupSelect : function() {
+                            var input  = this,
+                                  item   = input.input_parent,
+                                  module = input.module,
+                                  _options_ = {};
+
+                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.module_type );
+                                  return;
+                            } else {
+                                  //generates the options
+                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
+                                        var _attributes = {
+                                                  value : value,
+                                                  html: title
+                                            };
+                                        if ( value == input() ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        } else if ( 'px' === value ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        }
+                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                  });
+                                  $( 'select[data-czrtype]', input.container ).selecter();
+                            }
+                    },
+            },//CZRInputMths
+
+            // CZRSocialsItem : { },//CZRSocialsItem
+      };
+
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_level_section_layout_height_module : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : 'Layout Height Options',
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_section_layout_height_module' )
                   )
             },
       });
@@ -4215,55 +4424,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                 });
                 api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'module', input_container : input.container } );
                 //console.log( this.id, input_options );
-            }
-      });
-})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
-( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
-      api.czrModuleMap = api.czrModuleMap || {};
-      $.extend( api.czrModuleMap, {
-            sek_section_picker_module : {
-                  //mthds : SectionPickerModuleConstructor,
-                  crud : false,
-                  name : 'Section Picker',
-                  has_mod_opt : false,
-                  ready_on_section_expanded : true,
-                  defaultItemModel : _.extend(
-                        { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_section_picker_module' )
-                  )
-            },
-      });
-
-      api.czrInputMap = api.czrInputMap || {};
-      //input_type => callback fn to fire in the Input constructor on initialize
-      //the callback can receive specific params define in each module constructor
-      //For example, a content picker can be given params to display only taxonomies
-      $.extend( api.czrInputMap, {
-            section_picker : function( input_options ) {
-                  var input = this;
-                  // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
-                  input.container.find('[draggable]').each( function() {
-                        $(this).on( 'mousedown mouseup', function( evt ) {
-                              switch( evt.type ) {
-                                    case 'mousedown' :
-                                          $(this).addClass('sek-grabbing');
-                                    break;
-                                    case 'mouseup' :
-                                          $(this).removeClass('sek-grabbing');
-                                    break;
-                              }
-                        });
-                  });
-                  api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
@@ -4428,122 +4588,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_tiny_mce_editor_module' )
-                  )
-            },
-      });
-})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
-( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
-      api.czrModuleMap = api.czrModuleMap || {};
-      $.extend( api.czrModuleMap, {
-            czr_simple_html_module : {
-                  //mthds : SimpleHtmlModuleConstructor,
-                  crud : false,
-                  name : 'Simple Html',
-                  has_mod_opt : false,
-                  ready_on_section_expanded : true,
-                  defaultItemModel : _.extend(
-                        { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_html_module' )
-                  )
-            },
-      });
-})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
-( function ( api, $, _ ) {
-      var FeaturedPagesConstruct = {
-            initialize: function( id, options ) {
-                    //console.log('INITIALIZING IMAGE MODULE', id, options );
-                    var module = this;
-                    //run the parent initialize
-                    api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                    module.inputConstructor = api.CZRInput.extend( module.CZRFPInputsMths || {} );
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                    // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
-
-                    //SET THE CONTENT PICKER DEFAULT OPTIONS
-                    //@see ::setupContentPicker()
-                    // module.bind( 'set_default_content_picker_options', function( params ) {
-                    //       params.defaultContentPickerOption.defaultOption = {
-                    //             'title'      : '<span style="font-weight:bold">@missi18n Set a custom url</span>',
-                    //             'type'       : '',
-                    //             'type_label' : '',
-                    //             'object'     : '',
-                    //             'id'         : '_custom_',
-                    //             'url'        : ''
-                    //       };
-                    //       return params;
-                    // });
-            },//initialize
-
-            CZRFPInputsMths : {
-                    // initialize : function( name, options ) {
-                    //       var input = this;
-                    //       api.CZRInput.prototype.initialize.call( input, name, options );
-                    // },
-
-                    setupSelect : function() {
-                            var input  = this,
-                                  item   = input.input_parent,
-                                  module = input.module,
-                                  _options_ = {};
-
-                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in featured pages module');
-                                  return;
-                            } else {
-                                  //generates the options
-                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
-                                        var _attributes = {
-                                                  value : value,
-                                                  html: title
-                                            };
-                                        if ( value == input() ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        } else if ( 'px' === value ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        }
-                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                  });
-                                  $( 'select[data-czrtype]', input.container ).selecter();
-                            }
-                    }
-            },//CZRFPInputsMths
-
-            // CZRSocialsItem : { },//CZRSocialsItem
-      };//FeaturedPagesConstruct
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
-      api.czrModuleMap = api.czrModuleMap || {};
-      $.extend( api.czrModuleMap, {
-            czr_featured_pages_module : {
-                  mthds : FeaturedPagesConstruct,
-                  crud : true,
-                  hasPreItem : false,//a crud module has a pre item by default
-                  refresh_on_add_item : false,// the preview is refreshed on item add
-                  name : 'Featured Pages',
-                  has_mod_opt : false,
-                  ready_on_section_expanded : true,
-                  defaultItemModel : _.extend(
-                        { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_featured_pages_module' )
                   )
             },
       });

@@ -11,14 +11,15 @@ function sek_register_modules() {
     }
 
     foreach( [
-       'sek_module_picker_module',
-       'sek_section_picker_module',
-       'sek_level_layout_bg_module',
-       'sek_spacing_module',
-       'czr_simple_html_module',
-       'czr_tiny_mce_editor_module',
-       'czr_image_module',
-       'czr_featured_pages_module'
+        'sek_module_picker_module',
+        //'sek_section_picker_module',
+        'sek_level_bg_border_module',
+        'sek_level_section_layout_height_module',
+        'sek_spacing_module',
+        //'czr_simple_html_module',
+        'czr_tiny_mce_editor_module',
+        'czr_image_module',
+        //'czr_featured_pages_module'
     ] as $module_name ) {
         $fn = "sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {

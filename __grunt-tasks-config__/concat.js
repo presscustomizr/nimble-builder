@@ -185,13 +185,14 @@ module.exports = {
       // MODULE REGISTRATION
       '<%= paths.sektions %>_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php',
       '<%= paths.sektions %>_dev_php/module_registration/4_0_1_sek_register_module_picker.php',
-      '<%= paths.sektions %>_dev_php/module_registration/4_0_2_sek_register_section_picker.php',
-      '<%= paths.sektions %>_dev_php/module_registration/4_0_3_sek_register_layout_background_border.php',
+      //'<%= paths.sektions %>_dev_php/module_registration/4_0_2_sek_register_section_picker.php',
+      '<%= paths.sektions %>_dev_php/module_registration/4_0_3_sek_register_background_border.php',
+      '<%= paths.sektions %>_dev_php/module_registration/4_0_3_sek_register_section_layout_height.php',
       '<%= paths.sektions %>_dev_php/module_registration/4_0_4_sek_register_spacing.php',
-      '<%= paths.sektions %>_dev_php/module_registration/4_0_5_sek_register_simple_html.php',
+      //'<%= paths.sektions %>_dev_php/module_registration/4_0_5_sek_register_simple_html.php',
       '<%= paths.sektions %>_dev_php/module_registration/4_0_6_sek_register_tiny_mce_editor.php',
       '<%= paths.sektions %>_dev_php/module_registration/4_0_7_sek_register_image.php',
-      '<%= paths.sektions %>_dev_php/module_registration/4_0_8_sek_register_featured_pages.php',
+      //'<%= paths.sektions %>_dev_php/module_registration/4_0_8_sek_register_featured_pages.php',
 
       // DYN CSS
       '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_1_class-sek-dyn-css-builder.php',
@@ -225,15 +226,16 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_7_1_sektions_tinyMceEditor.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_8_0_sektions_instantiate.js',
 
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_layout_bg_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_bg_border_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_layout_height_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_1_UI_spacing.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_2_UI_module_picker.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_3_UI_section_picker.js',
+      //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_3_UI_section_picker.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_1_FRONT_tiny_mce_editor.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_2_FRONT_simple_html.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_3_FRONT_featured_pages.js'
+      //'<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_2_FRONT_simple_html.js',
+      //'<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_3_FRONT_featured_pages.js'
     ],
     dest: '<%= paths.czr_assets %>sek/js/ccat-sektions.js',
   },

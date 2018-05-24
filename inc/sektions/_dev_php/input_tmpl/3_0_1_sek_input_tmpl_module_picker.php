@@ -18,16 +18,16 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-id' => 'czr_image_module',
                   'title' => '@missi18n Image'
                 ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_simple_html_module',
-                  'title' => '@missi18n Html Content'
-                ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_featured_pages_module',
-                  'title' => '@missi18n Featured pages'
-                ),
+                // array(
+                //   'content-type' => 'module',
+                //   'content-id' => 'czr_simple_html_module',
+                //   'title' => '@missi18n Html Content'
+                // ),
+                // array(
+                //   'content-type' => 'module',
+                //   'content-id' => 'czr_featured_pages_module',
+                //   'title' => '@missi18n Featured pages'
+                // ),
 
             );
             $i = 0;

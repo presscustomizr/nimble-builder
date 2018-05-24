@@ -41,7 +41,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         switch( clickedOn ) {
                               case 'addContentButton' :
-                                    self._send_( $el, { action : 'pick-section' } );
+                                    //self._send_( $el, { action : 'pick-section' } );
+                                    self._send_( $el, { action : 'pick-module', level : _level , id : _id } );
                               break;
                               case 'overlayUiIcon' :
 

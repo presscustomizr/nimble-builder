@@ -996,16 +996,16 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-id' => 'czr_image_module',
                   'title' => '@missi18n Image'
                 ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_simple_html_module',
-                  'title' => '@missi18n Html Content'
-                ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_featured_pages_module',
-                  'title' => '@missi18n Featured pages'
-                ),
+                // array(
+                //   'content-type' => 'module',
+                //   'content-id' => 'czr_simple_html_module',
+                //   'title' => '@missi18n Html Content'
+                // ),
+                // array(
+                //   'content-type' => 'module',
+                //   'content-id' => 'czr_featured_pages_module',
+                //   'title' => '@missi18n Featured pages'
+                // ),
 
             );
             $i = 0;
@@ -1492,14 +1492,15 @@ function sek_register_modules() {
     }
 
     foreach( [
-       'sek_module_picker_module',
-       'sek_section_picker_module',
-       'sek_level_layout_bg_module',
-       'sek_spacing_module',
-       'czr_simple_html_module',
-       'czr_tiny_mce_editor_module',
-       'czr_image_module',
-       'czr_featured_pages_module'
+        'sek_module_picker_module',
+        //'sek_section_picker_module',
+        'sek_level_bg_border_module',
+        'sek_level_section_layout_height_module',
+        'sek_spacing_module',
+        //'czr_simple_html_module',
+        'czr_tiny_mce_editor_module',
+        'czr_image_module',
+        //'czr_featured_pages_module'
     ] as $module_name ) {
         $fn = "sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
@@ -1544,36 +1545,13 @@ function sek_get_module_params_for_sek_module_picker_module() {
 
 ?><?php
 /* ------------------------------------------------------------------------- *
- *  SEKTION PICKER MODULE
-/* ------------------------------------------------------------------------- */
-//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_section_picker_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'sek_section_picker_module',
-
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
-        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'tmpl' => array(
-            'item-inputs' => array(
-                'section_id' => array(
-                    'input_type'  => 'section_picker',
-                    'title'       => __('Pick a section', 'text_domain_to_be_replaced'),
-                    'width-100'   => true
-                )
-            )
-        )
-    );
-}
-?><?php
-/* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_level_layout_bg_module() {
+function sek_get_module_params_for_sek_level_bg_border_module() {
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'sek_level_layout_bg_module',
+        'module_type' => 'sek_level_bg_border_module',
 
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -1586,11 +1564,13 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
                             'bg-color' => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Background color', 'text_domain_to_be_replaced'),
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'default'     => '',
                             ),
                             'bg-image' => array(
                                 'input_type'  => 'upload',
-                                'title'       => __('Image', 'text_domain_to_be_replaced')
+                                'title'       => __('Image', 'text_domain_to_be_replaced'),
+                                'default'     => '',
                             ),
                             'bg-position' => array(
                                 'input_type'  => 'bg_position',
@@ -1603,7 +1583,8 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
                             // ),
                             'bg-attachment' => array(
                                 'input_type'  => 'gutencheck',
-                                'title'       => __('Fixed background', 'text_domain_to_be_replaced')
+                                'title'       => __('Fixed background', 'text_domain_to_be_replaced'),
+                                'default'     => 0
                             ),
                             // 'bg-repeat' => array(
                             //     'input_type'  => 'select',
@@ -1611,22 +1592,26 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
                             // ),
                             'bg-scale' => array(
                                 'input_type'  => 'select',
-                                'title'       => __('scale', 'text_domain_to_be_replaced')
+                                'title'       => __('scale', 'text_domain_to_be_replaced'),
+                                'default'     => 'default'
                             ),
-                            'bg-video' => array(
-                                'input_type'  => 'text',
-                                'title'       => __('Video', 'text_domain_to_be_replaced')
-                            ),
+                            // 'bg-video' => array(
+                            //     'input_type'  => 'text',
+                            //     'title'       => __('Video', 'text_domain_to_be_replaced'),
+                            //     'default'     => ''
+                            // ),
                             'bg-apply-overlay' => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Apply a background overlay', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-80',
-                                'input_width' => 'width-20'
+                                'input_width' => 'width-20',
+                                'default'     => 0
                             ),
                             'bg-color-overlay' => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Overlay Color', 'text_domain_to_be_replaced'),
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'default'     => ''
                             ),
                             'bg-opacity-overlay' => array(
                                 'input_type'  => 'range_slider',
@@ -1634,46 +1619,9 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
                                 'orientation' => 'horizontal',
                                 'min' => 0,
                                 'max' => 100,
-                                'unit' => '%'
+                                'unit' => '%',
+                                'default'  => 50
                             )
-                        )
-                    ),
-                    array(
-                        'title' => __('Layout', 'text_domain_to_be_replaced'),
-                        'inputs' => array(
-                            'boxed-wide' => array(
-                                'input_type'  => 'select',
-                                'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
-                                'refresh-markup' => true,
-                                'refresh-stylesheet' => false
-                            ),
-
-                            /* suspended, needs more thoughts
-                            'boxed-width' => array(
-                                'input_type'  => 'range_slider',
-                                'title'       => __('Custom boxed width', 'text_domain_to_be_replaced'),
-                                'orientation' => 'horizontal',
-                                'min' => 500,
-                                'max' => 1600,
-                                'unit' => 'px'
-                            ),*/
-                            'height-type' => array(
-                                'input_type'  => 'select',
-                                'title'       => __('Height : fit to screen or custom', 'text_domain_to_be_replaced')
-                            ),
-                            'custom-height' => array(
-                                'input_type'  => 'range_slider',
-                                'title'       => __('Custom height', 'text_domain_to_be_replaced'),
-                                'orientation' => 'horizontal',
-                                'min' => 0,
-                                'max' => 100,
-                                'unit' => '%'
-                            ),
-                            'v-alignment' => array(
-                                'input_type'  => 'v_alignment',
-                                'title'       => __('Vertical alignment', 'text_domain_to_be_replaced'),
-                                'default'     => 'center'
-                            ),
                         )
                     ),
                     array(
@@ -1684,22 +1632,26 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
                                 'title'       => __('Border width', 'text_domain_to_be_replaced'),
                                 'min' => 0,
                                 'max' => 100,
-                                'unit' => 'px'
+                                'unit' => 'px',
+                                'default' => 1
                             ),
                             'border-type' => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Border shape', 'text_domain_to_be_replaced')
+                                'title'       => __('Border shape', 'text_domain_to_be_replaced'),
+                                'default' => 'none'
                             ),
                             'border-color' => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Border color', 'text_domain_to_be_replaced'),
                                 'width-100'   => true,
+                                'default' => ''
                             ),
                             'shadow' => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Apply a shadow', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-80',
-                                'input_width' => 'width-20'
+                                'input_width' => 'width-20',
+                                'default' => 0
                             )
                         )
                     ),
@@ -1714,11 +1666,11 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_lbb_background', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_lbb_border', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_lbb_boxshadow', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_lbb_height', 10, 3 );
-function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
+add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_background', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_border', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_boxshadow', 10, 3 );
+
+function sek_add_css_rules_for_bg_border_background( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     // LBB - background
     // bg-apply-overlay
@@ -1741,7 +1693,7 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
     // height-type
     // shadow
 
-    if ( empty( $options[ 'lbb' ] ) )
+    if ( empty( $options[ 'bg_border' ] ) )
       return $rules;
 
     $background_properties = array();
@@ -1751,12 +1703,12 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
     * background: [background-image] [background-position] / [background-size] [background-repeat] [background-attachment] [background-origin] [background-clip] [background-color];
     */
     // Img background
-    if ( ! empty( $options['lbb'][ 'bg-image'] ) && is_numeric( $options['lbb'][ 'bg-image'] ) ) {
+    if ( ! empty( $options['bg_border'][ 'bg-image'] ) && is_numeric( $options['bg_border'][ 'bg-image'] ) ) {
         //no repeat by default?
-        $background_properties[] = 'url("'. wp_get_attachment_url( $options['lbb'][ 'bg-image'] ) .'")';
+        $background_properties[] = 'url("'. wp_get_attachment_url( $options['bg_border'][ 'bg-image'] ) .'")';
 
         // Img Bg Position
-        if ( ! empty( $options['lbb'][ 'bg-position'] ) ) {
+        if ( ! empty( $options['bg_border'][ 'bg-position'] ) ) {
             $pos_map = array(
                 'top_left'    => '0% 0%',
                 'top'         => '50% 0%',
@@ -1769,18 +1721,18 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
                 'bottom_right'=> '100% 100%'
             );
 
-            $raw_pos                    = $options['lbb'][ 'bg-position'];
+            $raw_pos                    = $options['bg_border'][ 'bg-position'];
             $background_properties[]         = array_key_exists($raw_pos, $pos_map) ? $pos_map[ $raw_pos ] : $pos_map[ 'center' ];
         }
 
 
         //background size
-        if ( ! empty( $options['lbb'][ 'bg-scale'] ) && 'default' != $options['lbb'][ 'bg-scale'] ) {
+        if ( ! empty( $options['bg_border'][ 'bg-scale'] ) && 'default' != $options['bg_border'][ 'bg-scale'] ) {
             //When specifying a background-size value, it must immediately follow the background-position value.
-            if ( ! empty( $options['lbb'][ 'bg-position'] ) ) {
-                $background_properties[] = '/ ' . $options['lbb'][ 'bg-scale'];
+            if ( ! empty( $options['bg_border'][ 'bg-position'] ) ) {
+                $background_properties[] = '/ ' . $options['bg_border'][ 'bg-scale'];
             } else {
-                $background_size    = $options['lbb'][ 'bg-scale'];
+                $background_size    = $options['bg_border'][ 'bg-scale'];
             }
         }
 
@@ -1788,7 +1740,7 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
         $background_properties[] = 'no-repeat';
 
         // write the bg-attachment rule only if true <=> set to "fixed"
-        if ( ! empty( $options['lbb'][ 'bg-attachment'] ) && sek_is_checked( $options['lbb'][ 'bg-attachment'] ) ) {
+        if ( ! empty( $options['bg_border'][ 'bg-attachment'] ) && sek_is_checked( $options['bg_border'][ 'bg-attachment'] ) ) {
             $background_properties[] = 'fixed';
         }
 
@@ -1796,8 +1748,8 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
 
 
     //background color (needs validation: we need a sanitize hex or rgba color)
-    if ( ! empty( $options[ 'lbb' ][ 'bg-color' ] ) ) {
-        $background_properties[] = $options[ 'lbb' ][ 'bg-color' ];
+    if ( ! empty( $options[ 'bg_border' ][ 'bg-color' ] ) ) {
+        $background_properties[] = $options[ 'bg_border' ][ 'bg-color' ];
     }
 
 
@@ -1816,16 +1768,16 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
     }
 
     //Background overlay?
-    if ( ! empty( $options['lbb'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['lbb'][ 'bg-apply-overlay'] ) ) {
+    if ( ! empty( $options['bg_border'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['bg_border'][ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
-        $bg_color_overlay = isset( $options[ 'lbb' ][ 'bg-color-overlay' ] ) ? $options[ 'lbb' ][ 'bg-color-overlay' ] : null;
+        $bg_color_overlay = isset( $options[ 'bg_border' ][ 'bg-color-overlay' ] ) ? $options[ 'bg_border' ][ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
             //overlay pseudo element
             $bg_overlay_css_rules = 'content:"";display:block;position:absolute;top:0;left:0;right:0;bottom:0;background-color:'.$bg_color_overlay;
 
             //opacity
             //validate/sanitize
-            $bg_overlay_opacity     = isset( $options[ 'lbb' ][ 'bg-opacity-overlay' ] ) ? filter_var( $options[ 'lbb' ][ 'bg-opacity-overlay' ], FILTER_VALIDATE_INT, array( 'options' =>
+            $bg_overlay_opacity     = isset( $options[ 'bg_border' ][ 'bg-opacity-overlay' ] ) ? filter_var( $options[ 'bg_border' ][ 'bg-opacity-overlay' ], FILTER_VALIDATE_INT, array( 'options' =>
                 array( "min_range"=>0, "max_range"=>100 ) )
             ) : FALSE;
             $bg_overlay_opacity     = FALSE !== $bg_overlay_opacity ? filter_var( $bg_overlay_opacity / 100, FILTER_VALIDATE_FLOAT ) : $bg_overlay_opacity;
@@ -1860,7 +1812,7 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
                 'mq' =>null
             );
         }
-    }//if ( ! empty( $options['lbb'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['lbb'][ 'bg-apply-overlay'] ) ) {}
+    }//if ( ! empty( $options['bg_border'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['bg_border'][ 'bg-apply-overlay'] ) ) {}
 
     return $rules;
 }
@@ -1875,15 +1827,15 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
 
 
 
-function sek_add_css_rules_for_lbb_border( array $rules, array $level ) {
+function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
 
     //TODO: we actually should allow multidimensional border widths plus different units
-    if ( empty( $options[ 'lbb' ] ) )
+    if ( empty( $options[ 'bg_border' ] ) )
       return $rules;
 
-    $border_width = ! empty( $options['lbb'][ 'border-width' ] ) ? filter_var( $options['lbb'][ 'border-width' ], FILTER_VALIDATE_INT ) : FALSE;
-    $border_type  = FALSE !== $border_width && ! empty( $options['lbb'][ 'border-type' ] ) && 'none' != $options['lbb'][ 'border-type' ] ? $options['lbb'][ 'border-type' ] : FALSE;
+    $border_width = ! empty( $options['bg_border'][ 'border-width' ] ) ? filter_var( $options['bg_border'][ 'border-width' ], FILTER_VALIDATE_INT ) : FALSE;
+    $border_type  = FALSE !== $border_width && ! empty( $options['bg_border'][ 'border-type' ] ) && 'none' != $options['bg_border'][ 'border-type' ] ? $options['bg_border'][ 'border-type' ] : FALSE;
 
     //border width
     if ( $border_type ) {
@@ -1895,8 +1847,8 @@ function sek_add_css_rules_for_lbb_border( array $rules, array $level ) {
 
         //border color
         //(needs validation: we need a sanitize hex or rgba color)
-        if ( ! empty( $options['lbb'][ 'border-color' ] ) ) {
-            $border_properties[] = $options['lbb'][ 'border-color' ];
+        if ( ! empty( $options['bg_border'][ 'border-color' ] ) ) {
+            $border_properties[] = $options['bg_border'][ 'border-color' ];
         }
 
         //append border rules
@@ -1923,12 +1875,12 @@ function sek_add_css_rules_for_lbb_border( array $rules, array $level ) {
 
 
 
-function sek_add_css_rules_for_lbb_boxshadow( array $rules, array $level ) {
+function sek_add_css_rules_for_bg_border_boxshadow( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    if ( empty( $options[ 'lbb' ] ) )
+    if ( empty( $options[ 'bg_border' ] ) )
       return $rules;
 
-    if ( !empty( $options[ 'lbb' ][ 'shadow' ] ) &&  sek_is_checked( $options['lbb'][ 'shadow'] ) ) {
+    if ( !empty( $options[ 'bg_border' ][ 'shadow' ] ) &&  sek_is_checked( $options['bg_border'][ 'shadow'] ) ) {
         $css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
 
         $rules[]     = array(
@@ -1939,29 +1891,81 @@ function sek_add_css_rules_for_lbb_boxshadow( array $rules, array $level ) {
     }
     return $rules;
 }
+?><?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_level_section_layout_height_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_level_section_layout_height_module',
+
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'boxed-wide' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
+                    'refresh-markup' => true,
+                    'refresh-stylesheet' => false,
+                    'default'     => 'fullwidth'
+                ),
+
+                /* suspended, needs more thoughts
+                'boxed-width' => array(
+                    'input_type'  => 'range_slider',
+                    'title'       => __('Custom boxed width', 'text_domain_to_be_replaced'),
+                    'orientation' => 'horizontal',
+                    'min' => 500,
+                    'max' => 1600,
+                    'unit' => 'px'
+                ),*/
+                'height-type' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Height : fit to screen or custom', 'text_domain_to_be_replaced'),
+                    'default'     => 'default'
+                ),
+                'custom-height' => array(
+                    'input_type'  => 'range_slider',
+                    'title'       => __('Custom height', 'text_domain_to_be_replaced'),
+                    'orientation' => 'horizontal',
+                    'min' => 0,
+                    'max' => 100,
+                    'unit' => '%',
+                    'default' => 50
+                ),
+                'v_alignment_css' => array(
+                    'input_type'  => 'v_alignment',
+                    'title'       => __('Vertical alignment', 'text_domain_to_be_replaced'),
+                    'default'     => 'center',
+                    'refresh-markup' => false,
+                    'refresh-stylesheet' => true
+                )
+            )
+        )//tmpl
+    );
+}
 
 
 
-
-
-
-
-
-
-
-
-function sek_add_css_rules_for_lbb_height( array $rules, array $level ) {
+/* ------------------------------------------------------------------------- *
+ *  SCHEDULE CSS RULES FILTERING
+/* ------------------------------------------------------------------------- */
+add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_section_layout_height', 10, 3 );
+function sek_add_css_rules_for_section_layout_height( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    if ( empty( $options[ 'lbb' ] ) )
+    if ( empty( $options[ 'layout_height' ] ) )
       return $rules;
 
-    if ( empty( $options[ 'lbb' ][ 'height-type' ] ) )
+    if ( empty( $options[ 'layout_height' ][ 'height-type' ] ) )
       return $rules;
 
-    if ( 'fit-to-screen' == $options[ 'lbb' ][ 'height-type' ] ) {
+    if ( 'fit-to-screen' == $options[ 'layout_height' ][ 'height-type' ] ) {
         $height = '100';
     }
-    elseif ( 'custom' == $options[ 'lbb' ][ 'height-type' ] && FALSE !== $height_value = filter_var( $options[ 'lbb' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
+    elseif ( 'custom' == $options[ 'layout_height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'layout_height' ] ) && FALSE !== $height_value = filter_var( $options[ 'layout_height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
                 array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
         $height = $height_value;
     }
@@ -1969,19 +1973,7 @@ function sek_add_css_rules_for_lbb_height( array $rules, array $level ) {
     if ( isset( $height ) && FALSE !== $height ) {
         $css_rules .= 'height:' . $height . 'vh;';
     }
-    if ( !empty( $options[ 'lbb' ][ 'v-alignment' ]) ) {
-        switch( $options[ 'lbb' ][ 'v-alignment' ] ) {
-            case 'top' :
-                $css_rules .= "align-items: flex-start;";
-            break;
-            case 'center' :
-                $css_rules .= "align-items: center;";
-            break;
-            case 'bottom' :
-                $css_rules .= "align-items: flex-end;";
-            break;
-        }
-    }
+
     if ( !empty( $css_rules ) ) {
         $rules[]     = array(
                 'selector' => '[data-sek-id="'.$level['id'].'"]',
@@ -2017,11 +2009,13 @@ function sek_get_module_params_for_sek_spacing_module() {
                                 'input_type'  => 'spacing',
                                 'title'       => __('Set padding and margin for Desktop', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-100',
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'default'     => array()
                             ),
                             'desktop_unit' =>  array(
                                 'input_type'  => 'select',
-                                'title'       => __('Unit', 'text_domain_to_be_replaced')
+                                'title'       => __('Unit', 'text_domain_to_be_replaced'),
+                                'default'     => 'px'
                             )
                         )
                     ),
@@ -2033,11 +2027,13 @@ function sek_get_module_params_for_sek_spacing_module() {
                                 'input_type'  => 'spacing',
                                 'title'       => __('Set padding and margin for tablet devices', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-100',
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'default'     => array()
                             ),
                             'tablet_unit' =>  array(
                                 'input_type'  => 'select',
-                                'title'       => __('Unit', 'text_domain_to_be_replaced')
+                                'title'       => __('Unit', 'text_domain_to_be_replaced'),
+                                'default'     => 'px'
                             )
                         )
                     ),
@@ -2049,11 +2045,13 @@ function sek_get_module_params_for_sek_spacing_module() {
                                 'input_type'  => 'spacing',
                                 'title'       => __('Set padding and margin for mobile devices', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-100',
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'default'     => array()
                             ),
                             'mobile_unit' =>  array(
                                 'input_type'  => 'select',
-                                'title'       => __('Unit', 'text_domain_to_be_replaced')
+                                'title'       => __('Unit', 'text_domain_to_be_replaced'),
+                                'default'     => 'px'
                             )
                         )
                     )
@@ -2155,31 +2153,6 @@ function sek_add_css_rules_for_spacing( array $rules, array $level ) {
 
 ?><?php
 /* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER THE SIMPLE HTML MODULE
-/* ------------------------------------------------------------------------- */
-//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_czr_simple_html_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'czr_simple_html_module',
-
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
-        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'tmpl' => array(
-            'item-inputs' => array(
-                'html_content' => array(
-                    'input_type'  => 'textarea',
-                    'title'       => __('HTML Content', 'text_domain_to_be_replaced')
-                )
-            )
-        ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/simple_html_module_tmpl.php",
-        'placeholder_icon' => 'code'
-    );
-}
-
-?><?php
-/* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER THE TEXT EDITOR MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
@@ -2187,7 +2160,9 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_tiny_mce_editor_module',
-
+        'starting_value' => array(
+            'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -2199,7 +2174,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                         'inputs' => array(
                             'content' => array(
                                 'input_type'  => 'tiny_mce_editor',
-                                'title'       => __('Content', 'text_domain_to_be_replaced')
+                                'title'       => __('Content', 'text_domain_to_be_replaced'),
+                                'default'     => ''
                             ),
                             'h_alignment_css' => array(
                                 'input_type'  => 'h_text_alignment',
@@ -2217,6 +2193,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'font_family_css' => array(
                                 'input_type'  => 'font_picker',
                                 'title'       => __('Font family', 'text_domain_to_be_replaced'),
+                                'default'     => '',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true,
                                 'refresh-fonts' => true,
@@ -2259,6 +2236,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'text_transform_css'  => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Text transform', 'text_domain_to_be_replaced'),
+                                'default'     => 'none',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true
                             ),//null,
@@ -2275,14 +2253,18 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Text color', 'text_domain_to_be_replaced'),
+                                'default'     => '',
                                 'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh-stylesheet' => true,
+                                'width-100'   => true
                             ),//"#000000",
                             'color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced'),
+                                'default'     => '',
                                 'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh-stylesheet' => true,
+                                'width-100'   => true
                             ),//"#000000",
                             'important_css'       => array(
                                 'input_type'  => 'gutencheck',
@@ -2363,89 +2345,6 @@ function sek_get_module_params_for_czr_image_module() {
 }
 
 ?><?php
-/* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER FEATURED PAGES MODULE
-/* ------------------------------------------------------------------------- */
-//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_czr_featured_pages_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'czr_featured_pages_module',
-
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
-        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'tmpl' => array(
-            'pre-item' => array(
-                // 'page-id' => array(
-                //     'input_type'  => 'content_picker',
-                //     'title'       => __('Pick a page', 'text_domain_to_be_replaced')
-                // ),
-                'img-type' => array(
-                    'input_type'  => 'select',
-                    'title'       => __('Display an image', 'text_domain_to_be_replaced'),
-                    'default'     => 'featured'
-                ),
-            ),
-            // 'mod-opt' => array(
-            //     // 'page-id' => array(
-            //     //     'input_type'  => 'content_picker',
-            //     //     'title'       => __('Pick a page', 'text_domain_to_be_replaced')
-            //     // ),
-            //     'mod_opt_test' => array(
-            //         'input_type'  => 'select',
-            //         'title'       => __('Display an image', 'text_domain_to_be_replaced'),
-            //         'default'     => 'featured'
-            //     ),
-            // ),
-            'item-inputs' => array(
-                'page-id' => array(
-                    'input_type'  => 'content_picker',
-                    'title'       => __('Pick a page', 'text_domain_to_be_replaced'),
-                    'default'     => ''
-                ),
-                'img-type' => array(
-                    'input_type'  => 'select',
-                    'title'       => __('Display an image', 'text_domain_to_be_replaced'),
-                    'default'     => 'featured'
-                ),
-                'img-id' => array(
-                    'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
-                    'default'     => ''
-                ),
-                'img-size' => array(
-                    'input_type'  => 'select',
-                    'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
-                    'default'     => 'large'
-                ),
-                'content-type' => array(
-                    'input_type'  => 'select',
-                    'title'       => __('Display a text', 'text_domain_to_be_replaced'),
-                    'default'     => 'page-excerpt'
-                ),
-                'content-custom-text' => array(
-                    'input_type'  => 'tiny_mce_editor',
-                    'title'       => __('Custom text content', 'text_domain_to_be_replaced'),
-                    'default'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
-                ),
-                'btn-display' => array(
-                    'input_type'  => 'gutencheck',
-                    'title'       => __('Display a call to action button', 'text_domain_to_be_replaced'),
-                    'default'     => true
-                ),
-                'btn-custom-text' => array(
-                    'input_type'  => 'tiny_mce_editor',
-                    'title'       => __('Custom button text', 'text_domain_to_be_replaced'),
-                    'default'     => __('Read More', 'text_domain_to_be_replaced'),
-                )
-            )
-        ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/featured_pages_module_tmpl.php",
-        'placeholder_icon' => 'short_text'
-    );
-}
-
-?><?php
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
@@ -2479,7 +2378,7 @@ class Sek_Dyn_CSS_Builder {
 
     private $collection;//the collection of css rules
     private $sek_model;
-    private $parent_level = array();
+    private $parent_level_model = array();
 
     public function __construct( $sek_model = array() ) {
         $this->sek_model  = $sek_model;
@@ -2500,12 +2399,20 @@ class Sek_Dyn_CSS_Builder {
 
     // Fired in the constructor
     // Walk the level tree and build rules when needed
-    public function sek_css_rules_sniffer_walker( $level = null ) {
+    public function sek_css_rules_sniffer_walker( $level = null, $parent_level = array() ) {
         $level      = is_null( $level ) ? $this->sek_model : $level;
         $level      = is_array( $level ) ? $level : array();
+        if ( ! empty( $parent_level ) ) {
+            $this -> parent_level_model = $parent_level;
+        }
 
         foreach ( $level as $key => $entry ) {
              $rules = array();
+            // // set the current parent level model
+            // if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
+            //     $this -> parent_level_model = $entry;
+            // }
+
             // Populate rules for sections / columns / modules
             if ( !empty( $entry[ 'level' ] ) && ( !empty( $entry[ 'options' ] ) || !empty( $entry[ 'width' ] ) ) ) {
                 // build rules for level options => section / column / module
@@ -2523,13 +2430,13 @@ class Sek_Dyn_CSS_Builder {
             // We want to filter each input
             // which makes it possible to target for example the font-family. Either in module values or in level options
             if ( empty( $entry[ 'level' ] ) && is_string( $key ) && 1 < strlen( $key ) ) {
-                // we need to have a parent level set
-                if ( !empty( $this -> parent_level ) ) {
+                // we need to have a level model set
+                if ( !empty( $this -> parent_level_model ) ) {
                     // the input_id candidate to filter is the $key
                     $input_id_candidate = $key;
                     // let's skip the $key that are reserved for the structure of the sektion tree
                     if ( ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options'] ) ) {
-                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level );
+                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level_model );
                     }
                 }
             }
@@ -2564,16 +2471,17 @@ class Sek_Dyn_CSS_Builder {
             }
 
             // keep walking if the current $entry is an array
-            // make sure that the parent_level is set right before jumping down the next level
+            // make sure that the parent_level_model is set right before jumping down the next level
             if ( is_array( $entry ) ) {
                 if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
-                    $this -> parent_level = $entry;
+                    $parent_level = $entry;
                 }
-                $this->sek_css_rules_sniffer_walker( $entry);
-                // Reset the parent level after walking the sublevels
-                if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
-                    $this -> parent_level = $entry;
-                }
+                $this->sek_css_rules_sniffer_walker( $entry, $parent_level );
+                // Reset the level model after walking the sublevels
+
+            }
+            if ( ! empty( $parent_level ) ) {
+                $this -> parent_level_model = $parent_level;
             }
         }//foreach
     }
@@ -3421,8 +3329,8 @@ class Sek_Dyn_CSS_Handler {
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
 add_filter( "sek_add_css_rules_for_input_id", 'sek_add_css_rules_for_generic_css_input_types', 10, 4 );
 function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, string $input_id, array $parent_level ) {
-    //error_log( $input_id );
-    //error_log( print_r( $parent_level, true ) );
+    // error_log( $input_id );
+    // error_log( print_r( $parent_level, true ) );
     $selector = '[data-sek-id="'.$parent_level['id'].'"]';
     $mq = null;
     $properties_to_render = array();
@@ -3458,6 +3366,23 @@ function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, st
         break;
         case 'h_alignment_css' :
             $properties_to_render['text-align'] = $value;
+        break;
+        case 'v_alignment_css' :
+            switch ( $value ) {
+                case 'top' :
+                    $v_align_value = "flex-start";
+                break;
+                case 'center' :
+                    $v_align_value = "center";
+                break;
+                case 'bottom' :
+                    $v_align_value = "flex-end";
+                break;
+                default :
+                    $v_align_value = "center";
+                break;
+            }
+            $properties_to_render['align-items'] = $v_align_value;
         break;
         case 'font_family_css' :
             $family = $value;
@@ -4103,14 +4028,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
                         <# if ( ! data.is_last_possible_section ) { #>
-                          <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Move', 'sek-builder' ); ?>"></i>
+                          <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Move section', 'sek-builder' ); ?>"></i>
                         <# } #>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Options', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Section options', 'sek-builder' ); ?>"></i>
                         <# if ( data.can_have_more_columns ) { #>
                           <i data-sek-action="add-column" class="fas fa-plus-circle sek-action" title="<?php _e( 'Add Column', 'sek-builder' ); ?>"></i>
                         <# } #>
-                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate section', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove section', 'sek-builder' ); ?>"></i>
                       </div>
 
                       <div class="sek-clear"></div>
@@ -4126,17 +4051,17 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <div class="sek-block-overlay sek-column-overlay">
                     <div class="sek-block-overlay-header">
                       <div class="sek-block-overlay-actions">
-                        <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Options', 'sek-builder' ); ?>"></i>
+                        <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Columns options', 'sek-builder' ); ?>"></i>
                         <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="<?php _e( 'Add Module', 'sek-builder' ); ?>"></i>
                         <# if ( data.parent_can_have_more_columns ) { #>
-                          <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate', 'sek-builder' ); ?>"></i>
+                          <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate column', 'sek-builder' ); ?>"></i>
                         <# } #>
                         <# if ( ! data.parent_is_last_allowed_nested ) { #>
                           <i data-sek-action="add-section" class="fas far fa-plus-square sek-action" title="<?php _e( 'Add Sektion', 'sek-builder' ); ?>"></i>
                         <# } #>
                         <# if ( ! data.parent_is_single_column ) { #>
-                          <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove', 'sek-builder' ); ?>"></i>
+                          <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove column', 'sek-builder' ); ?>"></i>
                         <# } #>
                       </div>
                       <div class="sek-clear"></div>
@@ -4163,11 +4088,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     </div><?php // .editor-block-settings-menu ?>
                     <div class="sek-block-overlay-header">
                       <div class="sek-block-overlay-actions">
-                        <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move', 'sek-builder' ); ?>"></i>
+                        <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'sek-builder' ); ?>"></i>
                         <i data-sek-action="edit-module" class="fas fa-pencil-alt sek-tip sek-action" title="<?php _e( 'Edit Module', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Options', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Module options', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate module', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove module', 'sek-builder' ); ?>"></i>
                       </div>
                       <div class="sek-clear"></div>
                     </div>
@@ -4296,7 +4221,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $is_nested            = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
                     $column_wrapper_class = 'sek-container-fluid';
                     //when boxed use proper container class
-                    if ( ! empty( $model[ 'options' ][ 'lbb' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'lbb' ][ 'boxed-wide' ] ) {
+                    if ( ! empty( $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) {
                       $column_wrapper_class = 'sek-container';
                     }
                     ?>
@@ -4395,7 +4320,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             $module_type = $model['module_type'];
             $render_tmpl_path = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
-            load_template( $render_tmpl_path, false );
+            if ( !empty( $render_tmpl_path ) ) {
+                load_template( $render_tmpl_path, false );
+            } else {
+                error_log( __FUNCTION__ . ' => no template found for module type ' . $module_type  );
+            }
 
             //$placeholder_icon = sek_get_registered_module_type_property( $module_type, 'placeholder_icon' );
 
