@@ -134,14 +134,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
                         <# if ( ! data.is_last_possible_section ) { #>
-                          <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Move', 'sek-builder' ); ?>"></i>
+                          <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Move section', 'sek-builder' ); ?>"></i>
                         <# } #>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Options', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Section options', 'sek-builder' ); ?>"></i>
                         <# if ( data.can_have_more_columns ) { #>
                           <i data-sek-action="add-column" class="fas fa-plus-circle sek-action" title="<?php _e( 'Add Column', 'sek-builder' ); ?>"></i>
                         <# } #>
-                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate section', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove section', 'sek-builder' ); ?>"></i>
                       </div>
 
                       <div class="sek-clear"></div>
@@ -157,17 +157,17 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <div class="sek-block-overlay sek-column-overlay">
                     <div class="sek-block-overlay-header">
                       <div class="sek-block-overlay-actions">
-                        <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Options', 'sek-builder' ); ?>"></i>
+                        <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Columns options', 'sek-builder' ); ?>"></i>
                         <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="<?php _e( 'Add Module', 'sek-builder' ); ?>"></i>
                         <# if ( data.parent_can_have_more_columns ) { #>
-                          <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate', 'sek-builder' ); ?>"></i>
+                          <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate column', 'sek-builder' ); ?>"></i>
                         <# } #>
                         <# if ( ! data.parent_is_last_allowed_nested ) { #>
                           <i data-sek-action="add-section" class="fas far fa-plus-square sek-action" title="<?php _e( 'Add Sektion', 'sek-builder' ); ?>"></i>
                         <# } #>
                         <# if ( ! data.parent_is_single_column ) { #>
-                          <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove', 'sek-builder' ); ?>"></i>
+                          <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove column', 'sek-builder' ); ?>"></i>
                         <# } #>
                       </div>
                       <div class="sek-clear"></div>
@@ -194,11 +194,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     </div><?php // .editor-block-settings-menu ?>
                     <div class="sek-block-overlay-header">
                       <div class="sek-block-overlay-actions">
-                        <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move', 'sek-builder' ); ?>"></i>
+                        <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'sek-builder' ); ?>"></i>
                         <i data-sek-action="edit-module" class="fas fa-pencil-alt sek-tip sek-action" title="<?php _e( 'Edit Module', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Options', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Module options', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate module', 'sek-builder' ); ?>"></i>
+                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove module', 'sek-builder' ); ?>"></i>
                       </div>
                       <div class="sek-clear"></div>
                     </div>
