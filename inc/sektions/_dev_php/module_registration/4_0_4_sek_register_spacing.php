@@ -22,11 +22,13 @@ function sek_get_module_params_for_sek_spacing_module() {
                                 'input_type'  => 'spacing',
                                 'title'       => __('Set padding and margin for Desktop', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-100',
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'default'     => array()
                             ),
                             'desktop_unit' =>  array(
                                 'input_type'  => 'select',
-                                'title'       => __('Unit', 'text_domain_to_be_replaced')
+                                'title'       => __('Unit', 'text_domain_to_be_replaced'),
+                                'default'     => 'px'
                             )
                         )
                     ),
@@ -38,11 +40,13 @@ function sek_get_module_params_for_sek_spacing_module() {
                                 'input_type'  => 'spacing',
                                 'title'       => __('Set padding and margin for tablet devices', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-100',
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'default'     => array()
                             ),
                             'tablet_unit' =>  array(
                                 'input_type'  => 'select',
-                                'title'       => __('Unit', 'text_domain_to_be_replaced')
+                                'title'       => __('Unit', 'text_domain_to_be_replaced'),
+                                'default'     => 'px'
                             )
                         )
                     ),
@@ -54,11 +58,13 @@ function sek_get_module_params_for_sek_spacing_module() {
                                 'input_type'  => 'spacing',
                                 'title'       => __('Set padding and margin for mobile devices', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-100',
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'default'     => array()
                             ),
                             'mobile_unit' =>  array(
                                 'input_type'  => 'select',
-                                'title'       => __('Unit', 'text_domain_to_be_replaced')
+                                'title'       => __('Unit', 'text_domain_to_be_replaced'),
+                                'default'     => 'px'
                             )
                         )
                     )

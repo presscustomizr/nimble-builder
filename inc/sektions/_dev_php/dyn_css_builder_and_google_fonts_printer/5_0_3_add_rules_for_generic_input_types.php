@@ -3,8 +3,8 @@
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
 add_filter( "sek_add_css_rules_for_input_id", 'sek_add_css_rules_for_generic_css_input_types', 10, 4 );
 function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, string $input_id, array $parent_level ) {
-    //error_log( $input_id );
-    //error_log( print_r( $parent_level, true ) );
+    // error_log( $input_id );
+    // error_log( print_r( $parent_level, true ) );
     $selector = '[data-sek-id="'.$parent_level['id'].'"]';
     $mq = null;
     $properties_to_render = array();
@@ -40,6 +40,23 @@ function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, st
         break;
         case 'h_alignment_css' :
             $properties_to_render['text-align'] = $value;
+        break;
+        case 'v_alignment_css' :
+            switch ( $value ) {
+                case 'top' :
+                    $v_align_value = "flex-start";
+                break;
+                case 'center' :
+                    $v_align_value = "center";
+                break;
+                case 'bottom' :
+                    $v_align_value = "flex-end";
+                break;
+                default :
+                    $v_align_value = "center";
+                break;
+            }
+            $properties_to_render['align-items'] = $v_align_value;
         break;
         case 'font_family_css' :
             $family = $value;

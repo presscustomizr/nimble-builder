@@ -32,7 +32,7 @@ class Sek_Dyn_CSS_Builder {
 
     private $collection;//the collection of css rules
     private $sek_model;
-    private $parent_level = array();
+    private $parent_level_model = array();
 
     public function __construct( $sek_model = array() ) {
         $this->sek_model  = $sek_model;
@@ -53,12 +53,20 @@ class Sek_Dyn_CSS_Builder {
 
     // Fired in the constructor
     // Walk the level tree and build rules when needed
-    public function sek_css_rules_sniffer_walker( $level = null ) {
+    public function sek_css_rules_sniffer_walker( $level = null, $parent_level = array() ) {
         $level      = is_null( $level ) ? $this->sek_model : $level;
         $level      = is_array( $level ) ? $level : array();
+        if ( ! empty( $parent_level ) ) {
+            $this -> parent_level_model = $parent_level;
+        }
 
         foreach ( $level as $key => $entry ) {
              $rules = array();
+            // // set the current parent level model
+            // if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
+            //     $this -> parent_level_model = $entry;
+            // }
+
             // Populate rules for sections / columns / modules
             if ( !empty( $entry[ 'level' ] ) && ( !empty( $entry[ 'options' ] ) || !empty( $entry[ 'width' ] ) ) ) {
                 // build rules for level options => section / column / module
@@ -76,13 +84,13 @@ class Sek_Dyn_CSS_Builder {
             // We want to filter each input
             // which makes it possible to target for example the font-family. Either in module values or in level options
             if ( empty( $entry[ 'level' ] ) && is_string( $key ) && 1 < strlen( $key ) ) {
-                // we need to have a parent level set
-                if ( !empty( $this -> parent_level ) ) {
+                // we need to have a level model set
+                if ( !empty( $this -> parent_level_model ) ) {
                     // the input_id candidate to filter is the $key
                     $input_id_candidate = $key;
                     // let's skip the $key that are reserved for the structure of the sektion tree
                     if ( ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options'] ) ) {
-                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level );
+                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level_model );
                     }
                 }
             }
@@ -117,16 +125,17 @@ class Sek_Dyn_CSS_Builder {
             }
 
             // keep walking if the current $entry is an array
-            // make sure that the parent_level is set right before jumping down the next level
+            // make sure that the parent_level_model is set right before jumping down the next level
             if ( is_array( $entry ) ) {
                 if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
-                    $this -> parent_level = $entry;
+                    $parent_level = $entry;
                 }
-                $this->sek_css_rules_sniffer_walker( $entry);
-                // Reset the parent level after walking the sublevels
-                if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
-                    $this -> parent_level = $entry;
-                }
+                $this->sek_css_rules_sniffer_walker( $entry, $parent_level );
+                // Reset the level model after walking the sublevels
+
+            }
+            if ( ! empty( $parent_level ) ) {
+                $this -> parent_level_model = $parent_level;
             }
         }//foreach
     }
