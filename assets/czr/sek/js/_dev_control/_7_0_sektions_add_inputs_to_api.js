@@ -22,7 +22,7 @@
                   $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
                         evt.preventDefault();
                         $wrapper.find('input[type="number"]').each( function() {
-                              $(this).val(0);
+                              $(this).val('').trigger('change');
                         });
                   });
 
