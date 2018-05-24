@@ -9,7 +9,7 @@
 
 
 /* To make vertical alignment possible in sections */
-.sek-section {
+.sek-section, .sek-column, .sek-module {
   display: flex;
   align-items: center;
 }
