@@ -3,13 +3,13 @@
   min-height: 50px;
 }
 .sek-section {
-  padding: 26px 0px 0;
+  padding: 21px 0px 0;
   position: relative;/* <= for the ui overlay block */
 }
 
 .sek-column {
   position: relative;
-  padding: 26px 0px 0;
+  padding: 18px 10px 0;
 }
 .sek-section h2 { color:black;}
 
@@ -31,9 +31,6 @@
 .sek-module h4 { color:red;}
 
 
-.sek-sektion-inner{
-    padding: 20px;
-}
 .sek-add-button-wrapper {
   text-align: center;
   width: 100%;
@@ -76,7 +73,7 @@
 }
 .sek-block-overlay-header {
     position: relative;
-    top: -23px;
+    top: -18px;
     opacity: 0.6;
     transition: opacity .25s ease;
 }
@@ -91,7 +88,7 @@
 .sek-block-overlay-actions {
   background: #00A0D2;
   float: left;
-  height: 23px;
+  height: 18px;
   margin: -1px -1px 0;
   padding: 0 4px;
   text-shadow: none;

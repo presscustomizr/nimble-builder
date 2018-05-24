@@ -6,7 +6,9 @@
   margin: 0;
 }
 
-
+.sek-sektion-inner{
+    padding: 15px;
+}
 
 /* To make vertical alignment possible in sections */
 .sek-section, .sek-column, .sek-module {
@@ -14,7 +16,7 @@
   align-items: center;
 }
 
-.sek-column-inner {
+.sek-column-inner, .sek-module-inner {
     -ms-flex: 0 0 100%;
     flex: 0 0 100%;
     max-width: 100%;
