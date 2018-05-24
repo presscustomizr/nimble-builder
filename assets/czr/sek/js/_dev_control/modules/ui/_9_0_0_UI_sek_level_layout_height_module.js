@@ -1,20 +1,20 @@
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var LevelBackgroundModuleConstructor = {
+      var Constructor = {
             initialize: function( id, options ) {
-                  //console.log('INITIALIZING SEKTION OPTIONS', id, options );
                   var module = this;
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                  module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRLBBInputMths || {} );
+
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
             },//initialize
 
-            CZRLBBInputMths : {
+            CZRInputMths : {
                     setupSelect : function() {
                             var input  = this,
                                   item   = input.input_parent,
@@ -22,7 +22,7 @@
                                   _options_ = {};
 
                             if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in lbb module');
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.module_type );
                                   return;
                             } else {
                                   //generates the options
@@ -41,7 +41,7 @@
                                   $( 'select[data-czrtype]', input.container ).selecter();
                             }
                     },
-            },//CZRLBBInputMths
+            },//CZRInputMths
 
             // CZRSocialsItem : { },//CZRSocialsItem
       };
@@ -57,15 +57,15 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            sek_level_layout_bg_module : {
-                  mthds : LevelBackgroundModuleConstructor,
+            sek_level_section_layout_height_module : {
+                  mthds : Constructor,
                   crud : false,
-                  name : 'Layout Background Border Options',
+                  name : 'Layout Height Options',
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_layout_bg_module' )
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_section_layout_height_module' )
                   )
             },
       });

@@ -3,10 +3,10 @@
  *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_level_layout_bg_module() {
+function sek_get_module_params_for_sek_level_bg_border_module() {
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'sek_level_layout_bg_module',
+        'module_type' => 'sek_level_bg_border_module',
 
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -19,11 +19,13 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
                             'bg-color' => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Background color', 'text_domain_to_be_replaced'),
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'default'     => '',
                             ),
                             'bg-image' => array(
                                 'input_type'  => 'upload',
-                                'title'       => __('Image', 'text_domain_to_be_replaced')
+                                'title'       => __('Image', 'text_domain_to_be_replaced'),
+                                'default'     => '',
                             ),
                             'bg-position' => array(
                                 'input_type'  => 'bg_position',
@@ -36,7 +38,8 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
                             // ),
                             'bg-attachment' => array(
                                 'input_type'  => 'gutencheck',
-                                'title'       => __('Fixed background', 'text_domain_to_be_replaced')
+                                'title'       => __('Fixed background', 'text_domain_to_be_replaced'),
+                                'default'     => 0
                             ),
                             // 'bg-repeat' => array(
                             //     'input_type'  => 'select',
@@ -44,22 +47,26 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
                             // ),
                             'bg-scale' => array(
                                 'input_type'  => 'select',
-                                'title'       => __('scale', 'text_domain_to_be_replaced')
+                                'title'       => __('scale', 'text_domain_to_be_replaced'),
+                                'default'     => 'default'
                             ),
-                            'bg-video' => array(
-                                'input_type'  => 'text',
-                                'title'       => __('Video', 'text_domain_to_be_replaced')
-                            ),
+                            // 'bg-video' => array(
+                            //     'input_type'  => 'text',
+                            //     'title'       => __('Video', 'text_domain_to_be_replaced'),
+                            //     'default'     => ''
+                            // ),
                             'bg-apply-overlay' => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Apply a background overlay', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-80',
-                                'input_width' => 'width-20'
+                                'input_width' => 'width-20',
+                                'default'     => 0
                             ),
                             'bg-color-overlay' => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Overlay Color', 'text_domain_to_be_replaced'),
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'default'     => ''
                             ),
                             'bg-opacity-overlay' => array(
                                 'input_type'  => 'range_slider',
@@ -67,46 +74,9 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
                                 'orientation' => 'horizontal',
                                 'min' => 0,
                                 'max' => 100,
-                                'unit' => '%'
+                                'unit' => '%',
+                                'default'  => 50
                             )
-                        )
-                    ),
-                    array(
-                        'title' => __('Layout', 'text_domain_to_be_replaced'),
-                        'inputs' => array(
-                            'boxed-wide' => array(
-                                'input_type'  => 'select',
-                                'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
-                                'refresh-markup' => true,
-                                'refresh-stylesheet' => false
-                            ),
-
-                            /* suspended, needs more thoughts
-                            'boxed-width' => array(
-                                'input_type'  => 'range_slider',
-                                'title'       => __('Custom boxed width', 'text_domain_to_be_replaced'),
-                                'orientation' => 'horizontal',
-                                'min' => 500,
-                                'max' => 1600,
-                                'unit' => 'px'
-                            ),*/
-                            'height-type' => array(
-                                'input_type'  => 'select',
-                                'title'       => __('Height : fit to screen or custom', 'text_domain_to_be_replaced')
-                            ),
-                            'custom-height' => array(
-                                'input_type'  => 'range_slider',
-                                'title'       => __('Custom height', 'text_domain_to_be_replaced'),
-                                'orientation' => 'horizontal',
-                                'min' => 0,
-                                'max' => 100,
-                                'unit' => '%'
-                            ),
-                            'v-alignment' => array(
-                                'input_type'  => 'v_alignment',
-                                'title'       => __('Vertical alignment', 'text_domain_to_be_replaced'),
-                                'default'     => 'center'
-                            ),
                         )
                     ),
                     array(
@@ -117,22 +87,26 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
                                 'title'       => __('Border width', 'text_domain_to_be_replaced'),
                                 'min' => 0,
                                 'max' => 100,
-                                'unit' => 'px'
+                                'unit' => 'px',
+                                'default' => 1
                             ),
                             'border-type' => array(
                                 'input_type'  => 'select',
-                                'title'       => __('Border shape', 'text_domain_to_be_replaced')
+                                'title'       => __('Border shape', 'text_domain_to_be_replaced'),
+                                'default' => 'none'
                             ),
                             'border-color' => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Border color', 'text_domain_to_be_replaced'),
                                 'width-100'   => true,
+                                'default' => ''
                             ),
                             'shadow' => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Apply a shadow', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-80',
-                                'input_width' => 'width-20'
+                                'input_width' => 'width-20',
+                                'default' => 0
                             )
                         )
                     ),
@@ -147,11 +121,11 @@ function sek_get_module_params_for_sek_level_layout_bg_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_lbb_background', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_lbb_border', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_lbb_boxshadow', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_lbb_height', 10, 3 );
-function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
+add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_background', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_border', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_boxshadow', 10, 3 );
+
+function sek_add_css_rules_for_bg_border_background( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     // LBB - background
     // bg-apply-overlay
@@ -174,7 +148,7 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
     // height-type
     // shadow
 
-    if ( empty( $options[ 'lbb' ] ) )
+    if ( empty( $options[ 'bg_border' ] ) )
       return $rules;
 
     $background_properties = array();
@@ -184,12 +158,12 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
     * background: [background-image] [background-position] / [background-size] [background-repeat] [background-attachment] [background-origin] [background-clip] [background-color];
     */
     // Img background
-    if ( ! empty( $options['lbb'][ 'bg-image'] ) && is_numeric( $options['lbb'][ 'bg-image'] ) ) {
+    if ( ! empty( $options['bg_border'][ 'bg-image'] ) && is_numeric( $options['bg_border'][ 'bg-image'] ) ) {
         //no repeat by default?
-        $background_properties[] = 'url("'. wp_get_attachment_url( $options['lbb'][ 'bg-image'] ) .'")';
+        $background_properties[] = 'url("'. wp_get_attachment_url( $options['bg_border'][ 'bg-image'] ) .'")';
 
         // Img Bg Position
-        if ( ! empty( $options['lbb'][ 'bg-position'] ) ) {
+        if ( ! empty( $options['bg_border'][ 'bg-position'] ) ) {
             $pos_map = array(
                 'top_left'    => '0% 0%',
                 'top'         => '50% 0%',
@@ -202,18 +176,18 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
                 'bottom_right'=> '100% 100%'
             );
 
-            $raw_pos                    = $options['lbb'][ 'bg-position'];
+            $raw_pos                    = $options['bg_border'][ 'bg-position'];
             $background_properties[]         = array_key_exists($raw_pos, $pos_map) ? $pos_map[ $raw_pos ] : $pos_map[ 'center' ];
         }
 
 
         //background size
-        if ( ! empty( $options['lbb'][ 'bg-scale'] ) && 'default' != $options['lbb'][ 'bg-scale'] ) {
+        if ( ! empty( $options['bg_border'][ 'bg-scale'] ) && 'default' != $options['bg_border'][ 'bg-scale'] ) {
             //When specifying a background-size value, it must immediately follow the background-position value.
-            if ( ! empty( $options['lbb'][ 'bg-position'] ) ) {
-                $background_properties[] = '/ ' . $options['lbb'][ 'bg-scale'];
+            if ( ! empty( $options['bg_border'][ 'bg-position'] ) ) {
+                $background_properties[] = '/ ' . $options['bg_border'][ 'bg-scale'];
             } else {
-                $background_size    = $options['lbb'][ 'bg-scale'];
+                $background_size    = $options['bg_border'][ 'bg-scale'];
             }
         }
 
@@ -221,7 +195,7 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
         $background_properties[] = 'no-repeat';
 
         // write the bg-attachment rule only if true <=> set to "fixed"
-        if ( ! empty( $options['lbb'][ 'bg-attachment'] ) && sek_is_checked( $options['lbb'][ 'bg-attachment'] ) ) {
+        if ( ! empty( $options['bg_border'][ 'bg-attachment'] ) && sek_is_checked( $options['bg_border'][ 'bg-attachment'] ) ) {
             $background_properties[] = 'fixed';
         }
 
@@ -229,8 +203,8 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
 
 
     //background color (needs validation: we need a sanitize hex or rgba color)
-    if ( ! empty( $options[ 'lbb' ][ 'bg-color' ] ) ) {
-        $background_properties[] = $options[ 'lbb' ][ 'bg-color' ];
+    if ( ! empty( $options[ 'bg_border' ][ 'bg-color' ] ) ) {
+        $background_properties[] = $options[ 'bg_border' ][ 'bg-color' ];
     }
 
 
@@ -249,16 +223,16 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
     }
 
     //Background overlay?
-    if ( ! empty( $options['lbb'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['lbb'][ 'bg-apply-overlay'] ) ) {
+    if ( ! empty( $options['bg_border'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['bg_border'][ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
-        $bg_color_overlay = isset( $options[ 'lbb' ][ 'bg-color-overlay' ] ) ? $options[ 'lbb' ][ 'bg-color-overlay' ] : null;
+        $bg_color_overlay = isset( $options[ 'bg_border' ][ 'bg-color-overlay' ] ) ? $options[ 'bg_border' ][ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
             //overlay pseudo element
             $bg_overlay_css_rules = 'content:"";display:block;position:absolute;top:0;left:0;right:0;bottom:0;background-color:'.$bg_color_overlay;
 
             //opacity
             //validate/sanitize
-            $bg_overlay_opacity     = isset( $options[ 'lbb' ][ 'bg-opacity-overlay' ] ) ? filter_var( $options[ 'lbb' ][ 'bg-opacity-overlay' ], FILTER_VALIDATE_INT, array( 'options' =>
+            $bg_overlay_opacity     = isset( $options[ 'bg_border' ][ 'bg-opacity-overlay' ] ) ? filter_var( $options[ 'bg_border' ][ 'bg-opacity-overlay' ], FILTER_VALIDATE_INT, array( 'options' =>
                 array( "min_range"=>0, "max_range"=>100 ) )
             ) : FALSE;
             $bg_overlay_opacity     = FALSE !== $bg_overlay_opacity ? filter_var( $bg_overlay_opacity / 100, FILTER_VALIDATE_FLOAT ) : $bg_overlay_opacity;
@@ -293,7 +267,7 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
                 'mq' =>null
             );
         }
-    }//if ( ! empty( $options['lbb'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['lbb'][ 'bg-apply-overlay'] ) ) {}
+    }//if ( ! empty( $options['bg_border'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['bg_border'][ 'bg-apply-overlay'] ) ) {}
 
     return $rules;
 }
@@ -308,15 +282,15 @@ function sek_add_css_rules_for_lbb_background( array $rules, array $level ) {
 
 
 
-function sek_add_css_rules_for_lbb_border( array $rules, array $level ) {
+function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
 
     //TODO: we actually should allow multidimensional border widths plus different units
-    if ( empty( $options[ 'lbb' ] ) )
+    if ( empty( $options[ 'bg_border' ] ) )
       return $rules;
 
-    $border_width = ! empty( $options['lbb'][ 'border-width' ] ) ? filter_var( $options['lbb'][ 'border-width' ], FILTER_VALIDATE_INT ) : FALSE;
-    $border_type  = FALSE !== $border_width && ! empty( $options['lbb'][ 'border-type' ] ) && 'none' != $options['lbb'][ 'border-type' ] ? $options['lbb'][ 'border-type' ] : FALSE;
+    $border_width = ! empty( $options['bg_border'][ 'border-width' ] ) ? filter_var( $options['bg_border'][ 'border-width' ], FILTER_VALIDATE_INT ) : FALSE;
+    $border_type  = FALSE !== $border_width && ! empty( $options['bg_border'][ 'border-type' ] ) && 'none' != $options['bg_border'][ 'border-type' ] ? $options['bg_border'][ 'border-type' ] : FALSE;
 
     //border width
     if ( $border_type ) {
@@ -328,8 +302,8 @@ function sek_add_css_rules_for_lbb_border( array $rules, array $level ) {
 
         //border color
         //(needs validation: we need a sanitize hex or rgba color)
-        if ( ! empty( $options['lbb'][ 'border-color' ] ) ) {
-            $border_properties[] = $options['lbb'][ 'border-color' ];
+        if ( ! empty( $options['bg_border'][ 'border-color' ] ) ) {
+            $border_properties[] = $options['bg_border'][ 'border-color' ];
         }
 
         //append border rules
@@ -356,12 +330,12 @@ function sek_add_css_rules_for_lbb_border( array $rules, array $level ) {
 
 
 
-function sek_add_css_rules_for_lbb_boxshadow( array $rules, array $level ) {
+function sek_add_css_rules_for_bg_border_boxshadow( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    if ( empty( $options[ 'lbb' ] ) )
+    if ( empty( $options[ 'bg_border' ] ) )
       return $rules;
 
-    if ( !empty( $options[ 'lbb' ][ 'shadow' ] ) &&  sek_is_checked( $options['lbb'][ 'shadow'] ) ) {
+    if ( !empty( $options[ 'bg_border' ][ 'shadow' ] ) &&  sek_is_checked( $options['bg_border'][ 'shadow'] ) ) {
         $css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
 
         $rules[]     = array(
@@ -372,58 +346,4 @@ function sek_add_css_rules_for_lbb_boxshadow( array $rules, array $level ) {
     }
     return $rules;
 }
-
-
-
-
-
-
-
-
-
-
-
-function sek_add_css_rules_for_lbb_height( array $rules, array $level ) {
-    $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    if ( empty( $options[ 'lbb' ] ) )
-      return $rules;
-
-    if ( empty( $options[ 'lbb' ][ 'height-type' ] ) )
-      return $rules;
-
-    if ( 'fit-to-screen' == $options[ 'lbb' ][ 'height-type' ] ) {
-        $height = '100';
-    }
-    elseif ( 'custom' == $options[ 'lbb' ][ 'height-type' ] && FALSE !== $height_value = filter_var( $options[ 'lbb' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
-                array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
-        $height = $height_value;
-    }
-    $css_rules = '';
-    if ( isset( $height ) && FALSE !== $height ) {
-        $css_rules .= 'height:' . $height . 'vh;';
-    }
-    if ( !empty( $options[ 'lbb' ][ 'v-alignment' ]) ) {
-        switch( $options[ 'lbb' ][ 'v-alignment' ] ) {
-            case 'top' :
-                $css_rules .= "align-items: flex-start;";
-            break;
-            case 'center' :
-                $css_rules .= "align-items: center;";
-            break;
-            case 'bottom' :
-                $css_rules .= "align-items: flex-end;";
-            break;
-        }
-    }
-    if ( !empty( $css_rules ) ) {
-        $rules[]     = array(
-                'selector' => '[data-sek-id="'.$level['id'].'"]',
-                'css_rules' => $css_rules,
-                'mq' =>null
-        );
-    }
-    //error_log( print_r($rules, true) );
-    return $rules;
-}
-
 ?>

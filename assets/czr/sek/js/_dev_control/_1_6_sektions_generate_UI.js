@@ -230,14 +230,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         case 'sek-generate-level-options-ui' :
                               // Generate the UI for level options
-
-                              var layoutBgBorderOptionsSetId = params.id + '__layoutBgBorder_options',
+                              console.log("PARAMS IN sek-generate-level-options-ui", params );
+                              var bgBorderOptionsSetId = params.id + '__bgBorder_options',
+                                  layoutHeightOptionsSetId = params.id + '__layoutHeight_options',
                                   spacingOptionsSetId = params.id + '__spacing_options';
 
                               // Is the UI currently displayed the one that is being requested ?
-                              // If so, don't generate the ui again, imply focus on it
-                              if ( self.isUIElementCurrentlyGenerated( layoutBgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
-                                    api.control( layoutBgBorderOptionsSetId ).focus({
+                              // If so, don't generate the ui again, simply focus on it
+                              if ( self.isUIElementCurrentlyGenerated( bgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( layoutHeightOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
+                                    api.control( bgBorderOptionsSetId ).focus({
                                           completeCallback : function() {}
                                     });
                                     break;
@@ -253,19 +254,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   });
                               optionDBValue = _.isObject( optionDBValue ) ? optionDBValue : {};
                               _do_register_ = function() {
-                                    // REGISTER LAYOUT BACKGROUND BORDER OPTIONS
+                                    // REGISTER BACKGROUND BORDER OPTIONS
                                     // Make sure this setting is bound only once !
-                                    if( ! api.has( layoutBgBorderOptionsSetId ) ) {
+                                    if( ! api.has( bgBorderOptionsSetId ) ) {
                                           // Schedule the binding to synchronize the options with the main collection setting
                                           // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
-                                          api( layoutBgBorderOptionsSetId, function( _setting_ ) {
+                                          api( bgBorderOptionsSetId, function( _setting_ ) {
                                                 _setting_.bind( _.debounce( function( to, from, args ) {
                                                       try { self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_stylesheet',
                                                             uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
-                                                            options_type : 'layout_background_border',
+                                                            options_type : 'bg_border',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
                                                             settingParams : {
                                                                   to : to,
                                                                   from : from,
@@ -275,38 +276,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
                                                       }
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
-                                          });//api( layoutBgBorderOptionsSetId, function( _setting_ ) {})
+                                          });//api( bgBorderOptionsSetId, function( _setting_ ) {})
 
 
                                           self.register( {
                                                 level : params.level,
                                                 what : 'setting',
-                                                id : layoutBgBorderOptionsSetId,
+                                                id : bgBorderOptionsSetId,
                                                 dirty : false,
-                                                value : optionDBValue.lbb || {},
+                                                value : optionDBValue.bg_border || {},
                                                 transport : 'postMessage',// 'refresh',
                                                 type : '_no_intended_to_be_saved_' //sekData.settingType
                                           });
-                                    }//if( ! api.has( layoutBgBorderOptionsSetId ) ) {
+                                    }//if( ! api.has( bgBorderOptionsSetId ) ) {
 
                                     self.register( {
                                           level : params.level,
                                           level_id : params.id,
                                           what : 'control',
-                                          id : layoutBgBorderOptionsSetId,
-                                          label : '@missi18n Layout Background and Border',
+                                          id : bgBorderOptionsSetId,
+                                          label : '@missi18n Background and Border',
                                           type : 'czr_module',//sekData.controlType,
-                                          module_type : 'sek_level_layout_bg_module',
+                                          module_type : 'sek_level_bg_border_module',
                                           section : params.id,
                                           priority : 10,
-                                          settings : { default : layoutBgBorderOptionsSetId }
+                                          settings : { default : bgBorderOptionsSetId }
                                     }).done( function() {
-                                          api.control( layoutBgBorderOptionsSetId ).focus({
+                                          api.control( bgBorderOptionsSetId ).focus({
                                                 completeCallback : function() {}
                                           });
                                     });
-
-
 
 
                                     // REGISTER SPAGING OPTIONS
@@ -321,7 +320,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       try { self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_stylesheet',
                                                             uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
-                                                            options_type : 'spacing',
+                                                            options_type : 'spacing',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
                                                             settingParams : {
                                                                   to : to,
                                                                   from : from,
@@ -331,7 +330,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
                                                       }
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
-                                          });//api( layoutBgBorderOptionsSetId, function( _setting_ ) {})
+                                          });//api( spacingOptionsSetId, function( _setting_ ) {})
 
 
                                           self.register( {
@@ -363,6 +362,63 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 completeCallback : function() {}
                                           });
                                     });
+
+
+
+                                    // REGISTER SECTION LAYOUT AND HEIGHT OPTIONS
+                                    // Make sure this setting is bound only once !
+                                    if( ! api.has( layoutHeightOptionsSetId ) ) {
+                                          // Schedule the binding to synchronize the options with the main collection setting
+                                          // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
+                                          // They need to be kept in order to keep track of the changes in the customizer.
+                                          // => that's why we check if ! api.has( ... )
+                                          api( layoutHeightOptionsSetId, function( _setting_ ) {
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      try { self.updateAPISettingAndExecutePreviewActions({
+                                                            defaultPreviewAction : 'refresh_stylesheet',
+                                                            uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                            options_type : 'layout_height',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
+                                                            settingParams : {
+                                                                  to : to,
+                                                                  from : from,
+                                                                  args : args
+                                                            }
+                                                      }); } catch( er ) {
+                                                            api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                                      }
+                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          });//api( layoutHeightOptionsSetId, function( _setting_ ) {})
+
+
+                                          self.register( {
+                                                level : params.level,
+                                                what : 'setting',
+                                                id : layoutHeightOptionsSetId,
+                                                dirty : false,
+                                                value : optionDBValue.layout_height || {},
+                                                transport : 'postMessage',// 'refresh',
+                                                type : '_no_intended_to_be_saved_' //sekData.settingType
+                                          });
+                                    }//if( ! api.has( layoutHeightOptionsSetId ) ) {
+
+                                    self.register( {
+                                          level : params.level,
+                                          level_id : params.id,
+                                          what : 'control',
+                                          id : layoutHeightOptionsSetId,
+                                          label : '@missi18n Layout and Height',
+                                          type : 'czr_module',//sekData.controlType,
+                                          module_type : 'sek_level_section_layout_height_module',
+                                          section : params.id,
+                                          priority : 10,
+                                          settings : { default : layoutHeightOptionsSetId }
+                                    }).done( function() {
+                                          api.control( layoutHeightOptionsSetId ).focus({
+                                                completeCallback : function() {}
+                                          });
+                                    });
+
+
                               };//_do_register_
 
                               // Defer the registration when the parent section gets added to the api
@@ -391,7 +447,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // This method
             // @params = {
             //     uiParams : params,
-            //     options_type : 'layout_background_border',
+            //     options_type : 'spacing',
             //     settingParams : {
             //           to : to,
             //           from : from,
@@ -528,7 +584,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               in_sektion : params.uiParams.in_sektion,
 
                               // specific for level options
-                              options_type : params.options_type,//'spacing', 'layout_background_border'
+                              options_type : params.options_type,//'spacing', 'bg_border', 'layout_height'
 
                         }).done( function( ) {
                               // STYLESHEET => default action when modifying the level options

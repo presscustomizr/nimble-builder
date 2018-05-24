@@ -635,10 +635,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
                                     }
                                     switch( params.options_type ) {
-                                          case 'layout_background_border' :
-                                                _candidate_.options.lbb = _valueCandidate;
+                                          case 'bg_border' :
+                                                _candidate_.options.bg_border = _valueCandidate;
                                           break;
-
+                                          case 'layout_height' :
+                                                _candidate_.options.layout_height = _valueCandidate;
+                                          break;
                                           case 'spacing' :
                                                 _candidate_.options.spacing = _valueCandidate;
                                           break;
