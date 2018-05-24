@@ -114,7 +114,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $is_nested            = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
                     $column_wrapper_class = 'sek-container-fluid';
                     //when boxed use proper container class
-                    if ( ! empty( $model[ 'options' ][ 'lbb' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'lbb' ][ 'boxed-wide' ] ) {
+                    if ( ! empty( $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) {
                       $column_wrapper_class = 'sek-container';
                     }
                     ?>
