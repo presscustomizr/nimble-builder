@@ -238,7 +238,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // Scheduled on previewer('ready') each time the previewer is refreshed
             dnd_getDropZonesElements : function() {
-                  return $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
+                  return $( api.previewer.targetWindow().document ).find('body');
             },
 
             // @return boolean
@@ -269,13 +269,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   evt.stopPropagation();
                   var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
                   // console.log('onDropping params', position, evt );
-                  // console.log('onDropping element => ', $dropTarget.data('sek-before-section'), $dropTarget );
+                  // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
                   api.czr_sektions.trigger( 'sek-content-dropped', {
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
                         position : _position,
-                        before_section : $dropTarget.data('sek-before-section'),
-                        after_section : $dropTarget.data('sek-after-section'),
+                        before_section : $dropTarget.data('drop-zone-before-section'),
+                        after_section : $dropTarget.data('drop-zone-after-section'),
                         content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
                         content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
                   });
@@ -369,6 +369,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 'between-sections' === params.drop_target_element.data('sek-location') ) {
                               dropCase = 'content-in-new-section';
                         }
+                        if ( 'in-empty-location' === params.drop_target_element.data('sek-location') ) {
+                              dropCase = 'content-in-empty-location';
+                        }
                         if ( 'between-columns' === params.drop_target_element.data('sek-location') ) {
                               dropCase = 'content-in-new-column';
                         }
@@ -400,6 +403,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
 
+                              case 'content-in-empty-location' :
+                                    api.previewer.trigger( 'sek-add-section', {
+                                          location : params.drop_target_element.closest('div[data-sek-level="location"]').data( 'sek-id'),
+                                          level : 'section',
+                                          is_first_section : true,
+                                          send_to_preview : false
+                                    });
+                              break;
+
                               case 'content-in-new-column' :
 
                               break;
@@ -410,8 +422,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // api.czr_sektions.trigger( 'sek-content-dropped', {
                   //       drop_target_element : $(this),
                   //       position : _position,
-                  //       before_section : $(this).data('sek-before-section'),
-                  //       after_section : $(this).data('sek-after-section'),
+                  //       before_section : $(this).data('drop-zone-before-section'),
+                  //       after_section : $(this).data('drop-zone-after-section'),
                   //       content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
                   //       content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
                   // });

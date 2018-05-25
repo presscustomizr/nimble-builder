@@ -6,7 +6,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // @return a promise()
             ajaxAddSektion : function( params ) {
                   var self = this;
-                  //console.log('preview => ajaxAddSektions', params );
                   return czrapp.doAjax( {
                         action : 'sek_get_content',
                         id : params.apiParams.id,
@@ -49,7 +48,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     } else if ( ! _.isEmpty( params.apiParams.after_section ) && $afterCandidate.length > 0 ) {
                                           $afterCandidate.after( _r_.data );
                                     } else {
-                                          $( '.sektion-wrapper[data-sek-id="' + params.apiParams.location + '"]').first().find('.sek-add-button-wrapper').before( _r_.data );
+                                          $( '[data-sek-id="' + params.apiParams.location + '"]').append( _r_.data );
                                     }
                               }
                         }
@@ -77,8 +76,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         // say it to the parent sektion
                         //=> will be listened to by fittext
-                        $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.cloneId + '"]' ).trigger('sek-section-added');
-                        $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger('sek-section-added');
+                        if ( params.cloneId ) {
+                              $( 'div[data-sek-id="' + params.cloneId + '"]' ).trigger('sek-section-added', params );
+                        }
+                        $( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger('sek-section-added', params );
                   }).fail( function( _r_ ) {
                         czrapp.errare( 'ERROR in sek_get_html_for_injection ? ' , _r_ );
                   });

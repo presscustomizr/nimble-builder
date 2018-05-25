@@ -584,10 +584,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       uiParams = {},
                       sendToPreview = true, //<= the default behaviour is to send a message to the preview when the setting has been changed
                       msgCollection = {
-                            // UPDATE THE MAIN SETTING
+                            // A section can be added in various scenarios :
+                            // 1) when clicking on the ( + ) Insert content => @see preview::scheduleUiClickReactions() => addContentButton
+                            //    - if the target location level already has section(s), then the section is appended in ajax, at the right place
+                            //    - if the target location is empty ( is_first_section is true ), nothing is send to the preview when updating the api setting, and we refresh the location level. => this makes sure that we removes the placeholder printed in the previously empty location
+                            // 2) when adding a nested section to a column
                             'sek-add-section' :{
                                   callback : function( params ) {
-                                        sendToPreview = true;
+                                        sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;
                                         uiParams = {};
                                         apiParams = {
                                               action : 'sek-add-section',
@@ -595,17 +599,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               location : params.location,
                                               in_sektion : params.in_sektion,
                                               in_column : params.in_column,
-                                              is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column )
+                                              is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
+                                              before_section : params.before_section,
+                                              after_section : params.after_section,
+                                              is_first_section : params.is_first_section
                                         };
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
                                         // When a section is created ( not duplicated )
-                                        // Send back a msg to the panel to automatically add an initial column in the created sektion
-                                        api.previewer.trigger( 'sek-add-column', {
-                                              in_sektion : params.apiParams.id,
-                                              autofocus : false//<=We want to focus on the section ui in this case, that's why the autofocus is set to false
-                                        });
+                                        console.log( "react to preview Msg, complete => ", params );
+                                        if ( params.apiParams.is_first_section ) {
+                                              api.previewer.trigger( 'sek-refresh-level', {
+                                                    level : 'location',
+                                                    id :  params.apiParams.location
+                                              });
+                                        }
                                         api.previewer.trigger( 'sek-pick-module', {});
                                         api.previewer.send('sek-focus-on', { id : params.apiParams.id });
                                   }
@@ -695,11 +704,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         }
                                         return self.updateAPISetting( apiParams );
                                   },
-                                  complete : function() {
+                                  complete : function( params ) {
+                                        //console.log('PARAMS IN SEK REMOVE ', params );
                                         api.previewer.trigger( 'sek-pick-module', {});
                                         // always update the root fonts property after a removal
                                         // because the removed level(s) might had registered fonts
                                         self.updateAPISetting({ action : 'sek-update-fonts' } );
+
+                                        // When the last section of a location gets removed, make sure we refresh the location level, to print the sek-empty-collection-placeholder
+                                        if ( 'sek-remove-section' === params.apiParams.action ) {
+                                              var locationLevel = self.getLevelModel( params.apiParams.location );
+                                              if ( _.isEmpty( locationLevel.collection ) ) {
+                                                    api.previewer.trigger( 'sek-refresh-level', {
+                                                          level : 'location',
+                                                          id :  params.apiParams.location
+                                                    });
+                                              }
+                                        }
                                   }
                             },
 
@@ -1864,7 +1885,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           columnCandidate.collection.push({
                                                 id : params.id,
                                                 level : 'section',
-                                                collection : [],
+                                                collection : [{
+                                                      id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                                      level : 'column',
+                                                      collection : []
+                                                }],
                                                 is_nested : true
                                           });
                                     } else {
@@ -1879,11 +1904,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           locationCandidate.collection.push({
                                                 id : params.id,
                                                 level : 'section',
-                                                collection : []
-                                                //module_type : 'czr_simple_html_module',
-                                                //settingType : '_no_intended_to_be_saved_',
-                                                //controlType : 'czr_module',
-                                                //value : []
+                                                collection : [{
+                                                      id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                                      level : 'column',
+                                                      collection : []
+                                                }]
                                           });
                                     }
 
@@ -3327,7 +3352,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // Scheduled on previewer('ready') each time the previewer is refreshed
             dnd_getDropZonesElements : function() {
-                  return $( api.previewer.targetWindow().document ).find( '.sektion-wrapper');
+                  return $( api.previewer.targetWindow().document ).find('body');
             },
 
             // @return boolean
@@ -3358,13 +3383,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   evt.stopPropagation();
                   var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
                   // console.log('onDropping params', position, evt );
-                  // console.log('onDropping element => ', $dropTarget.data('sek-before-section'), $dropTarget );
+                  // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
                   api.czr_sektions.trigger( 'sek-content-dropped', {
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
                         position : _position,
-                        before_section : $dropTarget.data('sek-before-section'),
-                        after_section : $dropTarget.data('sek-after-section'),
+                        before_section : $dropTarget.data('drop-zone-before-section'),
+                        after_section : $dropTarget.data('drop-zone-after-section'),
                         content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
                         content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
                   });
@@ -3458,6 +3483,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 'between-sections' === params.drop_target_element.data('sek-location') ) {
                               dropCase = 'content-in-new-section';
                         }
+                        if ( 'in-empty-location' === params.drop_target_element.data('sek-location') ) {
+                              dropCase = 'content-in-empty-location';
+                        }
                         if ( 'between-columns' === params.drop_target_element.data('sek-location') ) {
                               dropCase = 'content-in-new-column';
                         }
@@ -3489,6 +3517,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
 
+                              case 'content-in-empty-location' :
+                                    api.previewer.trigger( 'sek-add-section', {
+                                          location : params.drop_target_element.closest('div[data-sek-level="location"]').data( 'sek-id'),
+                                          level : 'section',
+                                          is_first_section : true,
+                                          send_to_preview : false
+                                    });
+                              break;
+
                               case 'content-in-new-column' :
 
                               break;
@@ -3499,8 +3536,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // api.czr_sektions.trigger( 'sek-content-dropped', {
                   //       drop_target_element : $(this),
                   //       position : _position,
-                  //       before_section : $(this).data('sek-before-section'),
-                  //       after_section : $(this).data('sek-after-section'),
+                  //       before_section : $(this).data('drop-zone-before-section'),
+                  //       after_section : $(this).data('drop-zone-after-section'),
                   //       content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
                   //       content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
                   // });
@@ -3536,7 +3573,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
                         evt.preventDefault();
                         $wrapper.find('input[type="number"]').each( function() {
-                              $(this).val(0);
+                              $(this).val('').trigger('change');
                         });
                   });
 

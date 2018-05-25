@@ -15,10 +15,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       uiParams = {},
                       sendToPreview = true, //<= the default behaviour is to send a message to the preview when the setting has been changed
                       msgCollection = {
-                            // UPDATE THE MAIN SETTING
+                            // A section can be added in various scenarios :
+                            // 1) when clicking on the ( + ) Insert content => @see preview::scheduleUiClickReactions() => addContentButton
+                            //    - if the target location level already has section(s), then the section is appended in ajax, at the right place
+                            //    - if the target location is empty ( is_first_section is true ), nothing is send to the preview when updating the api setting, and we refresh the location level. => this makes sure that we removes the placeholder printed in the previously empty location
+                            // 2) when adding a nested section to a column
                             'sek-add-section' :{
                                   callback : function( params ) {
-                                        sendToPreview = true;
+                                        sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;
                                         uiParams = {};
                                         apiParams = {
                                               action : 'sek-add-section',
@@ -26,17 +30,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               location : params.location,
                                               in_sektion : params.in_sektion,
                                               in_column : params.in_column,
-                                              is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column )
+                                              is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
+                                              before_section : params.before_section,
+                                              after_section : params.after_section,
+                                              is_first_section : params.is_first_section
                                         };
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
                                         // When a section is created ( not duplicated )
-                                        // Send back a msg to the panel to automatically add an initial column in the created sektion
-                                        api.previewer.trigger( 'sek-add-column', {
-                                              in_sektion : params.apiParams.id,
-                                              autofocus : false//<=We want to focus on the section ui in this case, that's why the autofocus is set to false
-                                        });
+                                        console.log( "react to preview Msg, complete => ", params );
+                                        if ( params.apiParams.is_first_section ) {
+                                              api.previewer.trigger( 'sek-refresh-level', {
+                                                    level : 'location',
+                                                    id :  params.apiParams.location
+                                              });
+                                        }
                                         api.previewer.trigger( 'sek-pick-module', {});
                                         api.previewer.send('sek-focus-on', { id : params.apiParams.id });
                                   }
@@ -126,11 +135,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         }
                                         return self.updateAPISetting( apiParams );
                                   },
-                                  complete : function() {
+                                  complete : function( params ) {
+                                        //console.log('PARAMS IN SEK REMOVE ', params );
                                         api.previewer.trigger( 'sek-pick-module', {});
                                         // always update the root fonts property after a removal
                                         // because the removed level(s) might had registered fonts
                                         self.updateAPISetting({ action : 'sek-update-fonts' } );
+
+                                        // When the last section of a location gets removed, make sure we refresh the location level, to print the sek-empty-collection-placeholder
+                                        if ( 'sek-remove-section' === params.apiParams.action ) {
+                                              var locationLevel = self.getLevelModel( params.apiParams.location );
+                                              if ( _.isEmpty( locationLevel.collection ) ) {
+                                                    api.previewer.trigger( 'sek-refresh-level', {
+                                                          level : 'location',
+                                                          id :  params.apiParams.location
+                                                    });
+                                              }
+                                        }
                                   }
                             },
 

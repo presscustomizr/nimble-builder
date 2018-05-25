@@ -42,7 +42,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         switch( clickedOn ) {
                               case 'addContentButton' :
                                     //self._send_( $el, { action : 'pick-section' } );
-                                    self._send_( $el, { action : 'pick-module', level : _level , id : _id } );
+                                    //self._send_( $el, { action : 'pick-module', level : _level , id : _id } );
+                                    var is_first_section = true === $el.closest('[data-sek-is-first-section]').data('sek-is-first-section');
+
+                                    api.preview.send( 'sek-add-section', {
+                                          location : _location,
+                                          level : 'section',
+                                          before_section : $el.closest('[data-sek-before-section]').data('sek-before-section'),
+                                          after_section : $el.closest('[data-sek-after-section]').data('sek-after-section'),
+                                          is_first_section : is_first_section,
+                                          send_to_preview : ! is_first_section
+                                    });
                               break;
                               case 'overlayUiIcon' :
 

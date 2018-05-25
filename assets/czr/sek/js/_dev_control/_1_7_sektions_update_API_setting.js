@@ -75,7 +75,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           columnCandidate.collection.push({
                                                 id : params.id,
                                                 level : 'section',
-                                                collection : [],
+                                                collection : [{
+                                                      id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                                      level : 'column',
+                                                      collection : []
+                                                }],
                                                 is_nested : true
                                           });
                                     } else {
@@ -90,11 +94,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           locationCandidate.collection.push({
                                                 id : params.id,
                                                 level : 'section',
-                                                collection : []
-                                                //module_type : 'czr_simple_html_module',
-                                                //settingType : '_no_intended_to_be_saved_',
-                                                //controlType : 'czr_module',
-                                                //value : []
+                                                collection : [{
+                                                      id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                                      level : 'column',
+                                                      collection : []
+                                                }]
                                           });
                                     }
 

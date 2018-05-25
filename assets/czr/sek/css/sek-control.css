@@ -51,25 +51,31 @@ ul[id*="sub-accordion-section-__sek__"] {
 
 
 /* MODULE AND SECTION PICKER INPUT */
+[data-sek-content-type] {
+    float: left;
+    padding: 0%;
+    margin: 3%;
+    text-align: center;
+    cursor: move;
+    cursor: -webkit-grab;
+    background: #eee;
+    transition: all .20s ease;
+}
 [data-sek-content-type="module"] {
   width: 40%;
-  float: left;
-  padding: 5%;
-  text-align: center;
-  cursor: move;/* fallback */
-  cursor: -webkit-grab;
 }
 [data-sek-content-type="preset_section"] {
   width: 90%;
-  float: left;
-  padding: 5%;
-  text-align: center;
-  cursor: move;/* fallback */
-  cursor: -webkit-grab;
 }
+
+
+[data-sek-content-type]:hover {
+  -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+
 [data-sek-content-type] p {
   padding: 9%;
-  background: #eee;
 }
 
 .sek-grabbing {

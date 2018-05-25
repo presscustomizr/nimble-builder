@@ -127,28 +127,27 @@ add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_bor
 
 function sek_add_css_rules_for_bg_border_background( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    // LBB - background
-    // bg-apply-overlay
-    // bg-attachment
-    // bg-color
-    // bg-color-overlay
-    // bg-image
-    // bg-opacity-overlay
-    // bg-position
-    // bg-scale
-    // bg-video
 
-    //TODO:
-    // border-color
-    // border-type
-    // border-width
-    // boxed-wide
-    // boxed-width
-    // custom-height
-    // height-type
-    // shadow
+    // $default_value_model = Array
+    // (
+    //     [bg-color] =>
+    //     [bg-image] =>
+    //     [bg-position] => center
+    //     [bg-attachment] => 0
+    //     [bg-scale] => default
+    //     [bg-apply-overlay] => 0
+    //     [bg-color-overlay] =>
+    //     [bg-opacity-overlay] => 50
+    //     [border-width] => 1
+    //     [border-type] => none
+    //     [border-color] =>
+    //     [shadow] => 0
+    // )
+    $default_value_model  = sek_get_default_module_model( 'sek_level_bg_border_module' );
+    $bg_border_options = ( ! empty( $options[ 'bg_border' ] ) && is_array( $options[ 'bg_border' ] ) ) ? $options[ 'bg_border' ] : array();
+    $bg_border_options = wp_parse_args( $bg_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
-    if ( empty( $options[ 'bg_border' ] ) )
+    if ( empty( $bg_border_options ) )
       return $rules;
 
     $background_properties = array();
@@ -158,12 +157,12 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
     * background: [background-image] [background-position] / [background-size] [background-repeat] [background-attachment] [background-origin] [background-clip] [background-color];
     */
     // Img background
-    if ( ! empty( $options['bg_border'][ 'bg-image'] ) && is_numeric( $options['bg_border'][ 'bg-image'] ) ) {
+    if ( ! empty( $bg_border_options[ 'bg-image'] ) && is_numeric( $bg_border_options[ 'bg-image'] ) ) {
         //no repeat by default?
-        $background_properties[] = 'url("'. wp_get_attachment_url( $options['bg_border'][ 'bg-image'] ) .'")';
+        $background_properties[] = 'url("'. wp_get_attachment_url( $bg_border_options[ 'bg-image'] ) .'")';
 
         // Img Bg Position
-        if ( ! empty( $options['bg_border'][ 'bg-position'] ) ) {
+        if ( ! empty( $bg_border_options[ 'bg-position'] ) ) {
             $pos_map = array(
                 'top_left'    => '0% 0%',
                 'top'         => '50% 0%',
@@ -176,18 +175,18 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
                 'bottom_right'=> '100% 100%'
             );
 
-            $raw_pos                    = $options['bg_border'][ 'bg-position'];
+            $raw_pos                    = $bg_border_options[ 'bg-position'];
             $background_properties[]         = array_key_exists($raw_pos, $pos_map) ? $pos_map[ $raw_pos ] : $pos_map[ 'center' ];
         }
 
 
         //background size
-        if ( ! empty( $options['bg_border'][ 'bg-scale'] ) && 'default' != $options['bg_border'][ 'bg-scale'] ) {
+        if ( ! empty( $bg_border_options[ 'bg-scale'] ) && 'default' != $bg_border_options[ 'bg-scale'] ) {
             //When specifying a background-size value, it must immediately follow the background-position value.
-            if ( ! empty( $options['bg_border'][ 'bg-position'] ) ) {
-                $background_properties[] = '/ ' . $options['bg_border'][ 'bg-scale'];
+            if ( ! empty( $bg_border_options[ 'bg-position'] ) ) {
+                $background_properties[] = '/ ' . $bg_border_options[ 'bg-scale'];
             } else {
-                $background_size    = $options['bg_border'][ 'bg-scale'];
+                $background_size    = $bg_border_options[ 'bg-scale'];
             }
         }
 
@@ -195,7 +194,7 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
         $background_properties[] = 'no-repeat';
 
         // write the bg-attachment rule only if true <=> set to "fixed"
-        if ( ! empty( $options['bg_border'][ 'bg-attachment'] ) && sek_is_checked( $options['bg_border'][ 'bg-attachment'] ) ) {
+        if ( ! empty( $bg_border_options[ 'bg-attachment'] ) && sek_is_checked( $bg_border_options[ 'bg-attachment'] ) ) {
             $background_properties[] = 'fixed';
         }
 
@@ -203,8 +202,8 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
 
 
     //background color (needs validation: we need a sanitize hex or rgba color)
-    if ( ! empty( $options[ 'bg_border' ][ 'bg-color' ] ) ) {
-        $background_properties[] = $options[ 'bg_border' ][ 'bg-color' ];
+    if ( ! empty( $bg_border_options[ 'bg-color' ] ) ) {
+        $background_properties[] = $bg_border_options[ 'bg-color' ];
     }
 
 
@@ -223,16 +222,16 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
     }
 
     //Background overlay?
-    if ( ! empty( $options['bg_border'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['bg_border'][ 'bg-apply-overlay'] ) ) {
+    if ( ! empty( $bg_border_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_border_options[ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
-        $bg_color_overlay = isset( $options[ 'bg_border' ][ 'bg-color-overlay' ] ) ? $options[ 'bg_border' ][ 'bg-color-overlay' ] : null;
+        $bg_color_overlay = isset( $bg_border_options[ 'bg-color-overlay' ] ) ? $bg_border_options[ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
             //overlay pseudo element
             $bg_overlay_css_rules = 'content:"";display:block;position:absolute;top:0;left:0;right:0;bottom:0;background-color:'.$bg_color_overlay;
 
             //opacity
             //validate/sanitize
-            $bg_overlay_opacity     = isset( $options[ 'bg_border' ][ 'bg-opacity-overlay' ] ) ? filter_var( $options[ 'bg_border' ][ 'bg-opacity-overlay' ], FILTER_VALIDATE_INT, array( 'options' =>
+            $bg_overlay_opacity     = isset( $bg_border_options[ 'bg-opacity-overlay' ] ) ? filter_var( $bg_border_options[ 'bg-opacity-overlay' ], FILTER_VALIDATE_INT, array( 'options' =>
                 array( "min_range"=>0, "max_range"=>100 ) )
             ) : FALSE;
             $bg_overlay_opacity     = FALSE !== $bg_overlay_opacity ? filter_var( $bg_overlay_opacity / 100, FILTER_VALIDATE_FLOAT ) : $bg_overlay_opacity;
@@ -267,7 +266,7 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
                 'mq' =>null
             );
         }
-    }//if ( ! empty( $options['bg_border'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['bg_border'][ 'bg-apply-overlay'] ) ) {}
+    }//if ( ! empty( $bg_border_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_border_options[ 'bg-apply-overlay'] ) ) {}
 
     return $rules;
 }
@@ -284,13 +283,31 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
 
 function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
+    // $default_value_model = Array
+    // (
+    //     [bg-color] =>
+    //     [bg-image] =>
+    //     [bg-position] => center
+    //     [bg-attachment] => 0
+    //     [bg-scale] => default
+    //     [bg-apply-overlay] => 0
+    //     [bg-color-overlay] =>
+    //     [bg-opacity-overlay] => 50
+    //     [border-width] => 1
+    //     [border-type] => none
+    //     [border-color] =>
+    //     [shadow] => 0
+    // )
+    $default_value_model  = sek_get_default_module_model( 'sek_level_bg_border_module' );
+    $bg_border_options = ( ! empty( $options[ 'bg_border' ] ) && is_array( $options[ 'bg_border' ] ) ) ? $options[ 'bg_border' ] : array();
+    $bg_border_options = wp_parse_args( $bg_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
     //TODO: we actually should allow multidimensional border widths plus different units
-    if ( empty( $options[ 'bg_border' ] ) )
+    if ( empty( $bg_border_options ) )
       return $rules;
 
-    $border_width = ! empty( $options['bg_border'][ 'border-width' ] ) ? filter_var( $options['bg_border'][ 'border-width' ], FILTER_VALIDATE_INT ) : FALSE;
-    $border_type  = FALSE !== $border_width && ! empty( $options['bg_border'][ 'border-type' ] ) && 'none' != $options['bg_border'][ 'border-type' ] ? $options['bg_border'][ 'border-type' ] : FALSE;
+    $border_width = ! empty( $bg_border_options[ 'border-width' ] ) ? filter_var( $bg_border_options[ 'border-width' ], FILTER_VALIDATE_INT ) : FALSE;
+    $border_type  = FALSE !== $border_width && ! empty( $bg_border_options[ 'border-type' ] ) && 'none' != $bg_border_options[ 'border-type' ] ? $bg_border_options[ 'border-type' ] : FALSE;
 
     //border width
     if ( $border_type ) {
@@ -302,8 +319,8 @@ function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
 
         //border color
         //(needs validation: we need a sanitize hex or rgba color)
-        if ( ! empty( $options['bg_border'][ 'border-color' ] ) ) {
-            $border_properties[] = $options['bg_border'][ 'border-color' ];
+        if ( ! empty( $bg_border_options[ 'border-color' ] ) ) {
+            $border_properties[] = $bg_border_options[ 'border-color' ];
         }
 
         //append border rules
@@ -332,10 +349,29 @@ function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
 
 function sek_add_css_rules_for_bg_border_boxshadow( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    if ( empty( $options[ 'bg_border' ] ) )
+    // $default_value_model = Array
+    // (
+    //     [bg-color] =>
+    //     [bg-image] =>
+    //     [bg-position] => center
+    //     [bg-attachment] => 0
+    //     [bg-scale] => default
+    //     [bg-apply-overlay] => 0
+    //     [bg-color-overlay] =>
+    //     [bg-opacity-overlay] => 50
+    //     [border-width] => 1
+    //     [border-type] => none
+    //     [border-color] =>
+    //     [shadow] => 0
+    // )
+    $default_value_model  = sek_get_default_module_model( 'sek_level_bg_border_module' );
+    $bg_border_options = ( ! empty( $options[ 'bg_border' ] ) && is_array( $options[ 'bg_border' ] ) ) ? $options[ 'bg_border' ] : array();
+    $bg_border_options = wp_parse_args( $bg_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
+
+    if ( empty( $bg_border_options) )
       return $rules;
 
-    if ( !empty( $options[ 'bg_border' ][ 'shadow' ] ) &&  sek_is_checked( $options['bg_border'][ 'shadow'] ) ) {
+    if ( !empty( $bg_border_options[ 'shadow' ] ) &&  sek_is_checked( $bg_border_options[ 'shadow'] ) ) {
         $css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
 
         $rules[]     = array(

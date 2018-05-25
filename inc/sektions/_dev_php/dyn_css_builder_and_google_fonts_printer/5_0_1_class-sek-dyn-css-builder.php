@@ -53,20 +53,21 @@ class Sek_Dyn_CSS_Builder {
 
     // Fired in the constructor
     // Walk the level tree and build rules when needed
+    // The rules are filtered when some conditions are met.
+    // This allows us to schedule the css rules addition remotely :
+    // - from the module registration php file
+    // - from the generic input types ( @see sek_add_css_rules_for_generic_css_input_types() )
     public function sek_css_rules_sniffer_walker( $level = null, $parent_level = array() ) {
         $level      = is_null( $level ) ? $this->sek_model : $level;
         $level      = is_array( $level ) ? $level : array();
+
+        // The parent level is set when the function is invoked recursively, from a level where we actually have a 'level' property
         if ( ! empty( $parent_level ) ) {
             $this -> parent_level_model = $parent_level;
         }
 
         foreach ( $level as $key => $entry ) {
              $rules = array();
-            // // set the current parent level model
-            // if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
-            //     $this -> parent_level_model = $entry;
-            // }
-
             // Populate rules for sections / columns / modules
             if ( !empty( $entry[ 'level' ] ) && ( !empty( $entry[ 'options' ] ) || !empty( $entry[ 'width' ] ) ) ) {
                 // build rules for level options => section / column / module
@@ -125,24 +126,28 @@ class Sek_Dyn_CSS_Builder {
             }
 
             // keep walking if the current $entry is an array
-            // make sure that the parent_level_model is set right before jumping down the next level
+            // make sure that the parent_level_model is set right before jumping down to the next level
             if ( is_array( $entry ) ) {
+                // Can we set a parent level ?
                 if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
                     $parent_level = $entry;
                 }
+                // Let's go recursive
                 $this->sek_css_rules_sniffer_walker( $entry, $parent_level );
-                // Reset the level model after walking the sublevels
+
 
             }
+            // Reset the parent level model because it might have been modified after walking the sublevels
             if ( ! empty( $parent_level ) ) {
                 $this -> parent_level_model = $parent_level;
             }
         }//foreach
-    }
+    }//sek_css_rules_sniffer_walker()
 
 
 
     // @return void()
+    // populates the css rules ::collection property, organized by media queries
     public function sek_populate( $selector, $css_rules, string $mq = null ) {
         if ( ! is_string( $selector ) )
             return;
@@ -172,7 +177,9 @@ class Sek_Dyn_CSS_Builder {
         }
 
         $this->collection[ $mq_device ][ $selector ][] = $css_rules;
-    }
+    }//sek_populate
+
+
 
     // @return string
     private function sek_maybe_wrap_in_media_query( $css,  $mq_device = 'all_devices' ) {
@@ -182,7 +189,9 @@ class Sek_Dyn_CSS_Builder {
         return sprintf( '@media(%1$s){%2$s}', $mq_device, $css);
     }
 
-    // sorts the max-width media queries from all_devices to the smallest
+
+    // sorts the media queries from all_devices to the smallest width
+    // This doesn't make the difference between max-width and min-width
     // @return integer
     private function user_defined_array_key_sort_fn($a, $b) {
         if ( 'all_devices' === $a ) {
@@ -197,7 +206,7 @@ class Sek_Dyn_CSS_Builder {
         return $b_int - $a_int;
     }
 
-    //@returns a stringified stylesheet
+    //@returns a stringified stylesheet, ready to be printed on the page or in a file
     public function get_stylesheet() {
         $css = '';
         // error_log('<mq collection>');
@@ -228,8 +237,6 @@ class Sek_Dyn_CSS_Builder {
 
 
 
-
-
     // hook : sek_add_css_rules_for_level_options
     public function sek_add_rules_for_column_width( array $rules, array $level ) {
         $width   = empty( $level[ 'width' ] ) || !is_numeric( $level[ 'width' ] ) ? '' : $level['width'];
@@ -244,9 +251,9 @@ class Sek_Dyn_CSS_Builder {
             'css_rules'     => $css_rules,
             'mq'            => 'min-width:' . self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] .'px'
         );
-
         return $rules;
     }
+
 
 }//end class
 

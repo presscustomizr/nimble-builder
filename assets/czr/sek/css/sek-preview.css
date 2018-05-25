@@ -31,10 +31,28 @@
 .sek-module h4 { color:red;}
 
 
-.sek-add-button-wrapper {
+
+
+
+
+/* This is printed when the location has no section
+ an add content button is rendered on hovering in this container */
+.sek-empty-collection-placeholder {
+  position: relative;
+  min-height: 50px;
+  margin:20px 0;
+  border-radius: 5px;
+}
+
+.sek-empty-collection-placeholder:hover {
+  border: 2px dotted black;
+}
+
+.sek-add-button-wrapper, {
   text-align: center;
   width: 100%;
   margin: 1rem 0;
+  position: relative;
 }
 
 
@@ -74,7 +92,7 @@
 .sek-block-overlay-header {
     position: relative;
     top: -18px;
-    opacity: 0.6;
+    opacity: 0.7;
     transition: opacity .25s ease;
 }
 .sek-block-overlay-header:hover {
@@ -88,7 +106,7 @@
 .sek-block-overlay-actions {
   background: #00A0D2;
   float: left;
-  height: 18px;
+  min-height: 18px;
   margin: -1px -1px 0;
   padding: 0 4px;
   text-shadow: none;
@@ -154,12 +172,16 @@
 }
 .sek-section > .sek-section-overlay .sek-block-overlay-header {
   top:0px;
+  z-index: 1000;
 }
-
 
 
 /* COLUMN OVERLAY*/
 /* prevent style propagation to nested levels with > */
+.sek-column > .sek-column-overlay .sek-block-overlay-header {
+  top:0px;
+  z-index: 1001;
+}
 .sek-column > .sek-block-overlay .sek-block-overlay-actions {
   background: #0085ba;
 }
@@ -170,6 +192,9 @@
     top: 0px;
     right: 0px;
     /*z-index: 100010;*/
+}
+.sek-column-overlay .dev-level-data {
+  background: #0085ba;
 }
 
 
@@ -187,11 +212,15 @@
 .sek-module:hover{
   cursor:pointer;
 }
+.sek-module > .sek-module-overlay .sek-block-overlay-header {
+  top:0px;
+  z-index: 1002;
+}
 .sek-module > .sek-block-overlay .sek-block-overlay-actions {
-  background: red;
+  background: #c68f00;
 }
 .sek-module-overlay {
-    border: 1px dotted red;
+    border: 1px dotted #c68f00;
     bottom: 0px;
     left: 0px;
     top: 0px;
@@ -199,7 +228,7 @@
     /*z-index: 100015;*/
 }
 /*.sek-module-inner {
-  border: 2px dotted red;
+  border: 2px dotted #30afd9;
 }*/
 
 /*.sek-block-overlay-title {
@@ -220,12 +249,9 @@
     padding: 1px 12px;
     font-size: 11px;
 }
-.sek-column-overlay .dev-level-data {
-  background: #0085ba;
-}
 
 .sek-module-overlay .dev-level-data {
-  background: red;
+  background: #c68f00;
   right: 0;
   left: unset;
 }
@@ -294,23 +320,26 @@
 
 .sek-drop-zone {
   height: 0px;
-  -webkit-transition: all 0.4s ease;
-  -moz-transition: all 0.4s ease;
-  -o-transition: all 0.4s ease;
-  transition: all 0.4s ease;
 }
 .sek-active-drop-zone.sek-drop-zone {
   height: auto!important;
   min-height : 50px;
 }
 .sek-dragging .sek-drop-zone {
-  height : 20px;
+  height: 20px;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  transition: all 0.4s ease;
   animation: sek-dragging-highlight 2s infinite;
   background: #eee;
+  border:2px dotted #a2a2a2;
+  border-radius: 5px;
 }
 @keyframes sek-dragging-highlight {
   0% {background-color: #eee;}
-  50% {background-color: #e8e8e8;}
+  50% {background-color: #dcdcdc;}
+  /*50% {background-color: #e8e8e8;}*/
   100% {background-color: #eee;}
 }
 
@@ -508,6 +537,10 @@
     /*transition: .1s ease-in-out;*/
     display: none;
 }
+/* when inserted in an empty location placeholder, center vertically */
+.sek-empty-collection-placeholder .sek-add-content-button {
+  top: 50%
+}
 .sek-add-content-button.is_last {
     bottom: 0;
     top: unset;
@@ -538,8 +571,8 @@
     display: inline-flex;
     align-items: center;
     border-radius: 1000px;
-    width: 26px;
-    height: 26px;
+    width: 18px;
+    height: 18px;
     background-color: #0085ba;
     color: #fff;
     border: none;
@@ -547,32 +580,46 @@
     font-size: 13px;
     overflow: hidden;
     transition: width .5s ease,background-color .5s ease;
-    font-weight: 700;
+    font-weight: 400;
     font-style: normal;
     cursor: pointer;
     position: absolute;
     left: calc(50% - 12px);
-    transition: all .35s ease;
-    opacity: 0.9;
+    transition: all .25s ease;
+    opacity: 0.7;
 }
 
 
-  .sek-add-content-btn:not(.disabled):hover {
-      --sek-add-content-btn-width: 52px;
-      width: calc(var(--sek-add-content-btn-width) + 62px);
-      /*transition: all .35s ease;*/
-      background-color: #008ec2;
-      /*transition: opacity,background-color 0.35s ease-in-out;*/
-      opacity: 1;
-      left: calc(50% - 60px);
-  }
-
+.sek-add-content-btn:hover {
+    width: 26px;
+    height: 26px;
+    --sek-add-content-btn-width: 65px;
+    width: calc(var(--sek-add-content-btn-width) + 70px);
+    /*transition: all .35s ease;*/
+    background-color: #008ec2;
+    /*transition: opacity,background-color 0.35s ease-in-out;*/
+    opacity: 1;
+    left: calc(50% - 83px);
+    -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
 .sek-action-button-icon {
-  padding: 0 7px;
+  font-size: 19px;
+  left: 4px;
+  top: -4px;
+  position: relative;
 }
+.sek-add-content-btn:hover .sek-action-button-icon {
+  font-size: 19px;
+  left: 8px;
+  top: 0px;
+}
+
 .action-button-text {
     visibility: hidden;
     white-space: nowrap;
+    padding-left: 14px;
+    padding-bottom: 2px;
 }
 
 .sek-add-content-btn:not(.disabled):hover .action-button-text {

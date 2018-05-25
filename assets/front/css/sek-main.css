@@ -6,6 +6,11 @@
   margin: 0;
 }
 
+/* if the column or module height is set to value higher than their parent section's height, we need to restrict the visible content height */
+/*.sek-section {
+  overflow: hidden;
+}*/
+
 .sek-sektion-inner{
     padding: 15px;
 }

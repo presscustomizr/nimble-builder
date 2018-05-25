@@ -75,6 +75,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             //   id : params.id
                             // }
                             'sek-refresh-level' : function( params ) {
+
                                   czrapp.doAjax( {
                                         skope_id : params.skope_id,
                                         action : 'sek_get_content',
@@ -85,18 +86,20 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         czrapp.errare( 'ERROR reactToPanelMsg => sek-refresh-level => ' , _r_ );
                                   }).done( function( _r_ ) {
                                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.id + '"></span>',
-                                            $currentLevelEl = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.id + '"]' );
+                                            $currentLevelEl = $( 'div[data-sek-id="' + params.apiParams.id + '"]' );
                                         if ( $currentLevelEl.length < 1 ) {
-                                              czrapp.errare( 'reactToPanelMsg => sek-refresh-level ajax done => the level to refresh is not rendered in the page' );
+                                              czrapp.errare( 'reactToPanelMsg => sek-refresh-level ajax done => the level to refresh is not rendered in the page', _r_ );
                                               return;
                                         }
                                         $currentLevelEl.before( placeholderHtml );
-                                        var $placeHolder = $( '.sektion-wrapper').find( '[data-sek-placeholder-for="' + params.apiParams.id + '"]' );
+                                        var $placeHolder = $( '[data-sek-placeholder-for="' + params.apiParams.id + '"]' );
                                         $currentLevelEl.remove();
                                         $placeHolder.after( _r_.data );
                                         $placeHolder.remove();
 
-                                        $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger( 'sek-refresh-level' );
+                                        $( '.sektion-wrapper' )
+                                              .find( 'div[data-sek-id="' + params.apiParams.id + '"]' )
+                                              .trigger( 'sek-refresh-level', { level : params.apiParams.level, id : params.apiParams.id } );
                                   });
                             },
 
@@ -201,22 +204,32 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             //@params { type : module || preset_section }
                             'sek-drag-start' : function( params ) {
+                                  console.log('PARAMS in sek-drag-start', params, $('.sektion-wrapper').children('[data-sek-level="section"]').length );
                                   // append the drop zones between sections
                                   var i = 1;
                                   $('.sektion-wrapper').children('[data-sek-level="section"]').each( function() {
+                                        console.log( 'merde', $(this), $('[data-drop-zone-before-section="' + $(this).data('sek-id') +'"]').length );
                                         // Always before
-                                        if ( $('[data-sek-before-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
+                                        if ( $('[data-drop-zone-before-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
+                                              console.log( $(this) );
                                               $(this).before(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-drop-zone" data-sek-location="between-sections" data-sek-before-section="' + $(this).data('sek-id') +'"></div>'
+                                                '<div class="sek-content-' + params.type + '-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + $(this).data('sek-id') +'"></div>'
                                               );
                                         }
                                         // After the last one
                                         if (  i == $('.sektion-wrapper').children('[data-sek-level="section"]').length ) {
                                               $(this).after(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-drop-zone" data-sek-location="between-sections" data-sek-after-section="' + $(this).data('sek-id') +'"></div>'
+                                                '<div class="sek-content-' + params.type + '-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + $(this).data('sek-id') +'"></div>'
                                               );
                                         }
                                         i++;
+                                  });
+
+                                  $('.sek-empty-collection-placeholder').each( function() {
+                                        console.log('SEK-DRAG-START', params );
+                                        $.when( $(this).append(
+                                              '<div class="sek-content-' + params.type + '-drop-zone sek-drop-zone" data-sek-location="in-empty-location"></div>'
+                                        ) );
                                   });
 
                                   $('body').addClass('sek-dragging');

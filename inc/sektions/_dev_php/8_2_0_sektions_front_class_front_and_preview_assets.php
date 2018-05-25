@@ -114,10 +114,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
         function sek_print_ui_tmpl() {
             ?>
               <script type="text/html" id="sek-tmpl-add-content-button">
+                  <# //console.log( 'data', data ); #>
                   <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                     <div class="sek-add-content-button-wrapper">
-                      <button data-sek-action="add-content" class="sek-add-content-btn" style="--sek-add-content-btn-width:60px;">
-                        <span title="<?php _e('Add Content', 'text_domain_to_be_replaced' ); ?>" class="sek-action-button-icon fas fa-plus-circle sek-action"></span><span class="action-button-text"><?php _e('Add Content', 'text_domain_to_be_replaced' ); ?></span>
+                      <button title="<?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?> <# if ( data.location ) { #>( hook : {{data.location}} )<# } #>" data-sek-action="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
+                        <span class="sek-action-button-icon sek-action">+</span><span class="action-button-text"><?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?></span>
                       </button>
                     </div>
                   </div>

@@ -158,8 +158,7 @@ function sek_get_default_module_model( string $module_type ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
         }
         // Build
-        $module_tmpl_data = $registered_modules[ $module_type ][ 'tmpl' ];
-        $default = _sek_build_default_model( $module_tmpl_data );
+        $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
 
         // Cache
         $default_models[ $module_type ] = $default;
@@ -214,12 +213,14 @@ function sek_get_default_module_model( string $module_type ) {
 // )
 function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
     $default_model = is_array( $default_model ) ? $default_model : array();
+    //error_log( print_r(  $module_tmpl_data , true ) );
     foreach( $module_tmpl_data as $key => $data ) {
-        if ( 'pre-item' == $key )
+        if ( 'pre-item' === $key )
           continue;
-        if ( array_key_exists( 'input_type', $data ) ) {
+        if ( is_array( $data ) && array_key_exists( 'input_type', $data ) ) {
             $default_model[ $key ] = array_key_exists( 'default', $data ) ? $data[ 'default' ] : '';
-        } else if ( is_array( $data ) ) {
+        }
+        if ( is_array( $data ) ) {
             $default_model = _sek_build_default_model( $data, $default_model );
         }
     }
@@ -618,8 +619,8 @@ function sek_enqueue_controls_js_css() {
             'dropSelectors' => implode(',', [
                 // 'module' type
                 '.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                '.sek-module',// the drop zone when there is at least one module
-                '.sek-column > .sek-module-wrapper sek-section',// the drop zone when there is at least one nested section
+                '.sek-column-inner',// the drop zone when there is at least one module
+                '.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
                 '.sek-content-module-drop-zone',//between sections
 
                 // 'preset_section' type
@@ -1672,28 +1673,27 @@ add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_bor
 
 function sek_add_css_rules_for_bg_border_background( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    // LBB - background
-    // bg-apply-overlay
-    // bg-attachment
-    // bg-color
-    // bg-color-overlay
-    // bg-image
-    // bg-opacity-overlay
-    // bg-position
-    // bg-scale
-    // bg-video
 
-    //TODO:
-    // border-color
-    // border-type
-    // border-width
-    // boxed-wide
-    // boxed-width
-    // custom-height
-    // height-type
-    // shadow
+    // $default_value_model = Array
+    // (
+    //     [bg-color] =>
+    //     [bg-image] =>
+    //     [bg-position] => center
+    //     [bg-attachment] => 0
+    //     [bg-scale] => default
+    //     [bg-apply-overlay] => 0
+    //     [bg-color-overlay] =>
+    //     [bg-opacity-overlay] => 50
+    //     [border-width] => 1
+    //     [border-type] => none
+    //     [border-color] =>
+    //     [shadow] => 0
+    // )
+    $default_value_model  = sek_get_default_module_model( 'sek_level_bg_border_module' );
+    $bg_border_options = ( ! empty( $options[ 'bg_border' ] ) && is_array( $options[ 'bg_border' ] ) ) ? $options[ 'bg_border' ] : array();
+    $bg_border_options = wp_parse_args( $bg_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
-    if ( empty( $options[ 'bg_border' ] ) )
+    if ( empty( $bg_border_options ) )
       return $rules;
 
     $background_properties = array();
@@ -1703,12 +1703,12 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
     * background: [background-image] [background-position] / [background-size] [background-repeat] [background-attachment] [background-origin] [background-clip] [background-color];
     */
     // Img background
-    if ( ! empty( $options['bg_border'][ 'bg-image'] ) && is_numeric( $options['bg_border'][ 'bg-image'] ) ) {
+    if ( ! empty( $bg_border_options[ 'bg-image'] ) && is_numeric( $bg_border_options[ 'bg-image'] ) ) {
         //no repeat by default?
-        $background_properties[] = 'url("'. wp_get_attachment_url( $options['bg_border'][ 'bg-image'] ) .'")';
+        $background_properties[] = 'url("'. wp_get_attachment_url( $bg_border_options[ 'bg-image'] ) .'")';
 
         // Img Bg Position
-        if ( ! empty( $options['bg_border'][ 'bg-position'] ) ) {
+        if ( ! empty( $bg_border_options[ 'bg-position'] ) ) {
             $pos_map = array(
                 'top_left'    => '0% 0%',
                 'top'         => '50% 0%',
@@ -1721,18 +1721,18 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
                 'bottom_right'=> '100% 100%'
             );
 
-            $raw_pos                    = $options['bg_border'][ 'bg-position'];
+            $raw_pos                    = $bg_border_options[ 'bg-position'];
             $background_properties[]         = array_key_exists($raw_pos, $pos_map) ? $pos_map[ $raw_pos ] : $pos_map[ 'center' ];
         }
 
 
         //background size
-        if ( ! empty( $options['bg_border'][ 'bg-scale'] ) && 'default' != $options['bg_border'][ 'bg-scale'] ) {
+        if ( ! empty( $bg_border_options[ 'bg-scale'] ) && 'default' != $bg_border_options[ 'bg-scale'] ) {
             //When specifying a background-size value, it must immediately follow the background-position value.
-            if ( ! empty( $options['bg_border'][ 'bg-position'] ) ) {
-                $background_properties[] = '/ ' . $options['bg_border'][ 'bg-scale'];
+            if ( ! empty( $bg_border_options[ 'bg-position'] ) ) {
+                $background_properties[] = '/ ' . $bg_border_options[ 'bg-scale'];
             } else {
-                $background_size    = $options['bg_border'][ 'bg-scale'];
+                $background_size    = $bg_border_options[ 'bg-scale'];
             }
         }
 
@@ -1740,7 +1740,7 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
         $background_properties[] = 'no-repeat';
 
         // write the bg-attachment rule only if true <=> set to "fixed"
-        if ( ! empty( $options['bg_border'][ 'bg-attachment'] ) && sek_is_checked( $options['bg_border'][ 'bg-attachment'] ) ) {
+        if ( ! empty( $bg_border_options[ 'bg-attachment'] ) && sek_is_checked( $bg_border_options[ 'bg-attachment'] ) ) {
             $background_properties[] = 'fixed';
         }
 
@@ -1748,8 +1748,8 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
 
 
     //background color (needs validation: we need a sanitize hex or rgba color)
-    if ( ! empty( $options[ 'bg_border' ][ 'bg-color' ] ) ) {
-        $background_properties[] = $options[ 'bg_border' ][ 'bg-color' ];
+    if ( ! empty( $bg_border_options[ 'bg-color' ] ) ) {
+        $background_properties[] = $bg_border_options[ 'bg-color' ];
     }
 
 
@@ -1768,16 +1768,16 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
     }
 
     //Background overlay?
-    if ( ! empty( $options['bg_border'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['bg_border'][ 'bg-apply-overlay'] ) ) {
+    if ( ! empty( $bg_border_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_border_options[ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
-        $bg_color_overlay = isset( $options[ 'bg_border' ][ 'bg-color-overlay' ] ) ? $options[ 'bg_border' ][ 'bg-color-overlay' ] : null;
+        $bg_color_overlay = isset( $bg_border_options[ 'bg-color-overlay' ] ) ? $bg_border_options[ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
             //overlay pseudo element
             $bg_overlay_css_rules = 'content:"";display:block;position:absolute;top:0;left:0;right:0;bottom:0;background-color:'.$bg_color_overlay;
 
             //opacity
             //validate/sanitize
-            $bg_overlay_opacity     = isset( $options[ 'bg_border' ][ 'bg-opacity-overlay' ] ) ? filter_var( $options[ 'bg_border' ][ 'bg-opacity-overlay' ], FILTER_VALIDATE_INT, array( 'options' =>
+            $bg_overlay_opacity     = isset( $bg_border_options[ 'bg-opacity-overlay' ] ) ? filter_var( $bg_border_options[ 'bg-opacity-overlay' ], FILTER_VALIDATE_INT, array( 'options' =>
                 array( "min_range"=>0, "max_range"=>100 ) )
             ) : FALSE;
             $bg_overlay_opacity     = FALSE !== $bg_overlay_opacity ? filter_var( $bg_overlay_opacity / 100, FILTER_VALIDATE_FLOAT ) : $bg_overlay_opacity;
@@ -1812,7 +1812,7 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
                 'mq' =>null
             );
         }
-    }//if ( ! empty( $options['bg_border'][ 'bg-apply-overlay'] ) && sek_is_checked( $options['bg_border'][ 'bg-apply-overlay'] ) ) {}
+    }//if ( ! empty( $bg_border_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_border_options[ 'bg-apply-overlay'] ) ) {}
 
     return $rules;
 }
@@ -1829,13 +1829,31 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
 
 function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
+    // $default_value_model = Array
+    // (
+    //     [bg-color] =>
+    //     [bg-image] =>
+    //     [bg-position] => center
+    //     [bg-attachment] => 0
+    //     [bg-scale] => default
+    //     [bg-apply-overlay] => 0
+    //     [bg-color-overlay] =>
+    //     [bg-opacity-overlay] => 50
+    //     [border-width] => 1
+    //     [border-type] => none
+    //     [border-color] =>
+    //     [shadow] => 0
+    // )
+    $default_value_model  = sek_get_default_module_model( 'sek_level_bg_border_module' );
+    $bg_border_options = ( ! empty( $options[ 'bg_border' ] ) && is_array( $options[ 'bg_border' ] ) ) ? $options[ 'bg_border' ] : array();
+    $bg_border_options = wp_parse_args( $bg_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
     //TODO: we actually should allow multidimensional border widths plus different units
-    if ( empty( $options[ 'bg_border' ] ) )
+    if ( empty( $bg_border_options ) )
       return $rules;
 
-    $border_width = ! empty( $options['bg_border'][ 'border-width' ] ) ? filter_var( $options['bg_border'][ 'border-width' ], FILTER_VALIDATE_INT ) : FALSE;
-    $border_type  = FALSE !== $border_width && ! empty( $options['bg_border'][ 'border-type' ] ) && 'none' != $options['bg_border'][ 'border-type' ] ? $options['bg_border'][ 'border-type' ] : FALSE;
+    $border_width = ! empty( $bg_border_options[ 'border-width' ] ) ? filter_var( $bg_border_options[ 'border-width' ], FILTER_VALIDATE_INT ) : FALSE;
+    $border_type  = FALSE !== $border_width && ! empty( $bg_border_options[ 'border-type' ] ) && 'none' != $bg_border_options[ 'border-type' ] ? $bg_border_options[ 'border-type' ] : FALSE;
 
     //border width
     if ( $border_type ) {
@@ -1847,8 +1865,8 @@ function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
 
         //border color
         //(needs validation: we need a sanitize hex or rgba color)
-        if ( ! empty( $options['bg_border'][ 'border-color' ] ) ) {
-            $border_properties[] = $options['bg_border'][ 'border-color' ];
+        if ( ! empty( $bg_border_options[ 'border-color' ] ) ) {
+            $border_properties[] = $bg_border_options[ 'border-color' ];
         }
 
         //append border rules
@@ -1877,10 +1895,29 @@ function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
 
 function sek_add_css_rules_for_bg_border_boxshadow( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    if ( empty( $options[ 'bg_border' ] ) )
+    // $default_value_model = Array
+    // (
+    //     [bg-color] =>
+    //     [bg-image] =>
+    //     [bg-position] => center
+    //     [bg-attachment] => 0
+    //     [bg-scale] => default
+    //     [bg-apply-overlay] => 0
+    //     [bg-color-overlay] =>
+    //     [bg-opacity-overlay] => 50
+    //     [border-width] => 1
+    //     [border-type] => none
+    //     [border-color] =>
+    //     [shadow] => 0
+    // )
+    $default_value_model  = sek_get_default_module_model( 'sek_level_bg_border_module' );
+    $bg_border_options = ( ! empty( $options[ 'bg_border' ] ) && is_array( $options[ 'bg_border' ] ) ) ? $options[ 'bg_border' ] : array();
+    $bg_border_options = wp_parse_args( $bg_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
+
+    if ( empty( $bg_border_options) )
       return $rules;
 
-    if ( !empty( $options[ 'bg_border' ][ 'shadow' ] ) &&  sek_is_checked( $options['bg_border'][ 'shadow'] ) ) {
+    if ( !empty( $bg_border_options[ 'shadow' ] ) &&  sek_is_checked( $bg_border_options[ 'shadow'] ) ) {
         $css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
 
         $rules[]     = array(
@@ -2399,20 +2436,21 @@ class Sek_Dyn_CSS_Builder {
 
     // Fired in the constructor
     // Walk the level tree and build rules when needed
+    // The rules are filtered when some conditions are met.
+    // This allows us to schedule the css rules addition remotely :
+    // - from the module registration php file
+    // - from the generic input types ( @see sek_add_css_rules_for_generic_css_input_types() )
     public function sek_css_rules_sniffer_walker( $level = null, $parent_level = array() ) {
         $level      = is_null( $level ) ? $this->sek_model : $level;
         $level      = is_array( $level ) ? $level : array();
+
+        // The parent level is set when the function is invoked recursively, from a level where we actually have a 'level' property
         if ( ! empty( $parent_level ) ) {
             $this -> parent_level_model = $parent_level;
         }
 
         foreach ( $level as $key => $entry ) {
              $rules = array();
-            // // set the current parent level model
-            // if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
-            //     $this -> parent_level_model = $entry;
-            // }
-
             // Populate rules for sections / columns / modules
             if ( !empty( $entry[ 'level' ] ) && ( !empty( $entry[ 'options' ] ) || !empty( $entry[ 'width' ] ) ) ) {
                 // build rules for level options => section / column / module
@@ -2471,24 +2509,28 @@ class Sek_Dyn_CSS_Builder {
             }
 
             // keep walking if the current $entry is an array
-            // make sure that the parent_level_model is set right before jumping down the next level
+            // make sure that the parent_level_model is set right before jumping down to the next level
             if ( is_array( $entry ) ) {
+                // Can we set a parent level ?
                 if ( !empty( $entry['level'] ) && in_array( $entry['level'], array( 'location', 'section', 'column', 'module' ) ) ) {
                     $parent_level = $entry;
                 }
+                // Let's go recursive
                 $this->sek_css_rules_sniffer_walker( $entry, $parent_level );
-                // Reset the level model after walking the sublevels
+
 
             }
+            // Reset the parent level model because it might have been modified after walking the sublevels
             if ( ! empty( $parent_level ) ) {
                 $this -> parent_level_model = $parent_level;
             }
         }//foreach
-    }
+    }//sek_css_rules_sniffer_walker()
 
 
 
     // @return void()
+    // populates the css rules ::collection property, organized by media queries
     public function sek_populate( $selector, $css_rules, string $mq = null ) {
         if ( ! is_string( $selector ) )
             return;
@@ -2518,7 +2560,9 @@ class Sek_Dyn_CSS_Builder {
         }
 
         $this->collection[ $mq_device ][ $selector ][] = $css_rules;
-    }
+    }//sek_populate
+
+
 
     // @return string
     private function sek_maybe_wrap_in_media_query( $css,  $mq_device = 'all_devices' ) {
@@ -2528,7 +2572,9 @@ class Sek_Dyn_CSS_Builder {
         return sprintf( '@media(%1$s){%2$s}', $mq_device, $css);
     }
 
-    // sorts the max-width media queries from all_devices to the smallest
+
+    // sorts the media queries from all_devices to the smallest width
+    // This doesn't make the difference between max-width and min-width
     // @return integer
     private function user_defined_array_key_sort_fn($a, $b) {
         if ( 'all_devices' === $a ) {
@@ -2543,7 +2589,7 @@ class Sek_Dyn_CSS_Builder {
         return $b_int - $a_int;
     }
 
-    //@returns a stringified stylesheet
+    //@returns a stringified stylesheet, ready to be printed on the page or in a file
     public function get_stylesheet() {
         $css = '';
         // error_log('<mq collection>');
@@ -2574,8 +2620,6 @@ class Sek_Dyn_CSS_Builder {
 
 
 
-
-
     // hook : sek_add_css_rules_for_level_options
     public function sek_add_rules_for_column_width( array $rules, array $level ) {
         $width   = empty( $level[ 'width' ] ) || !is_numeric( $level[ 'width' ] ) ? '' : $level['width'];
@@ -2590,9 +2634,9 @@ class Sek_Dyn_CSS_Builder {
             'css_rules'     => $css_rules,
             'mq'            => 'min-width:' . self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] .'px'
         );
-
         return $rules;
     }
+
 
 }//end class
 
@@ -4008,10 +4052,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
         function sek_print_ui_tmpl() {
             ?>
               <script type="text/html" id="sek-tmpl-add-content-button">
+                  <# //console.log( 'data', data ); #>
                   <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                     <div class="sek-add-content-button-wrapper">
-                      <button data-sek-action="add-content" class="sek-add-content-btn" style="--sek-add-content-btn-width:60px;">
-                        <span title="<?php _e('Add Content', 'text_domain_to_be_replaced' ); ?>" class="sek-action-button-icon fas fa-plus-circle sek-action"></span><span class="action-button-text"><?php _e('Add Content', 'text_domain_to_be_replaced' ); ?></span>
+                      <button title="<?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?> <# if ( data.location ) { #>( hook : {{data.location}} )<# } #>" data-sek-action="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
+                        <span class="sek-action-button-icon sek-action">+</span><span class="action-button-text"><?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?></span>
                       </button>
                     </div>
                   </div>
@@ -4200,18 +4245,21 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $parent_model = $this -> parent_model;
             $this -> model = $model;
 
-            $collection = array_key_exists('collection', $model ) ? $model['collection'] : array();
+            $collection = array_key_exists( 'collection', $model ) ? $model['collection'] : array();
 
             switch ( $level ) {
                 case 'location' :
                     ?>
-                      <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $location ?>">
+                      <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $id ?>">
                         <?php
                           $this -> parent_model = $model;
                           foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
                         ?>
-                        <?php if ( skp_is_customizing() ) : ?>
-                            <div class="sek-add-button-wrapper"><button class="btn btn-edit" data-sek-add="section"><?php _e( '+ Add a section', 'text_domain_to_be_replaced'); echo ' ' . $location; ?></button></div>
+
+                         <?php if ( skp_is_customizing() && empty( $collection ) ) : //if ( skp_is_customizing() ) : ?>
+                            <div class="sek-empty-collection-placeholder">
+                                <?php //_e( '+ Add a section', 'text_domain_to_be_replaced'); echo ' ' . $location; ?>
+                            </div>
                         <?php endif; ?>
                       </div>
                     <?php
@@ -4219,14 +4267,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                 case 'section' :
                     $is_nested            = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
-                    $column_wrapper_class = 'sek-container-fluid';
+                    $column_container_class = 'sek-container-fluid';
                     //when boxed use proper container class
                     if ( ! empty( $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) {
-                      $column_wrapper_class = 'sek-container';
+                      $column_container_class = 'sek-container';
                     }
                     ?>
                     <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section">', $id, $is_nested ? 'data-sek-is-nested="true"' : '' ); ?>
-                          <div class="<?php echo $column_wrapper_class ?> sek-column-wrapper">
+                          <div class="<?php echo $column_container_class ?>">
                             <div class="sek-row sek-sektion-inner">
                                 <?php
                                   // Set the parent model now
@@ -4261,31 +4309,29 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               empty( $collection ) ? 'data-sek-no-modules="true"' : ''
                           );
                       ?>
-                          <div class="sek-module-wrapper">
-                            <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
-                                <?php
-                                  if ( empty( $collection ) ) {
-                                      ?>
-                                      <div class="sek-no-modules-column">
-                                        <div class="sek-module-drop-zone-for-first-module">
-                                          <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="Add Module"></i>
-                                        </div>
-                                      </div>
-                                      <?php
-                                  } else {
-                                      // Set the parent model now
-                                      $this -> parent_model = $model;
-                                      foreach ( $collection as $module_or_nested_section_model ) {
-                                          ?>
-                                          <?php
-                                          $this -> render( $module_or_nested_section_model );
-                                      }
+                        <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
+                            <?php
+                              if ( empty( $collection ) ) {
+                                  ?>
+                                  <div class="sek-no-modules-column">
+                                    <div class="sek-module-drop-zone-for-first-module">
+                                      <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="Add Module"></i>
+                                    </div>
+                                  </div>
+                                  <?php
+                              } else {
+                                  // Set the parent model now
+                                  $this -> parent_model = $model;
+                                  foreach ( $collection as $module_or_nested_section_model ) {
                                       ?>
                                       <?php
+                                      $this -> render( $module_or_nested_section_model );
                                   }
-                                ?>
-                            </div>
-                          </div>
+                                  ?>
+                                  <?php
+                              }
+                            ?>
+                        </div>
                       </div>
                     <?php
                 break;

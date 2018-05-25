@@ -93,18 +93,21 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $parent_model = $this -> parent_model;
             $this -> model = $model;
 
-            $collection = array_key_exists('collection', $model ) ? $model['collection'] : array();
+            $collection = array_key_exists( 'collection', $model ) ? $model['collection'] : array();
 
             switch ( $level ) {
                 case 'location' :
                     ?>
-                      <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $location ?>">
+                      <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $id ?>">
                         <?php
                           $this -> parent_model = $model;
                           foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
                         ?>
-                        <?php if ( skp_is_customizing() ) : ?>
-                            <div class="sek-add-button-wrapper"><button class="btn btn-edit" data-sek-add="section"><?php _e( '+ Add a section', 'text_domain_to_be_replaced'); echo ' ' . $location; ?></button></div>
+
+                         <?php if ( skp_is_customizing() && empty( $collection ) ) : //if ( skp_is_customizing() ) : ?>
+                            <div class="sek-empty-collection-placeholder">
+                                <?php //_e( '+ Add a section', 'text_domain_to_be_replaced'); echo ' ' . $location; ?>
+                            </div>
                         <?php endif; ?>
                       </div>
                     <?php

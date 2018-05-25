@@ -6,6 +6,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // 1) Add a new column
             // 2) re-render the column collection in a sektion
             ajaxRefreshColumns : function( params ) {
+                  //console.log('PARAMS in ajaxRefreshColumns', params );
                   var self = this;
                   return czrapp.doAjax( {
                         action : 'sek_get_content',
@@ -16,7 +17,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   }).done( function( _r_ ) {
                         var $parentSektion = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' );
                         if ( 1 > $parentSektion.length ) {
-                              czrapp.errare( 'reactToPanelMsg => sek-add-column => no DOM node for parent sektion => ', params.apiParams.in_sektion );
+                              czrapp.errare( 'reactToPanelMsg => ' + params.apiParams.action + ' => no DOM node for parent sektion => ', params.apiParams.in_sektion );
                         }
                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.in_sektion + '"></span>';
                         $parentSektion.before( placeholderHtml );

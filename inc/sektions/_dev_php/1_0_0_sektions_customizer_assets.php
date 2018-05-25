@@ -87,8 +87,7 @@ function sek_enqueue_controls_js_css() {
             'dropSelectors' => implode(',', [
                 // 'module' type
                 '.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                '.sek-column-inner',
-                //'.sek-module',// the drop zone when there is at least one module
+                '.sek-column-inner',// the drop zone when there is at least one module
                 '.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
                 '.sek-content-module-drop-zone',//between sections
 

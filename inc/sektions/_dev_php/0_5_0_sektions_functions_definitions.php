@@ -158,8 +158,7 @@ function sek_get_default_module_model( string $module_type ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
         }
         // Build
-        $module_tmpl_data = $registered_modules[ $module_type ][ 'tmpl' ];
-        $default = _sek_build_default_model( $module_tmpl_data );
+        $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
 
         // Cache
         $default_models[ $module_type ] = $default;
@@ -214,12 +213,14 @@ function sek_get_default_module_model( string $module_type ) {
 // )
 function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
     $default_model = is_array( $default_model ) ? $default_model : array();
+    //error_log( print_r(  $module_tmpl_data , true ) );
     foreach( $module_tmpl_data as $key => $data ) {
-        if ( 'pre-item' == $key )
+        if ( 'pre-item' === $key )
           continue;
-        if ( array_key_exists( 'input_type', $data ) ) {
+        if ( is_array( $data ) && array_key_exists( 'input_type', $data ) ) {
             $default_model[ $key ] = array_key_exists( 'default', $data ) ? $data[ 'default' ] : '';
-        } else if ( is_array( $data ) ) {
+        }
+        if ( is_array( $data ) ) {
             $default_model = _sek_build_default_model( $data, $default_model );
         }
     }
