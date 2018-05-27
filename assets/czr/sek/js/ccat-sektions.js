@@ -585,13 +585,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       sendToPreview = true, //<= the default behaviour is to send a message to the preview when the setting has been changed
                       msgCollection = {
                             // A section can be added in various scenarios :
-                            // 1) when clicking on the ( + ) Insert content => @see preview::scheduleUiClickReactions() => addContentButton
-                            //    - if the target location level already has section(s), then the section is appended in ajax, at the right place
-                            //    - if the target location is empty ( is_first_section is true ), nothing is send to the preview when updating the api setting, and we refresh the location level. => this makes sure that we removes the placeholder printed in the previously empty location
-                            // 2) when adding a nested section to a column
-                            'sek-add-section' :{
+                            // - when clicking on the ( + ) Insert content => @see preview::scheduleUiClickReactions() => addContentButton
+                            // - when adding a nested section to a column
+                            // - when dragging a module in a 'between-sections' or 'in-empty-location' drop zone
+                            //
+                            // Note : if the target location level already has section(s), then the section is appended in ajax, at the right place
+                            // Note : if the target location is empty ( is_first_section is true ), nothing is send to the preview when updating the api setting, and we refresh the location level. => this makes sure that we removes the placeholder printed in the previously empty location
+                            'sek-add-section' : {
                                   callback : function( params ) {
-                                        sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;
+                                        sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;//<= when the level is refreshed when complete, we don't need to send to preview.
                                         uiParams = {};
                                         apiParams = {
                                               action : 'sek-add-section',
@@ -608,7 +610,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   },
                                   complete : function( params ) {
                                         // When a section is created ( not duplicated )
-                                        console.log( "react to preview Msg, complete => ", params );
+                                        //console.log( "react to preview Msg, sek-add-section complete => ", params );
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
                                                     level : 'location',
@@ -619,6 +621,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         api.previewer.send('sek-focus-on', { id : params.apiParams.id });
                                   }
                             },
+
+
                             'sek-add-column' : {
                                   callback : function( params ) {
                                         sendToPreview = true;
@@ -882,7 +886,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // }
                             'sek-add-content-in-new-sektion' : {
                                   callback : function( params ) {
-                                        sendToPreview = true;
+                                        sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;//<= when the level is refreshed when complete, we don't need to send to preview.
                                         uiParams = {};
                                         apiParams = params;
                                         apiParams.action = 'sek-add-content-in-new-sektion';
@@ -916,6 +920,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                     });
                                               break;
+                                        }
+                                        // When a section is created ( not duplicated )
+                                        //console.log( "react to preview Msg, sek-add-content-in-new-sektion complete => ", params );
+                                        if ( params.apiParams.is_first_section ) {
+                                              api.previewer.trigger( 'sek-refresh-level', {
+                                                    level : 'location',
+                                                    id :  params.apiParams.location
+                                              });
                                         }
                                   }
                             },
@@ -3327,6 +3339,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
                                                 self.dnd_onDrop( $(this), evt );
                                                 self.dnd_cleanOnLeaveDrop( $(this), evt );
+                                                // this event will fire another cleaner
+                                                // also sent on dragend
+                                                api.previewer.send( 'sek-drag-stop' );
                                           break;
                                     }
                               })
@@ -3352,7 +3367,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   this.$dropZones = this.$dropZones || this.dnd_getDropZonesElements();
                   this.$cachedDropZoneCandidates = _.isEmpty( this.$cachedDropZoneCandidates ) ? this.$dropZones.find('.sek-drop-zone') : this.$cachedDropZoneCandidates;// Will be reset on drop
 
-                  //
                   this.$dropZones.find('.sek-drop-zone').each( function() {
                         var yPos = evt.clientY,
                             xPos = evt.clientX,
@@ -3403,7 +3417,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         case 'module' :
                               html = '@missi18n Insert Here';
                               if ( $target.length > 0 ) {
-                                  if ( 'between-sections' == $target.data('sek-location') ) {
+                                  if ( 'between-sections' === $target.data('sek-location') || 'in-empty-location' === $target.data('sek-location') ) {
                                         html = '@missi18n Insert in a new section';
                                   }
                               }
@@ -3452,32 +3466,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             },
 
-            dnd_onDrop: function( $dropTarget, evt ) {
-                  evt.stopPropagation();
-                  var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
-                  // console.log('onDropping params', position, evt );
-                  // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
-                  api.czr_sektions.trigger( 'sek-content-dropped', {
-                        drop_target_element : $dropTarget,
-                        location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
-                        position : _position,
-                        before_section : $dropTarget.data('drop-zone-before-section'),
-                        after_section : $dropTarget.data('drop-zone-after-section'),
-                        content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                        content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
-                  });
-            },
-
             // @return void()
             dnd_cleanOnLeaveDrop : function( $dropTarget, evt ) {
                   var self = this;
                   this.$dropZones = this.$dropZones || this.dnd_getDropZonesElements();
-                  // Clean up
-                  // if ( $dropTarget && $dropTarget.length > 0 ) {
-                  //       $dropTarget.removeClass( 'sek-active-drop-zone' );
-                  //       $dropTarget.data( 'is-drag-entered', false );
-                  // }
-
                   this.preDropElement.remove();
                   this.$dropZones.removeClass( 'sek-is-dragging' );
 
@@ -3490,7 +3482,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             dnd_cleanSingleDropTarget : function( $dropTarget ) {
                   if ( _.isEmpty( $dropTarget ) || $dropTarget.length < 1 )
                     return;
-
                   $dropTarget.data( 'is-drag-entered', false );
                   $dropTarget.data( 'preDrop-position', false );
                   $dropTarget.removeClass( 'sek-active-drop-zone' );
@@ -3556,7 +3547,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return isXin && isYin;
             },
 
+            //@return void()
+            dnd_onDrop: function( $dropTarget, evt ) {
+                  evt.stopPropagation();
+                  var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
+                  // console.log('onDropping params', position, evt );
+                  // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
 
+
+                  api.czr_sektions.trigger( 'sek-content-dropped', {
+                        drop_target_element : $dropTarget,
+                        location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
+                        position : _position,
+                        before_section : $dropTarget.data('drop-zone-before-section'),
+                        after_section : $dropTarget.data('drop-zone-after-section'),
+                        content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                        content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
+                  });
+            },
 
 
 
@@ -3618,12 +3626,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
                               case 'content-in-empty-location' :
-                                    api.previewer.trigger( 'sek-add-section', {
-                                          location : params.drop_target_element.closest('div[data-sek-level="location"]').data( 'sek-id'),
-                                          level : 'section',
-                                          is_first_section : true,
-                                          send_to_preview : false
-                                    });
+                                    params.is_first_section = true;
+                                    params.send_to_preview = false;
+                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
 
                               case 'content-in-new-column' :

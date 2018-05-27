@@ -313,7 +313,6 @@
 
 /* This is the selector for all eligible drop zones */
 .sek-drop-zone {
-  opacity: 0;
   -webkit-transition: opacity, height 0.4s ease;
   -moz-transition: opacity, height 0.4s ease;
   -o-transition: opacity, height 0.4s ease;
@@ -346,9 +345,9 @@
 .sek-active-drop-zone.sek-module-drop-zone-for-first-module [data-sek-action="pick-module"] {
   display: none;
 }
-/*.sek-dynamic-drop-zone {
-  height: 0px;
-}*/
+.sek-dynamic-drop-zone {
+  opacity: 0;
+}
 .sek-active-drop-zone.sek-dynamic-drop-zone {
   height: auto!important;
   min-height : 50px;
@@ -363,7 +362,7 @@
 }
 
 .sek-dragging .sek-dynamic-drop-zone {
-  height: 10px;
+  height: 5px;
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
   -o-transition: all 0.4s ease;

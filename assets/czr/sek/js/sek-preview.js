@@ -966,7 +966,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         //console.log('SEK-DRAG-START', params );
                                         $.when( $(this).append(
                                               '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="in-empty-location"></div>'
-                                        ) );
+                                        ));
                                   });
 
                                   // Append a drop zone between modules in columns
@@ -994,13 +994,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         });
                                   }
 
+
+                                  // toggle a parent css classes controlling some css rules @see preview.css
                                   $('body').addClass('sek-dragging');
 
+                                  // Reveal all dynamic dropzones after a delay
                                   _.delay( function() {
-                                      $('.sek-drop-zone').css({ opacity : 1 });
+                                        $('.sek-dynamic-drop-zone').css({ opacity : 1 });
                                   }, 100 );
 
                             },
+                            // is sent on dragend and drop
                             'sek-drag-stop' : function( params ) {
                                   $('body').removeClass('sek-dragging');
                                   // Clean any remaining placeholder

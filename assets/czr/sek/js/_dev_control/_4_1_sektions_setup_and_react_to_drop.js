@@ -213,6 +213,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
                                                 self.dnd_onDrop( $(this), evt );
                                                 self.dnd_cleanOnLeaveDrop( $(this), evt );
+                                                // this event will fire another cleaner
+                                                // also sent on dragend
+                                                api.previewer.send( 'sek-drag-stop' );
                                           break;
                                     }
                               })
@@ -238,7 +241,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   this.$dropZones = this.$dropZones || this.dnd_getDropZonesElements();
                   this.$cachedDropZoneCandidates = _.isEmpty( this.$cachedDropZoneCandidates ) ? this.$dropZones.find('.sek-drop-zone') : this.$cachedDropZoneCandidates;// Will be reset on drop
 
-                  //
                   this.$dropZones.find('.sek-drop-zone').each( function() {
                         var yPos = evt.clientY,
                             xPos = evt.clientX,
@@ -289,7 +291,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         case 'module' :
                               html = '@missi18n Insert Here';
                               if ( $target.length > 0 ) {
-                                  if ( 'between-sections' == $target.data('sek-location') ) {
+                                  if ( 'between-sections' === $target.data('sek-location') || 'in-empty-location' === $target.data('sek-location') ) {
                                         html = '@missi18n Insert in a new section';
                                   }
                               }
@@ -338,32 +340,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             },
 
-            dnd_onDrop: function( $dropTarget, evt ) {
-                  evt.stopPropagation();
-                  var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
-                  // console.log('onDropping params', position, evt );
-                  // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
-                  api.czr_sektions.trigger( 'sek-content-dropped', {
-                        drop_target_element : $dropTarget,
-                        location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
-                        position : _position,
-                        before_section : $dropTarget.data('drop-zone-before-section'),
-                        after_section : $dropTarget.data('drop-zone-after-section'),
-                        content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                        content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
-                  });
-            },
-
             // @return void()
             dnd_cleanOnLeaveDrop : function( $dropTarget, evt ) {
                   var self = this;
                   this.$dropZones = this.$dropZones || this.dnd_getDropZonesElements();
-                  // Clean up
-                  // if ( $dropTarget && $dropTarget.length > 0 ) {
-                  //       $dropTarget.removeClass( 'sek-active-drop-zone' );
-                  //       $dropTarget.data( 'is-drag-entered', false );
-                  // }
-
                   this.preDropElement.remove();
                   this.$dropZones.removeClass( 'sek-is-dragging' );
 
@@ -376,7 +356,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             dnd_cleanSingleDropTarget : function( $dropTarget ) {
                   if ( _.isEmpty( $dropTarget ) || $dropTarget.length < 1 )
                     return;
-
                   $dropTarget.data( 'is-drag-entered', false );
                   $dropTarget.data( 'preDrop-position', false );
                   $dropTarget.removeClass( 'sek-active-drop-zone' );
@@ -442,7 +421,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return isXin && isYin;
             },
 
+            //@return void()
+            dnd_onDrop: function( $dropTarget, evt ) {
+                  evt.stopPropagation();
+                  var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
+                  // console.log('onDropping params', position, evt );
+                  // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
 
+
+                  api.czr_sektions.trigger( 'sek-content-dropped', {
+                        drop_target_element : $dropTarget,
+                        location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
+                        position : _position,
+                        before_section : $dropTarget.data('drop-zone-before-section'),
+                        after_section : $dropTarget.data('drop-zone-after-section'),
+                        content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                        content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
+                  });
+            },
 
 
 
@@ -504,12 +500,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
                               case 'content-in-empty-location' :
-                                    api.previewer.trigger( 'sek-add-section', {
-                                          location : params.drop_target_element.closest('div[data-sek-level="location"]').data( 'sek-id'),
-                                          level : 'section',
-                                          is_first_section : true,
-                                          send_to_preview : false
-                                    });
+                                    params.is_first_section = true;
+                                    params.send_to_preview = false;
+                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
 
                               case 'content-in-new-column' :

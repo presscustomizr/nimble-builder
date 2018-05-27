@@ -16,13 +16,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       sendToPreview = true, //<= the default behaviour is to send a message to the preview when the setting has been changed
                       msgCollection = {
                             // A section can be added in various scenarios :
-                            // 1) when clicking on the ( + ) Insert content => @see preview::scheduleUiClickReactions() => addContentButton
-                            //    - if the target location level already has section(s), then the section is appended in ajax, at the right place
-                            //    - if the target location is empty ( is_first_section is true ), nothing is send to the preview when updating the api setting, and we refresh the location level. => this makes sure that we removes the placeholder printed in the previously empty location
-                            // 2) when adding a nested section to a column
-                            'sek-add-section' :{
+                            // - when clicking on the ( + ) Insert content => @see preview::scheduleUiClickReactions() => addContentButton
+                            // - when adding a nested section to a column
+                            // - when dragging a module in a 'between-sections' or 'in-empty-location' drop zone
+                            //
+                            // Note : if the target location level already has section(s), then the section is appended in ajax, at the right place
+                            // Note : if the target location is empty ( is_first_section is true ), nothing is send to the preview when updating the api setting, and we refresh the location level. => this makes sure that we removes the placeholder printed in the previously empty location
+                            'sek-add-section' : {
                                   callback : function( params ) {
-                                        sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;
+                                        sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;//<= when the level is refreshed when complete, we don't need to send to preview.
                                         uiParams = {};
                                         apiParams = {
                                               action : 'sek-add-section',
@@ -39,7 +41,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   },
                                   complete : function( params ) {
                                         // When a section is created ( not duplicated )
-                                        console.log( "react to preview Msg, complete => ", params );
+                                        //console.log( "react to preview Msg, sek-add-section complete => ", params );
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
                                                     level : 'location',
@@ -50,6 +52,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         api.previewer.send('sek-focus-on', { id : params.apiParams.id });
                                   }
                             },
+
+
                             'sek-add-column' : {
                                   callback : function( params ) {
                                         sendToPreview = true;
@@ -313,7 +317,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // }
                             'sek-add-content-in-new-sektion' : {
                                   callback : function( params ) {
-                                        sendToPreview = true;
+                                        sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;//<= when the level is refreshed when complete, we don't need to send to preview.
                                         uiParams = {};
                                         apiParams = params;
                                         apiParams.action = 'sek-add-content-in-new-sektion';
@@ -347,6 +351,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                     });
                                               break;
+                                        }
+                                        // When a section is created ( not duplicated )
+                                        //console.log( "react to preview Msg, sek-add-content-in-new-sektion complete => ", params );
+                                        if ( params.apiParams.is_first_section ) {
+                                              api.previewer.trigger( 'sek-refresh-level', {
+                                                    level : 'location',
+                                                    id :  params.apiParams.location
+                                              });
                                         }
                                   }
                             },
