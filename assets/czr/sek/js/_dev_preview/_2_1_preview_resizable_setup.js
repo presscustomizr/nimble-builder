@@ -10,7 +10,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
                   // Delegate instantiation when a module is added ( => column re-rendered )
                   $('.sektion-wrapper').on(
-                        'sek-modules-refreshed sek-columns-refreshed sek-section-duplicated',
+                        'sek-modules-refreshed sek-columns-refreshed',
                         'div[data-sek-level="section"]',
                         function(evt) {
                               self.maybeMakeColumnResizableInSektion.call( this );

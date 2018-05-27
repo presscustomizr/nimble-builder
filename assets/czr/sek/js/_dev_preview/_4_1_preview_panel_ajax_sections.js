@@ -56,13 +56,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         // When a section is duplicated, fire sortable for the inner-column modules
                         if ( 'sek-duplicate-section' == params.apiParams.action ) {
                               // re-instantiate sortable in the refreshed columns of the section
-                              // make columns resizable
+                              // + make columns resizable
                               $( 'div[data-sek-id="' + params.cloneId + '"]', '.sektion-wrapper').each( function() {
-                                    //self.maybeMakeColumnResizableInSektion.call( this );
-
-                                    $(this).find(  'div[data-sek-level="column"]' ).each( function() {
-                                          self.makeModulesSortableInColumn( $(this).data('sek-id') );
-                                    });
+                                    $(this).trigger('sek-columns-refreshed');
                               });
                         }
 
