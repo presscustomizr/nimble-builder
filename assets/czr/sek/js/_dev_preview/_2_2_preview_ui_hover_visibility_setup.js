@@ -116,8 +116,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
 
-                        // .sek-empty-collection-placeholder container is printed when the location has no section yet in its collection
-                        $('.sek-empty-collection-placeholder').each( function() {
+                        // .sek-empty-location-placeholder container is printed when the location has no section yet in its collection
+                        $('.sek-empty-location-placeholder').each( function() {
                               if ( $(this).find('.sek-add-content-button').length > 0 )
                                 return;
                               $.when( $(this).append( tmpl({ location : $(this).closest( 'div[data-sek-level="location"]' ).data('sek-id') } ) ) ).done( function() {

@@ -105,7 +105,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         ?>
 
                          <?php if ( skp_is_customizing() && empty( $collection ) ) : //if ( skp_is_customizing() ) : ?>
-                            <div class="sek-empty-collection-placeholder">
+                            <div class="sek-empty-location-placeholder">
                                 <?php //_e( '+ Add a section', 'text_domain_to_be_replaced'); echo ' ' . $location; ?>
                             </div>
                         <?php endif; ?>
@@ -157,12 +157,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               empty( $collection ) ? 'data-sek-no-modules="true"' : ''
                           );
                       ?>
+                        <?php // Drop zone : if no modules, the drop zone is wrapped in sek-no-modules-columns
+                        // if at least one module, the sek-drop-zone is the .sek-column-inner wrapper ?>
                         <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
                             <?php
                               if ( empty( $collection ) ) {
                                   ?>
                                   <div class="sek-no-modules-column">
-                                    <div class="sek-module-drop-zone-for-first-module">
+                                    <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
                                       <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="Add Module"></i>
                                     </div>
                                   </div>

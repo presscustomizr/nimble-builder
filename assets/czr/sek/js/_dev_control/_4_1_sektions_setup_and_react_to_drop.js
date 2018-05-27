@@ -15,6 +15,14 @@
 // dragover  => handler : ondragover  Fired when an element or text selection is being dragged over a valid drop target (every few hundred milliseconds).
 // dragstart => handler : ondragstart Fired when the user starts dragging an element or text selection. (See Starting a Drag Operation.)
 // drop  => handler : ondrop  Fired when an element or text selection is dropped on a valid drop target. (See Performing a Drop.)
+
+// Drop targets can be rendered statically when the preview is rendered or dynamically on dragstart ( sent to preview with 'sek-drag-start')
+// Typically, an empty column will be populated with a zek-drop-zone element statically in the preview.
+// The other drop zones are rendered dynamically in ::schedulePanelMsgReactions case 'sek-drag-start'
+//
+// droppable targets are defined server side in sektionsLocalizedData.dropSelectors :
+// '.sek-drop-zone' <= to pass the ::dnd_canDrop() test, a droppable target should have this css class
+// 'body' <= body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
@@ -158,49 +166,60 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   this.$dropZones.each( function() {
-                      var $zone = $(this);
-                      // Make sure we don't delegate an event twice for a given element
-                      if ( true === $zone.data('zone-droppable-setup') )
-                          return;
+                        var $zone = $(this);
+                        // Make sure we don't delegate an event twice for a given element
+                        if ( true === $zone.data('zone-droppable-setup') )
+                            return;
 
-                      // Delegated to allow reactions on future modules / sections
-                      $zone
-                            .on( 'dragenter dragover', sektionsLocalizedData.dropSelectors, function( evt ) {
-                                  if ( ! self.dnd_canDrop( $(this) ) )
-                                    return;
+                        self.enterOverTimer = null;
+                        // Delegated to allow reactions on future modules / sections
+                        $zone
+                              //.on( 'dragenter dragover', sektionsLocalizedData.dropSelectors,  )
+                              .on( 'dragenter dragover', sektionsLocalizedData.dropSelectors, function( evt ) {
+                                    //console.log( self.enterOverTimer, self.dnd_canDrop( $(this) ) );
+                                    if ( _.isNull( self.enterOverTimer ) ) {
+                                          self.enterOverTimer = true;
+                                          _.delay(function() {
+                                                // If the mouse did not move, reset the time and do nothing
+                                                // this will prevent a drop zone to "dance", aka expand collapse, when stoping the mouse close to it
+                                                if ( self.currentMousePosition && ( ( self.currentMousePosition + '' ) == ( evt.clientY + '' + evt.clientX + '') ) ) {
+                                                      self.enterOverTimer = null;
+                                                      return;
+                                                }
+                                                self.currentMousePosition = evt.clientY + '' + evt.clientX + '';
+                                                self.dnd_toggleDragApproachClassesToDropZones( evt );
+                                          }, 100 );
+                                    }
 
-                                  evt.stopPropagation();
-                                  self.dnd_OnEnterOver( $(this), evt );
-                            })
-                            .on( 'dragleave drop', sektionsLocalizedData.dropSelectors, function( evt ) {
-                                  switch( evt.type ) {
-                                        case 'dragleave' :
-                                              if ( ! self.dnd_isOveringDropTarget( $(this), evt  ) ) {
-                                                    self.dnd_cleanOnLeaveDrop( $(this), evt );
-                                              }
-                                        break;
-                                        case 'drop' :
-                                              if ( ! self.dnd_canDrop( $(this) ) )
-                                                return;
-                                              evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
-                                              self.dnd_onDrop( $(this), evt );
-                                              self.dnd_cleanOnLeaveDrop( $(this), evt );
-                                        break;
-                                  }
-                            })
-                            .data( 'zone-droppable-setup', true );// flag the zone. Will be removed on 'destroy'
+                                    if ( ! self.dnd_canDrop( $(this) ) )
+                                      return;
+
+                                    evt.stopPropagation();
+                                    self.dnd_OnEnterOver( $(this), evt );
+                              })
+                              .on( 'dragleave drop', sektionsLocalizedData.dropSelectors, function( evt ) {
+                                    switch( evt.type ) {
+                                          case 'dragleave' :
+                                                if ( ! self.dnd_isOveringDropTarget( $(this), evt  ) ) {
+                                                      self.dnd_cleanOnLeaveDrop( $(this), evt );
+                                                }
+                                          break;
+                                          case 'drop' :
+                                                // Reset the this.$cachedDropZoneCandidates now
+                                                this.$cachedDropZoneCandidates = null;//has been declared on enter over
+
+                                                if ( ! self.dnd_canDrop( $(this) ) )
+                                                  return;
+                                                evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
+                                                self.dnd_onDrop( $(this), evt );
+                                                self.dnd_cleanOnLeaveDrop( $(this), evt );
+                                          break;
+                                    }
+                              })
+                              .data( 'zone-droppable-setup', true );// flag the zone. Will be removed on 'destroy'
+
                 });//this.dropZones.each()
             },//setupNimbleDropZones()
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -208,6 +227,59 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //-------------------------------------------------------------------------------------------------
             //-- DnD Helpers
             //-------------------------------------------------------------------------------------------------
+            // Fired on 'dragenter dragover'
+            // toggles the "approaching" and "close" css classes when conditions are met.
+            //
+            // Because this function can be potentially heavy if there are a lot of drop zones, this is fired with a timer
+            //
+            // Note : this is fired before checking if the target is eligible for drop. This way we can calculate an approach, as soon as we start hovering the 'body' ( which is part the drop selector list )
+            dnd_toggleDragApproachClassesToDropZones : function( evt ) {
+                  var self = this;
+                  this.$dropZones = this.$dropZones || this.dnd_getDropZonesElements();
+                  this.$cachedDropZoneCandidates = _.isEmpty( this.$cachedDropZoneCandidates ) ? this.$dropZones.find('.sek-drop-zone') : this.$cachedDropZoneCandidates;// Will be reset on drop
+
+                  //
+                  this.$dropZones.find('.sek-drop-zone').each( function() {
+                        var yPos = evt.clientY,
+                            xPos = evt.clientX,
+                            isApproachingThreshold = 80;
+                            isCloseThreshold = 30;
+
+                        var dzoneRect = $(this)[0].getBoundingClientRect(),
+                            mouseToBottom = yPos - dzoneRect.bottom,
+                            mouseToTop = dzoneRect.top - yPos,
+                            mouseToRight = xPos - dzoneRect.right,
+                            mouseToLeft = dzoneRect.left - xPos,
+                            isCloseVertically = ( mouseToBottom > 0 && mouseToBottom < isCloseThreshold ) || ( mouseToTop > 0 && mouseToTop < isCloseThreshold ),
+                            isCloseHorizontally =  ( mouseToRight > 0 && mouseToRight < isCloseThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isCloseThreshold ),
+                            isInHorizontally = xPos <= dzoneRect.right && dzoneRect.left <= xPos,
+                            isInVertically = yPos <= dzoneRect.top && dzoneRect.bottom <= yPos,
+                            isApproachingVertically = ( mouseToBottom > 0 && mouseToBottom < isApproachingThreshold ) || ( mouseToTop > 0 && mouseToTop < isApproachingThreshold ),
+                            isApproachingHorizontally = ( mouseToRight > 0 && mouseToRight < isApproachingThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isApproachingThreshold );
+
+                        // var html = "isApproachingHorizontally : " + isApproachingHorizontally + ' | isCloseHorizontally : ' + isCloseHorizontally + ' | isInHorizontally : ' + isInHorizontally;
+                        // html += ' | xPos : ' + xPos + ' | zoneRect.right : ' + dzoneRect.right;
+                        // html += "isApproachingVertically : " + isApproachingVertically + ' | isCloseVertically : ' + ' | isInVertically : ' + isInVertically;
+                        // html += ' | yPos : ' + yPos + ' | zoneRect.top : ' + dzoneRect.top;
+                        // $(this).html(html);
+
+                        if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
+                              $(this).addClass( 'sek-drag-is-close');
+                              $(this).removeClass( 'sek-drag-is-approaching' );
+                        } else if ( ( isApproachingVertically || isInVertically ) && ( isApproachingHorizontally || isInHorizontally ) ) {
+                              $(this).removeClass( 'sek-drag-is-close' );
+                              $(this).addClass( 'sek-drag-is-approaching' );
+                        } else {
+                              $(this).removeClass( 'sek-drag-is-close' );
+                              $(this).removeClass( 'sek-drag-is-approaching' );
+                        }
+                  });//$('.sek-drop-zones').each()
+
+                  // Reset the timer
+                  self.enterOverTimer = null;
+            },
+
+            // @return string
             dnd_getPreDropElementContent : function( evt ) {
                   var $target = $( evt.currentTarget ),
                       html,
@@ -238,14 +310,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // Scheduled on previewer('ready') each time the previewer is refreshed
             dnd_getDropZonesElements : function() {
-                  return $( api.previewer.targetWindow().document ).find('body');
+                  return $( api.previewer.targetWindow().document );
             },
 
             // @return boolean
             // Note : the class "sek-content-preset_section-drop-zone" is dynamically generated in preview::schedulePanelMsgReactions() sek-drag-start case
             dnd_canDrop : function( $dropTarget ) {
+                  //console.log("$dropTarget.hasClass('sek-drop-zone') ?", $dropTarget, $dropTarget.hasClass('sek-drop-zone') );
                   var isSectionDropZone = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' );
-                  return ( 'preset_section' === this.dnd_draggedType && isSectionDropZone ) || ( 'module' === this.dnd_draggedType && ! isSectionDropZone );
+                  return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === this.dnd_draggedType && isSectionDropZone ) || ( 'module' === this.dnd_draggedType && ! isSectionDropZone ) );
             },
 
             // @return void()
@@ -260,7 +333,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         this.$dropZones.addClass( 'sek-is-dragging' );
                   }
 
-                  try { this.dnd_mayBePrintPlaceHolder( $dropTarget, evt ); } catch( er ) {
+                  try { this.dnd_mayBePrintPreDropElement( $dropTarget, evt ); } catch( er ) {
                         api.errare('Error when trying to insert the preDrop content', er );
                   }
             },
@@ -283,17 +356,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // @return void()
             dnd_cleanOnLeaveDrop : function( $dropTarget, evt ) {
+                  var self = this;
                   this.$dropZones = this.$dropZones || this.dnd_getDropZonesElements();
                   // Clean up
-                  if ( $dropTarget && $dropTarget.length > 0 ) {
-                        $dropTarget.removeClass( 'sek-active-drop-zone' );
-                  }
+                  // if ( $dropTarget && $dropTarget.length > 0 ) {
+                  //       $dropTarget.removeClass( 'sek-active-drop-zone' );
+                  //       $dropTarget.data( 'is-drag-entered', false );
+                  // }
+
                   this.preDropElement.remove();
                   this.$dropZones.removeClass( 'sek-is-dragging' );
+
                   $( sektionsLocalizedData.dropSelectors, this.$dropZones ).each( function() {
-                        $(this).data( 'is-drag-entered', false );
-                        $(this).data( 'preDrop-position', false );
+                        self.dnd_cleanSingleDropTarget( $(this) );
                   });
+            },
+
+            // @return void()
+            dnd_cleanSingleDropTarget : function( $dropTarget ) {
+                  if ( _.isEmpty( $dropTarget ) || $dropTarget.length < 1 )
+                    return;
+
+                  $dropTarget.data( 'is-drag-entered', false );
+                  $dropTarget.data( 'preDrop-position', false );
+                  $dropTarget.removeClass( 'sek-active-drop-zone' );
+                  $dropTarget.find('.sek-drop-zone').removeClass('sek-drag-is-close');
+                  $dropTarget.find('.sek-drop-zone').removeClass('sek-drag-is-approaching');
             },
 
 
@@ -313,7 +401,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
             // @return void()
-            dnd_mayBePrintPlaceHolder : function( $dropTarget, evt ) {
+            dnd_mayBePrintPreDropElement : function( $dropTarget, evt ) {
                   var self = this,
                       previousPosition = $dropTarget.data( 'preDrop-position' ),
                       newPosition = this.dnd_getPosition( $dropTarget, evt  );
@@ -321,22 +409,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( previousPosition === newPosition )
                     return;
 
+                  if ( true === self.isPrintingPreDrop ) {
+                        return;
+                  }
+
+                  self.isPrintingPreDrop = true;
+
+                  // make sure we clean the previous wrapper of the pre drop element
+                  this.dnd_cleanSingleDropTarget( this.$currentPreDropTarget );
+
                   $.when( self.preDropElement.remove() ).done( function(){
                         $dropTarget[ 'before' === newPosition ? 'prepend' : 'append' ]( self.preDropElement )
                               .find( '.' + sektionsLocalizedData.preDropElementClass ).html( self.dnd_getPreDropElementContent( evt ) );
                         $dropTarget.data( 'preDrop-position', newPosition );
+
+                        self.isPrintingPreDrop = false;
+                        self.$currentPreDropTarget = $dropTarget;
                   });
             },
 
             //@return void()
             dnd_isOveringDropTarget : function( $dropTarget, evt ) {
-                  var targetPos = $dropTarget[0].getBoundingClientRect(),
+                  var targetRect = $dropTarget[0].getBoundingClientRect(),
                       mouseX = evt.clientX,
                       mouseY = evt.clientY,
-                      tLeft = targetPos.left,
-                      tRight = targetPos.right,
-                      tTop = targetPos.top,
-                      tBottom = targetPos.bottom,
+                      tLeft = targetRect.left,
+                      tRight = targetRect.right,
+                      tTop = targetRect.top,
+                      tBottom = targetRect.bottom,
                       isXin = mouseX >= tLeft && ( tRight - tLeft ) >= ( mouseX - tLeft),
                       isYin = mouseY >= tTop && ( tBottom - tTop ) >= ( mouseY - tTop);
                   return isXin && isYin;

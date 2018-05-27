@@ -142,7 +142,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         // because the removed level(s) might had registered fonts
                                         self.updateAPISetting({ action : 'sek-update-fonts' } );
 
-                                        // When the last section of a location gets removed, make sure we refresh the location level, to print the sek-empty-collection-placeholder
+                                        // When the last section of a location gets removed, make sure we refresh the location level, to print the sek-empty-location-placeholder
                                         if ( 'sek-remove-section' === params.apiParams.action ) {
                                               var locationLevel = self.getLevelModel( params.apiParams.location );
                                               if ( _.isEmpty( locationLevel.collection ) ) {

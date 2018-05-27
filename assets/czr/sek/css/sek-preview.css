@@ -17,7 +17,7 @@
 
 .sek-column-inner.sek-empty-col {
   min-height: 100px;
-  height: 100px;
+  height: 100%;
 }
 
 .sek-module {
@@ -29,32 +29,6 @@
 }
 
 .sek-module h4 { color:red;}
-
-
-
-
-
-
-/* This is printed when the location has no section
- an add content button is rendered on hovering in this container */
-.sek-empty-collection-placeholder {
-  position: relative;
-  min-height: 50px;
-  margin:20px 0;
-  border-radius: 5px;
-}
-
-.sek-empty-collection-placeholder:hover {
-  border: 2px dotted black;
-}
-
-.sek-add-button-wrapper, {
-  text-align: center;
-  width: 100%;
-  margin: 1rem 0;
-  position: relative;
-}
-
 
 
 
@@ -264,10 +238,32 @@
 
 
 
-/* TINYMCE BLOCK OUTLINE */
 
-.sek-module [data-sek-input-type="tiny_mce_editor"]:hover {
-  outline: 1px solid #1d85bb;
+
+
+
+
+
+
+
+/* This is printed when the location has no section
+ an add content button is rendered on hovering in this container */
+.sek-empty-location-placeholder {
+  position: relative;
+  min-height: 50px;
+  margin:20px 0;
+  border-radius: 5px;
+}
+
+.sek-empty-location-placeholder:hover {
+  border: 2px dotted black;
+}
+
+.sek-add-button-wrapper {
+  text-align: center;
+  width: 100%;
+  margin: 1rem 0;
+  position: relative;
 }
 
 
@@ -276,17 +272,12 @@
 
 
 
-
-
-
-
-
-
-
+/* DRAG AND DROP */
 /* Drop zone for first module */
 .sek-no-modules-column {
-  position: absolute;
-    top: 30px;
+  position: relative;
+  height: 100%;
+    /*top: 30px;*/
     bottom: 0;
     left: 0;
     right: 0;
@@ -300,6 +291,7 @@
     display: -ms-flexbox;
     display: flex;
     height: 100%;
+    min-height: 40px;
     -webkit-box-align: center;
     -webkit-align-items: center;
     -ms-flex-align: center;
@@ -309,155 +301,106 @@
     -ms-flex-pack: center;
     justify-content: center;
 }
+
 .sek-module-drop-zone-for-first-module [data-sek-action="pick-module"] {
   cursor: pointer;
 }
-/* hide empty column content when attempting to drop */
-.sek-active-drop-zone.sek-module-drop-zone-for-first-module [data-sek-action="pick-module"] {
-  display: none;
-}
+
+
+
 .sek-sortable-overing > .sek-no-modules-column { display: none; }
 
+
+/* This is the selector for all eligible drop zones */
 .sek-drop-zone {
-  height: 0px;
+  opacity: 0;
+  -webkit-transition: opacity, height 0.4s ease;
+  -moz-transition: opacity, height 0.4s ease;
+  -o-transition: opacity, height 0.4s ease;
+  transition: opacity, height 0.4s ease;
 }
-.sek-active-drop-zone.sek-drop-zone {
-  height: auto!important;
-  min-height : 50px;
-}
-.sek-dragging .sek-drop-zone {
-  height: 20px;
-  -webkit-transition: all 0.4s ease;
-  -moz-transition: all 0.4s ease;
-  -o-transition: all 0.4s ease;
-  transition: all 0.4s ease;
-  animation: sek-dragging-highlight 2s infinite;
-  background: #eee;
-  border:2px dotted #a2a2a2;
-  border-radius: 5px;
-}
+
+
+
+/* DYNAMIC DROP ZONES ON DRAG START + DRAGGING BEHAVIOUR */
+/* hide empty column content when attempting to drop */
+/* <Animations> when dragstart */
 @keyframes sek-dragging-highlight {
   0% {background-color: #eee;}
   50% {background-color: #dcdcdc;}
   /*50% {background-color: #e8e8e8;}*/
   100% {background-color: #eee;}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* BUTTON copy from customizr theme */
-.btn {
-    display: inline-block;
-    font-weight: normal;
-    line-height: 1.25;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: middle;
-    user-select: none;
-    border: 1px solid transparent;
-    padding: 0.5em 1em;
-    border-radius: 2px;
-    border-width: 2px;
-    border-style: solid;
-    font-size: 1em;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.2s ease-in-out;
+@keyframes sek-dragging-between-sec-highlight {
+  0% {background-color: #dcefff;}
+  50% {background-color: #99d1ff;}
+  /*50% {background-color: #e8e8e8;}*/
+  100% {background-color: #dcefff;}
 }
-/*.btn:hover, .btn:focus {
-    color: #333;
-    text-decoration: none;
+/* </Animations> */
+
+/*
+ the class .sek-active-drop-zone is added when entering / overing the drop target
+ and removed when leaving the drop element
+ */
+.sek-active-drop-zone.sek-module-drop-zone-for-first-module [data-sek-action="pick-module"] {
+  display: none;
+}
+/*.sek-dynamic-drop-zone {
+  height: 0px;
 }*/
-.btn-edit {
-    padding: 0 1.25em 0 0.625em;
-    line-height: 2em;
-    vertical-align: middle;
-    display: inline-block;
-    /*margin-bottom: 1em;*/
+.sek-active-drop-zone.sek-dynamic-drop-zone {
+  height: auto!important;
+  min-height : 50px;
 }
-.btn-small:hover, .btn-edit:hover, .btn-edit:focus {
-    color: #313131;
-    border-color: transparent;
-    background: #eceeef!important;
-}
-.btn-small, .btn-edit {
-    font-size: 0.65em;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    background: transparent;
-    border: 1.5px solid #eceeef!important;
-    font-family: sans-serif;
-    color: #777;
-    padding: 0.65em 1.3em;
-    transition: all 0.3s ease;
+/*
+ the class .sek-active-drop-zone is added when appending the pre drop elemnt
+ and removed when leaving the drop element
+ */
+.sek-has-pre-drop-element {
+  border: 1px solid red!important;
+  /*min-height : 50px;*/
 }
 
+.sek-dragging .sek-dynamic-drop-zone {
+  height: 10px;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+  animation: sek-dragging-highlight 2s infinite;
+  background: green;
+  border:2px dotted #a2a2a2;
+  border-radius: 5px;
+}
+.sek-dragging [data-sek-location="between-sections"], .sek-dragging [data-sek-location="in-empty-location"]{
+  animation: sek-dragging-between-sec-highlight 2s infinite;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-/* SORTABLE */
-.sortable-placeholder {
-  /*width: 100%;*/
-  background: #00A2D7;
-  border-radius: 4px;
-  color: #fff !important;
-  display: block;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  font-weight: normal;
-  font-size: 12px;
-  letter-spacing: 1px;
-  line-height: 14px;
-  margin: 10px;
-  padding: 6px 8px 5px;
-  position: relative;
-  text-align: left;
-  text-overflow: ellipsis;
-  text-shadow: none;
-  text-transform: none;
-  white-space: nowrap;
-  overflow: hidden;
-  z-index: 10;
+.sek-dragging .sek-drag-is-approaching.sek-dynamic-drop-zone {
+  height: 20px;
+}
+.sek-dragging .sek-drag-is-close.sek-dynamic-drop-zone {
+  height: 40px;
 }
 
 
-
-
-
-
+.sek-dragging .sek-module-drop-zone-for-first-module {
+  animation: sek-dragging-highlight 2s infinite;
+  background: #eee;
+  border:2px dotted #a2a2a2;
+  border-radius: 5px;
+}
 
 
 
 /* DRAG DROP
-
 /* When dragging, make the drop zone easier to find
 .sek-dragging-element is added / removed on sortable start / stop
 */
 .sek-dragging-element .sek-column-inner,
 .sek-dragging-element .sek-sektion-inner {
   min-height: 50px;
-}
-.sek-module-drop-zone-for-first-module {
-  min-height: 40px;
 }
 .sek-module-placeholder-content {
   text-align: center;
@@ -466,64 +409,6 @@
 .sek-module-placeholder-content > p {
   padding: 35px 10px;
 }
-
-
-
-
-
-
-/* RESIZABLE */
-.ui-resizable-helper { border: 2px dotted #33b3db; }
-[data-sek-level="column"] .ui-resizable-e {
-  cursor: e-resize;
-  width: 7px;
-  right: -4px;
-  font-size: 0.55em;
-}
-[data-sek-level="column"] .ui-resizable-e i {
-    background: #33b3db;
-    border-radius: 12px;
-    color: white;
-    padding: 2px;
-    display: none;
-}
-[data-sek-level="section"]:hover .ui-resizable-e {
-  background: #d5d5d573;
-  background: rgba(213, 213, 213, 0.42);
-}
-[data-sek-level="section"]:hover .ui-resizable-e i {
-    display: block;
-}
-
-
-
-[data-sek-level="column"] .ui-resizable-handle {
-  /*z-index: 90;*/
-  /* border: 1px dashed #d5dadf; */
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  height: calc(100% - 26px);/*26px is the padding-top of the .sek-column when previewing to let enough place for the ui icons */
-  top: 26px;/*26px is the padding-top of the .sek-column when previewing to let enough place for the ui icons */
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-
-
-
-
-
-
-
-
 
 
 
@@ -538,7 +423,7 @@
     display: none;
 }
 /* when inserted in an empty location placeholder, center vertically */
-.sek-empty-collection-placeholder .sek-add-content-button {
+.sek-empty-location-placeholder .sek-add-content-button {
   top: 50%
 }
 .sek-add-content-button.is_last {
@@ -625,6 +510,123 @@
 .sek-add-content-btn:not(.disabled):hover .action-button-text {
     visibility: visible;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* SORTABLE */
+.sortable-placeholder {
+  max-width: 100%;
+  flex-grow: 1;
+  background: #00A2D7;
+  border-radius: 4px;
+  color: #fff !important;
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-weight: normal;
+  font-size: 12px;
+  letter-spacing: 1px;
+  line-height: 14px;
+  margin: 10px;
+  padding: 6px 8px 5px;
+  position: relative;
+  text-align: left;
+  text-overflow: ellipsis;
+  text-shadow: none;
+  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  z-index: 10;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* RESIZABLE */
+.ui-resizable-helper { border: 2px dotted #33b3db; }
+[data-sek-level="column"] .ui-resizable-e {
+  cursor: e-resize;
+  width: 7px;
+  right: -4px;
+  font-size: 0.55em;
+}
+[data-sek-level="column"] .ui-resizable-e i {
+    background: #33b3db;
+    border-radius: 12px;
+    color: white;
+    padding: 2px;
+    display: none;
+}
+[data-sek-level="section"]:hover .ui-resizable-e {
+  background: #d5d5d573;
+  background: rgba(213, 213, 213, 0.42);
+}
+[data-sek-level="section"]:hover .ui-resizable-e i {
+    display: block;
+}
+
+
+
+[data-sek-level="column"] .ui-resizable-handle {
+  /*z-index: 90;*/
+  /* border: 1px dashed #d5dadf; */
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: calc(100% - 26px);/*26px is the padding-top of the .sek-column when previewing to let enough place for the ui icons */
+  top: 26px;/*26px is the padding-top of the .sek-column when previewing to let enough place for the ui icons */
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -717,4 +719,14 @@
 svg.dashicon {
     fill: currentColor;
     outline: none;
+}
+
+
+
+
+
+
+/* TINYMCE BLOCK OUTLINE */
+.sek-module [data-sek-input-type="tiny_mce_editor"]:hover {
+  outline: 1px solid #1d85bb;
 }

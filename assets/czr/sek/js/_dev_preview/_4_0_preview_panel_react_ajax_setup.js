@@ -204,42 +204,72 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             //@params { type : module || preset_section }
                             'sek-drag-start' : function( params ) {
-                                  console.log('PARAMS in sek-drag-start', params, $('.sektion-wrapper').children('[data-sek-level="section"]').length );
+                                  //console.log('PARAMS in sek-drag-start', params, $('.sektion-wrapper').children('[data-sek-level="section"]').length );
                                   // append the drop zones between sections
                                   var i = 1;
                                   $('.sektion-wrapper').children('[data-sek-level="section"]').each( function() {
-                                        console.log( 'merde', $(this), $('[data-drop-zone-before-section="' + $(this).data('sek-id') +'"]').length );
                                         // Always before
                                         if ( $('[data-drop-zone-before-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
-                                              console.log( $(this) );
                                               $(this).before(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + $(this).data('sek-id') +'"></div>'
+                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + $(this).data('sek-id') +'"></div>'
                                               );
                                         }
                                         // After the last one
                                         if (  i == $('.sektion-wrapper').children('[data-sek-level="section"]').length ) {
                                               $(this).after(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + $(this).data('sek-id') +'"></div>'
+                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + $(this).data('sek-id') +'"></div>'
                                               );
                                         }
                                         i++;
                                   });
 
-                                  $('.sek-empty-collection-placeholder').each( function() {
-                                        console.log('SEK-DRAG-START', params );
+                                  // Append the drop zone in empty locations
+                                  $('.sek-empty-location-placeholder').each( function() {
+                                        //console.log('SEK-DRAG-START', params );
                                         $.when( $(this).append(
-                                              '<div class="sek-content-' + params.type + '-drop-zone sek-drop-zone" data-sek-location="in-empty-location"></div>'
+                                              '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="in-empty-location"></div>'
                                         ) );
                                   });
 
+                                  // Append a drop zone between modules in columns
+                                  if ( 'module' ==  params.type ) {
+                                        $('[data-sek-level="column"]').each( function() {
+                                              var $modules = $(this).find('[data-sek-level="module"]');
+                                              // if ( $modules.length < 2 )
+                                              //   return;
+                                              var j = 1;
+                                              $modules.each( function() {
+                                                    // Always before
+                                                    if ( $('[data-drop-zone-before-module="' + $(this).data('sek-id') +'"]').length < 1 ) {
+                                                          $(this).before(
+                                                              '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules" data-drop-zone-before-module="' + $(this).data('sek-id') +'"></div>'
+                                                          );
+                                                    }
+                                                    // After the last one
+                                                    if (  j == $modules.length && $('[data-drop-zone-after-module="' + $(this).data('sek-id') +'"]').length < 1 ) {
+                                                          $(this).after(
+                                                            '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules" data-drop-zone-after-module="' + $(this).data('sek-id') +'"></div>'
+                                                          );
+                                                    }
+                                                    j++;
+                                              });
+                                        });
+                                  }
+
                                   $('body').addClass('sek-dragging');
+
+                                  _.delay( function() {
+                                      $('.sek-drop-zone').css({ opacity : 1 });
+                                  }, 100 );
+
                             },
                             'sek-drag-stop' : function( params ) {
                                   $('body').removeClass('sek-dragging');
                                   // Clean any remaining placeholder
                                   $('.sortable-placeholder').remove();
-                                  // Remove the drop zone between sections
-                                  $('.sek-drop-zone').remove();
+
+                                  // Remove the drop zone dynamically add on sek-drag-start
+                                  $('.sek-dynamic-drop-zone').remove();
                             },
 
 

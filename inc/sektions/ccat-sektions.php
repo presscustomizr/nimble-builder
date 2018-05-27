@@ -618,10 +618,13 @@ function sek_enqueue_controls_js_css() {
             'preDropElementClass' => 'sortable-placeholder',
             'dropSelectors' => implode(',', [
                 // 'module' type
-                '.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                '.sek-column-inner',// the drop zone when there is at least one module
-                '.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
-                '.sek-content-module-drop-zone',//between sections
+                //'.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
+                //'[data-sek-level="location"]',
+                //'.sek-not-empty-col',// the drop zone when there is at least one module
+                //'.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
+                //'.sek-content-module-drop-zone',//between sections
+                '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
+                'body',// body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
 
                 // 'preset_section' type
                 '.sek-content-preset_section-drop-zone'//between sections
@@ -4257,7 +4260,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         ?>
 
                          <?php if ( skp_is_customizing() && empty( $collection ) ) : //if ( skp_is_customizing() ) : ?>
-                            <div class="sek-empty-collection-placeholder">
+                            <div class="sek-empty-location-placeholder">
                                 <?php //_e( '+ Add a section', 'text_domain_to_be_replaced'); echo ' ' . $location; ?>
                             </div>
                         <?php endif; ?>
@@ -4309,12 +4312,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               empty( $collection ) ? 'data-sek-no-modules="true"' : ''
                           );
                       ?>
+                        <?php // Drop zone : if no modules, the drop zone is wrapped in sek-no-modules-columns
+                        // if at least one module, the sek-drop-zone is the .sek-column-inner wrapper ?>
                         <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
                             <?php
                               if ( empty( $collection ) ) {
                                   ?>
                                   <div class="sek-no-modules-column">
-                                    <div class="sek-module-drop-zone-for-first-module">
+                                    <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
                                       <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="Add Module"></i>
                                     </div>
                                   </div>

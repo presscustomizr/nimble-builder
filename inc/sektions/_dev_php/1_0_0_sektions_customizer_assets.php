@@ -86,10 +86,13 @@ function sek_enqueue_controls_js_css() {
             'preDropElementClass' => 'sortable-placeholder',
             'dropSelectors' => implode(',', [
                 // 'module' type
-                '.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                '.sek-column-inner',// the drop zone when there is at least one module
-                '.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
-                '.sek-content-module-drop-zone',//between sections
+                //'.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
+                //'[data-sek-level="location"]',
+                //'.sek-not-empty-col',// the drop zone when there is at least one module
+                //'.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
+                //'.sek-content-module-drop-zone',//between sections
+                '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
+                'body',// body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
 
                 // 'preset_section' type
                 '.sek-content-preset_section-drop-zone'//between sections
