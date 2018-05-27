@@ -161,7 +161,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         // if at least one module, the sek-drop-zone is the .sek-column-inner wrapper ?>
                         <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
                             <?php
-                              if ( empty( $collection ) ) {
+                              if ( skp_is_customizing() && empty( $collection ) ) {
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
