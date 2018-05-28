@@ -63,7 +63,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 break;
                                           }
                                           if ( true === parentSektionCandidate.is_nested ) {
-                                                dfd.reject( sektionsLocalizedData.i18n["You've reached the maximum number of allowed nested sections."]);
+                                                dfd.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
                                                 break;
                                           }
                                           if ( 'no_match' == columnCandidate ) {
@@ -83,15 +83,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 is_nested : true
                                           });
                                     } else {
+                                          console.log('UPDATE API SETTING SEK ADD SECTION', params );
+
                                           locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                           if ( 'no_match' == locationCandidate ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
                                                 dfd.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
                                                 break;
                                           }
+                                          locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
+                                          _.each( locationCandidate.collection, function( secModel, index ) {
+                                                if ( params.before_section === secModel.id ) {
+                                                      position = index;
+                                                }
+                                                if ( params.after_section === secModel.id ) {
+                                                      position = index + 1;
+                                                }
+                                          });
+
                                           // @see reactToCollectionSettingIdChange
                                           locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
-                                          locationCandidate.collection.push({
+                                          // insert the section in the collection at the right place
+                                          locationCandidate.collection.splice( position, 0, {
                                                 id : params.id,
                                                 level : 'section',
                                                 collection : [{
@@ -101,7 +114,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 }]
                                           });
                                     }
-
                               break;
 
 
@@ -249,6 +261,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     sektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' == sektionCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
 
@@ -302,6 +315,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     sektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' == sektionCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
 
@@ -340,13 +354,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // SET RESIZED COLUMN WIDTH
                                     if ( 'no_match' == resizedColumn ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no resized column matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no resized column matched');
                                           break;
                                     }
-                                    if ( 'no_match' == resizedColumn ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => there should be a sister column' );
-                                          break;
-                                    }
-
 
                                     resizedColumn.width = parseFloat( params.resizedColumnWidthInPercent );
 
@@ -467,23 +477,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing module_type' );
                                     }
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                    if ( 'no_match' != columnCandidate ) {
-                                          columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                          var _insertionPosition = _.isEmpty( columnCandidate.collection ) ? 0 : params.position,
-                                              _moduleParams = {
-                                                    id : params.id,
-                                                    level : 'module',
-                                                    module_type : params.module_type
-                                              };
-                                          // Let's add the starting value if provided when registrating the module
-                                          startingModuleValue = self.getModuleStartingValue( params.module_type );
-                                          if ( 'no_starting_value' !== startingModuleValue ) {
-                                                _moduleParams.value = startingModuleValue;
-                                          }
-                                          columnCandidate.collection.splice( _insertionPosition, 0, _moduleParams );
-                                    } else {
+                                    if ( 'no_match' === columnCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                          break;
                                     }
+
+                                    columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                                    var _insertionPosition = _.isEmpty( columnCandidate.collection ) ? 0 : params.module_position_in_column,
+                                        _moduleParams = {
+                                              id : params.id,
+                                              level : 'module',
+                                              module_type : params.module_type
+                                        };
+                                    // Let's add the starting value if provided when registrating the module
+                                    startingModuleValue = self.getModuleStartingValue( params.module_type );
+                                    if ( 'no_starting_value' !== startingModuleValue ) {
+                                          _moduleParams.value = startingModuleValue;
+                                    }
+                                    columnCandidate.collection.splice( _insertionPosition, 0, _moduleParams );
                               break;
 
                               case 'sek-duplicate-module' :
@@ -494,6 +506,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                     if ( 'no_match' == columnCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
                                           break;
                                     }
 
@@ -502,6 +515,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var deepClonedModule;
                                     try { deepClonedModule = self.cloneLevel( params.id ); } catch( er ) {
                                           api.errare( 'updateAPISetting => ' + params.action, er );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => error when cloning the level');
                                           break;
                                     }
                                     var insertInposition = self.getLevelPositionInCollection( params.id, newSetValue.collection );
@@ -604,6 +618,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                                     if ( 'no_match' == moduleCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no module matched', params );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => error no module matched');
                                           break;
                                     }
                                     moduleCandidate.value = _value_;
@@ -622,6 +637,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _valueCandidate = {};
                                     if ( 'no_match'=== _candidate_ ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
                                     _candidate_.options = _candidate_.options || {};
@@ -656,6 +672,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
+
+
+
+
+
+
                               //-------------------------------------------------------------------------------------------------
                               //-- CONTENT IN NEW SEKTION
                               //-------------------------------------------------------------------------------------------------
@@ -668,7 +691,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
                               // }
                               case 'sek-add-content-in-new-sektion' :
-                                    //console.log('update API Setting => sek-add-content-in-new-sektion => PARAMS', params );
+                                    // console.log('update API Setting => sek-add-content-in-new-sektion => PARAMS', params );
                                     // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
@@ -729,13 +752,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       });
                                                 } catch( _er_ ) {
                                                       api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
+                                                      dfd.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
                                                       break;
                                                 }
                                                 if ( ! _.isObject( presetSectionCandidate ) || _.isEmpty( presetSectionCandidate ) ) {
                                                       api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetSectionCandidate );
+                                                      dfd.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                                       break;
                                                 }
-                                                //console.log('SOOOOOOOOOO => ', presetSectionCandidate );
                                                 locationCandidate.collection.splice( position, 0, presetSectionCandidate );
                                           break;
                                     }//switch( params.content_type)
@@ -757,6 +781,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
                                           if ( params.font_family.indexOf('gfont') < 0 ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
+                                                dfd.reject( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont');
                                                 break;
                                           }
                                           currentGfonts.push( params.font_family );
