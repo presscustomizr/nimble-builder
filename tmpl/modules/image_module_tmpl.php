@@ -60,8 +60,8 @@ if ( ! function_exists( 'sek_get_img_module_img_link' ) ) {
 }
 
 // Print
-if ( 'no_link' === $value['link-to'] ) {
-    echo sek_get_img_module_img_html();
+if ( 'no-link' === $value['link-to'] ) {
+    echo sek_get_img_module_img_html( $value );
 } else {
     printf('<a href="%1$s" %2$s>%3$s</a>',
         sek_get_img_module_img_link( $value ),
