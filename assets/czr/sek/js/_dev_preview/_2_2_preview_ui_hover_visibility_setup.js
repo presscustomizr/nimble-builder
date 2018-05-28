@@ -8,20 +8,27 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   var tmpl,
                       level,
                       params,
-                      $levelEl;
+                      $levelEl,
+                      isFadingOut = false;//stores ths status of 200 ms fading out. => will let us know if we can print again when moving the mouse fast back and forth between two levels.
 
-                  // Level's overlay with delegation
+                  // Level's UI icons with delegation
                   $('body').on( 'mouseenter', '[data-sek-level]', function( evt ) {
-                        // if ( $(this).children('.sek-block-overlay').length > 0 )
+                        // if ( $(this).children('.sek-dyn-ui-wrapper').length > 0 )
                         //   return;
                         level = $(this).data('sek-level');
                         // we don't print a ui for locations
                         if ( 'location' == level )
                           return;
 
+                        $levelEl = $(this);
+
+                        // stop here if the .sek-dyn-ui-wrapper is already printed for this level AND is not being faded out.
+                        if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 && false === isFadingOut )
+                          return;
+
                         params = {
-                              id : $(this).data('sek-id'),
-                              level : $(this).data('sek-level')
+                              id : $levelEl.data('sek-id'),
+                              level : $levelEl.data('sek-level')
                         };
                         switch ( level ) {
                               case 'section' :
@@ -48,24 +55,24 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               return;
                         }
 
-                        tmpl = self.parseTemplate( '#sek-tmpl-overlay-ui-' + level );
+                        tmpl = self.parseTemplate( '#sek-dyn-ui-tmpl-' + level );
                         $.when( $(this).prepend( tmpl( params ) ) ).done( function() {
-                              $levelEl = $(this);
-                              $levelEl.find('.sek-block-overlay').stop( true, true ).fadeIn( {
+                              $levelEl.find('.sek-dyn-ui-wrapper').stop( true, true ).fadeIn( {
                                   duration : 300,
                                   complete : function() {}
                               } );
                         });
 
                   }).on( 'mouseleave', '[data-sek-level]', function( evt ) {
+                          isFadingOut = true;//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
                           $levelEl = $(this);
-                          $levelEl.children('.sek-block-overlay').stop( true, true ).fadeOut( {
+                          $levelEl.children('.sek-dyn-ui-wrapper').stop( true, true ).fadeOut( {
                                 duration : 200,
                                 complete : function() {
                                       $(this).remove();
+                                      isFadingOut = false;
                                 }
                           });
-
                   });
 
 
@@ -74,8 +81,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // <script type="text/html" id="sek-tmpl-add-content-button">
                   //     <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                   //       <div class="sek-add-content-button-wrapper">
-                  //         <button data-sek-action="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:60px;">
-                  //           <span title="<?php _e('Add Content', 'text_domain_to_be_replaced' ); ?>" class="sek-action-button-icon fas fa-plus-circle sek-action"></span><span class="action-button-text"><?php _e('Add Content', 'text_domain_to_be_replaced' ); ?></span>
+                  //         <button data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:60px;">
+                  //           <span title="<?php _e('Add Content', 'text_domain_to_be_replaced' ); ?>" class="sek-click-on-button-icon fas fa-plus-circle sek-click-on"></span><span class="action-button-text"><?php _e('Add Content', 'text_domain_to_be_replaced' ); ?></span>
                   //         </button>
                   //       </div>
                   //     </div>
