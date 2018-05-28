@@ -81,8 +81,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // error_log( '</LEVEL MODEL IN ::RENDER()>');
             // Is it the root level ?
             // The root level has no id and no level entry
+            if ( ! is_array( $model ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a model must be an array', $model );
+                return;
+            }
             if ( ! array_key_exists( 'level', $model ) || ! array_key_exists( 'id', $model ) ) {
-                error_log( 'render => a level model is missing the level or the id property' );
+                error_log( '::render() => a level model is missing the level or the id property' );
                 return;
             }
             $id = $model['id'];
@@ -187,8 +191,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 break;
 
                 case 'module' :
+                    if ( empty( $model['module_type'] ) ) {
+                        sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => missing module_type for a module', $model );
+                        break;
+                    }
+                    $module_type = $model['module_type'];
+
+                    // Prepare the module value with the defaults
+                    $default_value_model  = sek_get_default_module_model( $module_type );//walk the registered modules tree and generates the module default if not already cached
+                    $model['value'] = is_array( $model['value'] ) ? $model['value'] : array();
+                    $model['value'] = wp_parse_args( $model['value'], $default_value_model );
                     ?>
-                      <div data-sek-level="module" data-sek-id="<?php echo $id; ?>" class="sek-module">
+                      <div data-sek-level="module" data-sek-id="<?php echo $id; ?>" data-sek-module-type="<?php echo $module_type; ?>" class="sek-module">
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>
                             </div>
