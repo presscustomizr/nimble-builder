@@ -167,7 +167,6 @@ function sek_get_default_module_model( string $module_type ) {
         // error_log( print_r( $default_models, true ) );
         // error_log('</$default_models>');
     }
-
     return $default;
 }
 
@@ -295,5 +294,13 @@ function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true )
 
 
 
-
+function sek_error_log( string $title, $content = null ) {
+    if ( is_null( $content ) ) {
+        error_log( '<' . strtoupper( $title ) . '>' );
+    } else {
+        error_log( '<' . strtoupper( $title ) . '>' );
+        error_log( print_r( $content, true ) );
+        error_log( '<' . strtoupper( $title ) . '>' );
+    }
+}
 ?>
