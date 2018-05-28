@@ -258,7 +258,7 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
             //2) the block overlay
             //3) the add content button
             if ( is_customize_preview() ) {
-                $first_child_selector .= ':not(.ui-resizable-handle):not(.sek-block-overlay):not(.sek-add-content-button)';
+                $first_child_selector .= ':not(.ui-resizable-handle):not(.sek-dyn-ui-wrapper):not(.sek-add-content-button)';
             }
             $rules[]     = array(
                 'selector' => $first_child_selector,

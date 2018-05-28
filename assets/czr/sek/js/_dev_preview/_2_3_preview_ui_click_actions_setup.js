@@ -12,15 +12,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             $el = $(evt.target),
                             $hook_location = $el.closest('[data-sek-level="location"]'),
                             $closestLevelWrapper = $el.closest('[data-sek-level]'),
-                            $closestActionIcon = $el.closest('[data-sek-action]'),
+                            $closestActionIcon = $el.closest('[data-sek-click-on]'),
                             _action,
                             _location = $hook_location.data('sek-id'),
                             _level = $closestLevelWrapper.data('sek-level'),
                             _id = $closestLevelWrapper.data('sek-id');
-                        if ( 'add-content' == $el.data('sek-action') || ( $el.closest('[data-sek-action]').length > 0 && 'add-content' == $el.closest('[data-sek-action]').data('sek-action') ) ) {
+                        if ( 'add-content' == $el.data('sek-click-on') || ( $el.closest('[data-sek-click-on]').length > 0 && 'add-content' == $el.closest('[data-sek-click-on]').data('sek-click-on') ) ) {
                               clickedOn = 'addContentButton';
-                        } else if ( ! _.isEmpty( $el.data( 'sek-action' ) ) || $closestActionIcon.length > 0 ) {
-                              clickedOn = 'overlayUiIcon';
+                        } else if ( ! _.isEmpty( $el.data( 'sek-click-on' ) ) || $closestActionIcon.length > 0 ) {
+                              clickedOn = 'UIIcon';
                         } else if ( 'module' == $closestLevelWrapper.data('sek-level') ) {
                               clickedOn = 'moduleWrapper';
                         } else if ( 'column' == $closestLevelWrapper.data('sek-level') && true === $closestLevelWrapper.data('sek-no-modules') ) {
@@ -54,12 +54,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           send_to_preview : ! is_first_section
                                     });
                               break;
-                              case 'overlayUiIcon' :
+                              case 'UIIcon' :
 
                                     if ( 1 > $closestLevelWrapper.length ) {
                                         throw new Error( 'ERROR => sek-front-preview => No valid level dom element found' );
                                     }
-                                    _action = $el.data('sek-action');
+                                    _action = $el.data('sek-click-on');
 
                                     if ( _.isEmpty( _action ) ) {
                                         throw new Error( 'Invalid action' );
@@ -75,14 +75,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     });
                               break;
                               case 'moduleWrapper' :
-                                    // stop here if the ui overlay actions block was clicked
-                                    if ( $el.parent('.sek-block-overlay-actions').length > 0 )
+                                    // stop here if the ui icons block was clicked
+                                    if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
                                       return;
                                     self._send_( $el, { action : 'edit-module', level : _level , id : _id } );
                               break;
                               case 'noModulesColumn' :
-                                    // stop here if the ui overlay actions block was clicked
-                                    if ( $el.parent('.sek-block-overlay-actions').length > 0 )
+                                    // stop here if the ui icons block was clicked
+                                    if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
                                       return;
 
                                     self._send_( $el, { action : 'pick-module', level : _level , id : _id } );

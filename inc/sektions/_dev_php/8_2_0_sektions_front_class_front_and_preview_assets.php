@@ -117,19 +117,19 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <# //console.log( 'data', data ); #>
                   <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                     <div class="sek-add-content-button-wrapper">
-                      <button title="<?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?> <# if ( data.location ) { #>( hook : {{data.location}} )<# } #>" data-sek-action="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
-                        <span class="sek-action-button-icon sek-action">+</span><span class="action-button-text"><?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?></span>
+                      <button title="<?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?> <# if ( data.location ) { #>( hook : {{data.location}} )<# } #>" data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
+                        <span class="sek-click-on-button-icon sek-click-on">+</span><span class="action-button-text"><?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?></span>
                       </button>
                     </div>
                   </div>
               </script>
 
-              <script type="text/html" id="sek-tmpl-overlay-ui-section">
+              <script type="text/html" id="sek-dyn-ui-tmpl-section">
                   <?php //<# console.log( 'data', data ); #> ?>
                   <# //console.log( 'data', data ); #>
-                  <div class="sek-block-overlay sek-section-overlay">
-                    <div class="sek-block-overlay-header">
-                      <div class="sek-block-overlay-actions">
+                  <div class="sek-dyn-ui-wrapper sek-section-dyn-ui">
+                    <div class="sek-dyn-ui-inner">
+                      <div class="sek-dyn-ui-icons">
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
                         <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
@@ -137,15 +137,13 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <# if ( ! data.is_last_possible_section ) { #>
                           <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Move section', 'sek-builder' ); ?>"></i>
                         <# } #>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Section options', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="fas fa-cogs sek-click-on" title="<?php _e( 'Section options', 'sek-builder' ); ?>"></i>
                         <# if ( data.can_have_more_columns ) { #>
-                          <i data-sek-action="add-column" class="fas fa-plus-circle sek-action" title="<?php _e( 'Add Column', 'sek-builder' ); ?>"></i>
+                          <i data-sek-click-on="add-column" class="fas fa-plus-circle sek-click-on" title="<?php _e( 'Add Column', 'sek-builder' ); ?>"></i>
                         <# } #>
-                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate section', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove section', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="duplicate" class="far fa-clone sek-click-on" title="<?php _e( 'Duplicate section', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="remove" class="far fa-trash-alt sek-click-on" title="<?php _e( 'Remove section', 'sek-builder' ); ?>"></i>
                       </div>
-
-                      <div class="sek-clear"></div>
                     </div>
                     <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
@@ -153,25 +151,24 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   </div>
               </script>
 
-              <script type="text/html" id="sek-tmpl-overlay-ui-column">
+              <script type="text/html" id="sek-dyn-ui-tmpl-column">
                   <?php //<# console.log( 'data', data ); #> ?>
-                  <div class="sek-block-overlay sek-column-overlay">
-                    <div class="sek-block-overlay-header">
-                      <div class="sek-block-overlay-actions">
+                  <div class="sek-dyn-ui-wrapper sek-column-dyn-ui">
+                    <div class="sek-dyn-ui-inner">
+                      <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Columns options', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="<?php _e( 'Add Module', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="fas fa-cogs sek-click-on" title="<?php _e( 'Columns options', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="pick-module" class="fas fa-plus-circle sek-click-on" title="<?php _e( 'Add Module', 'sek-builder' ); ?>"></i>
                         <# if ( data.parent_can_have_more_columns ) { #>
-                          <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate column', 'sek-builder' ); ?>"></i>
+                          <i data-sek-click-on="duplicate" class="far fa-clone sek-click-on" title="<?php _e( 'Duplicate column', 'sek-builder' ); ?>"></i>
                         <# } #>
                         <# if ( ! data.parent_is_last_allowed_nested ) { #>
-                          <i data-sek-action="add-section" class="fas far fa-plus-square sek-action" title="<?php _e( 'Add Sektion', 'sek-builder' ); ?>"></i>
+                          <i data-sek-click-on="add-section" class="fas far fa-plus-square sek-click-on" title="<?php _e( 'Add a nested section', 'sek-builder' ); ?>"></i>
                         <# } #>
                         <# if ( ! data.parent_is_single_column ) { #>
-                          <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove column', 'sek-builder' ); ?>"></i>
+                          <i data-sek-click-on="remove" class="far fa-trash-alt sek-click-on" title="<?php _e( 'Remove column', 'sek-builder' ); ?>"></i>
                         <# } #>
                       </div>
-                      <div class="sek-clear"></div>
                     </div>
                     <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
@@ -179,8 +176,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   </div>
               </script>
 
-              <script type="text/html" id="sek-tmpl-overlay-ui-module">
-                  <div class="sek-block-overlay sek-module-overlay">
+              <script type="text/html" id="sek-dyn-ui-tmpl-module">
+                  <div class="sek-dyn-ui-wrapper sek-module-dyn-ui">
                     <div class="editor-block-settings-menu"><?php // add class  is-visible on hover ?>
                       <div>
                         <div>
@@ -193,20 +190,19 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         </div>
                       </div>
                     </div><?php // .editor-block-settings-menu ?>
-                    <div class="sek-block-overlay-header">
-                      <div class="sek-block-overlay-actions">
+                    <div class="sek-dyn-ui-inner">
+                      <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="edit-module" class="fas fa-pencil-alt sek-tip sek-action" title="<?php _e( 'Edit Module', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Module options', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate module', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove module', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit Module', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="fas fa-cogs sek-click-on" title="<?php _e( 'Module options', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="duplicate" class="far fa-clone sek-click-on" title="<?php _e( 'Duplicate module', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="remove" class="far fa-trash-alt sek-click-on" title="<?php _e( 'Remove module', 'sek-builder' ); ?>"></i>
                       </div>
-                      <div class="sek-clear"></div>
                     </div>
                     <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
-                  </div><?php // .sek-block-overlay-header ?>
+                  </div><?php // .sek-dyn-ui-inner ?>
               </script>
             <?php
         }

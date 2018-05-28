@@ -165,7 +165,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
-                                      <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="Add Module"></i>
+                                      <i data-sek-click-on="pick-module" class="fas fa-plus-circle sek-click-on" title="Add Module"></i>
                                     </div>
                                   </div>
                                   <?php
