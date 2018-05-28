@@ -4,7 +4,7 @@
 }
 .sek-section {
   padding: 21px 0px 0;
-  position: relative;/* <= for the ui overlay block */
+  position: relative;/* <= Needed for the placement of the ui icons container revealed on hover */
 }
 
 .sek-column {
@@ -23,7 +23,7 @@
 .sek-module {
   position: relative;
   /*z-index: 4;*/
-}/* <= Needed for the placement of the overlay action icons */
+}/* <= Needed for the placement of the ui icons container revealed on hover */
 .sek-module-inner {
   position: relative;
 }
@@ -46,11 +46,10 @@
 
 
 /* PREVIEW UI BLOCKS */
-.sek-block-overlay {
+.sek-dyn-ui-wrapper {
     display: none;
     position: absolute;
     left: 0;
-    /*z-index: 2;*/
     color: #fff;
     background: rgba(190, 239, 255, 0);
     border-radius: 4px;
@@ -58,26 +57,27 @@
     -moz-box-sizing: border-box !important;
     -webkit-box-sizing: border-box !important;
 }
-.sek-block-overlay,
-.sek-block-overlay * {
+.sek-dyn-ui-wrapper,
+.sek-dyn-ui-wrapper * {
   text-shadow: none;
   -webkit-touch-callout: none;
 }
-.sek-block-overlay-header {
-    position: relative;
+.sek-dyn-ui-inner {
+    position: absolute;
+    right: 0;
     top: -18px;
     opacity: 0.7;
     transition: opacity .25s ease;
 }
-.sek-block-overlay-header:hover {
+.sek-dyn-ui-inner:hover {
     opacity: 1;
 }
 
 
-.sek-block-overlay-active {
+.sek-dyn-ui-wrapper-active {
   position: relative;
 }
-.sek-block-overlay-actions {
+.sek-dyn-ui-icons {
   background: #00A0D2;
   float: left;
   min-height: 18px;
@@ -89,43 +89,32 @@
   font-size: 1rem;
 }
 
-/*.sek-builder-col-resizing .sek-block-overlay-actions,
-.sek-builder-row-resizing .sek-block-overlay-actions {
-  overflow: hidden;
-}*/
-.sek-block-overlay-actions > span {
+.sek-dyn-ui-icons > span {
   display: block;
   float: left;
 }
-.sek-block-overlay-actions i {
+.sek-dyn-ui-icons i {
   color: #fff !important;
   cursor: pointer;
-  /*display: block !important;*/
   float: left;
-  /*font-size: 16px !important;*/
   font-size: 0.8em;
-  /*height: 28px !important;
-  line-height: 28px !important;*/
   height: 1.4em;
   line-height: 1.4em;
   opacity: 0.8;
-/*  filter: alpha(opacity = 80);*/
   text-align: center;
-  /*width: 32px !important;*/
   width: 1.7em;
 }
 
-.sek-block-overlay-actions i:hover {
+.sek-dyn-ui-icons i:hover {
   opacity: 1;
-  filter: alpha(opacity = 100);
 }
-.sek-block-overlay-actions > i:first-child {
+.sek-dyn-ui-icons > i:first-child {
   padding-left: 4px;
 }
-.sek-block-overlay-actions > i:last-child {
+.sek-dyn-ui-icons > i:last-child {
   padding-right: 2px;
 }
-.sek-block-overlay-actions .fa-arrows-alt {
+.sek-dyn-ui-icons .fa-arrows-alt {
   cursor: move;
 }
 
@@ -133,18 +122,17 @@
 
 /* SECTION OVERLAY*/
 /* prevent style propagation to nested levels with > */
-.sek-section > .sek-block-overlay .sek-block-overlay-actions {
+.sek-section > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
   background: black;
 }
-.sek-section-overlay {
+.sek-section-dyn-ui {
     border: 2px dotted black;
     bottom: 0;
     left: 0;
     top: 0px;
     right: 0;
-    /*z-index: 100001;*/
 }
-.sek-section > .sek-section-overlay .sek-block-overlay-header {
+.sek-section > .sek-section-dyn-ui .sek-dyn-ui-inner {
   top:0px;
   z-index: 1000;
 }
@@ -152,22 +140,21 @@
 
 /* COLUMN OVERLAY*/
 /* prevent style propagation to nested levels with > */
-.sek-column > .sek-column-overlay .sek-block-overlay-header {
+.sek-column > .sek-column-dyn-ui .sek-dyn-ui-inner {
   top:0px;
   z-index: 1001;
 }
-.sek-column > .sek-block-overlay .sek-block-overlay-actions {
+.sek-column > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
   background: #0085ba;
 }
-.sek-column-overlay {
+.sek-column-dyn-ui {
     border: 2px dotted #0085ba;
     bottom: 0px;
     left: 0px;
     top: 0px;
     right: 0px;
-    /*z-index: 100010;*/
 }
-.sek-column-overlay .dev-level-data {
+.sek-column-dyn-ui .dev-level-data {
   background: #0085ba;
 }
 
@@ -186,35 +173,22 @@
 .sek-module:hover{
   cursor:pointer;
 }
-.sek-module > .sek-module-overlay .sek-block-overlay-header {
+.sek-module > .sek-module-dyn-ui .sek-dyn-ui-inner {
   top:0px;
   z-index: 1002;
 }
-.sek-module > .sek-block-overlay .sek-block-overlay-actions {
+.sek-module > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
   background: #c68f00;
 }
-.sek-module-overlay {
+.sek-module-dyn-ui {
     border: 1px dotted #c68f00;
     bottom: 0px;
     left: 0px;
     top: 0px;
     right: 0px;
-    /*z-index: 100015;*/
-}
-/*.sek-module-inner {
-  border: 2px dotted #30afd9;
-}*/
 
-/*.sek-block-overlay-title {
-  color: #fff !important;
-  float: left;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  font-size: 14px;
-  height: 30px;
-  line-height: 29px;
-  margin-right: 2px;
-  padding: 0 12px 0 8px;
-}*/
+}
+
 .dev-level-data {
     position: absolute;
     bottom: 0;
@@ -224,11 +198,13 @@
     font-size: 11px;
 }
 
-.sek-module-overlay .dev-level-data {
+.sek-module-dyn-ui .dev-level-data {
   background: #c68f00;
   right: 0;
   left: unset;
 }
+
+
 
 
 
@@ -302,7 +278,7 @@
     justify-content: center;
 }
 
-.sek-module-drop-zone-for-first-module [data-sek-action="pick-module"] {
+.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"] {
   cursor: pointer;
 }
 
@@ -342,7 +318,7 @@
  the class .sek-active-drop-zone is added when entering / overing the drop target
  and removed when leaving the drop element
  */
-.sek-active-drop-zone.sek-module-drop-zone-for-first-module [data-sek-action="pick-module"] {
+.sek-active-drop-zone.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"] {
   display: none;
 }
 .sek-dynamic-drop-zone {
@@ -487,13 +463,13 @@
     -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
     box-shadow: 0 2px 6px rgba(0,0,0,.2);
 }
-.sek-action-button-icon {
+.sek-click-on-button-icon {
   font-size: 19px;
   left: 4px;
   top: -4px;
   position: relative;
 }
-.sek-add-content-btn:hover .sek-action-button-icon {
+.sek-add-content-btn:hover .sek-click-on-button-icon {
   font-size: 19px;
   left: 8px;
   top: 0px;
