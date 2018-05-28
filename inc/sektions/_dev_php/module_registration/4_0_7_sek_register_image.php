@@ -16,7 +16,8 @@ function sek_get_module_params_for_czr_image_module() {
             'item-inputs' => array(
                 'img' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_domain_to_be_replaced')
+                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
+                    'default'     => ''
                 ),
                 'img-size' => array(
                     'input_type'  => 'select',
@@ -32,27 +33,31 @@ function sek_get_module_params_for_czr_image_module() {
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Link to', 'text_domain_to_be_replaced')
+                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'default'     => 'no-link'
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced')
+                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced')
+                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced')
+                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'default'     => false
                 ),
-                'lightbox' => array(
-                    'input_type'  => 'gutencheck',
-                    'title'       => __('Activate a lightbox on click', 'text_domain_to_be_replaced'),
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                    'default'     => 'center'
-                ),
+                // 'lightbox' => array(
+                //     'input_type'  => 'gutencheck',
+                //     'title'       => __('Activate a lightbox on click', 'text_domain_to_be_replaced'),
+                //     'title_width' => 'width-80',
+                //     'input_width' => 'width-20',
+                //     'default'     => 'center'
+                // ),
             )
         ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",

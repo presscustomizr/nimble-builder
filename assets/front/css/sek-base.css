@@ -550,4 +550,8 @@ fieldset[disabled] a.sek-btn {
 .no-cssanimations .sek-fp-thumb-wrapper:hover {
   opacity: 1;
 }
+
+[data-sek-module-type="czr_image_module"] {
+  text-align: center;
+}
 /*# sourceMappingURL=sek-base.css.map */
