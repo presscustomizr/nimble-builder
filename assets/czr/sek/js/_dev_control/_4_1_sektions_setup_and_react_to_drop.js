@@ -428,17 +428,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // console.log('onDropping params', position, evt );
                   // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
 
-
                   api.czr_sektions.trigger( 'sek-content-dropped', {
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
-                        position : _position,
+                        // when inserted between modules
+                        before_module : $dropTarget.data('drop-zone-before-module'),
+                        after_module : $dropTarget.data('drop-zone-after-module'),
+
+                        // When inserted between sections
                         before_section : $dropTarget.data('drop-zone-before-section'),
                         after_section : $dropTarget.data('drop-zone-after-section'),
+
                         content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
                         content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
                   });
             },
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -484,12 +499,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( _.isEmpty( _level ) || _.isEmpty( _id ) ) {
                                         throw new Error( 'No valid level id found' );
                                     }
+
+                                    //console.log(' reactToDrop => drop module in column', params );
                                     api.previewer.trigger( 'sek-add-module', {
                                           level : _level,
                                           id : _id,
                                           in_column : params.drop_target_element.closest('div[data-sek-level="column"]').data( 'sek-id'),
                                           in_sektion : params.drop_target_element.closest('div[data-sek-level="section"]').data( 'sek-id'),
-                                          position : params.position,
+
+                                          before_module : params.before_module,
+                                          after_module : params.after_module,
+
                                           content_type : params.content_type,
                                           content_id : params.content_id
                                     });

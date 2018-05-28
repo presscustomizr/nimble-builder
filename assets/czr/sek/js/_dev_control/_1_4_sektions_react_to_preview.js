@@ -85,12 +85,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               in_sektion : params.in_sektion,
                                               in_column : params.in_column,
                                               module_type : params.content_id,
-                                              position : params.position
+
+                                              before_module : params.before_module,
+                                              after_module : params.after_module
                                         };
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        api.previewer.trigger('sek-edit-module', {
+                                        api.previewer.trigger( 'sek-edit-module', {
                                               id : params.apiParams.id,
                                               level : 'module',
                                               in_sektion : params.apiParams.in_sektion,

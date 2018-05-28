@@ -483,19 +483,30 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }
 
+                                    var position = 0;
                                     columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                    var _insertionPosition = _.isEmpty( columnCandidate.collection ) ? 0 : params.module_position_in_column,
-                                        _moduleParams = {
-                                              id : params.id,
-                                              level : 'module',
-                                              module_type : params.module_type
-                                        };
+                                    // get the position of the before or after module
+                                    _.each( columnCandidate.collection, function( moduleModel, index ) {
+                                          if ( params.before_module === moduleModel.id ) {
+                                                position = index;
+                                          }
+                                          if ( params.after_module === moduleModel.id ) {
+                                                position = index + 1;
+                                          }
+                                    });
+
+                                    var _moduleParams = {
+                                          id : params.id,
+                                          level : 'module',
+                                          module_type : params.module_type
+                                    };
                                     // Let's add the starting value if provided when registrating the module
                                     startingModuleValue = self.getModuleStartingValue( params.module_type );
                                     if ( 'no_starting_value' !== startingModuleValue ) {
                                           _moduleParams.value = startingModuleValue;
                                     }
-                                    columnCandidate.collection.splice( _insertionPosition, 0, _moduleParams );
+
+                                    columnCandidate.collection.splice( position, 0, _moduleParams );
                               break;
 
                               case 'sek-duplicate-module' :
