@@ -124,11 +124,16 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   </div>
               </script>
 
+              <?php
+                  $icon_right_side_class = is_rtl() ? 'sek-dyn-left-icons' : 'sek-dyn-right-icons';
+                  $icon_left_side_class = is_rtl() ? 'sek-dyn-right-icons' : 'sek-dyn-left-icons';
+              ?>
+
               <script type="text/html" id="sek-dyn-ui-tmpl-section">
                   <?php //<# console.log( 'data', data ); #> ?>
                   <# //console.log( 'data', data ); #>
                   <div class="sek-dyn-ui-wrapper sek-section-dyn-ui">
-                    <div class="sek-dyn-ui-inner">
+                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
                         <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
@@ -142,6 +147,10 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                           <i data-sek-click-on="add-column" class="fas fa-plus-circle sek-click-on" title="<?php _e( 'Add Column', 'sek-builder' ); ?>"></i>
                         <# } #>
                         <i data-sek-click-on="duplicate" class="far fa-clone sek-click-on" title="<?php _e( 'Duplicate section', 'sek-builder' ); ?>"></i>
+                      </div>
+                    </div>
+                    <div class="sek-dyn-ui-inner sek-dyn-right-icons">
+                      <div class="sek-dyn-ui-icons">
                         <i data-sek-click-on="remove" class="far fa-trash-alt sek-click-on" title="<?php _e( 'Remove section', 'sek-builder' ); ?>"></i>
                       </div>
                     </div>
@@ -154,7 +163,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
               <script type="text/html" id="sek-dyn-ui-tmpl-column">
                   <?php //<# console.log( 'data', data ); #> ?>
                   <div class="sek-dyn-ui-wrapper sek-column-dyn-ui">
-                    <div class="sek-dyn-ui-inner">
+                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'sek-builder' ); ?>"></i>
                         <i data-sek-click-on="edit-options" class="fas fa-cogs sek-click-on" title="<?php _e( 'Columns options', 'sek-builder' ); ?>"></i>
@@ -165,6 +174,10 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <# if ( ! data.parent_is_last_allowed_nested ) { #>
                           <i data-sek-click-on="add-section" class="fas far fa-plus-square sek-click-on" title="<?php _e( 'Add a nested section', 'sek-builder' ); ?>"></i>
                         <# } #>
+                      </div>
+                    </div>
+                    <div class="sek-dyn-ui-inner sek-dyn-right-icons">
+                      <div class="sek-dyn-ui-icons">
                         <# if ( ! data.parent_is_single_column ) { #>
                           <i data-sek-click-on="remove" class="far fa-trash-alt sek-click-on" title="<?php _e( 'Remove column', 'sek-builder' ); ?>"></i>
                         <# } #>
@@ -190,12 +203,16 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         </div>
                       </div>
                     </div><?php // .editor-block-settings-menu ?>
-                    <div class="sek-dyn-ui-inner">
+                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'sek-builder' ); ?>"></i>
                         <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit Module', 'sek-builder' ); ?>"></i>
                         <i data-sek-click-on="edit-options" class="fas fa-cogs sek-click-on" title="<?php _e( 'Module options', 'sek-builder' ); ?>"></i>
                         <i data-sek-click-on="duplicate" class="far fa-clone sek-click-on" title="<?php _e( 'Duplicate module', 'sek-builder' ); ?>"></i>
+                      </div>
+                    </div>
+                    <div class="sek-dyn-ui-inner sek-dyn-right-icons">
+                      <div class="sek-dyn-ui-icons">
                         <i data-sek-click-on="remove" class="far fa-trash-alt sek-click-on" title="<?php _e( 'Remove module', 'sek-builder' ); ?>"></i>
                       </div>
                     </div>

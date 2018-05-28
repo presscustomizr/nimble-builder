@@ -117,15 +117,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         // Set the dragged type property now : module or preset_section
                         self.dnd_draggedType = $(this).data('sek-content-type');
-
+                        $('body').addClass('sek-dragging');
                         api.previewer.send( 'sek-drag-start', { type : self.dnd_draggedType } );//fires the rendering of the dropzones
-                        $(evt.currentTarget).addClass('sek-grabbing');
                   };
 
                   var _onEnd = function( evt ) {
+                        $('body').removeClass('sek-dragging');
                         api.previewer.send( 'sek-drag-stop' );
-                        // make sure that the sek-grabbing class ( -webkit-grabbing ) gets reset on dragEnd
-                        $(evt.currentTarget).removeClass('sek-grabbing');
                   };
 
                   // Schedule
@@ -244,34 +242,49 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   this.$dropZones.find('.sek-drop-zone').each( function() {
                         var yPos = evt.clientY,
                             xPos = evt.clientX,
-                            isApproachingThreshold = 80;
-                            isCloseThreshold = 30;
+                            isApproachingThreshold = 120,
+                            isCloseThreshold = 60,
+                            isVeryCloseThreshold = 40;
 
                         var dzoneRect = $(this)[0].getBoundingClientRect(),
-                            mouseToBottom = yPos - dzoneRect.bottom,
-                            mouseToTop = dzoneRect.top - yPos,
+                            mouseToBottom = Math.abs( yPos - dzoneRect.bottom ),
+                            mouseToTop = Math.abs( dzoneRect.top - yPos ),
                             mouseToRight = xPos - dzoneRect.right,
                             mouseToLeft = dzoneRect.left - xPos,
-                            isCloseVertically = ( mouseToBottom > 0 && mouseToBottom < isCloseThreshold ) || ( mouseToTop > 0 && mouseToTop < isCloseThreshold ),
+                            isVeryCloseVertically = ( mouseToBottom < isVeryCloseThreshold ) || ( mouseToTop < isVeryCloseThreshold ),
+                            isVeryCloseHorizontally =  ( mouseToRight > 0 && mouseToRight < isVeryCloseThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isVeryCloseThreshold ),
+                            isCloseVertically = ( mouseToBottom < isCloseThreshold ) || ( mouseToTop < isCloseThreshold ),
                             isCloseHorizontally =  ( mouseToRight > 0 && mouseToRight < isCloseThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isCloseThreshold ),
                             isInHorizontally = xPos <= dzoneRect.right && dzoneRect.left <= xPos,
                             isInVertically = yPos <= dzoneRect.top && dzoneRect.bottom <= yPos,
-                            isApproachingVertically = ( mouseToBottom > 0 && mouseToBottom < isApproachingThreshold ) || ( mouseToTop > 0 && mouseToTop < isApproachingThreshold ),
+                            isApproachingVertically = ( mouseToBottom < isApproachingThreshold ) || ( mouseToTop < isApproachingThreshold ),
                             isApproachingHorizontally = ( mouseToRight > 0 && mouseToRight < isApproachingThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isApproachingThreshold );
 
                         // var html = "isApproachingHorizontally : " + isApproachingHorizontally + ' | isCloseHorizontally : ' + isCloseHorizontally + ' | isInHorizontally : ' + isInHorizontally;
                         // html += ' | xPos : ' + xPos + ' | zoneRect.right : ' + dzoneRect.right;
-                        // html += "isApproachingVertically : " + isApproachingVertically + ' | isCloseVertically : ' + ' | isInVertically : ' + isInVertically;
+                        // html += "isApproachingVertically : " + isApproachingVertically + ' | isCloseVertically : ' + isCloseVertically + ' | isInVertically : ' + isInVertically;
                         // html += ' | yPos : ' + yPos + ' | zoneRect.top : ' + dzoneRect.top;
-                        // $(this).html(html);
+                        // $(this).html( '<span style="font-size:10px">' + html + '</span>');
 
-                        if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
+                        // var html = '';
+                        // html += ' | mouseToBottom : ' + mouseToBottom + ' | mouseToTop : ' + mouseToTop;
+                        // html += "isApproachingVertically : " + isApproachingVertically + ' | isCloseVertically : ' + isCloseVertically + ' | isInVertically : ' + isInVertically;
+                        // $(this).html( '<span style="font-size:12px">' + html + '</span>');
+
+                        if ( ( isVeryCloseVertically || isInVertically ) && ( isVeryCloseHorizontally || isInHorizontally ) ) {
+                              $(this).addClass( 'sek-drag-is-very-close');
+                              $(this).removeClass( 'sek-drag-is-close');
+                              $(this).removeClass( 'sek-drag-is-approaching' );
+                        } else if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
                               $(this).addClass( 'sek-drag-is-close');
+                              $(this).removeClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-approaching' );
                         } else if ( ( isApproachingVertically || isInVertically ) && ( isApproachingHorizontally || isInHorizontally ) ) {
+                              $(this).addClass( 'sek-drag-is-approaching');
+                              $(this).removeClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-close' );
-                              $(this).addClass( 'sek-drag-is-approaching' );
                         } else {
+                              $(this).removeClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-close' );
                               $(this).removeClass( 'sek-drag-is-approaching' );
                         }

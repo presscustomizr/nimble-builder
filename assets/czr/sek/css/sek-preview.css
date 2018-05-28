@@ -64,10 +64,18 @@
 }
 .sek-dyn-ui-inner {
     position: absolute;
-    right: 0;
     top: -18px;
     opacity: 0.7;
+    -webkit-transition: opacity .25s ease;
+    -moz-transition: opacity .25s ease;
+    -o-transition: opacity .25s ease;
     transition: opacity .25s ease;
+}
+.sek-dyn-left-icons {
+    left: 0;
+}
+.sek-dyn-right-icons {
+    right: 0;
 }
 .sek-dyn-ui-inner:hover {
     opacity: 1;
@@ -339,10 +347,10 @@
 
 .sek-dragging .sek-dynamic-drop-zone {
   height: 5px;
-  -webkit-transition: all 0.4s ease;
-  -moz-transition: all 0.4s ease;
-  -o-transition: all 0.4s ease;
-  transition: all 0.4s ease;
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
   animation: sek-dragging-highlight 2s infinite;
   background: green;
   border:2px dotted #a2a2a2;
@@ -356,7 +364,10 @@
   height: 20px;
 }
 .sek-dragging .sek-drag-is-close.sek-dynamic-drop-zone {
-  height: 40px;
+  height: 55px;
+}
+.sek-dragging .sek-drag-is-very-close.sek-dynamic-drop-zone {
+  height: 75px;
 }
 
 
@@ -423,7 +434,10 @@
     left: 0;
     display: flex;
     align-items: center;
-    transition: opacity .5s ease-in-out;
+    -webkit-transition: .5s ease-in-out;
+    -moz-transition: .5s ease-in-out;
+    -o-transition: .5s ease-in-out;
+    transition: .5s ease-in-out;
 }
 .sek-add-content-btn {
     margin: auto;
@@ -439,6 +453,9 @@
     outline: none;
     font-size: 13px;
     overflow: hidden;
+    -webkit-transition: width .5s ease,background-color .5s ease;
+    -moz-transition: width .5s ease,background-color .5s ease;
+    -o-transition: width .5s ease,background-color .5s ease;
     transition: width .5s ease,background-color .5s ease;
     font-weight: 400;
     font-style: normal;

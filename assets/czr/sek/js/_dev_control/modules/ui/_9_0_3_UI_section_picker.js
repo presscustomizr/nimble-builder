@@ -32,18 +32,18 @@
             section_picker : function( input_options ) {
                   var input = this;
                   // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
-                  input.container.find('[draggable]').each( function() {
-                        $(this).on( 'mousedown mouseup', function( evt ) {
-                              switch( evt.type ) {
-                                    case 'mousedown' :
-                                          $(this).addClass('sek-grabbing');
-                                    break;
-                                    case 'mouseup' :
-                                          $(this).removeClass('sek-grabbing');
-                                    break;
-                              }
-                        });
-                  });
+                  // input.container.find('[draggable]').each( function() {
+                  //       $(this).on( 'mousedown mouseup', function( evt ) {
+                  //             switch( evt.type ) {
+                  //                   case 'mousedown' :
+                  //                         //$(this).addClass('sek-grabbing');
+                  //                   break;
+                  //                   case 'mouseup' :
+                  //                         //$(this).removeClass('sek-grabbing');
+                  //                   break;
+                  //             }
+                  //       });
+                  // });
                   api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
             }
       });

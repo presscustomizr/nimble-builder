@@ -58,7 +58,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         tmpl = self.parseTemplate( '#sek-dyn-ui-tmpl-' + level );
                         $.when( $(this).prepend( tmpl( params ) ) ).done( function() {
                               $levelEl.find('.sek-dyn-ui-wrapper').stop( true, true ).fadeIn( {
-                                  duration : 300,
+                                  duration : 150,
                                   complete : function() {}
                               } );
                         });
@@ -67,7 +67,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           isFadingOut = true;//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
                           $levelEl = $(this);
                           $levelEl.children('.sek-dyn-ui-wrapper').stop( true, true ).fadeOut( {
-                                duration : 200,
+                                duration : 150,
                                 complete : function() {
                                       $(this).remove();
                                       isFadingOut = false;
