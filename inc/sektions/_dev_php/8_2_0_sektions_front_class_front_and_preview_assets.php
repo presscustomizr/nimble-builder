@@ -176,13 +176,13 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <# } #>
                       </div>
                     </div>
+                    <# if ( ! data.parent_is_single_column ) { #>
                     <div class="sek-dyn-ui-inner sek-dyn-right-icons">
                       <div class="sek-dyn-ui-icons">
-                        <# if ( ! data.parent_is_single_column ) { #>
                           <i data-sek-click-on="remove" class="far fa-trash-alt sek-click-on" title="<?php _e( 'Remove column', 'sek-builder' ); ?>"></i>
-                        <# } #>
                       </div>
                     </div>
+                    <# } #>
                     <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
