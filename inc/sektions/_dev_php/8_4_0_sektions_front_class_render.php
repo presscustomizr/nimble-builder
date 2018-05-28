@@ -201,6 +201,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $default_value_model  = sek_get_default_module_model( $module_type );//walk the registered modules tree and generates the module default if not already cached
                     $model['value'] = is_array( $model['value'] ) ? $model['value'] : array();
                     $model['value'] = wp_parse_args( $model['value'], $default_value_model );
+
+                    // update the current cached model
+                    $this -> model = $model;
                     ?>
                       <div data-sek-level="module" data-sek-id="<?php echo $id; ?>" data-sek-module-type="<?php echo $module_type; ?>" class="sek-module">
                             <div class="sek-module-inner">
