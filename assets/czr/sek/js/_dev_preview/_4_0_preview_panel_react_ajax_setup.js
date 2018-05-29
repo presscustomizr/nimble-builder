@@ -1,4 +1,4 @@
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -23,7 +23,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                     self.ajaxRefreshModulesAndNestedSections( params );
                                               } else {
                                                     if ( _.isEmpty( removeCandidateId ) || 1 > $candidateEl.length ) {
-                                                          czrapp.errare( 'reactToPanelMsg => sek-remove => invalid candidate id => ', removeCandidateId );
+                                                          self.errare( 'reactToPanelMsg => sek-remove => invalid candidate id => ', removeCandidateId );
                                                     }
                                                     $( '.sektion-wrapper').find( $candidateEl ).remove();
                                               }
@@ -75,20 +75,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             //   id : params.id
                             // }
                             'sek-refresh-level' : function( params ) {
-
-                                  czrapp.doAjax( {
+                                  self.doAjax( {
                                         skope_id : params.skope_id,
                                         action : 'sek_get_content',
                                         id : params.apiParams.id,
                                         level : params.apiParams.level,
                                         sek_action : params.apiParams.action
                                   }).fail( function( _r_ ) {
-                                        czrapp.errare( 'ERROR reactToPanelMsg => sek-refresh-level => ' , _r_ );
+                                        self.errare( 'ERROR reactToPanelMsg => sek-refresh-level => ' , _r_ );
                                   }).done( function( _r_ ) {
                                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.id + '"></span>',
                                             $currentLevelEl = $( 'div[data-sek-id="' + params.apiParams.id + '"]' );
                                         if ( $currentLevelEl.length < 1 ) {
-                                              czrapp.errare( 'reactToPanelMsg => sek-refresh-level ajax done => the level to refresh is not rendered in the page', _r_ );
+                                              self.errare( 'reactToPanelMsg => sek-refresh-level ajax done => the level to refresh is not rendered in the page', _r_ );
                                               return;
                                         }
                                         $currentLevelEl.before( placeholderHtml );
@@ -302,20 +301,20 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           $.when( callbackFn( params ) ).done( function() {
                                                 api.preview.send( [ msgId, 'done'].join('_'), params );
                                           }).fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sektionsLocalizedData.i18n['Something went wrong, please refresh this page.'] });
+                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
                                           });
                                     } catch( _er_ ) {
-                                          czrapp.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
+                                          self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
                                     }
                               } else {
                                     try {
                                           $.when( self[callbackFn].call( self, params ) ).done( function() {
                                                 api.preview.send( [ msgId, 'done'].join('_'), params );
                                           }).fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sektionsLocalizedData.i18n['Something went wrong, please refresh this page.'] });
+                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
                                           });
                                     } catch( _er_ ) {
-                                          czrapp.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
+                                          self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
                                     }
                               }
 

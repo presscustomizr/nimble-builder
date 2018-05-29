@@ -1,4 +1,4 @@
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -8,7 +8,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             ajaxRefreshColumns : function( params ) {
                   //console.log('PARAMS in ajaxRefreshColumns', params );
                   var self = this;
-                  return czrapp.doAjax( {
+                  return self.doAjax( {
                         action : 'sek_get_content',
                         id : params.apiParams.id,
                         in_sektion : params.apiParams.in_sektion,
@@ -17,7 +17,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   }).done( function( _r_ ) {
                         var $parentSektion = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' );
                         if ( 1 > $parentSektion.length ) {
-                              czrapp.errare( 'reactToPanelMsg => ' + params.apiParams.action + ' => no DOM node for parent sektion => ', params.apiParams.in_sektion );
+                              self.errare( 'reactToPanelMsg => ' + params.apiParams.action + ' => no DOM node for parent sektion => ', params.apiParams.in_sektion );
                         }
                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.in_sektion + '"></span>';
                         $parentSektion.before( placeholderHtml );
@@ -28,7 +28,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
                         // re-generate the stylesheet => this will take into account the reset width of each column
-                        czrapp.doAjax( {
+                        self.doAjax( {
                               action : 'sek_get_content',
                               skope_id : params.skope_id,
                               sek_action : 'sek-refresh-stylesheet'// sek-add-column
@@ -43,7 +43,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         //=> will be listened to by the column to re-instantiate sortable, resizable
                         $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
                   }).fail( function( _r_ ) {
-                        czrapp.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
+                        self.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
                   });
             },//ajaxRefreshColumns()
 
@@ -51,14 +51,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             ajaxResizeColumns : function( params ) {
                   //console.log('PREVIEW => REACT TO PANEL MSG => sek-resize-columns => ', params );
                   var self = this;
-                  return czrapp.doAjax( {
+                  return self.doAjax( {
                         action : 'sek_get_content',
                         resized_column : params.apiParams.resized_column,
                         sister_column : params.apiParams.sister_column,
                         skope_id : params.skope_id,
                         sek_action : 'sek-resize-columns'
                   }).done( function( _r_ ) {
-                        //czrapp.errare('sek-preview => resize-column ajax response => ', _r_.data );
+                        //self.errare('sek-preview => resize-column ajax response => ', _r_.data );
                         // Reset the automatic default resizable inline styling
                         $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.resized_column + '"]' ).css({
                               width : '',
@@ -68,7 +68,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         //Append
                         self.appendDynStyleSheet( params.skope_id, _r_.data );
                   }).fail( function( _r_ ) {
-                        czrapp.errare( 'ERROR reactToPanelMsg => sek-resize-columns => ' , _r_ );
+                        self.errare( 'ERROR reactToPanelMsg => sek-resize-columns => ' , _r_ );
                   });
             }
       });//$.extend()

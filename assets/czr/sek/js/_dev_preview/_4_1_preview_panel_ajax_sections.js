@@ -1,4 +1,4 @@
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -6,7 +6,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // @return a promise()
             ajaxAddSektion : function( params ) {
                   var self = this;
-                  return czrapp.doAjax( {
+                  return self.doAjax( {
                         action : 'sek_get_content',
                         id : params.apiParams.id,
                         in_sektion : params.apiParams.in_sektion,
@@ -21,7 +21,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         if ( params.apiParams.is_nested ) {
                               $parentColumn = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_column + '"]' );
                               if ( 1 > $parentColumn.length ) {
-                                    czrapp.errare( 'preview => reactToPanelMsg => sek-add-column => no DOM node for parent column => ', params.apiParams.in_column );
+                                    self.errare( 'preview => reactToPanelMsg => sek-add-column => no DOM node for parent column => ', params.apiParams.in_column );
                               }
                               var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.in_column + '"></span>';
                               $parentColumn.before( placeholderHtml );
@@ -77,7 +77,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         }
                         $( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger('sek-section-added', params );
                   }).fail( function( _r_ ) {
-                        czrapp.errare( 'ERROR in sek_get_html_for_injection ? ' , _r_ );
+                        self.errare( 'ERROR in sek_get_html_for_injection ? ' , _r_ );
                   });
             }//ajaxAddSektion()
 

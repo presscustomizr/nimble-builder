@@ -232,22 +232,22 @@ module.exports = {
     tasks : [],
   },
 
-  sektions_front_fmk_js : {
-    options: {
-      spawn : false,
-      // Start a live reload server on the default port 35729
-      livereload : true
-    },
-    files : [
-      '<%= paths.front_assets %>js/_front_js_fmk/**/*.js',
-      '<%= paths.front_assets %>js/_parts/**/*.js',
-      '<%= paths.front_assets %>js/libs/jquery-plugins/**/*.js'
-    ],
-    tasks : [
-      'jshint:those',
-      'concat:czr_sektions_front_fmk_js',
-    ],
-  },
+  // sektions_front_fmk_js : {
+  //   options: {
+  //     spawn : false,
+  //     // Start a live reload server on the default port 35729
+  //     livereload : true
+  //   },
+  //   files : [
+  //     '<%= paths.front_assets %>js/_front_js_fmk/**/*.js',
+  //     '<%= paths.front_assets %>js/_parts/**/*.js',
+  //     '<%= paths.front_assets %>js/libs/jquery-plugins/**/*.js'
+  //   ],
+  //   tasks : [
+  //     'jshint:those',
+  //     'concat:czr_sektions_front_fmk_js',
+  //   ],
+  // },
 
   sektions_modules : {
     options: {

@@ -1,4 +1,4 @@
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -7,7 +7,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   // Set the skope_id
                   try { this.skope_id = _.findWhere( _wpCustomizeSettings.czr_new_skopes, { skope : 'local' }).skope_id; } catch( _er_ ) {
-                        czrapp.errare('Preview => error when storing the skope_id', _er_ );
+                        this.errare('Preview => error when storing the skope_id', _er_ );
                         return;
                   }
 

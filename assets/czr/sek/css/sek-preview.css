@@ -3,13 +3,13 @@
   min-height: 50px;
 }
 .sek-section {
-  padding: 21px 0px 0;
+  padding: 23px 0px 0;
   position: relative;/* <= Needed for the placement of the ui icons container revealed on hover */
 }
 
 .sek-column {
   position: relative;
-  padding: 18px 10px 0;
+  padding: 23px 10px 0;/* <= Needed for the placement of the ui icons container revealed on hover */
 }
 .sek-section h2 { color:black;}
 
@@ -92,8 +92,6 @@
   margin: -1px -1px 0;
   padding: 0 4px;
   text-shadow: none;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
   font-size: 1rem;
 }
 
@@ -105,24 +103,26 @@
   color: #fff !important;
   cursor: pointer;
   float: left;
-  font-size: 0.8em;
+  font-size: 1em;
   height: 1.4em;
   line-height: 1.4em;
   opacity: 0.8;
   text-align: center;
-  width: 1.7em;
+  width: 1em;
 }
-
+.sek-dyn-left-icons .sek-dyn-ui-icons i {
+    margin: 0px 5px;
+}
 .sek-dyn-ui-icons i:hover {
   opacity: 1;
 }
-.sek-dyn-ui-icons > i:first-child {
+/*.sek-dyn-ui-icons > i:first-child {
   padding-left: 4px;
 }
 .sek-dyn-ui-icons > i:last-child {
   padding-right: 2px;
-}
-.sek-dyn-ui-icons .fa-arrows-alt {
+}*/
+.sek-dyn-ui-icons .fa-ellipsis-v {
   cursor: move;
 }
 
@@ -131,10 +131,10 @@
 /* SECTION OVERLAY*/
 /* prevent style propagation to nested levels with > */
 .sek-section > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
-  background: black;
+  background: #0085ba;
 }
 .sek-section-dyn-ui {
-    border: 2px dotted black;
+    border: 2px dotted #0085ba;
     bottom: 0;
     left: 0;
     top: 0px;
@@ -153,10 +153,10 @@
   z-index: 1001;
 }
 .sek-column > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
-  background: #0085ba;
+  background: #00b846;
 }
 .sek-column-dyn-ui {
-    border: 2px dotted #0085ba;
+    border: 2px dotted #00b846;
     bottom: 0px;
     left: 0px;
     top: 0px;
@@ -165,7 +165,12 @@
 .sek-column-dyn-ui .dev-level-data {
   background: #0085ba;
 }
-
+/*.sek-column [data-sek-click-on="add-section"] {
+  padding-left: 11px!important;
+  border-left: 1px solid #c5c5c5;
+  margin-left: 4px!important;
+  width: 27px;
+}*/
 
 
 
@@ -186,10 +191,10 @@
   z-index: 1002;
 }
 .sek-module > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
-  background: #c68f00;
+  background: #000;
 }
 .sek-module-dyn-ui {
-    border: 1px dotted #c68f00;
+    border: 1px dotted #000;
     bottom: 0px;
     left: 0px;
     top: 0px;
@@ -288,8 +293,17 @@
 
 .sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"] {
   cursor: pointer;
+  width: 50px;
+  height: 50px;
+  padding-top: 12px;
 }
-
+/* Hide the + during a drag phase */
+.sek-dragging .sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"] {
+  display: none;
+}
+/*.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"]:hover {
+  font-size: 27px;
+}*/
 
 
 .sek-sortable-overing > .sek-no-modules-column { display: none; }
@@ -307,20 +321,6 @@
 
 /* DYNAMIC DROP ZONES ON DRAG START + DRAGGING BEHAVIOUR */
 /* hide empty column content when attempting to drop */
-/* <Animations> when dragstart */
-@keyframes sek-dragging-highlight {
-  0% {background-color: #eee;}
-  50% {background-color: #dcdcdc;}
-  /*50% {background-color: #e8e8e8;}*/
-  100% {background-color: #eee;}
-}
-@keyframes sek-dragging-between-sec-highlight {
-  0% {background-color: #dcefff;}
-  50% {background-color: #99d1ff;}
-  /*50% {background-color: #e8e8e8;}*/
-  100% {background-color: #dcefff;}
-}
-/* </Animations> */
 
 /*
  the class .sek-active-drop-zone is added when entering / overing the drop target
@@ -340,10 +340,6 @@
  the class .sek-active-drop-zone is added when appending the pre drop elemnt
  and removed when leaving the drop element
  */
-.sek-has-pre-drop-element {
-  border: 1px solid red!important;
-  /*min-height : 50px;*/
-}
 
 .sek-dragging .sek-dynamic-drop-zone {
   height: 5px;
@@ -351,13 +347,15 @@
   -moz-transition: all 0.25s ease;
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
-  animation: sek-dragging-highlight 2s infinite;
-  background: green;
-  border:2px dotted #a2a2a2;
+  /*background: #eee;*/
+  /*border:2px dotted #a2a2a2;*/
+  border:2px dotted #72777c;
+  background: #ddd;
   border-radius: 5px;
 }
 .sek-dragging [data-sek-location="between-sections"], .sek-dragging [data-sek-location="in-empty-location"]{
-  animation: sek-dragging-between-sec-highlight 2s infinite;
+  background: #dcefff;
+  border:2px dotted #1d85bb;
 }
 
 .sek-dragging .sek-drag-is-approaching.sek-dynamic-drop-zone {
@@ -372,9 +370,8 @@
 
 
 .sek-dragging .sek-module-drop-zone-for-first-module {
-  animation: sek-dragging-highlight 2s infinite;
-  background: #eee;
-  border:2px dotted #a2a2a2;
+  background: #ddd;
+  border:2px dotted #72777c;
   border-radius: 5px;
 }
 
@@ -398,7 +395,11 @@
 
 
 
+
+
+
 /* ADD CONTENT BUTTON */
+
 .sek-add-content-button {
     /*position: relative;*/
     position: absolute;
@@ -408,6 +409,8 @@
     /*transition: .1s ease-in-out;*/
     display: none;
 }
+
+
 /* when inserted in an empty location placeholder, center vertically */
 .sek-empty-location-placeholder .sek-add-content-button {
   top: 50%
@@ -417,10 +420,7 @@
     top: unset;
 }
 
-.sek-add-content-button-wrapper {
-    width: 100%;
 
-}
 
 
   /*body:hover .sek-add-content-button-wrapper {
@@ -531,7 +531,7 @@
 .sortable-placeholder {
   max-width: 100%;
   flex-grow: 1;
-  background: #00A2D7;
+  background: #72777c;
   border-radius: 4px;
   color: #fff !important;
   display: block;
@@ -551,7 +551,10 @@
   overflow: hidden;
   z-index: 10;
 }
-
+/* class in-new-sektion is added dynamically when entering / overing the target */
+.in-new-sektion.sortable-placeholder{
+  background: #00A2D7;
+}
 
 
 

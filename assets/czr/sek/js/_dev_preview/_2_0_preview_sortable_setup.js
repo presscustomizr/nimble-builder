@@ -1,4 +1,4 @@
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -142,7 +142,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                       defaults = $.extend( true, {}, self.sortableDefaultParams ),
                       $sortableCandidate = $( '[data-sek-id="' + sektionId + '"]').find('.sek-sektion-inner').first();
                   // if ( $sortableCandidate.children('[data-sek-level="column"]').length > 11 ) {
-                  //       czrapp.errare('12 COLUMNS');
+                  //       self.errare('12 COLUMNS');
                   //       return;
                   // }
                   $sortableCandidate.sortable( _.extend( defaults, {
@@ -152,7 +152,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               $targetSektionCandidate = ui.item.closest('[data-sek-level="section"]');
                               if ( $targetSektionCandidate.length > 0 && $targetSektionCandidate.find('.sek-sektion-inner').first().children('[data-sek-level="column"]').length > 12 ) {
                                     api.preview.send( 'sek-notify', {
-                                          message : sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]
+                                          message : sekPreviewLocalized.i18n["You've reached the maximum number of columns allowed in this section."]
                                     });
                                     return false;
                               } else {
@@ -172,7 +172,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     startOrder.push( $(this).data('sek-id') );
                               });
                               if ( _.isEmpty( startOrder ) ) {
-                                    czrapp.errare( 'column sortable => startOrder should not be empty' );
+                                    self.errare( 'column sortable => startOrder should not be empty' );
                                     return;
                               }
                               //console.log('column moved from', from_sektion, ui );
@@ -187,7 +187,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     newOrder.push( $(this).data('sek-id') );
                               });
                               if ( _.isEmpty( newOrder ) ) {
-                                    czrapp.errare( 'column sortable =>  newOrder should not be empty' );
+                                    self.errare( 'column sortable =>  newOrder should not be empty' );
                                     return;
                               }
                               // console.log('ALORS SEKTIONS ?: ', to_sektion, from_sektion );
@@ -195,7 +195,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                               // don't send anything if the source and target columns are the same, and the order is unchanged
                               if ( _.isEqual( newOrder, startOrder ) && to_sektion === from_sektion ) {
-                                    czrapp.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
+                                    self.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
                                     return;
                               }
                               api.preview.send( 'sek-move', {
@@ -243,7 +243,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     startOrder.push( $(this).data('sek-id') );
                               });
                               if ( _.isEmpty( startOrder ) ) {
-                                    czrapp.errare( 'makeModulesSortableInColumn => startOrder should not be empty' );
+                                    self.errare( 'makeModulesSortableInColumn => startOrder should not be empty' );
                                     return;
                               }
                               //console.log('column moved from', from_sektion, ui );
@@ -258,7 +258,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     newOrder.push( $(this).data('sek-id') );
                               });
                               if ( _.isEmpty( newOrder ) ) {
-                                    czrapp.errare( 'makeModulesSortableInColumn => newOrder should not be empty' );
+                                    self.errare( 'makeModulesSortableInColumn => newOrder should not be empty' );
                                     return;
                               }
                               // console.log('ALORS COLUMNS ?: ', to_column, from_column );
@@ -266,7 +266,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                               // don't send anything if the source and target columns are the same, and the order is unchanged
                               if ( _.isEqual( newOrder, startOrder ) && to_column === from_column ) {
-                                    czrapp.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
+                                    self.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
                                     return;
                               }
                               api.preview.send( 'sek-move', {

@@ -1,4 +1,4 @@
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -155,7 +155,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         clearTimeout( $.data( this, '_scroll_move_timer_') );
                         $.data( this, '_scroll_move_timer_', setTimeout(function() {
                               self.mouseMovedRecently.set( {} );
-                        }, 2000 ) );
+                        }, 4000 ) );
                   }, 50 ) );
 
                   // Always remove when a dragging action is started

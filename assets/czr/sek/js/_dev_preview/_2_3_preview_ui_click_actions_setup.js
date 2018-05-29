@@ -1,4 +1,4 @@
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -59,7 +59,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     if ( 1 > $closestLevelWrapper.length ) {
                                         throw new Error( 'ERROR => sek-front-preview => No valid level dom element found' );
                                     }
-                                    _action = $el.data('sek-click-on');
+                                    _action = $el.closest('[data-sek-click-on]').data('sek-click-on');
 
                                     if ( _.isEmpty( _action ) ) {
                                         throw new Error( 'Invalid action' );

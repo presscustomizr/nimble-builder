@@ -1,4 +1,4 @@
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -7,7 +7,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
               // 2) re-render the module collection in a column, typically after a sortable move, or a module removal
               ajaxRefreshModulesAndNestedSections : function( params ) {
                     var self = this;
-                    return czrapp.doAjax( {
+                    return self.doAjax( {
                           action : 'sek_get_content',
                           id : params.apiParams.id,
                           in_sektion : params.apiParams.in_sektion,
@@ -18,7 +18,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                     }).done( function( _r_ ) {
                           var $parentColumn = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_column + '"]' );
                           if ( 1 > $parentColumn.length ) {
-                                czrapp.errare( 'reactToPanelMsg => ajaxRefreshModulesAndNestedSections => no DOM node for parent column => ', params.apiParams.in_column );
+                                self.errare( 'reactToPanelMsg => ajaxRefreshModulesAndNestedSections => no DOM node for parent column => ', params.apiParams.in_column );
                           }
                           var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.in_column + '"></span>';
                           $parentColumn.before( placeholderHtml );
@@ -32,7 +32,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_column + '"]' ).trigger('sek-modules-refreshed');
 
                     }).fail( function( _r_ ) {
-                          czrapp.errare( 'ERROR reactToPanelMsg => sek-add-module => ' , _r_ );
+                          self.errare( 'ERROR reactToPanelMsg => sek-add-module => ' , _r_ );
                     });
               }//ajaxRefreshModulesAndNestedSections()
       });//$.extend()

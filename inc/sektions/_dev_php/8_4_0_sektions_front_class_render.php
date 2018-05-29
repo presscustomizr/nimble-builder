@@ -18,11 +18,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
-            add_filter( 'template_include', function( $template ) {
-                  // error_log( 'TEMPLATE ? => ' . $template );
-                  // error_log( 'DID_ACTION WP => ' . did_action('wp') );
-                  return NIMBLE_BASE_PATH. "/tmpl/page-templates/full-width.php";// $template;
-            });
+            // add_filter( 'template_include', function( $template ) {
+            //       // error_log( 'TEMPLATE ? => ' . $template );
+            //       // error_log( 'DID_ACTION WP => ' . did_action('wp') );
+            //       return NIMBLE_BASE_PATH. "/tmpl/page-templates/full-width.php";// $template;
+            // });
         }
 
         // hook : loop_start, loop_end
@@ -169,7 +169,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
-                                      <i data-sek-click-on="pick-module" class="fas fa-plus-circle sek-click-on" title="Add Module"></i>
+                                      <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e('Add a module here', 'text_domain_to_be_replaced' ); ?>">add</i>
                                     </div>
                                   </div>
                                   <?php
