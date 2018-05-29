@@ -30,7 +30,7 @@ if ( ! function_exists( 'sek_get_img_module_img_html') ) {
 
 if ( ! function_exists( 'sek_get_img_module_img_link' ) ) {
     function sek_get_img_module_img_link( $value ) {
-        $link = 'javascript:void()';
+        $link = 'javascript:void(0);';
         if ( skp_is_customizing() ) {
             return $link;
         }
