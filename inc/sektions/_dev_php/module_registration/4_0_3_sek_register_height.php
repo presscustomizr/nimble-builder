@@ -3,32 +3,15 @@
  *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_level_section_layout_height_module() {
+function sek_get_module_params_for_sek_level_height_module() {
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'sek_level_section_layout_height_module',
+        'module_type' => 'sek_level_height_module',
 
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
-                'boxed-wide' => array(
-                    'input_type'  => 'select',
-                    'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
-                    'refresh-markup' => true,
-                    'refresh-stylesheet' => false,
-                    'default'     => 'fullwidth'
-                ),
-
-                /* suspended, needs more thoughts
-                'boxed-width' => array(
-                    'input_type'  => 'range_slider',
-                    'title'       => __('Custom boxed width', 'text_domain_to_be_replaced'),
-                    'orientation' => 'horizontal',
-                    'min' => 500,
-                    'max' => 1600,
-                    'unit' => 'px'
-                ),*/
                 'height-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Height : fit to screen or custom', 'text_domain_to_be_replaced'),
@@ -60,19 +43,19 @@ function sek_get_module_params_for_sek_level_section_layout_height_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_section_layout_height', 10, 3 );
-function sek_add_css_rules_for_section_layout_height( array $rules, array $level ) {
+add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_level_height', 10, 3 );
+function sek_add_css_rules_for_level_height( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    if ( empty( $options[ 'layout_height' ] ) )
+    if ( empty( $options[ 'height' ] ) )
       return $rules;
 
-    if ( empty( $options[ 'layout_height' ][ 'height-type' ] ) )
+    if ( empty( $options[ 'height' ][ 'height-type' ] ) )
       return $rules;
 
-    if ( 'fit-to-screen' == $options[ 'layout_height' ][ 'height-type' ] ) {
+    if ( 'fit-to-screen' == $options[ 'height' ][ 'height-type' ] ) {
         $height = '100';
     }
-    elseif ( 'custom' == $options[ 'layout_height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'layout_height' ] ) && FALSE !== $height_value = filter_var( $options[ 'layout_height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
+    elseif ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) && FALSE !== $height_value = filter_var( $options[ 'height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
                 array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
         $height = $height_value;
     }

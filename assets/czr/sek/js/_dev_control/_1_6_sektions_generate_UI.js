@@ -231,13 +231,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         case 'sek-generate-level-options-ui' :
                               // Generate the UI for level options
                               console.log("PARAMS IN sek-generate-level-options-ui", params );
-                              var bgBorderOptionsSetId = params.id + '__bgBorder_options',
-                                  layoutHeightOptionsSetId = params.id + '__layoutHeight_options',
+                              var sectionLayoutOptionsSetId = params.id + '__sectionLayout_options',
+                                  bgBorderOptionsSetId = params.id + '__bgBorder_options',
+                                  heightOptionsSetId = params.id + '__height_options',
                                   spacingOptionsSetId = params.id + '__spacing_options';
 
                               // Is the UI currently displayed the one that is being requested ?
                               // If so, don't generate the ui again, simply focus on it
-                              if ( self.isUIElementCurrentlyGenerated( bgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( layoutHeightOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
+                              if ( self.isUIElementCurrentlyGenerated( bgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( heightOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
                                     api.control( bgBorderOptionsSetId ).focus({
                                           completeCallback : function() {}
                                     });
@@ -253,7 +254,66 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         id : params.id
                                   });
                               optionDBValue = _.isObject( optionDBValue ) ? optionDBValue : {};
+
                               _do_register_ = function() {
+                                    if ( 'section' === params.level ) {
+                                          // REGISTER SECTION LAYOUT
+                                          // Make sure this setting is bound only once !
+                                          if( ! api.has( heightOptionsSetId ) ) {
+                                                // Schedule the binding to synchronize the options with the main collection setting
+                                                // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
+                                                // They need to be kept in order to keep track of the changes in the customizer.
+                                                // => that's why we check if ! api.has( ... )
+                                                api( sectionLayoutOptionsSetId, function( _setting_ ) {
+                                                      _setting_.bind( _.debounce( function( to, from, args ) {
+                                                            try { self.updateAPISettingAndExecutePreviewActions({
+                                                                  defaultPreviewAction : 'refresh_stylesheet',
+                                                                  uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                                  options_type : 'layout',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
+                                                                  settingParams : {
+                                                                        to : to,
+                                                                        from : from,
+                                                                        args : args
+                                                                  }
+                                                            }); } catch( er ) {
+                                                                  api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                                            }
+                                                      }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                                });//api( heightOptionsSetId, function( _setting_ ) {})
+
+
+                                                self.register( {
+                                                      level : params.level,
+                                                      what : 'setting',
+                                                      id : sectionLayoutOptionsSetId,
+                                                      dirty : false,
+                                                      value : optionDBValue.layout || {},
+                                                      transport : 'postMessage',// 'refresh',
+                                                      type : '_no_intended_to_be_saved_' //sekData.settingType
+                                                });
+                                          }//if( ! api.has( sectionLayoutOptionsSetId ) ) {
+
+
+                                          self.register( {
+                                                level : params.level,
+                                                level_id : params.id,
+                                                what : 'control',
+                                                id : sectionLayoutOptionsSetId,
+                                                label : sektionsLocalizedData.i18n['Section layout'],
+                                                type : 'czr_module',//sekData.controlType,
+                                                module_type : 'sek_level_section_layout_module',
+                                                section : params.id,
+                                                priority : 0,
+                                                settings : { default : sectionLayoutOptionsSetId }
+                                          }).done( function() {
+                                                api.control( sectionLayoutOptionsSetId ).focus({
+                                                      completeCallback : function() {}
+                                                });
+                                          });
+                                    }// if 'section' === params.level
+
+
+
                                     // REGISTER BACKGROUND BORDER OPTIONS
                                     // Make sure this setting is bound only once !
                                     if( ! api.has( bgBorderOptionsSetId ) ) {
@@ -354,7 +414,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_spacing_module',
                                           section : params.id,
-                                          priority : 10,
+                                          priority : 1,
                                           settings : { default : spacingOptionsSetId }
                                     }).done( function() {
                                           // synchronize the options with the main collection setting
@@ -365,19 +425,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-                                    // REGISTER SECTION LAYOUT AND HEIGHT OPTIONS
+                                    // REGISTER HEIGHT OPTIONS
                                     // Make sure this setting is bound only once !
-                                    if( ! api.has( layoutHeightOptionsSetId ) ) {
+                                    if( ! api.has( heightOptionsSetId ) ) {
                                           // Schedule the binding to synchronize the options with the main collection setting
                                           // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
-                                          api( layoutHeightOptionsSetId, function( _setting_ ) {
+                                          api( heightOptionsSetId, function( _setting_ ) {
                                                 _setting_.bind( _.debounce( function( to, from, args ) {
                                                       try { self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_stylesheet',
                                                             uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
-                                                            options_type : 'layout_height',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
+                                                            options_type : 'height',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
                                                             settingParams : {
                                                                   to : to,
                                                                   from : from,
@@ -387,39 +447,42 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
                                                       }
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
-                                          });//api( layoutHeightOptionsSetId, function( _setting_ ) {})
+                                          });//api( heightOptionsSetId, function( _setting_ ) {})
 
 
                                           self.register( {
                                                 level : params.level,
                                                 what : 'setting',
-                                                id : layoutHeightOptionsSetId,
+                                                id : heightOptionsSetId,
                                                 dirty : false,
-                                                value : optionDBValue.layout_height || {},
+                                                value : optionDBValue.height || {},
                                                 transport : 'postMessage',// 'refresh',
                                                 type : '_no_intended_to_be_saved_' //sekData.settingType
                                           });
-                                    }//if( ! api.has( layoutHeightOptionsSetId ) ) {
+                                    }//if( ! api.has( heightOptionsSetId ) ) {
 
                                     self.register( {
                                           level : params.level,
                                           level_id : params.id,
                                           what : 'control',
-                                          id : layoutHeightOptionsSetId,
-                                          label : sektionsLocalizedData.i18n['Layout and height'],
+                                          id : heightOptionsSetId,
+                                          label : sektionsLocalizedData.i18n['Height settings'],
                                           type : 'czr_module',//sekData.controlType,
-                                          module_type : 'sek_level_section_layout_height_module',
+                                          module_type : 'sek_level_height_module',
                                           section : params.id,
                                           priority : 10,
-                                          settings : { default : layoutHeightOptionsSetId }
+                                          settings : { default : heightOptionsSetId }
                                     }).done( function() {
-                                          api.control( layoutHeightOptionsSetId ).focus({
+                                          api.control( heightOptionsSetId ).focus({
                                                 completeCallback : function() {}
                                           });
                                     });
 
-
                               };//_do_register_
+
+
+
+
 
                               // Defer the registration when the parent section gets added to the api
                               api.section.when( params.id, function() {
@@ -444,7 +507,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-            // This method
+
+
+
+
+
+
+
+
+
+
             // @params = {
             //     uiParams : params,
             //     options_type : 'spacing',
@@ -584,7 +656,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               in_sektion : params.uiParams.in_sektion,
 
                               // specific for level options
-                              options_type : params.options_type,//'spacing', 'bg_border', 'layout_height'
+                              options_type : params.options_type,//'layout', 'spacing', 'bg_border', 'height'
 
                         }).done( function( ) {
                               // STYLESHEET => default action when modifying the level options

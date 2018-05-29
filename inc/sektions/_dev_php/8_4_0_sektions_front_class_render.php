@@ -18,11 +18,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
-            // add_filter( 'template_include', function( $template ) {
-            //       // error_log( 'TEMPLATE ? => ' . $template );
-            //       // error_log( 'DID_ACTION WP => ' . did_action('wp') );
-            //       return dirname( __FILE__ ). "/tmpl/page-templates/full-width.php";// $template;
-            // });
+            add_filter( 'template_include', function( $template ) {
+                  // error_log( 'TEMPLATE ? => ' . $template );
+                  // error_log( 'DID_ACTION WP => ' . did_action('wp') );
+                  return NIMBLE_BASE_PATH. "/tmpl/page-templates/full-width.php";// $template;
+            });
         }
 
         // hook : loop_start, loop_end
@@ -121,7 +121,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $is_nested            = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
                     $column_container_class = 'sek-container-fluid';
                     //when boxed use proper container class
-                    if ( ! empty( $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) {
+                    if ( ! empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
                       $column_container_class = 'sek-container';
                     }
                     ?>

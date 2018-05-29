@@ -176,7 +176,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   this.register({
                         what : 'panel',
                         id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
-                        title: '@missi18n Main sektions panel',
+                        title: sektionsLocalizedData.i18n['Nimble Builder'],
                         priority : 1000,
                         constructWith : SektionPanelConstructor,
                         track : false//don't register in the self.registered()
@@ -267,7 +267,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // this.register({
                   //       what : 'section',
                   //       id : sektionsLocalizedData.optPrefixForSektionGlobalOptsSetting,//'__sektions__'
-                  //       title: '@missi18n Global Options',
+                  //       title: 'Global Options',
                   //       priority : 1000,
                   //       constructWith : SektionPanelConstructor,
                   //       track : false//don't register in the self.registered()
@@ -278,7 +278,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // this.register({
                   //       what : 'control',
                   //       id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
-                  //       title: '@missi18n Main sektions panel',
+                  //       title: 'Main sektions panel',
                   //       priority : 1000,
                   //       constructWith : SektionPanelConstructor,
                   //       track : false//don't register in the self.registered()
@@ -384,10 +384,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     '<span style="font-size:0.95em">',
                                       '<strong>' + msg + '</strong>',
                                       '<br>',
-                                      '@missi18n If this problem prevents you to use the Nimble builder, you might need to reset the sections for this page.',
+                                      sektionsLocalizedData.i18n['If this problem locks the Nimble builder, you might try to reset the sections for this page.'],
                                       '<br>',
                                       '<span style="text-align:center;display:block">',
-                                        '<button type="button" class="button" aria-label="@missi18n Reset" data-sek-reset="true">@missi18n Reset</button>',
+                                        '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n['Reset'] + '" data-sek-reset="true">' + sektionsLocalizedData.i18n['Reset'] + '</button>',
                                       '</span>',
                                     '</span>'
                               ].join('')
@@ -556,7 +556,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                         api.notifications.add( new api.Notification( 'sek-reset-done', {
                               type: 'success',
-                              message: '@missi18n Reset complete',
+                              message: sektionsLocalizedData.i18n['Reset complete'],
                               dismissible: true
                         } ) );
 
@@ -654,12 +654,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               in_sektion : params.in_sektion,
                                               in_column : params.in_column,
                                               module_type : params.content_id,
-                                              position : params.position
+
+                                              before_module : params.before_module,
+                                              after_module : params.after_module
                                         };
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        api.previewer.trigger('sek-edit-module', {
+                                        api.previewer.trigger( 'sek-edit-module', {
                                               id : params.apiParams.id,
                                               level : 'module',
                                               in_sektion : params.apiParams.in_sektion,
@@ -1210,7 +1212,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level : params.level,
                                           what : 'control',
                                           id : _id_,
-                                          label : 'module' === params.content_type ? '@missi18n Module Picker' : '@missi18n Section Picker',
+                                          label : 'module' === params.content_type ? sektionsLocalizedData.i18n['Module Picker'] : sektionsLocalizedData.i18n['Section Picker'],
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'module' === params.content_type ? 'sek_module_picker_module' : 'sek_section_picker_module',
                                           section : _id_,
@@ -1232,7 +1234,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.register({
                                     what : 'section',
                                     id : _id_,
-                                    title: 'module' === params.content_type ? '@missi18n Module Picker' : '@missi18n Section Picker',
+                                    title: 'module' === params.content_type ? sektionsLocalizedData.i18n['Module Picker'] : sektionsLocalizedData.i18n['Section Picker'],
                                     panel : sektionsLocalizedData.sektionsPanelId,
                                     priority : 30,
                                     //track : false//don't register in the self.registered()
@@ -1326,7 +1328,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level : params.level,
                                           what : 'control',
                                           id : params.id,
-                                          label : '@missi18n Module ' + params.id,
+                                          label : sektionsLocalizedData.i18n['Module'] + ' ' + params.id,
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : moduleType,
                                           section : params.id,
@@ -1348,7 +1350,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.register({
                                     what : 'section',
                                     id : params.id,
-                                    title: '@missi18n Content for ' + api.czrModuleMap[ moduleType ].name,
+                                    title: sektionsLocalizedData.i18n['Content for'] + ' ' + api.czrModuleMap[ moduleType ].name,
                                     panel : sektionsLocalizedData.sektionsPanelId,
                                     priority : 20,
                                     //track : false//don't register in the self.registered()
@@ -1373,13 +1375,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         case 'sek-generate-level-options-ui' :
                               // Generate the UI for level options
                               console.log("PARAMS IN sek-generate-level-options-ui", params );
-                              var bgBorderOptionsSetId = params.id + '__bgBorder_options',
-                                  layoutHeightOptionsSetId = params.id + '__layoutHeight_options',
+                              var sectionLayoutOptionsSetId = params.id + '__sectionLayout_options',
+                                  bgBorderOptionsSetId = params.id + '__bgBorder_options',
+                                  heightOptionsSetId = params.id + '__height_options',
                                   spacingOptionsSetId = params.id + '__spacing_options';
 
                               // Is the UI currently displayed the one that is being requested ?
                               // If so, don't generate the ui again, simply focus on it
-                              if ( self.isUIElementCurrentlyGenerated( bgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( layoutHeightOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
+                              if ( self.isUIElementCurrentlyGenerated( bgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( heightOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
                                     api.control( bgBorderOptionsSetId ).focus({
                                           completeCallback : function() {}
                                     });
@@ -1395,7 +1398,66 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         id : params.id
                                   });
                               optionDBValue = _.isObject( optionDBValue ) ? optionDBValue : {};
+
                               _do_register_ = function() {
+                                    if ( 'section' === params.level ) {
+                                          // REGISTER SECTION LAYOUT
+                                          // Make sure this setting is bound only once !
+                                          if( ! api.has( heightOptionsSetId ) ) {
+                                                // Schedule the binding to synchronize the options with the main collection setting
+                                                // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
+                                                // They need to be kept in order to keep track of the changes in the customizer.
+                                                // => that's why we check if ! api.has( ... )
+                                                api( sectionLayoutOptionsSetId, function( _setting_ ) {
+                                                      _setting_.bind( _.debounce( function( to, from, args ) {
+                                                            try { self.updateAPISettingAndExecutePreviewActions({
+                                                                  defaultPreviewAction : 'refresh_stylesheet',
+                                                                  uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                                  options_type : 'layout',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
+                                                                  settingParams : {
+                                                                        to : to,
+                                                                        from : from,
+                                                                        args : args
+                                                                  }
+                                                            }); } catch( er ) {
+                                                                  api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                                            }
+                                                      }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                                });//api( heightOptionsSetId, function( _setting_ ) {})
+
+
+                                                self.register( {
+                                                      level : params.level,
+                                                      what : 'setting',
+                                                      id : sectionLayoutOptionsSetId,
+                                                      dirty : false,
+                                                      value : optionDBValue.layout || {},
+                                                      transport : 'postMessage',// 'refresh',
+                                                      type : '_no_intended_to_be_saved_' //sekData.settingType
+                                                });
+                                          }//if( ! api.has( sectionLayoutOptionsSetId ) ) {
+
+
+                                          self.register( {
+                                                level : params.level,
+                                                level_id : params.id,
+                                                what : 'control',
+                                                id : sectionLayoutOptionsSetId,
+                                                label : sektionsLocalizedData.i18n['Section layout'],
+                                                type : 'czr_module',//sekData.controlType,
+                                                module_type : 'sek_level_section_layout_module',
+                                                section : params.id,
+                                                priority : 0,
+                                                settings : { default : sectionLayoutOptionsSetId }
+                                          }).done( function() {
+                                                api.control( sectionLayoutOptionsSetId ).focus({
+                                                      completeCallback : function() {}
+                                                });
+                                          });
+                                    }// if 'section' === params.level
+
+
+
                                     // REGISTER BACKGROUND BORDER OPTIONS
                                     // Make sure this setting is bound only once !
                                     if( ! api.has( bgBorderOptionsSetId ) ) {
@@ -1437,7 +1499,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level_id : params.id,
                                           what : 'control',
                                           id : bgBorderOptionsSetId,
-                                          label : '@missi18n Background and Border',
+                                          label : sektionsLocalizedData.i18n['Background and Border'],
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_level_bg_border_module',
                                           section : params.id,
@@ -1492,11 +1554,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level : params.level,
                                           what : 'control',
                                           id : spacingOptionsSetId,
-                                          label : '@missi18n Spacing : padding and margin',
+                                          label : sektionsLocalizedData.i18n['Padding and margin'],
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_spacing_module',
                                           section : params.id,
-                                          priority : 10,
+                                          priority : 1,
                                           settings : { default : spacingOptionsSetId }
                                     }).done( function() {
                                           // synchronize the options with the main collection setting
@@ -1507,19 +1569,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-                                    // REGISTER SECTION LAYOUT AND HEIGHT OPTIONS
+                                    // REGISTER HEIGHT OPTIONS
                                     // Make sure this setting is bound only once !
-                                    if( ! api.has( layoutHeightOptionsSetId ) ) {
+                                    if( ! api.has( heightOptionsSetId ) ) {
                                           // Schedule the binding to synchronize the options with the main collection setting
                                           // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
                                           // They need to be kept in order to keep track of the changes in the customizer.
                                           // => that's why we check if ! api.has( ... )
-                                          api( layoutHeightOptionsSetId, function( _setting_ ) {
+                                          api( heightOptionsSetId, function( _setting_ ) {
                                                 _setting_.bind( _.debounce( function( to, from, args ) {
                                                       try { self.updateAPISettingAndExecutePreviewActions({
                                                             defaultPreviewAction : 'refresh_stylesheet',
                                                             uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
-                                                            options_type : 'layout_height',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
+                                                            options_type : 'height',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
                                                             settingParams : {
                                                                   to : to,
                                                                   from : from,
@@ -1529,39 +1591,42 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
                                                       }
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
-                                          });//api( layoutHeightOptionsSetId, function( _setting_ ) {})
+                                          });//api( heightOptionsSetId, function( _setting_ ) {})
 
 
                                           self.register( {
                                                 level : params.level,
                                                 what : 'setting',
-                                                id : layoutHeightOptionsSetId,
+                                                id : heightOptionsSetId,
                                                 dirty : false,
-                                                value : optionDBValue.layout_height || {},
+                                                value : optionDBValue.height || {},
                                                 transport : 'postMessage',// 'refresh',
                                                 type : '_no_intended_to_be_saved_' //sekData.settingType
                                           });
-                                    }//if( ! api.has( layoutHeightOptionsSetId ) ) {
+                                    }//if( ! api.has( heightOptionsSetId ) ) {
 
                                     self.register( {
                                           level : params.level,
                                           level_id : params.id,
                                           what : 'control',
-                                          id : layoutHeightOptionsSetId,
-                                          label : '@missi18n Layout and Height',
+                                          id : heightOptionsSetId,
+                                          label : sektionsLocalizedData.i18n['Height settings'],
                                           type : 'czr_module',//sekData.controlType,
-                                          module_type : 'sek_level_section_layout_height_module',
+                                          module_type : 'sek_level_height_module',
                                           section : params.id,
                                           priority : 10,
-                                          settings : { default : layoutHeightOptionsSetId }
+                                          settings : { default : heightOptionsSetId }
                                     }).done( function() {
-                                          api.control( layoutHeightOptionsSetId ).focus({
+                                          api.control( heightOptionsSetId ).focus({
                                                 completeCallback : function() {}
                                           });
                                     });
 
-
                               };//_do_register_
+
+
+
+
 
                               // Defer the registration when the parent section gets added to the api
                               api.section.when( params.id, function() {
@@ -1571,7 +1636,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.register({
                                     what : 'section',
                                     id : params.id,
-                                    title: '@missi18n Options for ' + params.level,
+                                    title: sektionsLocalizedData.i18n['Options for the'] + ' ' + params.level,
                                     panel : sektionsLocalizedData.sektionsPanelId,
                                     priority : 10,
                                     track : false//don't register in the self.registered()
@@ -1586,7 +1651,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-            // This method
+
+
+
+
+
+
+
+
+
+
             // @params = {
             //     uiParams : params,
             //     options_type : 'spacing',
@@ -1726,7 +1800,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               in_sektion : params.uiParams.in_sektion,
 
                               // specific for level options
-                              options_type : params.options_type,//'spacing', 'bg_border', 'layout_height'
+                              options_type : params.options_type,//'layout', 'spacing', 'bg_border', 'height'
 
                         }).done( function( ) {
                               // STYLESHEET => default action when modifying the level options
@@ -1885,7 +1959,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 break;
                                           }
                                           if ( true === parentSektionCandidate.is_nested ) {
-                                                dfd.reject( sektionsLocalizedData.i18n["You've reached the maximum number of allowed nested sections."]);
+                                                dfd.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
                                                 break;
                                           }
                                           if ( 'no_match' == columnCandidate ) {
@@ -1905,15 +1979,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 is_nested : true
                                           });
                                     } else {
+                                          console.log('UPDATE API SETTING SEK ADD SECTION', params );
+
                                           locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                           if ( 'no_match' == locationCandidate ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
                                                 dfd.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
                                                 break;
                                           }
+                                          locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
+                                          _.each( locationCandidate.collection, function( secModel, index ) {
+                                                if ( params.before_section === secModel.id ) {
+                                                      position = index;
+                                                }
+                                                if ( params.after_section === secModel.id ) {
+                                                      position = index + 1;
+                                                }
+                                          });
+
                                           // @see reactToCollectionSettingIdChange
                                           locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
-                                          locationCandidate.collection.push({
+                                          // insert the section in the collection at the right place
+                                          locationCandidate.collection.splice( position, 0, {
                                                 id : params.id,
                                                 level : 'section',
                                                 collection : [{
@@ -1923,7 +2010,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 }]
                                           });
                                     }
-
                               break;
 
 
@@ -2071,6 +2157,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     sektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' == sektionCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
 
@@ -2124,6 +2211,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     sektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' == sektionCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
 
@@ -2162,13 +2250,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // SET RESIZED COLUMN WIDTH
                                     if ( 'no_match' == resizedColumn ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no resized column matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no resized column matched');
                                           break;
                                     }
-                                    if ( 'no_match' == resizedColumn ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => there should be a sister column' );
-                                          break;
-                                    }
-
 
                                     resizedColumn.width = parseFloat( params.resizedColumnWidthInPercent );
 
@@ -2289,23 +2373,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing module_type' );
                                     }
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                    if ( 'no_match' != columnCandidate ) {
-                                          columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                          var _insertionPosition = _.isEmpty( columnCandidate.collection ) ? 0 : params.position,
-                                              _moduleParams = {
-                                                    id : params.id,
-                                                    level : 'module',
-                                                    module_type : params.module_type
-                                              };
-                                          // Let's add the starting value if provided when registrating the module
-                                          startingModuleValue = self.getModuleStartingValue( params.module_type );
-                                          if ( 'no_starting_value' !== startingModuleValue ) {
-                                                _moduleParams.value = startingModuleValue;
-                                          }
-                                          columnCandidate.collection.splice( _insertionPosition, 0, _moduleParams );
-                                    } else {
+                                    if ( 'no_match' === columnCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                          break;
                                     }
+
+                                    var position = 0;
+                                    columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                                    // get the position of the before or after module
+                                    _.each( columnCandidate.collection, function( moduleModel, index ) {
+                                          if ( params.before_module === moduleModel.id ) {
+                                                position = index;
+                                          }
+                                          if ( params.after_module === moduleModel.id ) {
+                                                position = index + 1;
+                                          }
+                                    });
+
+                                    var _moduleParams = {
+                                          id : params.id,
+                                          level : 'module',
+                                          module_type : params.module_type
+                                    };
+                                    // Let's add the starting value if provided when registrating the module
+                                    startingModuleValue = self.getModuleStartingValue( params.module_type );
+                                    if ( 'no_starting_value' !== startingModuleValue ) {
+                                          _moduleParams.value = startingModuleValue;
+                                    }
+
+                                    columnCandidate.collection.splice( position, 0, _moduleParams );
                               break;
 
                               case 'sek-duplicate-module' :
@@ -2316,6 +2413,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                     if ( 'no_match' == columnCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
                                           break;
                                     }
 
@@ -2324,6 +2422,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var deepClonedModule;
                                     try { deepClonedModule = self.cloneLevel( params.id ); } catch( er ) {
                                           api.errare( 'updateAPISetting => ' + params.action, er );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => error when cloning the level');
                                           break;
                                     }
                                     var insertInposition = self.getLevelPositionInCollection( params.id, newSetValue.collection );
@@ -2426,6 +2525,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                                     if ( 'no_match' == moduleCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no module matched', params );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => error no module matched');
                                           break;
                                     }
                                     moduleCandidate.value = _value_;
@@ -2444,6 +2544,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _valueCandidate = {};
                                     if ( 'no_match'=== _candidate_ ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
                                     _candidate_.options = _candidate_.options || {};
@@ -2461,17 +2562,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
                                     }
                                     switch( params.options_type ) {
+                                          case 'layout' :
+                                                _candidate_.options.layout = _valueCandidate;
+                                          break;
                                           case 'bg_border' :
                                                 _candidate_.options.bg_border = _valueCandidate;
                                           break;
-                                          case 'layout_height' :
-                                                _candidate_.options.layout_height = _valueCandidate;
+                                          case 'height' :
+                                                _candidate_.options.height = _valueCandidate;
                                           break;
                                           case 'spacing' :
                                                 _candidate_.options.spacing = _valueCandidate;
                                           break;
                                     }
                               break;
+
+
+
+
+
+
+
 
 
 
@@ -2490,7 +2601,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
                               // }
                               case 'sek-add-content-in-new-sektion' :
-                                    //console.log('update API Setting => sek-add-content-in-new-sektion => PARAMS', params );
+                                    // console.log('update API Setting => sek-add-content-in-new-sektion => PARAMS', params );
                                     // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
@@ -2551,13 +2662,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       });
                                                 } catch( _er_ ) {
                                                       api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
+                                                      dfd.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
                                                       break;
                                                 }
                                                 if ( ! _.isObject( presetSectionCandidate ) || _.isEmpty( presetSectionCandidate ) ) {
                                                       api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetSectionCandidate );
+                                                      dfd.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                                       break;
                                                 }
-                                                //console.log('SOOOOOOOOOO => ', presetSectionCandidate );
                                                 locationCandidate.collection.splice( position, 0, presetSectionCandidate );
                                           break;
                                     }//switch( params.content_type)
@@ -2579,6 +2691,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
                                           if ( params.font_family.indexOf('gfont') < 0 ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
+                                                dfd.reject( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont');
                                                 break;
                                           }
                                           currentGfonts.push( params.font_family );
@@ -3171,7 +3284,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                     api.notifications.add( new api.Notification( 'drag-drop-support', {
                                           type: 'error',
-                                          message:  '@missi18n => your browser does not support the drag and drop technology. You might want to customize your site using another browser.',
+                                          message:  sektionsLocalizedData.i18n['This browser does not support drag and drop. You might need to update your browser or use another one.'],
                                           dismissible: true
                                     } ) );
 
@@ -3193,9 +3306,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // => re-instantiate sekDrop on the new preview frame
                         // the registered() ui levels look like :
                         // [
-                        //   { what: "control", id: "__sek___sek_draggable_sections_ui", label: "@missi18n Section Picker", type: "czr_module", module_type: "sek_section_picker_module", …}
+                        //   { what: "control", id: "__sek___sek_draggable_sections_ui", label: "Section Picker", type: "czr_module", module_type: "sek_section_picker_module", …}
                         //   { what: "setting", id: "__sek___sek_draggable_sections_ui", dirty: false, value: "", transport: "postMessage", … }
-                        //   { what: "section", id: "__sek___sek_draggable_sections_ui", title: "@missi18n Section Picker", panel: "__sektions__", priority: 30}
+                        //   { what: "section", id: "__sek___sek_draggable_sections_ui", title: "Section Picker", panel: "__sektions__", priority: 30}
                         // ]
                         if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_section_picker_module' } ) ) ) {
                               self.rootPanelFocus();
@@ -3231,7 +3344,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                     api.notifications.add( new api.Notification( 'drag-drop-support', {
                                           type: 'error',
-                                          message:  '@missi18n => your browser does not support the drag and drop technology. You might want to customize your site using another browser.',
+                                          message:  sektionsLocalizedData.i18n['This browser does not support drag and drop. You might need to update your browser or use another one.'],
                                           dismissible: true
                                     } ) );
 
@@ -3243,15 +3356,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         // Set the dragged type property now : module or preset_section
                         self.dnd_draggedType = $(this).data('sek-content-type');
-
+                        $('body').addClass('sek-dragging');
                         api.previewer.send( 'sek-drag-start', { type : self.dnd_draggedType } );//fires the rendering of the dropzones
-                        $(evt.currentTarget).addClass('sek-grabbing');
                   };
 
                   var _onEnd = function( evt ) {
+                        $('body').removeClass('sek-dragging');
                         api.previewer.send( 'sek-drag-stop' );
-                        // make sure that the sek-grabbing class ( -webkit-grabbing ) gets reset on dragEnd
-                        $(evt.currentTarget).removeClass('sek-grabbing');
                   };
 
                   // Schedule
@@ -3370,34 +3481,49 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   this.$dropZones.find('.sek-drop-zone').each( function() {
                         var yPos = evt.clientY,
                             xPos = evt.clientX,
-                            isApproachingThreshold = 80;
-                            isCloseThreshold = 30;
+                            isApproachingThreshold = 120,
+                            isCloseThreshold = 60,
+                            isVeryCloseThreshold = 40;
 
                         var dzoneRect = $(this)[0].getBoundingClientRect(),
-                            mouseToBottom = yPos - dzoneRect.bottom,
-                            mouseToTop = dzoneRect.top - yPos,
+                            mouseToBottom = Math.abs( yPos - dzoneRect.bottom ),
+                            mouseToTop = Math.abs( dzoneRect.top - yPos ),
                             mouseToRight = xPos - dzoneRect.right,
                             mouseToLeft = dzoneRect.left - xPos,
-                            isCloseVertically = ( mouseToBottom > 0 && mouseToBottom < isCloseThreshold ) || ( mouseToTop > 0 && mouseToTop < isCloseThreshold ),
+                            isVeryCloseVertically = ( mouseToBottom < isVeryCloseThreshold ) || ( mouseToTop < isVeryCloseThreshold ),
+                            isVeryCloseHorizontally =  ( mouseToRight > 0 && mouseToRight < isVeryCloseThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isVeryCloseThreshold ),
+                            isCloseVertically = ( mouseToBottom < isCloseThreshold ) || ( mouseToTop < isCloseThreshold ),
                             isCloseHorizontally =  ( mouseToRight > 0 && mouseToRight < isCloseThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isCloseThreshold ),
                             isInHorizontally = xPos <= dzoneRect.right && dzoneRect.left <= xPos,
                             isInVertically = yPos <= dzoneRect.top && dzoneRect.bottom <= yPos,
-                            isApproachingVertically = ( mouseToBottom > 0 && mouseToBottom < isApproachingThreshold ) || ( mouseToTop > 0 && mouseToTop < isApproachingThreshold ),
+                            isApproachingVertically = ( mouseToBottom < isApproachingThreshold ) || ( mouseToTop < isApproachingThreshold ),
                             isApproachingHorizontally = ( mouseToRight > 0 && mouseToRight < isApproachingThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isApproachingThreshold );
 
                         // var html = "isApproachingHorizontally : " + isApproachingHorizontally + ' | isCloseHorizontally : ' + isCloseHorizontally + ' | isInHorizontally : ' + isInHorizontally;
                         // html += ' | xPos : ' + xPos + ' | zoneRect.right : ' + dzoneRect.right;
-                        // html += "isApproachingVertically : " + isApproachingVertically + ' | isCloseVertically : ' + ' | isInVertically : ' + isInVertically;
+                        // html += "isApproachingVertically : " + isApproachingVertically + ' | isCloseVertically : ' + isCloseVertically + ' | isInVertically : ' + isInVertically;
                         // html += ' | yPos : ' + yPos + ' | zoneRect.top : ' + dzoneRect.top;
-                        // $(this).html(html);
+                        // $(this).html( '<span style="font-size:10px">' + html + '</span>');
 
-                        if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
+                        // var html = '';
+                        // html += ' | mouseToBottom : ' + mouseToBottom + ' | mouseToTop : ' + mouseToTop;
+                        // html += "isApproachingVertically : " + isApproachingVertically + ' | isCloseVertically : ' + isCloseVertically + ' | isInVertically : ' + isInVertically;
+                        // $(this).html( '<span style="font-size:12px">' + html + '</span>');
+
+                        if ( ( isVeryCloseVertically || isInVertically ) && ( isVeryCloseHorizontally || isInHorizontally ) ) {
+                              $(this).addClass( 'sek-drag-is-very-close');
+                              $(this).removeClass( 'sek-drag-is-close');
+                              $(this).removeClass( 'sek-drag-is-approaching' );
+                        } else if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
                               $(this).addClass( 'sek-drag-is-close');
+                              $(this).removeClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-approaching' );
                         } else if ( ( isApproachingVertically || isInVertically ) && ( isApproachingHorizontally || isInHorizontally ) ) {
+                              $(this).addClass( 'sek-drag-is-approaching');
+                              $(this).removeClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-close' );
-                              $(this).addClass( 'sek-drag-is-approaching' );
                         } else {
+                              $(this).removeClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-close' );
                               $(this).removeClass( 'sek-drag-is-approaching' );
                         }
@@ -3415,17 +3541,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   switch( this.dnd_draggedType ) {
                         case 'module' :
-                              html = '@missi18n Insert Here';
+                              html = sektionsLocalizedData.i18n['Insert here'];
                               if ( $target.length > 0 ) {
                                   if ( 'between-sections' === $target.data('sek-location') || 'in-empty-location' === $target.data('sek-location') ) {
-                                        html = '@missi18n Insert in a new section';
+                                        html = sektionsLocalizedData.i18n['Insert in a new section'];
                                   }
                               }
                               preDropContent = '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
                         break;
 
                         case 'preset_section' :
-                              html = '@missi18n Insert a new section here';
+                              html = sektionsLocalizedData.i18n['Insert a new section here'];
                               preDropContent = '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
                         break;
 
@@ -3554,17 +3680,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // console.log('onDropping params', position, evt );
                   // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
 
-
                   api.czr_sektions.trigger( 'sek-content-dropped', {
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
-                        position : _position,
+                        // when inserted between modules
+                        before_module : $dropTarget.data('drop-zone-before-module'),
+                        after_module : $dropTarget.data('drop-zone-after-module'),
+
+                        // When inserted between sections
                         before_section : $dropTarget.data('drop-zone-before-section'),
                         after_section : $dropTarget.data('drop-zone-after-section'),
+
                         content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
                         content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
                   });
             },
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3610,12 +3751,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( _.isEmpty( _level ) || _.isEmpty( _id ) ) {
                                         throw new Error( 'No valid level id found' );
                                     }
+
+                                    //console.log(' reactToDrop => drop module in column', params );
                                     api.previewer.trigger( 'sek-add-module', {
                                           level : _level,
                                           id : _id,
                                           in_column : params.drop_target_element.closest('div[data-sek-level="column"]').data( 'sek-id'),
                                           in_sektion : params.drop_target_element.closest('div[data-sek-level="section"]').data( 'sek-id'),
-                                          position : params.position,
+
+                                          before_module : params.before_module,
+                                          after_module : params.after_module,
+
                                           content_type : params.content_type,
                                           content_id : params.content_id
                                     });
@@ -3857,21 +4003,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         //add the first option
                         if ( _.isNull( input() ) || _.isEmpty( input() ) ) {
-                              $fontSelectElement.append( '<option value="none" selected="selected">' + '@missi18n Select a font family' + '</option>' );
+                              $fontSelectElement.append( '<option value="none" selected="selected">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
                         } else {
-                              $fontSelectElement.append( '<option value="none">' + '@missi18n Select a font family' + '</option>' );
+                              $fontSelectElement.append( '<option value="none">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
                         }
 
 
                         // generate the cfont and gfont html
                         _.each( [
                               {
-                                    title : '@missi18n Web Safe Fonts',
+                                    title : sektionsLocalizedData.i18n['Web Safe Fonts'],
                                     type : 'cfont',
                                     list : fontCollections.cfonts
                               },
                               {
-                                    title : '@missi18n Google Fonts',
+                                    title : sektionsLocalizedData.i18n['Google Fonts'],
                                     type : 'gfont',
                                     list : fontCollections.gfonts//_googleFontsFilteredBySubset()
                               }
@@ -4033,8 +4179,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.sekEditorSynchronizedInput( newEditorSyncData );
                         api.sekEditorExpanded( true );
                         api.sekTinyMceEditor.focus();
-
-                        // $(this).text( ! api.sekEditorExpanded() ? '@missi18n Edit' : '@missi18n Close Editor' );
                   });
 
 
@@ -4301,43 +4445,110 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
-            CZRInputMths : {
-                    setupSelect : function() {
-                            var input  = this,
-                                  item   = input.input_parent,
-                                  module = input.module,
-                                  _options_ = {};
 
-                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.module_type );
-                                  return;
-                            } else {
-                                  //generates the options
-                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
-                                        var _attributes = {
-                                                  value : value,
-                                                  html: title
-                                            };
-                                        if ( value == input() ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        } else if ( 'px' === value ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        }
-                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                  });
-                                  $( 'select[data-czrtype]', input.container ).selecter();
-                            }
-                    },
+            CZRInputMths : {
+                  setupSelect : function() {
+                          var input  = this,
+                                item   = input.input_parent,
+                                module = input.module;
+
+                          if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
+                                api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.module_type );
+                                return;
+                          } else {
+                                //generates the options
+                                _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
+                                      var _attributes = {
+                                                value : value,
+                                                html: title
+                                          };
+                                      if ( value == input() ) {
+                                            $.extend( _attributes, { selected : "selected" } );
+                                      } else if ( 'px' === value ) {
+                                            $.extend( _attributes, { selected : "selected" } );
+                                      }
+                                      $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                });
+                                $( 'select[data-czrtype]', input.container ).selecter();
+                          }
+                  },
             },//CZRInputMths
 
-            // CZRSocialsItem : { },//CZRSocialsItem
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+
+                        //fire the parent
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+                        // input controller instance == this
+                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                              //Fire on init
+                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              //React on change
+                              this.bind( function( to ) {
+                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              });
+                        };
+                        //Internal item dependencies
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'bg-image' :
+                                          _.each( [ 'bg-position', 'bg-attachment', 'bg-scale', 'bg-apply-overlay', 'bg-color-overlay', 'bg-opacity-overlay' ] , function( _inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'bg-color-overlay' :
+                                                            case 'bg-opacity-overlay' :
+                                                                  bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-apply-overlay')() );
+                                                            break;
+                                                            default :
+                                                                  bool = ! _.isEmpty( input() + '' );
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'bg-apply-overlay' :
+                                          _.each( [ 'bg-color-overlay', 'bg-opacity-overlay' ] , function(_inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                              }
+                        });
+                  }
+            }//CZRItemConstructor
       };
 
 
@@ -4371,12 +4582,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var module = this;
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
+                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
-
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
             },//initialize
 
             CZRInputMths : {
@@ -4408,7 +4618,51 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     },
             },//CZRInputMths
 
-            // CZRSocialsItem : { },//CZRSocialsItem
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+
+                        //fire the parent
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+                        // input controller instance == this
+                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                              //Fire on init
+                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              //React on change
+                              this.bind( function( to ) {
+                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              });
+                        };
+                        //Internal item dependencies
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'height-type' :
+                                          scheduleVisibilityOfInputId.call( input, 'custom-height', function() {
+                                                return 'custom' === input();
+                                          });
+                                    break;
+                              }
+                        });
+                  }
+            }//CZRItemConstructor
       };
 
 
@@ -4422,15 +4676,83 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            sek_level_section_layout_height_module : {
+            sek_level_height_module : {
                   mthds : Constructor,
                   crud : false,
-                  name : 'Layout Height Options',
+                  name : 'Height Options',
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_section_layout_height_module' )
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_height_module' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                  module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
+                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+                  //run the parent initialize
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+            },//initialize
+
+            CZRInputMths : {
+                    setupSelect : function() {
+                            var input  = this,
+                                  item   = input.input_parent,
+                                  module = input.module,
+                                  _options_ = {};
+
+                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.module_type );
+                                  return;
+                            } else {
+                                  //generates the options
+                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
+                                        var _attributes = {
+                                                  value : value,
+                                                  html: title
+                                            };
+                                        if ( value == input() ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        } else if ( 'px' === value ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        }
+                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                  });
+                                  $( 'select[data-czrtype]', input.container ).selecter();
+                            }
+                    },
+            },//CZRInputMths
+      };
+
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_level_section_layout_module : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : 'Section Layout Options',
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_section_layout_module' )
                   )
             },
       });
@@ -4552,18 +4874,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             module_picker : function( input_options ) {
                 var input = this;
                 // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
-                input.container.find('[draggable]').each( function() {
-                      $(this).on( 'mousedown mouseup', function( evt ) {
-                            switch( evt.type ) {
-                                  case 'mousedown' :
-                                        $(this).addClass('sek-grabbing');
-                                  break;
-                                  case 'mouseup' :
-                                        $(this).removeClass('sek-grabbing');
-                                  break;
-                            }
-                      });
-                });
+                // input.container.find('[draggable]').each( function() {
+                //       $(this).on( 'mousedown mouseup', function( evt ) {
+                //             switch( evt.type ) {
+                //                   case 'mousedown' :
+                //                         //$(this).addClass('sek-grabbing');
+                //                   break;
+                //                   case 'mouseup' :
+                //                         //$(this).removeClass('sek-grabbing');
+                //                   break;
+                //             }
+                //       });
+                // });
                 api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'module', input_container : input.container } );
                 //console.log( this.id, input_options );
             }
@@ -4578,16 +4900,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     //run the parent initialize
                     api.CZRDynModule.prototype.initialize.call( module, id, options );
 
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                    // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                     module.inputConstructor = api.CZRInput.extend( module.CZRImageInputMths || {} );
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                    // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+                    // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                    module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                     //SET THE CONTENT PICKER DEFAULT OPTIONS
                     //@see ::setupContentPicker()
                     module.bind( 'set_default_content_picker_options', function( params ) {
                           params.defaultContentPickerOption.defaultOption = {
-                                'title'      : '<span style="font-weight:bold">@missi18n Set a custom url</span>',
+                                'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
                                 'type'       : '',
                                 'type_label' : '',
                                 'object'     : '',
@@ -4632,7 +4954,76 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     }
             },//CZRImageInputMths
 
-            // CZRSocialsItem : { },//CZRSocialsItem
+            // _isChecked : function( v ) {
+            //       return 0 !== v && '0' !== v && false !== v && 'off' !== v;
+            // },
+            //////////////////////////////////////////////////////////
+            /// ITEM CONSTRUCTOR
+            //////////////////////////////////////////
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+
+                        //fire the parent
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+                        // input controller instance == this
+                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                              //Fire on init
+                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              //React on change
+                              this.bind( function( to ) {
+                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              });
+                        };
+                        //Internal item dependencies
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'link-to' :
+                                          _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'link-custom-url' :
+                                                                  bool = 'url' == input() && '_custom_' == item.czr_Input('link-pick-url')().id;
+                                                            break;
+                                                            default :
+                                                                  bool = 'url' == input();
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                }); } catch( er ) {
+                                                      api.errare( 'Image module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'link-pick-url' :
+                                          scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                                return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
+                                          });
+                                    break;
+                              }
+                        });
+                  }
+            },//CZRItemConstructor
+
       };//ImageModuleConstructor
 
       //provides a description of each module

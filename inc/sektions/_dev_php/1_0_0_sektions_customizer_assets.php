@@ -224,10 +224,11 @@ function sek_enqueue_controls_js_css() {
                 'Module' => __('Module', 'text_domain_to_be_replaced'),
                 'Content for' => __('Content for', 'text_domain_to_be_replaced'),
 
+                'Section layout' => __('Section layout', 'text_domain_to_be_replaced'),
                 'Background and Border' => __('Background and Border', 'text_domain_to_be_replaced'),
 
                 'Padding and margin' => __('Padding and margin', 'text_domain_to_be_replaced'),
-                'Layout and height' => __('Layout and height', 'text_domain_to_be_replaced'),
+                'Height settings' => __('Height settings', 'text_domain_to_be_replaced'),
 
                 'Options for the' => __('Options for the', 'text_domain_to_be_replaced'),//section / column / module
 
@@ -244,12 +245,12 @@ function sek_enqueue_controls_js_css() {
                 'Set a custom url' => __('Set a custom url', 'text_domain_to_be_replaced'),
 
                 'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
-                'Module' => __('Module', 'text_domain_to_be_replaced'),
-                'Module' => __('Module', 'text_domain_to_be_replaced'),
-                'Module' => __('Module', 'text_domain_to_be_replaced'),
-                'Module' => __('Module', 'text_domain_to_be_replaced'),
-                'Module' => __('Module', 'text_domain_to_be_replaced'),
-                'Module' => __('Module', 'text_domain_to_be_replaced'),
+
+                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
 
 
             )

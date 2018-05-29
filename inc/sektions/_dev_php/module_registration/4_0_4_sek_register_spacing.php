@@ -20,7 +20,7 @@ function sek_get_module_params_for_sek_spacing_module() {
                         'inputs' => array(
                             'desktop_pad_marg' => array(
                                 'input_type'  => 'spacing',
-                                'title'       => __('Set padding and margin for Desktop', 'text_domain_to_be_replaced'),
+                                'title'       => __('Set padding and margin for desktops', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-100',
                                 'width-100'   => true,
                                 'default'     => array()

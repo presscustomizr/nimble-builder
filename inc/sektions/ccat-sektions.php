@@ -167,7 +167,6 @@ function sek_get_default_module_model( string $module_type ) {
         // error_log( print_r( $default_models, true ) );
         // error_log('</$default_models>');
     }
-
     return $default;
 }
 
@@ -295,7 +294,15 @@ function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true )
 
 
 
-
+function sek_error_log( string $title, $content = null ) {
+    if ( is_null( $content ) ) {
+        error_log( '<' . strtoupper( $title ) . '>' );
+    } else {
+        error_log( '<' . strtoupper( $title ) . '>' );
+        error_log( print_r( $content, true ) );
+        error_log( '<' . strtoupper( $title ) . '>' );
+    }
+}
 ?><?php
 // SEKTION POST
 register_post_type( SEK_CPT , array(
@@ -736,11 +743,55 @@ function sek_enqueue_controls_js_css() {
 
 
             'i18n' => array(
-                'Sektions' => __( 'Sektions', 'text_domain_to_be_replaced'),
+                'Sections' => __( 'Sections', 'text_domain_to_be_replaced'),
+
+                'Nimble Builder' => __('Nimble Builder', 'text_domain_to_be_replaced'),
+
                 'Customizing' => __('Customizing', 'text_domain_to_be_replaced'),
+
                 "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_domain_to_be_replaced'),
                 "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
-                "A section must have at least one column." => __( "A section must have at least one column.", 'text_domain_to_be_replaced')
+                "A section must have at least one column." => __( "A section must have at least one column.", 'text_domain_to_be_replaced'),
+
+                'If this problem locks the Nimble builder, you might try to reset the sections for this page.' => __('If this problem locks the Nimble builder, you might try to reset the sections for this page.', 'text_domain_to_be_replaced'),
+                'Reset' => __('Reset', 'text_domain_to_be_replaced'),
+                'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
+
+                'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
+                'Section Picker' => __('Section Picker', 'text_domain_to_be_replaced'),
+
+                'Module' => __('Module', 'text_domain_to_be_replaced'),
+                'Content for' => __('Content for', 'text_domain_to_be_replaced'),
+
+                'Section layout' => __('Section layout', 'text_domain_to_be_replaced'),
+                'Background and Border' => __('Background and Border', 'text_domain_to_be_replaced'),
+
+                'Padding and margin' => __('Padding and margin', 'text_domain_to_be_replaced'),
+                'Height settings' => __('Height settings', 'text_domain_to_be_replaced'),
+
+                'Options for the' => __('Options for the', 'text_domain_to_be_replaced'),//section / column / module
+
+                'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
+
+                'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
+                'Insert in a new section' => __('Insert in a new section', 'text_domain_to_be_replaced'),
+                'Insert a new section here' => __('Insert a new section here', 'text_domain_to_be_replaced'),
+
+                'Select a font family' => __('Select a font family', 'text_domain_to_be_replaced'),
+                'Web Safe Fonts' => __('Web Safe Fonts', 'text_domain_to_be_replaced'),
+                'Google Fonts' => __('Google Fonts', 'text_domain_to_be_replaced'),
+
+                'Set a custom url' => __('Set a custom url', 'text_domain_to_be_replaced'),
+
+                'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
+
+                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+
+
             )
         )
     );
@@ -994,21 +1045,24 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_tiny_mce_editor_module',
-                  'title' => '@missi18n Text Editor'),
+                  'title' => __( 'Text Editor', 'text_domain_to_be_replaced' ),
+                  'icon' => 'short_text'
+                ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_image_module',
-                  'title' => '@missi18n Image'
+                  'title' => __( 'Image', 'text_domain_to_be_replaced' ),
+                  'icon' => 'image'
                 ),
                 // array(
                 //   'content-type' => 'module',
                 //   'content-id' => 'czr_simple_html_module',
-                //   'title' => '@missi18n Html Content'
+                //   'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
                 // ),
                 // array(
                 //   'content-type' => 'module',
                 //   'content-id' => 'czr_featured_pages_module',
-                //   'title' => '@missi18n Featured pages'
+                //   'title' => __( 'Featured pages',  'text_domain_to_be_replaced' )
                 // ),
 
             );
@@ -1017,10 +1071,12 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 if ( $i % 2 == 0 ) {
                   //printf('<div class="sek-module-raw"></div');
                 }
-                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s"><p>%3$s</p></div>',
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><span class="sek-module-icon">%3$s</span><span class="sek-module-title">%4$s</span></div>',
                     $_params['content-type'],
                     $_params['content-id'],
-                    $_params['title']
+                    '<i class="material-icons">' . $_params['icon'] .'</i>',
+                    $_params['title'],
+                    __('Drag the module and drop it the previewed page.', 'text_domain_to_be_replaced' )
                 );
                 $i++;
             }
@@ -1074,64 +1130,65 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
     ?>
     <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
     <div class="sek-spacing-wrapper">
-        <div class="Spacing-spacingContainer-12n">
-          <div class="Spacing-spacingRow-K2n Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
-            <div class="SmartTextLabel-main-22n SmartTextLabel-selected-R2n" data-sek-spacing="margin-top">
-              <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+        <div class="sek-pad-marg-inner">
+          <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
+            <div class="sek-flex-center-stretch" data-sek-spacing="margin-top">
+              <div class="sek-pm-input-parent">
+                <input class="sek-pm-input" value="0" type="number"  >
               </div>
             </div>
           </div>
-          <div class="Spacing-spacingRow--large-32n Flex-main-32n Flex-row-12n" style="display: flex; justify-content: space-between;">
-            <div class="SmartTextLabel-main-22n Spacing-col-outer-left-32n SmartTextLabel-editable-false-22n" data-sek-spacing="margin-left">
-              <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+          <div class="sek-pm-middle-wrap sek-flex-justify-center">
+            <div class="sek-flex-center-stretch sek-pm-margin-left" data-sek-spacing="margin-left">
+              <div class="sek-pm-input-parent">
+                <input class="sek-pm-input" value="0" type="number"  >
               </div>
             </div>
 
-            <div class="Spacing-innerSpacingContainer-22n">
-              <div class="Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
-                <div class="SmartTextLabel-main-22n" data-sek-spacing="padding-top">
-                  <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                    <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+            <div class="sek-pm-padding-wrapper">
+              <div class="sek-flex-justify-center">
+                <div class="sek-flex-center-stretch" data-sek-spacing="padding-top">
+                  <div class="sek-pm-input-parent">
+                    <input class="sek-pm-input" value="0" type="number"  >
                   </div>
                 </div>
               </div>
-                <div class="Flex-main-32n Flex-row-12n" style="display: flex; justify-content: space-between;">
-                  <div class="SmartTextLabel-main-22n SmartTextLabel-editable-false-22n" data-sek-spacing="padding-left">
-                    <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                      <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+                <div class="sek-flex-justify-center sek-flex-space-between">
+                  <div class="sek-flex-center-stretch" data-sek-spacing="padding-left">
+                    <div class="sek-pm-input-parent">
+                      <input class="sek-pm-input" value="0" type="number"  >
                     </div>
                   </div>
-                  <div class="SmartTextLabel-main-22n" data-sek-spacing="padding-right">
-                    <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                      <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+                  <div class="sek-flex-center-stretch" data-sek-spacing="padding-right">
+                    <div class="sek-pm-input-parent">
+                      <input class="sek-pm-input" value="0" type="number"  >
                     </div>
                   </div>
                 </div>
-              <div class="Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
-                <div class="SmartTextLabel-main-22n" data-sek-spacing="padding-bottom">
-                  <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                    <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+              <div class="sek-flex-justify-center">
+                <div class="sek-flex-center-stretch" data-sek-spacing="padding-bottom">
+                  <div class="sek-pm-input-parent">
+                    <input class="sek-pm-input" value="0" type="number"  >
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="SmartTextLabel-main-22n Spacing-col-outer-right-22n" data-sek-spacing="margin-right">
-              <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+            <div class="sek-flex-center-stretch sek-pm-margin-right" data-sek-spacing="margin-right">
+              <div class="sek-pm-input-parent">
+                <input class="sek-pm-input" value="0" type="number"  >
               </div>
             </div>
           </div>
-          <div class="Spacing-spacingRow-K2n Flex-main-32n Flex-row-12n" style="display: flex; justify-content: center;">
-            <div class="SmartTextLabel-main-22n SmartTextLabel-editable-false-22n" data-sek-spacing="margin-bottom">
-              <div class="SmartTextLabel-input-12n TextBox-container-32n">
-                <input class="textBox--input TextBox-layout-small-22n TextBox-main-22n" value="0" type="number"  >
+
+          <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
+            <div class="sek-flex-center-stretch" data-sek-spacing="margin-bottom">
+              <div class="sek-pm-input-parent">
+                <input class="sek-pm-input" value="0" type="number"  >
               </div>
             </div>
           </div>
-        </div><?php //Spacing-spacingContainer-12n ?>
+        </div><?php //sek-pad-marg-inner ?>
         <div class="reset-spacing-wrap"><span class="sek-do-reset"><?php _e('Reset all spacing', 'text_domain_to_be_replaced' ); ?></span></div>
     </div><?php // sek-spacing-wrapper ?>
     <?php
@@ -1147,90 +1204,88 @@ function sek_set_input_tmpl___bg_position( $input_id, $input_data ) {
     ?>
         <div class="sek-bg-pos-wrapper">
           <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-          <div class="items">
-            <label class="item">
-              <input type="radio" name="rb_0" value="top_left">
-              <span>
-                <svg class="symbol symbol-alignTypeTopLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                  <path id="path-1" fill-rule="evenodd" d="M14.96 16v-1h-1v-1h-1v-1h-1v-1h-1v-1.001h-1V14h-1v-4-1h5v1h-3v.938h1v.999h1v1h1v1.001h1v1h1V16h-1z" class="cls-5">
-                  </path>
-                </svg>
-              </span>
-            </label>
-            <label class="item">
-              <input type="radio" name="rb_0" value="top">
-              <span>
-                <svg class="symbol symbol-alignTypeTop" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                  <path id="path-1" fill-rule="evenodd" d="M14.969 12v-1h-1v-1h-1v7h-1v-7h-1v1h-1v1h-1v-1.062h1V9.937h1v-1h1V8h1v.937h1v1h1v1.001h1V12h-1z" class="cls-5">
-                  </path>
-                </svg>
-              </span>
-            </label>
-            <label class="item">
-              <input type="radio" name="rb_0" value="top_right">
-              <span>
-                <svg class="symbol symbol-alignTypeTopRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                  <path id="path-1" fill-rule="evenodd" d="M9.969 16v-1h1v-1h1v-1h1v-1h1v-1.001h1V14h1v-4-1h-1-4v1h3v.938h-1v.999h-1v1h-1v1.001h-1v1h-1V16h1z" class="cls-5">
-                  </path>
-                </svg>
-              </span>
-            </label>
-            <label class="item">
-              <input type="radio" name="rb_0" value="left">
-              <span>
-                <svg class="symbol symbol-alignTypeLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                  <path id="path-1" fill-rule="evenodd" d="M11.469 9.5h-1v1h-1v1h7v1h-7v1h1v1h1v1h-1.063v-1h-1v-1h-1v-1h-.937v-1h.937v-1h1v-1h1v-1h1.063v1z" class="cls-5">
-                  </path>
-                </svg>
-              </span>
-            </label>
-            <label class="item">
-              <input type="radio" name="rb_0" value="center">
-              <span>
-                <svg class="symbol symbol-alignTypeCenter" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                  <path id="path-1" fill-rule="evenodd" d="M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" class="cls-5">
-                  </path>
-                </svg>
-              </span>
-            </label>
-            <label class="item">
-              <input type="radio" name="rb_0" value="right">
-              <span>
-                <svg class="symbol symbol-alignTypeRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                  <path id="path-1" fill-rule="evenodd" d="M12.469 14.5h1v-1h1v-1h-7v-1h7v-1h-1v-1h-1v-1h1.062v1h1v1h1v1h.938v1h-.938v1h-1v1h-1v1h-1.062v-1z" class="cls-5">
-                  </path>
-                </svg>
-              </span>
-            </label>
-            <label class="item">
-              <input type="radio" name="rb_0" value="bottom_left">
-              <span>
-                <svg class="symbol symbol-alignTypeBottomLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                  <path id="path-1" fill-rule="evenodd" d="M14.969 9v1h-1v1h-1v1h-1v1h-1v1.001h-1V11h-1v5h5v-1h-3v-.938h1v-.999h1v-1h1v-1.001h1v-1h1V9h-1z" class="cls-5">
-                  </path>
-                </svg>
-              </span>
-            </label>
-            <label class="item">
-              <input type="radio" name="rb_0" value="bottom">
-              <span>
-                <svg class="symbol symbol-alignTypeBottom" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                  <path id="path-1" fill-rule="evenodd" d="M9.969 13v1h1v1h1V8h1v7h1v-1h1v-1h1v1.063h-1v.999h-1v1.001h-1V17h-1v-.937h-1v-1.001h-1v-.999h-1V13h1z" class="cls-5">
-                  </path>
-                </svg>
-              </span>
-            </label>
-            <label class="item">
-              <input type="radio" name="rb_0" value="bottom_right">
-              <span>
-                <svg class="symbol symbol-alignTypeBottomRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
-                  <path id="path-1" fill-rule="evenodd" d="M9.969 9v1h1v1h1v1h1v1h1v1.001h1V11h1v5h-1-4v-1h3v-.938h-1v-.999h-1v-1h-1v-1.001h-1v-1h-1V9h1z" class="cls-5">
-                  </path>
-                </svg>
-              </span>
-            </label>
-          </div><?php // .items ?>
-        </div><?php // control-alignment ?>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="top_left">
+            <span>
+              <svg class="symbol symbol-alignTypeTopLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                <path id="path-1" fill-rule="evenodd" d="M14.96 16v-1h-1v-1h-1v-1h-1v-1h-1v-1.001h-1V14h-1v-4-1h5v1h-3v.938h1v.999h1v1h1v1.001h1v1h1V16h-1z" class="cls-5">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="top">
+            <span>
+              <svg class="symbol symbol-alignTypeTop" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                <path id="path-1" fill-rule="evenodd" d="M14.969 12v-1h-1v-1h-1v7h-1v-7h-1v1h-1v1h-1v-1.062h1V9.937h1v-1h1V8h1v.937h1v1h1v1.001h1V12h-1z" class="cls-5">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="top_right">
+            <span>
+              <svg class="symbol symbol-alignTypeTopRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                <path id="path-1" fill-rule="evenodd" d="M9.969 16v-1h1v-1h1v-1h1v-1h1v-1.001h1V14h1v-4-1h-1-4v1h3v.938h-1v.999h-1v1h-1v1.001h-1v1h-1V16h1z" class="cls-5">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="left">
+            <span>
+              <svg class="symbol symbol-alignTypeLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                <path id="path-1" fill-rule="evenodd" d="M11.469 9.5h-1v1h-1v1h7v1h-7v1h1v1h1v1h-1.063v-1h-1v-1h-1v-1h-.937v-1h.937v-1h1v-1h1v-1h1.063v1z" class="cls-5">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="center">
+            <span>
+              <svg class="symbol symbol-alignTypeCenter" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                <path id="path-1" fill-rule="evenodd" d="M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" class="cls-5">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="right">
+            <span>
+              <svg class="symbol symbol-alignTypeRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                <path id="path-1" fill-rule="evenodd" d="M12.469 14.5h1v-1h1v-1h-7v-1h7v-1h-1v-1h-1v-1h1.062v1h1v1h1v1h.938v1h-.938v1h-1v1h-1v1h-1.062v-1z" class="cls-5">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="bottom_left">
+            <span>
+              <svg class="symbol symbol-alignTypeBottomLeft" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                <path id="path-1" fill-rule="evenodd" d="M14.969 9v1h-1v1h-1v1h-1v1h-1v1.001h-1V11h-1v5h5v-1h-3v-.938h1v-.999h1v-1h1v-1.001h1v-1h1V9h-1z" class="cls-5">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="bottom">
+            <span>
+              <svg class="symbol symbol-alignTypeBottom" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                <path id="path-1" fill-rule="evenodd" d="M9.969 13v1h1v1h1V8h1v7h1v-1h1v-1h1v1.063h-1v.999h-1v1.001h-1V17h-1v-.937h-1v-1.001h-1v-.999h-1V13h1z" class="cls-5">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="bottom_right">
+            <span>
+              <svg class="symbol symbol-alignTypeBottomRight" width="24" height="24" preserveAspectRatio="xMidYMid" viewBox="0 0 24 24">
+                <path id="path-1" fill-rule="evenodd" d="M9.969 9v1h1v1h1v1h1v1h1v1.001h1V11h1v5h-1-4v-1h3v-.938h-1v-.999h-1v-1h-1v-1.001h-1v-1h-1V9h1z" class="cls-5">
+                </path>
+              </svg>
+            </span>
+          </label>
+        </div><?php // sek-bg-pos-wrapper ?>
     <?php
 }
 
@@ -1499,7 +1554,8 @@ function sek_register_modules() {
         'sek_module_picker_module',
         //'sek_section_picker_module',
         'sek_level_bg_border_module',
-        'sek_level_section_layout_height_module',
+        'sek_level_section_layout_module',
+        'sek_level_height_module',
         'sek_spacing_module',
         //'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
@@ -1538,8 +1594,9 @@ function sek_get_module_params_for_sek_module_picker_module() {
             'item-inputs' => array(
                 'module_id' => array(
                     'input_type'  => 'module_picker',
-                    'title'       => __('Pick a module', 'text_domain_to_be_replaced'),
-                    'width-100'   => true
+                    'title'       => __('Drag and drop modules in the previewed page', 'text_domain_to_be_replaced'),
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
                 )
             )
         )
@@ -1807,7 +1864,7 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
             //2) the block overlay
             //3) the add content button
             if ( is_customize_preview() ) {
-                $first_child_selector .= ':not(.ui-resizable-handle):not(.sek-block-overlay):not(.sek-add-content-button)';
+                $first_child_selector .= ':not(.ui-resizable-handle):not(.sek-dyn-ui-wrapper):not(.sek-add-content-button)';
             }
             $rules[]     = array(
                 'selector' => $first_child_selector,
@@ -1936,10 +1993,10 @@ function sek_add_css_rules_for_bg_border_boxshadow( array $rules, array $level )
  *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_level_section_layout_height_module() {
+function sek_get_module_params_for_sek_level_section_layout_module() {
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'sek_level_section_layout_height_module',
+        'module_type' => 'sek_level_section_layout_module',
 
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -1962,6 +2019,24 @@ function sek_get_module_params_for_sek_level_section_layout_height_module() {
                     'max' => 1600,
                     'unit' => 'px'
                 ),*/
+            )
+        )//tmpl
+    );
+}
+?><?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_level_height_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_level_height_module',
+
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
                 'height-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Height : fit to screen or custom', 'text_domain_to_be_replaced'),
@@ -1993,19 +2068,19 @@ function sek_get_module_params_for_sek_level_section_layout_height_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_section_layout_height', 10, 3 );
-function sek_add_css_rules_for_section_layout_height( array $rules, array $level ) {
+add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_level_height', 10, 3 );
+function sek_add_css_rules_for_level_height( array $rules, array $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    if ( empty( $options[ 'layout_height' ] ) )
+    if ( empty( $options[ 'height' ] ) )
       return $rules;
 
-    if ( empty( $options[ 'layout_height' ][ 'height-type' ] ) )
+    if ( empty( $options[ 'height' ][ 'height-type' ] ) )
       return $rules;
 
-    if ( 'fit-to-screen' == $options[ 'layout_height' ][ 'height-type' ] ) {
+    if ( 'fit-to-screen' == $options[ 'height' ][ 'height-type' ] ) {
         $height = '100';
     }
-    elseif ( 'custom' == $options[ 'layout_height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'layout_height' ] ) && FALSE !== $height_value = filter_var( $options[ 'layout_height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
+    elseif ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) && FALSE !== $height_value = filter_var( $options[ 'height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
                 array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
         $height = $height_value;
     }
@@ -2047,7 +2122,7 @@ function sek_get_module_params_for_sek_spacing_module() {
                         'inputs' => array(
                             'desktop_pad_marg' => array(
                                 'input_type'  => 'spacing',
-                                'title'       => __('Set padding and margin for Desktop', 'text_domain_to_be_replaced'),
+                                'title'       => __('Set padding and margin for desktops', 'text_domain_to_be_replaced'),
                                 'title_width' => 'width-100',
                                 'width-100'   => true,
                                 'default'     => array()
@@ -2304,7 +2379,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => '',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true,
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'title_width' => 'width-100'
                             ),//"#000000",
                             'important_css'       => array(
                                 'input_type'  => 'gutencheck',
@@ -2333,14 +2409,17 @@ function sek_get_module_params_for_czr_image_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_image_module',
-
+        'starting_value' => array(
+            'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'img' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_domain_to_be_replaced')
+                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
+                    'default'     => ''
                 ),
                 'img-size' => array(
                     'input_type'  => 'select',
@@ -2356,27 +2435,31 @@ function sek_get_module_params_for_czr_image_module() {
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Link to', 'text_domain_to_be_replaced')
+                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'default'     => 'no-link'
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced')
+                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced')
+                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced')
+                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'default'     => false
                 ),
-                'lightbox' => array(
-                    'input_type'  => 'gutencheck',
-                    'title'       => __('Activate a lightbox on click', 'text_domain_to_be_replaced'),
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                    'default'     => 'center'
-                ),
+                // 'lightbox' => array(
+                //     'input_type'  => 'gutencheck',
+                //     'title'       => __('Activate a lightbox on click', 'text_domain_to_be_replaced'),
+                //     'title_width' => 'width-80',
+                //     'input_width' => 'width-20',
+                //     'default'     => 'center'
+                // ),
             )
         ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",
@@ -4058,19 +4141,24 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <# //console.log( 'data', data ); #>
                   <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                     <div class="sek-add-content-button-wrapper">
-                      <button title="<?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?> <# if ( data.location ) { #>( hook : {{data.location}} )<# } #>" data-sek-action="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
-                        <span class="sek-action-button-icon sek-action">+</span><span class="action-button-text"><?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?></span>
+                      <button title="<?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?> <# if ( data.location ) { #>( hook : {{data.location}} )<# } #>" data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
+                        <span class="sek-click-on-button-icon sek-click-on">+</span><span class="action-button-text"><?php _e('Insert content here', 'text_domain_to_be_replaced' ); ?></span>
                       </button>
                     </div>
                   </div>
               </script>
 
-              <script type="text/html" id="sek-tmpl-overlay-ui-section">
+              <?php
+                  $icon_right_side_class = is_rtl() ? 'sek-dyn-left-icons' : 'sek-dyn-right-icons';
+                  $icon_left_side_class = is_rtl() ? 'sek-dyn-right-icons' : 'sek-dyn-left-icons';
+              ?>
+
+              <script type="text/html" id="sek-dyn-ui-tmpl-section">
                   <?php //<# console.log( 'data', data ); #> ?>
                   <# //console.log( 'data', data ); #>
-                  <div class="sek-block-overlay sek-section-overlay">
-                    <div class="sek-block-overlay-header">
-                      <div class="sek-block-overlay-actions">
+                  <div class="sek-dyn-ui-wrapper sek-section-dyn-ui">
+                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
+                      <div class="sek-dyn-ui-icons">
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
                         <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
@@ -4078,15 +4166,17 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <# if ( ! data.is_last_possible_section ) { #>
                           <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Move section', 'sek-builder' ); ?>"></i>
                         <# } #>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Section options', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="fas fa-cogs sek-click-on" title="<?php _e( 'Section options', 'sek-builder' ); ?>"></i>
                         <# if ( data.can_have_more_columns ) { #>
-                          <i data-sek-action="add-column" class="fas fa-plus-circle sek-action" title="<?php _e( 'Add Column', 'sek-builder' ); ?>"></i>
+                          <i data-sek-click-on="add-column" class="fas fa-plus-circle sek-click-on" title="<?php _e( 'Add Column', 'sek-builder' ); ?>"></i>
                         <# } #>
-                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate section', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove section', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="duplicate" class="far fa-clone sek-click-on" title="<?php _e( 'Duplicate section', 'sek-builder' ); ?>"></i>
                       </div>
-
-                      <div class="sek-clear"></div>
+                    </div>
+                    <div class="sek-dyn-ui-inner sek-dyn-right-icons">
+                      <div class="sek-dyn-ui-icons">
+                        <i data-sek-click-on="remove" class="far fa-trash-alt sek-click-on" title="<?php _e( 'Remove section', 'sek-builder' ); ?>"></i>
+                      </div>
                     </div>
                     <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
@@ -4094,34 +4184,37 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   </div>
               </script>
 
-              <script type="text/html" id="sek-tmpl-overlay-ui-column">
+              <script type="text/html" id="sek-dyn-ui-tmpl-column">
                   <?php //<# console.log( 'data', data ); #> ?>
-                  <div class="sek-block-overlay sek-column-overlay">
-                    <div class="sek-block-overlay-header">
-                      <div class="sek-block-overlay-actions">
+                  <div class="sek-dyn-ui-wrapper sek-column-dyn-ui">
+                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
+                      <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Columns options', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="<?php _e( 'Add Module', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="fas fa-cogs sek-click-on" title="<?php _e( 'Columns options', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="pick-module" class="fas fa-plus-circle sek-click-on" title="<?php _e( 'Add Module', 'sek-builder' ); ?>"></i>
                         <# if ( data.parent_can_have_more_columns ) { #>
-                          <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate column', 'sek-builder' ); ?>"></i>
+                          <i data-sek-click-on="duplicate" class="far fa-clone sek-click-on" title="<?php _e( 'Duplicate column', 'sek-builder' ); ?>"></i>
                         <# } #>
                         <# if ( ! data.parent_is_last_allowed_nested ) { #>
-                          <i data-sek-action="add-section" class="fas far fa-plus-square sek-action" title="<?php _e( 'Add Sektion', 'sek-builder' ); ?>"></i>
-                        <# } #>
-                        <# if ( ! data.parent_is_single_column ) { #>
-                          <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove column', 'sek-builder' ); ?>"></i>
+                          <i data-sek-click-on="add-section" class="fas far fa-plus-square sek-click-on" title="<?php _e( 'Add a nested section', 'sek-builder' ); ?>"></i>
                         <# } #>
                       </div>
-                      <div class="sek-clear"></div>
                     </div>
+                    <# if ( ! data.parent_is_single_column ) { #>
+                    <div class="sek-dyn-ui-inner sek-dyn-right-icons">
+                      <div class="sek-dyn-ui-icons">
+                          <i data-sek-click-on="remove" class="far fa-trash-alt sek-click-on" title="<?php _e( 'Remove column', 'sek-builder' ); ?>"></i>
+                      </div>
+                    </div>
+                    <# } #>
                     <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
                   </div>
               </script>
 
-              <script type="text/html" id="sek-tmpl-overlay-ui-module">
-                  <div class="sek-block-overlay sek-module-overlay">
+              <script type="text/html" id="sek-dyn-ui-tmpl-module">
+                  <div class="sek-dyn-ui-wrapper sek-module-dyn-ui">
                     <div class="editor-block-settings-menu"><?php // add class  is-visible on hover ?>
                       <div>
                         <div>
@@ -4134,20 +4227,23 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         </div>
                       </div>
                     </div><?php // .editor-block-settings-menu ?>
-                    <div class="sek-block-overlay-header">
-                      <div class="sek-block-overlay-actions">
+                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
+                      <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="edit-module" class="fas fa-pencil-alt sek-tip sek-action" title="<?php _e( 'Edit Module', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="edit-options" class="fas fa-cogs sek-action" title="<?php _e( 'Module options', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="duplicate" class="far fa-clone sek-action" title="<?php _e( 'Duplicate module', 'sek-builder' ); ?>"></i>
-                        <i data-sek-action="remove" class="far fa-trash-alt sek-action" title="<?php _e( 'Remove module', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit Module', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="fas fa-cogs sek-click-on" title="<?php _e( 'Module options', 'sek-builder' ); ?>"></i>
+                        <i data-sek-click-on="duplicate" class="far fa-clone sek-click-on" title="<?php _e( 'Duplicate module', 'sek-builder' ); ?>"></i>
                       </div>
-                      <div class="sek-clear"></div>
+                    </div>
+                    <div class="sek-dyn-ui-inner sek-dyn-right-icons">
+                      <div class="sek-dyn-ui-icons">
+                        <i data-sek-click-on="remove" class="far fa-trash-alt sek-click-on" title="<?php _e( 'Remove module', 'sek-builder' ); ?>"></i>
+                      </div>
                     </div>
                     <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
-                  </div><?php // .sek-block-overlay-header ?>
+                  </div><?php // .sek-dyn-ui-inner ?>
               </script>
             <?php
         }
@@ -4173,11 +4269,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
-            // add_filter( 'template_include', function( $template ) {
-            //       // error_log( 'TEMPLATE ? => ' . $template );
-            //       // error_log( 'DID_ACTION WP => ' . did_action('wp') );
-            //       return dirname( __FILE__ ). "/tmpl/page-templates/full-width.php";// $template;
-            // });
+            add_filter( 'template_include', function( $template ) {
+                  // error_log( 'TEMPLATE ? => ' . $template );
+                  // error_log( 'DID_ACTION WP => ' . did_action('wp') );
+                  return NIMBLE_BASE_PATH. "/tmpl/page-templates/full-width.php";// $template;
+            });
         }
 
         // hook : loop_start, loop_end
@@ -4236,8 +4332,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // error_log( '</LEVEL MODEL IN ::RENDER()>');
             // Is it the root level ?
             // The root level has no id and no level entry
+            if ( ! is_array( $model ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a model must be an array', $model );
+                return;
+            }
             if ( ! array_key_exists( 'level', $model ) || ! array_key_exists( 'id', $model ) ) {
-                error_log( 'render => a level model is missing the level or the id property' );
+                error_log( '::render() => a level model is missing the level or the id property' );
                 return;
             }
             $id = $model['id'];
@@ -4272,7 +4372,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $is_nested            = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
                     $column_container_class = 'sek-container-fluid';
                     //when boxed use proper container class
-                    if ( ! empty( $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout_height' ][ 'boxed-wide' ] ) {
+                    if ( ! empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
                       $column_container_class = 'sek-container';
                     }
                     ?>
@@ -4316,11 +4416,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         // if at least one module, the sek-drop-zone is the .sek-column-inner wrapper ?>
                         <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
                             <?php
-                              if ( empty( $collection ) ) {
+                              if ( skp_is_customizing() && empty( $collection ) ) {
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
-                                      <i data-sek-action="pick-module" class="fas fa-plus-circle sek-action" title="Add Module"></i>
+                                      <i data-sek-click-on="pick-module" class="fas fa-plus-circle sek-click-on" title="Add Module"></i>
                                     </div>
                                   </div>
                                   <?php
@@ -4342,8 +4442,23 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 break;
 
                 case 'module' :
+                    if ( empty( $model['module_type'] ) ) {
+                        sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => missing module_type for a module', $model );
+                        break;
+                    }
+                    $module_type = $model['module_type'];
+
+                    // Prepare the module value with the defaults
+                    $default_value_model  = sek_get_default_module_model( $module_type );//walk the registered modules tree and generates the module default if not already cached
+                    $model['value'] = ( ! empty( $model['value'] ) && is_array( $model['value'] ) ) ? $model['value'] : array();
+                    $model['value'] = wp_parse_args( $model['value'], $default_value_model );
+
+                    //sek_error_log( __FUNCTION__ , $model['value'] );
+
+                    // update the current cached model
+                    $this -> model = $model;
                     ?>
-                      <div data-sek-level="module" data-sek-id="<?php echo $id; ?>" class="sek-module">
+                      <div data-sek-level="module" data-sek-id="<?php echo $id; ?>" data-sek-module-type="<?php echo $module_type; ?>" class="sek-module">
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>
                             </div>
