@@ -1,4 +1,4 @@
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -7,7 +7,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   // Set the skope_id
                   try { this.skope_id = _.findWhere( _wpCustomizeSettings.czr_new_skopes, { skope : 'local' }).skope_id; } catch( _er_ ) {
-                        czrapp.errare('Preview => error when storing the skope_id', _er_ );
+                        this.errare('Preview => error when storing the skope_id', _er_ );
                         return;
                   }
 
@@ -22,7 +22,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
             }
       });//$.extend()
-})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+})( wp.customize, jQuery, _ );//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -166,7 +166,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                       defaults = $.extend( true, {}, self.sortableDefaultParams ),
                       $sortableCandidate = $( '[data-sek-id="' + sektionId + '"]').find('.sek-sektion-inner').first();
                   // if ( $sortableCandidate.children('[data-sek-level="column"]').length > 11 ) {
-                  //       czrapp.errare('12 COLUMNS');
+                  //       self.errare('12 COLUMNS');
                   //       return;
                   // }
                   $sortableCandidate.sortable( _.extend( defaults, {
@@ -176,7 +176,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               $targetSektionCandidate = ui.item.closest('[data-sek-level="section"]');
                               if ( $targetSektionCandidate.length > 0 && $targetSektionCandidate.find('.sek-sektion-inner').first().children('[data-sek-level="column"]').length > 12 ) {
                                     api.preview.send( 'sek-notify', {
-                                          message : sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]
+                                          message : sekPreviewLocalized.i18n["You've reached the maximum number of columns allowed in this section."]
                                     });
                                     return false;
                               } else {
@@ -196,7 +196,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     startOrder.push( $(this).data('sek-id') );
                               });
                               if ( _.isEmpty( startOrder ) ) {
-                                    czrapp.errare( 'column sortable => startOrder should not be empty' );
+                                    self.errare( 'column sortable => startOrder should not be empty' );
                                     return;
                               }
                               //console.log('column moved from', from_sektion, ui );
@@ -211,7 +211,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     newOrder.push( $(this).data('sek-id') );
                               });
                               if ( _.isEmpty( newOrder ) ) {
-                                    czrapp.errare( 'column sortable =>  newOrder should not be empty' );
+                                    self.errare( 'column sortable =>  newOrder should not be empty' );
                                     return;
                               }
                               // console.log('ALORS SEKTIONS ?: ', to_sektion, from_sektion );
@@ -219,7 +219,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                               // don't send anything if the source and target columns are the same, and the order is unchanged
                               if ( _.isEqual( newOrder, startOrder ) && to_sektion === from_sektion ) {
-                                    czrapp.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
+                                    self.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
                                     return;
                               }
                               api.preview.send( 'sek-move', {
@@ -267,7 +267,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     startOrder.push( $(this).data('sek-id') );
                               });
                               if ( _.isEmpty( startOrder ) ) {
-                                    czrapp.errare( 'makeModulesSortableInColumn => startOrder should not be empty' );
+                                    self.errare( 'makeModulesSortableInColumn => startOrder should not be empty' );
                                     return;
                               }
                               //console.log('column moved from', from_sektion, ui );
@@ -282,7 +282,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     newOrder.push( $(this).data('sek-id') );
                               });
                               if ( _.isEmpty( newOrder ) ) {
-                                    czrapp.errare( 'makeModulesSortableInColumn => newOrder should not be empty' );
+                                    self.errare( 'makeModulesSortableInColumn => newOrder should not be empty' );
                                     return;
                               }
                               // console.log('ALORS COLUMNS ?: ', to_column, from_column );
@@ -290,7 +290,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                               // don't send anything if the source and target columns are the same, and the order is unchanged
                               if ( _.isEqual( newOrder, startOrder ) && to_column === from_column ) {
-                                    czrapp.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
+                                    self.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
                                     return;
                               }
                               api.preview.send( 'sek-move', {
@@ -309,7 +309,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   }));
             },//makeModulesSortableInColumn
       });//$.extend()
-})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+})( wp.customize, jQuery, _ );//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -441,7 +441,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
       });//$.extend()
 })( wp.customize, jQuery, _ );
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -598,7 +598,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         clearTimeout( $.data( this, '_scroll_move_timer_') );
                         $.data( this, '_scroll_move_timer_', setTimeout(function() {
                               self.mouseMovedRecently.set( {} );
-                        }, 2000 ) );
+                        }, 4000 ) );
                   }, 50 ) );
 
                   // Always remove when a dragging action is started
@@ -614,7 +614,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // }
       });//$.extend()
 })( wp.customize, jQuery, _ );
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -675,7 +675,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     if ( 1 > $closestLevelWrapper.length ) {
                                         throw new Error( 'ERROR => sek-front-preview => No valid level dom element found' );
                                     }
-                                    _action = $el.data('sek-click-on');
+                                    _action = $el.closest('[data-sek-click-on]').data('sek-click-on');
 
                                     if ( _.isEmpty( _action ) ) {
                                         throw new Error( 'Invalid action' );
@@ -743,7 +743,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             }
       });//$.extend()
 })( wp.customize, jQuery, _ );
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -768,7 +768,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                     self.ajaxRefreshModulesAndNestedSections( params );
                                               } else {
                                                     if ( _.isEmpty( removeCandidateId ) || 1 > $candidateEl.length ) {
-                                                          czrapp.errare( 'reactToPanelMsg => sek-remove => invalid candidate id => ', removeCandidateId );
+                                                          self.errare( 'reactToPanelMsg => sek-remove => invalid candidate id => ', removeCandidateId );
                                                     }
                                                     $( '.sektion-wrapper').find( $candidateEl ).remove();
                                               }
@@ -820,20 +820,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             //   id : params.id
                             // }
                             'sek-refresh-level' : function( params ) {
-
-                                  czrapp.doAjax( {
+                                  self.doAjax( {
                                         skope_id : params.skope_id,
                                         action : 'sek_get_content',
                                         id : params.apiParams.id,
                                         level : params.apiParams.level,
                                         sek_action : params.apiParams.action
                                   }).fail( function( _r_ ) {
-                                        czrapp.errare( 'ERROR reactToPanelMsg => sek-refresh-level => ' , _r_ );
+                                        self.errare( 'ERROR reactToPanelMsg => sek-refresh-level => ' , _r_ );
                                   }).done( function( _r_ ) {
                                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.id + '"></span>',
                                             $currentLevelEl = $( 'div[data-sek-id="' + params.apiParams.id + '"]' );
                                         if ( $currentLevelEl.length < 1 ) {
-                                              czrapp.errare( 'reactToPanelMsg => sek-refresh-level ajax done => the level to refresh is not rendered in the page', _r_ );
+                                              self.errare( 'reactToPanelMsg => sek-refresh-level ajax done => the level to refresh is not rendered in the page', _r_ );
                                               return;
                                         }
                                         $currentLevelEl.before( placeholderHtml );
@@ -1047,20 +1046,20 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           $.when( callbackFn( params ) ).done( function() {
                                                 api.preview.send( [ msgId, 'done'].join('_'), params );
                                           }).fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sektionsLocalizedData.i18n['Something went wrong, please refresh this page.'] });
+                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
                                           });
                                     } catch( _er_ ) {
-                                          czrapp.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
+                                          self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
                                     }
                               } else {
                                     try {
                                           $.when( self[callbackFn].call( self, params ) ).done( function() {
                                                 api.preview.send( [ msgId, 'done'].join('_'), params );
                                           }).fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sektionsLocalizedData.i18n['Something went wrong, please refresh this page.'] });
+                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
                                           });
                                     } catch( _er_ ) {
-                                          czrapp.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
+                                          self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
                                     }
                               }
 
@@ -1070,7 +1069,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             }//schedulePanelMsgReactions()
       });//$.extend()
 })( wp.customize, jQuery, _ );
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -1078,7 +1077,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // @return a promise()
             ajaxAddSektion : function( params ) {
                   var self = this;
-                  return czrapp.doAjax( {
+                  return self.doAjax( {
                         action : 'sek_get_content',
                         id : params.apiParams.id,
                         in_sektion : params.apiParams.in_sektion,
@@ -1093,7 +1092,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         if ( params.apiParams.is_nested ) {
                               $parentColumn = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_column + '"]' );
                               if ( 1 > $parentColumn.length ) {
-                                    czrapp.errare( 'preview => reactToPanelMsg => sek-add-column => no DOM node for parent column => ', params.apiParams.in_column );
+                                    self.errare( 'preview => reactToPanelMsg => sek-add-column => no DOM node for parent column => ', params.apiParams.in_column );
                               }
                               var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.in_column + '"></span>';
                               $parentColumn.before( placeholderHtml );
@@ -1149,13 +1148,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         }
                         $( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger('sek-section-added', params );
                   }).fail( function( _r_ ) {
-                        czrapp.errare( 'ERROR in sek_get_html_for_injection ? ' , _r_ );
+                        self.errare( 'ERROR in sek_get_html_for_injection ? ' , _r_ );
                   });
             }//ajaxAddSektion()
 
       });//$.extend()
 })( wp.customize, jQuery, _ );
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -1165,7 +1164,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             ajaxRefreshColumns : function( params ) {
                   //console.log('PARAMS in ajaxRefreshColumns', params );
                   var self = this;
-                  return czrapp.doAjax( {
+                  return self.doAjax( {
                         action : 'sek_get_content',
                         id : params.apiParams.id,
                         in_sektion : params.apiParams.in_sektion,
@@ -1174,7 +1173,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   }).done( function( _r_ ) {
                         var $parentSektion = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' );
                         if ( 1 > $parentSektion.length ) {
-                              czrapp.errare( 'reactToPanelMsg => ' + params.apiParams.action + ' => no DOM node for parent sektion => ', params.apiParams.in_sektion );
+                              self.errare( 'reactToPanelMsg => ' + params.apiParams.action + ' => no DOM node for parent sektion => ', params.apiParams.in_sektion );
                         }
                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.in_sektion + '"></span>';
                         $parentSektion.before( placeholderHtml );
@@ -1185,7 +1184,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
                         // re-generate the stylesheet => this will take into account the reset width of each column
-                        czrapp.doAjax( {
+                        self.doAjax( {
                               action : 'sek_get_content',
                               skope_id : params.skope_id,
                               sek_action : 'sek-refresh-stylesheet'// sek-add-column
@@ -1200,7 +1199,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         //=> will be listened to by the column to re-instantiate sortable, resizable
                         $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
                   }).fail( function( _r_ ) {
-                        czrapp.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
+                        self.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
                   });
             },//ajaxRefreshColumns()
 
@@ -1208,14 +1207,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             ajaxResizeColumns : function( params ) {
                   //console.log('PREVIEW => REACT TO PANEL MSG => sek-resize-columns => ', params );
                   var self = this;
-                  return czrapp.doAjax( {
+                  return self.doAjax( {
                         action : 'sek_get_content',
                         resized_column : params.apiParams.resized_column,
                         sister_column : params.apiParams.sister_column,
                         skope_id : params.skope_id,
                         sek_action : 'sek-resize-columns'
                   }).done( function( _r_ ) {
-                        //czrapp.errare('sek-preview => resize-column ajax response => ', _r_.data );
+                        //self.errare('sek-preview => resize-column ajax response => ', _r_.data );
                         // Reset the automatic default resizable inline styling
                         $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.resized_column + '"]' ).css({
                               width : '',
@@ -1225,12 +1224,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         //Append
                         self.appendDynStyleSheet( params.skope_id, _r_.data );
                   }).fail( function( _r_ ) {
-                        czrapp.errare( 'ERROR reactToPanelMsg => sek-resize-columns => ' , _r_ );
+                        self.errare( 'ERROR reactToPanelMsg => sek-resize-columns => ' , _r_ );
                   });
             }
       });//$.extend()
 })( wp.customize, jQuery, _ );
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -1239,7 +1238,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
               // 2) re-render the module collection in a column, typically after a sortable move, or a module removal
               ajaxRefreshModulesAndNestedSections : function( params ) {
                     var self = this;
-                    return czrapp.doAjax( {
+                    return self.doAjax( {
                           action : 'sek_get_content',
                           id : params.apiParams.id,
                           in_sektion : params.apiParams.in_sektion,
@@ -1250,7 +1249,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                     }).done( function( _r_ ) {
                           var $parentColumn = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_column + '"]' );
                           if ( 1 > $parentColumn.length ) {
-                                czrapp.errare( 'reactToPanelMsg => ajaxRefreshModulesAndNestedSections => no DOM node for parent column => ', params.apiParams.in_column );
+                                self.errare( 'reactToPanelMsg => ajaxRefreshModulesAndNestedSections => no DOM node for parent column => ', params.apiParams.in_column );
                           }
                           var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.in_column + '"></span>';
                           $parentColumn.before( placeholderHtml );
@@ -1264,19 +1263,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_column + '"]' ).trigger('sek-modules-refreshed');
 
                     }).fail( function( _r_ ) {
-                          czrapp.errare( 'ERROR reactToPanelMsg => sek-add-module => ' , _r_ );
+                          self.errare( 'ERROR reactToPanelMsg => sek-add-module => ' , _r_ );
                     });
               }//ajaxRefreshModulesAndNestedSections()
       });//$.extend()
 })( wp.customize, jQuery, _ );
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
             ajaxRefreshStylesheet : function( params ) {
                   var self = this;
                   //console.log('preview => panel react => ajax refresh dyn style', params );
-                  return czrapp.doAjax( {
+                  return self.doAjax( {
                         action : 'sek_get_content',
                         skope_id : params.skope_id,
                         sek_action : 'sek-refresh-stylesheet'
@@ -1284,7 +1283,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         //console.log('sek-refresh-stylesheet done !',  _r_.data);
                         self.appendDynStyleSheet( params.skope_id, _r_.data );
                   }).fail( function( _r_ ) {
-                        czrapp.errare('sek-refresh-stylesheet fail !');
+                        self.errare('sek-refresh-stylesheet fail !');
                   });
             },
 
@@ -1304,19 +1303,20 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                 $('head').append( styleMarkup );
                 // if we have something to print ( styleMarkup not empty ), there should be a dom element
                 if ( ! _.isEmpty( styleMarkup ) && 1 > $('head').find( _stylesheet_id_ ).length ) {
-                      czrapp.errare( 'sek-preview => problem when printing the dynamic inline style for : '+ _stylesheet_id_ );
+                      this.errare( 'sek-preview => problem when printing the dynamic inline style for : '+ _stylesheet_id_ );
                 } else {
                       $('head').find( _stylesheet_id_ ).attr('sek-data-origin', 'customizer' );
                 }
             }//appendDynStyleSheet()
       });//$.extend()
 })( wp.customize, jQuery, _ );
-//global sektionsLocalizedData
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
             // inspired from wp.template in wp-includes/js/wp-util.js
             parseTemplate : _.memoize(function ( id ) {
+                  var self = this;
                   var compiled,
                     /*
                      * Underscore's default ERB-style templates are incompatible with PHP
@@ -1333,26 +1333,130 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   return function ( data ) {
                         if ( $( id ).length < 1 ) {
-                            czrapp.errare( 'preview => parseTemplate => the requested tmpl does not exist =>' + id );
+                            self.errare( 'preview => parseTemplate => the requested tmpl does not exist =>' + id );
                             return '';
                         }
                         try { compiled = compiled || _.template( $( id ).html(),  options );} catch( _er_ ) {
-                              czrapp.errare( 'preview => parseTemplate => problem when parsing tmpl =>' + id, _er_ );
+                              self.errare( 'preview => parseTemplate => problem when parsing tmpl =>' + id, _er_ );
                         }
                         return compiled( data );
                   };
             }),
+
+
+
+            //@return [] for console method
+            //@bgCol @textCol are hex colors
+            //@arguments : the original console arguments
+            _prettyPrintLog : function( args ) {
+                  var _defaults = {
+                        bgCol : '#5ed1f5',
+                        textCol : '#000',
+                        consoleArguments : []
+                  };
+                  args = _.extend( _defaults, args );
+
+                  var _toArr = Array.from( args.consoleArguments ),
+                      _truncate = function( string ){
+                            if ( ! _.isString( string ) )
+                              return '';
+                            return string.length > 300 ? string.substr( 0, 299 ) + '...' : string;
+                      };
+
+                  //if the array to print is not composed exclusively of strings, then let's stringify it
+                  //else join(' ')
+                  if ( ! _.isEmpty( _.filter( _toArr, function( it ) { return ! _.isString( it ); } ) ) ) {
+                        _toArr =  JSON.stringify( _toArr.join(' ') );
+                  } else {
+                        _toArr = _toArr.join(' ');
+                  }
+                  return [
+                        '%c ' + _truncate( _toArr ),
+                        [ 'background:' + args.bgCol, 'color:' + args.textCol, 'display: block;' ].join(';')
+                  ];
+            },
+
+            _wrapLogInsideTags : function( title, msg, bgColor ) {
+                  //fix for IE, because console is only defined when in F12 debugging mode in IE
+                  if ( ( _.isUndefined( console ) && typeof window.console.log != 'function' ) )
+                    return;
+                  if ( sekPreviewLocalized.isDevMode ) {
+                        if ( _.isUndefined( msg ) ) {
+                              console.log.apply( console, this._prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ '<' + title + '>' ] } ) );
+                        } else {
+                              console.log.apply( console, this._prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ '<' + title + '>' ] } ) );
+                              console.log( msg );
+                              console.log.apply( console, this._prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ '</' + title + '>' ] } ) );
+                        }
+                  } else {
+                        console.log.apply( console, _prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ title ] } ) );
+                  }
+            },
+
+            errare : function( title, msg ) { this._wrapLogInsideTags( title, msg, '#ffd5a0' ); },
+            infoLog : function( title, msg ) { this._wrapLogInsideTags( title, msg, '#5ed1f5' ); },
+
+            //encapsulates a WordPress ajax request in a normalize method
+            //@param queryParams = {}
+            doAjax : function( queryParams ) {
+                  var self = this;
+                  //do we have a queryParams ?
+                  queryParams = queryParams || ( _.isObject( queryParams ) ? queryParams : {} );
+
+                  var ajaxUrl = queryParams.ajaxUrl || sekPreviewLocalized.ajaxUrl,//the ajaxUrl can be specified when invoking doAjax
+                      nonce = sekPreviewLocalized.frontNonce,//{ 'id' => 'HuFrontNonce', 'handle' => wp_create_nonce( 'hu-front-nonce' ) },
+                      dfd = $.Deferred(),
+                      _query_ = _.extend( {
+                                  action : '',
+                                  withNonce : false
+                            },
+                            queryParams
+                      );
+
+                  // HTTP ajaxurl when site is HTTPS causes Access-Control-Allow-Origin failure in Desktop and iOS Safari
+                  if ( "https:" == document.location.protocol ) {
+                        ajaxUrl = ajaxUrl.replace( "http://", "https://" );
+                  }
+
+                  //check if we're good
+                  if ( _.isEmpty( _query_.action ) || ! _.isString( _query_.action ) ) {
+                        self.errare( 'self.doAjax : unproper action provided' );
+                        return dfd.resolve().promise();
+                  }
+                  //setup nonce
+                  //Note : the nonce might be checked server side ( not in all cases, only when writing in db )  with check_ajax_referer( 'hu-front-nonce', 'HuFrontNonce' )
+                  _query_[ nonce.id ] = nonce.handle;
+                  if ( ! _.isObject( nonce ) || _.isUndefined( nonce.id ) || _.isUndefined( nonce.handle ) ) {
+                        self.errare( 'self.doAjax : unproper nonce' );
+                        return dfd.resolve().promise();
+                  }
+
+                  $.post( ajaxUrl, _query_ )
+                        .done( function( _r ) {
+                              // Check if the user is logged out.
+                              if ( '0' === _r ||  '-1' === _r || false === _r.success ) {
+                                    self.errare( 'self.doAjax : done ajax error for action : ' + _query_.action , _r );
+                                    dfd.reject( _r );
+                              }
+                              dfd.resolve( _r );
+                        })
+                        .fail( function( _r ) {
+                              self.errare( 'self.doAjax : failed ajax error for : ' + _query_.action, _r );
+                              dfd.reject( _r );
+                        });
+                        //.always( function( _r ) { dfd.resolve( _r ); });
+                  return dfd.promise();
+            }//doAjax
       });//$.extend()
-})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+})( wp.customize, jQuery, _ );//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 (function( api, $, _ ) {
       $.extend( SekPreviewPrototype, api.Events );
       var SekPreviewConstructor   = api.Class.extend( SekPreviewPrototype );
-
       api.bind( 'preview-ready', function(){
               api.preview.bind( 'active', function() {
                   try { api.sekPreview = new SekPreviewConstructor(); } catch( _er_ ) {
-                        czrapp.errare( 'SekPreviewConstructor => problem on instantiation', _er_ );
+                        SekPreviewPrototype.errare( 'SekPreviewConstructor => problem on instantiation', _er_ );
                   }
             });
       });

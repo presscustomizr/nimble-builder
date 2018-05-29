@@ -1374,7 +1374,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         case 'sek-generate-level-options-ui' :
                               // Generate the UI for level options
-                              console.log("PARAMS IN sek-generate-level-options-ui", params );
+                              //console.log("PARAMS IN sek-generate-level-options-ui", params );
                               var sectionLayoutOptionsSetId = params.id + '__sectionLayout_options',
                                   bgBorderOptionsSetId = params.id + '__bgBorder_options',
                                   heightOptionsSetId = params.id + '__height_options',
@@ -1979,8 +1979,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 is_nested : true
                                           });
                                     } else {
-                                          console.log('UPDATE API SETTING SEK ADD SECTION', params );
-
                                           locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                           if ( 'no_match' == locationCandidate ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
@@ -3125,7 +3123,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return {}
             getDefaultItemModelFromRegisteredModuleData : function( moduleType ) {
                   if ( ! this.isModuleRegistered( moduleType ) ) {
-                      return {};
+                        return {};
                   }
                   var data = sektionsLocalizedData.registeredModules[ moduleType ]['tmpl']['item-inputs'],
                       defaultItemModem = {},
@@ -3148,6 +3146,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return defaultItemModem;
             },
 
+            //@return mixed
+            getRegisteredModuleProperty : function( moduleType, property ) {
+                  if ( ! this.isModuleRegistered( moduleType ) ) {
+                        return 'not_set';
+                  }
+                  return sektionsLocalizedData.registeredModules[ moduleType ][ property ];
+            },
 
             // @return boolean
             isModuleRegistered : function( moduleType ) {
@@ -3648,10 +3653,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // make sure we clean the previous wrapper of the pre drop element
                   this.dnd_cleanSingleDropTarget( this.$currentPreDropTarget );
-
+                  var inNewSection = 'between-sections' === $dropTarget.data('sek-location') || 'in-empty-location' === $dropTarget.data('sek-location');
                   $.when( self.preDropElement.remove() ).done( function(){
                         $dropTarget[ 'before' === newPosition ? 'prepend' : 'append' ]( self.preDropElement )
                               .find( '.' + sektionsLocalizedData.preDropElementClass ).html( self.dnd_getPreDropElementContent( evt ) );
+                        // Flag the preDrop element with class to apply a specific style if inserted in a new sektion of in a column
+                        $dropTarget.find( '.' + sektionsLocalizedData.preDropElementClass ).toggleClass('in-new-sektion', inNewSection );
                         $dropTarget.data( 'preDrop-position', newPosition );
 
                         self.isPrintingPreDrop = false;
@@ -3679,7 +3686,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
                   // console.log('onDropping params', position, evt );
                   // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
-
                   api.czr_sektions.trigger( 'sek-content-dropped', {
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
@@ -3815,7 +3821,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       $wrapper = $('.sek-spacing-wrapper', input.container );
 
                   // Listen to user actions on the inputs and set the input value
-                  $wrapper.on( 'change', 'input[type="number"]', function(evt) {
+                  $wrapper.on( 'keyup mouseup', 'input[type="number"]', function(evt) {
                         var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
                             _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
                         _newInputVal[ _type_ ] = $(this).val();
@@ -4565,7 +4571,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             sek_level_bg_border_module : {
                   mthds : Constructor,
                   crud : false,
-                  name : 'Background Border Options',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_bg_border_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
@@ -4679,7 +4685,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             sek_level_height_module : {
                   mthds : Constructor,
                   crud : false,
-                  name : 'Height Options',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_height_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
@@ -4747,7 +4753,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             sek_level_section_layout_module : {
                   mthds : Constructor,
                   crud : false,
-                  name : 'Section Layout Options',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_section_layout_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
@@ -4830,7 +4836,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             sek_spacing_module : {
                   mthds : SpacingModuleConstructor,
                   crud : false,
-                  name : 'Spacing',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_spacing_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
@@ -4855,7 +4861,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             sek_module_picker_module : {
                   //mthds : ModulePickerModuleConstructor,
                   crud : false,
-                  name : 'Module Picker',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_module_picker_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel :  _.extend(
@@ -5039,7 +5045,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             czr_image_module : {
                   mthds : ImageModuleConstructor,
                   crud : false,
-                  name : 'Image',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_image_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
@@ -5115,7 +5121,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             czr_tiny_mce_editor_module : {
                   mthds : TinyMceEditorModuleConstructor,
                   crud : false,
-                  name : 'Text Editor',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_tiny_mce_editor_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
