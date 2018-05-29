@@ -16,7 +16,7 @@ if ( ! function_exists( 'sek_get_img_module_img_html') ) {
         $html = '';
         if ( is_int( $value['img'] ) ) {
             $html = wp_get_attachment_image( $value['img'], empty( $value['img-size'] ) ? 'large' : $value['img-size']);
-        } else if ( array_key_exists('img', $value ) && is_string( $value['img'] ) ) {
+        } else if ( ! empty( $value['img'] ) && is_string( $value['img'] ) ) {
             $html = sprintf( '<img alt="default img" src="%1$s"/>', $value['img'] );
         } else {
             //falls back on an icon if previewing
