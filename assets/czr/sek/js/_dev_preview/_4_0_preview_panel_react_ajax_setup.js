@@ -302,7 +302,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           $.when( callbackFn( params ) ).done( function() {
                                                 api.preview.send( [ msgId, 'done'].join('_'), params );
                                           }).fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : '@missi18n Something went wrong, please refresh this page.'});
+                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sektionsLocalizedData.i18n['Something went wrong, please refresh this page.'] });
                                           });
                                     } catch( _er_ ) {
                                           czrapp.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
@@ -312,7 +312,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           $.when( self[callbackFn].call( self, params ) ).done( function() {
                                                 api.preview.send( [ msgId, 'done'].join('_'), params );
                                           }).fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : '@missi18n Something went wrong, please refresh this page.'});
+                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sektionsLocalizedData.i18n['Something went wrong, please refresh this page.'] });
                                           });
                                     } catch( _er_ ) {
                                           czrapp.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );

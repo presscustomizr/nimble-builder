@@ -176,7 +176,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   this.register({
                         what : 'panel',
                         id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
-                        title: '@missi18n Main sektions panel',
+                        title: sektionsLocalizedData.i18n['Nimble Builder'],
                         priority : 1000,
                         constructWith : SektionPanelConstructor,
                         track : false//don't register in the self.registered()

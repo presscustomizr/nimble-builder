@@ -201,21 +201,21 @@
 
                         //add the first option
                         if ( _.isNull( input() ) || _.isEmpty( input() ) ) {
-                              $fontSelectElement.append( '<option value="none" selected="selected">' + '@missi18n Select a font family' + '</option>' );
+                              $fontSelectElement.append( '<option value="none" selected="selected">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
                         } else {
-                              $fontSelectElement.append( '<option value="none">' + '@missi18n Select a font family' + '</option>' );
+                              $fontSelectElement.append( '<option value="none">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
                         }
 
 
                         // generate the cfont and gfont html
                         _.each( [
                               {
-                                    title : '@missi18n Web Safe Fonts',
+                                    title : sektionsLocalizedData.i18n['Web Safe Fonts'],
                                     type : 'cfont',
                                     list : fontCollections.cfonts
                               },
                               {
-                                    title : '@missi18n Google Fonts',
+                                    title : sektionsLocalizedData.i18n['Google Fonts'],
                                     type : 'gfont',
                                     list : fontCollections.gfonts//_googleFontsFilteredBySubset()
                               }

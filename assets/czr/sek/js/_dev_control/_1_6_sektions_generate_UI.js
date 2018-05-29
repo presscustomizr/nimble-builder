@@ -68,7 +68,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level : params.level,
                                           what : 'control',
                                           id : _id_,
-                                          label : 'module' === params.content_type ? '@missi18n Module Picker' : '@missi18n Section Picker',
+                                          label : 'module' === params.content_type ? sektionsLocalizedData.i18n['Module Picker'] : sektionsLocalizedData.i18n['Section Picker'],
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'module' === params.content_type ? 'sek_module_picker_module' : 'sek_section_picker_module',
                                           section : _id_,
@@ -90,7 +90,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.register({
                                     what : 'section',
                                     id : _id_,
-                                    title: 'module' === params.content_type ? '@missi18n Module Picker' : '@missi18n Section Picker',
+                                    title: 'module' === params.content_type ? sektionsLocalizedData.i18n['Module Picker'] : sektionsLocalizedData.i18n['Section Picker'],
                                     panel : sektionsLocalizedData.sektionsPanelId,
                                     priority : 30,
                                     //track : false//don't register in the self.registered()
@@ -184,7 +184,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level : params.level,
                                           what : 'control',
                                           id : params.id,
-                                          label : '@missi18n Module ' + params.id,
+                                          label : sektionsLocalizedData.i18n['Module'] + ' ' + params.id,
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : moduleType,
                                           section : params.id,
@@ -206,7 +206,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.register({
                                     what : 'section',
                                     id : params.id,
-                                    title: '@missi18n Content for ' + api.czrModuleMap[ moduleType ].name,
+                                    title: sektionsLocalizedData.i18n['Content for'] + ' ' + api.czrModuleMap[ moduleType ].name,
                                     panel : sektionsLocalizedData.sektionsPanelId,
                                     priority : 20,
                                     //track : false//don't register in the self.registered()
@@ -295,7 +295,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level_id : params.id,
                                           what : 'control',
                                           id : bgBorderOptionsSetId,
-                                          label : '@missi18n Background and Border',
+                                          label : sektionsLocalizedData.i18n['Background and Border'],
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_level_bg_border_module',
                                           section : params.id,
@@ -350,7 +350,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level : params.level,
                                           what : 'control',
                                           id : spacingOptionsSetId,
-                                          label : '@missi18n Spacing : padding and margin',
+                                          label : sektionsLocalizedData.i18n['Padding and margin'],
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_spacing_module',
                                           section : params.id,
@@ -406,7 +406,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level_id : params.id,
                                           what : 'control',
                                           id : layoutHeightOptionsSetId,
-                                          label : '@missi18n Layout and Height',
+                                          label : sektionsLocalizedData.i18n['Layout and height'],
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_level_section_layout_height_module',
                                           section : params.id,
@@ -429,7 +429,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.register({
                                     what : 'section',
                                     id : params.id,
-                                    title: '@missi18n Options for ' + params.level,
+                                    title: sektionsLocalizedData.i18n['Options for the'] + ' ' + params.level,
                                     panel : sektionsLocalizedData.sektionsPanelId,
                                     priority : 10,
                                     track : false//don't register in the self.registered()

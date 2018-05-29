@@ -45,7 +45,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                     api.notifications.add( new api.Notification( 'drag-drop-support', {
                                           type: 'error',
-                                          message:  '@missi18n => your browser does not support the drag and drop technology. You might want to customize your site using another browser.',
+                                          message:  sektionsLocalizedData.i18n['This browser does not support drag and drop. You might need to update your browser or use another one.'],
                                           dismissible: true
                                     } ) );
 
@@ -67,9 +67,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // => re-instantiate sekDrop on the new preview frame
                         // the registered() ui levels look like :
                         // [
-                        //   { what: "control", id: "__sek___sek_draggable_sections_ui", label: "@missi18n Section Picker", type: "czr_module", module_type: "sek_section_picker_module", …}
+                        //   { what: "control", id: "__sek___sek_draggable_sections_ui", label: "Section Picker", type: "czr_module", module_type: "sek_section_picker_module", …}
                         //   { what: "setting", id: "__sek___sek_draggable_sections_ui", dirty: false, value: "", transport: "postMessage", … }
-                        //   { what: "section", id: "__sek___sek_draggable_sections_ui", title: "@missi18n Section Picker", panel: "__sektions__", priority: 30}
+                        //   { what: "section", id: "__sek___sek_draggable_sections_ui", title: "Section Picker", panel: "__sektions__", priority: 30}
                         // ]
                         if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_section_picker_module' } ) ) ) {
                               self.rootPanelFocus();
@@ -105,7 +105,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                     api.notifications.add( new api.Notification( 'drag-drop-support', {
                                           type: 'error',
-                                          message:  '@missi18n => your browser does not support the drag and drop technology. You might want to customize your site using another browser.',
+                                          message:  sektionsLocalizedData.i18n['This browser does not support drag and drop. You might need to update your browser or use another one.'],
                                           dismissible: true
                                     } ) );
 
@@ -302,17 +302,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   switch( this.dnd_draggedType ) {
                         case 'module' :
-                              html = '@missi18n Insert Here';
+                              html = sektionsLocalizedData.i18n['Insert here'];
                               if ( $target.length > 0 ) {
                                   if ( 'between-sections' === $target.data('sek-location') || 'in-empty-location' === $target.data('sek-location') ) {
-                                        html = '@missi18n Insert in a new section';
+                                        html = sektionsLocalizedData.i18n['Insert in a new section'];
                                   }
                               }
                               preDropContent = '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
                         break;
 
                         case 'preset_section' :
-                              html = '@missi18n Insert a new section here';
+                              html = sektionsLocalizedData.i18n['Insert a new section here'];
                               preDropContent = '<div class="sek-module-placeholder-content"><p>' + html + '</p></div>';
                         break;
 

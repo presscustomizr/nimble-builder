@@ -51,7 +51,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // this.register({
                   //       what : 'section',
                   //       id : sektionsLocalizedData.optPrefixForSektionGlobalOptsSetting,//'__sektions__'
-                  //       title: '@missi18n Global Options',
+                  //       title: 'Global Options',
                   //       priority : 1000,
                   //       constructWith : SektionPanelConstructor,
                   //       track : false//don't register in the self.registered()
@@ -62,7 +62,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // this.register({
                   //       what : 'control',
                   //       id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
-                  //       title: '@missi18n Main sektions panel',
+                  //       title: 'Main sektions panel',
                   //       priority : 1000,
                   //       constructWith : SektionPanelConstructor,
                   //       track : false//don't register in the self.registered()
@@ -168,10 +168,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     '<span style="font-size:0.95em">',
                                       '<strong>' + msg + '</strong>',
                                       '<br>',
-                                      '@missi18n If this problem prevents you to use the Nimble builder, you might need to reset the sections for this page.',
+                                      sektionsLocalizedData.i18n['If this problem locks the Nimble builder, you might try to reset the sections for this page.'],
                                       '<br>',
                                       '<span style="text-align:center;display:block">',
-                                        '<button type="button" class="button" aria-label="@missi18n Reset" data-sek-reset="true">@missi18n Reset</button>',
+                                        '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n['Reset'] + '" data-sek-reset="true">' + sektionsLocalizedData.i18n['Reset'] + '</button>',
                                       '</span>',
                                     '</span>'
                               ].join('')
@@ -340,7 +340,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                         api.notifications.add( new api.Notification( 'sek-reset-done', {
                               type: 'success',
-                              message: '@missi18n Reset complete',
+                              message: sektionsLocalizedData.i18n['Reset complete'],
                               dismissible: true
                         } ) );
 

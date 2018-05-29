@@ -15,8 +15,9 @@ function sek_get_module_params_for_sek_module_picker_module() {
             'item-inputs' => array(
                 'module_id' => array(
                     'input_type'  => 'module_picker',
-                    'title'       => __('Pick a module', 'text_domain_to_be_replaced'),
-                    'width-100'   => true
+                    'title'       => __('Drag and drop modules in the previewed page', 'text_domain_to_be_replaced'),
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
                 )
             )
         )

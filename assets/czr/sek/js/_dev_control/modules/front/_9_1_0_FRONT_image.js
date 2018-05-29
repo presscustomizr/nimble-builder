@@ -17,7 +17,7 @@
                     //@see ::setupContentPicker()
                     module.bind( 'set_default_content_picker_options', function( params ) {
                           params.defaultContentPickerOption.defaultOption = {
-                                'title'      : '<span style="font-weight:bold">@missi18n Set a custom url</span>',
+                                'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
                                 'type'       : '',
                                 'type_label' : '',
                                 'object'     : '',

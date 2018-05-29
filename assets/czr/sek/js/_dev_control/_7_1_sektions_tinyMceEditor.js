@@ -57,8 +57,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.sekEditorSynchronizedInput( newEditorSyncData );
                         api.sekEditorExpanded( true );
                         api.sekTinyMceEditor.focus();
-
-                        // $(this).text( ! api.sekEditorExpanded() ? '@missi18n Edit' : '@missi18n Close Editor' );
                   });
 
 

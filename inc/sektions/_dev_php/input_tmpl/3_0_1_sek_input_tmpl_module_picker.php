@@ -24,12 +24,12 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 // array(
                 //   'content-type' => 'module',
                 //   'content-id' => 'czr_simple_html_module',
-                //   'title' => '@missi18n Html Content'
+                //   'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
                 // ),
                 // array(
                 //   'content-type' => 'module',
                 //   'content-id' => 'czr_featured_pages_module',
-                //   'title' => '@missi18n Featured pages'
+                //   'title' => __( 'Featured pages',  'text_domain_to_be_replaced' )
                 // ),
 
             );

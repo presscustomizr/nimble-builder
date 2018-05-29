@@ -204,11 +204,54 @@ function sek_enqueue_controls_js_css() {
 
 
             'i18n' => array(
-                'Sektions' => __( 'Sektions', 'text_domain_to_be_replaced'),
+                'Sections' => __( 'Sections', 'text_domain_to_be_replaced'),
+
+                'Nimble Builder' => __('Nimble Builder', 'text_domain_to_be_replaced'),
+
                 'Customizing' => __('Customizing', 'text_domain_to_be_replaced'),
+
                 "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_domain_to_be_replaced'),
                 "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
-                "A section must have at least one column." => __( "A section must have at least one column.", 'text_domain_to_be_replaced')
+                "A section must have at least one column." => __( "A section must have at least one column.", 'text_domain_to_be_replaced'),
+
+                'If this problem locks the Nimble builder, you might try to reset the sections for this page.' => __('If this problem locks the Nimble builder, you might try to reset the sections for this page.', 'text_domain_to_be_replaced'),
+                'Reset' => __('Reset', 'text_domain_to_be_replaced'),
+                'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
+
+                'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
+                'Section Picker' => __('Section Picker', 'text_domain_to_be_replaced'),
+
+                'Module' => __('Module', 'text_domain_to_be_replaced'),
+                'Content for' => __('Content for', 'text_domain_to_be_replaced'),
+
+                'Background and Border' => __('Background and Border', 'text_domain_to_be_replaced'),
+
+                'Padding and margin' => __('Padding and margin', 'text_domain_to_be_replaced'),
+                'Layout and height' => __('Layout and height', 'text_domain_to_be_replaced'),
+
+                'Options for the' => __('Options for the', 'text_domain_to_be_replaced'),//section / column / module
+
+                'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
+
+                'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
+                'Insert in a new section' => __('Insert in a new section', 'text_domain_to_be_replaced'),
+                'Insert a new section here' => __('Insert a new section here', 'text_domain_to_be_replaced'),
+
+                'Select a font family' => __('Select a font family', 'text_domain_to_be_replaced'),
+                'Web Safe Fonts' => __('Web Safe Fonts', 'text_domain_to_be_replaced'),
+                'Google Fonts' => __('Google Fonts', 'text_domain_to_be_replaced'),
+
+                'Set a custom url' => __('Set a custom url', 'text_domain_to_be_replaced'),
+
+                'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
+                'Module' => __('Module', 'text_domain_to_be_replaced'),
+                'Module' => __('Module', 'text_domain_to_be_replaced'),
+                'Module' => __('Module', 'text_domain_to_be_replaced'),
+                'Module' => __('Module', 'text_domain_to_be_replaced'),
+                'Module' => __('Module', 'text_domain_to_be_replaced'),
+                'Module' => __('Module', 'text_domain_to_be_replaced'),
+
+
             )
         )
     );
