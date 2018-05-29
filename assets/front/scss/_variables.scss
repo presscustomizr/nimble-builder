@@ -31,10 +31,7 @@ $sek-grid-breakpoints: (
 @include _assert-starts-at-zero($sek-grid-breakpoints);
 
 
-// Grid Columns (see elementor)
-// we thought about allowing layouts from 1 to 12 columns
-// elementor, though, allows, some other column widths like 30%, 40%, 60%, 66% (1/3, 2/3 ) etc etc.,
-// in order to create more "complex" layouts
+// Grid Columns
 $sek-column-sizes: (
    //col suffix: percentage
      8: 8.333,     //12 columns
