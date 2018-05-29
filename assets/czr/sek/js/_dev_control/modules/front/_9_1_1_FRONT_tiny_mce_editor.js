@@ -65,7 +65,7 @@
             czr_tiny_mce_editor_module : {
                   mthds : TinyMceEditorModuleConstructor,
                   crud : false,
-                  name : 'Text Editor',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_tiny_mce_editor_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(

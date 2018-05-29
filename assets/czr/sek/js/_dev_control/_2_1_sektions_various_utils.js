@@ -150,7 +150,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return {}
             getDefaultItemModelFromRegisteredModuleData : function( moduleType ) {
                   if ( ! this.isModuleRegistered( moduleType ) ) {
-                      return {};
+                        return {};
                   }
                   var data = sektionsLocalizedData.registeredModules[ moduleType ]['tmpl']['item-inputs'],
                       defaultItemModem = {},
@@ -173,6 +173,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return defaultItemModem;
             },
 
+            //@return mixed
+            getRegisteredModuleProperty : function( moduleType, property ) {
+                  if ( ! this.isModuleRegistered( moduleType ) ) {
+                        return 'not_set';
+                  }
+                  return sektionsLocalizedData.registeredModules[ moduleType ][ property ];
+            },
 
             // @return boolean
             isModuleRegistered : function( moduleType ) {

@@ -147,7 +147,7 @@
             czr_image_module : {
                   mthds : ImageModuleConstructor,
                   crud : false,
-                  name : 'Image',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_image_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(

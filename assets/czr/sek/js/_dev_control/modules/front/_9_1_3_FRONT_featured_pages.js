@@ -80,7 +80,7 @@
                   crud : true,
                   hasPreItem : false,//a crud module has a pre item by default
                   refresh_on_add_item : false,// the preview is refreshed on item add
-                  name : 'Featured Pages',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(

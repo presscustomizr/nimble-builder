@@ -7,6 +7,7 @@ function sek_get_module_params_for_czr_image_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_image_module',
+        'name' => __('Image', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
         ),

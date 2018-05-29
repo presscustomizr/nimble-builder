@@ -72,7 +72,7 @@
             sek_spacing_module : {
                   mthds : SpacingModuleConstructor,
                   crud : false,
-                  name : 'Spacing',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_spacing_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(

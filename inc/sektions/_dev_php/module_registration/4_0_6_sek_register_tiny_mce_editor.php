@@ -7,6 +7,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_tiny_mce_editor_module',
+        'name' => __('Text Editor', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
         ),

@@ -14,7 +14,7 @@
             czr_simple_html_module : {
                   //mthds : SimpleHtmlModuleConstructor,
                   crud : false,
-                  name : 'Simple Html',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_html_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(

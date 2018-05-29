@@ -14,7 +14,7 @@
             sek_section_picker_module : {
                   //mthds : SectionPickerModuleConstructor,
                   crud : false,
-                  name : 'Section Picker',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_section_picker_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(

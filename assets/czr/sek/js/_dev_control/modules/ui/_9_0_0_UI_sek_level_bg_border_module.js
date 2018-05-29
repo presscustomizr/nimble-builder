@@ -128,7 +128,7 @@
             sek_level_bg_border_module : {
                   mthds : Constructor,
                   crud : false,
-                  name : 'Background Border Options',
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_bg_border_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
