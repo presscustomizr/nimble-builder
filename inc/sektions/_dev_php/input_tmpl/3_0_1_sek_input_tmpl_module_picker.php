@@ -43,7 +43,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                     $_params['content-id'],
                     '<i class="material-icons">' . $_params['icon'] .'</i>',
                     $_params['title'],
-                    __('Drag the module and drop it the previewed page.', 'text_domain_to_be_replaced' )
+                    __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' )
                 );
                 $i++;
             }

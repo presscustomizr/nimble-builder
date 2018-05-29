@@ -230,7 +230,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         case 'sek-generate-level-options-ui' :
                               // Generate the UI for level options
-                              console.log("PARAMS IN sek-generate-level-options-ui", params );
+                              //console.log("PARAMS IN sek-generate-level-options-ui", params );
                               var sectionLayoutOptionsSetId = params.id + '__sectionLayout_options',
                                   bgBorderOptionsSetId = params.id + '__bgBorder_options',
                                   heightOptionsSetId = params.id + '__height_options',

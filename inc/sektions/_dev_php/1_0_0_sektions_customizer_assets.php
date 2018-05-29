@@ -36,21 +36,10 @@ function sek_enqueue_controls_js_css() {
             'ccat-sektions.js'
         ),
         array( 'czr-skope-base' , 'jquery', 'underscore' ),
-        ( defined('WP_DEBUG') && true === WP_DEBUG ) ? time() :  wp_get_theme() -> version,
+        NIMBLE_ASSETS_VERSION,
         $in_footer = true
     );
-    // wp_enqueue_script(
-    //     'sek-drag-n-drop',
-    //     //dev / debug mode mode?
-    //     sprintf(
-    //         '%1$s/assets/czr/sek/js/libs/%2$s' ,
-    //         NIMBLE_BASE_URL,
-    //         'nimbleZones.js'//'dragdrop.js'
-    //     ),
-    //     array( 'jquery' ),
-    //     ( defined('WP_DEBUG') && true === WP_DEBUG ) ? time() :  wp_get_theme() -> version,
-    //     $in_footer = true
-    // );
+
     wp_enqueue_script(
         'czr-color-picker',
         //dev / debug mode mode?
@@ -60,7 +49,7 @@ function sek_enqueue_controls_js_css() {
             'czr-color-picker.js'
         ),
         array( 'jquery' ),
-        ( defined('WP_DEBUG') && true === WP_DEBUG ) ? time() :  wp_get_theme() -> version,
+        NIMBLE_ASSETS_VERSION,
         $in_footer = true
     );
 
@@ -219,6 +208,8 @@ function sek_enqueue_controls_js_css() {
                 'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
 
                 'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
+                'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
+
                 'Section Picker' => __('Section Picker', 'text_domain_to_be_replaced'),
 
                 'Module' => __('Module', 'text_domain_to_be_replaced'),
@@ -261,7 +252,7 @@ function sek_enqueue_controls_js_css() {
         'sek-control',
         NIMBLE_BASE_URL . '/assets/czr/sek/css/sek-control.css',
         array(),
-        time(),
+        NIMBLE_ASSETS_VERSION,
         'all'
     );
 }

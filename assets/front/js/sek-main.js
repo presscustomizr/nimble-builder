@@ -64,35 +64,3 @@ jQuery( function($){
     //     });
     // }
 });
-
-
-
-
-
-var czrapp = czrapp || {};
-
-//@global sekFrontLocalized
-( function ( czrapp ) {
-      //adds the server params to the app now
-      czrapp.localized = sekFrontLocalized || {};
-
-      //THE DEFAULT MAP
-      //Other methods can be hooked. @see czrapp.customMap
-      var appMap = {
-                // base : {
-                //       ctor : czrapp.Base,
-                //       ready : [
-                //             'cacheProp'
-                //       ]
-                // },
-                // browserDetect : {
-                //       ctor : czrapp.Base.extend( czrapp.methods.BrowserDetect ),
-                //       ready : [ 'addBrowserClassToBody' ]
-                // }
-      };//map
-
-      //set the observable value
-      //listened to by _instantianteAndFireOnDomReady = function( newMap, previousMap, isInitial )
-      czrapp.appMap( appMap , true );//true for isInitial map
-
-})( czrapp );

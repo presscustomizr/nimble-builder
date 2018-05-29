@@ -48,7 +48,7 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                             'bg-scale' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('scale', 'text_domain_to_be_replaced'),
-                                'default'     => 'default'
+                                'default'     => 'cover'
                             ),
                             // 'bg-video' => array(
                             //     'input_type'  => 'text',

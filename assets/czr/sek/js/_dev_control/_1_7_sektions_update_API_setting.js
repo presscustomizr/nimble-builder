@@ -83,8 +83,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 is_nested : true
                                           });
                                     } else {
-                                          console.log('UPDATE API SETTING SEK ADD SECTION', params );
-
                                           locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                           if ( 'no_match' == locationCandidate ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
