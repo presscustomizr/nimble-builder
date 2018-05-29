@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 // this.defaultItemModel = {
 //     img : '',
 //     'img-size' : 'large',

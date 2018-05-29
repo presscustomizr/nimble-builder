@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 $model = SEK_Front() -> model;
 $module_type = $model['module_type'];
 // print the module content if not empty

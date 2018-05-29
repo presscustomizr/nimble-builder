@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 $model = SEK_Front() -> model;
 if ( ! is_array( $model ) ) {
   error_log( 'module_tmpl => $model should be an array' );
