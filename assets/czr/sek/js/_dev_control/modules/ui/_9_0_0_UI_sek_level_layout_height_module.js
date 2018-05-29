@@ -6,12 +6,11 @@
                   var module = this;
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
+                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
-
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
             },//initialize
 
             CZRInputMths : {
@@ -43,7 +42,51 @@
                     },
             },//CZRInputMths
 
-            // CZRSocialsItem : { },//CZRSocialsItem
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+
+                        //fire the parent
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+                        // input controller instance == this
+                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                              //Fire on init
+                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              //React on change
+                              this.bind( function( to ) {
+                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              });
+                        };
+                        //Internal item dependencies
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'height-type' :
+                                          scheduleVisibilityOfInputId.call( input, 'custom-height', function() {
+                                                return 'custom' === input();
+                                          });
+                                    break;
+                              }
+                        });
+                  }
+            }//CZRItemConstructor
       };
 
 

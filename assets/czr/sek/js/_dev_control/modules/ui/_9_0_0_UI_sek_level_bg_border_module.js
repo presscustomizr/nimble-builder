@@ -8,43 +8,110 @@
 
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
-            CZRInputMths : {
-                    setupSelect : function() {
-                            var input  = this,
-                                  item   = input.input_parent,
-                                  module = input.module,
-                                  _options_ = {};
 
-                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.module_type );
-                                  return;
-                            } else {
-                                  //generates the options
-                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
-                                        var _attributes = {
-                                                  value : value,
-                                                  html: title
-                                            };
-                                        if ( value == input() ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        } else if ( 'px' === value ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        }
-                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                  });
-                                  $( 'select[data-czrtype]', input.container ).selecter();
-                            }
-                    },
+            CZRInputMths : {
+                  setupSelect : function() {
+                          var input  = this,
+                                item   = input.input_parent,
+                                module = input.module;
+
+                          if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
+                                api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.module_type );
+                                return;
+                          } else {
+                                //generates the options
+                                _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
+                                      var _attributes = {
+                                                value : value,
+                                                html: title
+                                          };
+                                      if ( value == input() ) {
+                                            $.extend( _attributes, { selected : "selected" } );
+                                      } else if ( 'px' === value ) {
+                                            $.extend( _attributes, { selected : "selected" } );
+                                      }
+                                      $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                });
+                                $( 'select[data-czrtype]', input.container ).selecter();
+                          }
+                  },
             },//CZRInputMths
 
-            // CZRSocialsItem : { },//CZRSocialsItem
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+
+                        //fire the parent
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+                        // input controller instance == this
+                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                              //Fire on init
+                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              //React on change
+                              this.bind( function( to ) {
+                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              });
+                        };
+                        //Internal item dependencies
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'bg-image' :
+                                          _.each( [ 'bg-position', 'bg-attachment', 'bg-scale', 'bg-apply-overlay', 'bg-color-overlay', 'bg-opacity-overlay' ] , function( _inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'bg-color-overlay' :
+                                                            case 'bg-opacity-overlay' :
+                                                                  bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-apply-overlay')() );
+                                                            break;
+                                                            default :
+                                                                  bool = ! _.isEmpty( input() + '' );
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'bg-apply-overlay' :
+                                          _.each( [ 'bg-color-overlay', 'bg-opacity-overlay' ] , function(_inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                              }
+                        });
+                  }
+            }//CZRItemConstructor
       };
 
 

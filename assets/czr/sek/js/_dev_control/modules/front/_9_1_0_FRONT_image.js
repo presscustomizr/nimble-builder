@@ -8,10 +8,10 @@
                     //run the parent initialize
                     api.CZRDynModule.prototype.initialize.call( module, id, options );
 
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                    // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                     module.inputConstructor = api.CZRInput.extend( module.CZRImageInputMths || {} );
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                    module.itemConstructor = api.CZRItem.extend( module.CZRImageItem || {} );
+                    // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                    module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                     //SET THE CONTENT PICKER DEFAULT OPTIONS
                     //@see ::setupContentPicker()
@@ -62,11 +62,13 @@
                     }
             },//CZRImageInputMths
 
-
+            // _isChecked : function( v ) {
+            //       return 0 !== v && '0' !== v && false !== v && 'off' !== v;
+            // },
             //////////////////////////////////////////////////////////
             /// ITEM CONSTRUCTOR
             //////////////////////////////////////////
-            CZRImageItem : {
+            CZRItemConstructor : {
                   //overrides the parent ready
                   ready : function() {
                         var item = this;
@@ -127,8 +129,8 @@
                                     break;
                               }
                         });
-                  },
-            },//CZRImageItem
+                  }
+            },//CZRItemConstructor
 
       };//ImageModuleConstructor
 
