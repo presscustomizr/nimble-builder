@@ -111,7 +111,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => '',
                                 'refresh-markup' => false,
                                 'refresh-stylesheet' => true,
-                                'width-100'   => true
+                                'width-100'   => true,
+                                'title_width' => 'width-100'
                             ),//"#000000",
                             'important_css'       => array(
                                 'input_type'  => 'gutencheck',
