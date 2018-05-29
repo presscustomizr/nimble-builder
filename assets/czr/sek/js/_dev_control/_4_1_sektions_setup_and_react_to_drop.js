@@ -409,10 +409,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // make sure we clean the previous wrapper of the pre drop element
                   this.dnd_cleanSingleDropTarget( this.$currentPreDropTarget );
-
+                  var inNewSection = 'between-sections' === $dropTarget.data('sek-location') || 'in-empty-location' === $dropTarget.data('sek-location');
                   $.when( self.preDropElement.remove() ).done( function(){
                         $dropTarget[ 'before' === newPosition ? 'prepend' : 'append' ]( self.preDropElement )
                               .find( '.' + sektionsLocalizedData.preDropElementClass ).html( self.dnd_getPreDropElementContent( evt ) );
+                        // Flag the preDrop element with class to apply a specific style if inserted in a new sektion of in a column
+                        $dropTarget.find( '.' + sektionsLocalizedData.preDropElementClass ).toggleClass('in-new-sektion', inNewSection );
                         $dropTarget.data( 'preDrop-position', newPosition );
 
                         self.isPrintingPreDrop = false;
@@ -440,7 +442,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
                   // console.log('onDropping params', position, evt );
                   // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
-
                   api.czr_sektions.trigger( 'sek-content-dropped', {
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
