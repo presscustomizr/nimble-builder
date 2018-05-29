@@ -12,13 +12,13 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_tiny_mce_editor_module',
-                  'title' => __( 'Text Editor', 'text-domain-to-be-replaced' ),
+                  'title' => __( 'Text Editor', 'text_domain_to_be_replaced' ),
                   'icon' => 'short_text'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_image_module',
-                  'title' => __( 'Image', 'text-domain-to-be-replaced' ),
+                  'title' => __( 'Image', 'text_domain_to_be_replaced' ),
                   'icon' => 'image'
                 ),
                 // array(
@@ -43,7 +43,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                     $_params['content-id'],
                     '<i class="material-icons">' . $_params['icon'] .'</i>',
                     $_params['title'],
-                    __('Drag the module and drop it the previewed page.', 'text-domain-to-be-replaced' )
+                    __('Drag the module and drop it the previewed page.', 'text_domain_to_be_replaced' )
                 );
                 $i++;
             }
