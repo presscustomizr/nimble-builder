@@ -203,7 +203,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // set the sekCollectionSettingId now, and update it on skope change
                   sektionsData = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local');
-                  api.infoLog( '::setContextualCollectionSettingIdWhenSkopeSet => SEKTIONS DATA ? ', sektionsData );
+                  if ( sektionsLocalizedData.isDevMode ) {
+                        api.infoLog( '::setContextualCollectionSettingIdWhenSkopeSet => SEKTIONS DATA ? ', sektionsData );
+                  }
                   if ( _.isEmpty( sektionsData ) ) {
                         api.errare('::setContextualCollectionSettingIdWhenSkopeSet() => no sektionsData');
                   }

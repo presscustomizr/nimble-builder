@@ -50,4 +50,39 @@ module.exports = {
     } ]
   },
 
+
+
+
+  plug_version_one: {
+    src: [
+      'wordpress-font-customizer.php'
+    ],
+    overwrite: true,
+    replacements: [ {
+      from: /^.* Version: .*$/m,
+      to: " * Version: <%= pkg.version %>"
+    } ]
+  },
+  plug_version_two: {
+    src: [
+      'wordpress-font-customizer.php'
+    ],
+    overwrite: true,
+    replacements: [ {
+      from: /^.*this -> plug_version = '.*$/m,
+      to: "            $this -> plug_version = '<%= pkg.version %>';"
+    } ]
+  },
+  stable_tag : {
+    src: [
+      'readme.txt', 'readme.md'
+    ],
+    overwrite: true,
+    replacements: [ {
+      from: /^.*Stable tag: .*$/m,
+      to: "Stable tag: <%= pkg.version %>"
+    } ]
+  }
+
+
 };

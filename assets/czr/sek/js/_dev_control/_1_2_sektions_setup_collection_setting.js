@@ -30,17 +30,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               track : false//don't register in the self.registered()
                         });
 
-                        api( collectionSettingId, function( sektionSetInstance ) {
-                              // Is the collection well formed ?
-                              // @see customize-base.js
-                              //sektionSetInstance.validate = self.validateSettingValue;
+                        if ( sektionsLocalizedData.isDevMode ) {
+                              api( collectionSettingId, function( sektionSetInstance ) {
+                                    // Is the collection well formed ?
+                                    // @see customize-base.js
+                                    //sektionSetInstance.validate = self.validateSettingValue;// Replaced by self.validateSettingValue()
 
-
-                              // Schedule reactions to a collection change
-                              sektionSetInstance.bind( function( newSektionSettingValue, previousValue, params ) {
-                                    console.log( 'newSektionSettingValue => ', newSektionSettingValue );
-                              });
-                        });//api( collectionSettingId, function( sektionSetInstance ){}
+                                    // Schedule reactions to a collection change
+                                    sektionSetInstance.bind( function( newSektionSettingValue, previousValue, params ) {
+                                          api.infoLog( 'sektionSettingValue is updated',
+                                                {
+                                                      newValue : newSektionSettingValue,
+                                                      previousValue : previousValue,
+                                                      params : params
+                                                }
+                                          );
+                                    });
+                              });//api( collectionSettingId, function( sektionSetInstance ){}
+                        }
                   }
 
 

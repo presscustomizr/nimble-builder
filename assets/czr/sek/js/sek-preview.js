@@ -219,7 +219,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                               // don't send anything if the source and target columns are the same, and the order is unchanged
                               if ( _.isEqual( newOrder, startOrder ) && to_sektion === from_sektion ) {
-                                    self.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
+                                    if ( sekPreviewLocalized.isDevMode ) {
+                                          self.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
+                                    }
                                     return;
                               }
                               api.preview.send( 'sek-move', {
@@ -1389,7 +1391,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               console.log.apply( console, this._prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ '</' + title + '>' ] } ) );
                         }
                   } else {
-                        console.log.apply( console, _prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ title ] } ) );
+                        console.log.apply( console, this._prettyPrintLog( { bgCol : bgColor, textCol : '#000', consoleArguments : [ title ] } ) );
                   }
             },
 

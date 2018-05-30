@@ -600,6 +600,7 @@ function sek_enqueue_controls_js_css() {
         'czr-sektions',
         'sektionsLocalizedData',
         array(
+            'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
             'sektionsPanelId' => '__sektions__',
             'addNewSektionId' => 'sek_add_new_sektion',
             'addNewColumnId' => 'sek_add_new_column',
@@ -750,6 +751,7 @@ function sek_enqueue_controls_js_css() {
                 'Reset' => __('Reset', 'text_domain_to_be_replaced'),
                 'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
 
+                // Generated UI
                 'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
                 'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
 
@@ -757,21 +759,29 @@ function sek_enqueue_controls_js_css() {
 
                 'Module' => __('Module', 'text_domain_to_be_replaced'),
                 'Content for' => __('Content for', 'text_domain_to_be_replaced'),
+                'Customize the options for module :' => __('Customize the options for module :', 'text_domain_to_be_replaced'),
 
-                'Section layout' => __('Section layout', 'text_domain_to_be_replaced'),
-                'Background and Border' => __('Background and Border', 'text_domain_to_be_replaced'),
+                'Layout settings for the' => __('Layout settings for the', 'text_domain_to_be_replaced'),
+                'Background and border settings for the' => __('Background and border settings for the', 'text_domain_to_be_replaced'),
+                'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_domain_to_be_replaced'),
+                'Height settings for the' => __('Height settings for the', 'text_domain_to_be_replaced'),
 
-                'Padding and margin' => __('Padding and margin', 'text_domain_to_be_replaced'),
-                'Height settings' => __('Height settings', 'text_domain_to_be_replaced'),
+                'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
 
-                'Options for the' => __('Options for the', 'text_domain_to_be_replaced'),//section / column / module
+                // Levels
+                'location' => __('location', 'text_domain_to_be_replaced'),
+                'section' => __('section', 'text_domain_to_be_replaced'),
+                'column' => __('column', 'text_domain_to_be_replaced'),
+                'module' => __('module', 'text_domain_to_be_replaced'),
 
                 'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
 
+                // DRAG n DROP
                 'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
                 'Insert in a new section' => __('Insert in a new section', 'text_domain_to_be_replaced'),
                 'Insert a new section here' => __('Insert a new section here', 'text_domain_to_be_replaced'),
 
+                // MODULES
                 'Select a font family' => __('Select a font family', 'text_domain_to_be_replaced'),
                 'Web Safe Fonts' => __('Web Safe Fonts', 'text_domain_to_be_replaced'),
                 'Google Fonts' => __('Google Fonts', 'text_domain_to_be_replaced'),

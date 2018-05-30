@@ -1,4 +1,4 @@
-
+//@global serverControlParams
 var CZRSkopeBaseMths = CZRSkopeBaseMths || {};
 (function ( api, $, _ ) {
       $.extend( CZRSkopeBaseMths, {
@@ -31,8 +31,9 @@ var CZRSkopeBaseMths = CZRSkopeBaseMths || {};
                   // }
                   api.bind( 'ready' , function() {
                         api.previewer.bind( 'czr-new-skopes-synced', function( skope_server_data ) {
-
-                              console.log('API SKOPE SYNCED => ', skope_server_data );
+                              if ( serverControlParams.isDevMode ) {
+                                    api.infoLog( 'API SKOPE SYNCED', skope_server_data );
+                              }
 
                               // set the currently active stylesheet
                               if ( ! _.has( skope_server_data, 'czr_stylesheet') ) {

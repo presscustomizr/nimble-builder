@@ -203,7 +203,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // set the sekCollectionSettingId now, and update it on skope change
                   sektionsData = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local');
-                  api.infoLog( '::setContextualCollectionSettingIdWhenSkopeSet => SEKTIONS DATA ? ', sektionsData );
+                  if ( sektionsLocalizedData.isDevMode ) {
+                        api.infoLog( '::setContextualCollectionSettingIdWhenSkopeSet => SEKTIONS DATA ? ', sektionsData );
+                  }
                   if ( _.isEmpty( sektionsData ) ) {
                         api.errare('::setContextualCollectionSettingIdWhenSkopeSet() => no sektionsData');
                   }
@@ -246,17 +248,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               track : false//don't register in the self.registered()
                         });
 
-                        api( collectionSettingId, function( sektionSetInstance ) {
-                              // Is the collection well formed ?
-                              // @see customize-base.js
-                              //sektionSetInstance.validate = self.validateSettingValue;
+                        if ( sektionsLocalizedData.isDevMode ) {
+                              api( collectionSettingId, function( sektionSetInstance ) {
+                                    // Is the collection well formed ?
+                                    // @see customize-base.js
+                                    //sektionSetInstance.validate = self.validateSettingValue;// Replaced by self.validateSettingValue()
 
-
-                              // Schedule reactions to a collection change
-                              sektionSetInstance.bind( function( newSektionSettingValue, previousValue, params ) {
-                                    console.log( 'newSektionSettingValue => ', newSektionSettingValue );
-                              });
-                        });//api( collectionSettingId, function( sektionSetInstance ){}
+                                    // Schedule reactions to a collection change
+                                    sektionSetInstance.bind( function( newSektionSettingValue, previousValue, params ) {
+                                          api.infoLog( 'sektionSettingValue is updated',
+                                                {
+                                                      newValue : newSektionSettingValue,
+                                                      previousValue : previousValue,
+                                                      params : params
+                                                }
+                                          );
+                                    });
+                              });//api( collectionSettingId, function( sektionSetInstance ){}
+                        }
                   }
 
 
@@ -1328,7 +1337,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level : params.level,
                                           what : 'control',
                                           id : params.id,
-                                          label : sektionsLocalizedData.i18n['Module'] + ' ' + params.id,
+                                          label : sektionsLocalizedData.i18n['Customize the options for module :'] + ' ' + api.czrModuleMap[ moduleType ].name,
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : moduleType,
                                           section : params.id,
@@ -1443,7 +1452,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 level_id : params.id,
                                                 what : 'control',
                                                 id : sectionLayoutOptionsSetId,
-                                                label : sektionsLocalizedData.i18n['Section layout'],
+                                                label : sektionsLocalizedData.i18n['Layout settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                                                 type : 'czr_module',//sekData.controlType,
                                                 module_type : 'sek_level_section_layout_module',
                                                 section : params.id,
@@ -1499,7 +1508,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level_id : params.id,
                                           what : 'control',
                                           id : bgBorderOptionsSetId,
-                                          label : sektionsLocalizedData.i18n['Background and Border'],
+                                          label : sektionsLocalizedData.i18n['Background and border settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_level_bg_border_module',
                                           section : params.id,
@@ -1554,7 +1563,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level : params.level,
                                           what : 'control',
                                           id : spacingOptionsSetId,
-                                          label : sektionsLocalizedData.i18n['Padding and margin'],
+                                          label : sektionsLocalizedData.i18n['Padding and margin settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_spacing_module',
                                           section : params.id,
@@ -1610,7 +1619,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           level_id : params.id,
                                           what : 'control',
                                           id : heightOptionsSetId,
-                                          label : sektionsLocalizedData.i18n['Height settings'],
+                                          label : sektionsLocalizedData.i18n['Height settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_level_height_module',
                                           section : params.id,
@@ -1636,7 +1645,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.register({
                                     what : 'section',
                                     id : params.id,
-                                    title: sektionsLocalizedData.i18n['Options for the'] + ' ' + params.level,
+                                    title: sektionsLocalizedData.i18n['Settings for the'] + ' ' + params.level,
                                     panel : sektionsLocalizedData.sektionsPanelId,
                                     priority : 10,
                                     track : false//don't register in the self.registered()
@@ -1802,6 +1811,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // specific for level options
                               options_type : params.options_type,//'layout', 'spacing', 'bg_border', 'height'
 
+                              settingParams : params.settingParams
                         }).done( function( ) {
                               // STYLESHEET => default action when modifying the level options
                               if ( true === refresh_stylesheet ) {

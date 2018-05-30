@@ -3,7 +3,7 @@
 * Plugin Name: Nimble Builder
 * Plugin URI: https://presscustomizr.com
 * Description: Live Page Builder for the WordPress Customizer
-* Version: 1.0.0-alpha
+* Version: 1.0.0-beta
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://presscustomizr.com
@@ -22,7 +22,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-if ( ! defined( 'NIMBLE_VERSION' ) ) { define( 'NIMBLE_VERSION' , '1.0.0' ); }
+if ( ! defined( 'NIMBLE_VERSION' ) ) { define( 'NIMBLE_VERSION' , '1.0.0-beta' ); }
 if ( ! defined( 'NIMBLE_ASSETS_VERSION' ) ) {
     define( 'NIMBLE_ASSETS_VERSION', ( ( defined( 'CZR_DEV' ) && CZR_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) ? time() : NIMBLE_VERSION );
 }

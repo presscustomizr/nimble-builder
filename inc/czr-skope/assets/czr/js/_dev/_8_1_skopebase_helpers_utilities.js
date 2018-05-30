@@ -1,4 +1,4 @@
-
+//@global serverControlParams
 var CZRSkopeBaseMths = CZRSkopeBaseMths || {};
 ( function ( api, $, _ ) {
 $.extend( CZRSkopeBaseMths, {

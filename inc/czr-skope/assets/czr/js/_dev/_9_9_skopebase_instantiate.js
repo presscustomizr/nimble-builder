@@ -1,3 +1,4 @@
+//@global serverControlParams
 var CZRSkopeBaseMths = CZRSkopeBaseMths || {};
 (function ( api, $ ) {
       // Skope
