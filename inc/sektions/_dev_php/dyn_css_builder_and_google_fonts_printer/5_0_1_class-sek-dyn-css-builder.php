@@ -240,7 +240,7 @@ class Sek_Dyn_CSS_Builder {
 
 
     // hook : sek_add_css_rules_for_level_options
-    public function sek_add_rules_for_column_width( array $rules, array $level ) {
+    public function sek_add_rules_for_column_width( $rules, $level ) {
         $width   = empty( $level[ 'width' ] ) || !is_numeric( $level[ 'width' ] ) ? '' : $level['width'];
 
         //width

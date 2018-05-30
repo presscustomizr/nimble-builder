@@ -2,7 +2,7 @@
 // filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
 add_filter( "sek_add_css_rules_for_input_id", 'sek_add_css_rules_for_generic_css_input_types', 10, 4 );
-function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, $input_id, array $parent_level ) {
+function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_id, $parent_level ) {
     // error_log( $input_id );
     // error_log( print_r( $parent_level, true ) );
     if ( ! is_string( $input_id ) )
