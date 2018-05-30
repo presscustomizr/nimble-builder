@@ -30,18 +30,28 @@ module.exports = {
       dest: '<%= paths.czr_base_fmk %>assets/js/',
       ext: '.min.js'
     }]
+  },
+
+
+  czr_flat_skope_js : {
+    files: [{
+      expand: true,
+      cwd: '<%= paths.flat_skope_czr_js %>',
+      src: [ 'czr-skope-base.js' ],
+      dest: '<%= paths.flat_skope_czr_js %>',
+      ext: '.min.js'
+    }]
+  },
+
+  czr_sektions_customizer_control_js : {
+    files: [{
+      expand: true,
+      cwd: '<%= paths.czr_assets %>sek/js/',
+      src: [ 'czr-skope-base.js' ],
+      dest: '<%= paths.czr_assets %>sek/js/',
+      ext: '.min.js'
+    }]
   }
-
- //  czr_pro_control_js : {
- //    files: [{
- //      expand: true,
- //      cwd: '<%= paths.czr_assets %>fmk/js/',
- //      src: ['czr-control-full.js'],
- //      dest: '<%= paths.czr_assets %>js',
- //      ext: '.min.js'
- //    }]
- //  },
-
 	// any_file : {
 	//	files: { '<%= uglify_requested_paths.dest %>': ['<%= uglify_requested_paths.src %>']
  //      }

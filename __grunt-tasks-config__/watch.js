@@ -177,7 +177,7 @@ module.exports = {
     ],
     tasks : [
       'jshint:those',
-      'concat:czr_sektions_customizer_js',
+      'concat:czr_sektions_customizer_control_js',
     ],
   },
 

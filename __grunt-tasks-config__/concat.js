@@ -213,7 +213,7 @@ module.exports = {
 
 
 
-  czr_sektions_customizer_js : {
+  czr_sektions_customizer_control_js : {
     src: [
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_0_sektions_itinialize.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_2_sektions_setup_collection_setting.js',
@@ -239,7 +239,7 @@ module.exports = {
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_2_FRONT_simple_html.js',
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_3_FRONT_featured_pages.js'
     ],
-    dest: '<%= paths.czr_assets %>sek/js/ccat-sektions.js',
+    dest: '<%= paths.czr_assets %>sek/js/ccat-sek-control.js',
   },
 
   czr_sektions_customizer_preview_js : {
@@ -257,7 +257,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_preview/_9_0_preview_utilities.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_9_9_preview_instantiate.js'
     ],
-    dest: '<%= paths.czr_assets %>sek/js/sek-preview.js',
+    dest: '<%= paths.czr_assets %>sek/js/ccat-sek-preview.js',
   },
 
 

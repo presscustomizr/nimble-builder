@@ -31,34 +31,59 @@ module.exports = function(grunt) {
 
             tmpl: 'tmpl/'
         },
-			tasks : {
-        //'pre_czr' : ['concat:czr_control_css', 'concat:czr_control_js', 'comments:czr_base_control_js', 'lineending:czr_js', 'uglify:czr_control_js', 'uglify:czr_preview_js', 'cssmin:czr_css'],
-        //This task concat the css and js base and full + strip comments + uglify + copy to the themes and plugin folders
-        'build_czr_fmk' : [
-            'concat:czr_fmk_control_js',
-            'concat:czr_theme_control_js',
+        vars : {
+          textdomain : 'nimble-builder'//@see nimble-builder.php
+        },
+        tasks : {
+          //'pre_czr' : ['concat:czr_control_css', 'concat:czr_control_js', 'comments:czr_base_control_js', 'lineending:czr_js', 'uglify:czr_control_js', 'uglify:czr_preview_js', 'cssmin:czr_css'],
+          //This task concat the css and js base and full + strip comments + uglify + copy to the themes and plugin folders
+          'build_customizer_css_js_php_fmk_panel_and_preview' : [
+              'concat:czr_base_fmk_php',
 
-            'uglify:czr_control_js',
+              'concat:czr_fmk_control_js',
+              'concat:czr_theme_control_js',
+              'uglify:czr_control_js',
+              'uglify:czr_preview_js',
 
-            'concat:czr_control_css',
-            'cssmin:czr_css',
+              'concat:czr_control_css',
+              'cssmin:czr_css',
+          ],
 
-            'concat:czr_base_fmk_php',
+          'copy_customizer_fmk_css_js_php_to_other_themes_and_plugins' : [
+              'copy:czr_base_fmk_in_customizr_theme',
+              'copy:czr_base_fmk_in_wfc'
+          ],
 
-            'copy:czr_base_fmk_in_customizr_theme',
-            'copy:czr_base_fmk_in_wfc'
-        ],
+          'build_skope_php_js' : [
+              'concat:czr_flat_skope_php',
+              'concat:czr_flat_skope_js',
+              'uglify:czr_flat_skope_js'
+          ],
 
-        'nimble_dev' : [ 'concurrent:ac_dev'],
+          'build_sektion_php_js_css' : [
+              'concat:czr_sektions_php',
 
-        build : [ 'build_czr_fmk'  ]
-			},
-			uglify_requested_paths : {
-				src : '' || grunt.option('src'),
-				dest : '' || grunt.option('dest')
-			}
-		}
-	};
+              'concat:czr_sektions_customizer_control_js',
+              'uglify:czr_sektions_customizer_control_js',//<========================================== TO CREATE
+              'concat:czr_sektions_customizer_preview_js',
+              'uglify:czr_sektions_customizer_preview_js',//<========================================== TO CREATE
+
+              'cssmin:czr_sek_preview_css',//<========================================== TO CREATE
+
+              'sass:sek_main',
+              'postcss:sek_main',
+              'cssmin:sek_css'//<========================================== TO CREATE
+          ],
+
+          build : [ 'build_customizer_css_js_php_fmk_panel_and_preview'  ]
+        },
+        uglify_requested_paths : {
+          src : '' || grunt.option('src'),
+          dest : '' || grunt.option('dest')
+        }
+      }
+	};//global_config
+
 	// LOAD GRUNT PACKAGES AND CONFIGS
 	// https://www.npmjs.org/package/load-grunt-config
 	require( 'load-grunt-config' )( grunt , global_config );

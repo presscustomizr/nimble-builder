@@ -68,7 +68,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
             wp_enqueue_style(
                 'sek-preview',
-                NIMBLE_BASE_URL . '/assets/czr/sek/css/sek-preview.css',
+                sprintf(
+                    '%1$s/assets/czr/sek/css/%2$s' ,
+                    NIMBLE_BASE_URL,
+                    defined('CZR_DEV') && true === CZR_DEV ? 'sek-preview.css' : 'sek-preview.min.css'
+                ),
                 array( 'sek-main' ),
                 NIMBLE_ASSETS_VERSION,
                 'all'
@@ -77,7 +81,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             // Communication between preview and customizer panel
             wp_enqueue_script(
                 'sek-customize-preview',
-                NIMBLE_BASE_URL . '/assets/czr/sek/js/sek-preview.js',
+                sprintf(
+                    '%1$s/assets/czr/sek/js/%2$s' ,
+                    NIMBLE_BASE_URL,
+                    defined('CZR_DEV') && true === CZR_DEV ? 'ccat-sek-preview.js' : 'ccat-sek-preview.min.js'
+                ),
                 array( 'customize-preview', 'underscore'),
                 NIMBLE_ASSETS_VERSION,
                 true

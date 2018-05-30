@@ -33,7 +33,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/%2$s' ,
             NIMBLE_BASE_URL,
-            'ccat-sektions.js'
+            defined('CZR_DEV') && true === CZR_DEV ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
         ),
         array( 'czr-skope-base' , 'jquery', 'underscore' ),
         NIMBLE_ASSETS_VERSION,
@@ -46,7 +46,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
-            'czr-color-picker.js'
+            defined('CZR_DEV') && true === CZR_DEV ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
         ),
         array( 'jquery' ),
         NIMBLE_ASSETS_VERSION,

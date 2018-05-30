@@ -8,7 +8,7 @@ function skp_enqueue_controls_js_css() {
         // && false === strpos( dirname( dirname( dirname (__FILE__) ) ) , 'inc/wfc' )
         && file_exists( sprintf( '%s/assets/czr/js/czr-skope-base.js' , dirname( __FILE__ ) ) );
 
-    $_prod_script_path          = sprintf(
+    $_prod_script_path = sprintf(
         '%1$s/assets/czr/js/%2$s' ,
         SKOPE_BASE_URL,
         $_use_unminified ? 'czr-skope-base.js' : 'czr-skope-base.min.js'

@@ -135,8 +135,11 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
 // @param module_type
 // walk the registered modules tree and generates the module default if not already cached
 // @return array;
-function sek_get_default_module_model( string $module_type ) {
+function sek_get_default_module_model( $module_type = '' ) {
     $default = array();
+    if ( empty( $module_type ) || is_null( $module_type ) )
+      return $default;
+
     // Did we already cache it ?
     $default_models = SEK_Front()->default_models;
     if ( ! empty( $default_models[ $module_type ] ) ) {
@@ -298,7 +301,7 @@ function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true )
 
 
 
-function sek_error_log( string $title, $content = null ) {
+function sek_error_log( $title, $content = null ) {
     if ( is_null( $content ) ) {
         error_log( '<' . strtoupper( $title ) . '>' );
     } else {
@@ -576,7 +579,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/%2$s' ,
             NIMBLE_BASE_URL,
-            'ccat-sektions.js'
+            defined('CZR_DEV') && true === CZR_DEV ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
         ),
         array( 'czr-skope-base' , 'jquery', 'underscore' ),
         NIMBLE_ASSETS_VERSION,
@@ -589,7 +592,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
-            'czr-color-picker.js'
+            defined('CZR_DEV') && true === CZR_DEV ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
         ),
         array( 'jquery' ),
         NIMBLE_ASSETS_VERSION,
@@ -1736,7 +1739,7 @@ add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_bor
 add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_border', 10, 3 );
 add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_boxshadow', 10, 3 );
 
-function sek_add_css_rules_for_bg_border_background( array $rules, array $level ) {
+function sek_add_css_rules_for_bg_border_background( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
 
     // $default_value_model = Array
@@ -1892,7 +1895,7 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
 
 
 
-function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
+function sek_add_css_rules_for_bg_border_border( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     // $default_value_model = Array
     // (
@@ -1958,7 +1961,7 @@ function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
 
 
 
-function sek_add_css_rules_for_bg_border_boxshadow( array $rules, array $level ) {
+function sek_add_css_rules_for_bg_border_boxshadow( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     // $default_value_model = Array
     // (
@@ -2074,7 +2077,7 @@ function sek_get_module_params_for_sek_level_height_module() {
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
 add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_level_height', 10, 3 );
-function sek_add_css_rules_for_level_height( array $rules, array $level ) {
+function sek_add_css_rules_for_level_height( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     if ( empty( $options[ 'height' ] ) )
       return $rules;
@@ -2188,7 +2191,7 @@ function sek_get_module_params_for_sek_spacing_module() {
 add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_spacing', 10, 3 );
 // hook : sek_dyn_css_builder_rules
 // @return array() of css rules
-function sek_add_css_rules_for_spacing( array $rules, array $level ) {
+function sek_add_css_rules_for_spacing( $rules, $level ) {
 
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
 
@@ -4099,7 +4102,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
             wp_enqueue_style(
                 'sek-preview',
-                NIMBLE_BASE_URL . '/assets/czr/sek/css/sek-preview.css',
+                sprintf(
+                    '%1$s/assets/czr/sek/css/%2$s' ,
+                    NIMBLE_BASE_URL,
+                    defined('CZR_DEV') && true === CZR_DEV ? 'sek-preview.css' : 'sek-preview.min.css'
+                ),
                 array( 'sek-main' ),
                 NIMBLE_ASSETS_VERSION,
                 'all'
@@ -4108,7 +4115,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             // Communication between preview and customizer panel
             wp_enqueue_script(
                 'sek-customize-preview',
-                NIMBLE_BASE_URL . '/assets/czr/sek/js/sek-preview.js',
+                sprintf(
+                    '%1$s/assets/czr/sek/js/%2$s' ,
+                    NIMBLE_BASE_URL,
+                    defined('CZR_DEV') && true === CZR_DEV ? 'ccat-sek-preview.js' : 'ccat-sek-preview.min.js'
+                ),
                 array( 'customize-preview', 'underscore'),
                 NIMBLE_ASSETS_VERSION,
                 true
