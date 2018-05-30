@@ -135,8 +135,11 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
 // @param module_type
 // walk the registered modules tree and generates the module default if not already cached
 // @return array;
-function sek_get_default_module_model( string $module_type ) {
+function sek_get_default_module_model( $module_type = '' ) {
     $default = array();
+    if ( empty( $module_type ) || is_null( $module_type ) )
+      return $default;
+
     // Did we already cache it ?
     $default_models = SEK_Front()->default_models;
     if ( ! empty( $default_models[ $module_type ] ) ) {
@@ -298,7 +301,7 @@ function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true )
 
 
 
-function sek_error_log( string $title, $content = null ) {
+function sek_error_log( $title, $content = null ) {
     if ( is_null( $content ) ) {
         error_log( '<' . strtoupper( $title ) . '>' );
     } else {

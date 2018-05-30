@@ -125,7 +125,7 @@ add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_bor
 add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_border', 10, 3 );
 add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_boxshadow', 10, 3 );
 
-function sek_add_css_rules_for_bg_border_background( array $rules, array $level ) {
+function sek_add_css_rules_for_bg_border_background( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
 
     // $default_value_model = Array
@@ -281,7 +281,7 @@ function sek_add_css_rules_for_bg_border_background( array $rules, array $level 
 
 
 
-function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
+function sek_add_css_rules_for_bg_border_border( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     // $default_value_model = Array
     // (
@@ -347,7 +347,7 @@ function sek_add_css_rules_for_bg_border_border( array $rules, array $level ) {
 
 
 
-function sek_add_css_rules_for_bg_border_boxshadow( array $rules, array $level ) {
+function sek_add_css_rules_for_bg_border_boxshadow( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     // $default_value_model = Array
     // (

@@ -81,7 +81,7 @@ function sek_get_module_params_for_sek_spacing_module() {
 add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_spacing', 10, 3 );
 // hook : sek_dyn_css_builder_rules
 // @return array() of css rules
-function sek_add_css_rules_for_spacing( array $rules, array $level ) {
+function sek_add_css_rules_for_spacing( $rules, $level ) {
 
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
 
