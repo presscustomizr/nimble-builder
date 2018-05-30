@@ -299,17 +299,9 @@ class Sek_Dyn_CSS_Handler {
             //build stylesheet
             $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model );
 
-            // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->collection>');
-            // error_log( print_r( $stylesheet->collection, true ) );
-            // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->collection>');
-
             // now that the stylesheet is ready let's cache it
             $this->css_string_to_enqueue_or_print = (string)$this->builder-> get_stylesheet();
         }
-
-        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$args>');
-        // error_log( print_r( $args, true ) );
-        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$args>');
 
         //hook setup for printing or enqueuing
         //bail if "customizer_save" == true, typically when saving the customizer settings @see Sek_Customizer_Setting::update()
@@ -391,7 +383,6 @@ class Sek_Dyn_CSS_Handler {
      * @return void()
      */
     public function sek_dyn_css_enqueue_or_print_and_google_gonts_print() {
-        //error_log( __FUNCTION__ . ' current_filter() => ' . current_filter() );
         // CSS FILE
         //case enqueue file : front end + user with customize caps not logged in
         if ( self::MODE_FILE == $this->mode ) {
@@ -482,9 +473,6 @@ class Sek_Dyn_CSS_Handler {
         // in a front end, not logged in scenario, the sek_model is 'not set', because the stylesheet has not been re-built in the constructor
         $sektions = 'no_set' === $this->sek_model ? sek_get_skoped_seks( $this -> skope_id ) : $this->sek_model;
         $print_candidates = '';
-        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' => REGISTERED GOOGLE FONTS>');
-        // error_log( print_r( $sektions['font'], true ) );
-        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' => REGISTERED GOOGLE FONTS>');
 
         if ( !empty( $sektions['fonts'] ) && is_array( $sektions['fonts'] ) ) {
             $ffamilies = implode( "|", $sektions['fonts'] );

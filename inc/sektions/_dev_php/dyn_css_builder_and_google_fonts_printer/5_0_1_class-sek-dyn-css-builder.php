@@ -36,11 +36,6 @@ class Sek_Dyn_CSS_Builder {
 
     public function __construct( $sek_model = array() ) {
         $this->sek_model  = $sek_model;
-
-        // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>saved sektions>');
-        // error_log( print_r( $this -> sek_model, true ) );
-        // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' =>saved sektions>');
-
         // set the css rules for columns
         /* ------------------------------------------------------------------------- *
          *  SCHEDULE CSS RULES FILTERING
@@ -90,7 +85,9 @@ class Sek_Dyn_CSS_Builder {
                     // the input_id candidate to filter is the $key
                     $input_id_candidate = $key;
                     // let's skip the $key that are reserved for the structure of the sektion tree
-                    if ( ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options'] ) ) {
+                    // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
+                    // The generic rules must be suffixed with '_css'
+                    if ( false !== strpos( $key, '_css') ) {
                         $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level_model );
                     }
                 }
@@ -98,23 +95,15 @@ class Sek_Dyn_CSS_Builder {
 
             // populates the rules collection
             if ( !empty( $rules ) ) {
-                /*error_log('<ALOORS RULE ?>');
-                error_log(print_r( $rules, true ) );
-                error_log('<ALOORS RULE ?>');*/
+
                 //TODO: MAKE SURE RULE ARE NORMALIZED
                 foreach( $rules as $rule ) {
                     if ( ! is_array( $rule ) ) {
-                        error_log( '<' . __CLASS__ . '::' . __FUNCTION__ . '>');
-                        error_log( ' => a css rule should be represented by an array' );
-                        error_log( print_r( $rule, true ) );
-                        error_log( '</' . __CLASS__ . '::' . __FUNCTION__ . '>');
+                        sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a css rule should be represented by an array', $rule );
                         continue;
                     }
                     if ( empty( $rule['selector']) ) {
-                        error_log( '<' . __CLASS__ . '::' . __FUNCTION__ . '>');
-                        error_log( ' => a css rule is missing the selector param' );
-                        error_log( print_r( $rule, true ) );
-                        error_log( '</' . __CLASS__ . '::' . __FUNCTION__ . '>');
+                        sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . '=> a css rule is missing the selector param', $rule );
                         continue;
                     }
                     $this->sek_populate(
@@ -152,8 +141,6 @@ class Sek_Dyn_CSS_Builder {
         if ( ! is_string( $selector ) )
             return;
         if ( ! is_string( $css_rules ) )
-            return;
-        if ( ! is_string( $mq ) )
             return;
 
         // Assign a default media device
@@ -211,9 +198,6 @@ class Sek_Dyn_CSS_Builder {
     //@returns a stringified stylesheet, ready to be printed on the page or in a file
     public function get_stylesheet() {
         $css = '';
-        // error_log('<mq collection>');
-        // error_log( print_r( $this->collection, true ) );
-        // error_log('</mq collection>');
         if ( ! is_array( $this->collection ) || empty( $this->collection ) )
           return $css;
         // Sort the collection by media queries
