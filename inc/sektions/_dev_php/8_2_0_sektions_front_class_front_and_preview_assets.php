@@ -24,13 +24,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 NIMBLE_ASSETS_VERSION,
                 'all'
             );
-            wp_enqueue_style(
-                'font-awesome',
-                NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
-                array(),
-                NIMBLE_ASSETS_VERSION,
-                $media = 'all'
-            );
+
 
             // wp_register_script(
             //     'sek-front-fmk-js',
@@ -42,7 +36,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             wp_enqueue_script(
                 'sek-main-js',
                 NIMBLE_BASE_URL . '/assets/front/js/sek-main.js',
-                array( 'jquery', 'sek-front-fmk-js'),
+                array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 true
             );
@@ -74,7 +68,13 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 NIMBLE_ASSETS_VERSION,
                 'all'
             );
-
+            wp_enqueue_style(
+                'font-awesome',
+                NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
+                array(),
+                NIMBLE_ASSETS_VERSION,
+                $media = 'all'
+            );
             // Communication between preview and customizer panel
             wp_enqueue_script(
                 'sek-customize-preview',
