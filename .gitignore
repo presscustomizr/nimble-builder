@@ -24,7 +24,7 @@ hs-search.js
 # nimble.jpg
 
 # BUILD
-build/
+# __build__/
 
 
 # WPCS

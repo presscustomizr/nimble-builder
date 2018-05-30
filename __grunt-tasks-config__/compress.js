@@ -2,10 +2,10 @@ module.exports = {
 	main: {
 		options: {
 			mode: 'zip',
-			archive: './build/<%= pkg.name %>.zip'
+			archive: './__build__/<%= pkg.name %>.zip'
 		},
 		expand: true,
-		cwd: 'build/<%= pkg.name %>/',
+		cwd: '__build__/<%= pkg.name %>/',
 		src: ['**/*'],
 		dest: '<%= pkg.name %>/'
 	}

@@ -76,7 +76,16 @@ module.exports = function(grunt) {
               'cssmin:sek_front_css'
           ],
 
-          build : [ 'build_customizer_css_js_php_fmk_panel_and_preview', 'build_skope_php_js', 'build_sektion_php_js_css'  ]
+          build : [
+            'build_customizer_css_js_php_fmk_panel_and_preview',
+            'build_skope_php_js',
+            'build_sektion_php_js_css',
+            'replace',
+            'clean',
+            'copy:main',
+            'addtextdomain',
+            'compress'
+          ]
         },
         uglify_requested_paths : {
           src : '' || grunt.option('src'),

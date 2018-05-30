@@ -1,4 +1,75 @@
 module.exports = {
+
+  main: {
+    src:  [
+      '**',
+      '!bin/**',
+
+      '!__build__/**',
+      '!__grunt-tasks-config__/**',
+      '!node_modules/**',
+      '!tests/**',
+      '!wpcs/**',
+
+      '!.git/**',
+      '!gruntfile.js',
+      '!package.json',
+      '!package-lock.json',
+      '!.gitignore',
+      '!.ftpauth',
+      '!.travis.yml',
+      '!travis-examples/**',
+      '!phpunit.xml',
+      '!readme.md',
+      '!npm-debug.log',
+
+      '!nimble.jpg',
+
+      '!**/*.db',
+      '!patches/**',
+
+      // czr js dev fmk
+      '!assets/czr/fmk/**',
+      // czr php dev
+      '!inc/czr-base-fmk/_dev_php/**',
+
+      // skope js dev fmk
+      '!inc/czr-skope/assets/czr/js/_dev/**',
+      // skope php dev
+      '!inc/czr-skope/_dev/**',
+
+      // sektions customizer dev js
+      '!assets/czr/sek/js/_dev_control/**',
+      '!assets/czr/sek/js/_dev_preview/**',
+      // sektions dev php
+      '!inc/sektions/_dev_php/**',
+
+      // front dev fmk js
+      '!assets/front/js/_front_js_fmk/**',
+      '!assets/front/js/parts/**',
+      '!assets/front/js/libs/**',
+      '!assets/front/js/_front_js_fmk.js',
+
+      // front dev sass
+      '!assets/front/scss/**',
+      '!assets/front/css/sek-base.css.map',
+
+      // front tests php
+      '!tests.php'
+    ],
+    dest: '__build__/<%= pkg.name %>/'
+  },
+
+
+
+
+
+
+
+
+
+
+
   // Since may 2018 => not done from the advanced-customizer plugin anymore but from here
   czr_base_fmk_in_customizr_theme : {
     expand: true,

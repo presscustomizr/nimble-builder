@@ -7,7 +7,7 @@ module.exports = {
     target: {
         files: {
             src: [
-                'build/**/*.php'
+                '__build__/**/*.php'
                 // '*/*.php',
                 // '**/*.php',
                 // '!build/**',
