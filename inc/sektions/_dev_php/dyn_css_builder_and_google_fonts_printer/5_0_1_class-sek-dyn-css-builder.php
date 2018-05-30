@@ -148,10 +148,12 @@ class Sek_Dyn_CSS_Builder {
 
     // @return void()
     // populates the css rules ::collection property, organized by media queries
-    public function sek_populate( $selector, $css_rules, string $mq = null ) {
+    public function sek_populate( $selector, $css_rules, $mq = '' ) {
         if ( ! is_string( $selector ) )
             return;
         if ( ! is_string( $css_rules ) )
+            return;
+        if ( ! is_string( $mq ) )
             return;
 
         // Assign a default media device
