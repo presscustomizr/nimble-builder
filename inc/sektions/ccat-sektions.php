@@ -2627,10 +2627,12 @@ class Sek_Dyn_CSS_Builder {
 
     // @return void()
     // populates the css rules ::collection property, organized by media queries
-    public function sek_populate( $selector, $css_rules, string $mq = null ) {
+    public function sek_populate( $selector, $css_rules, $mq = '' ) {
         if ( ! is_string( $selector ) )
             return;
         if ( ! is_string( $css_rules ) )
+            return;
+        if ( ! is_string( $mq ) )
             return;
 
         // Assign a default media device
@@ -2717,7 +2719,7 @@ class Sek_Dyn_CSS_Builder {
 
 
     // hook : sek_add_css_rules_for_level_options
-    public function sek_add_rules_for_column_width( array $rules, array $level ) {
+    public function sek_add_rules_for_column_width( $rules, $level ) {
         $width   = empty( $level[ 'width' ] ) || !is_numeric( $level[ 'width' ] ) ? '' : $level['width'];
 
         //width
@@ -3037,12 +3039,10 @@ class Sek_Dyn_CSS_Handler {
             //build stylesheet
             $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model );
 
-            // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->collection>');
-            // error_log( print_r( $stylesheet->collection, true ) );
-            // error_log('</' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->collection>');
-
             // now that the stylesheet is ready let's cache it
             $this->css_string_to_enqueue_or_print = (string)$this->builder-> get_stylesheet();
+
+            sek_error_log( __CLASS__ . ' ' . __FUNCTION__ . ' =>$stylesheet->collection>', $this->css_string_to_enqueue_or_print, true );
         }
 
         // error_log('<' . __CLASS__ . ' ' . __FUNCTION__ . ' =>$args>');
@@ -3468,9 +3468,12 @@ class Sek_Dyn_CSS_Handler {
 // filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
 add_filter( "sek_add_css_rules_for_input_id", 'sek_add_css_rules_for_generic_css_input_types', 10, 4 );
-function sek_add_css_rules_for_generic_css_input_types( array $rules, $value, string $input_id, array $parent_level ) {
+function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_id, $parent_level ) {
     // error_log( $input_id );
     // error_log( print_r( $parent_level, true ) );
+    if ( ! is_string( $input_id ) )
+        return $rules;
+
     $selector = '[data-sek-id="'.$parent_level['id'].'"]';
     $mq = null;
     $properties_to_render = array();
@@ -4049,15 +4052,12 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             //base custom CSS bootstrap inspired
             wp_enqueue_style(
                 'sek-base',
-                NIMBLE_BASE_URL . '/assets/front/css/sek-base.css',
+                sprintf(
+                    '%1$s/assets/front/css/%2$s' ,
+                    NIMBLE_BASE_URL,
+                    defined('CZR_DEV') && true === CZR_DEV ? 'sek-base.css' : 'sek-base.min.css'
+                ),
                 array(),
-                NIMBLE_ASSETS_VERSION,
-                'all'
-            );
-            wp_enqueue_style(
-                'sek-main',
-                NIMBLE_BASE_URL . '/assets/front/css/sek-main.css',
-                array( 'sek-base' ),
                 NIMBLE_ASSETS_VERSION,
                 'all'
             );
@@ -4107,7 +4107,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     NIMBLE_BASE_URL,
                     defined('CZR_DEV') && true === CZR_DEV ? 'sek-preview.css' : 'sek-preview.min.css'
                 ),
-                array( 'sek-main' ),
+                array( 'sek-base' ),
                 NIMBLE_ASSETS_VERSION,
                 'all'
             );

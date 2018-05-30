@@ -670,7 +670,7 @@
     border-left: 1px solid #e2e4e7;
     left: 0;
 }
-.editor-block-settings-menu:before
+.editor-block-settings-menu:before {
     content: "";
     position: absolute;
     height: 36px;

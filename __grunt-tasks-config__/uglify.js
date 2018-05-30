@@ -47,8 +47,28 @@ module.exports = {
     files: [{
       expand: true,
       cwd: '<%= paths.czr_assets %>sek/js/',
-      src: [ 'czr-skope-base.js' ],
+      src: [ 'ccat-sek-control.js' ],
       dest: '<%= paths.czr_assets %>sek/js/',
+      ext: '.min.js'
+    }]
+  },
+
+  czr_sektions_customizer_preview_js : {
+    files: [{
+      expand: true,
+      cwd: '<%= paths.czr_assets %>sek/js/',
+      src: [ 'ccat-sek-preview.js' ],
+      dest: '<%= paths.czr_assets %>sek/js/',
+      ext: '.min.js'
+    }]
+  },
+
+  czr_sektions_customizer_libs_js : {
+    files: [{
+      expand: true,
+      cwd: '<%= paths.czr_assets %>sek/js/libs/',
+      src: [ '*.js', '!*.min.js' ],
+      dest: '<%= paths.czr_assets %>sek/js/libs/',
       ext: '.min.js'
     }]
   }

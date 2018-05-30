@@ -10,15 +10,6 @@
 * License: GPLv2 or later
 */
 
-//error_log( 'get_stylesheet ' . get_stylesheet() );
-// if ( 0 === strpos( get_stylesheet(), 'customizr' ) )
-//   return;
-
-/* ------------------------------------------------------------------------- *
- *  LOADS TESTS
-/* ------------------------------------------------------------------------- */
-require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
-
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
@@ -47,31 +38,34 @@ function ac_load_czr_base_fmk() {
     ));
 }
 
-
-
 /* ------------------------------------------------------------------------- *
  *  LOADS SKOP
 /* ------------------------------------------------------------------------- */
 require_once( plugin_dir_path( __FILE__ ) . 'inc/czr-skope/index.php' );
-// If in hueman-pro-addons or in hueman-pro theme
-// add_action('hu_hueman_loaded', function() {
-//     Flat_Skop_Base();
-// });
 add_action( 'after_setup_theme', function() {
     Flat_Skop_Base( array(
         'base_url_path' => NIMBLE_BASE_URL . '/inc/czr-skope'
     ) );
 });
 
+/* ------------------------------------------------------------------------- *
+ *  LOADS SEKS
+/* ------------------------------------------------------------------------- */
+require_once( plugin_dir_path( __FILE__ ) . 'inc/sektions/ccat-sektions.php' );
+
+/* ------------------------------------------------------------------------- *
+ *  LOADS TESTS
+/* ------------------------------------------------------------------------- */
+if ( defined( 'CZR_DEV' ) && CZR_DEV && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
+    require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
+}
+
+//error_log( 'get_stylesheet ' . get_stylesheet() );
+// if ( 0 === strpos( get_stylesheet(), 'customizr' ) )
+//   return;
 
 // add_action('wp', function() {
 //     error_log( '<////////////////////THEMEMODS>' );
 //     error_log( print_r( get_theme_mods(), true ) );
 //     error_log( '</////////////////////THEMEMODS>' );
 // });
-
-
-/* ------------------------------------------------------------------------- *
- *  LOADS SEKTION BUILDER
-/* ------------------------------------------------------------------------- */
-require_once( plugin_dir_path( __FILE__ ) . 'inc/sektions/ccat-sektions.php' );

@@ -64,18 +64,19 @@ module.exports = function(grunt) {
               'concat:czr_sektions_php',
 
               'concat:czr_sektions_customizer_control_js',
-              'uglify:czr_sektions_customizer_control_js',//<========================================== TO CREATE
+              'uglify:czr_sektions_customizer_control_js',
               'concat:czr_sektions_customizer_preview_js',
-              'uglify:czr_sektions_customizer_preview_js',//<========================================== TO CREATE
+              'uglify:czr_sektions_customizer_preview_js',
+              'uglify:czr_sektions_customizer_libs_js',
 
-              'cssmin:czr_sek_preview_css',//<========================================== TO CREATE
+              'cssmin:sek_customizer_css',
 
               'sass:sek_main',
               'postcss:sek_main',
-              'cssmin:sek_css'//<========================================== TO CREATE
+              'cssmin:sek_front_css'
           ],
 
-          build : [ 'build_customizer_css_js_php_fmk_panel_and_preview'  ]
+          build : [ 'build_customizer_css_js_php_fmk_panel_and_preview', 'build_skope_php_js', 'build_sektion_php_js_css'  ]
         },
         uglify_requested_paths : {
           src : '' || grunt.option('src'),

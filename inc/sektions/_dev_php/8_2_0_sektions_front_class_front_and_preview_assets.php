@@ -15,15 +15,12 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             //base custom CSS bootstrap inspired
             wp_enqueue_style(
                 'sek-base',
-                NIMBLE_BASE_URL . '/assets/front/css/sek-base.css',
+                sprintf(
+                    '%1$s/assets/front/css/%2$s' ,
+                    NIMBLE_BASE_URL,
+                    defined('CZR_DEV') && true === CZR_DEV ? 'sek-base.css' : 'sek-base.min.css'
+                ),
                 array(),
-                NIMBLE_ASSETS_VERSION,
-                'all'
-            );
-            wp_enqueue_style(
-                'sek-main',
-                NIMBLE_BASE_URL . '/assets/front/css/sek-main.css',
-                array( 'sek-base' ),
                 NIMBLE_ASSETS_VERSION,
                 'all'
             );
@@ -73,7 +70,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     NIMBLE_BASE_URL,
                     defined('CZR_DEV') && true === CZR_DEV ? 'sek-preview.css' : 'sek-preview.min.css'
                 ),
-                array( 'sek-main' ),
+                array( 'sek-base' ),
                 NIMBLE_ASSETS_VERSION,
                 'all'
             );

@@ -27,5 +27,21 @@ module.exports = {
     src: ['*.css', '!*.min.css'],
     dest: '<%= paths.czr_base_fmk %>assets/css',
     ext: '.min.css'
+  },
+
+  sek_customizer_css: {
+    expand: true,
+    cwd: '<%= paths.czr_assets %>sek/css/',
+    src: ['*.css', '!*.min.css'],
+    dest: '<%= paths.czr_assets %>sek/css/',
+    ext: '.min.css'
+  },
+
+  sek_front_css: {
+    expand: true,
+    cwd: '<%= paths.front_assets %>css/',
+    src: ['sek-base.css'],
+    dest: '<%= paths.front_assets %>css/',
+    ext: '.min.css'
   }
 };
