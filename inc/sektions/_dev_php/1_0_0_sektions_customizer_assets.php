@@ -17,6 +17,18 @@ add_action( 'customize_register', function() {
 // ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
 add_action ( 'customize_controls_enqueue_scripts', 'sek_enqueue_controls_js_css', 20 );
 function sek_enqueue_controls_js_css() {
+    wp_enqueue_style(
+        'sek-control',
+        sprintf(
+            '%1$s/assets/czr/sek/css/%2$s' ,
+            NIMBLE_BASE_URL,
+            defined('CZR_DEV') && true === CZR_DEV ? 'sek-control.css' : 'sek-control.min.css'
+        ),
+        array(),
+        NIMBLE_ASSETS_VERSION,
+        'all'
+    );
+
     $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
     //czr_fn\czr_register_dynamic_module
     $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
@@ -256,14 +268,6 @@ function sek_enqueue_controls_js_css() {
 
             )
         )
-    );
-
-    wp_enqueue_style(
-        'sek-control',
-        NIMBLE_BASE_URL . '/assets/czr/sek/css/sek-control.css',
-        array(),
-        NIMBLE_ASSETS_VERSION,
-        'all'
     );
 }
 
