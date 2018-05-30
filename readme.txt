@@ -1,15 +1,15 @@
 === Nimble Builder ===
-Contributors: nikeo
+Contributors: nikeo, d4z_c0nf
 Author URI: https://presscustomizr.com
 Plugin URI: https://wordpress.org/plugins/nimble-builder/
-Tags: customizer
+Tags: customizer, editor, page builder, drag and drop
 Requires at least: 3.4
 Tested up to: 4.9.4
-Stable tag: 1.0.0
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Stable tag: 1.0.0-beta-2
+License: GPLv3
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Enhanced Customizer for WordPress.
+Live drag and drop builder for the WordPress Customizer.
 
 == Description ==
 **Enhanced Customizer for WordPress.**
