@@ -1,8 +1,7 @@
 <?php
 /**
 * Plugin Name: Nimble Builder
-* Plugin URI: https://presscustomizr.com
-* Description: Live drag and drop builder for the WordPress Customizer
+* Description: Drag and drop page builder for the WordPress customizer
 * Version: 1.0.0
 * Text Domain: nimble-builder
 * Author: Press Customizr
