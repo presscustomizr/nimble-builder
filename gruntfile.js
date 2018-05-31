@@ -49,11 +49,6 @@ module.exports = function(grunt) {
               'cssmin:czr_css',
           ],
 
-          'copy_customizer_fmk_css_js_php_to_other_themes_and_plugins' : [
-              'copy:czr_base_fmk_in_customizr_theme',
-              'copy:czr_base_fmk_in_wfc'
-          ],
-
           'build_skope_php_js' : [
               'concat:czr_flat_skope_php',
               'concat:czr_flat_skope_js',
@@ -85,6 +80,12 @@ module.exports = function(grunt) {
             'copy:main',
             'addtextdomain',
             'compress'
+          ],
+
+          copy_czr_fmk : [
+            'build_customizer_css_js_php_fmk_panel_and_preview',
+            'copy:czr_base_fmk_in_customizr_theme',
+            'copy:czr_base_fmk_in_wfc'
           ]
         },
         uglify_requested_paths : {

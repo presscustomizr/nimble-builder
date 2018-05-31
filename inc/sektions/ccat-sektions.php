@@ -563,6 +563,18 @@ add_action( 'customize_register', function() {
 // ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
 add_action ( 'customize_controls_enqueue_scripts', 'sek_enqueue_controls_js_css', 20 );
 function sek_enqueue_controls_js_css() {
+    wp_enqueue_style(
+        'sek-control',
+        sprintf(
+            '%1$s/assets/czr/sek/css/%2$s' ,
+            NIMBLE_BASE_URL,
+            defined('CZR_DEV') && true === CZR_DEV ? 'sek-control.css' : 'sek-control.min.css'
+        ),
+        array(),
+        NIMBLE_ASSETS_VERSION,
+        'all'
+    );
+
     $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
     //czr_fn\czr_register_dynamic_module
     $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
@@ -604,6 +616,7 @@ function sek_enqueue_controls_js_css() {
         'sektionsLocalizedData',
         array(
             'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
+            'baseUrl' => NIMBLE_BASE_URL,
             'sektionsPanelId' => '__sektions__',
             'addNewSektionId' => 'sek_add_new_sektion',
             'addNewColumnId' => 'sek_add_new_column',
@@ -802,14 +815,6 @@ function sek_enqueue_controls_js_css() {
 
             )
         )
-    );
-
-    wp_enqueue_style(
-        'sek-control',
-        NIMBLE_BASE_URL . '/assets/czr/sek/css/sek-control.css',
-        array(),
-        NIMBLE_ASSETS_VERSION,
-        'all'
     );
 }
 
@@ -4032,13 +4037,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 NIMBLE_ASSETS_VERSION,
                 'all'
             );
-            wp_enqueue_style(
-                'font-awesome',
-                NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
-                array(),
-                NIMBLE_ASSETS_VERSION,
-                $media = 'all'
-            );
+
 
             // wp_register_script(
             //     'sek-front-fmk-js',
@@ -4050,7 +4049,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             wp_enqueue_script(
                 'sek-main-js',
                 NIMBLE_BASE_URL . '/assets/front/js/sek-main.js',
-                array( 'jquery', 'sek-front-fmk-js'),
+                array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 true
             );
@@ -4082,7 +4081,13 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 NIMBLE_ASSETS_VERSION,
                 'all'
             );
-
+            wp_enqueue_style(
+                'font-awesome',
+                NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
+                array(),
+                NIMBLE_ASSETS_VERSION,
+                $media = 'all'
+            );
             // Communication between preview and customizer panel
             wp_enqueue_script(
                 'sek-customize-preview',
@@ -4255,17 +4260,33 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // hook : loop_start, loop_end
         function sek_schedule_sektions_rendering() {
+            // A location can be rendered only once
+            // for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
+            // @see issue with Twenty Seventeen here : https://github.com/presscustomizr/nimble-builder/issues/14
+            // That's why we check if did_action( ... )
+            if ( did_action( 'sek_before_location_' . current_filter() ) )
+              return;
+            do_action( 'sek_before_location_' . current_filter() );
             $this->_render_seks_for_location( current_filter() );
+            do_action( 'sek_after_location_' . current_filter() );
         }
 
         // hook : before_content
         function sek_schedule_sektion_rendering_before_content( $html ) {
+            if ( did_action( 'sek_before_location_before_content' ) )
+              return;
+            do_action( 'sek_before_location_before_content' );
             return $this -> _filter_the_content( $html, 'before_content' );
+            do_action( 'sek_after_location_before_content' );
         }
 
         // hook : after_content
         function sek_schedule_sektion_rendering_after_content( $html ) {
+            if ( did_action( 'sek_before_location_after_content' ) )
+              return;
+            do_action( 'sek_before_location_after_content' );
             return $this -> _filter_the_content( $html, 'after_content' );
+            do_action( 'sek_after_location_after_content' );
         }
 
         private function _render_seks_for_location( $location = '' ) {

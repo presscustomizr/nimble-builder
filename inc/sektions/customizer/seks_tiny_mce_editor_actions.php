@@ -2,6 +2,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+
+/* This approach has been inspired by the excellent https://github.com/xwp/wp-customize-posts */
 add_action( 'customize_controls_print_footer_scripts', 'sek_print_tiny_mce_editor_template', 0 );
 function sek_print_tiny_mce_editor_template() {
 ?>

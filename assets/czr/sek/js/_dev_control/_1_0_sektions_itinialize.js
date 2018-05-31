@@ -172,6 +172,41 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         },
                         _toggleActive : function(){ return true; }
                   });
+
+                  // Always display the module-picker when expanding the main panel
+                  // the panel.expanded() Value is not the right candidate to be observed because it gets changed on too many events, when generating the various UI.
+                  api.panel( sektionsLocalizedData.sektionsPanelId, function( _mainPanel_ ) {
+                        _mainPanel_.deferred.embedded.done( function() {
+                              var $sidePanelTitleEl = _mainPanel_.container.find('h3.accordion-section-title'),
+                                  $topPanelTitleEl = _mainPanel_.container.find('.panel-meta .accordion-section-title'),
+                                  logoHtml = [ '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="', sektionsLocalizedData.baseUrl, '/assets/img/nimble/nimble_horizontal.svg', '"/>' ].join('');
+
+
+
+
+                              if ( 0 < $sidePanelTitleEl.length ) {
+                                    // Attach click event
+                                    $sidePanelTitleEl.on( 'click', function( evt ) {
+                                          api.previewer.trigger('sek-pick-module');
+                                    });
+                                    // The default title looks like this : Nimble Builder <span class="screen-reader-text">Press return or enter to open this section</span>
+                                    // we want to style "Nimble Builder" only.
+                                    var $sidePanelTitleElSpan = $sidePanelTitleEl.find('span');
+                                    $sidePanelTitleEl
+                                          .addClass('sek-side-nimble-logo-wrapper')
+                                          .html( logoHtml )
+                                          .append( $sidePanelTitleElSpan );
+                              }
+
+                              // default looks like
+                              // <span class="preview-notice">You are customizing <strong class="panel-title">Nimble Builder</strong></span>
+                              // if ( 0 < $topPanelTitleEl.length ) {
+                              //       var $topPanelTitleElInner = $topPanelTitleEl.find('.panel-title');
+                              //       $topPanelTitleElInner.html( logoHtml );
+                              // }
+                        });
+                  });
+
                   // The parent panel for all ui sections + global options section
                   this.register({
                         what : 'panel',
@@ -179,8 +214,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         title: sektionsLocalizedData.i18n['Nimble Builder'],
                         priority : 1000,
                         constructWith : SektionPanelConstructor,
-                        track : false//don't register in the self.registered()
+                        track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                   });
+
             },//mayBeRegisterAndSetupAddNewSektionSection()
 
 
@@ -195,8 +231,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             setContextualCollectionSettingIdWhenSkopeSet : function( newSkopes, previousSkopes ) {
                   var self = this;
 
-                  // Clear all previous sektions if we're coming from a previousSkopes
-                  if ( ! _.isEmpty( previousSkopes.local ) ) {
+                  // Clear all previous sektions if the main panel is expanded and we're coming from a previousSkopes
+                  if ( ! _.isEmpty( previousSkopes.local ) && api.panel( sektionsLocalizedData.sektionsPanelId ).expanded() ) {
                         //api.previewer.trigger('sek-pick-section');
                         api.previewer.trigger('sek-pick-module');
                   }

@@ -724,8 +724,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     api.preview.send( 'sek-to-json', { id : _id } );
                               break;
                               case 'inactiveZone' :
-                                    api.preview.send( 'sek-click-on-inactive-zone');
-                                    self._send_( $el, { action : 'pick-module' } );
+                                    api.preview.send( 'sek-click-on-inactive-zone');//<= for example, collapses the tinyMce editor if expanded
+                                    //self._send_( $el, { action : 'pick-module' } );
                               break;
                         }
                   });

@@ -1,5 +1,5 @@
 === Nimble Builder ===
-Contributors: nikeo
+Contributors: nikeo, d4z_c0nf
 Author URI: https://presscustomizr.com
 Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: customizer, editor, page builder, drag and drop

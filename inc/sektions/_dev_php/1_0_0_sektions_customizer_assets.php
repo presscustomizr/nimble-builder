@@ -70,6 +70,7 @@ function sek_enqueue_controls_js_css() {
         'sektionsLocalizedData',
         array(
             'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
+            'baseUrl' => NIMBLE_BASE_URL,
             'sektionsPanelId' => '__sektions__',
             'addNewSektionId' => 'sek_add_new_sektion',
             'addNewColumnId' => 'sek_add_new_column',

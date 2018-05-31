@@ -73,7 +73,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           module_type : 'module' === params.content_type ? 'sek_module_picker_module' : 'sek_section_picker_module',
                                           section : _id_,
                                           priority : 10,
-                                          settings : { default : _id_ }
+                                          settings : { default : _id_ },
+                                          track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                                     }).done( function() {
                                           api.control( _id_ ).focus({
                                               completeCallback : function() {}
@@ -93,8 +94,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     title: 'module' === params.content_type ? sektionsLocalizedData.i18n['Module Picker'] : sektionsLocalizedData.i18n['Section Picker'],
                                     panel : sektionsLocalizedData.sektionsPanelId,
                                     priority : 30,
-                                    //track : false//don't register in the self.registered()
-                                    //constructWith : MainSectionConstructor,
+                                    track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                                    constructWith : api.Section.extend({
+                                          //attachEvents : function () {},
+                                          // Always make the section active, event if we have no control in it
+                                          isContextuallyActive : function () {
+                                            return this.active();
+                                          },
+                                          _toggleActive : function(){ return true; }
+                                    })
                               });
                         break;
 
@@ -237,11 +245,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   spacingOptionsSetId = params.id + '__spacing_options';
 
                               // Is the UI currently displayed the one that is being requested ?
-                              // If so, don't generate the ui again, simply focus on it
+                              // If so, don't generate the ui again, simply focus on the section
                               if ( self.isUIElementCurrentlyGenerated( bgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( heightOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
-                                    api.control( bgBorderOptionsSetId ).focus({
-                                          completeCallback : function() {}
-                                    });
+                                    api.section( api.control( bgBorderOptionsSetId ).section() ).expanded( true );
                                     break;
                               }
 

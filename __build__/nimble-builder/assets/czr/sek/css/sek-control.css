@@ -326,3 +326,13 @@ div[data-sek-align].selected {
     box-shadow: none;
     background: #555d66;
 }
+
+
+/* Nimble Logo */
+/* this class is added to a .accordion-section-title selector */
+.sek-side-nimble-logo-wrapper {
+  padding: 4px 25px 0 2px!important;
+}
+.sek-side-nimble-logo-wrapper .sek-nimble-logo {
+  height: 45px;
+}
