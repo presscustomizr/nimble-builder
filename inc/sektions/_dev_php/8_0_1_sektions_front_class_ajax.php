@@ -33,9 +33,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
         // hook : 'wp_ajax_sek_get_html_for_injection'
         function sek_get_level_content_for_injection( $params ) {
-            // error_log('<ajax sek_get_level_content_for_injection>');
-            // error_log( print_r( $_POST, true ) );
-            // error_log('</ajax sek_get_level_content_for_injection>');
+            // sek_error_log( 'ajax sek_get_level_content_for_injection', $_POST );
             if ( ! is_user_logged_in() ) {
                 wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
             }
@@ -61,6 +59,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             // is this action possible ?
             if ( in_array( $sek_action, $this -> ajax_action_map ) ) {
                 $html = $this -> sek_ajax_fetch_content( $sek_action );
+                //sek_error_log('sek_ajax_fetch_content()', $html );
                 if ( is_wp_error( $html ) ) {
                     wp_send_json_error( $html );
                 }
@@ -86,9 +85,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // @return string
         // @param $sek_action is $_POST['sek_action']
         private function sek_ajax_fetch_content( $sek_action = '' ) {
-            // error_log('<ajax sek_ajax_fetch_content>');
-            // error_log( print_r( $_POST, true ) );
-            // error_log('</ajax sek_ajax_fetch_content>');
+            // sek_error_log( 'sek_ajax_fetch_content', $_POST );
             // the $_POST['customized'] has already been updated
             // so invoking sek_get_skoped_seks() will ensure that we get the latest data
             // since wp has not been fired yet, we need to use the posted skope_id param.
@@ -124,16 +121,10 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                     } else {
                         $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                     }
-                    //  error_log('<ajax sek-remove-section>');
-                    // error_log( print_r( $_POST, true ) );
-                    // error_log('</ajax sek-remove-section>');
                 break;
 
                 //only used for nested section
                 case 'sek-remove-section' :
-                    // error_log('<ajax sek-remove-section>');
-                    // error_log( print_r( $_POST, true ) );
-                    // error_log('</ajax sek-remove-section>');
                     if ( ! array_key_exists( 'is_nested', $_POST ) || true !== json_decode( $_POST['is_nested'] ) ) {
                         wp_send_json_error(  __FUNCTION__ . ' sek-remove-section => the section must be nested in this ajax action' );
                         break;
@@ -145,9 +136,6 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 break;
 
                 case 'sek-duplicate-section' :
-                    // error_log('<ajax sek-duplicate-section>');
-                    // error_log( print_r( $_POST, true ) );
-                    // error_log('</ajax sek-duplicate-section>');
                     if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
                         $this -> parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
@@ -166,6 +154,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                         wp_send_json_error(  __FUNCTION__ . ' ' . $sek_action .' => missing in_sektion param' );
                         break;
                     }
+                    // sek_error_log('sektion_collection', $sektion_collection );
                     $level_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
                 break;
 
@@ -178,9 +167,6 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                         wp_send_json_error(  __FUNCTION__ . ' ' . $sek_action .' => missing in_column param' );
                         break;
                     }
-                    // error_log('<sek_ajax_fetch_content => $_POST>');
-                    // error_log( print_r( $_POST, true ) );
-                    // error_log('</sek_ajax_fetch_content => $_POST>');
                     if ( ! array_key_exists( 'in_sektion', $_POST ) || empty( $_POST[ 'in_sektion' ] ) ) {
                         $this -> parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     } else {
@@ -202,7 +188,6 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 break;
 
                  case 'sek-refresh-level' :
-                    //error_log( print_r( $_POST, true ) );
                     if ( ! array_key_exists( 'id', $_POST ) || empty( $_POST['id'] ) ) {
                         wp_send_json_error(  __FUNCTION__ . ' ' . $sek_action .' => missing level id' );
                         break;
@@ -211,18 +196,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 break;
             }//Switch sek_action
 
-            // error_log( '<$_POST AJAXING>');
-            // error_log( print_r( $_POST, true ) );
-            // error_log( '</$_POST AJAXING>');
-            // error_log( '<///////////////////////////////////////////////////>');
-            // error_log( '<PARENT LEVEL MODEL WHEN AJAXING>');
-            // error_log( print_r( $this -> parent_model, true ) );
-            // error_log( '</PARENT LEVEL MODEL WHEN AJAXING>');
-            // error_log( '<///////////////////////////////////////////////////>');
-            // error_log( '<LEVEL MODEL WHEN AJAXING>');
-            // error_log( 'ALORS? => ' . $sek_action );
-            // error_log( print_r( $level_model, true ) );
-            // error_log( '</LEVEL MODEL WHEN AJAXING>');
+            // sek_error_log('LEVEL MODEL WHEN AJAXING', $level_model );
 
             ob_start();
 
@@ -318,19 +292,6 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             $this -> model = sek_get_level_model( $_POST[ 'id' ], $sektionSettingValue['collection'] );
 
             $level = $_POST['level'];
-
-            error_log( '<$_POST AJAXING>');
-            error_log( print_r( $_POST, true ) );
-            error_log( '</$_POST AJAXING>');
-            error_log( '<///////////////////////////////////////////////////>');
-            error_log( '<PARENT LEVEL MODEL WHEN AJAXING>');
-            error_log( print_r( $this -> parent_model, true ) );
-            error_log( '</PARENT LEVEL MODEL WHEN AJAXING>');
-            error_log( '<///////////////////////////////////////////////////>');
-            error_log( '<LEVEL MODEL WHEN AJAXING>');
-            error_log( print_r( $this -> model , true ) );
-            error_log( '</LEVEL MODEL WHEN AJAXING>');
-
 
             $html = '';
             ob_start();
