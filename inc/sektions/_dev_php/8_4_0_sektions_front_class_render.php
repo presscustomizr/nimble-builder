@@ -41,7 +41,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // hook : before_content
         function sek_schedule_sektion_rendering_before_content( $html ) {
             if ( did_action( 'sek_before_location_before_content' ) )
-              return;
+              return $html;
             do_action( 'sek_before_location_before_content' );
             return $this -> _filter_the_content( $html, 'before_content' );
             do_action( 'sek_after_location_before_content' );
@@ -50,14 +50,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // hook : after_content
         function sek_schedule_sektion_rendering_after_content( $html ) {
             if ( did_action( 'sek_before_location_after_content' ) )
-              return;
+              return $html;
             do_action( 'sek_before_location_after_content' );
             return $this -> _filter_the_content( $html, 'after_content' );
             do_action( 'sek_after_location_after_content' );
         }
 
         private function _render_seks_for_location( $location = '' ) {
-            if ( ! in_array( $location,sek_get_locations() ) ) {
+            if ( ! in_array( $location, sek_get_locations() ) ) {
                 error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
             }
@@ -92,9 +92,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // Walk a model tree recursively and render each level with a specific template
         // Each level is described with at least 2 properties : collection and options
         function render( $model = array(), $location = 'loop_start' ) {
-            // error_log( '<LEVEL MODEL IN ::RENDER()>');
-            // error_log( print_r( $model, true ) );
-            // error_log( '</LEVEL MODEL IN ::RENDER()>');
+            //sek_error_log('LEVEL MODEL IN ::RENDER()', $model );
             // Is it the root level ?
             // The root level has no id and no level entry
             if ( ! is_array( $model ) ) {
