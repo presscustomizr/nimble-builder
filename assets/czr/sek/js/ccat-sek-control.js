@@ -1870,6 +1870,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( true === refresh_stylesheet ) {
                                     api.previewer.send( 'sek-refresh-stylesheet', {
                                           skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                          apiParams : {
+                                                action : 'sek-refresh-stylesheet',
+                                                id : params.uiParams.id,
+                                                level : params.uiParams.level
+                                          },
                                     });
                               }
 
@@ -2949,8 +2954,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         case 'control' :
                               if ( api.control.has( params.id ) ) {
-                                    api.errorLog( 'registerControl => ' + params.id + ' is already registered');
-                                     break;
+                                    //api.errorLog( 'registerControl => ' + params.id + ' is already registered');
+                                    break;
                               }
 
                               //console.log('PARAMS BEFORE REGISTERING A CONTROL => ', params);

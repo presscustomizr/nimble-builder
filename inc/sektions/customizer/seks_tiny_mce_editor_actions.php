@@ -43,11 +43,3 @@ function sek_enqueue_tiny_mce_editor() {
     add_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'enqueue_scripts' ) );
   }
 }
-
-function kv_show_font_selector($buttons) {
-
-  $buttons[] = 'fontselect';
-
-  return $buttons;
-}
-add_filter('mce_buttons_2', 'kv_show_font_selector');

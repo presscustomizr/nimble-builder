@@ -19,9 +19,9 @@ module.exports = {
       to: '$current_version = "<%= pkg.version %>";'
     } ]
   },
-	readme : {
+	readme_txt : {
 		src: [
-			'readme.md', 'readme.txt'
+			'readme.txt'
 		],
 		overwrite: true,
 		replacements: [ {
@@ -29,6 +29,16 @@ module.exports = {
 			to: 'Stable tag: <%= pkg.version %>'
 		} ]
 	},
+  readme_md : {
+    src: [
+      'readme.md'
+    ],
+    overwrite: true,
+    replacements: [ {
+      from: /^.*# Nimble Builder v.*$/m,
+      to: '# Nimble Builder v<%= pkg.version %> [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)'
+    } ]
+  }
   // lang : {
   //   src: [
   //     '<%= paths.lang %>*.po'

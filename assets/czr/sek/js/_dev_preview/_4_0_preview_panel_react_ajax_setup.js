@@ -210,8 +210,18 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             // GENERATE UI ELEMENTS
                             // when the options ui has been generated in the panel for a level, we receive back this msg
-                            'sek-generate-level-options-ui' : function( params ) {},
+                            // 'sek-generate-level-options-ui' : function( params ) {
+                            //       console.log('PANEL REACT? ', 'sek-generate-level-options-ui', params );
+                            // },
 
+                            'sek-edit-options' : function( params ) {
+                                  // ::activeLevelUI is declared in ::initialized()
+                                  self.activeLevelUI( params.uiParams.id );
+                            },
+                            'sek-edit-module' : function( params ) {
+                                  // ::activeLevelUI is declared in ::initialized()
+                                  self.activeLevelUI( params.uiParams.id );
+                            },
 
                             // @params =  {
                             //   skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing

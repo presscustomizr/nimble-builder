@@ -3,7 +3,7 @@
 * Plugin Name: Nimble Builder
 * Plugin URI: https://presscustomizr.com
 * Description: Live drag and drop builder for the WordPress Customizer
-* Version: 1.0.0-beta-2
+* Version: 1.0.0
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://presscustomizr.com
@@ -12,7 +12,7 @@
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "1.0.0-beta-2";
+$current_version = "1.0.0";
 if ( ! defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version );}
 if ( ! defined( 'NIMBLE_ASSETS_VERSION' ) ) {
     define( 'NIMBLE_ASSETS_VERSION', ( ( defined( 'CZR_DEV' ) && CZR_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) ? time() : NIMBLE_VERSION );

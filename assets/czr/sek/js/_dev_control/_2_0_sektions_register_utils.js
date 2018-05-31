@@ -110,8 +110,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         case 'control' :
                               if ( api.control.has( params.id ) ) {
-                                    api.errorLog( 'registerControl => ' + params.id + ' is already registered');
-                                     break;
+                                    //api.errorLog( 'registerControl => ' + params.id + ' is already registered');
+                                    break;
                               }
 
                               //console.log('PARAMS BEFORE REGISTERING A CONTROL => ', params);

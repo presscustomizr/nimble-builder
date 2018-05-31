@@ -670,6 +670,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( true === refresh_stylesheet ) {
                                     api.previewer.send( 'sek-refresh-stylesheet', {
                                           skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                          apiParams : {
+                                                action : 'sek-refresh-stylesheet',
+                                                id : params.uiParams.id,
+                                                level : params.uiParams.level
+                                          },
                                     });
                               }
 
