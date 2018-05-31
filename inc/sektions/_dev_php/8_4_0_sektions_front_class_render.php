@@ -27,17 +27,33 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // hook : loop_start, loop_end
         function sek_schedule_sektions_rendering() {
+            // A location can be rendered only once
+            // for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
+            // @see issue with Twenty Seventeen here : https://github.com/presscustomizr/nimble-builder/issues/14
+            // That's why we check if did_action( ... )
+            if ( did_action( 'sek_before_location_' . current_filter() ) )
+              return;
+            do_action( 'sek_before_location_' . current_filter() );
             $this->_render_seks_for_location( current_filter() );
+            do_action( 'sek_after_location_' . current_filter() );
         }
 
         // hook : before_content
         function sek_schedule_sektion_rendering_before_content( $html ) {
+            if ( did_action( 'sek_before_location_before_content' ) )
+              return;
+            do_action( 'sek_before_location_before_content' );
             return $this -> _filter_the_content( $html, 'before_content' );
+            do_action( 'sek_after_location_before_content' );
         }
 
         // hook : after_content
         function sek_schedule_sektion_rendering_after_content( $html ) {
+            if ( did_action( 'sek_before_location_after_content' ) )
+              return;
+            do_action( 'sek_before_location_after_content' );
             return $this -> _filter_the_content( $html, 'after_content' );
+            do_action( 'sek_after_location_after_content' );
         }
 
         private function _render_seks_for_location( $location = '' ) {
