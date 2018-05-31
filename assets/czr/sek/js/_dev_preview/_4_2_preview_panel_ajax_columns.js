@@ -15,7 +15,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         skope_id : params.skope_id,
                         sek_action : params.apiParams.action// sek-add-column || sek-remove-column
                   }).done( function( _r_ ) {
-                        var $parentSektion = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' );
+                        var $parentSektion = $( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' );
                         if ( 1 > $parentSektion.length ) {
                               self.errare( 'reactToPanelMsg => ' + params.apiParams.action + ' => no DOM node for parent sektion => ', params.apiParams.in_sektion );
                         }
@@ -41,7 +41,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         // say it to the parent sektion
                         //=> will be listened to by the column to re-instantiate sortable, resizable
-                        $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
+                        $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
                   });
