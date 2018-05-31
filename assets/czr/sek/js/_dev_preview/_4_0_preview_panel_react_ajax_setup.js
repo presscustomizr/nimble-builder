@@ -96,8 +96,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         $placeHolder.after( _r_.data );
                                         $placeHolder.remove();
 
-                                        $( '.sektion-wrapper' )
-                                              .find( 'div[data-sek-id="' + params.apiParams.id + '"]' )
+                                        $( 'div[data-sek-id="' + params.apiParams.id + '"]' )
                                               .trigger( 'sek-refresh-level', { level : params.apiParams.level, id : params.apiParams.id } );
                                   });
                             },
@@ -112,34 +111,37 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             // EDITING MODULE AND OPTIONS
                             'sek-move' : function( params ) {
                                   switch ( params.apiParams.action ) {
-                                        case 'sek-move-module' :
-                                              var paramsForSourceColumn = $.extend( true, {}, params ),
-                                                  paramsForTargetColumn = $.extend( true, {}, params );
-                                              // SOURCE COLUMN
-                                              //always re-render the source column if different than the target column
-                                              //=> this will ensure that we have the drop-zone placeholder printed for a no-module column
-                                              //+ will refresh the sortable()
-                                              if ( paramsForSourceColumn.apiParams.from_column != paramsForSourceColumn.apiParams.to_column ) {
-                                                    paramsForSourceColumn.apiParams = _.extend( paramsForSourceColumn.apiParams, {
-                                                          in_column : paramsForSourceColumn.apiParams.from_column,
-                                                          in_sektion : paramsForSourceColumn.apiParams.from_sektion,
-                                                          action : 'sek-refresh-modules-in-column'
-                                                    });
-                                                    self.ajaxRefreshModulesAndNestedSections( paramsForSourceColumn );
-                                              }
+                                        // case 'sek-move-section' :
+                                        //       //always re-render the source sektion and target sektion if different
+                                        //       //=> this will ensure a reset of the column's widths
+                                        //       if ( params.apiParams.from_location != params.apiParams.to_location ) {
+                                        //             var paramsForSourceSektion = $.extend( true, {}, params );
+                                        //             var paramsForTargetSektion = $.extend( true, {}, params );
 
-                                              // TARGET COLUMN
-                                              params.apiParams = _.extend( paramsForTargetColumn.apiParams, {
-                                                    in_column : paramsForTargetColumn.apiParams.to_column,
-                                                    in_sektion : paramsForTargetColumn.apiParams.to_sektion,
-                                                    action : 'sek-refresh-modules-in-column'
-                                              });
-                                              self.ajaxRefreshModulesAndNestedSections( paramsForTargetColumn );
+                                        //             // SOURCE SEKTION
+                                        //             // if the source sektion has been emptied, let's populate it with a new column
+                                        //             if ( $('[data-sek-id="' + params.apiParams.from_sektion +'"]', '.sektion-wrapper').find('div[data-sek-level="column"]').length < 1 ) {
+                                        //                   api.preview.send( 'sek-add-column', {
+                                        //                         in_sektion : params.apiParams.from_sektion,
+                                        //                         autofocus:false//<= because we want to focus on the column that has been moved away from the section
+                                        //                   });
+                                        //             } else {
+                                        //                   paramsForSourceSektion.apiParams =  _.extend( paramsForSourceSektion.apiParams, {
+                                        //                         in_sektion : params.apiParams.from_sektion,
+                                        //                         action : 'sek-refresh-columns-in-sektion'
+                                        //                   });
+                                        //                   self.ajaxRefreshColumns( paramsForSourceSektion );
+                                        //             }
 
-                                              // Re-instantiate sortable for the target column
-                                              $('[data-sek-id="' + params.apiParams.to_column +'"]', '.sektion-wrapper').find('.sek-column-inner').sortable( "refresh" );
-                                        break;
+                                        //             // TARGET SEKTION
+                                        //             paramsForTargetSektion.apiParams =  _.extend( paramsForTargetSektion.apiParams, {
+                                        //                   in_sektion : params.apiParams.to_sektion,
+                                        //                   action : 'sek-refresh-columns-in-sektion'
+                                        //             });
+                                        //             self.ajaxRefreshColumns( paramsForTargetSektion );
 
+                                        //       }
+                                        // break;
                                         case 'sek-move-column' :
                                               //always re-render the source sektion and target sektion if different
                                               //=> this will ensure a reset of the column's widths
@@ -170,6 +172,33 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                     self.ajaxRefreshColumns( paramsForTargetSektion );
 
                                               }
+                                        break;
+                                        case 'sek-move-module' :
+                                              var paramsForSourceColumn = $.extend( true, {}, params ),
+                                                  paramsForTargetColumn = $.extend( true, {}, params );
+                                              // SOURCE COLUMN
+                                              //always re-render the source column if different than the target column
+                                              //=> this will ensure that we have the drop-zone placeholder printed for a no-module column
+                                              //+ will refresh the sortable()
+                                              if ( paramsForSourceColumn.apiParams.from_column != paramsForSourceColumn.apiParams.to_column ) {
+                                                    paramsForSourceColumn.apiParams = _.extend( paramsForSourceColumn.apiParams, {
+                                                          in_column : paramsForSourceColumn.apiParams.from_column,
+                                                          in_sektion : paramsForSourceColumn.apiParams.from_sektion,
+                                                          action : 'sek-refresh-modules-in-column'
+                                                    });
+                                                    self.ajaxRefreshModulesAndNestedSections( paramsForSourceColumn );
+                                              }
+
+                                              // TARGET COLUMN
+                                              params.apiParams = _.extend( paramsForTargetColumn.apiParams, {
+                                                    in_column : paramsForTargetColumn.apiParams.to_column,
+                                                    in_sektion : paramsForTargetColumn.apiParams.to_sektion,
+                                                    action : 'sek-refresh-modules-in-column'
+                                              });
+                                              self.ajaxRefreshModulesAndNestedSections( paramsForTargetColumn );
+
+                                              // Re-instantiate sortable for the target column
+                                              $('[data-sek-id="' + params.apiParams.to_column +'"]', '.sektion-wrapper').find('.sek-column-inner').sortable( "refresh" );
                                         break;
                                   }
                             },

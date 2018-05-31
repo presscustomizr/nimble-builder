@@ -94,7 +94,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 array(
                     'i18n' => array(
                         "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
-                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced')
+                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
+                        'Insert here' => __('Insert here', 'text_domain_to_be_replaced')
                     ),
                     'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),

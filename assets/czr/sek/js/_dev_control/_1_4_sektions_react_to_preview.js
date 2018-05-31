@@ -207,6 +207,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           level : 'section',
                                                           in_sektion : params.apiParams.id
                                                     });
+                                                    // refresh location levels if the source and target location are differents
+                                                    if ( params.apiParams.from_location != params.apiParams.to_location ) {
+                                                          api.previewer.trigger( 'sek-refresh-level', {
+                                                                level : 'location',
+                                                                id :  params.apiParams.to_location
+                                                          });
+                                                          api.previewer.trigger( 'sek-refresh-level', {
+                                                                level : 'location',
+                                                                id :  params.apiParams.from_location
+                                                          });
+                                                    }
                                               break;
                                               case 'sek-move-column' :
                                                     api.previewer.trigger('sek-edit-options', {

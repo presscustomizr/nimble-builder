@@ -102,7 +102,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $(this).sortable( _.extend( defaults, {
                               handle : '.sek-move-section',
                               connectWith : '[data-sek-level="location"]',
+                              placeholder: {
+                                    element: function(currentItem) {
+                                        return $('<div class="sortable-placeholder"><div class="sek-module-placeholder-content"><p>' + sekPreviewLocalized.i18n['Insert here'] + '</p></div></div>')[0];
+                                    },
+                                    update: function(container, p) {
+                                        return;
+                                    }
+                              },
                               start: function( event, ui ) {
+                                    $('body').addClass('sek-moving-section');
                                     $sourceLocation = ui.item.closest('[data-sek-level="location"]');
                                     from_location = $sourceLocation.data('sek-id');
 
@@ -110,9 +119,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     $sourceLocation.children( '[data-sek-level="section"]' ).each( function() {
                                           startOrder.push( $(this).data('sek-id') );
                                     });
-                                    //console.log('column moved from', from_sektion, ui );
                               },
                               stop : function( event, ui ) {
+                                    $('body').removeClass('sek-moving-section');
+
                                     newOrder = [];
                                     $targetLocation = ui.item.closest('[data-sek-level="location"]');
                                     to_location = $targetLocation.data('sek-id');
@@ -129,6 +139,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           from_location : from_location,
                                           to_location : to_location
                                     });
+                              },
+                              over : function( event, ui ) {
+                                    ui.placeholder.addClass('sek-sortable-section-over');
+                              },
+                              out : function( event, ui  ) {
+                                    ui.placeholder.removeClass('sek-sortable-section-over');
                               }
                         }));
                   });

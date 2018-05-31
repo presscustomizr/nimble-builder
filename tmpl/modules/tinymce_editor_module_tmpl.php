@@ -16,4 +16,3 @@ if ( ! array_key_exists( 'value', $model ) ) {
         SEK_Front() -> sek_print_tiny_mce_text_content( $model['value']['content'], 'content', $model );
     }
 }
-

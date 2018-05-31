@@ -20,6 +20,37 @@ if ( ! defined( 'NIMBLE_ASSETS_VERSION' ) ) {
 if ( ! defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
 if ( ! defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
 if ( ! defined( 'NIMBLE_BASE_PATH' ) ) { define( 'NIMBLE_BASE_PATH' , dirname( __FILE__ ) ); }
+if ( !defined( 'NIMBLE_MIN_PHP_VERSION' ) ) define ( 'NIMBLE_MIN_PHP_VERSION', '5.4' );
+if ( !defined( 'NIMBLE_MIN_WP_VERSION' ) ) define ( 'NIMBLE_MIN_WP_VERSION', '4.7' );
+
+
+/* ------------------------------------------------------------------------- *
+ *  MINIMAL PHP AND WP REQUIREMENTS
+/* ------------------------------------------------------------------------- */
+if ( version_compare( phpversion(), NIMBLE_MIN_PHP_VERSION, '<' ) ) {
+    add_action( 'admin_notices' , 'sek_display_min_php_message' );
+    return;
+}
+global $wp_version;
+if ( version_compare( $wp_version, NIMBLE_MIN_WP_VERSION, '<' ) ) {
+    add_action( 'admin_notices' , 'sek_display_min_wp_message' );
+    return;
+}
+function sek_display_min_php_message() {
+    sek_display_min_requirement_notice( __( 'PHP', 'nimble-builder' ), NIMBLE_MIN_PHP_VERSION );
+}
+function sek_display_min_wp_message() {
+    sek_display_min_requirement_notice( __( 'WordPress', 'nimble-builder' ), NIMBLE_MIN_WP_VERSION );
+}
+function sek_display_min_requirement_notice( $requires_what, $requires_what_version ) {
+    printf( '<div class="error"><p>%1$s</p></div>',
+        sprintf( __( 'The <strong>%1$s</strong> plugin requires at least %2$s version %3$s.', 'nimble-builder' ),
+            __('Nimble Builder', 'nimble-builder'),
+            $requires_what,
+            $requires_what_version
+        )
+    );
+}
 
 /* ------------------------------------------------------------------------- *
  *  LOAD THE BASE CUSTOMIZER FMK => NEEDED WHEN USED AS STANDALONE PLUGIN
@@ -60,6 +91,15 @@ if ( defined( 'CZR_DEV' ) && CZR_DEV && file_exists( plugin_dir_path( __FILE__ )
     require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
 }
 
+add_action('plugins_loaded', 'sek_load_plugin_textdomain');
+/**
+* Load language files
+* @action plugins_loaded
+*/
+function sek_load_plugin_textdomain() {
+  // Note to self, the third argument must not be hardcoded, to account for relocated folders.
+  load_plugin_textdomain( 'nimble-builder' );
+}
 //error_log( 'get_stylesheet ' . get_stylesheet() );
 // if ( 0 === strpos( get_stylesheet(), 'customizr' ) )
 //   return;

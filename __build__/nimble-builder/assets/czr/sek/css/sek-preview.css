@@ -131,10 +131,10 @@
 /* SECTION OVERLAY*/
 /* prevent style propagation to nested levels with > */
 .sek-section > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
-  background: #0085ba;
+  background: #000;
 }
 .sek-section-dyn-ui {
-    border: 2px dotted #0085ba;
+    border: 2px dotted #000;
     bottom: 0;
     left: 0;
     top: 0px;
@@ -191,10 +191,10 @@
   z-index: 1002;
 }
 .sek-module > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
-  background: #000;
+  background: #0085ba;
 }
 .sek-module-dyn-ui {
-    border: 1px dotted #000;
+    border: 1px dotted #0085ba;
     bottom: 0px;
     left: 0px;
     top: 0px;
@@ -354,8 +354,8 @@
   border-radius: 5px;
 }
 .sek-dragging [data-sek-location="between-sections"], .sek-dragging [data-sek-location="in-empty-location"]{
-  background: #dcefff;
-  border:2px dotted #1d85bb;
+  background: #ddd;
+  border:2px dotted #72777c;
 }
 
 .sek-dragging .sek-drag-is-approaching.sek-dynamic-drop-zone {
@@ -369,9 +369,9 @@
 }
 
 
-.sek-dragging .sek-module-drop-zone-for-first-module {
-  background: #ddd;
-  border:2px dotted #72777c;
+.sek-dragging [data-sek-location="between-modules"], .sek-dragging .sek-module-drop-zone-for-first-module {
+  background: #dcefff;
+  border:2px dotted #1d85bb;
   border-radius: 5px;
 }
 
@@ -447,7 +447,7 @@
     border-radius: 1000px;
     width: 18px;
     height: 18px;
-    background-color: #0085ba;
+    background-color: #000;
     color: #fff;
     border: none;
     outline: none;
@@ -473,7 +473,7 @@
     --sek-add-content-btn-width: 65px;
     width: calc(var(--sek-add-content-btn-width) + 70px);
     /*transition: all .35s ease;*/
-    background-color: #008ec2;
+    background-color: #000;
     /*transition: opacity,background-color 0.35s ease-in-out;*/
     opacity: 1;
     left: calc(50% - 83px);
@@ -531,7 +531,7 @@
 .sortable-placeholder {
   max-width: 100%;
   flex-grow: 1;
-  background: #72777c;
+  background: #00A2D7;
   border-radius: 4px;
   color: #fff !important;
   display: block;
@@ -553,15 +553,24 @@
 }
 /* class in-new-sektion is added dynamically when entering / overing the target */
 .in-new-sektion.sortable-placeholder{
-  background: #00A2D7;
+  background: #72777c;
+}
+
+/* class .sek-moving-section is toggled on sortable start/stop */
+.sek-moving-section [data-sek-level="location"] {
+  background: #ddd;
+  border:2px dotted #72777c;
+  border-radius: 5px;
+}
+.sek-moving-section .sek-empty-location-placeholder {
+  display: none;
 }
 
 
 
-
-
-
-
+.sek-sortable-section-over .sortable-placeholder {
+   background: #72777c;
+}
 
 
 
@@ -576,7 +585,7 @@
   font-size: 0.55em;
 }
 [data-sek-level="column"] .ui-resizable-e i {
-    background: #33b3db;
+    background: #00b846;
     border-radius: 12px;
     color: white;
     padding: 2px;
