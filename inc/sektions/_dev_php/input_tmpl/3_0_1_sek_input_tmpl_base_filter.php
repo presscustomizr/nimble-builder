@@ -1,6 +1,6 @@
 <?php
 // Set input content
-add_action( 'czr_set_input_tmpl_content', 'sek_set_input_tmpl_content', 10, 3 );
+add_action( 'czr_set_input_tmpl_content', '\Nimble\sek_set_input_tmpl_content', 10, 3 );
 function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
     // error_log( print_r( $input_data, true ) );
     // error_log('$input_type' . $input_type );

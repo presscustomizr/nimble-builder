@@ -1,10 +1,11 @@
 <?php
+namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
 /* This approach has been inspired by the excellent https://github.com/xwp/wp-customize-posts */
-add_action( 'customize_controls_print_footer_scripts', 'sek_print_tiny_mce_editor_template', 0 );
+add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_tiny_mce_editor_template', 0 );
 function sek_print_tiny_mce_editor_template() {
 ?>
   <div id="czr-customize-content_editor-pane">
@@ -35,7 +36,7 @@ function sek_print_tiny_mce_editor_template() {
 /**
  * Enqueue a WP Editor instance we can use for rich text editing.
  */
-add_action( 'customize_controls_init', 'sek_enqueue_tiny_mce_editor' );
+add_action( 'customize_controls_init', '\Nimble\sek_enqueue_tiny_mce_editor' );
 function sek_enqueue_tiny_mce_editor() {
   //add_action( 'customize_controls_print_footer_scripts', 'render_editor' , 0 );
   // @todo These should be included in \_WP_Editors::editor_settings()

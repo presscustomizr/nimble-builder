@@ -1,4 +1,5 @@
 <?php
+namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -105,7 +106,7 @@ $fp_col_suffix  = isset( $fp_col_map[$fp_per_row] ) ? $fp_col_map[$fp_per_row] :
 * and at least one [page-id][id] must be numeric or _custom_, and in this case [padge-id][url] must be set?
 */
 
-if ( ! function_exists( 'sek_fp_is_fp_set' ) ) :
+if ( ! function_exists( '\Nimble\sek_fp_is_fp_set' ) ) :
     function sek_fp_is_fp_set( array $fp ) {
         return ( ! empty( $fp[ 'page-id' ]['id'] ) &&
             ( sek_fp_can_be_wp_page( $fp ) || sek_fp_is_custom( $fp ) ) );
@@ -113,13 +114,13 @@ if ( ! function_exists( 'sek_fp_is_fp_set' ) ) :
 endif;
 
 
-if ( ! function_exists( 'sek_fp_is_custom' ) ) :
+if ( ! function_exists( '\Nimble\sek_fp_is_custom' ) ) :
     function sek_fp_is_custom( array $fp ) {
         return ( '_custom_' == $fp[ 'page-id' ]['id'] && esc_url( $fp[ 'page-id' ]['url'] ) );
     }
 endif;
 
-if ( ! function_exists( 'sek_fp_can_be_wp_page' ) ) :
+if ( ! function_exists( '\Nimble\sek_fp_can_be_wp_page' ) ) :
     function sek_fp_can_be_wp_page( array $fp ) {
         return is_numeric( $fp[ 'page-id' ]['id'] );
     }

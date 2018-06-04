@@ -1,4 +1,5 @@
 <?php
+namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
   exit;
 }

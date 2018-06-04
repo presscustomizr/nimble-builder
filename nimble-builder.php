@@ -27,21 +27,21 @@ if ( !defined( 'NIMBLE_MIN_WP_VERSION' ) ) define ( 'NIMBLE_MIN_WP_VERSION', '4.
  *  MINIMAL PHP AND WP REQUIREMENTS
 /* ------------------------------------------------------------------------- */
 if ( version_compare( phpversion(), NIMBLE_MIN_PHP_VERSION, '<' ) ) {
-    add_action( 'admin_notices' , 'sek_display_min_php_message' );
+    add_action( 'admin_notices' , 'nimble_display_min_php_message' );
     return;
 }
 global $wp_version;
 if ( version_compare( $wp_version, NIMBLE_MIN_WP_VERSION, '<' ) ) {
-    add_action( 'admin_notices' , 'sek_display_min_wp_message' );
+    add_action( 'admin_notices' , 'nimble_display_min_wp_message' );
     return;
 }
-function sek_display_min_php_message() {
-    sek_display_min_requirement_notice( __( 'PHP', 'text_domain_to_be_replaced' ), NIMBLE_MIN_PHP_VERSION );
+function nimble_display_min_php_message() {
+    nimble_display_min_requirement_notice( __( 'PHP', 'text_domain_to_be_replaced' ), NIMBLE_MIN_PHP_VERSION );
 }
-function sek_display_min_wp_message() {
-    sek_display_min_requirement_notice( __( 'WordPress', 'text_domain_to_be_replaced' ), NIMBLE_MIN_WP_VERSION );
+function nimble_display_min_wp_message() {
+    nimble_display_min_requirement_notice( __( 'WordPress', 'text_domain_to_be_replaced' ), NIMBLE_MIN_WP_VERSION );
 }
-function sek_display_min_requirement_notice( $requires_what, $requires_what_version ) {
+function nimble_display_min_requirement_notice( $requires_what, $requires_what_version ) {
     printf( '<div class="error"><p>%1$s</p></div>',
         sprintf( __( 'The <strong>%1$s</strong> plugin requires at least %2$s version %3$s.', 'text_domain_to_be_replaced' ),
             __('Nimble Builder', 'text_domain_to_be_replaced'),
@@ -90,12 +90,12 @@ if ( defined( 'CZR_DEV' ) && CZR_DEV && file_exists( plugin_dir_path( __FILE__ )
     require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
 }
 
-add_action('plugins_loaded', 'sek_load_plugin_textdomain');
+add_action('plugins_loaded', 'nimble_load_plugin_textdomain');
 /**
 * Load language files
 * @action plugins_loaded
 */
-function sek_load_plugin_textdomain() {
+function nimble_load_plugin_textdomain() {
   // Note to self, the third argument must not be hardcoded, to account for relocated folders.
   load_plugin_textdomain( 'nimble-builder' );
 }
