@@ -1,7 +1,9 @@
 <?php
+namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+
 
 if ( ! defined( 'SEK_CPT' ) ) { define( 'SEK_CPT' , 'sek_post_type' ); }
 if ( ! defined( 'SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'sek___' ); }
@@ -554,14 +556,14 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
 require_once(  dirname( __FILE__ ) . '/customizer/seks_tiny_mce_editor_actions.php' );
 
 // CONTENT PICKER AJAX
-add_action( 'customize_register', function() {
+add_action( 'customize_register', '\Nimble\sek_setup_content_picker' );
+function sek_setup_content_picker() {
     require_once(  dirname( __FILE__ ) . '/customizer/seks_content_picker-ajax_actions.php' );
     new SEK_customize_ajax_content_picker_actions();
-});
-
+}
 
 // ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
-add_action ( 'customize_controls_enqueue_scripts', 'sek_enqueue_controls_js_css', 20 );
+add_action ( 'customize_controls_enqueue_scripts', '\Nimble\sek_enqueue_controls_js_css', 20 );
 function sek_enqueue_controls_js_css() {
     wp_enqueue_style(
         'sek-control',
@@ -964,8 +966,8 @@ add_filter( 'customize_dynamic_setting_args', function( $setting_args, $setting_
             'transport' => 'refresh',
             'type' => '_no_intended_to_be_saved_',
             'default' => array(),
-            'sanitize_callback'    => 'sek_sanitize_callback',
-            'validate_callback'    => 'sek_validate_callback'
+            'sanitize_callback'    => '\Nimble\sek_sanitize_callback',
+            'validate_callback'    => '\Nimble\sek_validate_callback'
         );
     }
 
@@ -991,7 +993,7 @@ add_filter( 'customize_dynamic_setting_class', function( $class, $setting_id, $a
   if ( 0 !== strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
     return $class;
   //error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
-  return 'Sek_Customizer_Setting';
+  return '\Nimble\Nimble_Customizer_Setting';
 }, 10, 3 );
 
 // add_filter( 'customize_dynamic_setting_class', function( $class, $setting_id, $args ) {
@@ -1004,7 +1006,7 @@ add_filter( 'customize_dynamic_setting_class', function( $class, $setting_id, $a
 
 ?><?php
 // Set input content
-add_action( 'czr_set_input_tmpl_content', 'sek_set_input_tmpl_content', 10, 3 );
+add_action( 'czr_set_input_tmpl_content', '\Nimble\sek_set_input_tmpl_content', 10, 3 );
 function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
     // error_log( print_r( $input_data, true ) );
     // error_log('$input_type' . $input_type );
@@ -1371,7 +1373,7 @@ function sek_set_input_tmpl___font_picker( $input_id, $input_data ) {
 // this dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
 // It allows us to populate the server response with the relevant module html template
 // $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
-add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", 'sek_get_font_list_tmpl', 10, 3 );
+add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_list_tmpl', 10, 3 );
 // hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
 // this dynamic filter is declared on wp_ajax_ac_get_template
 // It allows us to populate the server response with the relevant module html template
@@ -1553,7 +1555,7 @@ function sek_set_input_tmpl___line_height( $input_id, $input_data ) {
 }
 ?><?php
 // The base fmk is loaded on after_setup_theme before 50
-add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
     //czr_fn\czr_register_dynamic_module
@@ -1575,7 +1577,7 @@ function sek_register_modules() {
         'czr_image_module',
         //'czr_featured_pages_module'
     ] as $module_name ) {
-        $fn = "sek_get_module_params_for_{$module_name}";
+        $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
             $params = $fn();
             if ( is_array( $params ) ) {
@@ -1740,9 +1742,9 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_background', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_border', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_boxshadow', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_bg_border_background', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_bg_border_border', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_bg_border_boxshadow', 10, 3 );
 
 function sek_add_css_rules_for_bg_border_background( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
@@ -2081,7 +2083,7 @@ function sek_get_module_params_for_sek_level_height_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_level_height', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_level_height', 10, 3 );
 function sek_add_css_rules_for_level_height( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     if ( empty( $options[ 'height' ] ) )
@@ -2193,7 +2195,7 @@ function sek_get_module_params_for_sek_spacing_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_spacing', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_spacing', 10, 3 );
 // hook : sek_dyn_css_builder_rules
 // @return array() of css rules
 function sek_add_css_rules_for_spacing( $rules, $level ) {
@@ -2985,7 +2987,7 @@ class Sek_Dyn_CSS_Handler {
             'dep'                             => $this->dep,
             'hook'                            => '',
             'priority'                        => $this->priority,
-            'customizer_save'                 => false,//<= used when saving the customizer settins => we want to write the css file on Sek_Customizer_Setting::update()
+            'customizer_save'                 => false,//<= used when saving the customizer settins => we want to write the css file on Nimble_Customizer_Setting::update()
             'force_write'                     => $this->force_write,
             'force_rewrite'                   => $this->force_rewrite
         );
@@ -3033,7 +3035,7 @@ class Sek_Dyn_CSS_Handler {
         }
 
         //hook setup for printing or enqueuing
-        //bail if "customizer_save" == true, typically when saving the customizer settings @see Sek_Customizer_Setting::update()
+        //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
         if ( ! $this->customizer_save ) {
             $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
         } else {
@@ -3446,7 +3448,7 @@ class Sek_Dyn_CSS_Handler {
 ?><?php
 // filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
-add_filter( "sek_add_css_rules_for_input_id", 'sek_add_css_rules_for_generic_css_input_types', 10, 4 );
+add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_generic_css_input_types', 10, 4 );
 function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_id, $parent_level ) {
     if ( ! is_string( $input_id ) || empty( $input_id ) )
         return $rules;

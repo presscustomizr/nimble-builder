@@ -43,7 +43,7 @@ function sek_get_module_params_for_sek_level_height_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_level_height', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_level_height', 10, 3 );
 function sek_add_css_rules_for_level_height( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     if ( empty( $options[ 'height' ] ) )

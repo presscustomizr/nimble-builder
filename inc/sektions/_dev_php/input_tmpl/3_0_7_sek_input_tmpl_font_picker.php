@@ -13,7 +13,7 @@ function sek_set_input_tmpl___font_picker( $input_id, $input_data ) {
 // this dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
 // It allows us to populate the server response with the relevant module html template
 // $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
-add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", 'sek_get_font_list_tmpl', 10, 3 );
+add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_list_tmpl', 10, 3 );
 // hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
 // this dynamic filter is declared on wp_ajax_ac_get_template
 // It allows us to populate the server response with the relevant module html template

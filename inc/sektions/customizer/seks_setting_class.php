@@ -1,7 +1,9 @@
 <?php
+namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+
 /**
  * This handles validation, sanitization and saving of the value.
  */
@@ -11,7 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @see WP_Customize_Setting
  */
-final class Sek_Customizer_Setting extends WP_Customize_Setting {
+// Note : the backslash before WP_Customize_Setting is here to indicate the global namespace
+// otherwise "PHP Fatal error:  Class 'Nimble\WP_Customize_Setting'" not found will be triggered by the php engine
+final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
 
   /**
    * The setting type.
@@ -42,13 +46,13 @@ final class Sek_Customizer_Setting extends WP_Customize_Setting {
     parent::__construct( $manager, $id, $args );
     // shall start with "sek___"
     if ( 0 !== strpos( $this->id_data['base'], SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) { //$this->id_data['base'] looks like "sek___"
-        throw new Exception( 'Sek_Customizer_Setting => __construct => Expected ' . SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . ' id_base.' );
+        throw new Exception( 'Nimble_Customizer_Setting => __construct => Expected ' . SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . ' id_base.' );
     }
 
 
     //there can be only one skope_id key instantiated at a time
     if ( 1 !== count( $this->id_data['keys'] ) || empty( $this->id_data['keys'][0] ) ) {
-        throw new Exception( 'Sek_Customizer_Setting => __construct => Expected single option key.' );
+        throw new Exception( 'Nimble_Customizer_Setting => __construct => Expected single option key.' );
     }
     $this->skope_id = $this->id_data['keys'][0];
   }
@@ -106,7 +110,7 @@ final class Sek_Customizer_Setting extends WP_Customize_Setting {
     }
     $id_base = $this->id_data['base'];
 
-    error_log('id_base in Sek_Customizer_Setting class => ' . $this->id_data['base'] );
+    error_log('id_base in Nimble_Customizer_Setting class => ' . $this->id_data['base'] );
 
     $value = '';
     $post = sek_get_seks_post( $this->skope_id );
@@ -138,7 +142,7 @@ final class Sek_Customizer_Setting extends WP_Customize_Setting {
       }
 
       if ( empty( $this->skope_id ) || ! is_string( $this->skope_id ) ) {
-          throw new Exception( 'Sek_Customizer_Setting => update => invalid skope id' );
+          throw new Exception( 'Nimble_Customizer_Setting => update => invalid skope id' );
       }
 
       $r = sek_update_sek_post( $seks_collection, array(
@@ -154,9 +158,7 @@ final class Sek_Customizer_Setting extends WP_Customize_Setting {
           'force_rewrite'  => true //<- write even if the file exists
       ) );
 
-      // error_log( '<Sek_Customizer_Setting::update() => $seks_collection>');
-      // error_log( print_r($seks_collection, true ) );
-      // error_log( '</Sek_Customizer_Setting::update() => $seks_collection>');
+      // sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => $seks_collection', $seks_collection);
 
       if ( $r instanceof WP_Error ) {
           return false;
@@ -173,9 +175,7 @@ final class Sek_Customizer_Setting extends WP_Customize_Setting {
       // $seks_options = (int)$post_id;//$r is the post ID
 
       update_option( $option_name, (int)$post_id );
-      // error_log( '<Sek_Customizer_Setting::update() => $seks_options>');
-      // error_log( print_r((int)$post_id, true ) );
-      // error_log( '</Sek_Customizer_Setting::update() => $seks_options>');
+      // sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => $seks_options', (int)$post_id);
 
       return $post_id;
   }

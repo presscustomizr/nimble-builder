@@ -22,8 +22,8 @@ add_filter( 'customize_dynamic_setting_args', function( $setting_args, $setting_
             'transport' => 'refresh',
             'type' => '_no_intended_to_be_saved_',
             'default' => array(),
-            'sanitize_callback'    => 'sek_sanitize_callback',
-            'validate_callback'    => 'sek_validate_callback'
+            'sanitize_callback'    => '\Nimble\sek_sanitize_callback',
+            'validate_callback'    => '\Nimble\sek_validate_callback'
         );
     }
 
@@ -49,7 +49,7 @@ add_filter( 'customize_dynamic_setting_class', function( $class, $setting_id, $a
   if ( 0 !== strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
     return $class;
   //error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
-  return 'Sek_Customizer_Setting';
+  return '\Nimble\Nimble_Customizer_Setting';
 }, 10, 3 );
 
 // add_filter( 'customize_dynamic_setting_class', function( $class, $setting_id, $args ) {

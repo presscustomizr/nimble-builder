@@ -1,4 +1,5 @@
 <?php
+namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -14,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // };
 $model = SEK_Front() -> model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
-if ( ! function_exists( 'sek_get_img_module_img_html') ) {
+if ( ! function_exists( '\Nimble\sek_get_img_module_img_html') ) {
     function sek_get_img_module_img_html( $value ) {
         $html = '';
         if ( is_int( $value['img'] ) ) {
@@ -31,7 +32,7 @@ if ( ! function_exists( 'sek_get_img_module_img_html') ) {
     }
 }
 
-if ( ! function_exists( 'sek_get_img_module_img_link' ) ) {
+if ( ! function_exists( '\Nimble\sek_get_img_module_img_link' ) ) {
     function sek_get_img_module_img_link( $value ) {
         $link = 'javascript:void(0);';
         if ( skp_is_customizing() ) {

@@ -121,9 +121,9 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_background', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_border', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', 'sek_add_css_rules_for_bg_border_boxshadow', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_bg_border_background', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_bg_border_border', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_bg_border_boxshadow', 10, 3 );
 
 function sek_add_css_rules_for_bg_border_background( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];

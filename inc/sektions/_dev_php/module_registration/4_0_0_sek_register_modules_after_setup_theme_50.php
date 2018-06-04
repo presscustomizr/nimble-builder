@@ -1,6 +1,6 @@
 <?php
 // The base fmk is loaded on after_setup_theme before 50
-add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
     //czr_fn\czr_register_dynamic_module
@@ -22,7 +22,7 @@ function sek_register_modules() {
         'czr_image_module',
         //'czr_featured_pages_module'
     ] as $module_name ) {
-        $fn = "sek_get_module_params_for_{$module_name}";
+        $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
             $params = $fn();
             if ( is_array( $params ) ) {
