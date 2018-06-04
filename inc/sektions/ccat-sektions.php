@@ -822,7 +822,8 @@ function sek_enqueue_controls_js_css() {
 
 
 // ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
-add_filter( 'skp_json_export_ready_skopes', function( $skopes ) {
+add_filter( 'skp_json_export_ready_skopes', '\Nimble\add_sektion_values_to_skope_export' );
+function add_sektion_values_to_skope_export( $skopes ) {
     if ( ! is_array( $skopes ) ) {
         error_log( 'skp_json_export_ready_skopes filter => the filtered skopes must be an array.' );
     }
@@ -861,7 +862,7 @@ add_filter( 'skp_json_export_ready_skopes', function( $skopes ) {
     // error_log( '</////////////////////$new_skopes>' );
 
     return $new_skopes;
-} );
+}
 
 
 
@@ -908,50 +909,18 @@ function sek_get_img_sizes() {
 
     return $to_return;
 }
-
-
-
-// PRINT THE ADD NEW SEKTION BUTTON TMPL
-// DEPRECATED WAS USED TO DISPLAY UI BUTTON IN THE PANEL
-/*add_action( 'customize_controls_print_footer_scripts', function() {
-  ?>
-  <script type="text/html" id="tmpl-<?php echo SEK_BUTTON_SECTION_TMPL_SUFFIX;//'sek-add-new-sektion-button' ?>">
-    <h3>
-      <button type="button" class="button czr-add-sektion-button">
-        <?php _e( ' + Add New Sektion' ); ?>
-      </button>&nbsp;
-      <button type="button" class="button czr-remove-all-sektions-button">
-        <?php _e( ' - Remove All Sektions' ); ?>
-      </button>
-    </h3>
-  </script>
-  <script type="text/html" id="tmpl-<?php echo SEK_BUTTON_COLUMN_TMPL_SUFFIX;//'sek-add-new-column-button' ?>">
-    <h3>
-      <button type="button" class="button czr-add-column-button">
-        <?php _e( ' + Add New Column' ); ?>
-      </button>
-    </h3>
-  </script>
-  <script type="text/html" id="tmpl-<?php echo SEK_BUTTON_MODULE_TMPL_SUFFIX;//'sek-add-new-module-button' ?>">
-    <h3>
-      <button type="button" class="button czr-add-module-button">
-        <?php _e( ' + Add New Module' ); ?>
-      </button>
-    </h3>
-  </script>
-  <?php
-});*/
-
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  SETUP DYNAMIC SERVER REGISTRATION FOR SETTING
 /* ------------------------------------------------------------------------- */
 // Schedule the loading the skoped settings class
-add_action( 'customize_register', function() {
+add_action( 'customize_register', '\Nimble\load_nimble_setting_class' );
+function load_nimble_setting_class() {
       require_once(  dirname( __FILE__ ) . '/customizer/seks_setting_class.php' );
-});
+}
 
-add_filter( 'customize_dynamic_setting_args', function( $setting_args, $setting_id ) {
+add_filter( 'customize_dynamic_setting_args', '\Nimble\set_dyn_setting_args', 10, 2 );
+function set_dyn_setting_args( $setting_args, $setting_id ) {
     // shall start with "sek__"
     if ( 0 === strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
         //error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
@@ -974,7 +943,7 @@ add_filter( 'customize_dynamic_setting_args', function( $setting_args, $setting_
     //error_log( print_r( $setting_args, true ) );
     return $setting_args;
     //return wp_parse_args( array( 'default' => array() ), $setting_args );
-}, 10, 2 );
+}
 
 function sek_sanitize_callback( $sektion_data ) {
     //error_log( 'in_sek_sanitize_callback' );
@@ -988,22 +957,14 @@ function sek_validate_callback( $validity, $sektion_data ) {
 }
 
 
-add_filter( 'customize_dynamic_setting_class', function( $class, $setting_id, $args ) {
+add_filter( 'customize_dynamic_setting_class', '\Nimble\set_dyn_setting_class', 10, 3 );
+function set_dyn_setting_class( $class, $setting_id, $args ) {
   // shall start with 'sek___'
   if ( 0 !== strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
     return $class;
   //error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
   return '\Nimble\Nimble_Customizer_Setting';
-}, 10, 3 );
-
-// add_filter( 'customize_dynamic_setting_class', function( $class, $setting_id, $args ) {
-//   // shall start with 'sek_for_customizer___sektion_'
-//   if ( 0 !== strpos( $setting_id, '__sek__' ) )
-//     return $class;
-//   //error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
-//   return 'Sek_Not_Saved_Customizer_Setting';
-// }, 10, 3 );
-
+}
 ?><?php
 // Set input content
 add_action( 'czr_set_input_tmpl_content', '\Nimble\sek_set_input_tmpl_content', 10, 3 );

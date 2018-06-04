@@ -55,8 +55,8 @@ function nimble_display_min_requirement_notice( $requires_what, $requires_what_v
  *  LOAD THE BASE CUSTOMIZER FMK => NEEDED WHEN USED AS STANDALONE PLUGIN
  *  WE ALSO NEED TO FIRE THIS FILE WHEN AJAXING FROM THE CUSTOMIZER
 /* ------------------------------------------------------------------------- */
-add_action( 'after_setup_theme', 'ac_load_czr_base_fmk', 10 );
-function ac_load_czr_base_fmk() {
+add_action( 'after_setup_theme', 'nimble_load_czr_base_fmk', 10 );
+function nimble_load_czr_base_fmk() {
     if ( isset( $GLOBALS['czr_base_fmk_namespace'] ) ) {
         //error_log('The czr_base_fmk has already been loaded');
         return;
@@ -99,12 +99,3 @@ function nimble_load_plugin_textdomain() {
   // Note to self, the third argument must not be hardcoded, to account for relocated folders.
   load_plugin_textdomain( 'nimble-builder' );
 }
-//error_log( 'get_stylesheet ' . get_stylesheet() );
-// if ( 0 === strpos( get_stylesheet(), 'customizr' ) )
-//   return;
-
-// add_action('wp', function() {
-//     error_log( '<////////////////////THEMEMODS>' );
-//     error_log( print_r( get_theme_mods(), true ) );
-//     error_log( '</////////////////////THEMEMODS>' );
-// });

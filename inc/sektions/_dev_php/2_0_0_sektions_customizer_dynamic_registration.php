@@ -3,11 +3,13 @@
  *  SETUP DYNAMIC SERVER REGISTRATION FOR SETTING
 /* ------------------------------------------------------------------------- */
 // Schedule the loading the skoped settings class
-add_action( 'customize_register', function() {
+add_action( 'customize_register', '\Nimble\load_nimble_setting_class' );
+function load_nimble_setting_class() {
       require_once(  dirname( __FILE__ ) . '/customizer/seks_setting_class.php' );
-});
+}
 
-add_filter( 'customize_dynamic_setting_args', function( $setting_args, $setting_id ) {
+add_filter( 'customize_dynamic_setting_args', '\Nimble\set_dyn_setting_args', 10, 2 );
+function set_dyn_setting_args( $setting_args, $setting_id ) {
     // shall start with "sek__"
     if ( 0 === strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
         //error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
@@ -30,7 +32,7 @@ add_filter( 'customize_dynamic_setting_args', function( $setting_args, $setting_
     //error_log( print_r( $setting_args, true ) );
     return $setting_args;
     //return wp_parse_args( array( 'default' => array() ), $setting_args );
-}, 10, 2 );
+}
 
 function sek_sanitize_callback( $sektion_data ) {
     //error_log( 'in_sek_sanitize_callback' );
@@ -44,20 +46,12 @@ function sek_validate_callback( $validity, $sektion_data ) {
 }
 
 
-add_filter( 'customize_dynamic_setting_class', function( $class, $setting_id, $args ) {
+add_filter( 'customize_dynamic_setting_class', '\Nimble\set_dyn_setting_class', 10, 3 );
+function set_dyn_setting_class( $class, $setting_id, $args ) {
   // shall start with 'sek___'
   if ( 0 !== strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
     return $class;
   //error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
   return '\Nimble\Nimble_Customizer_Setting';
-}, 10, 3 );
-
-// add_filter( 'customize_dynamic_setting_class', function( $class, $setting_id, $args ) {
-//   // shall start with 'sek_for_customizer___sektion_'
-//   if ( 0 !== strpos( $setting_id, '__sek__' ) )
-//     return $class;
-//   //error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
-//   return 'Sek_Not_Saved_Customizer_Setting';
-// }, 10, 3 );
-
+}
 ?>

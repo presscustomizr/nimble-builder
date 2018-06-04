@@ -274,7 +274,8 @@ function sek_enqueue_controls_js_css() {
 
 
 // ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
-add_filter( 'skp_json_export_ready_skopes', function( $skopes ) {
+add_filter( 'skp_json_export_ready_skopes', '\Nimble\add_sektion_values_to_skope_export' );
+function add_sektion_values_to_skope_export( $skopes ) {
     if ( ! is_array( $skopes ) ) {
         error_log( 'skp_json_export_ready_skopes filter => the filtered skopes must be an array.' );
     }
@@ -313,7 +314,7 @@ add_filter( 'skp_json_export_ready_skopes', function( $skopes ) {
     // error_log( '</////////////////////$new_skopes>' );
 
     return $new_skopes;
-} );
+}
 
 
 
@@ -360,38 +361,4 @@ function sek_get_img_sizes() {
 
     return $to_return;
 }
-
-
-
-// PRINT THE ADD NEW SEKTION BUTTON TMPL
-// DEPRECATED WAS USED TO DISPLAY UI BUTTON IN THE PANEL
-/*add_action( 'customize_controls_print_footer_scripts', function() {
-  ?>
-  <script type="text/html" id="tmpl-<?php echo SEK_BUTTON_SECTION_TMPL_SUFFIX;//'sek-add-new-sektion-button' ?>">
-    <h3>
-      <button type="button" class="button czr-add-sektion-button">
-        <?php _e( ' + Add New Sektion' ); ?>
-      </button>&nbsp;
-      <button type="button" class="button czr-remove-all-sektions-button">
-        <?php _e( ' - Remove All Sektions' ); ?>
-      </button>
-    </h3>
-  </script>
-  <script type="text/html" id="tmpl-<?php echo SEK_BUTTON_COLUMN_TMPL_SUFFIX;//'sek-add-new-column-button' ?>">
-    <h3>
-      <button type="button" class="button czr-add-column-button">
-        <?php _e( ' + Add New Column' ); ?>
-      </button>
-    </h3>
-  </script>
-  <script type="text/html" id="tmpl-<?php echo SEK_BUTTON_MODULE_TMPL_SUFFIX;//'sek-add-new-module-button' ?>">
-    <h3>
-      <button type="button" class="button czr-add-module-button">
-        <?php _e( ' + Add New Module' ); ?>
-      </button>
-    </h3>
-  </script>
-  <?php
-});*/
-
 ?>
