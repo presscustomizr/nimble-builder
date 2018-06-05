@@ -21,7 +21,7 @@ if ( ! function_exists( '\Nimble\sek_get_img_module_img_html') ) {
         if ( is_int( $value['img'] ) ) {
             $html = wp_get_attachment_image( $value['img'], empty( $value['img-size'] ) ? 'large' : $value['img-size']);
         } else if ( ! empty( $value['img'] ) && is_string( $value['img'] ) ) {
-            $html = sprintf( '<img alt="default img" src="%1$s"/>', $value['img'] );
+            $html = sprintf( '<img alt="default img" src="%1$s"/>', esc_url(  $value['img'] ) );
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
@@ -42,9 +42,9 @@ if ( ! function_exists( '\Nimble\sek_get_img_module_img_link' ) ) {
             case 'url' :
                 if ( ! empty( $value['link-pick-url'] ) && ! empty( $value['link-pick-url']['id'] ) ) {
                     if ( '_custom_' == $value['link-pick-url']['id']  && ! empty( $value['link-custom-url'] ) ) {
-                        $link = $value['link-custom-url'];
+                        $link = esc_url( $value['link-custom-url'] );
                     } else if ( ! empty( $value['link-pick-url']['url'] ) ) {
-                        $link = $value['link-pick-url']['url'];
+                        $link = esc_url( $value['link-pick-url']['url'] );
                     }
                 }
             break;
@@ -69,7 +69,7 @@ if ( 'no-link' === $value['link-to'] ) {
 } else {
     printf('<a href="%1$s" %2$s>%3$s</a>',
         sek_get_img_module_img_link( $value ),
-        true === (bool)$value['link-target'] ? 'target="_blank"' : '',
+        true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank"' : '',
         sek_get_img_module_img_html( $value )
     );
 }
