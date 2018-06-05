@@ -60,15 +60,8 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 
 // Helper
 function sek_get_registered_module_type_property( $module_type, $property = '' ) {
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
     // registered modules
-    $registered_modules = $CZR_Fmk_Base_fn() -> registered_modules;
+    $registered_modules = CZR_Fmk_Base() -> registered_modules;
     if ( ! array_key_exists( $module_type, $registered_modules ) ) {
         error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
         return;
@@ -147,14 +140,7 @@ function sek_get_default_module_model( $module_type = '' ) {
     if ( ! empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
-        $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-        //czr_fn\czr_register_dynamic_module
-        $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-        if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-            error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
-            return array();
-        }
-        $registered_modules = $CZR_Fmk_Base_fn() -> registered_modules;
+        $registered_modules = CZR_Fmk_Base()->registered_modules;
 
         // error_log('<registered_modules>');
         // error_log( print_r( $registered_modules, true ) );
@@ -577,15 +563,8 @@ function sek_enqueue_controls_js_css() {
         'all'
     );
 
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
     // registered modules
-    $registered_modules = $CZR_Fmk_Base_fn() -> registered_modules;
+    $registered_modules = CZR_Fmk_Base() -> registered_modules;
 
     wp_enqueue_script(
         'czr-sektions',
@@ -1342,17 +1321,8 @@ add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_li
 //
 // For czr_tiny_mce_editor_module, we request the font_list tmpl
 function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
-    // error_log('<' . __FUNCTION__ . ' => ajax posted params>');
-    // error_log( print_r( $posted_params, true ) );
-    // error_log('<' . __FUNCTION__ . ' => ajax posted params>');
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
-    $css_attr = $CZR_Fmk_Base_fn() -> czr_css_attr;
+    // sek_error_log( __FUNCTION__ . ' => ajax posted params', $posted_params );
+    $css_attr = CZR_Fmk_Base() -> czr_css_attr;
 
     if ( empty( $requested_tmpl ) ) {
         wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
@@ -1518,14 +1488,6 @@ function sek_set_input_tmpl___line_height( $input_id, $input_data ) {
 // The base fmk is loaded on after_setup_theme before 50
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
-
     foreach( [
         'sek_module_picker_module',
         //'sek_section_picker_module',
@@ -1542,7 +1504,7 @@ function sek_register_modules() {
         if ( function_exists( $fn ) ) {
             $params = $fn();
             if ( is_array( $params ) ) {
-                $CZR_Fmk_Base_fn() -> czr_pre_register_dynamic_module( $params );
+                CZR_Fmk_Base()->czr_pre_register_dynamic_module( $params );
             } else {
                 error_log( __FUNCTION__ . ' Module registration params should be an array');
             }

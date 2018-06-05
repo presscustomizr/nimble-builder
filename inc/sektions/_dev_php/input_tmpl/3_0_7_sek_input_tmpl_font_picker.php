@@ -21,17 +21,8 @@ add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_li
 //
 // For czr_tiny_mce_editor_module, we request the font_list tmpl
 function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
-    // error_log('<' . __FUNCTION__ . ' => ajax posted params>');
-    // error_log( print_r( $posted_params, true ) );
-    // error_log('<' . __FUNCTION__ . ' => ajax posted params>');
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
-    $css_attr = $CZR_Fmk_Base_fn() -> czr_css_attr;
+    // sek_error_log( __FUNCTION__ . ' => ajax posted params', $posted_params );
+    $css_attr = CZR_Fmk_Base() -> czr_css_attr;
 
     if ( empty( $requested_tmpl ) ) {
         wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );

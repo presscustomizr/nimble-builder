@@ -1,4 +1,5 @@
 <?php
+namespace Nimble;
 //Creates a new instance
 function Flat_Skop_Base( $params = array() ) {
     return Flat_Skop_Base::skp_get_instance( $params );

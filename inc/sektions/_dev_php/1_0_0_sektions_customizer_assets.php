@@ -29,15 +29,8 @@ function sek_enqueue_controls_js_css() {
         'all'
     );
 
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
     // registered modules
-    $registered_modules = $CZR_Fmk_Base_fn() -> registered_modules;
+    $registered_modules = CZR_Fmk_Base() -> registered_modules;
 
     wp_enqueue_script(
         'czr-sektions',

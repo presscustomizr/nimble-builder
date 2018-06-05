@@ -1,4 +1,5 @@
 <?php
+namespace Nimble;
 //Creates a new instance
 function Flat_Skop_Base( $params = array() ) {
     return Flat_Skop_Base::skp_get_instance( $params );
@@ -452,7 +453,7 @@ if ( ! class_exists( 'Flat_Skop_Base' ) ) :
 
         public static function skp_get_instance( $params ) {
             if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Flat_Skop_Base ) )
-              self::$instance = new Flat_Skop_Base( $params );
+              self::$instance = new Flat_Skope_Clean_Final( $params );
             return self::$instance;
         }
         function __construct( $params = array() ) {
@@ -462,254 +463,282 @@ if ( ! class_exists( 'Flat_Skop_Base' ) ) :
             $params = wp_parse_args( $params, $defaults );
             if ( ! defined( 'SKOPE_BASE_URL' ) ) { define( 'SKOPE_BASE_URL' , $params['base_url_path'] ); }
             if ( ! defined( 'SKOPE_ID_PREFIX' ) ) { define( 'SKOPE_ID_PREFIX' , "skp__" ); }
+
+            $this->skp_register_and_load_control_assets();
+            $this->skp_export_skope_data_and_schedule_sending_to_panel();
+            $this->skp_schedule_cleaning_on_object_delete();
         }//__construct
     }
 endif;
 ?><?php
 /////////////////////////////////////////////////////////////////
 // PRINT CUSTOMIZER JAVASCRIPT + LOCALIZED DATA
-add_action ( 'customize_controls_enqueue_scripts', 'skp_enqueue_controls_js_css', 20 );
-function skp_enqueue_controls_js_css() {
-    $_use_unminified = defined('CZR_DEV')
-        && true === CZR_DEV
-        // && false === strpos( dirname( dirname( dirname (__FILE__) ) ) , 'inc/wfc' )
-        && file_exists( sprintf( '%s/assets/czr/js/czr-skope-base.js' , dirname( __FILE__ ) ) );
+if ( ! class_exists( 'Flat_Skop_Register_And_Load_Control_Assets' ) ) :
+    class Flat_Skop_Register_And_Load_Control_Assets extends Flat_Skop_Base {
+          // Fired in Flat_Skop_Base::__construct()
+          public function skp_register_and_load_control_assets() {
+              add_action( 'customize_controls_enqueue_scripts', array( $this, 'skp_enqueue_controls_js_css' ), 20 );
+          }
 
-    $_prod_script_path = sprintf(
-        '%1$s/assets/czr/js/%2$s' ,
-        SKOPE_BASE_URL,
-        $_use_unminified ? 'czr-skope-base.js' : 'czr-skope-base.min.js'
-    );
+          public function skp_enqueue_controls_js_css() {
+              $_use_unminified = defined('CZR_DEV')
+                  && true === CZR_DEV
+                  // && false === strpos( dirname( dirname( dirname (__FILE__) ) ) , 'inc/wfc' )
+                  && file_exists( sprintf( '%s/assets/czr/js/czr-skope-base.js' , dirname( __FILE__ ) ) );
 
-    wp_enqueue_script(
-        'czr-skope-base',
-        //dev / debug mode mode?
-        $_prod_script_path,
-        array('customize-controls' , 'jquery', 'underscore'),
-        ( defined('WP_DEBUG') && true === WP_DEBUG ) ? time() :  wp_get_theme() -> version,
-        $in_footer = true
-    );
+              $_prod_script_path = sprintf(
+                  '%1$s/assets/czr/js/%2$s' ,
+                  SKOPE_BASE_URL,
+                  $_use_unminified ? 'czr-skope-base.js' : 'czr-skope-base.min.js'
+              );
 
-    wp_localize_script(
-        'czr-skope-base',
-        'FlatSkopeLocalizedData',
-        array(
-            'noGroupSkopeList' => skp_get_no_group_skope_list(),
-            'defaultSkopeModel' => skp_get_default_skope_model(),
-            'i18n' => array()
-        )
-    );
-}
+              wp_enqueue_script(
+                  'czr-skope-base',
+                  //dev / debug mode mode?
+                  $_prod_script_path,
+                  array('customize-controls' , 'jquery', 'underscore'),
+                  ( defined('WP_DEBUG') && true === WP_DEBUG ) ? time() :  wp_get_theme() -> version,
+                  $in_footer = true
+              );
+
+              wp_localize_script(
+                  'czr-skope-base',
+                  'FlatSkopeLocalizedData',
+                  array(
+                      'noGroupSkopeList' => skp_get_no_group_skope_list(),
+                      'defaultSkopeModel' => skp_get_default_skope_model(),
+                      'i18n' => array()
+                  )
+              );
+          }
+    }//class
+endif;
 
 ?><?php
-
-
 /* ------------------------------------------------------------------------- *
 *  CUSTOMIZE PREVIEW : export skope data and send skope to the panel
 /* ------------------------------------------------------------------------- */
-add_action( 'wp_footer', 'skp_print_server_skope_data', 30 );
-
-//hook : 'wp_footer'
-function skp_print_server_skope_data() {
-    if ( ! skp_is_customize_preview_frame() )
-        return;
-
-    global $wp_query, $wp_customize;
-    $_meta_type = skp_get_skope( 'meta_type', true );
-
-    // $_czr_scopes = array( );
-    $_czr_skopes            = _skp_get_json_export_ready_skopes();
-    ?>
-        <script type="text/javascript" id="czr-print-skop">
-            (function ( _export ){
-                    _export.czr_new_skopes        = <?php echo wp_json_encode( $_czr_skopes ); ?>;
-                    _export.czr_stylesheet    = '<?php echo get_stylesheet(); ?>';
-            })( _wpCustomizeSettings );
-
-            ( function( api, $, _ ) {
-                $( function() {
-                      api.preview.bind( 'sync', function( events ) {
-                            api.preview.send( 'czr-new-skopes-synced', {
-                                  czr_new_skopes : _wpCustomizeSettings.czr_new_skopes || [],
-                                  czr_stylesheet : _wpCustomizeSettings.czr_stylesheet || '',
-                                  isChangesetDirty : _wpCustomizeSettings.isChangesetDirty || false,
-                                  skopeGlobalDBOpt : _wpCustomizeSettings.skopeGlobalDBOpt || [],
-                            } );
-                      });
-                });
-            } )( wp.customize, jQuery, _ );
-        </script>
-    <?php
-}
-
-/* ------------------------------------------------------------------------- *
-    *  CUSTOMIZE PREVIEW : BUILD SKOPES JSON
-/* ------------------------------------------------------------------------- */
-//generates the array of available scopes for a given context
-//ex for a single post tagged #tag1 and #tag2 and categroized #cat1 :
-//global
-//all posts
-//local
-//posts tagged #tag1
-//posts tagged #tag2
-//posts categorized #cat1
-//@return array()
-//
-//skp_get_skope_title() takes the following default args
-//array(
-//  'level'       =>  '',
-//  'meta_type'   => null,
-//  'long'        => false,
-//  'is_prefixed' => true
-//)
-function _skp_get_json_export_ready_skopes() {
-    $skopes = array();
-    $_meta_type = skp_get_skope( 'meta_type', true );
-
-    //default properties of the scope object
-    $defaults = skp_get_default_skope_model();
-    //global and local and always sent
-    $skopes[] = wp_parse_args(
-        array(
-            'title'       => skp_get_skope_title( array( 'level' => 'global' ) ),
-            'long_title'  => skp_get_skope_title( array( 'level' => 'global', 'meta_type' => null, 'long' => true ) ),
-            'ctx_title'   => skp_get_skope_title( array( 'level' => 'global', 'meta_type' => null, 'long' => true, 'is_prefixed' => false ) ),
-            'skope'       => 'global',
-            'level'       => '_all_'
-        ),
-        $defaults
-    );
+if ( ! class_exists( 'Flat_Export_Skope_Data_And_Send_To_Panel' ) ) :
+    class Flat_Export_Skope_Data_And_Send_To_Panel extends Flat_Skop_Register_And_Load_Control_Assets {
+          // Fired in Flat_Skop_Base::__construct()
+          public function skp_export_skope_data_and_schedule_sending_to_panel() {
+              add_action( 'wp_footer', array( $this, 'skp_print_server_skope_data') , 30 );
+          }
 
 
-    //SPECIAL GROUPS
-    //@todo
+          //hook : 'wp_footer'
+          public function skp_print_server_skope_data() {
+              if ( ! skp_is_customize_preview_frame() )
+                  return;
+
+              global $wp_query, $wp_customize;
+              $_meta_type = skp_get_skope( 'meta_type', true );
+
+              // $_czr_scopes = array( );
+              $_czr_skopes            = $this->_skp_get_json_export_ready_skopes();
+              ?>
+                  <script type="text/javascript" id="czr-print-skop">
+                      (function ( _export ){
+                              _export.czr_new_skopes        = <?php echo wp_json_encode( $_czr_skopes ); ?>;
+                              _export.czr_stylesheet    = '<?php echo get_stylesheet(); ?>';
+                      })( _wpCustomizeSettings );
+
+                      ( function( api, $, _ ) {
+                          $( function() {
+                                api.preview.bind( 'sync', function( events ) {
+                                      api.preview.send( 'czr-new-skopes-synced', {
+                                            czr_new_skopes : _wpCustomizeSettings.czr_new_skopes || [],
+                                            czr_stylesheet : _wpCustomizeSettings.czr_stylesheet || '',
+                                            isChangesetDirty : _wpCustomizeSettings.isChangesetDirty || false,
+                                            skopeGlobalDBOpt : _wpCustomizeSettings.skopeGlobalDBOpt || [],
+                                      } );
+                                });
+                          });
+                      } )( wp.customize, jQuery, _ );
+                  </script>
+              <?php
+          }
+
+          /* ------------------------------------------------------------------------- *
+              *  CUSTOMIZE PREVIEW : BUILD SKOPES JSON
+          /* ------------------------------------------------------------------------- */
+          //generates the array of available scopes for a given context
+          //ex for a single post tagged #tag1 and #tag2 and categroized #cat1 :
+          //global
+          //all posts
+          //local
+          //posts tagged #tag1
+          //posts tagged #tag2
+          //posts categorized #cat1
+          //@return array()
+          //
+          //skp_get_skope_title() takes the following default args
+          //array(
+          //  'level'       =>  '',
+          //  'meta_type'   => null,
+          //  'long'        => false,
+          //  'is_prefixed' => true
+          //)
+          private function _skp_get_json_export_ready_skopes() {
+              $skopes = array();
+              $_meta_type = skp_get_skope( 'meta_type', true );
+
+              //default properties of the scope object
+              $defaults = skp_get_default_skope_model();
+              //global and local and always sent
+              $skopes[] = wp_parse_args(
+                  array(
+                      'title'       => skp_get_skope_title( array( 'level' => 'global' ) ),
+                      'long_title'  => skp_get_skope_title( array( 'level' => 'global', 'meta_type' => null, 'long' => true ) ),
+                      'ctx_title'   => skp_get_skope_title( array( 'level' => 'global', 'meta_type' => null, 'long' => true, 'is_prefixed' => false ) ),
+                      'skope'       => 'global',
+                      'level'       => '_all_'
+                  ),
+                  $defaults
+              );
 
 
-    //GROUP
-    //Do we have a group ? => if yes, then there must be a meta type
-    if ( skp_get_skope('meta_type') ) {
-        $skopes[] = wp_parse_args(
-            array(
-                'title'       => skp_get_skope_title( array( 'level' => 'group', 'meta_type' => $_meta_type  ) ),
-                'long_title'  => skp_get_skope_title( array( 'level' => 'group', 'meta_type' => $_meta_type, 'long' => true ) ),
-                'ctx_title'   => skp_get_skope_title( array( 'level' => 'group', 'meta_type' => $_meta_type, 'long' => true, 'is_prefixed' => false ) ),
-                'skope'       => 'group',
-                'level'       => 'all_' . skp_get_skope('type'),
-                'skope_id'    => skp_get_skope_id( 'group' )
-            ),
-            $defaults
-        );
-    }
+              //SPECIAL GROUPS
+              //@todo
 
 
-    //LOCAL
-    $skopes[] = wp_parse_args(
-        array(
-            'title'       => skp_get_skope_title( array( 'level' => 'local', 'meta_type' => $_meta_type ) ),
-            'long_title'  => skp_get_skope_title( array( 'level' => 'local', 'meta_type' => $_meta_type, 'long' => true ) ),
-            'ctx_title'   => skp_get_skope_title( array( 'level' => 'local', 'meta_type' => $_meta_type, 'long' => true, 'is_prefixed' => false ) ),
-            'skope'       => 'local',
-            'level'       => skp_get_skope(),
-            'obj_id'      => skp_get_skope('id'),
-            'skope_id'    => skp_get_skope_id( 'local' )
-        ),
-        $defaults
-    );
-    return apply_filters( 'skp_json_export_ready_skopes', $skopes );
-}
+              //GROUP
+              //Do we have a group ? => if yes, then there must be a meta type
+              if ( skp_get_skope('meta_type') ) {
+                  $skopes[] = wp_parse_args(
+                      array(
+                          'title'       => skp_get_skope_title( array( 'level' => 'group', 'meta_type' => $_meta_type  ) ),
+                          'long_title'  => skp_get_skope_title( array( 'level' => 'group', 'meta_type' => $_meta_type, 'long' => true ) ),
+                          'ctx_title'   => skp_get_skope_title( array( 'level' => 'group', 'meta_type' => $_meta_type, 'long' => true, 'is_prefixed' => false ) ),
+                          'skope'       => 'group',
+                          'level'       => 'all_' . skp_get_skope('type'),
+                          'skope_id'    => skp_get_skope_id( 'group' )
+                      ),
+                      $defaults
+                  );
+              }
+
+
+              //LOCAL
+              $skopes[] = wp_parse_args(
+                  array(
+                      'title'       => skp_get_skope_title( array( 'level' => 'local', 'meta_type' => $_meta_type ) ),
+                      'long_title'  => skp_get_skope_title( array( 'level' => 'local', 'meta_type' => $_meta_type, 'long' => true ) ),
+                      'ctx_title'   => skp_get_skope_title( array( 'level' => 'local', 'meta_type' => $_meta_type, 'long' => true, 'is_prefixed' => false ) ),
+                      'skope'       => 'local',
+                      'level'       => skp_get_skope(),
+                      'obj_id'      => skp_get_skope('id'),
+                      'skope_id'    => skp_get_skope_id( 'local' )
+                  ),
+                  $defaults
+              );
+              return apply_filters( 'skp_json_export_ready_skopes', $skopes );
+          }
+    }//class
+endif;
 
 ?><?php
-// Clean any associated skope post for all public post types : post, page, public cpt
-// 'delete_post' Fires immediately before a post is deleted from the database.
-// @see wp-includes/post.php
-// don't have to return anything
-add_action( 'delete_post', 'skp_clean_skopified_posts' );
-function skp_clean_skopified_posts( $postid ) {
-    $deletion_candidate = get_post( $postid );
-    if ( ! $deletion_candidate || ! is_object( $deletion_candidate ) )
-      return;
 
-    // Stop here if the post type is not considered "viewable".
-    // For built-in post types such as posts and pages, the 'public' value will be evaluated.
-    // For all others, the 'publicly_queryable' value will be used.
-    // For example, the 'revision' post type, which is purely internal and not skopable, won't pass this test.
-    if ( ! is_post_type_viewable( $deletion_candidate -> post_type ) )
-      return;
-
-    // Force the skope parts normally retrieved with skp_get_query_skope()
-    $skope_string = skp_get_skope( null, true, array(
-        'meta_type' => 'post',
-        'type'      => $deletion_candidate -> post_type,
-        'obj_id'    => $postid
-    ) );
-
-    // build a skope_id with the normalized function
-    $skope_id = skp_build_skope_id( array( 'skope_string' => $skope_string, 'skope_level' => 'local' ) );
-
-    // fetch the skope post id which, if exists, is set as a theme mod
-    $skope_post_id_candidate = get_theme_mod( $skope_id );
-    if ( $skope_post_id_candidate > 0 && get_post( $skope_post_id_candidate ) ) {
-        // permanently delete the skope post from db
-        wp_delete_post( $skope_post_id_candidate );
-        // remove the theme_mod
-        remove_theme_mod( $skope_id );
-    }
-}
+if ( ! class_exists( 'Flat_Skope_Clean_Final' ) ) :
+    final class Flat_Skope_Clean_Final extends Flat_Export_Skope_Data_And_Send_To_Panel {
+          // Fired in Flat_Skop_Base::__construct()
+          public function skp_schedule_cleaning_on_object_delete() {
+              add_action( 'delete_post', array( $this, 'skp_clean_skopified_posts' ) );
+              add_action( 'delete_term_taxonomy', array( $this, 'skp_clean_skopified_taxonomies' ) );
+              add_action( 'delete_user', array( $this, 'skp_clean_skopified_users' ) );
+          }
 
 
-// 'delete_term_taxonomy' Fires immediately before a term taxonomy ID is deleted.
-add_action( 'delete_term_taxonomy', 'skp_clean_skopified_taxonomies' );
-function skp_clean_skopified_taxonomies( $term_id ) {
-    $deletion_candidate = get_term( $term_id );
-    if ( ! $deletion_candidate || ! is_object( $deletion_candidate ) )
-      return;
+          // Clean any associated skope post for all public post types : post, page, public cpt
+          // 'delete_post' Fires immediately before a post is deleted from the database.
+          // @see wp-includes/post.php
+          // don't have to return anything
+          public function skp_clean_skopified_posts( $postid ) {
+              $deletion_candidate = get_post( $postid );
+              if ( ! $deletion_candidate || ! is_object( $deletion_candidate ) )
+                return;
 
-    //error_log( print_r( $deletion_candidate, true ) );
+              // Stop here if the post type is not considered "viewable".
+              // For built-in post types such as posts and pages, the 'public' value will be evaluated.
+              // For all others, the 'publicly_queryable' value will be used.
+              // For example, the 'revision' post type, which is purely internal and not skopable, won't pass this test.
+              if ( ! is_post_type_viewable( $deletion_candidate -> post_type ) )
+                return;
 
-    // Force the skope parts normally retrieved with skp_get_query_skope()
-    $skope_string = skp_get_skope( null, true, array(
-        'meta_type' => 'tax',
-        'type'      => $deletion_candidate -> taxonomy,
-        'obj_id'    => $term_id
-    ) );
+              // Force the skope parts normally retrieved with skp_get_query_skope()
+              $skope_string = skp_get_skope( null, true, array(
+                  'meta_type' => 'post',
+                  'type'      => $deletion_candidate -> post_type,
+                  'obj_id'    => $postid
+              ) );
 
-    // build a skope_id with the normalized function
-    $skope_id = skp_build_skope_id( array( 'skope_string' => $skope_string, 'skope_level' => 'local' ) );
+              // build a skope_id with the normalized function
+              $skope_id = skp_build_skope_id( array( 'skope_string' => $skope_string, 'skope_level' => 'local' ) );
 
-    // fetch the skope post id which, if exists, is set as a theme mod
-    $skope_post_id_candidate = get_theme_mod( $skope_id );
-    if ( $skope_post_id_candidate > 0 && get_post( $skope_post_id_candidate ) ) {
-        // permanently delete the skope post from db
-        wp_delete_post( $skope_post_id_candidate );
-        // remove the theme_mod
-        remove_theme_mod( $skope_id );
-        //error_log( 'SUCCESSFULLY REMOVED SKOPE POST ID ' . $skope_post_id_candidate . ' AND THEME MOD ' . $skope_id );
-    }
-}
+              // fetch the skope post id which, if exists, is set as a theme mod
+              $skope_post_id_candidate = get_theme_mod( $skope_id );
+              if ( $skope_post_id_candidate > 0 && get_post( $skope_post_id_candidate ) ) {
+                  // permanently delete the skope post from db
+                  wp_delete_post( $skope_post_id_candidate );
+                  // remove the theme_mod
+                  remove_theme_mod( $skope_id );
+              }
+          }
 
 
-// 'delete_user' Fires immediately before a user is deleted from the database.
-add_action( 'delete_user', 'skp_clean_skopified_users' );
-function skp_clean_skopified_users( $user_id ) {
-    // Force the skope parts normally retrieved with skp_get_query_skope()
-    $skope_string = skp_get_skope( null, true, array(
-        'meta_type' => 'user',
-        'type'      => 'author',
-        'obj_id'    => $user_id
-    ) );
+          // 'delete_term_taxonomy' Fires immediately before a term taxonomy ID is deleted.
+          public function skp_clean_skopified_taxonomies( $term_id ) {
+              $deletion_candidate = get_term( $term_id );
+              if ( ! $deletion_candidate || ! is_object( $deletion_candidate ) )
+                return;
 
-    // build a skope_id with the normalized function
-    $skope_id = skp_build_skope_id( array( 'skope_string' => $skope_string, 'skope_level' => 'local' ) );
+              //error_log( print_r( $deletion_candidate, true ) );
 
-    // fetch the skope post id which, if exists, is set as a theme mod
-    $skope_post_id_candidate = get_theme_mod( $skope_id );
-    if ( $skope_post_id_candidate > 0 && get_post( $skope_post_id_candidate ) ) {
-        // permanently delete the skope post from db
-        wp_delete_post( $skope_post_id_candidate );
-        // remove the theme_mod
-        remove_theme_mod( $skope_id );
-        //error_log( 'SUCCESSFULLY REMOVED SKOPE POST ID ' . $skope_post_id_candidate . ' AND THEME MOD ' . $skope_id );
-    }
-}
+              // Force the skope parts normally retrieved with skp_get_query_skope()
+              $skope_string = skp_get_skope( null, true, array(
+                  'meta_type' => 'tax',
+                  'type'      => $deletion_candidate -> taxonomy,
+                  'obj_id'    => $term_id
+              ) );
+
+              // build a skope_id with the normalized function
+              $skope_id = skp_build_skope_id( array( 'skope_string' => $skope_string, 'skope_level' => 'local' ) );
+
+              // fetch the skope post id which, if exists, is set as a theme mod
+              $skope_post_id_candidate = get_theme_mod( $skope_id );
+              if ( $skope_post_id_candidate > 0 && get_post( $skope_post_id_candidate ) ) {
+                  // permanently delete the skope post from db
+                  wp_delete_post( $skope_post_id_candidate );
+                  // remove the theme_mod
+                  remove_theme_mod( $skope_id );
+                  //error_log( 'SUCCESSFULLY REMOVED SKOPE POST ID ' . $skope_post_id_candidate . ' AND THEME MOD ' . $skope_id );
+              }
+          }
+
+
+          // 'delete_user' Fires immediately before a user is deleted from the database.
+          public function skp_clean_skopified_users( $user_id ) {
+              // Force the skope parts normally retrieved with skp_get_query_skope()
+              $skope_string = skp_get_skope( null, true, array(
+                  'meta_type' => 'user',
+                  'type'      => 'author',
+                  'obj_id'    => $user_id
+              ) );
+
+              // build a skope_id with the normalized function
+              $skope_id = skp_build_skope_id( array( 'skope_string' => $skope_string, 'skope_level' => 'local' ) );
+
+              // fetch the skope post id which, if exists, is set as a theme mod
+              $skope_post_id_candidate = get_theme_mod( $skope_id );
+              if ( $skope_post_id_candidate > 0 && get_post( $skope_post_id_candidate ) ) {
+                  // permanently delete the skope post from db
+                  wp_delete_post( $skope_post_id_candidate );
+                  // remove the theme_mod
+                  remove_theme_mod( $skope_id );
+                  //error_log( 'SUCCESSFULLY REMOVED SKOPE POST ID ' . $skope_post_id_candidate . ' AND THEME MOD ' . $skope_id );
+              }
+          }
+    }//class
+endif;
 
 ?>

@@ -24,7 +24,7 @@ if ( !defined( 'NIMBLE_MIN_WP_VERSION' ) ) define ( 'NIMBLE_MIN_WP_VERSION', '4.
 
 
 /* ------------------------------------------------------------------------- *
- *  MINIMAL PHP AND WP REQUIREMENTS
+ *  CHECK PHP AND WP REQUIREMENTS
 /* ------------------------------------------------------------------------- */
 if ( version_compare( phpversion(), NIMBLE_MIN_PHP_VERSION, '<' ) ) {
     add_action( 'admin_notices' , 'nimble_display_min_php_message' );
@@ -52,40 +52,30 @@ function nimble_display_min_requirement_notice( $requires_what, $requires_what_v
 }
 
 /* ------------------------------------------------------------------------- *
- *  LOAD THE BASE CUSTOMIZER FMK => NEEDED WHEN USED AS STANDALONE PLUGIN
- *  WE ALSO NEED TO FIRE THIS FILE WHEN AJAXING FROM THE CUSTOMIZER
+ *  LOAD
 /* ------------------------------------------------------------------------- */
 add_action( 'after_setup_theme', 'nimble_load_czr_base_fmk', 10 );
 function nimble_load_czr_base_fmk() {
-    if ( isset( $GLOBALS['czr_base_fmk_namespace'] ) ) {
-        //error_log('The czr_base_fmk has already been loaded');
+    if ( did_action( 'nimble_base_fmk_loaded' ) ) {
+        sek_error_log('The czr_base_fmk has already been loaded');
         return;
     }
     require_once(  dirname( __FILE__ ) . '/inc/czr-base-fmk/czr-base-fmk.php' );
-    \czr_fn\CZR_Fmk_Base( array(
+    \Nimble\CZR_Fmk_Base( array(
        'base_url' => NIMBLE_BASE_URL . '/inc/czr-base-fmk',
        'version' => NIMBLE_VERSION
     ));
 }
 
-/* ------------------------------------------------------------------------- *
- *  LOADS SKOP
-/* ------------------------------------------------------------------------- */
 require_once( plugin_dir_path( __FILE__ ) . 'inc/czr-skope/index.php' );
 add_action( 'after_setup_theme', function() {
-    Flat_Skop_Base( array(
+    \Nimble\Flat_Skop_Base( array(
         'base_url_path' => NIMBLE_BASE_URL . '/inc/czr-skope'
     ) );
 });
 
-/* ------------------------------------------------------------------------- *
- *  LOADS SEKS
-/* ------------------------------------------------------------------------- */
 require_once( plugin_dir_path( __FILE__ ) . 'inc/sektions/ccat-sektions.php' );
 
-/* ------------------------------------------------------------------------- *
- *  LOADS TESTS
-/* ------------------------------------------------------------------------- */
 if ( defined( 'CZR_DEV' ) && CZR_DEV && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
     require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
 }

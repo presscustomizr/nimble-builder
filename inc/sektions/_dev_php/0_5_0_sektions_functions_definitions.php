@@ -60,15 +60,8 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 
 // Helper
 function sek_get_registered_module_type_property( $module_type, $property = '' ) {
-    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-    //czr_fn\czr_register_dynamic_module
-    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-        error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
-        return;
-    }
     // registered modules
-    $registered_modules = $CZR_Fmk_Base_fn() -> registered_modules;
+    $registered_modules = CZR_Fmk_Base() -> registered_modules;
     if ( ! array_key_exists( $module_type, $registered_modules ) ) {
         error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
         return;
@@ -147,14 +140,7 @@ function sek_get_default_module_model( $module_type = '' ) {
     if ( ! empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
-        $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-        //czr_fn\czr_register_dynamic_module
-        $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
-        if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
-            error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
-            return array();
-        }
-        $registered_modules = $CZR_Fmk_Base_fn() -> registered_modules;
+        $registered_modules = CZR_Fmk_Base() -> registered_modules;
 
         // error_log('<registered_modules>');
         // error_log( print_r( $registered_modules, true ) );
