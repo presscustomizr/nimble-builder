@@ -58,19 +58,6 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 
 
 
-// Helper
-function sek_get_registered_module_type_property( $module_type, $property = '' ) {
-    // registered modules
-    $registered_modules = CZR_Fmk_Base() -> registered_modules;
-    if ( ! array_key_exists( $module_type, $registered_modules ) ) {
-        error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
-        return;
-    }
-    if ( array_key_exists( $property , $registered_modules[ $module_type ] ) ) {
-        return $registered_modules[ $module_type ][$property];
-    }
-    return;
-}
 
 // Recursively walk the level tree until a match is found
 // @param id = the id of the level for which the model shall be returned
@@ -125,11 +112,32 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
 
 
 
+/* ------------------------------------------------------------------------- *
+ *  REGISTERED MODULES => GET PROPERTY
+/* ------------------------------------------------------------------------- */
+// Helper
+function sek_get_registered_module_type_property( $module_type, $property = '' ) {
+    // registered modules
+    $registered_modules = CZR_Fmk_Base() -> registered_modules;
+    if ( ! array_key_exists( $module_type, $registered_modules ) ) {
+        error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
+        return;
+    }
+    if ( array_key_exists( $property , $registered_modules[ $module_type ] ) ) {
+        return $registered_modules[ $module_type ][$property];
+    }
+    return;
+}
 
-
-// @param module_type
-// walk the registered modules tree and generates the module default if not already cached
-// @return array;
+/* ------------------------------------------------------------------------- *
+ *  REGISTERED MODULES => DEFAULT MODULE MODEL
+/* ------------------------------------------------------------------------- */
+// @param (string) module_type
+// Walk the registered modules tree and generates the module default if not already cached
+// used :
+// - when preprocessing the module model before printing the module template. @seeSEL_Front::render()
+// - when setting the level option css. @see sek_add_css_rules_for_bg_border_background()
+// @return array()
 function sek_get_default_module_model( $module_type = '' ) {
     $default = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
@@ -141,10 +149,7 @@ function sek_get_default_module_model( $module_type = '' ) {
         $default = $default_models[ $module_type ];
     } else {
         $registered_modules = CZR_Fmk_Base() -> registered_modules;
-
-        // error_log('<registered_modules>');
-        // error_log( print_r( $registered_modules, true ) );
-        // error_log('</registered_modules>');
+        // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
         }
@@ -158,9 +163,7 @@ function sek_get_default_module_model( $module_type = '' ) {
         // Cache
         $default_models[ $module_type ] = $default;
         SEK_Front()->default_models = $default_models;
-        // error_log('<$default_models>');
-        // error_log( print_r( $default_models, true ) );
-        // error_log('</$default_models>');
+        // sek_error_log( __FUNCTION__ . ' => $default_models', $default_models );
     }
     return $default;
 }
@@ -233,6 +236,113 @@ function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
 
 
 
+/* ------------------------------------------------------------------------- *
+ *  REGISTERED MODULES => SANITIZE/VALIDATE CALLBACKS LISTS BY INPUT ID FOR A MODULE
+/* ------------------------------------------------------------------------- */
+// @param (string) module_type
+// Walk the registered modules tree and generates the list of sanitize callbacks by input ids if not already cached
+// invoked when customizing and saving
+// @return array()
+function sek_get_module_sanitize_callbacks( $module_type = '' ) {
+    $callbacks = array();
+    if ( empty( $module_type ) || is_null( $module_type ) )
+      return $callbacks;
+
+    // Did we already cache it ?
+    $cached_callbacks = SEK_CZR_Dyn_Register()->sanitize_callbacks;
+    if ( ! empty( $cached_callbacks[ $module_type ] ) ) {
+        $callbacks = $cached_callbacks[ $module_type ];
+    } else {
+        $registered_modules = CZR_Fmk_Base() -> registered_modules;
+        // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
+        if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+        }
+
+        if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+        }
+        // Build
+        $callbacks = _sek_build_sanitize_cb_list( $registered_modules[ $module_type ][ 'tmpl' ] );
+
+        // Cache
+        $cached_callbacks[ $module_type ] = $callbacks;
+        SEK_CZR_Dyn_Register()->cached_callbacks = $cached_callbacks;
+        // sek_error_log( __FUNCTION__ . ' => $cached_callbacks', $cached_callbacks );
+    }
+    return $callbacks;
+}
+
+// @return array() default model
+// Walk recursively the 'tmpl' property of the module
+// 'tmpl' => array(
+//     'pre-item' => array(
+//         'social-icon' => array(
+//             'input_type'  => 'select',
+//             'title'       => __('Select an icon', 'text_domain_to_be_replaced')
+//         ),
+//     ),
+//     'mod-opt' => array(
+//         'social-size' => array(
+//             'input_type'  => 'number',
+//             'title'       => __('Size in px', 'text_domain_to_be_replaced'),
+//             'step'        => 1,
+//             'min'         => 5,
+//             'transport' => 'postMessage'
+//         )
+//     ),
+//     'item-inputs' => array(
+//         'item-inputs' => array(
+                // 'tabs' => array(
+                //     array(
+                //         'title' => __('Content', 'text_domain_to_be_replaced'),
+                //         //'attributes' => 'data-sek-device="desktop"',
+                //         'inputs' => array(
+                //             'content' => array(
+                //                 'input_type'  => 'tiny_mce_editor',
+                //                 'title'       => __('Content', 'text_domain_to_be_replaced')
+                //             ),
+                //             'h_alignment_css' => array(
+                //                 'input_type'  => 'h_text_alignment',
+                //                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                //                 'default'     => is_rtl() ? 'right' : 'left',
+                //                 'refresh-markup' => false,
+                //                 'refresh-stylesheet' => true
+                //             )
+                //         )
+//         )
+//     )
+// )
+function _sek_build_sanitize_cb_list( $module_tmpl_data, $sanitize_cbs = null ) {
+    $sanitize_cbs = is_array( $sanitize_cbs ) ? $sanitize_cbs : array();
+    //error_log( print_r(  $module_tmpl_data , true ) );
+    foreach( $module_tmpl_data as $key => $data ) {
+        if ( 'pre-item' === $key )
+          continue;
+        if ( is_array( $data ) && array_key_exists( 'input_type', $data ) ) {
+            $sanitize_cbs[ $key ] = array(
+                'sanitize_cb' => array_key_exists( 'sanitize_cb', $data ) ? $data[ 'sanitize_cb' ] : '',
+                'input_type' => $data[ 'input_type' ]
+            );
+        }
+        if ( is_array( $data ) ) {
+            $sanitize_cbs = _sek_build_sanitize_cb_list( $data, $sanitize_cbs );
+        }
+    }
+
+    return $sanitize_cbs;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -244,8 +354,9 @@ function sek_is_checked( $val ) {
 }
 
 function sek_booleanize_checkbox_val( $val ) {
-    if ( ! $val )
+    if ( ! $val || is_array( $val ) ) {
       return false;
+    }
     if ( is_bool( $val ) && $val )
       return true;
     switch ( (string) $val ) {
@@ -291,11 +402,11 @@ function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true )
 
 function sek_error_log( $title, $content = null ) {
     if ( is_null( $content ) ) {
-        error_log( '<' . strtoupper( $title ) . '>' );
+        error_log( '<' . $title . '>' );
     } else {
-        error_log( '<' . strtoupper( $title ) . '>' );
+        error_log( '<' . $title . '>' );
         error_log( print_r( $content, true ) );
-        error_log( '<' . strtoupper( $title ) . '>' );
+        error_log( '</' . $title . '>' );
     }
 }
 ?>

@@ -11,8 +11,8 @@ function sek_get_module_params_for_czr_image_module() {
         'starting_value' => array(
             'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
         ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
-        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        // 'sanitize_callback' => '\Nimble\czr_image_module_sanitize_validate',
+        // 'validate_callback' => '\Nimble\czr_image_module_sanitize_validate',
         'tmpl' => array(
             'item-inputs' => array(
                 'img' => array(
@@ -44,7 +44,7 @@ function sek_get_module_params_for_czr_image_module() {
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
                     'default'     => ''
                 ),
                 'link-target' => array(
@@ -65,5 +65,4 @@ function sek_get_module_params_for_czr_image_module() {
         'placeholder_icon' => 'short_text'
     );
 }
-
 ?>

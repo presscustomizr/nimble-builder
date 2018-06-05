@@ -1,17 +1,16 @@
 <?php
 ////////////////////////////////////////////////////////////////
-// FLAT SKOPE BASE
-//  This Class is instantiated on 'hu_hueman_loaded', declared in /init-core.php
+// SEK Front Class
 if ( ! class_exists( 'SEK_Front_Construct' ) ) :
     class SEK_Front_Construct {
         static $instance;
         public $local_seks = 'not_cached';// <= used to cache the sektions for the local skope_id
         public $model = array();//<= when rendering, the current level model
         public $parent_model = array();//<= when rendering, the current parent model
-        public $default_models = array();// <= will be populated and cached when invoking sek_get_default_module_model
+        public $default_models = array();// <= will be populated to cache the default models when invoking sek_get_default_module_model
         public $ajax_action_map = array();
 
-        public static function sek_get_instance( $params ) {
+        public static function get_instance( $params ) {
             if ( ! isset( self::$instance ) && ! ( self::$instance instanceof SEK_Front_Render ) )
               self::$instance = new SEK_Front_Render_Css( $params );
             return self::$instance;

@@ -1,9 +1,4 @@
 <?php
-// DEPRECATED WAS USED TO DISPLAY UI BUTTON IN THE PANEL
-// if ( ! defined( 'SEK_BUTTON_SECTION_TMPL_SUFFIX' ) ) { define( 'SEK_BUTTON_SECTION_TMPL_SUFFIX', 'sek-add-new-sektion-button' ); }
-// if ( ! defined( 'SEK_BUTTON_COLUMN_TMPL_SUFFIX' ) ) { define( 'SEK_BUTTON_COLUMN_TMPL_SUFFIX', 'sek-add-new-column-button' ); }
-// if ( ! defined( 'SEK_BUTTON_MODULE_TMPL_SUFFIX' ) ) { define( 'SEK_BUTTON_MODULE_TMPL_SUFFIX', 'sek-add-new-module-button' ); }
-
 // TINY MCE EDITOR
 require_once(  dirname( __FILE__ ) . '/customizer/seks_tiny_mce_editor_actions.php' );
 
@@ -302,9 +297,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
         $new_skopes[] = $skp_data;
     }
 
-    // error_log( '<////////////////////$new_skopes>' );
-    // error_log( print_r($new_skopes, true ) );
-    // error_log( '</////////////////////$new_skopes>' );
+    // sek_error_log( '//////////////////// => new_skopes', $new_skopes);
 
     return $new_skopes;
 }

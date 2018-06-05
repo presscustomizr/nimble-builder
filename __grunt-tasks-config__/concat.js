@@ -4,7 +4,7 @@ module.exports = {
   },
 
   //
-  //------------------------- CUSTOMIZER PANE JS
+  //------------------------- CUSTOMIZER BASE FMK CONTROL JS
   //
   czr_fmk_control_js:{
     src: [
@@ -103,7 +103,7 @@ module.exports = {
   },
 
   //
-  //------------------------- CUSTOMIZER PANE CSS
+  //------------------------- CUSTOMIZER BASE FMK CONTROL CSS
   //
   czr_control_css:{
     src:[
@@ -117,6 +117,9 @@ module.exports = {
     dest : '<%= paths.czr_base_fmk %>assets/css/czr-ccat-control-base.css',
   },
 
+  //
+  //------------------------- CUSTOMIZER BASE FMK PHP
+  //
   czr_base_fmk_php : {
     src: [
       '<%= paths.czr_base_fmk %>_dev_php/0_0_czr-base-fmk-construct.php',
@@ -130,6 +133,12 @@ module.exports = {
     dest: '<%= paths.czr_base_fmk %>czr-base-fmk.php',
   },
 
+
+
+
+  //
+  //------------------------- SKOPE PHP AND JS
+  //
   czr_flat_skope_php : {
     src: [
       '<%= paths.flat_skope_php %>_dev/0_0_1_skop_functions_skope_helpers.php',
@@ -161,7 +170,7 @@ module.exports = {
 
 
   //
-  //------------------------- SEKTIONS
+  //------------------------- SEKTIONS PHP AND JS
   //
 
   czr_sektions_php : {
