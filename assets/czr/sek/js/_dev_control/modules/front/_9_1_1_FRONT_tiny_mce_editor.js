@@ -68,10 +68,7 @@
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_tiny_mce_editor_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
-                  defaultItemModel : _.extend(
-                        { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_tiny_mce_editor_module' )
-                  )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_tiny_mce_editor_module' )
             },
       });
 })( wp.customize , jQuery, _ );

@@ -153,7 +153,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return {};
                   }
                   var data = sektionsLocalizedData.registeredModules[ moduleType ]['tmpl']['item-inputs'],
-                      defaultItemModem = {},
+                      // title, id are always included in the defaultItemModel but those properties don't need to be saved in database
+                      // title and id are legacy entries that can be used in multi-items modules to identify and name the item
+                      defaultItemModem = {
+                            id : '',
+                            title : ''
+                      },
                       self = this;
 
                   _.each( data, function( _d_, _key_ ) {

@@ -594,6 +594,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var normalizeSingleItemValue = function( _item_ ) {
                         var itemCandidate = {};
                         _.each( _item_, function( _val, input_id ) {
+                              // title, id and module_type don't need to be saved in database
+                              // title and id are legacy entries that can be used in multi-items modules to identify and name the item
+                              // @see ::getDefaultItemModelFromRegisteredModuleData()
                               if ( _.contains( ['title', 'id' ], input_id ) )
                                 return;
 
