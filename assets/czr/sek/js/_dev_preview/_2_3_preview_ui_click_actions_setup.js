@@ -118,6 +118,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   api.preview.send( 'sek-' + params.action, {
                         location : params.location,
                         level : params.level,
+                        module_type : 'module' == params.level ? $el.closest('div[data-sek-level="module"]').data( 'sek-module-type') : '',
                         id : params.id,
                         in_column : $el.closest('div[data-sek-level="column"]').length > 0 ? $el.closest('div[data-sek-level="column"]').data( 'sek-id') : '',
                         in_sektion : $el.closest('div[data-sek-level="section"]').length > 0 ? $el.closest('div[data-sek-level="section"]').data( 'sek-id') : '',

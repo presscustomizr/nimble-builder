@@ -1,7 +1,7 @@
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-            var TinyMceEditorModuleConstructor = {
+      var TinyMceEditorModuleConstructor = {
             initialize: function( id, options ) {
                     //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
@@ -15,10 +15,17 @@
             },//initialize
 
             CZRTextEditorInputMths : {
-                    // initialize : function( name, options ) {
-                    //       var input = this;
-                    //       api.CZRInput.prototype.initialize.call( input, name, options );
-                    // },
+                    initialize : function( name, options ) {
+                          var input = this;
+                          api.CZRInput.prototype.initialize.call( input, name, options );
+
+                          // Expand the editor when ready
+                          if ( 'tiny_mce_editor' == input.type ) {
+                                input.isReady.then( function() {
+                                      input.container.find('[data-czr-action="open-tinymce-editor"]').trigger('click');
+                                });
+                          }
+                    },
 
                     setupSelect : function() {
                             var input  = this,
