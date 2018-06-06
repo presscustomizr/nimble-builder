@@ -555,6 +555,11 @@ fieldset[disabled] a.sek-btn {
   text-align: center;
 }
 
+/* make sure that the location level occupies 100% of the width */
+[data-sek-level="location"] {
+  clear: both;
+}
+
 .sek-sektion-inner {
   padding: 15px;
 }

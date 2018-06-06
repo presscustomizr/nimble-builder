@@ -11,8 +11,12 @@
 //modules
 @import "modules";
 
-
-//previously in sek-main.css
+// Structural base
+// @todo create a specific scss file for the code after this line
+/* make sure that the location level occupies 100% of the width */
+[data-sek-level="location"] {
+  clear: both;
+}
 
 .sek-sektion-inner{
   padding: 15px;
