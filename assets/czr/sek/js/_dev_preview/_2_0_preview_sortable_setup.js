@@ -18,7 +18,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
 
-                  // Schedule
+                  // Schedule with delegation
                   $( 'body').on( 'sek-section-added sek-refresh-level', '[data-sek-level="location"]', function( evt, params  ) {
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
@@ -30,8 +30,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                         });
                   });
-                  // Schedule
-                  $('[data-sek-level="location"]').on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
+                  // Schedule with delegation
+                  $('body').on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
                         self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                   });
 
@@ -42,11 +42,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
-                  // Schedule
-                  $('[data-sek-level="location"]').on( 'sek-modules-refreshed', '[data-sek-level="column"]', function() {
+                  // Schedule with delegation
+                  $('body').on( 'sek-modules-refreshed', '[data-sek-level="column"]', function() {
                         self.makeModulesSortableInColumn( $(this).data('sek-id') );
                   });
-                  $('[data-sek-level="location"]').on( 'sek-columns-refreshed', '[data-sek-level="section"]', function() {
+                  $('body').on( 'sek-columns-refreshed', '[data-sek-level="section"]', function() {
                         $(this).find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
