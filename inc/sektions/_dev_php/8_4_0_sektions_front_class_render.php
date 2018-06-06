@@ -136,7 +136,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $column_container_class = 'sek-container-fluid';
                     //when boxed use proper container class
                     if ( ! empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
-                      $column_container_class = 'sek-container';
+                        $column_container_class = 'sek-container';
                     }
                     ?>
                     <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section">', $id, $is_nested ? 'data-sek-is-nested="true"' : '' ); ?>
@@ -181,7 +181,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
-                                      <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e('Drag and drop a module here', 'text_domain_to_be_replaced' ); ?>">add</i>
+                                      <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e('Drag and drop a module here', 'text_domain_to_be_replaced' ); ?>">add_circle_outline</i>
                                     </div>
                                   </div>
                                   <?php

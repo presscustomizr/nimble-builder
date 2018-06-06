@@ -125,7 +125,19 @@
   cursor: move;
 }
 
-
+/* add space between the remove icons and the other */
+.sek-dyn-ui-icons [data-sek-click-on="remove"] {
+    padding-left: 9px;
+    margin-left: 0px;
+    width: 1.6em!important;
+    border-left: 1px dotted white;
+}
+.sek-dyn-ui-icons [data-sek-click-on="pick-module"] {
+    padding-left: 9px;
+    margin-left: 0px;
+    width: 1.6em!important;
+    border-left: 1px dotted #fff;
+}
 
 
 
@@ -304,6 +316,7 @@
   width: 50px;
   height: 50px;
   padding-top: 12px;
+  color: #0085ba;
 }
 /* Hide the + during a drag phase */
 .sek-dragging .sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"] {
