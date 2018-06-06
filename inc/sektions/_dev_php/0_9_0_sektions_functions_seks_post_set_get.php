@@ -36,7 +36,7 @@ register_post_type( NIMBLE_CPT , array(
 
 
 /**
- * Fetch the `sek_post_type` post for a given {skope_id}
+ * Fetch the `nimble_post_type` post for a given {skope_id}
  *
  * @since 4.7.0
  *
@@ -149,8 +149,8 @@ function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'lo
 
 
 /**
- * Update the `sek_post_type` post for a given "{$skope_id}"
- * Inserts a `sek_post_type` post when one doesn't yet exist.
+ * Update the `nimble_post_type` post for a given "{$skope_id}"
+ * Inserts a `nimble_post_type` post when one doesn't yet exist.
  *
  * @since 4.7.0
  *

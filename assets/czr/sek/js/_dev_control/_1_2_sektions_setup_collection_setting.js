@@ -326,7 +326,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //     }
             //     return $defaut_sektions_value;
             // }
-            // 2) a real reset should delete the sektion post ( sek_post_type, with for example title nimble___skp__post_page_21 ) and its database option storing its id ( for example : nimble___skp__post_page_21 )
+            // 2) a real reset should delete the sektion post ( nimble_post_type, with for example title nimble___skp__post_page_21 ) and its database option storing its id ( for example : nimble___skp__post_page_21 )
             resetCollectionSetting : function() {
                   var self = this;
                   if ( _.isEmpty( self.sekCollectionSettingId() ) ) {
