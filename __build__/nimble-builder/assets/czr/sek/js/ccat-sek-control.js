@@ -4319,8 +4319,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.sekEditorExpanded   = new api.Value( false );
                   api.sekEditorSynchronizedInput = new api.Value();
 
-                  self.sekEditorBound = false;//this allows us to bind the unique tinyMce instance only once
+                  self.editorEventsListenerSetup = false;//this status will help us ensure that we bind the shared tinyMce instance only once
 
+                  // Cache the instance and attach
+                  var mayBeAwakeTinyMceEditor = function() {
+                        api.sekTinyMceEditor = api.sekTinyMceEditor || tinyMCE.get( 'czr-customize-content_editor' );
+
+                        if ( false === self.editorEventsListenerSetup ) {
+                              self.attachEventsToEditor();
+                              self.editorEventsListenerSetup = true;
+                              self.trigger('sek-tiny-mce-editor-bound-and-instantiated');
+                        }
+                  };
 
 
                   // SET THE SYNCHRONIZED INPUT
@@ -4375,15 +4385,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // 1) make sure the editor is expanded
                   // 2) refresh the editor content with the input() one
                   api.sekEditorSynchronizedInput.bind( function( to, from ) {
-
-                        api.sekTinyMceEditor = api.sekTinyMceEditor || tinyMCE.get( 'czr-customize-content_editor' );
-
-                        if ( false === self.sekEditorBound ) {
-                              self.bindSekEditor();
-                              self.sekEditorBound = true;
-                              self.trigger('sek-tiny-mce-editor-bound-and-instantiated');
-                        }
-
+                        mayBeAwakeTinyMceEditor();
                         //api.sekEditorExpanded( true );
                         //console.log('MODULE VALUE ?', self.getLevelProperty( { property : 'value', id : to.control_id } ) );
                         // When initializing the module, its customized value might not be set yet
@@ -4405,7 +4407,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // REACT TO EDITOR VISIBILITY
                   api.sekEditorExpanded.bind( function ( expanded ) {
-                        //api.consoleLog('in api.sekEditorExpanded', expanded, input() );
+                        mayBeAwakeTinyMceEditor();
+                        //api.infoLog('in api.sekEditorExpanded', expanded );
                         if ( expanded ) {
                             api.sekTinyMceEditor.focus();
                         }
@@ -4475,7 +4478,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }, 50 ));
                   });
 
-
                   _.each( [
                         'sek-click-on-inactive-zone',
                         'sek-add-section',
@@ -4490,24 +4492,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         'sek-edit-options',
                         'sek-edit-module'
                   ], function( _evt_ ) {
-
                         if ( 'sek-edit-module' != _evt_ ) {
                               api.previewer.bind( _evt_, function() { api.sekEditorExpanded( false ); } );
                         } else {
                               api.previewer.bind( _evt_, function( params ) {
-                                    api.sekEditorExpanded( params.clicked_input_type === 'tiny_mce_editor' );
+                                    api.sekEditorExpanded(  params.module_type === 'czr_tiny_mce_editor_module' );
                               });
                         }
                   });
-
-
-
             },//setupTinyMceEditor
 
 
 
 
-            bindSekEditor : function() {
+            attachEventsToEditor : function() {
                   var self = this;
                   // Cache some dom elements
                   self.$editorTextArea = $( '#czr-customize-content_editor' );
@@ -5260,7 +5258,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-            var TinyMceEditorModuleConstructor = {
+      var TinyMceEditorModuleConstructor = {
             initialize: function( id, options ) {
                     //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
@@ -5274,10 +5272,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//initialize
 
             CZRTextEditorInputMths : {
-                    // initialize : function( name, options ) {
-                    //       var input = this;
-                    //       api.CZRInput.prototype.initialize.call( input, name, options );
-                    // },
+                    initialize : function( name, options ) {
+                          var input = this;
+                          api.CZRInput.prototype.initialize.call( input, name, options );
+
+                          // Expand the editor when ready
+                          if ( 'tiny_mce_editor' == input.type ) {
+                                input.isReady.then( function() {
+                                      input.container.find('[data-czr-action="open-tinymce-editor"]').trigger('click');
+                                });
+                          }
+                    },
 
                     setupSelect : function() {
                             var input  = this,

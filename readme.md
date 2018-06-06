@@ -1,4 +1,4 @@
-# Nimble Builder v1.0.1-beta [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+# Nimble Builder v1.0.1 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 ![Nimble Builder](/nimble.jpg)
 
 > Drag and drop page builder for the WordPress customizer.
@@ -19,5 +19,15 @@ The Nimble Builder is a lightweight page builder that works from the WordPress l
 5. Drag a module in your section
 
 == Changelog ==
+= 1.0.1 : June 6th, 2018 =
+* fixed : submission issue on wordpress.org. The plugin must use unique function names, namespaces, defines, and classnames.
+* fixed : location levels need the css rule clear:both
+* fixed : clicking on the pencil icon of the tiny_mce_module should expand the editor
+* fixed : impossible to resize a fresh new column
+* fixed : impossible to move a fresh new module
+* fixed : alpha color input unwanted expansion when 2 instances displayed at the same time
+* fixed : before (after) loop sections might be duplicated in some edge cases
+* improved : reconsider behavior on mouse click (release) in the preview
+
 = 1.0.0 : June 1st, 2018 =
-* First offical release
+* initial submission to the wordpress.org plugins repository

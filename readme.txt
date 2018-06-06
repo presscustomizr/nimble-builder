@@ -5,7 +5,7 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Tested up to: 4.9.6
-Stable tag: 1.0.1-beta
+Stable tag: 1.0.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -27,7 +27,14 @@ The Nimble Builder is a lightweight page builder that works from the WordPress l
 
 == Changelog ==
 = 1.0.1 : June 6th, 2018 =
-
+* fixed : submission issue on wordpress.org. The plugin must use unique function names, namespaces, defines, and classnames.
+* fixed : location levels need the css rule clear:both
+* fixed : clicking on the pencil icon of the tiny_mce_module should expand the editor
+* fixed : impossible to resize a fresh new column
+* fixed : impossible to move a fresh new module
+* fixed : alpha color input unwanted expansion when 2 instances displayed at the same time
+* fixed : before (after) loop sections might be duplicated in some edge cases
+* improved : reconsider behavior on mouse click (release) in the preview
 
 = 1.0.0 : June 1st, 2018 =
-* First offical release
+* initial submission to the wordpress.org plugins repository

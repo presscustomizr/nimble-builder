@@ -101,7 +101,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
 
-                  // Schedule
+                  // Schedule with delegation
                   $( 'body').on( 'sek-section-added sek-refresh-level', '[data-sek-level="location"]', function( evt, params  ) {
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
@@ -113,8 +113,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                         });
                   });
-                  // Schedule
-                  $('[data-sek-level="location"]').on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
+                  // Schedule with delegation
+                  $('body').on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
                         self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                   });
 
@@ -125,11 +125,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
-                  // Schedule
-                  $('[data-sek-level="location"]').on( 'sek-modules-refreshed', '[data-sek-level="column"]', function() {
+                  // Schedule with delegation
+                  $('body').on( 'sek-modules-refreshed', '[data-sek-level="column"]', function() {
                         self.makeModulesSortableInColumn( $(this).data('sek-id') );
                   });
-                  $('[data-sek-level="location"]').on( 'sek-columns-refreshed', '[data-sek-level="section"]', function() {
+                  $('body').on( 'sek-columns-refreshed', '[data-sek-level="section"]', function() {
                         $(this).find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
@@ -397,10 +397,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.maybeMakeColumnResizableInSektion.call( this );
                   });
                   // Delegate instantiation when a module is added ( => column re-rendered )
-                  $('.sektion-wrapper').on(
+                  $('body').on(
                         'sek-modules-refreshed sek-columns-refreshed',
                         'div[data-sek-level="section"]',
                         function(evt) {
+                              console.log('ALOTS ???', evt.type );
                               self.maybeMakeColumnResizableInSektion.call( this );
                         }
                   );
@@ -811,6 +812,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   api.preview.send( 'sek-' + params.action, {
                         location : params.location,
                         level : params.level,
+                        module_type : 'module' == params.level ? $el.closest('div[data-sek-level="module"]').data( 'sek-module-type') : '',
                         id : params.id,
                         in_column : $el.closest('div[data-sek-level="column"]').length > 0 ? $el.closest('div[data-sek-level="column"]').data( 'sek-id') : '',
                         in_sektion : $el.closest('div[data-sek-level="section"]').length > 0 ? $el.closest('div[data-sek-level="section"]').data( 'sek-id') : '',
