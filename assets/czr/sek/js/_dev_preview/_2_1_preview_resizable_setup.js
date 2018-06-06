@@ -9,10 +9,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.maybeMakeColumnResizableInSektion.call( this );
                   });
                   // Delegate instantiation when a module is added ( => column re-rendered )
-                  $('.sektion-wrapper').on(
+                  $('body').on(
                         'sek-modules-refreshed sek-columns-refreshed',
                         'div[data-sek-level="section"]',
                         function(evt) {
+                              console.log('ALOTS ???', evt.type );
                               self.maybeMakeColumnResizableInSektion.call( this );
                         }
                   );
