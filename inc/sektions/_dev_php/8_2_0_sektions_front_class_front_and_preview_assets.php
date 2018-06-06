@@ -18,7 +18,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/front/css/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('CZR_DEV') && true === CZR_DEV ? 'sek-base.css' : 'sek-base.min.css'
+                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-base.css' : 'sek-base.min.css'
                 ),
                 array(),
                 NIMBLE_ASSETS_VERSION,
@@ -44,7 +44,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             //     'sek-main-js',
             //     'sekFrontLocalized',
             //     array(
-            //         'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
+            //         'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
             //         'ajaxUrl' => admin_url( 'admin-ajax.php' ),
             //         'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
             //     )
@@ -62,7 +62,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/czr/sek/css/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('CZR_DEV') && true === CZR_DEV ? 'sek-preview.css' : 'sek-preview.min.css'
+                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-preview.css' : 'sek-preview.min.css'
                 ),
                 array( 'sek-base' ),
                 NIMBLE_ASSETS_VERSION,
@@ -81,7 +81,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/czr/sek/js/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('CZR_DEV') && true === CZR_DEV ? 'ccat-sek-preview.js' : 'ccat-sek-preview.min.js'
+                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'ccat-sek-preview.js' : 'ccat-sek-preview.min.js'
                 ),
                 array( 'customize-preview', 'underscore'),
                 NIMBLE_ASSETS_VERSION,
@@ -97,7 +97,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
                         'Insert here' => __('Insert here', 'text_domain_to_be_replaced')
                     ),
-                    'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
+                    'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) )
                 )
@@ -141,7 +141,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
-                        <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
+                        <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
                         <# if ( ! data.is_last_possible_section ) { #>
@@ -155,7 +155,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'sek-builder' ); ?>">delete_forever</i>
                       </div>
                     </div>
-                    <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
+                    <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
                   </div>
@@ -181,7 +181,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                       </div>
                     </div>
 
-                    <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
+                    <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
                   </div>
@@ -210,7 +210,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'sek-builder' ); ?>">delete_forever</i>
                       </div>
                     </div>
-                    <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
+                    <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
                   </div><?php // .sek-dyn-ui-inner ?>

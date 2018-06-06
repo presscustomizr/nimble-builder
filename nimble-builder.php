@@ -14,7 +14,7 @@
 $current_version = "1.0.0";
 if ( ! defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version );}
 if ( ! defined( 'NIMBLE_ASSETS_VERSION' ) ) {
-    define( 'NIMBLE_ASSETS_VERSION', ( ( defined( 'CZR_DEV' ) && CZR_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) ? time() : NIMBLE_VERSION );
+    define( 'NIMBLE_ASSETS_VERSION', ( ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) ? time() : NIMBLE_VERSION );
 }
 if ( ! defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
 if ( ! defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
@@ -76,7 +76,7 @@ add_action( 'after_setup_theme', function() {
 
 require_once( plugin_dir_path( __FILE__ ) . 'inc/sektions/ccat-sektions.php' );
 
-if ( defined( 'CZR_DEV' ) && CZR_DEV && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
+if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
     require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
 }
 

@@ -17,7 +17,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/css/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('CZR_DEV') && true === CZR_DEV ? 'sek-control.css' : 'sek-control.min.css'
+            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-control.css' : 'sek-control.min.css'
         ),
         array(),
         NIMBLE_ASSETS_VERSION,
@@ -33,7 +33,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('CZR_DEV') && true === CZR_DEV ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
+            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
         ),
         array( 'czr-skope-base' , 'jquery', 'underscore' ),
         NIMBLE_ASSETS_VERSION,
@@ -46,7 +46,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('CZR_DEV') && true === CZR_DEV ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
+            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
         ),
         array( 'jquery' ),
         NIMBLE_ASSETS_VERSION,
@@ -57,7 +57,7 @@ function sek_enqueue_controls_js_css() {
         'czr-sektions',
         'sektionsLocalizedData',
         array(
-            'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
+            'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
             'baseUrl' => NIMBLE_BASE_URL,
             'sektionsPanelId' => '__sektions__',
             'addNewSektionId' => 'sek_add_new_sektion',

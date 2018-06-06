@@ -157,9 +157,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     // if ( defined('DOING_AJAX') && DOING_AJAX ) {
                     //     error_log( print_r( $parent_model, true ) );
                     // }
-                    // error_log( '<PARENT MODEL WHEN RENDERING>');
-                    // error_log( print_r( $parent_model, true ) );
-                    // error_log( '</PARENT MODEL WHEN RENDERING>');
+                    // sek_error_log( 'PARENT MODEL WHEN RENDERING', $parent_model );
 
                     $col_number = ( array_key_exists( 'collection', $parent_model ) && is_array( $parent_model['collection'] ) ) ? count( $parent_model['collection'] ) : 1;
                     $col_number = 12 < $col_number ? 12 : $col_number;
@@ -183,7 +181,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
-                                      <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e('Add a module here', 'text_domain_to_be_replaced' ); ?>">add</i>
+                                      <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e('Drag and drop a module here', 'text_domain_to_be_replaced' ); ?>">add</i>
                                     </div>
                                   </div>
                                   <?php
