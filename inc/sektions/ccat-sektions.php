@@ -5,9 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'sek_post_type' ); }
-if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'sek___' ); }
-if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__sek__' ); }
+if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
+if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
+if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
 
 // @return array
 function sek_get_locations() {
@@ -334,7 +334,7 @@ register_post_type( NIMBLE_CPT , array(
 
 
 /**
- * Fetch the `sek_post_type` post for a given {skope_id}
+ * Fetch the `nimble_post_type` post for a given {skope_id}
  *
  * @since 4.7.0
  *
@@ -447,8 +447,8 @@ function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'lo
 
 
 /**
- * Update the `sek_post_type` post for a given "{$skope_id}"
- * Inserts a `sek_post_type` post when one doesn't yet exist.
+ * Update the `nimble_post_type` post for a given "{$skope_id}"
+ * Inserts a `nimble_post_type` post when one doesn't yet exist.
  *
  * @since 4.7.0
  *
@@ -527,7 +527,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/css/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('CZR_DEV') && true === CZR_DEV ? 'sek-control.css' : 'sek-control.min.css'
+            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-control.css' : 'sek-control.min.css'
         ),
         array(),
         NIMBLE_ASSETS_VERSION,
@@ -543,7 +543,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('CZR_DEV') && true === CZR_DEV ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
+            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
         ),
         array( 'czr-skope-base' , 'jquery', 'underscore' ),
         NIMBLE_ASSETS_VERSION,
@@ -556,7 +556,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('CZR_DEV') && true === CZR_DEV ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
+            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
         ),
         array( 'jquery' ),
         NIMBLE_ASSETS_VERSION,
@@ -567,15 +567,15 @@ function sek_enqueue_controls_js_css() {
         'czr-sektions',
         'sektionsLocalizedData',
         array(
-            'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
+            'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
             'baseUrl' => NIMBLE_BASE_URL,
             'sektionsPanelId' => '__sektions__',
             'addNewSektionId' => 'sek_add_new_sektion',
             'addNewColumnId' => 'sek_add_new_column',
             'addNewModuleId' => 'sek_add_new_module',
 
-            'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'sek___'
-            'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__sek__"
+            'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
+            'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__nimble__"
 
             'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 
@@ -790,7 +790,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
         $skope_id = skp_get_skope_id( $skp_data['skope'] );
         $skp_data[ 'sektions' ] = array(
             'db_values' => sek_get_skoped_seks( $skope_id ),
-            'setting_id' => sek_get_seks_setting_id( $skope_id )//sek___loop_start[skp__post_page_home]
+            'setting_id' => sek_get_seks_setting_id( $skope_id )//nimble___loop_start[skp__post_page_home]
         );
         // foreach( [
         //     'loop_start',
@@ -801,7 +801,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
         //     ] as $location ) {
         //     $skp_data[ 'sektions' ][ $location ] = array(
         //         'db_values' => sek_get_skoped_seks( $skope_id, $location ),
-        //         'setting_id' => sek_get_seks_setting_id( $skope_id, $location )//sek___loop_start[skp__post_page_home]
+        //         'setting_id' => sek_get_seks_setting_id( $skope_id, $location )//nimble___loop_start[skp__post_page_home]
         //     );
         // }
         $new_skopes[] = $skp_data;
@@ -913,7 +913,7 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         //@filter 'customize_dynamic_setting_class'
         function set_dyn_setting_class( $class, $setting_id, $args ) {
-            // shall start with 'sek___'
+            // shall start with 'nimble___'
             if ( 0 !== strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
               return $class;
             //sek_error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
@@ -3657,11 +3657,11 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // (
         //     [action] => sek_get_content
         //     [withNonce] => false
-        //     [id] => __sek__0b7c85561448ab4eb8adb978
+        //     [id] => __nimble__0b7c85561448ab4eb8adb978
         //     [skope_id] => skp__post_page_home
         //     [sek_action] => sek-add-section
         //     [SEKFrontNonce] => 3713b8ac5c
-        //     [customized] => {\"sek___loop_start[skp__post_page_home]\":{...}}
+        //     [customized] => {\"nimble___loop_start[skp__post_page_home]\":{...}}
         // )
         // @return string
         // @param $sek_action is $_POST['sek_action']
@@ -3908,7 +3908,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/front/css/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('CZR_DEV') && true === CZR_DEV ? 'sek-base.css' : 'sek-base.min.css'
+                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-base.css' : 'sek-base.min.css'
                 ),
                 array(),
                 NIMBLE_ASSETS_VERSION,
@@ -3934,7 +3934,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             //     'sek-main-js',
             //     'sekFrontLocalized',
             //     array(
-            //         'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
+            //         'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
             //         'ajaxUrl' => admin_url( 'admin-ajax.php' ),
             //         'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
             //     )
@@ -3952,7 +3952,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/czr/sek/css/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('CZR_DEV') && true === CZR_DEV ? 'sek-preview.css' : 'sek-preview.min.css'
+                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-preview.css' : 'sek-preview.min.css'
                 ),
                 array( 'sek-base' ),
                 NIMBLE_ASSETS_VERSION,
@@ -3971,7 +3971,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/czr/sek/js/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('CZR_DEV') && true === CZR_DEV ? 'ccat-sek-preview.js' : 'ccat-sek-preview.min.js'
+                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'ccat-sek-preview.js' : 'ccat-sek-preview.min.js'
                 ),
                 array( 'customize-preview', 'underscore'),
                 NIMBLE_ASSETS_VERSION,
@@ -3987,7 +3987,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
                         'Insert here' => __('Insert here', 'text_domain_to_be_replaced')
                     ),
-                    'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
+                    'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) )
                 )
@@ -4031,7 +4031,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
-                        <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
+                        <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
                         <# if ( ! data.is_last_possible_section ) { #>
@@ -4039,13 +4039,13 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <# } #>
                         <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Section options', 'sek-builder' ); ?>">settings</i>
                         <# if ( data.can_have_more_columns ) { #>
-                          <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add Column', 'sek-builder' ); ?>">add</i>
+                          <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'sek-builder' ); ?>">view_column</i>
                         <# } #>
                         <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'sek-builder' ); ?>">filter_none</i>
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'sek-builder' ); ?>">delete_forever</i>
                       </div>
                     </div>
-                    <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
+                    <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
                   </div>
@@ -4058,20 +4058,21 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-ellipsis-v sek-move-column" title="<?php _e( 'Move column', 'sek-builder' ); ?>"></i>
                         <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Columns options', 'sek-builder' ); ?>">settings</i>
-                        <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e( 'Add Module', 'sek-builder' ); ?>">add</i>
+                        <# if ( ! data.parent_is_last_allowed_nested ) { #>
+                          <i data-sek-click-on="add-section" class="material-icons sek-click-on" title="<?php _e( 'Add a nested section', 'sek-builder' ); ?>">account_balance_wallet</i>
+                        <# } #>
                         <# if ( data.parent_can_have_more_columns ) { #>
                           <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate column', 'sek-builder' ); ?>">filter_none</i>
                         <# } #>
-                        <# if ( ! data.parent_is_last_allowed_nested ) { #>
-                          <i data-sek-click-on="add-section" class="fas far fa-plus-square sek-click-on" title="<?php _e( 'Add a nested section', 'sek-builder' ); ?>"></i>
-                        <# } #>
+
+                        <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'sek-builder' ); ?>">add_circle_outline</i>
                         <# if ( ! data.parent_is_single_column ) { #>
                           <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'sek-builder' ); ?>">delete_forever</i>
                         <# } #>
                       </div>
                     </div>
 
-                    <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
+                    <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
                   </div>
@@ -4100,7 +4101,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'sek-builder' ); ?>">delete_forever</i>
                       </div>
                     </div>
-                    <?php if ( defined( 'CZR_DEV' ) && CZR_DEV ) : ?>
+                    <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
                   </div><?php // .sek-dyn-ui-inner ?>
@@ -4247,7 +4248,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $column_container_class = 'sek-container-fluid';
                     //when boxed use proper container class
                     if ( ! empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
-                      $column_container_class = 'sek-container';
+                        $column_container_class = 'sek-container';
                     }
                     ?>
                     <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section">', $id, $is_nested ? 'data-sek-is-nested="true"' : '' ); ?>
@@ -4268,9 +4269,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     // if ( defined('DOING_AJAX') && DOING_AJAX ) {
                     //     error_log( print_r( $parent_model, true ) );
                     // }
-                    // error_log( '<PARENT MODEL WHEN RENDERING>');
-                    // error_log( print_r( $parent_model, true ) );
-                    // error_log( '</PARENT MODEL WHEN RENDERING>');
+                    // sek_error_log( 'PARENT MODEL WHEN RENDERING', $parent_model );
 
                     $col_number = ( array_key_exists( 'collection', $parent_model ) && is_array( $parent_model['collection'] ) ) ? count( $parent_model['collection'] ) : 1;
                     $col_number = 12 < $col_number ? 12 : $col_number;
@@ -4294,7 +4293,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
-                                      <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e('Add a module here', 'text_domain_to_be_replaced' ); ?>">add</i>
+                                      <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e('Drag and drop a module here', 'text_domain_to_be_replaced' ); ?>">add_circle_outline</i>
                                     </div>
                                   </div>
                                   <?php

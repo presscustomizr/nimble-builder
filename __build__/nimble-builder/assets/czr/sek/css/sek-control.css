@@ -1,0 +1,403 @@
+/* @see https://github.com/google/material-design-icons/blob/master/iconfont/material-icons.css */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/material-icons/MaterialIcons-Regular.eot'); /* For IE6-8 */
+  src: local('Material Icons'),
+       local('MaterialIcons-Regular'),
+       url('../fonts/material-icons/MaterialIcons-Regular.woff2') format('woff2'),
+       url('../fonts/material-icons/MaterialIcons-Regular.woff') format('woff'),
+       url('../fonts/material-icons/MaterialIcons-Regular.ttf') format('truetype');
+}
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  -webkit-font-feature-settings: 'liga';
+          font-feature-settings: 'liga';
+}
+
+
+
+/* OVERRIDE WP CUSTOMIZER */
+ul[id*="sub-accordion-section-__nimble__"] {
+    background: #F2F2F2!important;
+}
+/* No sliding transition needed when switching from a section to another when generating the UI's */
+#customize-theme-controls .customize-pane-child[id*="__nimble__"] {
+    -webkit-transition: unset;
+    -o-transition: unset;
+    transition: unset;
+}
+
+
+
+
+
+/* MODULE AND SECTION PICKER INPUT */
+[data-sek-content-type] {
+    float: left;
+    padding: 0%;
+    margin: 3%;
+    text-align: center;
+    cursor: move;
+    /*cursor: -webkit-grab;*/
+    /*background: #eee;*/
+    -webkit-transition: -webkit-box-shadow .2s ease;
+    transition: -webkit-box-shadow .2s ease;
+    -o-transition: box-shadow .2s ease;
+    transition: box-shadow .2s ease;
+    transition: box-shadow .2s ease, -webkit-box-shadow .2s ease;
+    -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.25);
+    box-shadow: 0 2px 5px rgba(0,0,0,.25);
+}
+[data-sek-content-type="module"] {
+  width: 40%;
+}
+[data-sek-content-type="preset_section"] {
+  width: 90%;
+}
+
+
+[data-sek-content-type]:hover {
+  -webkit-box-shadow: 0 12px 20px rgba(0,0,0,.2);
+  box-shadow: 0 12px 20px rgba(0,0,0,.2);
+}
+
+.sek-dragging [data-sek-content-type] {
+  -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.35)!important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.35)!important;
+}
+
+
+[data-sek-content-type] .sek-module-icon {
+  display: block;
+  padding: 10px 0 0;
+}
+[data-sek-content-type] .sek-module-icon .material-icons {
+  font-size: 3rem;
+  color: #878787;
+}
+[data-sek-content-type] .sek-module-title {
+  display: block;
+  padding: 10px;
+  font-size: 0.9em;
+}
+/*.sek-grabbing {
+  cursor: -webkit-grabbing;
+}
+*/
+
+
+/* PADDING MARGIN SPACING INPUT */
+.sek-pad-marg-inner {
+    font-size: 12px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin: 10px auto 0px auto;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    padding: 0;
+    background-color: #e6e6e6;
+    border: 1px solid #c5c5c5;
+    height: 192px;
+    width: 232px;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    -webkit-transition: background-color 0.2s ease;
+    -o-transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease;
+}
+.sek-pm-top-bottom-wrap {
+    height: 46px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+}
+.sek-flex-center-stretch {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: stretch;
+        -ms-flex-align: stretch;
+            align-items: stretch;
+}
+
+.sek-pm-input {
+    width: 35px;
+    height: 15px;
+    padding: 0;
+    text-align: center;
+    font-family: Source Sans Pro;
+    padding: 5px;
+    border-radius: 3px;
+    text-align: left;
+    font-size: 13px;
+    outline: none;
+    -webkit-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.15);
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.15);
+    border: 1px solid #CED6D9;
+}
+.sek-pm-input-parent .sek-pm-input {
+    -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+    display: block;
+    margin: auto 3px;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    padding: 1px 3px;
+    font-size: 12px;
+    font-weight: 300;
+    min-width: 34px;
+    min-height: 20px;
+    color: #313131;
+}
+.sek-pm-middle-wrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    height: 100px;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+}
+
+.sek-pm-margin-left, .sek-pm-margin-right {
+    width: 46px;
+}
+
+.sek-pm-padding-wrapper {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    background-color: white;
+    border: 1px solid #CED6D9;
+    height: 100px;
+    width: 140px;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    padding: 5px;
+    -webkit-transition: background-color 0.2s ease;
+    -o-transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    margin: auto;
+}
+.sek-flex-justify-center {
+    min-height: 0;
+    min-width: 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+}
+.sek-flex-space-between {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.sek-pm-input-parent {
+   /* width: 100%;*/
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+.sek-pm-input-parent .sek-pm-input {
+    min-height: 25px;
+    min-width: 40px;
+    background-color: white;
+}
+.sek-pm-input-parent .sek-pm-input {
+    -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+    display: block;
+    margin: auto 3px!important;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    padding: 1px 3px;
+    font-size: 12px;
+    font-weight: 300;
+    min-width: 34px;
+    min-height: 20px;
+    color: #313131;
+    width: 40px!important;
+    text-align: center;
+}
+
+
+.sek-pm-padding-wrapper label {
+    margin: 0;
+}
+.sek-pad-marg-inner label {
+    -webkit-box-flex: 0;
+        -ms-flex: 0;
+            flex: 0;
+}
+.reset-spacing-wrap {
+    padding: 10px;
+    font-size: 0.8em;
+    text-decoration: underline;
+    cursor: pointer;
+    text-align: center;
+}
+.reset-spacing-wrap:hover {
+  color: #006799;
+}
+
+
+
+
+
+
+
+
+
+/* BACKGROUND POSITION INPUT */
+.sek-bg-pos-wrapper {
+    padding: 10px;
+    text-align: center;
+    display: inline-block;
+    width: 90px;
+    height: 90px;
+}
+.sek-bg-pos-wrapper {
+    display: inline-block;
+    width: 90px;
+    height: 90px;
+}
+.sek-bg-pos-wrapper .sek-bg-pos {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    margin: 3px;
+    float: left;
+}
+.sek-bg-pos-wrapper input[type="radio"] {
+    display: none;
+}
+.sek-bg-pos-wrapper .sek-bg-pos span {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    background: #e6e6e6 no-repeat center;
+    -webkit-transition: background-color 0.2s ease;
+    -o-transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease;
+}
+
+/* hover*/
+.sek-bg-pos-wrapper .sek-bg-pos span:hover {
+    background-color: #33b3db;
+}
+
+.sek-bg-pos-wrapper .sek-bg-pos span:hover svg {
+    visibility: visible;
+}
+/* checked */
+.sek-bg-pos-wrapper .sek-bg-pos input[type="radio"]:checked + span {
+    background-color: #33b3db;
+}
+.sek-bg-pos-wrapper .sek-bg-pos input[type="radio"]:checked + span svg {
+    visibility: visible;
+}
+
+.sek-bg-pos-wrapper .sek-bg-pos span svg {
+    visibility: hidden;
+    shape-rendering: crispEdges;
+}
+
+
+.sek-bg-pos-wrapper .cls-5 {
+    fill: #fff;
+}
+
+
+/* H and V ALIGNMENT INPUT */
+div[data-sek-align] {
+    margin: 0 5px;
+    padding: 4px;
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-align: end;
+        -ms-flex-align: end;
+            align-items: flex-end;
+    position: relative;
+    text-align: center;
+    width: 23px;
+    height: 24px;
+    top: -4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.sek-h-align-wrapper .sek-align-icons {
+  float: right
+}
+
+div[data-sek-align]:hover {
+    -webkit-box-shadow: inset 0 0 0 1px #555d66, inset 0 0 0 2px #fff;
+            box-shadow: inset 0 0 0 1px #555d66, inset 0 0 0 2px #fff;
+}
+div[data-sek-align].selected {
+    outline: none;
+    color: #fff;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+    background: #555d66;
+}
+
+
+/* Nimble Logo */
+/* this class is added to a .accordion-section-title selector */
+.sek-side-nimble-logo-wrapper {
+  padding: 4px 25px 0 2px!important;
+}
+.sek-side-nimble-logo-wrapper .sek-nimble-logo {
+  height: 45px;
+}
