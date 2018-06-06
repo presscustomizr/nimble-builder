@@ -76,11 +76,11 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // (
         //     [action] => sek_get_content
         //     [withNonce] => false
-        //     [id] => __sek__0b7c85561448ab4eb8adb978
+        //     [id] => __nimble__0b7c85561448ab4eb8adb978
         //     [skope_id] => skp__post_page_home
         //     [sek_action] => sek-add-section
         //     [SEKFrontNonce] => 3713b8ac5c
-        //     [customized] => {\"sek___loop_start[skp__post_page_home]\":{...}}
+        //     [customized] => {\"nimble___loop_start[skp__post_page_home]\":{...}}
         // )
         // @return string
         // @param $sek_action is $_POST['sek_action']

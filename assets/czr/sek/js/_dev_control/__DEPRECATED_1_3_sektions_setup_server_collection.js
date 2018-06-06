@@ -2,7 +2,7 @@
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // register the collection setting sek___{$location}[{$skope_id}] ( ex : sek___[skp__post_page_20] )
+            // register the collection setting nimble___{$location}[{$skope_id}] ( ex : nimble___[skp__post_page_20] )
             // schedule reactions to a collection change
             // @return void()
             setupServerCollection : function() {

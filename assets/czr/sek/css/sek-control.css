@@ -39,11 +39,11 @@
 
 
 /* OVERRIDE WP CUSTOMIZER */
-ul[id*="sub-accordion-section-__sek__"] {
+ul[id*="sub-accordion-section-__nimble__"] {
     background: #F2F2F2!important;
 }
 /* No sliding transition needed when switching from a section to another when generating the UI's */
-#customize-theme-controls .customize-pane-child[id*="__sek__"] {
+#customize-theme-controls .customize-pane-child[id*="__nimble__"] {
     -webkit-transition: unset;
     -o-transition: unset;
     transition: unset;

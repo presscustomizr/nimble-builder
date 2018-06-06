@@ -64,8 +64,8 @@ function sek_enqueue_controls_js_css() {
             'addNewColumnId' => 'sek_add_new_column',
             'addNewModuleId' => 'sek_add_new_module',
 
-            'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'sek___'
-            'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__sek__"
+            'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
+            'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__nimble__"
 
             'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 
@@ -280,7 +280,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
         $skope_id = skp_get_skope_id( $skp_data['skope'] );
         $skp_data[ 'sektions' ] = array(
             'db_values' => sek_get_skoped_seks( $skope_id ),
-            'setting_id' => sek_get_seks_setting_id( $skope_id )//sek___loop_start[skp__post_page_home]
+            'setting_id' => sek_get_seks_setting_id( $skope_id )//nimble___loop_start[skp__post_page_home]
         );
         // foreach( [
         //     'loop_start',
@@ -291,7 +291,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
         //     ] as $location ) {
         //     $skp_data[ 'sektions' ][ $location ] = array(
         //         'db_values' => sek_get_skoped_seks( $skope_id, $location ),
-        //         'setting_id' => sek_get_seks_setting_id( $skope_id, $location )//sek___loop_start[skp__post_page_home]
+        //         'setting_id' => sek_get_seks_setting_id( $skope_id, $location )//nimble___loop_start[skp__post_page_home]
         //     );
         // }
         $new_skopes[] = $skp_data;

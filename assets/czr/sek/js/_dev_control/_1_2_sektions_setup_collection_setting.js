@@ -3,7 +3,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
             // Fired on api 'ready', in reaction to ::setContextualCollectionSettingIdWhenSkopeSet => ::sekCollectionSettingId
-            // 1) register the collection setting sek___[{$skope_id}] ( ex : sek___[skp__post_page_20] )
+            // 1) register the collection setting nimble___[{$skope_id}] ( ex : nimble___[skp__post_page_20] )
             // 2) validate that the setting is well formed before being changed
             // 3) schedule reactions on change ?
             // @return void()
@@ -13,7 +13,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   serverCollection = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local').db_values;
                   // maybe register the sektion_collection setting
-                  var collectionSettingId = self.sekCollectionSettingId();// [ 'sek___' , '[', newSkopes.local, ']' ].join('');
+                  var collectionSettingId = self.sekCollectionSettingId();// [ 'nimble___' , '[', newSkopes.local, ']' ].join('');
                   if ( _.isEmpty( collectionSettingId ) ) {
                         throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
                   }
@@ -326,7 +326,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //     }
             //     return $defaut_sektions_value;
             // }
-            // 2) a real reset should delete the sektion post ( sek_post_type, with for example title sek___skp__post_page_21 ) and its database option storing its id ( for example : sek___skp__post_page_21 )
+            // 2) a real reset should delete the sektion post ( sek_post_type, with for example title nimble___skp__post_page_21 ) and its database option storing its id ( for example : nimble___skp__post_page_21 )
             resetCollectionSetting : function() {
                   var self = this;
                   if ( _.isEmpty( self.sekCollectionSettingId() ) ) {

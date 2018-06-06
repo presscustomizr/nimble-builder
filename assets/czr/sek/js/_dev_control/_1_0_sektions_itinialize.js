@@ -226,7 +226,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // sektionsData is built server side :
             //array(
             //     'db_values' => sek_get_skoped_seks( $skope_id ),
-            //     'setting_id' => sek_get_seks_setting_id( $skope_id )//sek___[skp__post_page_home]
+            //     'setting_id' => sek_get_seks_setting_id( $skope_id )//nimble___[skp__post_page_home]
             // )
             setContextualCollectionSettingIdWhenSkopeSet : function( newSkopes, previousSkopes ) {
                   var self = this;
