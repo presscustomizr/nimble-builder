@@ -298,6 +298,7 @@
     text-align: center;
     border: 1px dotted #ccc;
     background: #eee;
+    background: rgba(238, 238, 238, 0.84);
     height: 100%;
     min-height: 40px;
     -webkit-box-align: center;
@@ -390,6 +391,7 @@
 
 .sek-dragging [data-sek-location="between-modules"], .sek-dragging .sek-module-drop-zone-for-first-module {
   background: #dcefff;
+  background: rgba(220, 239, 255, 0.84);
   border:2px dotted #1d85bb;
   border-radius: 5px;
 }
