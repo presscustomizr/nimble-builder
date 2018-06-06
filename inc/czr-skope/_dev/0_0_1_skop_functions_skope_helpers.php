@@ -278,11 +278,11 @@ function skp_build_skope_id( $args = array() ) {
     // generate skope_id for two cases : local or group
     switch( $args[ 'skope_level'] ) {
           case 'local' :
-              $skope_id = strtolower( SKOPE_ID_PREFIX . $args[ 'skope_string' ] );
+              $skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . $args[ 'skope_string' ] );
           break;
           case 'group' :
               if ( ! empty( $args[ 'skope_type' ] ) ) {
-                  $skope_id = strtolower( SKOPE_ID_PREFIX . 'all_' . $args[ 'skope_type' ] );
+                  $skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'all_' . $args[ 'skope_type' ] );
               }
           break;
     }

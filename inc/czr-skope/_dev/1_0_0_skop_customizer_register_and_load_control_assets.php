@@ -16,7 +16,7 @@ if ( ! class_exists( 'Flat_Skop_Register_And_Load_Control_Assets' ) ) :
 
               $_prod_script_path = sprintf(
                   '%1$s/assets/czr/js/%2$s' ,
-                  SKOPE_BASE_URL,
+                  NIMBLE_SKOPE_BASE_URL,
                   $_use_unminified ? 'czr-skope-base.js' : 'czr-skope-base.min.js'
               );
 
