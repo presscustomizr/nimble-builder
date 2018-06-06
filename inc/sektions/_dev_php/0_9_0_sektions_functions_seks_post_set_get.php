@@ -1,6 +1,6 @@
 <?php
 // SEKTION POST
-register_post_type( SEK_CPT , array(
+register_post_type( NIMBLE_CPT , array(
     'labels' => array(
       'name'          => __( 'Nimble sections', 'text_domain_to_be_replaced' ),
       'singular_name' => __( 'Nimble sections', 'text_domain_to_be_replaced' ),
@@ -50,9 +50,9 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
     }
 
     $sek_post_query_vars = array(
-        'post_type'              => SEK_CPT,
+        'post_type'              => NIMBLE_CPT,
         'post_status'            => get_post_stati(),
-        'name'                   => sanitize_title( SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
         'posts_per_page'         => 1,
         'no_found_rows'          => true,
         'cache_results'          => true,
@@ -63,7 +63,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
 
     $post = null;
 
-    $option_name = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
 
     $post_id = (int)get_option( $option_name );
     // if the options has not been set yet, it will return (int) 0
@@ -173,12 +173,12 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
         return new WP_Error( 'sek_update_sek_post => empty skope_id');
     }
 
-    $post_title = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+    $post_title = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
 
     $post_data = array(
         'post_title' => $post_title,
         'post_name' => sanitize_title( $post_title ),
-        'post_type' => SEK_CPT,
+        'post_type' => NIMBLE_CPT,
         'post_status' => 'publish',
         'post_content' => maybe_serialize( $seks_data )
     );
@@ -192,7 +192,7 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
     } else {
         $r = wp_insert_post( wp_slash( $post_data ), true );
         if ( ! is_wp_error( $r ) ) {
-            $option_name = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+            $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
             $post_id = $r;//$r is the post ID
 
             update_option( $option_name, (int)$post_id );

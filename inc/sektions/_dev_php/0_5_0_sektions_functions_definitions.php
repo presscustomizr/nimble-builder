@@ -5,9 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-if ( ! defined( 'SEK_CPT' ) ) { define( 'SEK_CPT' , 'sek_post_type' ); }
-if ( ! defined( 'SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'sek___' ); }
-if ( ! defined( 'SEK_OPT_PREFIX_FOR_SEKTIONS_NOT_SAVED' ) ) { define( 'SEK_OPT_PREFIX_FOR_SEKTIONS_NOT_SAVED' , '__sek__' ); }
+if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'sek_post_type' ); }
+if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'sek___' ); }
+if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__sek__' ); }
 
 // @return array
 function sek_get_locations() {
@@ -39,7 +39,7 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
   if ( empty( $skope_id ) ) {
       error_log( 'sek_get_seks_setting_id => empty skope id or location => collection setting id impossible to build' );
   }
-  return SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . "[{$skope_id}]";
+  return NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "[{$skope_id}]";
 }
 
 

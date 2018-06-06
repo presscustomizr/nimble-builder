@@ -5,9 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-if ( ! defined( 'SEK_CPT' ) ) { define( 'SEK_CPT' , 'sek_post_type' ); }
-if ( ! defined( 'SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'sek___' ); }
-if ( ! defined( 'SEK_OPT_PREFIX_FOR_SEKTIONS_NOT_SAVED' ) ) { define( 'SEK_OPT_PREFIX_FOR_SEKTIONS_NOT_SAVED' , '__sek__' ); }
+if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'sek_post_type' ); }
+if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'sek___' ); }
+if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__sek__' ); }
 
 // @return array
 function sek_get_locations() {
@@ -39,7 +39,7 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
   if ( empty( $skope_id ) ) {
       error_log( 'sek_get_seks_setting_id => empty skope id or location => collection setting id impossible to build' );
   }
-  return SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . "[{$skope_id}]";
+  return NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "[{$skope_id}]";
 }
 
 
@@ -58,19 +58,6 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 
 
 
-// Helper
-function sek_get_registered_module_type_property( $module_type, $property = '' ) {
-    // registered modules
-    $registered_modules = CZR_Fmk_Base() -> registered_modules;
-    if ( ! array_key_exists( $module_type, $registered_modules ) ) {
-        error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
-        return;
-    }
-    if ( array_key_exists( $property , $registered_modules[ $module_type ] ) ) {
-        return $registered_modules[ $module_type ][$property];
-    }
-    return;
-}
 
 // Recursively walk the level tree until a match is found
 // @param id = the id of the level for which the model shall be returned
@@ -125,11 +112,32 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
 
 
 
+/* ------------------------------------------------------------------------- *
+ *  REGISTERED MODULES => GET PROPERTY
+/* ------------------------------------------------------------------------- */
+// Helper
+function sek_get_registered_module_type_property( $module_type, $property = '' ) {
+    // registered modules
+    $registered_modules = CZR_Fmk_Base() -> registered_modules;
+    if ( ! array_key_exists( $module_type, $registered_modules ) ) {
+        error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
+        return;
+    }
+    if ( array_key_exists( $property , $registered_modules[ $module_type ] ) ) {
+        return $registered_modules[ $module_type ][$property];
+    }
+    return;
+}
 
-
-// @param module_type
-// walk the registered modules tree and generates the module default if not already cached
-// @return array;
+/* ------------------------------------------------------------------------- *
+ *  REGISTERED MODULES => DEFAULT MODULE MODEL
+/* ------------------------------------------------------------------------- */
+// @param (string) module_type
+// Walk the registered modules tree and generates the module default if not already cached
+// used :
+// - when preprocessing the module model before printing the module template. @seeSEL_Front::render()
+// - when setting the level option css. @see sek_add_css_rules_for_bg_border_background()
+// @return array()
 function sek_get_default_module_model( $module_type = '' ) {
     $default = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
@@ -140,11 +148,8 @@ function sek_get_default_module_model( $module_type = '' ) {
     if ( ! empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
-        $registered_modules = CZR_Fmk_Base()->registered_modules;
-
-        // error_log('<registered_modules>');
-        // error_log( print_r( $registered_modules, true ) );
-        // error_log('</registered_modules>');
+        $registered_modules = CZR_Fmk_Base() -> registered_modules;
+        // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
         }
@@ -158,9 +163,7 @@ function sek_get_default_module_model( $module_type = '' ) {
         // Cache
         $default_models[ $module_type ] = $default;
         SEK_Front()->default_models = $default_models;
-        // error_log('<$default_models>');
-        // error_log( print_r( $default_models, true ) );
-        // error_log('</$default_models>');
+        // sek_error_log( __FUNCTION__ . ' => $default_models', $default_models );
     }
     return $default;
 }
@@ -230,12 +233,6 @@ function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
 
 
 
-
-
-
-
-
-
 /* HELPER FOR CHECKBOX OPTIONS */
 function sek_is_checked( $val ) {
     //cast to string if array
@@ -244,8 +241,9 @@ function sek_is_checked( $val ) {
 }
 
 function sek_booleanize_checkbox_val( $val ) {
-    if ( ! $val )
+    if ( ! $val || is_array( $val ) ) {
       return false;
+    }
     if ( is_bool( $val ) && $val )
       return true;
     switch ( (string) $val ) {
@@ -291,19 +289,19 @@ function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true )
 
 function sek_error_log( $title, $content = null ) {
     if ( is_null( $content ) ) {
-        error_log( '<' . strtoupper( $title ) . '>' );
+        error_log( '<' . $title . '>' );
     } else {
-        error_log( '<' . strtoupper( $title ) . '>' );
+        error_log( '<' . $title . '>' );
         error_log( print_r( $content, true ) );
-        error_log( '<' . strtoupper( $title ) . '>' );
+        error_log( '</' . $title . '>' );
     }
 }
 ?><?php
 // SEKTION POST
-register_post_type( SEK_CPT , array(
+register_post_type( NIMBLE_CPT , array(
     'labels' => array(
-      'name'          => __( 'Sektion settings', 'text_domain_to_be_replaced' ),
-      'singular_name' => __( 'Sektion settings', 'text_domain_to_be_replaced' ),
+      'name'          => __( 'Nimble sections', 'text_domain_to_be_replaced' ),
+      'singular_name' => __( 'Nimble sections', 'text_domain_to_be_replaced' ),
     ),
     'public'           => false,
     'hierarchical'     => false,
@@ -344,17 +342,15 @@ register_post_type( SEK_CPT , array(
  * @return WP_Post|null The skope post or null if none exists.
  */
 function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
-    //error_log('skope_id in sek_get_seks_post => ' . $skope_id );
+    //sek_error_log('skope_id in sek_get_seks_post => ' . $skope_id );
     if ( empty( $skope_id ) ) {
         $skope_id = skp_get_skope_id( $skope_level );
     }
-    // if ( empty( $location ) ) {
-    //     $location = 'loop_start';
-    // }
+
     $sek_post_query_vars = array(
-        'post_type'              => SEK_CPT,
+        'post_type'              => NIMBLE_CPT,
         'post_status'            => get_post_stati(),
-        'name'                   => sanitize_title( SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
         'posts_per_page'         => 1,
         'no_found_rows'          => true,
         'cache_results'          => true,
@@ -365,12 +361,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
 
     $post = null;
 
-    $option_name = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
-
-    // $seks_options = get_option( $option_name );
-    // $seks_options = is_array( $seks_options ) ? $seks_options : array();
-
-    // $post_id = array_key_exists( $skope_id, $seks_options ) ? $seks_options : -1;
+    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
 
     $post_id = (int)get_option( $option_name );
     // if the options has not been set yet, it will return (int) 0
@@ -412,9 +403,6 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
  * @return array => the skope setting items
  */
 function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'local' ) {
-    // if ( empty( $location ) ) {
-    //     $location = 'loop_start';
-    // }
     if ( empty( $skope_id ) ) {
         $skope_id = skp_get_skope_id( $skope_level );
     }
@@ -424,9 +412,7 @@ function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'lo
     } else {
         $seks_data = array();
         $post = sek_get_seks_post( $skope_id );
-        // error_log( '<sek_get_skoped_seks() => $post>');
-        // error_log( print_r( $post, true ) );
-        // error_log( '</sek_get_skoped_seks() => $post>');
+        // sek_error_log( 'sek_get_skoped_seks() => $post', $post);
         if ( $post ) {
             $seks_data = maybe_unserialize( $post->post_content );
         }
@@ -446,10 +432,7 @@ function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'lo
     // normalizes
     $seks_data = wp_parse_args( $seks_data, sek_get_default_sektions_value() );
 
-    // error_log( '<sek_get_skoped_seks()>');
-    // error_log('location => ' . $location .  array_key_exists( 'collection', $seks_data ));
-    // error_log( print_r( $seks_data, true ) );
-    // error_log( '</sek_get_skoped_seks()>');
+    // sek_error_log( '<sek_get_skoped_seks() location => ' . $location .  array_key_exists( 'collection', $seks_data ), $seks_data );
     // if a location is specified, return specifically the sections of this location
     if ( array_key_exists( 'collection', $seks_data ) && ! empty( $location ) ) {
         if ( ! in_array( $location, sek_get_locations() ) ) {
@@ -465,7 +448,6 @@ function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'lo
 
 /**
  * Update the `sek_post_type` post for a given "{$skope_id}"
- *
  * Inserts a `sek_post_type` post when one doesn't yet exist.
  *
  * @since 4.7.0
@@ -489,13 +471,12 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
         return new WP_Error( 'sek_update_sek_post => empty skope_id');
     }
 
-    $post_title = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
-    //$post_title = "{$location}_{$skope_id}";// as defined in sek_get_seks_post
+    $post_title = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
 
     $post_data = array(
         'post_title' => $post_title,
         'post_name' => sanitize_title( $post_title ),
-        'post_type' => SEK_CPT,
+        'post_type' => NIMBLE_CPT,
         'post_status' => 'publish',
         'post_content' => maybe_serialize( $seks_data )
     );
@@ -508,13 +489,8 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
         $r = wp_update_post( wp_slash( $post_data ), true );
     } else {
         $r = wp_insert_post( wp_slash( $post_data ), true );
-
         if ( ! is_wp_error( $r ) ) {
-            //$option_name = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $location;
-            $option_name = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
-            //$seks_options = get_option( $option_name );
-            //$seks_options = is_array( $seks_options ) ? $seks_options : array();
-            //$seks_options[$skope_id] = $r;//$r is the post ID
+            $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
             $post_id = $r;//$r is the post ID
 
             update_option( $option_name, (int)$post_id );
@@ -533,11 +509,6 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
 }
 
 ?><?php
-// DEPRECATED WAS USED TO DISPLAY UI BUTTON IN THE PANEL
-// if ( ! defined( 'SEK_BUTTON_SECTION_TMPL_SUFFIX' ) ) { define( 'SEK_BUTTON_SECTION_TMPL_SUFFIX', 'sek-add-new-sektion-button' ); }
-// if ( ! defined( 'SEK_BUTTON_COLUMN_TMPL_SUFFIX' ) ) { define( 'SEK_BUTTON_COLUMN_TMPL_SUFFIX', 'sek-add-new-column-button' ); }
-// if ( ! defined( 'SEK_BUTTON_MODULE_TMPL_SUFFIX' ) ) { define( 'SEK_BUTTON_MODULE_TMPL_SUFFIX', 'sek-add-new-module-button' ); }
-
 // TINY MCE EDITOR
 require_once(  dirname( __FILE__ ) . '/customizer/seks_tiny_mce_editor_actions.php' );
 
@@ -603,8 +574,8 @@ function sek_enqueue_controls_js_css() {
             'addNewColumnId' => 'sek_add_new_column',
             'addNewModuleId' => 'sek_add_new_module',
 
-            'optPrefixForSektionSetting' => SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'sek___'
-            'optPrefixForSektionsNotSaved' => SEK_OPT_PREFIX_FOR_SEKTIONS_NOT_SAVED,//"__sek__"
+            'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'sek___'
+            'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__sek__"
 
             'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 
@@ -836,9 +807,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
         $new_skopes[] = $skp_data;
     }
 
-    // error_log( '<////////////////////$new_skopes>' );
-    // error_log( print_r($new_skopes, true ) );
-    // error_log( '</////////////////////$new_skopes>' );
+    // sek_error_log( '//////////////////// => new_skopes', $new_skopes);
 
     return $new_skopes;
 }
@@ -892,58 +861,82 @@ function sek_get_img_sizes() {
 /* ------------------------------------------------------------------------- *
  *  SETUP DYNAMIC SERVER REGISTRATION FOR SETTING
 /* ------------------------------------------------------------------------- */
-// Schedule the loading the skoped settings class
-add_action( 'customize_register', '\Nimble\load_nimble_setting_class' );
-function load_nimble_setting_class() {
-      require_once(  dirname( __FILE__ ) . '/customizer/seks_setting_class.php' );
-}
+if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
+    class SEK_CZR_Dyn_Register {
+        static $instance;
+        public $sanitize_callbacks = array();// <= will be populated to cache the callbacks when invoking sek_get_module_sanitize_callbacks().
 
-add_filter( 'customize_dynamic_setting_args', '\Nimble\set_dyn_setting_args', 10, 2 );
-function set_dyn_setting_args( $setting_args, $setting_id ) {
-    // shall start with "sek__"
-    if ( 0 === strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
-        //error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
-        return array(
-            'transport' => 'refresh',
-            'type' => 'option',
-            'default' => array()
-        );
-    } else if ( 0 === strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTIONS_NOT_SAVED ) ) {
-        //error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
-        return array(
-            'transport' => 'refresh',
-            'type' => '_no_intended_to_be_saved_',
-            'default' => array(),
-            'sanitize_callback'    => '\Nimble\sek_sanitize_callback',
-            'validate_callback'    => '\Nimble\sek_validate_callback'
-        );
-    }
+        public static function get_instance( $params ) {
+            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof SEK_CZR_Dyn_Register ) )
+              self::$instance = new SEK_CZR_Dyn_Register( $params );
+            return self::$instance;
+        }
 
-    //error_log( print_r( $setting_args, true ) );
-    return $setting_args;
-    //return wp_parse_args( array( 'default' => array() ), $setting_args );
-}
+        function __construct( $params = array() ) {
+            // Schedule the loading the skoped settings class
+            add_action( 'customize_register', array( $this, 'load_nimble_setting_class' ) );
 
-function sek_sanitize_callback( $sektion_data ) {
-    //error_log( 'in_sek_sanitize_callback' );
-    return $sektion_data;
-}
+            add_filter( 'customize_dynamic_setting_args', array( $this, 'set_dyn_setting_args' ), 10, 2 );
+            add_filter( 'customize_dynamic_setting_class', array( $this, 'set_dyn_setting_class') , 10, 3 );
+        }//__construct
 
-function sek_validate_callback( $validity, $sektion_data ) {
-    //error_log( 'in_sek_validate_callback' );
-    return null;
-    //return new WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $sektion_data );
-}
+        //@action 'customize_register'
+        function load_nimble_setting_class() {
+              require_once(  dirname( __FILE__ ) . '/customizer/seks_setting_class.php' );
+        }
+
+        //@filter 'customize_dynamic_setting_args'
+        function set_dyn_setting_args( $setting_args, $setting_id ) {
+            // shall start with "sek__"
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
+                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
+                return array(
+                    'transport' => 'refresh',
+                    'type' => 'option',
+                    'default' => array()
+                    //'sanitize_callback'    => array( $this, 'sanitize_callback' )
+                    //'validate_callback'    => array( $this, 'validate_callback' )
+                );
+            } else if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) ) {
+                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
+                return array(
+                    'transport' => 'refresh',
+                    'type' => '_nimble_ui_',//won't be saved as is,
+                    'default' => array()
+                );
+            }
+
+            //sek_error_log( print_r( $setting_args, true ) );
+            return $setting_args;
+            //return wp_parse_args( array( 'default' => array() ), $setting_args );
+        }
+
+        //@filter 'customize_dynamic_setting_class'
+        function set_dyn_setting_class( $class, $setting_id, $args ) {
+            // shall start with 'sek___'
+            if ( 0 !== strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
+              return $class;
+            //sek_error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
+            return '\Nimble\Nimble_Customizer_Setting';
+        }
 
 
-add_filter( 'customize_dynamic_setting_class', '\Nimble\set_dyn_setting_class', 10, 3 );
-function set_dyn_setting_class( $class, $setting_id, $args ) {
-  // shall start with 'sek___'
-  if ( 0 !== strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
-    return $class;
-  //error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
-  return '\Nimble\Nimble_Customizer_Setting';
-}
+        function sanitize_callback( $setting_data, $setting_instance ) {
+            sek_error_log( 'in_sek_sanitize_callback for setting id ' . $setting_instance->id, $setting_data );
+            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
+            return $setting_data;
+        }
+
+        function validate_callback( $validity, $setting_data, $setting_instance ) {
+            //sek_error_log( 'in sek_validate_callback for setting id ' . $setting_instance->id, $setting_data );
+            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
+            return null;
+        }
+
+
+ }//class
+endif;
+
 ?><?php
 // Set input content
 add_action( 'czr_set_input_tmpl_content', '\Nimble\sek_set_input_tmpl_content', 10, 3 );
@@ -2352,8 +2345,8 @@ function sek_get_module_params_for_czr_image_module() {
         'starting_value' => array(
             'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
         ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
-        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        // 'sanitize_callback' => '\Nimble\czr_image_module_sanitize_validate',
+        // 'validate_callback' => '\Nimble\czr_image_module_sanitize_validate',
         'tmpl' => array(
             'item-inputs' => array(
                 'img' => array(
@@ -2385,7 +2378,7 @@ function sek_get_module_params_for_czr_image_module() {
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
                     'default'     => ''
                 ),
                 'link-target' => array(
@@ -2406,7 +2399,6 @@ function sek_get_module_params_for_czr_image_module() {
         'placeholder_icon' => 'short_text'
     );
 }
-
 ?><?php
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -3469,18 +3461,17 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
 }
 ?><?php
 ////////////////////////////////////////////////////////////////
-// FLAT SKOPE BASE
-//  This Class is instantiated on 'hu_hueman_loaded', declared in /init-core.php
+// SEK Front Class
 if ( ! class_exists( 'SEK_Front_Construct' ) ) :
     class SEK_Front_Construct {
         static $instance;
         public $local_seks = 'not_cached';// <= used to cache the sektions for the local skope_id
         public $model = array();//<= when rendering, the current level model
         public $parent_model = array();//<= when rendering, the current parent model
-        public $default_models = array();// <= will be populated and cached when invoking sek_get_default_module_model
+        public $default_models = array();// <= will be populated to cache the default models when invoking sek_get_default_module_model
         public $ajax_action_map = array();
 
-        public static function sek_get_instance( $params ) {
+        public static function get_instance( $params ) {
             if ( ! isset( self::$instance ) && ! ( self::$instance instanceof SEK_Front_Render ) )
               self::$instance = new SEK_Front_Render_Css( $params );
             return self::$instance;
@@ -4404,23 +4395,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 return $ph;
             }
         }
-
-
-        // Utility to print the text content generated with tinyMce
-        // should be wrapped in a specific selector when customizing,
-        //  => so we can listen to user click actions and open the editor on for each separate tiny_mce_editor input
-        function sek_print_tiny_mce_text_content( $tiny_mce_content, $input_id, $module_model ) {
-            if ( empty( $tiny_mce_content ) ) {
-                echo $this -> sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
-            } else {
-                $content = apply_filters( 'the_content', $tiny_mce_content );
-                if ( skp_is_customizing() ) {
-                    printf('<div title="%3$s" data-sek-input-type="tiny_mce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __('Click to edit', 'here') );
-                } else {
-                    echo $content;
-                }
-            }
-        }
     }//class
 endif;
 ?><?php
@@ -4471,8 +4445,15 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
 endif;
 
 ?><?php
+// invoked ( and instanciated ) when skp_is_customizing()
+function SEK_CZR_Dyn_Register( $params = array() ) {
+    return SEK_CZR_Dyn_Register::get_instance( $params );
+}
 function SEK_Front( $params = array() ) {
-    return SEK_Front_Render_Css::sek_get_instance( $params );
+    return SEK_Front_Render_Css::get_instance( $params );
+}
+if (  skp_is_customizing() ) {
+  SEK_CZR_Dyn_Register();
 }
 SEK_Front();
 ?>

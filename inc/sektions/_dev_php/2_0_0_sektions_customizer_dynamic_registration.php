@@ -29,7 +29,7 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         //@filter 'customize_dynamic_setting_args'
         function set_dyn_setting_args( $setting_args, $setting_id ) {
             // shall start with "sek__"
-            if ( 0 === strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
                 return array(
                     'transport' => 'refresh',
@@ -38,14 +38,12 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     //'sanitize_callback'    => array( $this, 'sanitize_callback' )
                     //'validate_callback'    => array( $this, 'validate_callback' )
                 );
-            } else if ( 0 === strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTIONS_NOT_SAVED ) ) {
+            } else if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) ) {
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
                 return array(
                     'transport' => 'refresh',
-                    'type' => '_no_intended_to_be_saved_',
+                    'type' => '_nimble_ui_',//won't be saved as is,
                     'default' => array()
-                    //'sanitize_callback'    => array( $this, 'sanitize_callback' )
-                    //'validate_callback'    => array( $this, 'validate_callback' )
                 );
             }
 
@@ -57,23 +55,19 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         //@filter 'customize_dynamic_setting_class'
         function set_dyn_setting_class( $class, $setting_id, $args ) {
             // shall start with 'sek___'
-            if ( 0 !== strpos( $setting_id, SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
+            if ( 0 !== strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
               return $class;
             //sek_error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
             return '\Nimble\Nimble_Customizer_Setting';
         }
 
 
-
-
-        // done in javascript
         function sanitize_callback( $setting_data, $setting_instance ) {
             sek_error_log( 'in_sek_sanitize_callback for setting id ' . $setting_instance->id, $setting_data );
             //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
             return $setting_data;
         }
 
-        // done in javascript
         function validate_callback( $validity, $setting_data, $setting_instance ) {
             //sek_error_log( 'in sek_validate_callback for setting id ' . $setting_instance->id, $setting_data );
             //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );

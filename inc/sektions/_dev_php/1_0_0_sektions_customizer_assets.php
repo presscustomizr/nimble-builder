@@ -64,8 +64,8 @@ function sek_enqueue_controls_js_css() {
             'addNewColumnId' => 'sek_add_new_column',
             'addNewModuleId' => 'sek_add_new_module',
 
-            'optPrefixForSektionSetting' => SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'sek___'
-            'optPrefixForSektionsNotSaved' => SEK_OPT_PREFIX_FOR_SEKTIONS_NOT_SAVED,//"__sek__"
+            'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'sek___'
+            'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__sek__"
 
             'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 

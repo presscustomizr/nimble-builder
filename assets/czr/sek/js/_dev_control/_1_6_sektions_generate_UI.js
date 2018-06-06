@@ -60,7 +60,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 dirty : false,
                                                 value : '',
                                                 transport : 'postMessage',// 'refresh',
-                                                type : '_no_intended_to_be_saved_'// columnData.settingType
+                                                type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
                                           });
                                     }
 
@@ -182,7 +182,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 dirty : false,
                                                 value : moduleValue,
                                                 transport : 'postMessage',// 'refresh',
-                                                type : '_no_intended_to_be_saved_'// columnData.settingType
+                                                type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
                                           });
                                     }
 
@@ -295,7 +295,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       dirty : false,
                                                       value : optionDBValue.layout || {},
                                                       transport : 'postMessage',// 'refresh',
-                                                      type : '_no_intended_to_be_saved_' //sekData.settingType
+                                                      type : '_nimble_ui_'//will be dynamically registered but not saved in db as option //sekData.settingType
                                                 });
                                           }//if( ! api.has( sectionLayoutOptionsSetId ) ) {
 
@@ -352,7 +352,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 dirty : false,
                                                 value : optionDBValue.bg_border || {},
                                                 transport : 'postMessage',// 'refresh',
-                                                type : '_no_intended_to_be_saved_' //sekData.settingType
+                                                type : '_nimble_ui_'//will be dynamically registered but not saved in db as option //sekData.settingType
                                           });
                                     }//if( ! api.has( bgBorderOptionsSetId ) ) {
 
@@ -406,7 +406,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 dirty : false,
                                                 value : optionDBValue.spacing || {},
                                                 transport : 'postMessage',// 'refresh',
-                                                type : '_no_intended_to_be_saved_' //sekData.settingType
+                                                type : '_nimble_ui_'//will be dynamically registered but not saved in db as option //sekData.settingType
                                           });
                                     }
 
@@ -463,7 +463,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 dirty : false,
                                                 value : optionDBValue.height || {},
                                                 transport : 'postMessage',// 'refresh',
-                                                type : '_no_intended_to_be_saved_' //sekData.settingType
+                                                type : '_nimble_ui_'//will be dynamically registered but not saved in db as option //sekData.settingType
                                           });
                                     }//if( ! api.has( heightOptionsSetId ) ) {
 

@@ -35,7 +35,7 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
   /**
    * constructor.
    *
-   * @throws Exception If the setting ID does not match the pattern SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION.
+   * @throws Exception If the setting ID does not match the pattern NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION.
    *
    * @param WP_Customize_Manager $manager The Customize Manager class.
    * @param string               $id      An specific ID of the setting. Can be a
@@ -45,8 +45,8 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
   public function __construct( $manager, $id, $args = array() ) {
     parent::__construct( $manager, $id, $args );
     // shall start with "sek___"
-    if ( 0 !== strpos( $this->id_data['base'], SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) { //$this->id_data['base'] looks like "sek___"
-        throw new Exception( 'Nimble_Customizer_Setting => __construct => Expected ' . SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . ' id_base.' );
+    if ( 0 !== strpos( $this->id_data['base'], NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) { //$this->id_data['base'] looks like "sek___"
+        throw new Exception( 'Nimble_Customizer_Setting => __construct => Expected ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . ' id_base.' );
     }
 
 
@@ -165,7 +165,7 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
       }
       $post_id = $r->ID;
 
-      $option_name = SEK_OPT_PREFIX_FOR_SEKTION_COLLECTION . $this->skope_id;
+      $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $this->skope_id;
 
       // Cache post ID in option for performance to avoid additional DB query.
       // $seks_options = get_option( $option_name );
