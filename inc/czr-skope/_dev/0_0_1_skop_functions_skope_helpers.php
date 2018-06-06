@@ -355,7 +355,7 @@ function skp_get_skope_title( $args = array() ) {
         }
     }
     if ( 'group' == $level || 'special_group' == $level ) {
-        $title = $is_prefixed ? __( 'Options for all', 'text_domain_to_be_replaced') . ' ' : __( 'All' , 'hueman-adons' ) . ' ';
+        $title = $is_prefixed ? __( 'Options for all', 'text_domain_to_be_replaced') . ' ' : __( 'All' , 'text_domain_to_be_replaced' ) . ' ';
         switch( $meta_type ) {
             case 'post' :
                 $type_obj = get_post_type_object( $type );

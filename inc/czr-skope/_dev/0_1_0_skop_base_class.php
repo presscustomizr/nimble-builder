@@ -2,7 +2,6 @@
 
 ////////////////////////////////////////////////////////////////
 // FLAT SKOPE BASE
-//  This Class is instantiated on 'hu_hueman_loaded', declared in /init-core.php
 if ( ! class_exists( 'Flat_Skop_Base' ) ) :
     class Flat_Skop_Base {
         static $instance;

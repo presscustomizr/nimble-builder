@@ -1,7 +1,7 @@
 <?php
 /**
 * Plugin Name: Nimble Builder
-* Description: Drag and drop page builder for the WordPress customizer
+* Description: Drag and drop page builder for the WordPress live customizer.
 * Version: 1.0.1
 * Text Domain: nimble-builder
 * Author: Press Customizr
@@ -12,15 +12,15 @@
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
 $current_version = "1.0.1";
-if ( ! defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version );}
-if ( ! defined( 'NIMBLE_ASSETS_VERSION' ) ) {
+if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
+if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) {
     define( 'NIMBLE_ASSETS_VERSION', ( ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) ? time() : NIMBLE_VERSION );
 }
-if ( ! defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
-if ( ! defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
-if ( ! defined( 'NIMBLE_BASE_PATH' ) ) { define( 'NIMBLE_BASE_PATH' , dirname( __FILE__ ) ); }
-if ( !defined( 'NIMBLE_MIN_PHP_VERSION' ) ) define ( 'NIMBLE_MIN_PHP_VERSION', '5.4' );
-if ( !defined( 'NIMBLE_MIN_WP_VERSION' ) ) define ( 'NIMBLE_MIN_WP_VERSION', '4.7' );
+if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
+if ( !defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
+if ( !defined( 'NIMBLE_BASE_PATH' ) ) { define( 'NIMBLE_BASE_PATH' , dirname( __FILE__ ) ); }
+if ( !defined( 'NIMBLE_MIN_PHP_VERSION' ) ) { define ( 'NIMBLE_MIN_PHP_VERSION', '5.4' ); }
+if ( !defined( 'NIMBLE_MIN_WP_VERSION' ) ) { define ( 'NIMBLE_MIN_WP_VERSION', '4.7' ); }
 
 
 /* ------------------------------------------------------------------------- *
