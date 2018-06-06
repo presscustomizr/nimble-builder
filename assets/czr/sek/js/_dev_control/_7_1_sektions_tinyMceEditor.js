@@ -213,15 +213,39 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // REACT TO EDITOR CHANGES
                   // bind on / off event actions
+                  // Problem to solve : we need to attach event to both the visual and the text editor tab ( html editor ), which have different selectors
+                  // If we bind only the visual editor, changes made to the simple textual html editor won't be taken into account
+                  // VISUAL EDITOR
                   api.sekTinyMceEditor.on( 'input change keyup', function( evt ) {
+                        //console.log('api.sekTinyMceEditor on input change keyup', evt.type, api.sekTinyMceEditor.getContent() );
                         // set the input value
                         if ( api.control.has( api.sekEditorSynchronizedInput().control_id ) ) {
                               try { api.control( api.sekEditorSynchronizedInput().control_id )
-                                    .trigger( 'tinyMceEditorUpdated', { input_id : api.sekEditorSynchronizedInput().input_id } ); } catch( er ) {
+                                    .trigger( 'tinyMceEditorUpdated', {
+                                          input_id : api.sekEditorSynchronizedInput().input_id,
+                                          html_content : api.sekTinyMceEditor.getContent(),
+                                          modified_editor_element : api.sekTinyMceEditor
+                                    });
+                              } catch( er ) {
                                     api.errare( 'Error when triggering tinyMceEditorUpdated', er );
                               }
                         }
                   });
+
+                  // TEXT EDITOR
+                  self.$editorTextArea.on( 'change keyup', function( evt ) {
+                        //console.log('self.$editorTextArea on change keyup', evt.type, self.$editorTextArea.val() );
+                        try { api.control( api.sekEditorSynchronizedInput().control_id )
+                              .trigger( 'tinyMceEditorUpdated', {
+                                    input_id : api.sekEditorSynchronizedInput().input_id,
+                                    html_content : self.$editorTextArea.val(),
+                                    modified_editor_element : self.$editorTextArea
+                              });
+                        } catch( er ) {
+                              api.errare( 'Error when triggering tinyMceEditorUpdated', er );
+                        }
+                  });
+
 
 
                   // LISTEN TO USER DRAG ACTIONS => RESIZE EDITOR
