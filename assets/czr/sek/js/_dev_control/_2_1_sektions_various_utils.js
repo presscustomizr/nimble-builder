@@ -249,16 +249,61 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           return;
                         if ( input_id === _key_ && ! _.isUndefined( levelData.default ) ) {
                               _defaultVal_ = levelData.default;
-                              // cache it
-                              self.cachedDefaultInputValues[ module_type ][ input_id ] = _defaultVal_;
                         }
                         // if we have still no match, and the data are sniffable, let's go ahead recursively
                         if ( 'no_default_value_specified' === _defaultVal_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
                               _defaultVal_ = self.getInputDefaultValue( input_id, module_type, levelData );
                         }
+                        if ( 'no_default_value_specified' !== _defaultVal_ ) {
+                            // cache it
+                            self.cachedDefaultInputValues[ module_type ][ input_id ] = _defaultVal_;
+                        }
                   });
                   return _defaultVal_;
             },
+
+            // @return input_type string
+            // @param input_id string
+            // @param module_type string
+            // @param level array || object
+            getInputType : function( input_id, module_type, level ) {
+                  var self = this;
+
+                  // Do we have a cached default value ?
+                  self.cachedInputTypes = self.cachedInputTypes || {};
+                  self.cachedInputTypes[ module_type ] = self.cachedInputTypes[ module_type ] || {};
+                  if ( _.has( self.cachedInputTypes[ module_type ], input_id ) ) {
+                        return self.cachedInputTypes[ module_type ][ input_id ];
+                  }
+                  //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
+                        api.errare( 'getInputDefaultValue => missing sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( _.isUndefined( level ) ) {
+                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                  }
+                  var _inputType_ = 'no_input_type_specified';
+                  _.each( level, function( levelData, _key_ ) {
+                        // we found a match skip next levels
+                        if ( 'no_input_type_specified' !== _inputType_ )
+                          return;
+                        if ( input_id === _key_ && ! _.isUndefined( levelData.input_type ) ) {
+                              _inputType_ = levelData.input_type;
+                        }
+                        // if we have still no match, and the data are sniffable, let's go ahead recursively
+                        if ( 'no_input_type_specified' === _inputType_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
+                              _inputType_ = self.getInputType( input_id, module_type, levelData );
+                        }
+                        if ( 'no_input_type_specified' !== _inputType_ ) {
+                              // cache it
+                              self.cachedInputTypes[ module_type ][ input_id ] = _inputType_;
+                        }
+                  });
+                  return _inputType_;
+            },
+
+
 
             // @return the item(s) ( array of items if multi-item module ) that we should use when adding the module to the main setting
             getModuleStartingValue : function( module_type ) {

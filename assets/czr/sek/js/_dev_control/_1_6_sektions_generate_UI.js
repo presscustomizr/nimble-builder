@@ -569,7 +569,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // 2) We don't want to write in db the properties that are set to their default values
                   var rawModuleValue = params.settingParams.to,
                       moduleValueCandidate,// {} or [] if mono item of multi-item module
-                      inputDefaultValue = null,
                       parentModuleType = null,
                       isMultiItemModule = false;
 
@@ -590,41 +589,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing parentModuleInstance', params );
                   }
 
-                  // @return {}
-                  var normalizeSingleItemValue = function( _item_ ) {
-                        var itemCandidate = {};
-                        _.each( _item_, function( _val, input_id ) {
-                              // title, id and module_type don't need to be saved in database
-                              // title and id are legacy entries that can be used in multi-items modules to identify and name the item
-                              // @see ::getDefaultItemModelFromRegisteredModuleData()
-                              if ( _.contains( ['title', 'id' ], input_id ) )
-                                return;
-
-                              if ( null !== parentModuleType ) {
-                                    inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
-                                    if ( 'no_default_value_specified' === inputDefaultValue ) {
-                                          api.infoLog( '::updateAPISettingAndExecutePreviewActions => missing default value for input ' + input_id + ' in module ' + parentModuleType );
-                                    }
-                              }
-                              if ( _val === inputDefaultValue ) {
-                                    return;
-                              } else {
-                                    itemCandidate[ input_id ] = _val;
-                              }
-                        });
-                        return itemCandidate;
-                  };
-
                   //console.log('updateAPISettingAndExecutePreviewActions => ', params.settingParams, isMultiItemModule, rawModuleValue,  _.isObject( rawModuleValue ) );
 
                   // The new module value can be an single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
                   if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
-                        moduleValueCandidate = normalizeSingleItemValue( rawModuleValue );
+                        moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( rawModuleValue, parentModuleType );
                   } else {
                         moduleValueCandidate = [];
                         _.each( rawModuleValue, function( item ) {
-                              moduleValueCandidate.push( normalizeSingleItemValue( item ) );
+                              moduleValueCandidate.push( self.normalizeAndSanitizeSingleItemInputValues( item, parentModuleType ) );
                         });
                   }
 
@@ -738,6 +712,98 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _doUpdateWithRequestedAction();
                   }
             },//updateAPISettingAndExecutePreviewActions
+
+
+
+
+
+
+
+
+
+
+
+
+            // @return a normalized and sanitized item value
+            normalizeAndSanitizeSingleItemInputValues : function( _item_, parentModuleType ) {
+                  var itemNormalized = {},
+                      itemNormalizedAndSanitized = {},
+                      inputDefaultValue = null,
+                      inputType = null,
+                      sanitizedVal,
+                      self = this;
+
+                  //console.log('normalizeAndSanitizeSingleItemInputValues => ', _item_, parentModuleType );
+
+                  // NORMALIZE
+                  // title, id and module_type don't need to be saved in database
+                  // title and id are legacy entries that can be used in multi-items modules to identify and name the item
+                  // @see ::getDefaultItemModelFromRegisteredModuleData()
+                  _.each( _item_, function( _val, input_id ) {
+                        if ( _.contains( ['title', 'id' ], input_id ) )
+                          return;
+
+                        if ( null !== parentModuleType ) {
+                              inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
+                              if ( 'no_default_value_specified' === inputDefaultValue ) {
+                                    api.infoLog( '::updateAPISettingAndExecutePreviewActions => missing default value for input ' + input_id + ' in module ' + parentModuleType );
+                              }
+                        }
+                        if ( _val === inputDefaultValue ) {
+                              return;
+                        } else {
+                              itemNormalized[ input_id ] = _val;
+                        }
+                  });
+
+                  // SANITIZE
+                  _.each( itemNormalized, function( _val, input_id ) {
+                        // @see extend_api_base.js
+                        // @see sektions::_7_0_sektions_add_inputs_to_api.js
+                        switch( self.getInputType( input_id, parentModuleType ) ) {
+                              case 'text' :
+                              case 'textarea' :
+                              case 'check' :
+                              case 'gutencheck' :
+                              case 'select' :
+                              case 'radio' :
+                              case 'number' :
+                              case 'upload' :
+                              case 'upload_url' :
+                              case 'color' :
+                              case 'wp_color_alpha' :
+                              case 'wp_color' :
+                              case 'content_picker' :
+                              case 'tiny_mce_editor' :
+                              case 'password' :
+                              case 'range' :
+                              case 'range_slider' :
+                              case 'hidden' :
+                              case 'h_alignment' :
+                              case 'h_text_alignment' :
+
+                              case 'spacing' :
+                              case 'bg_position' :
+                              case 'v_alignment' :
+                              case 'font_size' :
+                              case 'line_height' :
+                              case 'font_picker' :
+                                  sanitizedVal = _val;
+                              break;
+                              default :
+                                  sanitizedVal = _val;
+                              break;
+                        }
+
+                        itemNormalizedAndSanitized[ input_id ] = sanitizedVal;
+                  });
+                  return itemNormalizedAndSanitized;
+            },
+
+
+
+
+
 
 
 

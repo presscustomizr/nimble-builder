@@ -32,10 +32,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         if ( sektionsLocalizedData.isDevMode ) {
                               api( collectionSettingId, function( sektionSetInstance ) {
-                                    // Is the collection well formed ?
-                                    // @see customize-base.js
-                                    //sektionSetInstance.validate = self.validateSettingValue;// Replaced by self.validateSettingValue()
-
                                     // Schedule reactions to a collection change
                                     sektionSetInstance.bind( function( newSektionSettingValue, previousValue, params ) {
                                           api.infoLog( 'sektionSettingValue is updated',
@@ -286,7 +282,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   break;
 
                                   case 'module' :
-                                        // A section must have a "location" level parent
                                         if ( 'column' != parentLevel.level ) {
                                               _errorDetected_('validation error => the module ' + level.id +' must be child of a column' );
                                               return;
