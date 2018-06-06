@@ -1,14 +1,17 @@
 # Nimble Builder v1.0.1 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 ![Nimble Builder](/nimble.jpg)
 
-> Drag and drop page builder for the WordPress customizer.
+> Drag and drop page builder for the WordPress live customizer.
 
 == Description ==
-The Nimble Builder is a lightweight page builder that works from the WordPress live customizer.
+The Nimble Builder is a lightweight drag and drop page builder designed to work in the WordPress live customizer.
 
 == Features ==
-* Organize your content in responsive sections and columns layouts.
-* Works in any WordPress contexts : home, pages, posts, custom post types, archives, author pages, search page.
+* Easily create responsive layouts composed of sections and colums.
+* Drag and drop content modules in your pages.
+* Create content, style, move / duplicate / remove elements in live preview.
+* Leverage the customizer auto-drafting and schedule publishing features, and safely build and save drafts of your content before deploying in production.
+* Works in any WordPress contexts : home, pages, posts, custom post types, archives, author pages, search page, ...
 
 == Installation ==
 1. Install the plugin right from your WordPress admin in plugins > Add New.

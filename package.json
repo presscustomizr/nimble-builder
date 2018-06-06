@@ -1,7 +1,7 @@
 {
   "name": "nimble-builder",
   "version": "1.0.1",
-  "description": "Drag and drop page builder for the WordPress customizer.",
+  "description": "Drag and drop page builder for the WordPress live customizer.",
   "author": "nikeo",
   "license": "GNU GPL v3.0",
   "repository": {
