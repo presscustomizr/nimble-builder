@@ -13,7 +13,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         'sek-modules-refreshed sek-columns-refreshed',
                         'div[data-sek-level="section"]',
                         function(evt) {
-                              console.log('ALOTS ???', evt.type );
                               self.maybeMakeColumnResizableInSektion.call( this );
                         }
                   );
