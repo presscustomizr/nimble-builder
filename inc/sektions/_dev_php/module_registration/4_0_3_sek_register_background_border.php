@@ -222,7 +222,9 @@ function sek_add_css_rules_for_bg_border_background( $rules, $level ) {
     }
 
     //Background overlay?
-    if ( ! empty( $bg_border_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_border_options[ 'bg-apply-overlay'] ) ) {
+    // 1) a background image should be set
+    // 2) the option should be checked
+    if ( !empty( $bg_border_options['bg-image']) && ! empty( $bg_border_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_border_options[ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
         $bg_color_overlay = isset( $bg_border_options[ 'bg-color-overlay' ] ) ? $bg_border_options[ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
