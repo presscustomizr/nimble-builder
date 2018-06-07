@@ -65,7 +65,7 @@
 .sek-dyn-ui-inner {
     position: absolute;
     top: -18px;
-    opacity: 0.7;
+    opacity: 0.8;
     -webkit-transition: opacity .25s ease;
     -o-transition: opacity .25s ease;
     transition: opacity .25s ease;
@@ -91,7 +91,7 @@
   margin: -1px -1px 0;
   padding: 0 4px;
   text-shadow: none;
-  font-size: 1rem;
+  font-size: 1em;
 }
 
 .sek-dyn-ui-icons > span {
@@ -110,7 +110,8 @@
   width: 1em;
 }
 .sek-dyn-left-icons .sek-dyn-ui-icons i {
-    margin: 0px 5px;
+    /*margin: 0px 5px;*/
+    margin: 0 0.30em;
 }
 .sek-dyn-ui-icons i:hover {
   opacity: 1;
@@ -127,25 +128,67 @@
 
 /* add space between the remove icons and the other */
 .sek-dyn-ui-icons [data-sek-click-on="remove"] {
-    padding-left: 9px;
+    /*padding-left: 9px;*/
+    padding-left: 0.42em;
     margin-left: 0px;
     width: 1.6em!important;
     border-left: 1px dotted white;
 }
 .sek-dyn-ui-icons [data-sek-click-on="pick-module"] {
-    padding-left: 9px;
+    /*padding-left: 9px;*/
+    padding-left: 0.42em;
     margin-left: 0px;
     width: 1.6em!important;
     border-left: 1px dotted #fff;
+}
+.sek-dyn-ui-location-type {
+    position: absolute;
+    z-index: 2;
+    bottom: 0;
+    padding: 0 1em;
+    font-size: 0.6em;
+    right: 0;
+    cursor: pointer;
 }
 
 
 
 
+
+/* ADAPT THE UI ICONS SIZES WHEN COLUMNS ARE BECOMING NARROWS */
+.sek-col-8 > .sek-column-dyn-ui,
+.sek-col-9 > .sek-column-dyn-ui,
+.sek-col-10 > .sek-column-dyn-ui,
+.sek-col-11 > .sek-column-dyn-ui,
+.sek-col-12 > .sek-column-dyn-ui,
+.sek-col-14 > .sek-column-dyn-ui,
+.sek-col-16 > .sek-column-dyn-ui,
+.sek-col-20 > .sek-column-dyn-ui,
+.sek-col-25 > .sek-column-dyn-ui,
+.sek-col-8 .sek-module-dyn-ui,
+.sek-col-9 .sek-module-dyn-ui,
+.sek-col-10 .sek-module-dyn-ui,
+.sek-col-11 .sek-module-dyn-ui,
+.sek-col-12 .sek-module-dyn-ui,
+.sek-col-14 .sek-module-dyn-ui,
+.sek-col-16 .sek-module-dyn-ui,
+.sek-col-20 .sek-module-dyn-ui,
+.sek-col-25 .sek-module-dyn-ui {
+  font-size: 0.7em;
+}
+
+
+
 /* SECTION UI*/
 /* prevent style propagation to nested levels with > */
-.sek-section > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
+.sek-section > .sek-dyn-ui-wrapper .sek-dyn-ui-icons, .sek-section > .sek-dyn-ui-wrapper .sek-dyn-ui-location-type {
   background: #000;
+}
+.sek-section > .sek-dyn-ui-wrapper .sek-dyn-ui-location-type {
+  z-index: 1000;
+}
+.sek-section[data-sek-is-nested="true"] > .sek-dyn-ui-wrapper .sek-dyn-ui-location-type {
+  z-index: 1002;
 }
 .sek-section-dyn-ui {
     border: 2px dotted #000;
@@ -163,14 +206,19 @@
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
 }
 
+
+
 /* COLUMN UI*/
 /* prevent style propagation to nested levels with > */
 .sek-column > .sek-column-dyn-ui .sek-dyn-ui-inner {
   top:0px;
   z-index: 1001;
 }
-.sek-column > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
+.sek-column > .sek-dyn-ui-wrapper .sek-dyn-ui-icons, .sek-column > .sek-dyn-ui-wrapper .sek-dyn-ui-location-type {
   background: #00b846;
+}
+.sek-column > .sek-dyn-ui-wrapper .sek-dyn-ui-location-type {
+  z-index: 1001;
 }
 .sek-column-dyn-ui {
     border: 2px dotted #00b846;
@@ -206,10 +254,15 @@
 }
 .sek-module > .sek-module-dyn-ui .sek-dyn-ui-inner {
   top:0px;
-  z-index: 1002;
+  z-index: 1005;
 }
-.sek-module > .sek-dyn-ui-wrapper .sek-dyn-ui-icons {
+.sek-module > .sek-dyn-ui-wrapper .sek-dyn-ui-icons, .sek-module > .sek-dyn-ui-wrapper .sek-dyn-ui-location-type{
   background: #0085ba;
+}
+.sek-module > .sek-dyn-ui-wrapper .sek-dyn-ui-location-type {
+  left: 0;
+  right: auto;
+  z-index: 1005;
 }
 .sek-module-dyn-ui {
     border: 1px dotted #0085ba;
@@ -316,9 +369,37 @@
   cursor: pointer;
   width: 50px;
   height: 50px;
-  padding-top: 12px;
+  padding-top: 13px;
+  color: #0085ba;
+  color: rgba(0, 133, 186, 0.6);
+  border-radius: 30px;
+  -webkit-transition: all .20s ease;
+  -o-transition: all .20s ease;
+  transition: all .20s ease;
+}
+.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"]:hover {
+  -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
   color: #0085ba;
 }
+
+/* Adapt the size when columns are too narrow */
+.sek-col-8 [data-sek-click-on="pick-module"],
+.sek-col-9 [data-sek-click-on="pick-module"],
+.sek-col-10 [data-sek-click-on="pick-module"],
+.sek-col-11 [data-sek-click-on="pick-module"],
+.sek-col-12 [data-sek-click-on="pick-module"],
+.sek-col-14 [data-sek-click-on="pick-module"],
+.sek-col-16 [data-sek-click-on="pick-module"],
+.sek-col-20 [data-sek-click-on="pick-module"],
+.sek-col-25 [data-sek-click-on="pick-module"] {
+  font-size: 0.9em;
+  width: 35px;
+  height: 35px;
+  padding-top: 11px;
+}
+
+
 /* Hide the + during a drag phase */
 .sek-dragging .sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"] {
   display: none;
@@ -489,9 +570,9 @@
     cursor: pointer;
     position: absolute;
     left: calc(50% - 12px);
-    -webkit-transition: all .25s ease;
-    -o-transition: all .25s ease;
-    transition: all .25s ease;
+    -webkit-transition: all .20s ease;
+    -o-transition: all .20s ease;
+    transition: all .20s ease;
     opacity: 0.7;
 }
 

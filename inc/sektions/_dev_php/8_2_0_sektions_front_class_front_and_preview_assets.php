@@ -145,16 +145,17 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
                         <# if ( ! data.is_last_possible_section ) { #>
-                          <i class="fas fa-ellipsis-v sek-move-section" title="<?php _e( 'Move section', 'sek-builder' ); ?>"></i>
+                          <i class="fas fa-ellipsis-v sek-move-section" title="<?php _e( 'Move section', 'text_domain' ); ?>"></i>
                         <# } #>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Section options', 'sek-builder' ); ?>">settings</i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Section settings', 'text_domain' ); ?>">settings</i>
                         <# if ( data.can_have_more_columns ) { #>
-                          <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'sek-builder' ); ?>">view_column</i>
+                          <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'text_domain' ); ?>">view_column</i>
                         <# } #>
-                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'sek-builder' ); ?>">filter_none</i>
-                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'sek-builder' ); ?>">delete_forever</i>
+                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'text_domain' ); ?>">filter_none</i>
+                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'text_domain' ); ?>">delete_forever</i>
                       </div>
                     </div>
+                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Section settings', 'text_domain' ); ?>"><?php _e( 'section', 'text_domain' ); ?></span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
@@ -166,22 +167,22 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <div class="sek-dyn-ui-wrapper sek-column-dyn-ui">
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
-                        <i class="fas fa-ellipsis-v sek-move-column" title="<?php _e( 'Move column', 'sek-builder' ); ?>"></i>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Columns options', 'sek-builder' ); ?>">settings</i>
+                        <i class="fas fa-ellipsis-v sek-move-column" title="<?php _e( 'Move column', 'text_domain' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Column settings', 'text_domain' ); ?>">settings</i>
                         <# if ( ! data.parent_is_last_allowed_nested ) { #>
-                          <i data-sek-click-on="add-section" class="material-icons sek-click-on" title="<?php _e( 'Add a nested section', 'sek-builder' ); ?>">account_balance_wallet</i>
+                          <i data-sek-click-on="add-section" class="material-icons sek-click-on" title="<?php _e( 'Add a nested section', 'text_domain' ); ?>">account_balance_wallet</i>
                         <# } #>
                         <# if ( data.parent_can_have_more_columns ) { #>
-                          <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate column', 'sek-builder' ); ?>">filter_none</i>
+                          <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate column', 'text_domain' ); ?>">filter_none</i>
                         <# } #>
 
-                        <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'sek-builder' ); ?>">add_circle_outline</i>
+                        <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'text_domain' ); ?>">add_circle_outline</i>
                         <# if ( ! data.parent_is_single_column ) { #>
-                          <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'sek-builder' ); ?>">delete_forever</i>
+                          <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'text_domain' ); ?>">delete_forever</i>
                         <# } #>
                       </div>
                     </div>
-
+                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Column settings', 'text_domain' ); ?>"><?php _e( 'column', 'text_domain' ); ?></span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
@@ -204,13 +205,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     </div><?php // .editor-block-settings-menu ?>
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
-                        <i class="fas fa-ellipsis-v sek-move-module" title="<?php _e( 'Move module', 'sek-builder' ); ?>"></i>
-                        <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit Module', 'sek-builder' ); ?>"></i>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Module options', 'sek-builder' ); ?>">settings</i>
-                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate module', 'sek-builder' ); ?>">filter_none</i>
-                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'sek-builder' ); ?>">delete_forever</i>
+                        <i class="fas fa-ellipsis-v sek-move-module" title="<?php _e( 'Move module', 'text_domain' ); ?>"></i>
+                        <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit Module', 'text_domain' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Module settings', 'text_domain' ); ?>">settings</i>
+                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate module', 'text_domain' ); ?>">filter_none</i>
+                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'text_domain' ); ?>">delete_forever</i>
                       </div>
                     </div>
+                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Module settings', 'text_domain' ); ?>"><?php _e( 'module', 'text_domain' ); ?></span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
