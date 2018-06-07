@@ -14,12 +14,11 @@ The Nimble Builder is a lightweight drag and drop page builder designed to work 
 * Works in any WordPress contexts : home, pages, posts, custom post types, archives, author pages, search page, ...
 
 == Installation ==
-1. Install the plugin right from your WordPress admin in plugins > Add New.
-1-bis. Download the plugin, unzip the package and upload it to your /wp-content/plugins/ directory
-2. Activate the plugin
-3. Navigate to the live customizer
-4. Click on the "+" button in the previewed page and insert your first section of content
-5. Drag a module in your section
+1. Install the plugin through the WordPress plugins screen. Or download the plugin, unzip the package and upload it to your /wp-content/plugins/ directory
+2. Activate the plugin through the 'Plugins' screen in WordPress
+3. Navigate to the WordPress live customizer
+4. Look for a drop zone candidate in the previewed page and click on the "+" button to start building your first section of content
+5. Drag a module from the left panel and drop it in a drop zone of the previewed page
 
 == Changelog ==
 = 1.0.2 : June 7th, 2018 =
