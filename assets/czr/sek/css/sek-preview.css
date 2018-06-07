@@ -394,9 +394,9 @@
 .sek-col-20 [data-sek-click-on="pick-module"],
 .sek-col-25 [data-sek-click-on="pick-module"] {
   font-size: 0.9em;
-  width: 35px;
+/*  width: 35px;
   height: 35px;
-  padding-top: 11px;
+  padding-top: 11px;*/
 }
 
 
@@ -506,7 +506,8 @@
     /*position: relative;*/
     position: absolute;
     top: 0px;
-    right: 50%;
+    /*right: 50%;*/
+    width: 100%;
     z-index: 1001;
     /*transition: .1s ease-in-out;*/
     display: none;
@@ -530,19 +531,30 @@
   }*/
 
 .sek-add-content-button-wrapper {
-    /*height: 40px;*/
-    width: 100%;
-    /*position: absolute;*/
-    left: 0;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
-    -webkit-transition: .5s ease-in-out;
-    -o-transition: .5s ease-in-out;
-    transition: .5s ease-in-out;
+  position: relative;
+  top: -5px;
+  width: 100%;
+  border: 1px dashed #ccc;
+  height: 10px;
+  left: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-transition: .35s ease-in-out;
+  -o-transition: .35s ease-in-out;
+  transition: .35s ease-in-out;
+}
+.is_last .sek-add-content-button-wrapper {
+  top: 10px;
+}
+.sek-mouse-is-close .sek-add-content-button-wrapper {
+  border: 1px dashed #333;
+}
+.sek-mouse-is-close .sek-add-content-button-wrapper .sek-add-content-btn {
+  opacity: 1;
 }
 .sek-add-content-btn {
     margin: auto;
@@ -573,9 +585,11 @@
     -webkit-transition: all .20s ease;
     -o-transition: all .20s ease;
     transition: all .20s ease;
-    opacity: 0.7;
+    opacity: 0;
 }
-
+.sek-add-content-btn.sek-mouse-is-close {
+    z-index: 10000;
+}
 
 .sek-add-content-btn:hover {
     width: 26px;

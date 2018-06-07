@@ -87,7 +87,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   //       </div>
                   //     </div>
                   // </script>
-                  var _printAddContentButton_ = function( evt ) {
+                  // fired on mousemove and scroll, every 50ms
+                  var _printAddContentButtons = function() {
                         $('body').find( 'div[data-sek-level="location"]' ).each( function() {
                               $sectionCollection = $(this).children( 'div[data-sek-level="section"]' );
                               tmpl = self.parseTemplate( '#sek-tmpl-add-content-button' );
@@ -98,6 +99,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               $sectionCollection.each( function() {
                                     if ( $(this).find('.sek-add-content-button').length > 0 )
                                       return;
+
                                     $.when( $(this).prepend( tmpl({ location : _location }) ) ).done( function() {
                                           $btn_el = $(this).find('.sek-add-content-button');
                                           //console.log( "$(this).data('sek-id') ", $btn_el, $(this).data('sek-id')  );
@@ -133,14 +135,44 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     $btn_el.fadeIn( 300 );
                               });
                         });
-                  };//_printAddContentButton_
+                  };//_printAddContentButtons
 
+                  // fired on mousemove and scroll, every 50ms
+                  var _sniffAndRevealButtons = function( position ) {
+                        $( 'body').find('.sek-add-content-button').each( function() {
+                              var btnWrapperRect = $(this)[0].getBoundingClientRect(),
+                                  yPos = position.y,
+                                  xPos = position.x,
+                                  isCloseThreshold = 40,
+                                  mouseToBottom = Math.abs( yPos - btnWrapperRect.bottom ),
+                                  mouseToTop = Math.abs( btnWrapperRect.top - yPos ),
+                                  mouseToRight = xPos - btnWrapperRect.right,
+                                  mouseToLeft = btnWrapperRect.left - xPos,
+                                  isCloseVertically = ( mouseToBottom < isCloseThreshold ) || ( mouseToTop < isCloseThreshold ),
+                                  isCloseHorizontally =  ( mouseToRight > 0 && mouseToRight < isCloseThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isCloseThreshold ),
+                                  isInHorizontally = xPos <= btnWrapperRect.right && btnWrapperRect.left <= xPos,
+                                  isInVertically = yPos <= btnWrapperRect.top && btnWrapperRect.bottom <= yPos;
+
+                              // var html = '';
+                              // html += ' | mouseToBottom : ' + mouseToBottom + ' | mouseToTop : ' + mouseToTop;
+                              // html += ' isCloseVertically : ' + isCloseVertically + ' | isInVertically : ' + isInVertically;
+                              // $(this).html( '<span style="font-size:12px">' + html + '</span>');
+
+                              $(this).toggleClass(
+                                    'sek-mouse-is-close',
+                                    ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally )
+                              );
+                        });
+                  };
 
                   // Schedule the printing / removal of the add content button
                   self.mouseMovedRecently = new api.Value( {} );
                   self.mouseMovedRecently.bind( function( position ) {
                         if ( ! _.isEmpty( position) ) {
-                              _printAddContentButton_();
+                              // print the buttons ( display:none)
+                              _printAddContentButtons();
+                              // sniff sections around pointer and reveal add content button for the collection of candidates
+                              _sniffAndRevealButtons( position );
                         } else {
                               $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
                                     $(this).fadeOut( {
