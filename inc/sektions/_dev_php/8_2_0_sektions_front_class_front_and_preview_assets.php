@@ -122,7 +122,13 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <# //console.log( 'data', data ); #>
                   <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                     <div class="sek-add-content-button-wrapper">
-                      <button title="<?php _e('Insert a new section', 'text_domain_to_be_replaced' ); ?> <# if ( data.location ) { #>( hook : {{data.location}} )<# } #>" data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
+                     <# var hook_location = ''; #>
+                      <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
+                          <# if ( data.location ) {
+                              hook_location = '( @hook : ' + data.location + ')';
+                          } #>
+                      <?php endif; ?>
+                      <button title="<?php _e('Insert a new section', 'text_domain_to_be_replaced' ); ?> {{hook_location}}" data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
                         <span class="sek-click-on-button-icon sek-click-on">+</span><span class="action-button-text"><?php _e('Insert a new section', 'text_domain_to_be_replaced' ); ?></span>
                       </button>
                     </div>
