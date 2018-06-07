@@ -174,7 +174,7 @@
 .sek-col-16 .sek-module-dyn-ui,
 .sek-col-20 .sek-module-dyn-ui,
 .sek-col-25 .sek-module-dyn-ui {
-  font-size: 0.7em;
+  font-size: 0.7rem;
 }
 
 
@@ -226,6 +226,7 @@
     left: 0px;
     top: 0px;
     right: 0px;
+    font-size: 1rem;
 }
 .sek-column-dyn-ui .dev-level-data {
   background: #0085ba;
@@ -270,7 +271,7 @@
     left: 0px;
     top: 0px;
     right: 0px;
-
+    font-size: 1rem;
 }
 
 .dev-level-data {
@@ -393,7 +394,7 @@
 .sek-col-16 [data-sek-click-on="pick-module"],
 .sek-col-20 [data-sek-click-on="pick-module"],
 .sek-col-25 [data-sek-click-on="pick-module"] {
-  font-size: 0.9em;
+  font-size: 0.9rem;
 /*  width: 35px;
   height: 35px;
   padding-top: 11px;*/
