@@ -5,7 +5,7 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Tested up to: 4.9.6
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -29,6 +29,13 @@ The Nimble Builder is a lightweight drag and drop page builder designed to work 
 5. Drag a module in the section
 
 == Changelog ==
+= 1.0.2 : June 7th, 2018 =
+* fixed : the background overlay should not be applied to a level when there's no background image
+* added : a border-radius css rule to the pickable modules
+* added : the location type printed at the bottom of the dynamic ui when hovering
+* improved : the ui icon size gets smaller when number of columns is >= 4
+* improved : the "Insert new section" is revealed when mouse is coming 50 pixels around
+
 = 1.0.1 : June 6th, 2018 =
 * fixed : submission issue on wordpress.org. The plugin must use unique function names, namespaces, defines, and classnames.
 * fixed : location levels need the css rule clear:both

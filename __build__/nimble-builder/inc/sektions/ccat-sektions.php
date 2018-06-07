@@ -1759,7 +1759,9 @@ function sek_add_css_rules_for_bg_border_background( $rules, $level ) {
     }
 
     //Background overlay?
-    if ( ! empty( $bg_border_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_border_options[ 'bg-apply-overlay'] ) ) {
+    // 1) a background image should be set
+    // 2) the option should be checked
+    if ( !empty( $bg_border_options['bg-image']) && ! empty( $bg_border_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_border_options[ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
         $bg_color_overlay = isset( $bg_border_options[ 'bg-color-overlay' ] ) ? $bg_border_options[ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
@@ -4012,7 +4014,13 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <# //console.log( 'data', data ); #>
                   <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                     <div class="sek-add-content-button-wrapper">
-                      <button title="<?php _e('Insert a new section', 'nimble-builder' ); ?> <# if ( data.location ) { #>( hook : {{data.location}} )<# } #>" data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
+                     <# var hook_location = ''; #>
+                      <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
+                          <# if ( data.location ) {
+                              hook_location = '( @hook : ' + data.location + ')';
+                          } #>
+                      <?php endif; ?>
+                      <button title="<?php _e('Insert a new section', 'nimble-builder' ); ?> {{hook_location}}" data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
                         <span class="sek-click-on-button-icon sek-click-on">+</span><span class="action-button-text"><?php _e('Insert a new section', 'nimble-builder' ); ?></span>
                       </button>
                     </div>
@@ -4037,7 +4045,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <# if ( ! data.is_last_possible_section ) { #>
                           <i class="fas fa-ellipsis-v sek-move-section" title="<?php _e( 'Move section', 'nimble-builder' ); ?>"></i>
                         <# } #>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Section options', 'nimble-builder' ); ?>">settings</i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Section settings', 'nimble-builder' ); ?>">settings</i>
                         <# if ( data.can_have_more_columns ) { #>
                           <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'nimble-builder' ); ?>">view_column</i>
                         <# } #>
@@ -4045,6 +4053,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'nimble-builder' ); ?>">delete_forever</i>
                       </div>
                     </div>
+                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Section settings', 'nimble-builder' ); ?>"><?php _e( 'section', 'nimble-builder' ); ?></span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
@@ -4057,7 +4066,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-ellipsis-v sek-move-column" title="<?php _e( 'Move column', 'nimble-builder' ); ?>"></i>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Columns options', 'nimble-builder' ); ?>">settings</i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Column settings', 'nimble-builder' ); ?>">settings</i>
                         <# if ( ! data.parent_is_last_allowed_nested ) { #>
                           <i data-sek-click-on="add-section" class="material-icons sek-click-on" title="<?php _e( 'Add a nested section', 'nimble-builder' ); ?>">account_balance_wallet</i>
                         <# } #>
@@ -4071,7 +4080,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <# } #>
                       </div>
                     </div>
-
+                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Column settings', 'nimble-builder' ); ?>"><?php _e( 'column', 'nimble-builder' ); ?></span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
@@ -4096,11 +4105,12 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-ellipsis-v sek-move-module" title="<?php _e( 'Move module', 'nimble-builder' ); ?>"></i>
                         <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit Module', 'nimble-builder' ); ?>"></i>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Module options', 'nimble-builder' ); ?>">settings</i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Module settings', 'nimble-builder' ); ?>">settings</i>
                         <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate module', 'nimble-builder' ); ?>">filter_none</i>
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'nimble-builder' ); ?>">delete_forever</i>
                       </div>
                     </div>
+                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Module settings', 'nimble-builder' ); ?>"><?php _e( 'module', 'nimble-builder' ); ?></span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
