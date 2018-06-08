@@ -19,7 +19,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
 
                   // Schedule with delegation
-                  $( 'body').on( 'sek-section-added sek-refresh-level', '[data-sek-level="location"]', function( evt, params  ) {
+                  $( 'body').on( 'sek-section-added sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
 
