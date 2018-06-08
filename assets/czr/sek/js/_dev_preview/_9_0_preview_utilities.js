@@ -134,6 +134,25 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                         //.always( function( _r ) { dfd.resolve( _r ); });
                   return dfd.promise();
-            }//doAjax
+            },//doAjax
+
+
+
+
+
+
+            // @return boolean
+            isModuleRegistered : function( moduleType ) {
+                  return sekPreviewLocalized.registeredModules && ! _.isUndefined( sekPreviewLocalized.registeredModules[ moduleType ] );
+            },
+
+
+            //@return mixed
+            getRegisteredModuleProperty : function( moduleType, property ) {
+                  if ( ! this.isModuleRegistered( moduleType ) ) {
+                        return 'not_set';
+                  }
+                  return sekPreviewLocalized.registeredModules[ moduleType ][ property ];
+            }
       });//$.extend()
 })( wp.customize, jQuery, _ );

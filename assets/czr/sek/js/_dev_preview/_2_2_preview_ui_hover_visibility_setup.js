@@ -47,7 +47,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     });
                               break;
                               case 'module' :
-                                    params = _.extend( params, {});
+                                    var module_name = self.getRegisteredModuleProperty( $levelEl.data('sek-module-type'), 'name' );
+                                    params = _.extend( params, {
+                                          module_name : 'not_set' != module_name ? module_name : ''
+                                    });
                               break;
                         }
                         // don't display the column and module ui when resizing columns
@@ -58,21 +61,21 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         tmpl = self.parseTemplate( '#sek-dyn-ui-tmpl-' + level );
                         $.when( $(this).prepend( tmpl( params ) ) ).done( function() {
                               $levelEl.find('.sek-dyn-ui-wrapper').stop( true, true ).fadeIn( {
-                                  duration : 150,
-                                  complete : function() {}
+                                    duration : 150,
+                                    complete : function() {}
                               } );
                         });
 
                   }).on( 'mouseleave', '[data-sek-level]', function( evt ) {
-                          isFadingOut = true;//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
-                          $levelEl = $(this);
-                          $levelEl.children('.sek-dyn-ui-wrapper').stop( true, true ).fadeOut( {
-                                duration : 150,
-                                complete : function() {
-                                      $(this).remove();
-                                      isFadingOut = false;
-                                }
-                          });
+                        isFadingOut = true;//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
+                        $levelEl = $(this);
+                        $levelEl.children('.sek-dyn-ui-wrapper').stop( true, true ).fadeOut( {
+                              duration : 150,
+                              complete : function() {
+                                    $(this).remove();
+                                    isFadingOut = false;
+                              }
+                        });
                   });
 
 
