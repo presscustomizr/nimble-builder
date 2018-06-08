@@ -258,6 +258,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_preview/_2_1_preview_resizable_setup.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_2_2_preview_ui_hover_visibility_setup.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_2_3_preview_ui_click_actions_setup.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_2_4_preview_ui_setup_loader.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_4_0_preview_panel_react_ajax_setup.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_4_1_preview_panel_ajax_sections.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_4_2_preview_panel_ajax_columns.js',

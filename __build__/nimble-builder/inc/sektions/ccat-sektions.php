@@ -534,8 +534,6 @@ function sek_enqueue_controls_js_css() {
         'all'
     );
 
-    // registered modules
-    $registered_modules = CZR_Fmk_Base() -> registered_modules;
 
     wp_enqueue_script(
         'czr-sektions',
@@ -581,7 +579,7 @@ function sek_enqueue_controls_js_css() {
 
             'presetSections' => sek_get_preset_sektions(),
 
-            'registeredModules' => $registered_modules,
+            'registeredModules' => CZR_Fmk_Base() -> registered_modules,
 
             // Dnd
             'preDropElementClass' => 'sortable-placeholder',
@@ -3987,11 +3985,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'i18n' => array(
                         "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'nimble-builder'),
                         'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'nimble-builder'),
-                        'Insert here' => __('Insert here', 'nimble-builder')
+                        'Insert here' => __('Insert here', 'nimble-builder'),
+                        'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'nimble-builder' )
                     ),
                     'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-                    'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) )
+                    'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
+
+                    'registeredModules' => CZR_Fmk_Base() -> registered_modules,
                 )
             );
 
@@ -4045,19 +4046,20 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <# if ( ! data.is_last_possible_section ) { #>
                           <i class="fas fa-ellipsis-v sek-move-section" title="<?php _e( 'Move section', 'nimble-builder' ); ?>"></i>
                         <# } #>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Section settings', 'nimble-builder' ); ?>">settings</i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit section settings', 'nimble-builder' ); ?>">settings</i>
                         <# if ( data.can_have_more_columns ) { #>
                           <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'nimble-builder' ); ?>">view_column</i>
                         <# } #>
                         <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'nimble-builder' ); ?>">filter_none</i>
+                        <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'nimble-builder' ); ?>">add_circle_outline</i>
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'nimble-builder' ); ?>">delete_forever</i>
                       </div>
-                    </div>
-                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Section settings', 'nimble-builder' ); ?>"><?php _e( 'section', 'nimble-builder' ); ?></span>
+                    </div><?php // .sek-dyn-ui-inner ?>
+                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'nimble-builder' ); ?>"><?php _e( 'section', 'nimble-builder' ); ?></span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
-                  </div>
+                  </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 
               <script type="text/html" id="sek-dyn-ui-tmpl-column">
@@ -4066,7 +4068,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-ellipsis-v sek-move-column" title="<?php _e( 'Move column', 'nimble-builder' ); ?>"></i>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Column settings', 'nimble-builder' ); ?>">settings</i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit column settings', 'nimble-builder' ); ?>">settings</i>
                         <# if ( ! data.parent_is_last_allowed_nested ) { #>
                           <i data-sek-click-on="add-section" class="material-icons sek-click-on" title="<?php _e( 'Add a nested section', 'nimble-builder' ); ?>">account_balance_wallet</i>
                         <# } #>
@@ -4079,42 +4081,47 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                           <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'nimble-builder' ); ?>">delete_forever</i>
                         <# } #>
                       </div>
-                    </div>
-                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Column settings', 'nimble-builder' ); ?>"><?php _e( 'column', 'nimble-builder' ); ?></span>
+                    </div><?php // .sek-dyn-ui-inner ?>
+                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'nimble-builder' ); ?>"><?php _e( 'column', 'nimble-builder' ); ?></span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
-                  </div>
+                  </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 
               <script type="text/html" id="sek-dyn-ui-tmpl-module">
                   <div class="sek-dyn-ui-wrapper sek-module-dyn-ui">
-                    <div class="editor-block-settings-menu"><?php // add class  is-visible on hover ?>
-                      <div>
-                        <div>
-                          <button type="button" aria-expanded="false" aria-label="More Options" class="components-button components-icon-button editor-block-settings-menu__toggle">
-                            <svg aria-hidden="true" role="img" focusable="false" class="dashicon dashicons-ellipsis" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
-                              <path d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z">
-                              </path>
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div><?php // .editor-block-settings-menu ?>
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-ellipsis-v sek-move-module" title="<?php _e( 'Move module', 'nimble-builder' ); ?>"></i>
-                        <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit Module', 'nimble-builder' ); ?>"></i>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Module settings', 'nimble-builder' ); ?>">settings</i>
+                        <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit module content', 'nimble-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit module settings', 'nimble-builder' ); ?>">settings</i>
                         <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate module', 'nimble-builder' ); ?>">filter_none</i>
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'nimble-builder' ); ?>">delete_forever</i>
                       </div>
-                    </div>
-                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Module settings', 'nimble-builder' ); ?>"><?php _e( 'module', 'nimble-builder' ); ?></span>
+                    </div><?php // .sek-dyn-ui-inner ?>
+                    <#
+                      var module_name = ! _.isEmpty( data.module_name ) ? data.module_name + ' ' + '<?php _e("module", "nimble-builder"); ?>' : '<?php _e("module", "nimble-builder"); ?>';
+                    #>
+                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Edit module settings', 'nimble-builder' ); ?>">{{module_name}}</span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
-                  </div><?php // .sek-dyn-ui-inner ?>
+                  </div><?php // .sek-dyn-ui-wrapper ?>
+              </script>
+
+              <script type="text/html" id="sek-dyn-ui-tmpl-wp-content">
+                  <div class="sek-dyn-ui-wrapper sek-wp-content-dyn-ui">
+                    <div class="sek-dyn-ui-inner">
+                      <div class="sek-dyn-ui-icons">
+                        <i class="fas fa-pencil-alt sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'nimble-builder' ); ?>"></i>
+                      </div>
+                    </div><?php // .sek-dyn-ui-inner ?>
+
+                    <span class="sek-dyn-ui-location-type" title="<?php _e( 'Edit module settings', 'nimble-builder' ); ?>">
+                      <i class="fab fa-wordpress sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'nimble-builder' ); ?>"> <?php _e( 'WordPress content', 'nimble-builder'); ?></i>
+                    </span>
+                  </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
             <?php
         }
@@ -4125,6 +4132,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
     class SEK_Front_Render extends SEK_Front_Assets {
         // Fired in __construct()
         function _schedule_front_rendering() {
+            if ( !defined( "NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY", 1 - PHP_INT_MAX ); }
+            if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
+            if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
+
             foreach( sek_get_locations() as $hook ) {
                 switch ( $hook ) {
                     case 'loop_start' :
@@ -4132,13 +4143,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         add_action( $hook, array( $this, 'sek_schedule_sektions_rendering' ) );
                     break;
                     case 'before_content' :
-                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), -9999 );
+                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
                     break;
                     case 'after_content' :
-                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), 9999 );
+                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
                     break;
                 }
             }
+
+            add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
 
             // add_filter( 'template_include', function( $template ) {
             //       // error_log( 'TEMPLATE ? => ' . $template );
@@ -4146,6 +4159,26 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //       return NIMBLE_BASE_PATH. "/tmpl/page-templates/full-width.php";// $template;
             // });
         }
+
+        // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
+        // @filter the_content::NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY
+        function sek_wrap_wp_content( $html ) {
+            if ( ! skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) )
+              return $html;
+            if ( is_singular() && in_the_loop() && is_main_query() ) {
+                global $post;
+                // note : the edit url is printed as a data attribute to prevent being automatically parsed by wp when customizing and turned into a changeset url
+                $html = sprintf( '<div class="sek-wp-content-wrapper" data-sek-wp-post-id="%1$s" data-sek-wp-edit-link="%2$s" title="%3$s">%4$s</div>',
+                      $post->ID,
+                      // we can't rely on the get_edit_post_link() function when customizing because emptied by wp core
+                      $this->get_unfiltered_edit_post_link( $post->ID ),
+                      __( 'WordPress content', 'nimble-builder'),
+                      wpautop( $html )
+                );
+            }
+            return $html;
+        }
+
 
         // hook : loop_start, loop_end
         function sek_schedule_sektions_rendering() {
@@ -4160,23 +4193,34 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             do_action( 'sek_after_location_' . current_filter() );
         }
 
-        // hook : before_content
+        // hook : 'the_content'::-9999
         function sek_schedule_sektion_rendering_before_content( $html ) {
             if ( did_action( 'sek_before_location_before_content' ) )
               return $html;
+
             do_action( 'sek_before_location_before_content' );
             return $this -> _filter_the_content( $html, 'before_content' );
-            do_action( 'sek_after_location_before_content' );
         }
 
-        // hook : after_content
+        // hook : 'the_content'::9999
         function sek_schedule_sektion_rendering_after_content( $html ) {
             if ( did_action( 'sek_before_location_after_content' ) )
               return $html;
+
             do_action( 'sek_before_location_after_content' );
             return $this -> _filter_the_content( $html, 'after_content' );
-            do_action( 'sek_after_location_after_content' );
         }
+
+        private function _filter_the_content( $html, $where ) {
+            if ( is_singular() && in_the_loop() && is_main_query() ) {
+                ob_start();
+                $this->_render_seks_for_location( $where );
+                $html = 'before_content' == $where ? ob_get_clean() . $html : $html . ob_get_clean();
+            }
+
+            return $html;
+        }
+
 
         private function _render_seks_for_location( $location = '' ) {
             if ( ! in_array( $location, sek_get_locations() ) ) {
@@ -4185,34 +4229,25 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
             if ( is_array( $locationSettingValue ) ) {
-                // error_log( '<LEVEL MODEL IN ::sek_schedule_sektions_rendering()>');
-                // error_log( print_r( $locationSettingValue, true ) );
-                // error_log( '</LEVEL MODEL IN ::sek_schedule_sektions_rendering()>');
-                remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), -9999 );
-                remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), 9999 );
+
+                remove_filter('the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
+                // sek_error_log( 'LEVEL MODEL IN ::sek_schedule_sektions_rendering()', $locationSettingValue);
+                remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
+                remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
 
                 $this->render( $locationSettingValue, $location );
 
-                add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), -9999 );
-                add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), 9999 );
+                add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ),NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
+                add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
+
+                add_filter('the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
+
             } else {
                 error_log( __CLASS__ . ' :: ' . __FUNCTION__ .' => sek_get_skoped_seks() should always return an array().');
             }
         }
 
-        private function _filter_the_content( $html, $where ) {
-            if ( is_singular() && in_the_loop() && is_main_query() ) {
-                ob_start();
-                $this->_render_seks_for_location( $where );
-                return 'before_content' == $where ? ob_get_clean() . $html : $html . ob_get_clean();
-            }
-            return $html;
-        }
-
-
-
         // Walk a model tree recursively and render each level with a specific template
-        // Each level is described with at least 2 properties : collection and options
         function render( $model = array(), $location = 'loop_start' ) {
             //sek_error_log('LEVEL MODEL IN ::RENDER()', $model );
             // Is it the root level ?
@@ -4404,6 +4439,39 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 return $ph;
             }
         }
+
+
+
+        /**
+         * unfiltered version of get_edit_post_link() located in wp-includes/link-template.php
+         * ( filtered by wp core when invoked in customize-preview )
+         */
+        function get_unfiltered_edit_post_link( $id = 0, $context = 'display' ) {
+          if ( ! $post = get_post( $id ) )
+            return;
+
+          if ( 'revision' === $post->post_type )
+            $action = '';
+          elseif ( 'display' == $context )
+            $action = '&amp;action=edit';
+          else
+            $action = '&action=edit';
+
+          $post_type_object = get_post_type_object( $post->post_type );
+          if ( !$post_type_object )
+            return;
+
+          if ( !current_user_can( 'edit_post', $post->ID ) )
+            return;
+
+          if ( $post_type_object->_edit_link ) {
+            $link = admin_url( sprintf( $post_type_object->_edit_link . $action, $post->ID ) );
+          } else {
+            $link = '';
+          }
+          return $link;
+        }
+
     }//class
 endif;
 ?><?php
