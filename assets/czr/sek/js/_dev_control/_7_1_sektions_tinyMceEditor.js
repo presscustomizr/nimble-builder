@@ -180,7 +180,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         'sek-add-content-in-new-sektion',
                         'sek-pick-module',
                         'sek-edit-options',
-                        'sek-edit-module'
+                        'sek-edit-module',
+                        'sek-notify'
                   ], function( _evt_ ) {
                         if ( 'sek-edit-module' != _evt_ ) {
                               api.previewer.bind( _evt_, function() { api.sekEditorExpanded( false ); } );
