@@ -231,8 +231,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   // TEXT EDITOR
-                  self.$editorTextArea.on( 'change keyup', function( evt ) {
-                        //console.log('self.$editorTextArea on change keyup', evt.type, self.$editorTextArea.val() );
+                  self.$editorTextArea.on( 'input', function( evt ) {
+                        //console.log('self.$editorTextArea EVENT ', evt.type, self.$editorTextArea.val() );
                         try { api.control( api.sekEditorSynchronizedInput().control_id )
                               .trigger( 'tinyMceEditorUpdated', {
                                     input_id : api.sekEditorSynchronizedInput().input_id,
