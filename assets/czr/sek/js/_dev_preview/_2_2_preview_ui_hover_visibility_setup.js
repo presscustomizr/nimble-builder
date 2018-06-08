@@ -81,7 +81,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
 
 
-
+                  // Ui for the WP content.
+                  // Generated when is_singular() only
+                  // @see SEK_Front::render()
                   var $wpContentEl;
                   $('body').on( 'mouseenter', '.sek-wp-content-wrapper', function( evt ) {
                         $wpContentEl = $(this);
