@@ -8,8 +8,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   var tmpl,
                       level,
                       params,
-                      $levelEl,
-                      isFadingOut = false;//stores ths status of 200 ms fading out. => will let us know if we can print again when moving the mouse fast back and forth between two levels.
+                      $levelEl;
 
                   // Level's UI icons with delegation
                   $('body').on( 'mouseenter', '[data-sek-level]', function( evt ) {
@@ -23,7 +22,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $levelEl = $(this);
 
                         // stop here if the .sek-dyn-ui-wrapper is already printed for this level AND is not being faded out.
-                        if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 && false === isFadingOut )
+                        if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 && true !== $levelEl.data( 'UIisFadingOut' ) )
                           return;
 
                         params = {
@@ -67,17 +66,47 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
 
                   }).on( 'mouseleave', '[data-sek-level]', function( evt ) {
-                        isFadingOut = true;//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
                         $levelEl = $(this);
+                        //stores ths status of 200 ms fading out. => will let us know if we can print again when moving the mouse fast back and forth between two levels.
+                        $levelEl.data( 'UIisFadingOut', true );//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
+
+
                         $levelEl.children('.sek-dyn-ui-wrapper').stop( true, true ).fadeOut( {
                               duration : 150,
                               complete : function() {
                                     $(this).remove();
-                                    isFadingOut = false;
+                                    $levelEl.data( 'UIisFadingOut', false );
                               }
                         });
                   });
 
+
+
+                  var $wpContentEl;
+                  $('body').on( 'mouseenter', '.sek-wp-content-wrapper', function( evt ) {
+                        $wpContentEl = $(this);
+                        // stop here if the .sek-dyn-ui-wrapper is already printed for this level AND is not being faded out.
+                        if ( $wpContentEl.children('.sek-dyn-ui-wrapper').length > 0 && true !== $wpContentEl.data( 'UIisFadingOut' ) )
+                          return;
+
+                        tmpl = self.parseTemplate( '#sek-dyn-ui-tmpl-wp-content');
+                        $.when( $wpContentEl.prepend( tmpl( {} ) ) ).done( function() {
+                              $wpContentEl.find('.sek-dyn-ui-wrapper').stop( true, true ).fadeIn( {
+                                    duration : 150,
+                                    complete : function() {}
+                              } );
+                        });
+                  }).on( 'mouseleave', '.sek-wp-content-wrapper', function( evt ) {
+                        $(this).data( 'UIisFadingOut', true );//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
+                        $wpContentEl = $(this);
+                        $(this).children('.sek-dyn-ui-wrapper').stop( true, true ).fadeOut( {
+                              duration : 150,
+                              complete : function() {
+                                    $(this).remove();
+                                    $wpContentEl.data( 'UIisFadingOut', false );
+                              }
+                        });
+                  });
 
 
                   // Add content button between sections

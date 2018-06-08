@@ -33,6 +33,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               clickedOn = 'addSektion';
                         } else if ( $el.hasClass('sek-to-json') ) {
                               clickedOn = 'sekToJson';
+                        } else if ( $el.hasClass('sek-wp-content-wrapper') || $el.hasClass( 'sek-wp-content-dyn-ui') ) {
+                              clickedOn = 'wpContent';
+                        } else if ( $el.hasClass('sek-edit-wp-content') ) {
+                              clickedOn = 'editWpContent';
                         } else {
                               clickedOn = 'inactiveZone';
                         }
@@ -104,6 +108,21 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               break;
                               case 'sekToJson' :
                                     api.preview.send( 'sek-to-json', { id : _id } );
+                              break;
+                              case 'wpContent' :
+                                    api.preview.send( 'sek-notify', {
+                                          type : 'info',
+                                          duration : 8000,
+                                          message : sekPreviewLocalized.i18n['This content has been created with the WordPress editor.']
+                                    });
+                              break;
+                              case 'editWpContent' :
+                                    // note : the edit url is printed as a data attribute to prevent being automatically parsed by wp when customizing and turned into a changeset url
+                                    var edit_url = $el.closest('[data-sek-wp-edit-link]').data('sek-wp-edit-link');
+                                    if ( ! _.isEmpty( edit_url ) ) {
+                                          window.open( edit_url,'_blank' );
+                                    }
+
                               break;
                               case 'inactiveZone' :
                                     api.preview.send( 'sek-click-on-inactive-zone');//<= for example, collapses the tinyMce editor if expanded

@@ -3,6 +3,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
     class SEK_Front_Render extends SEK_Front_Assets {
         // Fired in __construct()
         function _schedule_front_rendering() {
+            if ( !defined( "NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY", 1 - PHP_INT_MAX ); }
+            if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
+            if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
+
             foreach( sek_get_locations() as $hook ) {
                 switch ( $hook ) {
                     case 'loop_start' :
@@ -10,13 +14,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         add_action( $hook, array( $this, 'sek_schedule_sektions_rendering' ) );
                     break;
                     case 'before_content' :
-                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), -9999 );
+                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
                     break;
                     case 'after_content' :
-                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), 9999 );
+                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
                     break;
                 }
             }
+
+            add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
 
             // add_filter( 'template_include', function( $template ) {
             //       // error_log( 'TEMPLATE ? => ' . $template );
@@ -24,6 +30,26 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //       return NIMBLE_BASE_PATH. "/tmpl/page-templates/full-width.php";// $template;
             // });
         }
+
+        // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
+        // @filter the_content::NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY
+        function sek_wrap_wp_content( $html ) {
+            if ( ! skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) )
+              return $html;
+            if ( is_singular() && in_the_loop() && is_main_query() ) {
+                global $post;
+                // note : the edit url is printed as a data attribute to prevent being automatically parsed by wp when customizing and turned into a changeset url
+                $html = sprintf( '<div class="sek-wp-content-wrapper" data-sek-wp-post-id="%1$s" data-sek-wp-edit-link="%2$s" title="%3$s">%4$s</div>',
+                      $post->ID,
+                      // we can't rely on the get_edit_post_link() function when customizing because emptied by wp core
+                      $this->get_unfiltered_edit_post_link( $post->ID ),
+                      __( 'WordPress content', 'text_domain'),
+                      wpautop( $html )
+                );
+            }
+            return $html;
+        }
+
 
         // hook : loop_start, loop_end
         function sek_schedule_sektions_rendering() {
@@ -38,23 +64,34 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             do_action( 'sek_after_location_' . current_filter() );
         }
 
-        // hook : before_content
+        // hook : 'the_content'::-9999
         function sek_schedule_sektion_rendering_before_content( $html ) {
             if ( did_action( 'sek_before_location_before_content' ) )
               return $html;
+
             do_action( 'sek_before_location_before_content' );
             return $this -> _filter_the_content( $html, 'before_content' );
-            do_action( 'sek_after_location_before_content' );
         }
 
-        // hook : after_content
+        // hook : 'the_content'::9999
         function sek_schedule_sektion_rendering_after_content( $html ) {
             if ( did_action( 'sek_before_location_after_content' ) )
               return $html;
+
             do_action( 'sek_before_location_after_content' );
             return $this -> _filter_the_content( $html, 'after_content' );
-            do_action( 'sek_after_location_after_content' );
         }
+
+        private function _filter_the_content( $html, $where ) {
+            if ( is_singular() && in_the_loop() && is_main_query() ) {
+                ob_start();
+                $this->_render_seks_for_location( $where );
+                $html = 'before_content' == $where ? ob_get_clean() . $html : $html . ob_get_clean();
+            }
+
+            return $html;
+        }
+
 
         private function _render_seks_for_location( $location = '' ) {
             if ( ! in_array( $location, sek_get_locations() ) ) {
@@ -63,34 +100,25 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
             if ( is_array( $locationSettingValue ) ) {
-                // error_log( '<LEVEL MODEL IN ::sek_schedule_sektions_rendering()>');
-                // error_log( print_r( $locationSettingValue, true ) );
-                // error_log( '</LEVEL MODEL IN ::sek_schedule_sektions_rendering()>');
-                remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), -9999 );
-                remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), 9999 );
+
+                remove_filter('the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
+                // sek_error_log( 'LEVEL MODEL IN ::sek_schedule_sektions_rendering()', $locationSettingValue);
+                remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
+                remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
 
                 $this->render( $locationSettingValue, $location );
 
-                add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), -9999 );
-                add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), 9999 );
+                add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ),NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
+                add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
+
+                add_filter('the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
+
             } else {
                 error_log( __CLASS__ . ' :: ' . __FUNCTION__ .' => sek_get_skoped_seks() should always return an array().');
             }
         }
 
-        private function _filter_the_content( $html, $where ) {
-            if ( is_singular() && in_the_loop() && is_main_query() ) {
-                ob_start();
-                $this->_render_seks_for_location( $where );
-                return 'before_content' == $where ? ob_get_clean() . $html : $html . ob_get_clean();
-            }
-            return $html;
-        }
-
-
-
         // Walk a model tree recursively and render each level with a specific template
-        // Each level is described with at least 2 properties : collection and options
         function render( $model = array(), $location = 'loop_start' ) {
             //sek_error_log('LEVEL MODEL IN ::RENDER()', $model );
             // Is it the root level ?
@@ -282,6 +310,39 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 return $ph;
             }
         }
+
+
+
+        /**
+         * unfiltered version of get_edit_post_link() located in wp-includes/link-template.php
+         * ( filtered by wp core when invoked in customize-preview )
+         */
+        function get_unfiltered_edit_post_link( $id = 0, $context = 'display' ) {
+          if ( ! $post = get_post( $id ) )
+            return;
+
+          if ( 'revision' === $post->post_type )
+            $action = '';
+          elseif ( 'display' == $context )
+            $action = '&amp;action=edit';
+          else
+            $action = '&action=edit';
+
+          $post_type_object = get_post_type_object( $post->post_type );
+          if ( !$post_type_object )
+            return;
+
+          if ( !current_user_can( 'edit_post', $post->ID ) )
+            return;
+
+          if ( $post_type_object->_edit_link ) {
+            $link = admin_url( sprintf( $post_type_object->_edit_link . $action, $post->ID ) );
+          } else {
+            $link = '';
+          }
+          return $link;
+        }
+
     }//class
 endif;
 ?>

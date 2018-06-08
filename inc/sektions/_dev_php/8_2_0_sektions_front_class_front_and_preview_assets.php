@@ -95,7 +95,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'i18n' => array(
                         "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
                         'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
-                        'Insert here' => __('Insert here', 'text_domain_to_be_replaced')
+                        'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
+                        'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' )
                     ),
                     'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -162,12 +163,12 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'text_domain' ); ?>">filter_none</i>
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'text_domain' ); ?>">delete_forever</i>
                       </div>
-                    </div>
+                    </div><?php // .sek-dyn-ui-inner ?>
                     <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>"><?php _e( 'section', 'text_domain' ); ?></span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
-                  </div>
+                  </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 
               <script type="text/html" id="sek-dyn-ui-tmpl-column">
@@ -189,12 +190,12 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                           <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'text_domain' ); ?>">delete_forever</i>
                         <# } #>
                       </div>
-                    </div>
+                    </div><?php // .sek-dyn-ui-inner ?>
                     <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>"><?php _e( 'column', 'text_domain' ); ?></span>
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
-                  </div>
+                  </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 
               <script type="text/html" id="sek-dyn-ui-tmpl-module">
@@ -207,7 +208,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate module', 'text_domain' ); ?>">filter_none</i>
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'text_domain' ); ?>">delete_forever</i>
                       </div>
-                    </div>
+                    </div><?php // .sek-dyn-ui-inner ?>
                     <#
                       var module_name = ! _.isEmpty( data.module_name ) ? data.module_name + ' ' + '<?php _e("module", "text_domain"); ?>' : '<?php _e("module", "text_domain"); ?>';
                     #>
@@ -215,7 +216,21 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                       <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
                     <?php endif; ?>
-                  </div><?php // .sek-dyn-ui-inner ?>
+                  </div><?php // .sek-dyn-ui-wrapper ?>
+              </script>
+
+              <script type="text/html" id="sek-dyn-ui-tmpl-wp-content">
+                  <div class="sek-dyn-ui-wrapper sek-wp-content-dyn-ui">
+                    <div class="sek-dyn-ui-inner">
+                      <div class="sek-dyn-ui-icons">
+                        <i class="fas fa-pencil-alt sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'text_domain' ); ?>"></i>
+                      </div>
+                    </div><?php // .sek-dyn-ui-inner ?>
+
+                    <span class="sek-dyn-ui-location-type" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">
+                      <i class="fab fa-wordpress sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'text_domain' ); ?>"> <?php _e( 'WordPress content', 'text_domain'); ?></i>
+                    </span>
+                  </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
             <?php
         }
