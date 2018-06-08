@@ -24,8 +24,6 @@ function sek_enqueue_controls_js_css() {
         'all'
     );
 
-    // registered modules
-    $registered_modules = CZR_Fmk_Base() -> registered_modules;
 
     wp_enqueue_script(
         'czr-sektions',
@@ -71,7 +69,7 @@ function sek_enqueue_controls_js_css() {
 
             'presetSections' => sek_get_preset_sektions(),
 
-            'registeredModules' => $registered_modules,
+            'registeredModules' => CZR_Fmk_Base() -> registered_modules,
 
             // Dnd
             'preDropElementClass' => 'sortable-placeholder',
