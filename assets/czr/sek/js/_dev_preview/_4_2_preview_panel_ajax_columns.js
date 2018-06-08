@@ -51,6 +51,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             ajaxResizeColumns : function( params ) {
                   //console.log('PREVIEW => REACT TO PANEL MSG => sek-resize-columns => ', params );
                   var self = this;
+                  // will be cleaned on 'sek-module-refreshed'
+                  self.mayBePrintLoader({
+                        loader_located_in_level_id : params.apiParams.in_sektion
+                  });
                   return self.doAjax( {
                         action : 'sek_get_content',
                         resized_column : params.apiParams.resized_column,
@@ -60,13 +64,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   }).done( function( _r_ ) {
                         //self.errare('sek-preview => resize-column ajax response => ', _r_.data );
                         // Reset the automatic default resizable inline styling
-                        $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.resized_column + '"]' ).css({
+                        $( '[data-sek-id="' + params.apiParams.resized_column + '"]' ).css({
                               width : '',
                               height: ''
                         });
 
                         //Append
                         self.appendDynStyleSheet( params.skope_id, _r_.data );
+
+                        // say it
+                        $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-resize-columns => ' , _r_ );
                   });

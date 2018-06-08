@@ -14,6 +14,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // Active UI
                   this.scheduleHighlightActiveLevel();
 
+                  // The loading icon when a level is refreshed
+                  self.setupLoader();
+
                   // DOM READY
                   $( function() {
                         self.setupSortable();
@@ -77,8 +80,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.activeUIChangedRecently( false );
                         }, 3000 ) );
                   });
-
-
             }
       });//$.extend()
 })( wp.customize, jQuery, _ );

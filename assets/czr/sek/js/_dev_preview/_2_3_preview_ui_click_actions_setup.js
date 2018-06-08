@@ -41,7 +41,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               clickedOn = 'inactiveZone';
                         }
 
-                        //console.log('CLICKED', $(evt.target), clickedOn );
+
+                        //console.log('CLICKED', clickedOn, _action );
 
                         switch( clickedOn ) {
                               case 'addContentButton' :
@@ -56,6 +57,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           after_section : $el.closest('[data-sek-after-section]').data('sek-after-section'),
                                           is_first_section : is_first_section,
                                           send_to_preview : ! is_first_section
+                                    });
+
+                                    // will be cleaned on ajax.done()
+                                    // @see ::scheduleTheLoaderCleaning
+                                    self.mayBePrintLoader({
+                                          loader_located_in_level_id : _location
                                     });
                               break;
                               case 'UIIcon' :
@@ -77,6 +84,22 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         level : _level,
                                         id : _id
                                     });
+
+                                    //console.log('CLICKED', clickedOn, _action );
+                                    // What are the click actions eligible for a loader ?
+                                    // duplicate
+                                    // remove
+                                    // add-column
+                                    // add-section
+                                    if ( _.contains( [ 'add-section', 'add-column', 'remove', 'duplicate' ], _action ) ) {
+                                          // will be cleaned on ajax.done()
+                                          // @see ::scheduleTheLoaderCleaning
+                                          self.mayBePrintLoader({
+                                                element : $el,
+                                                action : _action,
+                                                level : _level
+                                          });
+                                    }
                               break;
                               case 'moduleWrapper' :
                                     // stop here if the ui icons block was clicked
@@ -129,11 +152,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     //self._send_( $el, { action : 'pick-module' } );
                               break;
                         }
-                  });
+                  });//$('body').on('click', function( evt ) {}
+
             },//scheduleUserReactions()
 
 
             _send_ : function( $el, params ) {
+                  //console.log('IN _send_', $el, params );
                   api.preview.send( 'sek-' + params.action, {
                         location : params.location,
                         level : params.level,

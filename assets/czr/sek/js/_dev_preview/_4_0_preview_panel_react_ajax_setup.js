@@ -15,34 +15,36 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             'sek-add-module' : 'ajaxRefreshModulesAndNestedSections',
                             'sek-remove' : function( params ) {
                                   var removeCandidateId = params.apiParams.id,
-                                      $candidateEl = $('div[data-sek-id="' + removeCandidateId + '"]' );
+                                      $candidateEl = $('div[data-sek-id="' + removeCandidateId + '"]' ),
+                                      dfd;
                                   switch ( params.apiParams.action ) {
                                         case 'sek-remove-section' :
-                                              //console.log('SEK-remove-sektion', params );
                                               if ( true === params.apiParams.is_nested ) {
-                                                    self.ajaxRefreshModulesAndNestedSections( params );
+                                                    dfd = self.ajaxRefreshModulesAndNestedSections( params );
                                               } else {
                                                     if ( _.isEmpty( removeCandidateId ) || 1 > $candidateEl.length ) {
                                                           self.errare( 'reactToPanelMsg => sek-remove => invalid candidate id => ', removeCandidateId );
                                                     }
-                                                    $( '.sektion-wrapper').find( $candidateEl ).remove();
+                                                    $('body').find( $candidateEl ).remove();
+                                                    // say it
+                                                    $('[data-sek-id="' + params.apiParams.location + '"]').trigger( 'sek-level-refreshed');
                                               }
                                               //console.log( params.apiParams.action, params );
                                               //self.ajaxRefreshModulesAndNestedSections( params );
                                         break;
                                         case 'sek-remove-column' :
                                               //console.log( params.apiParams.action, params );
-                                              self.ajaxRefreshColumns( params );
+                                              dfd = self.ajaxRefreshColumns( params );
                                         break;
                                         case 'sek-remove-module' :
                                               //console.log( params.apiParams.action, params );
-                                              self.ajaxRefreshModulesAndNestedSections( params );
+                                              dfd = self.ajaxRefreshModulesAndNestedSections( params );
                                         break;
                                         default :
-
                                         break;
                                   }
-
+                                  // We should always return a promise
+                                  return _.isEmpty( dfd ) ? $.Deferred( function() { this.resolve(); } ) : dfd;
                             },
 
                             'sek-duplicate' : function( params ) {
@@ -75,7 +77,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             //   id : params.id
                             // }
                             'sek-refresh-level' : function( params ) {
-                                  self.doAjax( {
+                                  // will be cleaned on 'sek-module-refreshed'
+                                  self.mayBePrintLoader({
+                                        loader_located_in_level_id : params.apiParams.id
+                                  });
+                                  return self.doAjax( {
                                         skope_id : params.skope_id,
                                         action : 'sek_get_content',
                                         id : params.apiParams.id,
@@ -96,7 +102,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         $placeHolder.after( _r_.data );
                                         $placeHolder.remove();
 
-                                        $( 'div[data-sek-id="' + params.apiParams.id + '"]' )
+                                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
                                               .trigger( 'sek-refresh-level', { level : params.apiParams.level, id : params.apiParams.id } );
                                   });
                             },
@@ -238,7 +244,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             // };
                             //
                             // when the module ui has been generated in the panel, we receive back this msg
-                            'sek-generate-module-ui' : function( params ) {},
+                            //'sek-generate-module-ui' : function( params ) {},
 
                             //@params { type : module || preset_section }
                             'sek-drag-start' : function( params ) {
@@ -341,6 +347,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                 api.preview.send( [ msgId, 'done'].join('_'), params );
                                           }).fail( function() {
                                                 api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
+                                          }).then( function() {
+                                                api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
                                           });
                                     } catch( _er_ ) {
                                           self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
@@ -351,6 +359,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                 api.preview.send( [ msgId, 'done'].join('_'), params );
                                           }).fail( function() {
                                                 api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
+                                          }).then( function() {
+                                                api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
                                           });
                                     } catch( _er_ ) {
                                           self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
