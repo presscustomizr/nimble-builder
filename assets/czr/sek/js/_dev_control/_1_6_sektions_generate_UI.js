@@ -37,6 +37,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
                                     api.control( _id_ ).focus({
                                           completeCallback : function() {
+                                                //console.log('params sek-generate-draggable-candidates-picker-ui' , params);
                                                 var $container = api.control( _id_ ).container;
                                                 // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
                                                 if ( $container.hasClass( 'button-see-me') )
@@ -426,7 +427,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_spacing_module',
                                           section : params.id,
-                                          priority : 1,
+                                          priority : 15,
                                           settings : { default : spacingOptionsSetId }
                                     }).done( function() {
                                           // synchronize the options with the main collection setting
@@ -482,7 +483,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_level_height_module',
                                           section : params.id,
-                                          priority : 10,
+                                          priority : 20,
                                           settings : { default : heightOptionsSetId }
                                     }).done( function() {
                                           api.control( heightOptionsSetId ).focus({
