@@ -256,17 +256,22 @@ module.exports = {
   czr_sektions_customizer_preview_js : {
      src: [
       '<%= paths.czr_assets %>sek/js/_dev_preview/_1_0_preview_itinialize.js',
+
       '<%= paths.czr_assets %>sek/js/_dev_preview/_2_0_preview_sortable_setup.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_2_1_preview_resizable_setup.js',
+
       '<%= paths.czr_assets %>sek/js/_dev_preview/_2_2_preview_ui_hover_visibility_setup.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_2_3_preview_ui_click_actions_setup.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_2_4_preview_ui_setup_loader.js',
-      '<%= paths.czr_assets %>sek/js/_dev_preview/_4_0_preview_panel_react_ajax_setup.js',
+
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_4_0_preview_panel_reactions_setup.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_4_1_preview_panel_ajax_sections.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_4_2_preview_panel_ajax_columns.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_4_3_preview_panel_ajax_modules.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_4_4_preview_panel_react_dynamic_style.js',
+
       '<%= paths.czr_assets %>sek/js/_dev_preview/_9_0_preview_utilities.js',
+
       '<%= paths.czr_assets %>sek/js/_dev_preview/_9_9_preview_instantiate.js'
     ],
     dest: '<%= paths.czr_assets %>sek/js/ccat-sek-preview.js',
