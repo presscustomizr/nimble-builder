@@ -797,12 +797,12 @@
 
 /* REFRESHING A LEVEL */
 .sek-refreshing {
-  -webkit-filter: blur(2px);
-  filter: blur(2px);
+  -webkit-filter: blur(1px);
+  filter: blur(1px);
   /*position: absolute*/
 }
 .sek-level-clone {
-  position: absolute;
+  position: absolute!important;
   z-index: 10000;
 }
 .sek-level-clone::before {
