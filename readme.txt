@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 4.9.6
-Stable tag: 1.0.3-beta
+Stable tag: 1.0.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -41,11 +41,29 @@ The Nimble Builder is a lightweight drag and drop page builder designed to work 
 Yes, the Nimble Builder works with any WordPress theme. If you experience any problem with a particular theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.0.2 =
-Nimble has been approved to be hosted on the wordpress.org repository.
-This version fixes a minor bug related to the level's image background and bring some improvements in the user interface on the previewed page.
+= 1.0.3 =
+* fixed : missing dropzones around nested sections
+* fixed : reseting the spacing of a level was not changing the main setting.
+* fixed : the tinyMceEditor not collapsing on 'sek-notify'
+* improved : tinyMce text editor => attach callbacks on 'input' instead of 'change keyup'
+* improved : module dynamic ui => print the module name instead of 'module' at the bottom
+* improved : when clicking more than one time one the + ui icon, visually remind the user that a module should be dragged, with a light animation on the module picker container
+* added : encapsulate the singular post / page content inside a dom element so we can generate a dynamic ui around it when customizing + add an edit link to the post or page
+* added : introduced a loader overlay printed when the markup of any level being refreshed.
+* added : a "+" icon to add module from the sections dynamic UI
 
 == Changelog ==
+= 1.0.3 : June 9th, 2018 =
+* fixed : missing dropzones around nested sections
+* fixed : reseting the spacing of a level was not changing the main setting.
+* fixed : the tinyMceEditor not collapsing on 'sek-notify'
+* improved : tinyMce text editor => attach callbacks on 'input' instead of 'change keyup'
+* improved : module dynamic ui => print the module name instead of 'module' at the bottom
+* improved : when clicking more than one time one the + ui icon, visually remind the user that a module should be dragged, with a light animation on the module picker container
+* added : encapsulate the singular post / page content inside a dom element so we can generate a dynamic ui around it when customizing + add an edit link to the post or page
+* added : introduced a loader overlay printed when the markup of any level being refreshed.
+* added : a "+" icon to add module from the sections dynamic UI
+
 = 1.0.2 : June 7th, 2018 =
 * info : Nimble has been approved to be hosted on the wordpress.org plugin repository!
 * fixed : the background overlay should not be applied to a level when there's no background image

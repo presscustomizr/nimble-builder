@@ -818,12 +818,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           is_first_section : is_first_section,
                                           send_to_preview : ! is_first_section
                                     });
-
-                                    // will be cleaned on ajax.done()
-                                    // @see ::scheduleTheLoaderCleaning
-                                    self.mayBePrintLoader({
-                                          loader_located_in_level_id : _location
-                                    });
                               break;
                               case 'UIIcon' :
 
@@ -839,27 +833,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         throw new Error( 'ERROR => sek-front-preview => No valid level id found' );
                                     }
                                     self._send_( $el, {
-                                        action : _action,
-                                        location : _location,
-                                        level : _level,
-                                        id : _id
+                                          action : _action,
+                                          location : _location,
+                                          level : _level,
+                                          id : _id,
+                                          was_triggered : false //<= indicates that the user clicked.
                                     });
-
-                                    //console.log('CLICKED', clickedOn, _action );
-                                    // What are the click actions eligible for a loader ?
-                                    // duplicate
-                                    // remove
-                                    // add-column
-                                    // add-section
-                                    if ( _.contains( [ 'add-section', 'add-column', 'remove', 'duplicate' ], _action ) ) {
-                                          // will be cleaned on ajax.done()
-                                          // @see ::scheduleTheLoaderCleaning
-                                          self.mayBePrintLoader({
-                                                element : $el,
-                                                action : _action,
-                                                level : _level
-                                          });
-                                    }
                               break;
                               case 'moduleWrapper' :
                                     // stop here if the ui icons block was clicked
@@ -927,7 +906,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         in_column : $el.closest('div[data-sek-level="column"]').length > 0 ? $el.closest('div[data-sek-level="column"]').data( 'sek-id') : '',
                         in_sektion : $el.closest('div[data-sek-level="section"]').length > 0 ? $el.closest('div[data-sek-level="section"]').data( 'sek-id') : '',
                         clicked_input_type : $el.closest('div[data-sek-input-type]').length > 0 ? $el.closest('div[data-sek-input-type]').data('sek-input-type') : '',
-                        clicked_input_id : $el.closest('div[data-sek-input-id]').length > 0 ? $el.closest('div[data-sek-input-id]').data('sek-input-id') : ''
+                        clicked_input_id : $el.closest('div[data-sek-input-id]').length > 0 ? $el.closest('div[data-sek-input-id]').data('sek-input-id') : '',
+                        was_triggered : params.was_triggered
                   });
             }
       });//$.extend()
@@ -944,15 +924,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   // Loader Cleaning <= the element printed when refreshing a level
                   // @see ::mayBePrintLoader
-                  $( 'body').on( 'sek-modules-refreshed sek-columns-refreshed sek-section-added sek-level-refreshed', function( evt ) {
+                  $( 'body').on([
+                        'sek-modules-refreshed',
+                        'sek-columns-refreshed',
+                        'sek-section-added',
+                        'sek-level-refreshed',
+                        'sek-stylesheet-refreshed',
+                        'sek-ajax-error'
+                  ].join(' '), function( evt ) {
                         self.cleanLoader();
                   });
-
-                  // Declare and bind a state to help us monitor the existence of a loader, and the need for an auto-removal of it after a while.
-                  // this.loaderActive = this.loaderActive || new api.Value( false );
-                  // this.loaderActive.bind( function( isActive ) {
-
-                  // });
             },
 
             // @return void()
@@ -973,70 +954,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             mayBePrintLoader : function( params ) {
                   var self = this,
                       levelIdForTheLoader = params.loader_located_in_level_id;
-
-                  //self.infoLog('control:: mayBePrintLoader() => params ', params );
-
-                  // if the level if where to insert the loader has not been specified, let's determinate it
-                  if ( _.isEmpty( levelIdForTheLoader ) ) {
-                        if ( params.element.length < 1 ) {
-                              self.errare( '::mayBePrintLoader => the provided params.element does not exist in the DOM.');
-                              return;
-                        }
-
-                        if ( _.isEmpty( params.action ) ) {
-                              self.errare( '::mayBePrintLoader => missing level param.');
-                              return;
-                        }
-
-                        switch( params.action ) {
-                              case 'add-column' :
-                                    levelIdForTheLoader = params.element.closest('[data-sek-level="section"]').data('sek-id');
-                              break;
-                              case 'add-section' :
-                                    // this is the nested section case
-                                    levelIdForTheLoader = params.element.closest('[data-sek-level="column"]').data('sek-id');
-                              break;
-                              case 'duplicate' :
-                                    if ( _.isEmpty( params.level ) ) {
-                                          self.errare( '::mayBePrintLoader => missing level param.');
-                                          break;
-                                    }
-                                    switch( params.level ) {
-                                          case 'module' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="column"]').data('sek-id');
-                                          break;
-                                          case 'column' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="section"]').data('sek-id');
-                                          break;
-                                          case 'section' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="location"]').data('sek-id');
-                                          break;
-                                          case 'default' :
-                                                self.errare( '::mayBePrintLoader => unrecognized level param.', params.level );
-                                          break;
-                                    }
-                              break;
-                              case 'remove' :
-                                    switch( params.level ) {
-                                          case 'module' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="column"]').data('sek-id');
-                                          break;
-                                          case 'column' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="section"]').data('sek-id');
-                                          break;
-                                          case 'section' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="location"]').data('sek-id');
-                                          break;
-                                    }
-                              break;
-                              case 'sek-add-module' :
-                                    levelIdForTheLoader = params.loader_located_in_level_id;
-                              break;
-                              default :
-                                    self.infoLog( '::mayBePrintLoader => unrecognized action param.', params.action );
-                              break;
-                        }
-                  }//if ( _.isEmpty( params.loader_located_in_level_id ) )
 
                   if ( ! _.isEmpty( levelIdForTheLoader ) ) {
                         var $levelElementForTheLoader = $('[data-sek-id="' + levelIdForTheLoader +'"]');
@@ -1090,12 +1007,21 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             'sek-add-content-in-new-sektion' : 'ajaxAddSektion',
                             'sek-add-column' : 'ajaxRefreshColumns',
                             'sek-add-module' : 'ajaxRefreshModulesAndNestedSections',
+                            'sek-refresh-stylesheet' : 'ajaxRefreshStylesheet',
+
+                            'sek-resize-columns' : 'ajaxResizeColumns',
+
                             'sek-remove' : function( params ) {
                                   var removeCandidateId = params.apiParams.id,
                                       $candidateEl = $('div[data-sek-id="' + removeCandidateId + '"]' ),
                                       dfd;
                                   switch ( params.apiParams.action ) {
                                         case 'sek-remove-section' :
+                                              // will be cleaned on ajax.done()
+                                              // @see ::scheduleTheLoaderCleaning
+                                              self.mayBePrintLoader({
+                                                    loader_located_in_level_id : params.apiParams.location
+                                              });
                                               if ( true === params.apiParams.is_nested ) {
                                                     dfd = self.ajaxRefreshModulesAndNestedSections( params );
                                               } else {
@@ -1104,17 +1030,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                     }
                                                     $('body').find( $candidateEl ).remove();
                                                     // say it
+                                                    // listened to clean the loader just in time
                                                     $('[data-sek-id="' + params.apiParams.location + '"]').trigger( 'sek-level-refreshed');
                                               }
                                               //console.log( params.apiParams.action, params );
                                               //self.ajaxRefreshModulesAndNestedSections( params );
                                         break;
                                         case 'sek-remove-column' :
-                                              //console.log( params.apiParams.action, params );
                                               dfd = self.ajaxRefreshColumns( params );
                                         break;
                                         case 'sek-remove-module' :
-                                              //console.log( params.apiParams.action, params );
                                               dfd = self.ajaxRefreshModulesAndNestedSections( params );
                                         break;
                                         default :
@@ -1166,6 +1091,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         sek_action : params.apiParams.action
                                   }).fail( function( _r_ ) {
                                         self.errare( 'ERROR reactToPanelMsg => sek-refresh-level => ' , _r_ );
+                                        $( '[data-sek-id="' + params.apiParams.id + '"]' ).trigger( 'sek-ajax-error' );
                                   }).done( function( _r_ ) {
                                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.id + '"></span>',
                                             $currentLevelEl = $( 'div[data-sek-id="' + params.apiParams.id + '"]' );
@@ -1179,13 +1105,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         $placeHolder.after( _r_.data );
                                         $placeHolder.remove();
 
+                                        //=> 'sek-level-refreshed' is listened to clean the loader overalay in time
                                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
-                                              .trigger( 'sek-refresh-level', { level : params.apiParams.level, id : params.apiParams.id } );
+                                              .trigger( 'sek-level-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                                   });
                             },
 
-                            //'sek-set-level-options' : 'ajaxRefreshStylesheet',
-                            'sek-refresh-stylesheet' : 'ajaxRefreshStylesheet',
 
 
 
@@ -1286,7 +1211,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   }
                             },
 
-                            'sek-resize-columns' : 'ajaxResizeColumns',
 
 
 
@@ -1305,6 +1229,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   // ::activeLevelUI is declared in ::initialized()
                                   self.activeLevelUI( params.uiParams.id );
                             },
+
+
+
+
+
+
+
+
 
                             // @params =  {
                             //   skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
@@ -1352,24 +1284,27 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         ));
                                   });
 
-                                  // Append a drop zone between modules in columns
+                                  // Append a drop zone between modules and nested sections in columns
                                   if ( 'module' ==  params.type ) {
                                         $('[data-sek-level="column"]').each( function() {
-                                              var $modules = $(this).find('[data-sek-level="module"]');
-                                              // if ( $modules.length < 2 )
-                                              //   return;
+                                              // Our candidates are the modules and nested section which are direct children of this column
+                                              // We don't want to include the modules inserted in the columns of a nested section.
+                                              var $modules_and_nested_sections = $(this).children('.sek-column-inner').children( '[data-sek-level="module"]' );
+                                              var $nested_sections = $(this).children('.sek-column-inner').children( '[data-sek-is-nested="true"]' );
+                                              $modules_and_nested_sections = $modules_and_nested_sections.add( $nested_sections );
+
                                               var j = 1;
-                                              $modules.each( function() {
+                                              $modules_and_nested_sections.each( function() {
                                                     // Always before
-                                                    if ( $('[data-drop-zone-before-module="' + $(this).data('sek-id') +'"]').length < 1 ) {
+                                                    if ( $('[data-drop-zone-before-module-or-nested-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
                                                           $(this).before(
-                                                              '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules" data-drop-zone-before-module="' + $(this).data('sek-id') +'"></div>'
+                                                              '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules-and-nested-sections" data-drop-zone-before-module-or-nested-section="' + $(this).data('sek-id') +'"></div>'
                                                           );
                                                     }
                                                     // After the last one
-                                                    if (  j == $modules.length && $('[data-drop-zone-after-module="' + $(this).data('sek-id') +'"]').length < 1 ) {
+                                                    if (  j == $modules_and_nested_sections.length && $('[data-drop-zone-after-module-or-nested-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
                                                           $(this).after(
-                                                            '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules" data-drop-zone-after-module="' + $(this).data('sek-id') +'"></div>'
+                                                            '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules-and-nested-sections" data-drop-zone-after-module-or-nested-section="' + $(this).data('sek-id') +'"></div>'
                                                           );
                                                     }
                                                     j++;
@@ -1396,6 +1331,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   // Remove the drop zone dynamically add on sek-drag-start
                                   $('.sek-dynamic-drop-zone').remove();
                             },
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                             // FOCUS
@@ -1458,6 +1406,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // @return a promise()
             ajaxAddSektion : function( params ) {
                   var self = this;
+                  // will be cleaned on ajax.done()
+                  // @see ::scheduleTheLoaderCleaning
+                  self.mayBePrintLoader({
+                        loader_located_in_level_id : params.apiParams.location
+                  });
                   return self.doAjax( {
                         action : 'sek_get_content',
                         id : params.apiParams.id,
@@ -1523,13 +1476,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         }
 
                         // say it to the parent sektion
-                        //=> will be listened to by fittext
+                        //=> will be listened to clean the loader overlay just in time
                         if ( params.cloneId ) {
                               $( 'div[data-sek-id="' + params.cloneId + '"]' ).trigger('sek-section-added', params );
                         }
                         $( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger('sek-section-added', params );
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR in sek_get_html_for_injection ? ' , _r_ );
+                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
+                              .trigger( 'sek-ajax-error' );
                   });
             }//ajaxAddSektion()
 
@@ -1545,6 +1500,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             ajaxRefreshColumns : function( params ) {
                   //console.log('PARAMS in ajaxRefreshColumns', params );
                   var self = this;
+                  // will be cleaned on 'sek-columns-refreshed'
+                  self.mayBePrintLoader({
+                        loader_located_in_level_id : params.apiParams.in_sektion
+                  });
                   return self.doAjax( {
                         action : 'sek_get_content',
                         id : params.apiParams.id,
@@ -1578,9 +1537,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         // say it to the parent sektion
                         //=> will be listened to by the column to re-instantiate sortable, resizable
+                        //=> also listened to clean the loader overalay in time
                         $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
+                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
+                              .trigger( 'sek-ajax-error' );
                   });
             },//ajaxRefreshColumns()
 
@@ -1610,9 +1572,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.appendDynStyleSheet( params.skope_id, _r_.data );
 
                         // say it
+                        // listened to clean the loader just in time
                         $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-resize-columns => ' , _r_ );
+                        $( '[data-sek-id="' + params.apiParams.in_sektion + '"]' )
+                              .trigger( 'sek-ajax-error' );
                   });
             }
       });//$.extend()
@@ -1656,6 +1621,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                     }).fail( function( _r_ ) {
                           self.errare( 'ERROR reactToPanelMsg => sek-add-module => ' , _r_ );
+                          $( '[data-sek-id="' + params.apiParams.id + '"]' )
+                              .trigger( 'sek-ajax-error' );
                     });
               }//ajaxRefreshModulesAndNestedSections()
       });//$.extend()
@@ -1667,6 +1634,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             ajaxRefreshStylesheet : function( params ) {
                   var self = this;
                   //console.log('preview => panel react => ajax refresh dyn style', params );
+                  // will be cleaned on 'sek-module-refreshed'
+                  self.mayBePrintLoader({
+                        loader_located_in_level_id : params.apiParams.id
+                  });
                   return self.doAjax( {
                         action : 'sek_get_content',
                         skope_id : params.skope_id,
@@ -1674,8 +1645,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   }).done( function( _r_ ) {
                         //console.log('sek-refresh-stylesheet done !',  _r_.data);
                         self.appendDynStyleSheet( params.skope_id, _r_.data );
+                        //=> 'sek-level-refreshed' is listened to clean the loader overalay in time
+                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
+                              .trigger( 'sek-stylesheet-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                   }).fail( function( _r_ ) {
                         self.errare('sek-refresh-stylesheet fail !');
+                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
+                              .trigger( 'sek-ajax-error' );
                   });
             },
 
@@ -1831,6 +1807,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     dfd.reject( _r );
                               }
                               dfd.resolve( _r );
+
                         })
                         .fail( function( _r ) {
                               self.errare( 'self.doAjax : failed ajax error for : ' + _query_.action, _r );

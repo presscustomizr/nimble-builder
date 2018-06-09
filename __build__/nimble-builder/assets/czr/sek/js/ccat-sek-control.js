@@ -915,11 +915,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             // GENERATE UI ELEMENTS
                             'sek-pick-module' : function( params ) {
+                                  //console.log('sek-pick-module react to preview', params);
                                   sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
-                                        content_type : 'module'
+                                        content_type : 'module',
+                                        // <= the was_triggered param can be used to determine if we need to animate the picker control or not. @see ::generateUI() case 'sek-generate-draggable-candidates-picker-ui'
+                                        // true by default, because this is the most common scenario ( when adding a section, a column ... )
+                                        // but false when clicking on the + ui icon in the preview
+                                        was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true
                                   };
                                   return self.generateUI( uiParams );
                             },
@@ -928,7 +933,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
-                                        content_type : 'section'
+                                        content_type : 'section',
+                                        // <= the was_triggered param can be used to determine if we need to animate the picker control or not. @see ::generateUI() case 'sek-generate-draggable-candidates-picker-ui'
+                                        // true by default, because this is the most common scenario ( when adding a section, a column ... )
+                                        // but false when clicking on the + ui icon in the preview
+                                        was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true
                                   };
                                   return self.generateUI( uiParams );
                             },
@@ -1146,19 +1155,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-
-
-
                         // Possible content types :
                         // 1) module
                         // 2) preset_section
                         case 'sek-generate-draggable-candidates-picker-ui' :
                               var _id_ = sektionsLocalizedData.optPrefixForSektionsNotSaved + ( 'module' === params.content_type ? '_sek_draggable_modules_ui' : '_sek_draggable_sections_ui' );
                               // Is the UI currently displayed the one that is being requested ?
-                              // If so, don't generate the ui again, imply focus on it
-                              if ( self.isUIElementCurrentlyGenerated( _id_ ) ) {
+                              // If so, visually remind the user that a module should be dragged
+                              if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
                                     api.control( _id_ ).focus({
-                                          completeCallback : function() {}
+                                          completeCallback : function() {
+                                                //console.log('params sek-generate-draggable-candidates-picker-ui' , params);
+                                                var $container = api.control( _id_ ).container;
+                                                // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
+                                                if ( $container.hasClass( 'button-see-me') )
+                                                  return;
+                                                $container.addClass('button-see-me');
+                                                _.delay( function() {
+                                                     $container.removeClass('button-see-me');
+                                                }, 800 );
+                                          }
                                     });
                                     break;
                               }
@@ -1246,7 +1262,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               // Is the UI currently displayed the one that is being requested ?
                               // If so, don't generate the ui again, simply focus on it
-                              if ( self.isUIElementCurrentlyGenerated( params.id ) ) {
+                              if ( self.isUIControlAlreadyRegistered( params.id ) ) {
                                     api.control( params.id ).focus({
                                           completeCallback : function() {}
                                     });
@@ -1365,7 +1381,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // Is the UI currently displayed the one that is being requested ?
                               // If so, don't generate the ui again, simply focus on the section
-                              if ( self.isUIElementCurrentlyGenerated( bgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( heightOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
+                              if ( self.isUIControlAlreadyRegistered( bgBorderOptionsSetId ) || self.isUIControlAlreadyRegistered( heightOptionsSetId ) || self.isUIControlAlreadyRegistered( spacingOptionsSetId ) ) {
                                     api.section( api.control( bgBorderOptionsSetId ).section() ).expanded( true );
                                     break;
                               }
@@ -1539,7 +1555,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_spacing_module',
                                           section : params.id,
-                                          priority : 1,
+                                          priority : 15,
                                           settings : { default : spacingOptionsSetId }
                                     }).done( function() {
                                           // synchronize the options with the main collection setting
@@ -1595,7 +1611,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           type : 'czr_module',//sekData.controlType,
                                           module_type : 'sek_level_height_module',
                                           section : params.id,
-                                          priority : 10,
+                                          priority : 20,
                                           settings : { default : heightOptionsSetId }
                                     }).done( function() {
                                           api.control( heightOptionsSetId ).focus({
@@ -1932,22 +1948,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Is the UI currently displayed the one that is being requested ?
             // If so, don't generate the ui again
             // @return bool
-            isUIElementCurrentlyGenerated : function( uiElementId ) {
+            isUIControlAlreadyRegistered : function( uiElementId ) {
                   var self = this,
                       uiCandidate = _.filter( self.registered(), function( registered ) {
-                            return registered.id == uiElementId && 'control' == registered.what;
-                      });
+                            return registered.id == uiElementId && 'control' === registered.what;
+                      }),
+                      controlIsAlreadyRegistered = false;
+
+                  // If the control is not been tracked in our self.registered(), let's check if it is registered in the api
+                  // Typically, the module / section picker will match that case, because we don't keep track of it ( so it's not cleaned )
                   if ( _.isEmpty( uiCandidate ) ) {
-                        return false;
+                        controlIsAlreadyRegistered = api.control.has( uiElementId );
                   } else {
-                        // we have match => don't generate the ui
+                        controlIsAlreadyRegistered = true;
                         // we should have only one uiCandidate with this very id
                         if ( uiCandidate.length > 1 ) {
-                             throw new Error( 'generateUI => why is this control registered more than once ? => ' + uiElementId );
-                        } else {
-                              return true;
+                              api.errare( 'generateUI => why is this control registered more than once ? => ' + uiElementId );
                         }
                   }
+                  return controlIsAlreadyRegistered;
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData, serverControlParams
@@ -3796,8 +3815,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
                         // when inserted between modules
-                        before_module : $dropTarget.data('drop-zone-before-module'),
-                        after_module : $dropTarget.data('drop-zone-after-module'),
+                        before_module : $dropTarget.data('drop-zone-before-module-or-nested-section'),
+                        after_module : $dropTarget.data('drop-zone-after-module-or-nested-section'),
 
                         // When inserted between sections
                         before_section : $dropTarget.data('drop-zone-before-section'),
@@ -3925,19 +3944,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             spacing : function( input_options ) {
                   var input = this,
                       $wrapper = $('.sek-spacing-wrapper', input.container );
-
                   // Listen to user actions on the inputs and set the input value
-                  $wrapper.on( 'keyup mouseup', 'input[type="number"]', function(evt) {
+                  $wrapper.on( 'keyup mouseup change', 'input[type="number"]', function(evt) {
                         var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
                             _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
                         _newInputVal[ _type_ ] = $(this).val();
                         input( _newInputVal );
                   });
+                  // Schedule a reset action
+                  // Note : this has to be done by device
                   $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
                         evt.preventDefault();
                         $wrapper.find('input[type="number"]').each( function() {
-                              $(this).val('').trigger('change');
+                              $(this).val('');
                         });
+                        // [] is the default value
+                        // we could have get it with api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_spacing_module' )
+                        // @see php spacing module registration
+                        input( [] );
                   });
 
                   // Synchronize on init

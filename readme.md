@@ -1,4 +1,4 @@
-# Nimble Builder v1.0.3-beta [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+# Nimble Builder v1.0.3 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 ![Nimble Builder](/nimble.jpg)
 
 > Drag and drop page builder for the WordPress live customizer.
@@ -21,6 +21,17 @@ The Nimble Builder is a lightweight drag and drop page builder designed to work 
 5. Drag a module from the left panel and drop it in a drop zone of the previewed page
 
 == Changelog ==
+= 1.0.3 : June 9th, 2018 =
+* fixed : missing dropzones around nested sections
+* fixed : reseting the spacing of a level was not changing the main setting.
+* fixed : the tinyMceEditor not collapsing on 'sek-notify'
+* improved : tinyMce text editor => attach callbacks on 'input' instead of 'change keyup'
+* improved : module dynamic ui => print the module name instead of 'module' at the bottom
+* improved : when clicking more than one time one the + ui icon, visually remind the user that a module should be dragged, with a light animation on the module picker container
+* added : encapsulate the singular post / page content inside a dom element so we can generate a dynamic ui around it when customizing + add an edit link to the post or page
+* added : introduced a loader overlay printed when the markup of any level being refreshed.
+* added : a "+" icon to add module from the sections dynamic UI
+
 = 1.0.2 : June 7th, 2018 =
 * fixed : the background overlay should not be applied to a level when there's no background image
 * added : a border-radius css rule to the pickable modules
