@@ -382,11 +382,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             // GENERATE UI ELEMENTS
                             'sek-pick-module' : function( params ) {
+                                  //console.log('sek-pick-module react to preview', params);
                                   sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
-                                        content_type : 'module'
+                                        content_type : 'module',
+                                        // <= the was_triggered param can be used to determine if we need to animate the picker control or not. @see ::generateUI() case 'sek-generate-draggable-candidates-picker-ui'
+                                        // true by default, because this is the most common scenario ( when adding a section, a column ... )
+                                        // but false when clicking on the + ui icon in the preview
+                                        was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true
                                   };
                                   return self.generateUI( uiParams );
                             },
@@ -395,7 +400,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
-                                        content_type : 'section'
+                                        content_type : 'section',
+                                        // <= the was_triggered param can be used to determine if we need to animate the picker control or not. @see ::generateUI() case 'sek-generate-draggable-candidates-picker-ui'
+                                        // true by default, because this is the most common scenario ( when adding a section, a column ... )
+                                        // but false when clicking on the + ui icon in the preview
+                                        was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true
                                   };
                                   return self.generateUI( uiParams );
                             },
