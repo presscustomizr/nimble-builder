@@ -19,6 +19,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                       dfd;
                                   switch ( params.apiParams.action ) {
                                         case 'sek-remove-section' :
+                                              // will be cleaned on ajax.done()
+                                              // @see ::scheduleTheLoaderCleaning
+                                              self.mayBePrintLoader({
+                                                    loader_located_in_level_id : params.apiParams.location
+                                              });
                                               if ( true === params.apiParams.is_nested ) {
                                                     dfd = self.ajaxRefreshModulesAndNestedSections( params );
                                               } else {
@@ -27,17 +32,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                     }
                                                     $('body').find( $candidateEl ).remove();
                                                     // say it
+                                                    // listened to clean the loader just in time
                                                     $('[data-sek-id="' + params.apiParams.location + '"]').trigger( 'sek-level-refreshed');
                                               }
                                               //console.log( params.apiParams.action, params );
                                               //self.ajaxRefreshModulesAndNestedSections( params );
                                         break;
                                         case 'sek-remove-column' :
-                                              //console.log( params.apiParams.action, params );
                                               dfd = self.ajaxRefreshColumns( params );
                                         break;
                                         case 'sek-remove-module' :
-                                              //console.log( params.apiParams.action, params );
                                               dfd = self.ajaxRefreshModulesAndNestedSections( params );
                                         break;
                                         default :
@@ -89,6 +93,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         sek_action : params.apiParams.action
                                   }).fail( function( _r_ ) {
                                         self.errare( 'ERROR reactToPanelMsg => sek-refresh-level => ' , _r_ );
+                                        $( '[data-sek-id="' + params.apiParams.id + '"]' ).trigger( 'sek-ajax-error' );
                                   }).done( function( _r_ ) {
                                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.id + '"></span>',
                                             $currentLevelEl = $( 'div[data-sek-id="' + params.apiParams.id + '"]' );
@@ -102,8 +107,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         $placeHolder.after( _r_.data );
                                         $placeHolder.remove();
 
+                                        //=> 'sek-level-refreshed' is listened to clean the loader overalay in time
                                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
-                                              .trigger( 'sek-refresh-level', { level : params.apiParams.level, id : params.apiParams.id } );
+                                              .trigger( 'sek-level-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                                   });
                             },
 

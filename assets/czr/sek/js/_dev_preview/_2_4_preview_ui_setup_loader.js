@@ -10,15 +10,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   // Loader Cleaning <= the element printed when refreshing a level
                   // @see ::mayBePrintLoader
-                  $( 'body').on( 'sek-modules-refreshed sek-columns-refreshed sek-section-added sek-level-refreshed', function( evt ) {
+                  $( 'body').on([
+                        'sek-modules-refreshed',
+                        'sek-columns-refreshed',
+                        'sek-section-added',
+                        'sek-level-refreshed',
+                        'sek-stylesheet-refreshed',
+                        'sek-ajax-error'
+                  ].join(' '), function( evt ) {
                         self.cleanLoader();
                   });
-
-                  // Declare and bind a state to help us monitor the existence of a loader, and the need for an auto-removal of it after a while.
-                  // this.loaderActive = this.loaderActive || new api.Value( false );
-                  // this.loaderActive.bind( function( isActive ) {
-
-                  // });
             },
 
             // @return void()
@@ -39,70 +40,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             mayBePrintLoader : function( params ) {
                   var self = this,
                       levelIdForTheLoader = params.loader_located_in_level_id;
-
-                  //self.infoLog('control:: mayBePrintLoader() => params ', params );
-
-                  // if the level if where to insert the loader has not been specified, let's determinate it
-                  if ( _.isEmpty( levelIdForTheLoader ) ) {
-                        if ( params.element.length < 1 ) {
-                              self.errare( '::mayBePrintLoader => the provided params.element does not exist in the DOM.');
-                              return;
-                        }
-
-                        if ( _.isEmpty( params.action ) ) {
-                              self.errare( '::mayBePrintLoader => missing level param.');
-                              return;
-                        }
-
-                        switch( params.action ) {
-                              case 'add-column' :
-                                    levelIdForTheLoader = params.element.closest('[data-sek-level="section"]').data('sek-id');
-                              break;
-                              case 'add-section' :
-                                    // this is the nested section case
-                                    levelIdForTheLoader = params.element.closest('[data-sek-level="column"]').data('sek-id');
-                              break;
-                              case 'duplicate' :
-                                    if ( _.isEmpty( params.level ) ) {
-                                          self.errare( '::mayBePrintLoader => missing level param.');
-                                          break;
-                                    }
-                                    switch( params.level ) {
-                                          case 'module' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="column"]').data('sek-id');
-                                          break;
-                                          case 'column' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="section"]').data('sek-id');
-                                          break;
-                                          case 'section' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="location"]').data('sek-id');
-                                          break;
-                                          case 'default' :
-                                                self.errare( '::mayBePrintLoader => unrecognized level param.', params.level );
-                                          break;
-                                    }
-                              break;
-                              case 'remove' :
-                                    switch( params.level ) {
-                                          case 'module' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="column"]').data('sek-id');
-                                          break;
-                                          case 'column' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="section"]').data('sek-id');
-                                          break;
-                                          case 'section' :
-                                                levelIdForTheLoader = params.element.closest('[data-sek-level="location"]').data('sek-id');
-                                          break;
-                                    }
-                              break;
-                              case 'sek-add-module' :
-                                    levelIdForTheLoader = params.loader_located_in_level_id;
-                              break;
-                              default :
-                                    self.infoLog( '::mayBePrintLoader => unrecognized action param.', params.action );
-                              break;
-                        }
-                  }//if ( _.isEmpty( params.loader_located_in_level_id ) )
 
                   if ( ! _.isEmpty( levelIdForTheLoader ) ) {
                         var $levelElementForTheLoader = $('[data-sek-id="' + levelIdForTheLoader +'"]');

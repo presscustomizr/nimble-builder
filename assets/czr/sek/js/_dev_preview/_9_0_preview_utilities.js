@@ -127,6 +127,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     dfd.reject( _r );
                               }
                               dfd.resolve( _r );
+
                         })
                         .fail( function( _r ) {
                               self.errare( 'self.doAjax : failed ajax error for : ' + _query_.action, _r );

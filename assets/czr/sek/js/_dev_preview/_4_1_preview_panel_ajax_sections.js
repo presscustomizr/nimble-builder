@@ -6,6 +6,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // @return a promise()
             ajaxAddSektion : function( params ) {
                   var self = this;
+                  // will be cleaned on ajax.done()
+                  // @see ::scheduleTheLoaderCleaning
+                  self.mayBePrintLoader({
+                        loader_located_in_level_id : params.apiParams.location
+                  });
                   return self.doAjax( {
                         action : 'sek_get_content',
                         id : params.apiParams.id,
@@ -71,13 +76,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         }
 
                         // say it to the parent sektion
-                        //=> will be listened to by fittext
+                        //=> will be listened to clean the loader overlay just in time
                         if ( params.cloneId ) {
                               $( 'div[data-sek-id="' + params.cloneId + '"]' ).trigger('sek-section-added', params );
                         }
                         $( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger('sek-section-added', params );
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR in sek_get_html_for_injection ? ' , _r_ );
+                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
+                              .trigger( 'sek-ajax-error' );
                   });
             }//ajaxAddSektion()
 

@@ -37,6 +37,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                     }).fail( function( _r_ ) {
                           self.errare( 'ERROR reactToPanelMsg => sek-add-module => ' , _r_ );
+                          $( '[data-sek-id="' + params.apiParams.id + '"]' )
+                              .trigger( 'sek-ajax-error' );
                     });
               }//ajaxRefreshModulesAndNestedSections()
       });//$.extend()

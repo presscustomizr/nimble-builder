@@ -5,6 +5,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             ajaxRefreshStylesheet : function( params ) {
                   var self = this;
                   //console.log('preview => panel react => ajax refresh dyn style', params );
+                  // will be cleaned on 'sek-module-refreshed'
+                  self.mayBePrintLoader({
+                        loader_located_in_level_id : params.apiParams.id
+                  });
                   return self.doAjax( {
                         action : 'sek_get_content',
                         skope_id : params.skope_id,
@@ -12,8 +16,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   }).done( function( _r_ ) {
                         //console.log('sek-refresh-stylesheet done !',  _r_.data);
                         self.appendDynStyleSheet( params.skope_id, _r_.data );
+                        //=> 'sek-level-refreshed' is listened to clean the loader overalay in time
+                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
+                              .trigger( 'sek-stylesheet-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                   }).fail( function( _r_ ) {
                         self.errare('sek-refresh-stylesheet fail !');
+                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
+                              .trigger( 'sek-ajax-error' );
                   });
             },
 

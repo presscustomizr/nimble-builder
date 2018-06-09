@@ -8,6 +8,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             ajaxRefreshColumns : function( params ) {
                   //console.log('PARAMS in ajaxRefreshColumns', params );
                   var self = this;
+                  // will be cleaned on 'sek-columns-refreshed'
+                  self.mayBePrintLoader({
+                        loader_located_in_level_id : params.apiParams.in_sektion
+                  });
                   return self.doAjax( {
                         action : 'sek_get_content',
                         id : params.apiParams.id,
@@ -41,9 +45,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         // say it to the parent sektion
                         //=> will be listened to by the column to re-instantiate sortable, resizable
+                        //=> also listened to clean the loader overalay in time
                         $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
+                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
+                              .trigger( 'sek-ajax-error' );
                   });
             },//ajaxRefreshColumns()
 
@@ -73,9 +80,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.appendDynStyleSheet( params.skope_id, _r_.data );
 
                         // say it
+                        // listened to clean the loader just in time
                         $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-resize-columns => ' , _r_ );
+                        $( '[data-sek-id="' + params.apiParams.in_sektion + '"]' )
+                              .trigger( 'sek-ajax-error' );
                   });
             }
       });//$.extend()

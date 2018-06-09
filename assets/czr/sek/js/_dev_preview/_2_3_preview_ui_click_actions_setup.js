@@ -58,12 +58,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           is_first_section : is_first_section,
                                           send_to_preview : ! is_first_section
                                     });
-
-                                    // will be cleaned on ajax.done()
-                                    // @see ::scheduleTheLoaderCleaning
-                                    self.mayBePrintLoader({
-                                          loader_located_in_level_id : _location
-                                    });
                               break;
                               case 'UIIcon' :
 
@@ -79,27 +73,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         throw new Error( 'ERROR => sek-front-preview => No valid level id found' );
                                     }
                                     self._send_( $el, {
-                                        action : _action,
-                                        location : _location,
-                                        level : _level,
-                                        id : _id
+                                          action : _action,
+                                          location : _location,
+                                          level : _level,
+                                          id : _id,
+                                          was_triggered : false //<= indicates that the user clicked.
                                     });
-
-                                    //console.log('CLICKED', clickedOn, _action );
-                                    // What are the click actions eligible for a loader ?
-                                    // duplicate
-                                    // remove
-                                    // add-column
-                                    // add-section
-                                    if ( _.contains( [ 'add-section', 'add-column', 'remove', 'duplicate' ], _action ) ) {
-                                          // will be cleaned on ajax.done()
-                                          // @see ::scheduleTheLoaderCleaning
-                                          self.mayBePrintLoader({
-                                                element : $el,
-                                                action : _action,
-                                                level : _level
-                                          });
-                                    }
                               break;
                               case 'moduleWrapper' :
                                     // stop here if the ui icons block was clicked
@@ -167,7 +146,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         in_column : $el.closest('div[data-sek-level="column"]').length > 0 ? $el.closest('div[data-sek-level="column"]').data( 'sek-id') : '',
                         in_sektion : $el.closest('div[data-sek-level="section"]').length > 0 ? $el.closest('div[data-sek-level="section"]').data( 'sek-id') : '',
                         clicked_input_type : $el.closest('div[data-sek-input-type]').length > 0 ? $el.closest('div[data-sek-input-type]').data('sek-input-type') : '',
-                        clicked_input_id : $el.closest('div[data-sek-input-id]').length > 0 ? $el.closest('div[data-sek-input-id]').data('sek-input-id') : ''
+                        clicked_input_id : $el.closest('div[data-sek-input-id]').length > 0 ? $el.closest('div[data-sek-input-id]').data('sek-input-id') : '',
+                        was_triggered : params.was_triggered
                   });
             }
       });//$.extend()
