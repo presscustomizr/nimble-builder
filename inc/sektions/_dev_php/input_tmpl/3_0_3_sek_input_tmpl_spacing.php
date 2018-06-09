@@ -12,14 +12,14 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
           <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
             <div class="sek-flex-center-stretch" data-sek-spacing="margin-top">
               <div class="sek-pm-input-parent">
-                <input class="sek-pm-input" value="0" type="number"  >
+                <input class="sek-pm-input" value="" type="number"  >
               </div>
             </div>
           </div>
           <div class="sek-pm-middle-wrap sek-flex-justify-center">
             <div class="sek-flex-center-stretch sek-pm-margin-left" data-sek-spacing="margin-left">
               <div class="sek-pm-input-parent">
-                <input class="sek-pm-input" value="0" type="number"  >
+                <input class="sek-pm-input" value="" type="number"  >
               </div>
             </div>
 
@@ -27,26 +27,26 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
               <div class="sek-flex-justify-center">
                 <div class="sek-flex-center-stretch" data-sek-spacing="padding-top">
                   <div class="sek-pm-input-parent">
-                    <input class="sek-pm-input" value="0" type="number"  >
+                    <input class="sek-pm-input" value="" type="number"  >
                   </div>
                 </div>
               </div>
                 <div class="sek-flex-justify-center sek-flex-space-between">
                   <div class="sek-flex-center-stretch" data-sek-spacing="padding-left">
                     <div class="sek-pm-input-parent">
-                      <input class="sek-pm-input" value="0" type="number"  >
+                      <input class="sek-pm-input" value="" type="number"  >
                     </div>
                   </div>
                   <div class="sek-flex-center-stretch" data-sek-spacing="padding-right">
                     <div class="sek-pm-input-parent">
-                      <input class="sek-pm-input" value="0" type="number"  >
+                      <input class="sek-pm-input" value="" type="number"  >
                     </div>
                   </div>
                 </div>
               <div class="sek-flex-justify-center">
                 <div class="sek-flex-center-stretch" data-sek-spacing="padding-bottom">
                   <div class="sek-pm-input-parent">
-                    <input class="sek-pm-input" value="0" type="number"  >
+                    <input class="sek-pm-input" value="" type="number"  >
                   </div>
                 </div>
               </div>
@@ -54,7 +54,7 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
 
             <div class="sek-flex-center-stretch sek-pm-margin-right" data-sek-spacing="margin-right">
               <div class="sek-pm-input-parent">
-                <input class="sek-pm-input" value="0" type="number"  >
+                <input class="sek-pm-input" value="" type="number"  >
               </div>
             </div>
           </div>
@@ -62,7 +62,7 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
           <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
             <div class="sek-flex-center-stretch" data-sek-spacing="margin-bottom">
               <div class="sek-pm-input-parent">
-                <input class="sek-pm-input" value="0" type="number"  >
+                <input class="sek-pm-input" value="" type="number"  >
               </div>
             </div>
           </div>

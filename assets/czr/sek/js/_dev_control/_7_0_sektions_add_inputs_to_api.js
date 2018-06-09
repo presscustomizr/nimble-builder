@@ -11,19 +11,24 @@
             spacing : function( input_options ) {
                   var input = this,
                       $wrapper = $('.sek-spacing-wrapper', input.container );
-
                   // Listen to user actions on the inputs and set the input value
-                  $wrapper.on( 'keyup mouseup', 'input[type="number"]', function(evt) {
+                  $wrapper.on( 'keyup mouseup change', 'input[type="number"]', function(evt) {
                         var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
                             _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
                         _newInputVal[ _type_ ] = $(this).val();
                         input( _newInputVal );
                   });
+                  // Schedule a reset action
+                  // Note : this has to be done by device
                   $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
                         evt.preventDefault();
                         $wrapper.find('input[type="number"]').each( function() {
-                              $(this).val('').trigger('change');
+                              $(this).val('');
                         });
+                        // [] is the default value
+                        // we could have get it with api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_spacing_module' )
+                        // @see php spacing module registration
+                        input( [] );
                   });
 
                   // Synchronize on init
