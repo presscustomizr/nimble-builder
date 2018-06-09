@@ -501,7 +501,7 @@
 }
 
 
-.sek-dragging [data-sek-location="between-modules"], .sek-dragging .sek-module-drop-zone-for-first-module {
+.sek-dragging [data-sek-location="between-modules-and-nested-sections"], .sek-dragging .sek-module-drop-zone-for-first-module {
   background: #dcefff;
   background: rgba(220, 239, 255, 0.84);
   border:2px dotted #1d85bb;

@@ -13,6 +13,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             'sek-add-content-in-new-sektion' : 'ajaxAddSektion',
                             'sek-add-column' : 'ajaxRefreshColumns',
                             'sek-add-module' : 'ajaxRefreshModulesAndNestedSections',
+                            'sek-refresh-stylesheet' : 'ajaxRefreshStylesheet',
+
+                            'sek-resize-columns' : 'ajaxResizeColumns',
+
                             'sek-remove' : function( params ) {
                                   var removeCandidateId = params.apiParams.id,
                                       $candidateEl = $('div[data-sek-id="' + removeCandidateId + '"]' ),
@@ -113,8 +117,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   });
                             },
 
-                            //'sek-set-level-options' : 'ajaxRefreshStylesheet',
-                            'sek-refresh-stylesheet' : 'ajaxRefreshStylesheet',
 
 
 
@@ -215,7 +217,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   }
                             },
 
-                            'sek-resize-columns' : 'ajaxResizeColumns',
 
 
 
@@ -234,6 +235,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   // ::activeLevelUI is declared in ::initialized()
                                   self.activeLevelUI( params.uiParams.id );
                             },
+
+
+
+
+
+
+
+
 
                             // @params =  {
                             //   skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
@@ -281,24 +290,27 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         ));
                                   });
 
-                                  // Append a drop zone between modules in columns
+                                  // Append a drop zone between modules and nested sections in columns
                                   if ( 'module' ==  params.type ) {
                                         $('[data-sek-level="column"]').each( function() {
-                                              var $modules = $(this).find('[data-sek-level="module"]');
-                                              // if ( $modules.length < 2 )
-                                              //   return;
+                                              // Our candidates are the modules and nested section which are direct children of this column
+                                              // We don't want to include the modules inserted in the columns of a nested section.
+                                              var $modules_and_nested_sections = $(this).children('.sek-column-inner').children( '[data-sek-level="module"]' );
+                                              var $nested_sections = $(this).children('.sek-column-inner').children( '[data-sek-is-nested="true"]' );
+                                              $modules_and_nested_sections = $modules_and_nested_sections.add( $nested_sections );
+
                                               var j = 1;
-                                              $modules.each( function() {
+                                              $modules_and_nested_sections.each( function() {
                                                     // Always before
-                                                    if ( $('[data-drop-zone-before-module="' + $(this).data('sek-id') +'"]').length < 1 ) {
+                                                    if ( $('[data-drop-zone-before-module-or-nested-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
                                                           $(this).before(
-                                                              '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules" data-drop-zone-before-module="' + $(this).data('sek-id') +'"></div>'
+                                                              '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules-and-nested-sections" data-drop-zone-before-module-or-nested-section="' + $(this).data('sek-id') +'"></div>'
                                                           );
                                                     }
                                                     // After the last one
-                                                    if (  j == $modules.length && $('[data-drop-zone-after-module="' + $(this).data('sek-id') +'"]').length < 1 ) {
+                                                    if (  j == $modules_and_nested_sections.length && $('[data-drop-zone-after-module-or-nested-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
                                                           $(this).after(
-                                                            '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules" data-drop-zone-after-module="' + $(this).data('sek-id') +'"></div>'
+                                                            '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules-and-nested-sections" data-drop-zone-after-module-or-nested-section="' + $(this).data('sek-id') +'"></div>'
                                                           );
                                                     }
                                                     j++;
@@ -325,6 +337,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   // Remove the drop zone dynamically add on sek-drag-start
                                   $('.sek-dynamic-drop-zone').remove();
                             },
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                             // FOCUS

@@ -446,8 +446,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
                         // when inserted between modules
-                        before_module : $dropTarget.data('drop-zone-before-module'),
-                        after_module : $dropTarget.data('drop-zone-after-module'),
+                        before_module : $dropTarget.data('drop-zone-before-module-or-nested-section'),
+                        after_module : $dropTarget.data('drop-zone-after-module-or-nested-section'),
 
                         // When inserted between sections
                         before_section : $dropTarget.data('drop-zone-before-section'),
