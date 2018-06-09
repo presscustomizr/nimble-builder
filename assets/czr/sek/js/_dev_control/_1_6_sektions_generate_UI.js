@@ -27,19 +27,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-
-
-
                         // Possible content types :
                         // 1) module
                         // 2) preset_section
                         case 'sek-generate-draggable-candidates-picker-ui' :
                               var _id_ = sektionsLocalizedData.optPrefixForSektionsNotSaved + ( 'module' === params.content_type ? '_sek_draggable_modules_ui' : '_sek_draggable_sections_ui' );
                               // Is the UI currently displayed the one that is being requested ?
-                              // If so, don't generate the ui again, imply focus on it
-                              if ( self.isUIElementCurrentlyGenerated( _id_ ) ) {
+                              // If so, visually remind the user that a module should be dragged
+                              if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
                                     api.control( _id_ ).focus({
-                                          completeCallback : function() {}
+                                          completeCallback : function() {
+                                                var $container = api.control( _id_ ).container;
+                                                // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
+                                                if ( $container.hasClass( 'button-see-me') )
+                                                  return;
+                                                $container.addClass('button-see-me');
+                                                _.delay( function() {
+                                                     $container.removeClass('button-see-me');
+                                                }, 800 );
+                                          }
                                     });
                                     break;
                               }
@@ -127,7 +133,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               // Is the UI currently displayed the one that is being requested ?
                               // If so, don't generate the ui again, simply focus on it
-                              if ( self.isUIElementCurrentlyGenerated( params.id ) ) {
+                              if ( self.isUIControlAlreadyRegistered( params.id ) ) {
                                     api.control( params.id ).focus({
                                           completeCallback : function() {}
                                     });
@@ -246,7 +252,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // Is the UI currently displayed the one that is being requested ?
                               // If so, don't generate the ui again, simply focus on the section
-                              if ( self.isUIElementCurrentlyGenerated( bgBorderOptionsSetId ) || self.isUIElementCurrentlyGenerated( heightOptionsSetId ) || self.isUIElementCurrentlyGenerated( spacingOptionsSetId ) ) {
+                              if ( self.isUIControlAlreadyRegistered( bgBorderOptionsSetId ) || self.isUIControlAlreadyRegistered( heightOptionsSetId ) || self.isUIControlAlreadyRegistered( spacingOptionsSetId ) ) {
                                     api.section( api.control( bgBorderOptionsSetId ).section() ).expanded( true );
                                     break;
                               }
@@ -813,22 +819,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Is the UI currently displayed the one that is being requested ?
             // If so, don't generate the ui again
             // @return bool
-            isUIElementCurrentlyGenerated : function( uiElementId ) {
+            isUIControlAlreadyRegistered : function( uiElementId ) {
                   var self = this,
                       uiCandidate = _.filter( self.registered(), function( registered ) {
-                            return registered.id == uiElementId && 'control' == registered.what;
-                      });
+                            return registered.id == uiElementId && 'control' === registered.what;
+                      }),
+                      controlIsAlreadyRegistered = false;
+
+                  // If the control is not been tracked in our self.registered(), let's check if it is registered in the api
+                  // Typically, the module / section picker will match that case, because we don't keep track of it ( so it's not cleaned )
                   if ( _.isEmpty( uiCandidate ) ) {
-                        return false;
+                        controlIsAlreadyRegistered = api.control.has( uiElementId );
                   } else {
-                        // we have match => don't generate the ui
+                        controlIsAlreadyRegistered = true;
                         // we should have only one uiCandidate with this very id
                         if ( uiCandidate.length > 1 ) {
-                             throw new Error( 'generateUI => why is this control registered more than once ? => ' + uiElementId );
-                        } else {
-                              return true;
+                              api.errare( 'generateUI => why is this control registered more than once ? => ' + uiElementId );
                         }
                   }
+                  return controlIsAlreadyRegistered;
             }
       });//$.extend()
 })( wp.customize, jQuery );
