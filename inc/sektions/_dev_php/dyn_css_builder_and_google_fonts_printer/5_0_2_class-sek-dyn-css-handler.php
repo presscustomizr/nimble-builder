@@ -361,10 +361,10 @@ class Sek_Dyn_CSS_Handler {
      */
     private function _schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook() {
         if ( $this->hook ) {
-            add_action( $this->hook, array( $this, 'sek_dyn_css_enqueue_or_print_and_google_gonts_print' ), $this->priority );
+            add_action( $this->hook, array( $this, 'sek_dyn_css_enqueue_or_print_and_google_fonts_print' ), $this->priority );
         } else {
             //enqueue or print
-            $this->sek_dyn_css_enqueue_or_print_and_google_gonts_print();
+            $this->sek_dyn_css_enqueue_or_print_and_google_fonts_print();
         }
     }
 
@@ -382,7 +382,7 @@ class Sek_Dyn_CSS_Handler {
      * @access public
      * @return void()
      */
-    public function sek_dyn_css_enqueue_or_print_and_google_gonts_print() {
+    public function sek_dyn_css_enqueue_or_print_and_google_fonts_print() {
         // CSS FILE
         //case enqueue file : front end + user with customize caps not logged in
         if ( self::MODE_FILE == $this->mode ) {
@@ -420,7 +420,7 @@ class Sek_Dyn_CSS_Handler {
 
         //if $this->mode != 'file' or the file enqueuing didn't go through (fall back)
         //print inline style
-        if ( $this->css_string_to_enqueue_or_print ) {
+        if ( $this->css_string_to_enqueue_or_print && ! $this->enqueued_or_printed ) {
             $dep =  array_pop( $this->dep );
 
             if ( !$dep || wp_style_is( $dep, 'done' ) || !wp_style_is( $dep, 'done' ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
