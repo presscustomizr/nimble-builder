@@ -560,10 +560,6 @@ fieldset[disabled] a.sek-btn {
   clear: both;
 }
 
-.sek-sektion-inner {
-  padding: 15px;
-}
-
 /* To make vertical alignment possible in sections */
 .sek-section, .sek-column, .sek-module {
   display: -ms-flexbox;
