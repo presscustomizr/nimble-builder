@@ -118,6 +118,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
         }
 
+
+
+
+
+
+
+
+
         // Walk a model tree recursively and render each level with a specific template
         function render( $model = array(), $location = 'loop_start' ) {
             //sek_error_log('LEVEL MODEL IN ::RENDER()', $model );
@@ -143,19 +151,20 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             switch ( $level ) {
                 case 'location' :
+                    //empty sektions wrapper are only printed when customizing
                     ?>
-                      <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $id ?>">
-                        <?php
-                          $this -> parent_model = $model;
-                          foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
-                        ?>
+                      <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
+                          <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $id ?>">
+                            <?php
+                              $this -> parent_model = $model;
+                              foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
+                            ?>
 
-                         <?php if ( skp_is_customizing() && empty( $collection ) ) : //if ( skp_is_customizing() ) : ?>
-                            <div class="sek-empty-location-placeholder">
-                                <?php //_e( '+ Add a section', 'text_domain_to_be_replaced'); echo ' ' . $location; ?>
-                            </div>
-                        <?php endif; ?>
-                      </div>
+                             <?php if ( empty( $collection ) ) : ?>
+                                <div class="sek-empty-location-placeholder"></div>
+                            <?php endif; ?>
+                          </div>
+                      <?php endif; ?>
                     <?php
                 break;
 
