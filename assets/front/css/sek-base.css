@@ -574,6 +574,14 @@ fieldset[disabled] a.sek-btn {
   max-width: 100%;
 }
 
+/* a nested sektion should reset its parent column padding
+@see https://github.com/presscustomizr/nimble-builder/issues/25
+*/
+[data-sek-is-nested="true"] .sek-container-fluid {
+  padding-right: 0;
+  padding-left: 0;
+}
+
 /* MODULE PLACEHOLDER */
 /*@font-face {
   font-family: 'Material Icons';

@@ -11,6 +11,7 @@
 //modules
 @import "modules";
 
+
 // Structural base
 // @todo create a specific scss file for the code after this line
 /* make sure that the location level occupies 100% of the width */
@@ -29,6 +30,15 @@
   flex: 0 0 100%;
   max-width: 100%;
 }
+/* a nested sektion should reset its parent column padding
+@see https://github.com/presscustomizr/nimble-builder/issues/25
+*/
+[data-sek-is-nested="true"] .sek-container-fluid {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+
 
 
 /* MODULE PLACEHOLDER */
