@@ -297,6 +297,14 @@
   cursor: pointer;
   position: relative;
 }
+/* prevent element in the wp content to be displayed out of the wp-content-wrapper when previewing
+@fixes https://github.com/presscustomizr/nimble-builder/issues/29
+*/
+.sek-wp-content-wrapper:after {
+  content: '';
+  display: block;
+  clear: both;
+}
 .sek-wp-content-wrapper:hover {
   outline: 2px dashed #036697;
 }
