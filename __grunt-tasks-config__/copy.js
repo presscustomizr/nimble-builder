@@ -80,6 +80,15 @@ module.exports = {
     dest: '../../themes/customizr/core/czr-base-fmk/'
   },
 
+  czr_base_fmk_in_hueman_theme : {
+    expand: true,
+    flatten: false,
+    //filter:'isFile',
+    cwd : '<%= paths.czr_base_fmk %>',
+    src: [ '**', '! _dev_php/**'],
+    dest: '../../themes/hueman/functions/czr-base-fmk/'
+  },
+
   czr_base_fmk_in_wfc : {
     expand: true,
     flatten: false,

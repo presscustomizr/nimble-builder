@@ -82,10 +82,21 @@ module.exports = function(grunt) {
             'compress'
           ],
 
-          copy_czr_fmk : [
+          build_and_copy_czr_fmk : [
             'build_customizer_css_js_php_fmk_panel_and_preview',
+
+            'replace:czr_fmk_namespace_from_nimble_to_customizr',
             'copy:czr_base_fmk_in_customizr_theme',
-            'copy:czr_base_fmk_in_wfc'
+            'replace:czr_fmk_namespace_from_customizr_to_nimble',
+
+            'replace:czr_fmk_namespace_from_nimble_to_hueman',
+            'copy:czr_base_fmk_in_hueman_theme',
+            'replace:czr_fmk_namespace_from_hueman_to_nimble',
+
+            'replace:czr_fmk_namespace_from_nimble_to_wfc',
+            'copy:czr_base_fmk_in_wfc',
+            'replace:czr_fmk_namespace_from_wfc_to_nimble',
+
           ]
         },
         uglify_requested_paths : {
