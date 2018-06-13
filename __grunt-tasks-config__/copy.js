@@ -98,7 +98,26 @@ module.exports = {
     dest: '../wordpress-font-customizer/back/czr-base-fmk/'
   },
 
+  czr_base_fmk_in_hueman_pro_addons : {
+    expand: true,
+    flatten: false,
+    //filter:'isFile',
+    cwd : '<%= paths.czr_base_fmk %>',
+    src: [ '**', '! _dev_php/**'],
+    dest: '../hueman-pro-addons/inc/czr-base-fmk/'
+  },
 
+
+
+
+  skope_in_hueman_pro_addons : {
+    expand: true,
+    flatten: false,
+    //filter:'isFile',
+    cwd : '<%= paths.flat_skope_php %>',
+    src: [ '**', '! _dev/**'],
+    dest: '../hueman-pro-addons/inc/czr-skope/'
+  },
 
   // czr_social_links_module_in_customizr_theme : {
   //   expand: true,

@@ -51,7 +51,7 @@ module.exports = {
     overwrite: true,
     replacements: [ {
       from: /^.*namespace Nimble;.*$/m,//
-      to: 'namespace czr_fn;'// '"Project-Id-Version: Hueman Addons v<%= pkg.version %>\\n"'
+      to: 'namespace czr_fn;'
     } ]
   },
 
@@ -62,7 +62,7 @@ module.exports = {
     overwrite: true,
     replacements: [ {
       from: /^.*namespace czr_fn;.*$/m,//
-      to: 'namespace Nimble;'// '"Project-Id-Version: Hueman Addons v<%= pkg.version %>\\n"'
+      to: 'namespace Nimble;'
     } ]
   },
 
@@ -73,7 +73,7 @@ module.exports = {
     overwrite: true,
     replacements: [ {
       from: /^.*namespace Nimble;.*$/m,//
-      to: 'namespace hu_czr_fmk;'// '"Project-Id-Version: Hueman Addons v<%= pkg.version %>\\n"'
+      to: 'namespace hu_czr_fmk;'
     } ]
   },
 
@@ -84,7 +84,7 @@ module.exports = {
     overwrite: true,
     replacements: [ {
       from: /^.*namespace hu_czr_fmk;.*$/m,//
-      to: 'namespace Nimble;'// '"Project-Id-Version: Hueman Addons v<%= pkg.version %>\\n"'
+      to: 'namespace Nimble;'
     } ]
   },
 
@@ -94,8 +94,8 @@ module.exports = {
     ],
     overwrite: true,
     replacements: [ {
-      from: /^.*namespace Nimble;.*$/m,//
-      to: 'namespace wfc_czr_fmk;'// '"Project-Id-Version: Hueman Addons v<%= pkg.version %>\\n"'
+      from: /^.*namespace Nimble;.*$/m,
+      to: 'namespace wfc_czr_fmk;'
     } ]
   },
 
@@ -106,11 +106,33 @@ module.exports = {
     overwrite: true,
     replacements: [ {
       from: /^.*namespace wfc_czr_fmk;.*$/m,//
-      to: 'namespace Nimble;'// '"Project-Id-Version: Hueman Addons v<%= pkg.version %>\\n"'
+      to: 'namespace Nimble;'
+    } ]
+  },
+
+
+
+
+  skope_namespace_from_nimble_to_hueman : {
+    src: [
+      '<%= paths.flat_skope_php %>index.php'
+    ],
+    overwrite: true,
+    replacements: [ {
+      from: /^.*namespace Nimble;.*$/m,
+      to: 'namespace hueman_skp;'
+    } ]
+  },
+  skope_namespace_from_hueman_to_nimble : {
+    src: [
+      '<%= paths.flat_skope_php %>index.php'
+    ],
+    overwrite: true,
+    replacements: [ {
+      from: /^.*namespace hueman_skp;.*$/m,//
+      to: 'namespace Nimble;'
     } ]
   }
-
-
 
 
 

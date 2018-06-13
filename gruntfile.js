@@ -93,10 +93,21 @@ module.exports = function(grunt) {
             'copy:czr_base_fmk_in_hueman_theme',
             'replace:czr_fmk_namespace_from_hueman_to_nimble',
 
+            'replace:czr_fmk_namespace_from_nimble_to_hueman',
+            'copy:czr_base_fmk_in_hueman_pro_addons',
+            'replace:czr_fmk_namespace_from_hueman_to_nimble',
+
             'replace:czr_fmk_namespace_from_nimble_to_wfc',
             'copy:czr_base_fmk_in_wfc',
             'replace:czr_fmk_namespace_from_wfc_to_nimble',
+          ],
 
+          build_and_copy_skope : [
+            'build_skope_php_js',
+
+            'replace:skope_namespace_from_nimble_to_hueman',
+            'copy:skope_in_hueman_pro_addons',
+            'replace:skope_namespace_from_hueman_to_nimble'
           ]
         },
         uglify_requested_paths : {
