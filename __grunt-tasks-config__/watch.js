@@ -48,7 +48,7 @@ module.exports = {
       [ '<%= paths.czr_base_fmk %>assets/js/czr-preview-base.js' ],
     tasks : [
       'uglify:czr_preview_js',
-      'copy:build_and_copy_czr_fmk'
+      'build_and_copy_czr_fmk'
       //'copy:czr_base_fmk_in_customizr_theme'
       // 'copy:czr_js_in_hueman_addons',
       // 'copy:czr_js_in_hueman_theme',
@@ -66,7 +66,7 @@ module.exports = {
     tasks : [
       'concat:czr_control_css',
       'cssmin:czr_css',
-      'copy:build_and_copy_czr_fmk'
+      'build_and_copy_czr_fmk'
       //'copy:czr_base_fmk_in_customizr_theme'
       // 'copy:czr_css_in_hueman_addons',
       // 'copy:czr_css_in_hueman_theme',
@@ -88,7 +88,7 @@ module.exports = {
     files : [ '<%= paths.czr_base_fmk %>_dev_php/*.php'],
     tasks : [
         'concat:czr_base_fmk_php',
-        'copy:build_and_copy_czr_fmk'
+        'build_and_copy_czr_fmk'
         //'copy:czr_base_fmk_in_customizr_theme'
     ]
   },
