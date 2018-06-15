@@ -7,6 +7,12 @@
   position: relative;/* <= Needed for the placement of the ui icons container revealed on hover */
 }
 
+/* only when previewing */
+/* @fixed since https://github.com/presscustomizr/nimble-builder/issues/24 */
+.sek-sektion-inner{
+  padding: 15px;/* <= Needed for the placement of the ui icons container revealed on hover */
+}
+
 .sek-column {
   position: relative;
   padding: 23px 10px 0;/* <= Needed for the placement of the ui icons container revealed on hover */
@@ -29,7 +35,6 @@
 }
 
 .sek-module h4 { color:red;}
-
 
 
 
@@ -291,6 +296,14 @@
 .sek-wp-content-wrapper {
   cursor: pointer;
   position: relative;
+}
+/* prevent element in the wp content to be displayed out of the wp-content-wrapper when previewing
+@fixes https://github.com/presscustomizr/nimble-builder/issues/29
+*/
+.sek-wp-content-wrapper:after {
+  content: '';
+  display: block;
+  clear: both;
 }
 .sek-wp-content-wrapper:hover {
   outline: 2px dashed #036697;

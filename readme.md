@@ -1,4 +1,4 @@
-# Nimble Builder v1.0.3 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+# Nimble Builder v1.0.4 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 ![Nimble Builder](/nimble.jpg)
 
 > Drag and drop page builder for the WordPress live customizer.
@@ -21,6 +21,14 @@ The Nimble Builder is a lightweight drag and drop page builder designed to work 
 5. Drag a module from the left panel and drop it in a drop zone of the previewed page
 
 == Changelog ==
+= 1.0.4 : June 14th, 2018 =
+* fixed : when margins and paddings are not defined ( number field emptied ), no related CSS properties should be printed.
+* fixed : sek-sektion-inner should not have a padding of 15px on front.
+* fixed : a nested sektion should reset its parent column padding.
+* fixed : empty sektions wrapper should only be printed when customizing.
+* fixed : prevent element in the wp content to be displayed out of the wp-content-wrapper when previewing.
+* fixed : dynamic CSS can be printed twice : inline and enqueued as CSS file when user logged in.
+
 = 1.0.3 : June 9th, 2018 =
 * fixed : missing dropzones around nested sections
 * fixed : reseting the spacing of a level was not changing the main setting.

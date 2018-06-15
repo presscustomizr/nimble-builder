@@ -1476,7 +1476,7 @@ function sek_set_input_tmpl___line_height( $input_id, $input_data ) {
     <?php
 }
 ?><?php
-// The base fmk is loaded on after_setup_theme before 50
+// The base fmk is loaded @after_setup_theme:10
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     foreach( [
@@ -3007,10 +3007,10 @@ class Sek_Dyn_CSS_Handler {
      */
     private function _schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook() {
         if ( $this->hook ) {
-            add_action( $this->hook, array( $this, 'sek_dyn_css_enqueue_or_print_and_google_gonts_print' ), $this->priority );
+            add_action( $this->hook, array( $this, 'sek_dyn_css_enqueue_or_print_and_google_fonts_print' ), $this->priority );
         } else {
             //enqueue or print
-            $this->sek_dyn_css_enqueue_or_print_and_google_gonts_print();
+            $this->sek_dyn_css_enqueue_or_print_and_google_fonts_print();
         }
     }
 
@@ -3028,7 +3028,7 @@ class Sek_Dyn_CSS_Handler {
      * @access public
      * @return void()
      */
-    public function sek_dyn_css_enqueue_or_print_and_google_gonts_print() {
+    public function sek_dyn_css_enqueue_or_print_and_google_fonts_print() {
         // CSS FILE
         //case enqueue file : front end + user with customize caps not logged in
         if ( self::MODE_FILE == $this->mode ) {
@@ -3066,7 +3066,7 @@ class Sek_Dyn_CSS_Handler {
 
         //if $this->mode != 'file' or the file enqueuing didn't go through (fall back)
         //print inline style
-        if ( $this->css_string_to_enqueue_or_print ) {
+        if ( $this->css_string_to_enqueue_or_print && ! $this->enqueued_or_printed ) {
             $dep =  array_pop( $this->dep );
 
             if ( !$dep || wp_style_is( $dep, 'done' ) || !wp_style_is( $dep, 'done' ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
@@ -4247,6 +4247,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
         }
 
+
+
+
+
+
+
+
+
         // Walk a model tree recursively and render each level with a specific template
         function render( $model = array(), $location = 'loop_start' ) {
             //sek_error_log('LEVEL MODEL IN ::RENDER()', $model );
@@ -4272,19 +4280,20 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             switch ( $level ) {
                 case 'location' :
+                    //empty sektions wrapper are only printed when customizing
                     ?>
-                      <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $id ?>">
-                        <?php
-                          $this -> parent_model = $model;
-                          foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
-                        ?>
+                      <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
+                          <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $id ?>">
+                            <?php
+                              $this -> parent_model = $model;
+                              foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
+                            ?>
 
-                         <?php if ( skp_is_customizing() && empty( $collection ) ) : //if ( skp_is_customizing() ) : ?>
-                            <div class="sek-empty-location-placeholder">
-                                <?php //_e( '+ Add a section', 'text_domain_to_be_replaced'); echo ' ' . $location; ?>
-                            </div>
-                        <?php endif; ?>
-                      </div>
+                             <?php if ( empty( $collection ) ) : ?>
+                                <div class="sek-empty-location-placeholder"></div>
+                            <?php endif; ?>
+                          </div>
+                      <?php endif; ?>
                     <?php
                 break;
 

@@ -1,5 +1,5 @@
 <?php
-// The base fmk is loaded on after_setup_theme before 50
+// The base fmk is loaded @after_setup_theme:10
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     foreach( [

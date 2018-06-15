@@ -1,5 +1,16 @@
 <?php
 namespace Nimble;
+if ( did_action('nimble_skope_loaded') ) {
+    error_log( __FILE__ . '  => The czr_base_fmk has already been loaded' );
+    return;
+}
+
+// Set the namsepace as a global so we can use it when fired from another theme/plugin using the fmk
+global $czr_skope_namespace;
+$czr_skope_namespace = __NAMESPACE__ . '\\';
+
+do_action( 'nimble_skope_loaded' );
+
 //Creates a new instance
 function Flat_Skop_Base( $params = array() ) {
     return Flat_Skop_Base::skp_get_instance( $params );

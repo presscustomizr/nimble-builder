@@ -560,10 +560,6 @@ fieldset[disabled] a.sek-btn {
   clear: both;
 }
 
-.sek-sektion-inner {
-  padding: 15px;
-}
-
 /* To make vertical alignment possible in sections */
 .sek-section, .sek-column, .sek-module {
   display: -ms-flexbox;
@@ -576,6 +572,14 @@ fieldset[disabled] a.sek-btn {
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
   max-width: 100%;
+}
+
+/* a nested sektion should reset its parent column padding
+@see https://github.com/presscustomizr/nimble-builder/issues/25
+*/
+[data-sek-is-nested="true"] .sek-container-fluid {
+  padding-right: 0;
+  padding-left: 0;
 }
 
 /* MODULE PLACEHOLDER */

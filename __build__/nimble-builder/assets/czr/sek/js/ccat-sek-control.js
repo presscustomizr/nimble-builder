@@ -3947,8 +3947,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Listen to user actions on the inputs and set the input value
                   $wrapper.on( 'keyup mouseup change', 'input[type="number"]', function(evt) {
                         var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
-                            _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
-                        _newInputVal[ _type_ ] = $(this).val();
+                            _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
+                            _rawVal = $(this).val();
+
+                        // Validates
+                        // @fixes https://github.com/presscustomizr/nimble-builder/issues/26
+                        if ( ( _.isString( _rawVal ) && ! _.isEmpty( _rawVal ) ) || _.isNumber( _rawVal ) ) {
+                              _newInputVal[ _type_ ] = _rawVal;
+                        } else {
+                              // this allow users to reset a given padding / margin instead of reseting them all at once with the "reset all spacing" option
+                              _newInputVal = _.omit( _type_, _newInputVal );
+                        }
+
                         input( _newInputVal );
                   });
                   // Schedule a reset action

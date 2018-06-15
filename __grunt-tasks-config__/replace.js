@@ -120,7 +120,7 @@ module.exports = {
     overwrite: true,
     replacements: [ {
       from: /^.*namespace Nimble;.*$/m,
-      to: ''
+      to: 'namespace hueman_skp;'
     } ]
   },
   skope_namespace_from_hueman_to_nimble : {
@@ -130,7 +130,7 @@ module.exports = {
     overwrite: true,
     replacements: [ {
       from: /^.*namespace hueman_skp;.*$/m,//
-      to: ''
+      to: 'namespace Nimble;'
     } ]
   },
 

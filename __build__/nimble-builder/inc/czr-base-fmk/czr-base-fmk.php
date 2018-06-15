@@ -449,18 +449,6 @@ if ( ! class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
                     <?php
                 break;
 
-                // only used in the Widget module for the Hueman theme
-                // to prevent the removal of the theme's builtin widget zones
-                case 'ru-item-part' :
-                    ?>
-                      <div class="<?php echo $css_attr['item_header']; ?> czr-custom-model">
-                        <div class="<?php echo $css_attr['item_title']; ?> <?php echo $css_attr['item_sort_handle']; ?>"><h4>{{ data.title }}</h4></div>
-                          <div class="<?php echo $css_attr['item_btns']; ?>"><a title="<?php _e('Edit', 'nimble-builder'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt <?php echo $css_attr['edit_view_btn']; ?>"></a></div>
-                        </div>
-                      </div>
-                    <?php
-                break;
-
                 case 'rud-item-alert-part' :
                     ?>
                       <p class="czr-item-removal-title"><?php _e('Are you sure you want to remove : <strong>{{ data.title }} ?</strong>', 'nimble-builder'); ?></p>
@@ -1270,6 +1258,8 @@ if ( ! class_exists( 'CZR_Fmk_Base' ) ) :
             if ( ! is_array( $this->registered_modules ) || empty( $this->registered_modules ) )
               return;
 
+            $wp_scripts = wp_scripts();
+
             // loop on each registered modules
             foreach ( $this->registered_modules as $module_type => $params ) {
                 $params = wp_parse_args( $params, $this -> default_dynamic_module_params );
@@ -1278,13 +1268,17 @@ if ( ! class_exists( 'CZR_Fmk_Base' ) ) :
                 // Enqueue the list of registered scripts
                 if ( ! empty( $control_js_params ) ) {
                     foreach ( $control_js_params as $handle => $script_args ) {
-                        wp_enqueue_script(
-                            $handle,
-                            array_key_exists( 'src', $script_args ) ? $script_args['src'] : null,
-                            array_key_exists( 'deps', $script_args ) ? $script_args['deps'] : null,
-                            array_key_exists( 'ver', $script_args ) ? $script_args['ver'] : null,
-                            array_key_exists( 'in_footer', $script_args ) ? $script_args['in_footer'] : false
-                        );
+                        if ( ! isset( $wp_scripts->registered[$handle] ) ) {
+                            wp_enqueue_script(
+                                $handle,
+                                array_key_exists( 'src', $script_args ) ? $script_args['src'] : null,
+                                array_key_exists( 'deps', $script_args ) ? $script_args['deps'] : null,
+                                array_key_exists( 'ver', $script_args ) ? $script_args['ver'] : null,
+                                array_key_exists( 'in_footer', $script_args ) ? $script_args['in_footer'] : false
+                            );
+                        } else {
+                            error_log( __CLASS__ . '::' . __FUNCTION__ . " => handle already registered : " . $handle . " , this asset won't be enqueued => " . $script_args['src'] );
+                        }
                     }
 
                 }

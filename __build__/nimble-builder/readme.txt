@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 4.9.6
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -41,18 +41,23 @@ The Nimble Builder is a lightweight drag and drop page builder designed to work 
 Yes, the Nimble Builder works with any WordPress theme. If you experience any problem with a particular theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.0.3 =
-* fixed : missing dropzones around nested sections
-* fixed : reseting the spacing of a level was not changing the main setting.
-* fixed : the tinyMceEditor not collapsing on 'sek-notify'
-* improved : tinyMce text editor => attach callbacks on 'input' instead of 'change keyup'
-* improved : module dynamic ui => print the module name instead of 'module' at the bottom
-* improved : when clicking more than one time one the + ui icon, visually remind the user that a module should be dragged, with a light animation on the module picker container
-* added : encapsulate the singular post / page content inside a dom element so we can generate a dynamic ui around it when customizing + add an edit link to the post or page
-* added : introduced a loader overlay printed when the markup of any level being refreshed.
-* added : a "+" icon to add module from the sections dynamic UI
+= 1.0.4 : June 14th, 2018 =
+* fixed : when margins and paddings are not defined ( number field emptied ), no related CSS properties should be printed.
+* fixed : sek-sektion-inner should not have a padding of 15px on front.
+* fixed : a nested sektion should reset its parent column padding.
+* fixed : empty sektions wrapper should only be printed when customizing.
+* fixed : prevent element in the wp content to be displayed out of the wp-content-wrapper when previewing.
+* fixed : dynamic CSS can be printed twice : inline and enqueued as CSS file when user logged in.
 
 == Changelog ==
+= 1.0.4 : June 14th, 2018 =
+* fixed : when margins and paddings are not defined ( number field emptied ), no related CSS properties should be printed.
+* fixed : sek-sektion-inner should not have a padding of 15px on front.
+* fixed : a nested sektion should reset its parent column padding.
+* fixed : empty sektions wrapper should only be printed when customizing.
+* fixed : prevent element in the wp content to be displayed out of the wp-content-wrapper when previewing.
+* fixed : dynamic CSS can be printed twice : inline and enqueued as CSS file when user logged in.
+
 = 1.0.3 : June 9th, 2018 =
 * fixed : missing dropzones around nested sections
 * fixed : reseting the spacing of a level was not changing the main setting.
