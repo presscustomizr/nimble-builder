@@ -60,7 +60,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       api.errare('MODULE / SECTION PICKER SETTING CHANGED');
                                                 });
                                           });
-                                          self.register( {
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 what : 'setting',
                                                 id : _id_,
@@ -71,7 +72,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     }
 
-                                    self.register( {
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
                                           level : params.level,
                                           what : 'control',
                                           id : _id_,
@@ -95,7 +97,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
 
                               // MODULE / SECTION PICKER SECTION
-                              self.register({
+                              api.CZR_Helpers.register({
+                                    origin : 'nimble',
                                     what : 'section',
                                     id : _id_,
                                     title: 'module' === params.content_type ? sektionsLocalizedData.i18n['Module Picker'] : sektionsLocalizedData.i18n['Section Picker'],
@@ -182,7 +185,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                           });
 
-                                          self.register({
+                                          api.CZR_Helpers.register({
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 what : 'setting',
                                                 id : params.id,
@@ -195,7 +199,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-                                    self.register( {
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
                                           level : params.level,
                                           what : 'control',
                                           id : params.id,
@@ -218,7 +223,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
 
                               // MAIN CONTENT SECTION
-                              self.register({
+                              api.CZR_Helpers.register({
+                                    origin : 'nimble',
                                     what : 'section',
                                     id : params.id,
                                     title: sektionsLocalizedData.i18n['Content for'] + ' ' + api.czrModuleMap[ moduleType ].name,
@@ -295,7 +301,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 });//api( heightOptionsSetId, function( _setting_ ) {})
 
 
-                                                self.register( {
+                                                api.CZR_Helpers.register( {
+                                                      origin : 'nimble',
                                                       level : params.level,
                                                       what : 'setting',
                                                       id : sectionLayoutOptionsSetId,
@@ -307,7 +314,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }//if( ! api.has( sectionLayoutOptionsSetId ) ) {
 
 
-                                          self.register( {
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 level_id : params.id,
                                                 what : 'control',
@@ -352,7 +360,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });//api( bgBorderOptionsSetId, function( _setting_ ) {})
 
 
-                                          self.register( {
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 what : 'setting',
                                                 id : bgBorderOptionsSetId,
@@ -363,7 +372,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     }//if( ! api.has( bgBorderOptionsSetId ) ) {
 
-                                    self.register( {
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
                                           level : params.level,
                                           level_id : params.id,
                                           what : 'control',
@@ -406,7 +416,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });//api( spacingOptionsSetId, function( _setting_ ) {})
 
 
-                                          self.register( {
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 what : 'setting',
                                                 id : spacingOptionsSetId,
@@ -419,7 +430,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-                                    self.register( {
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
                                           level : params.level,
                                           what : 'control',
                                           id : spacingOptionsSetId,
@@ -463,7 +475,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });//api( heightOptionsSetId, function( _setting_ ) {})
 
 
-                                          self.register( {
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 what : 'setting',
                                                 id : heightOptionsSetId,
@@ -474,7 +487,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     }//if( ! api.has( heightOptionsSetId ) ) {
 
-                                    self.register( {
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
                                           level : params.level,
                                           level_id : params.id,
                                           what : 'control',
@@ -502,7 +516,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     _do_register_();
                               });
 
-                              self.register({
+                              api.CZR_Helpers.register({
+                                    origin : 'nimble',
                                     what : 'section',
                                     id : params.id,
                                     title: sektionsLocalizedData.i18n['Settings for the'] + ' ' + params.level,

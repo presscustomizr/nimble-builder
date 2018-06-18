@@ -21,13 +21,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // if the collection setting is not registered yet
                   // => register it and bind it
                   if ( ! api.has( collectionSettingId ) ) {
-                        var __collectionSettingInstance__ = self.register({
+                        var __collectionSettingInstance__ = api.CZR_Helpers.register({
                               what : 'setting',
                               id : collectionSettingId,
                               value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.defaultSektionSettingValue ),
                               transport : 'postMessage',//'refresh'
                               type : 'option',
-                              track : false//don't register in the self.registered()
+                              track : false,//don't register in the self.registered()
+                              origin : 'nimble'
                         });
 
                         if ( sektionsLocalizedData.isDevMode ) {
@@ -51,7 +52,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // loop_start, before_content, after_content, loop_end
 
                   // Global Options : section
-                  // this.register({
+                  // api.CZR_Helpers.register({
                   //       what : 'section',
                   //       id : sektionsLocalizedData.optPrefixForSektionGlobalOptsSetting,//'__sektions__'
                   //       title: 'Global Options',
@@ -62,7 +63,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // // => register a control
                   // // Template
-                  // this.register({
+                  // api.CZR_Helpers.register({
                   //       what : 'control',
                   //       id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
                   //       title: 'Main sektions panel',

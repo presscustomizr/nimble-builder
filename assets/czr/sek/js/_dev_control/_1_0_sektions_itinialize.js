@@ -148,6 +148,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       api.errare( 'sek_import_attachment ajax action failed', _er_ );
                         // });
 
+                        // POPULATE THE REGISTERED COLLECTION
+                        api.bind( 'czr-new-registered', function( params ) {
+                              // Check that we have an origin property and that make sure we populate only the registration emitted by 'nimble'
+                              if ( _.isUndefined( params.origin ) ) {
+                                    throw new Error( 'czr-new-registered event => missing params.origin' );
+                              }
+                              if ( 'nimble' !== params.origin )
+                                return;
+
+                              // when no collection is provided, we use
+                              if ( false !== params.track ) {
+                                    var currentlyRegistered = self.registered();
+                                    var newRegistered = $.extend( true, [], currentlyRegistered );
+                                    //Check for duplicates
+                                    var duplicateCandidate = _.findWhere( newRegistered, { id : params.id } );
+                                    if ( ! _.isEmpty( duplicateCandidate ) && _.isEqual( duplicateCandidate, params ) ) {
+                                          throw new Error( 'register => duplicated element in self.registered() collection ' + params.id );
+                                    }
+                                    newRegistered.push( params );
+                                    self.registered( newRegistered );
+
+                                    console.log('ALORS registered ?', self.registered() );
+                                    // say it
+                                    //this.trigger( [params.what, params.id , 'registered' ].join('__'), params );
+                              }
+                        });
+
                   });//api.bind( 'ready' )
             },// initialize()
 
@@ -208,13 +235,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   // The parent panel for all ui sections + global options section
-                  this.register({
+                  api.CZR_Helpers.register({
                         what : 'panel',
                         id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
                         title: sektionsLocalizedData.i18n['Nimble Builder'],
                         priority : 1000,
                         constructWith : SektionPanelConstructor,
-                        track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                        track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                        origin : 'nimble'
                   });
 
             },//mayBeRegisterAndSetupAddNewSektionSection()
