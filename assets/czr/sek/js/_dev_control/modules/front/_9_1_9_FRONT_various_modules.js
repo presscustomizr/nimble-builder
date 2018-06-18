@@ -2,21 +2,50 @@
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var ModuleConstructor = {
-            // initialize: function( id, options ) {
-            //         //console.log('INITIALIZING IMAGE MODULE', id, options );
-            //         var module = this;
-            //         //run the parent initialize
-            //         api.CZRDynModule.prototype.initialize.call( module, id, options );
+            initialize: function( id, options ) {
+                    //console.log('INITIALIZING IMAGE MODULE', id, options );
+                    var module = this;
+                    //run the parent initialize
+                    api.CZRDynModule.prototype.initialize.call( module, id, options );
 
-            //         // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-            //         //module.inputConstructor = api.CZRInput.extend( module.CCZRInputMths || {} );
-            //         // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-            //         // module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
-            // },//initialize
+                    //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                    module.inputConstructor = api.CZRInput.extend( module.CZRHeadingsInputMths || {} );
 
-            // CZRInputMths : {},//CZRInputMths
+                    //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                    //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
+            },//initialize
 
-            // CZRItemMethods : { },//CZRItemMethods
+            //HEADING MODULE
+            CZRHeadingsInputMths: {
+                    setupSelect : function() {
+                            var input  = this,
+                                  item   = input.input_parent,
+                                  module = input.module,
+                                  _options_ = {};
+
+                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in heading module');
+                                  return;
+                            } else {
+                                  //generates the options
+                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
+                                        var _attributes = {
+                                                  value : value,
+                                                  html: title
+                                            };
+                                        if ( value == input() ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        } else if ( 'px' === value ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        }
+                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                  });
+                                  $( 'select[data-czrtype]', input.container ).selecter();
+                            }
+                    }
+            },//CZRHeadingsInputMths
+
+            CZRItemMethods : { },//CZRItemMethods
       };//ModuleConstructor
 
 
