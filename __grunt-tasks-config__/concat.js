@@ -34,8 +34,12 @@ module.exports = {
 
 
       //BASE : HELPERS
-      '<%= paths.czr_assets %>fmk/js/base-fmk/0_3_api_helpers/_0_0_0_pre_97_api_helpers_various.js',
-      '<%= paths.czr_assets %>fmk/js/base-fmk/0_3_api_helpers/_0_0_0_pre_98_api_helpers_dom.js',
+      '<%= paths.czr_assets %>fmk/js/base-fmk/0_3_api_helpers/_0_0_0_pre_97_api_helpers_setup_input_from_dom.js',
+      '<%= paths.czr_assets %>fmk/js/base-fmk/0_3_api_helpers/_0_0_1_pre_97_api_helpers_get_module_template.js',
+      '<%= paths.czr_assets %>fmk/js/base-fmk/0_3_api_helpers/_0_0_2_pre_97_api_helpers_register_utils.js',
+      '<%= paths.czr_assets %>fmk/js/base-fmk/0_3_api_helpers/_0_0_9_pre_97_api_helpers_various.js',
+      '<%= paths.czr_assets %>fmk/js/base-fmk/0_3_api_helpers/_0_1_0_pre_98_api_helpers_setup_dom_listeners.js',
+
 
       '<%= paths.czr_assets %>fmk/js/base-fmk/0_4_preview_listeners/_0_0_0_pre_99_preview_listeners.js',
 
