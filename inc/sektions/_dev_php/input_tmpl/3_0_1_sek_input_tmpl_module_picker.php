@@ -21,6 +21,12 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'title' => __( 'Image', 'text_domain_to_be_replaced' ),
                   'icon' => 'image'
                 ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_heading_module',
+                  'title' => __( 'Heading', 'text_domain_to_be_replaced' ),
+                  'icon' => 'title'
+                )
                 // array(
                 //   'content-type' => 'module',
                 //   'content-id' => 'czr_simple_html_module',
