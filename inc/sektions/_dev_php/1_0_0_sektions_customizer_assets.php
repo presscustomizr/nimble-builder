@@ -197,8 +197,6 @@ function sek_enqueue_controls_js_css() {
 
                 'Nimble Builder' => __('Nimble Builder', 'text_domain_to_be_replaced'),
 
-                'Customizing' => __('Customizing', 'text_domain_to_be_replaced'),
-
                 "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_domain_to_be_replaced'),
                 "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
                 "A section must have at least one column." => __( "A section must have at least one column.", 'text_domain_to_be_replaced'),
