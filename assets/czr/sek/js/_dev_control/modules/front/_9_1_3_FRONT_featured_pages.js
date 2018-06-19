@@ -5,13 +5,16 @@
             initialize: function( id, options ) {
                     //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
-                    //run the parent initialize
-                    api.CZRDynModule.prototype.initialize.call( module, id, options );
 
                     // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                     module.inputConstructor = api.CZRInput.extend( module.CZRFPInputsMths || {} );
                     // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                     // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+
+                    // run the parent initialize
+                    // Note : must be always invoked always after the input / item class extension
+                    // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                    api.CZRDynModule.prototype.initialize.call( module, id, options );
 
                     //SET THE CONTENT PICKER DEFAULT OPTIONS
                     //@see ::setupContentPicker()
