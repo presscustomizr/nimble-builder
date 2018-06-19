@@ -3,13 +3,14 @@
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
 add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_generic_css_input_types', 10, 4 );
 function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_id, $parent_level ) {
+
     if ( ! is_string( $input_id ) || empty( $input_id ) )
         return $rules;
     $selector = '[data-sek-id="'.$parent_level['id'].'"]';
     $mq = null;
     $properties_to_render = array();
 
-    switch( $input_id ) {
+    switch ( $input_id ) {
         case 'font_size_css' :
             $properties_to_render['font-size'] = $value;
         break;
@@ -75,12 +76,60 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
             $properties_to_render['font-family'] = false != strstr( $value, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
         break;
-        case 'height_css' :
-            $properties_to_render['height'] = $value > 0 ? $value . 'px' : '1px';
-            //the height property is applied to the first leverl inside the .sek-module-inner.
-            $selector = $selector . ' .sek-module-inner > *';
-        break;
-    }//switch
+    }//swtich
+
+
+    //Specific for the module level
+    if ( 'module' == $parent_level[ 'level' ] && empty( $properties_to_render ) ) {
+        //properties are usually applied to the first level child inside the .sek-module-inner.
+        $selector = $selector . ' .sek-module-inner > *';
+        switch ( $input_id ) {
+            /* Spacer */
+            case 'height_css' :
+                $properties_to_render['height'] = $value > 0 ? $value . 'px' : '1px';
+            break;
+            /* Divider */
+            case 'border_top_width_css' :
+                $properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
+            break;
+            case 'border_top_style_css' :
+                $properties_to_render['border-top-style'] = $value ? $value : 'solid';
+            break;
+            case 'border_top_color_css' :
+                $properties_to_render['border-top-color'] = $value ? $value : '#5a5a5a';
+            break;
+            case 'width_css' :
+                $properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
+            break;
+            case 'v_spacing_css' :
+                $value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
+                $properties_to_render = array(
+                    'margin-top'  => $value,
+                    'margin-bottom' => $value
+                );
+            break;
+            //not used at the moment, but it might if we want to display the divider as block (e.g. a div instead of a span)
+            case 'h_alignment_block_css' :
+                switch ( $value ) {
+                    case 'right' :
+                        $properties_to_render = array(
+                            'margin-right'  => '0'
+                        );
+                    break;
+                    case 'left' :
+                        $properties_to_render = array(
+                            'margin-left'  => '0'
+                        );
+                    break;
+                    default :
+                        $properties_to_render = array(
+                            'margin-left'  => 'auto',
+                            'margin-right' => 'auto'
+                        );
+                }
+            break;
+        }//switch
+    }//Specific for the module level
 
     if ( ! empty( $properties_to_render ) ) {
         // is the important flag on ?

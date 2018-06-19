@@ -2,6 +2,25 @@
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var ModuleConstructor = {
+            // initialize: function( id, options ) {
+            //         //console.log('INITIALIZING IMAGE MODULE', id, options );
+            //         var module = this;
+            //         //run the parent initialize
+            //         api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+            //         // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+            //         //module.inputConstructor = api.CZRInput.extend( module.CCZRInputMths || {} );
+            //         // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+            //         // module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
+            // },//initialize
+
+            // CZRInputMths : {},//CZRInputMths
+
+            // CZRItemMethods : { },//CZRItemMethods
+      };
+
+      //HEADING MODULE
+      var HeadingModuleConstructor  = {
             initialize: function( id, options ) {
                     //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
@@ -9,14 +28,13 @@
                     api.CZRDynModule.prototype.initialize.call( module, id, options );
 
                     //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                    module.inputConstructor = api.CZRInput.extend( module.CZRHeadingsInputMths || {} );
+                    module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
 
                     //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                     //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
             },//initialize
 
-            //HEADING MODULE
-            CZRHeadingsInputMths: {
+            CZRHeadingInputMths: {
                     setupSelect : function() {
                             var input  = this,
                                   item   = input.input_parent,
@@ -29,6 +47,52 @@
                             } else {
                                   //generates the options
                                   _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
+                                        var _attributes = {
+                                                  value : value,
+                                                  html: title
+                                            };
+                                        if ( value == input() ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        } else if ( 'px' === value ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        }
+                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                  });
+                                  $( 'select[data-czrtype]', input.container ).selecter();
+                            }
+                    }
+            },//CZRHeadingsInputMths
+      }
+
+      //DIVIDER MODULE
+      var DividerModuleConstructor = {
+            initialize: function( id, options ) {
+                    //console.log('INITIALIZING IMAGE MODULE', id, options );
+                    var module = this;
+                    //run the parent initialize
+                    api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+                    //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                    module.inputConstructor = api.CZRInput.extend( module.CZRDividerInputMths || {} );
+
+                    //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                    //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
+            },//initialize
+
+
+            CZRDividerInputMths: {
+                    setupSelect : function() {
+                            var input  = this,
+                                  item   = input.input_parent,
+                                  module = input.module,
+                                  _options_ = {};
+
+                            if ( _.isEmpty( sektionsLocalizedData.selectOptions['border-type'] ) ) {
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in divider module');
+                                  return;
+                            } else {
+                                  //generates the options
+                                  _.each( sektionsLocalizedData.selectOptions['border-type'] , function( title, value ) {
                                         var _attributes = {
                                                   value : value,
                                                   html: title
@@ -60,7 +124,7 @@
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_heading_module : {
-                  mthds : ModuleConstructor,
+                  mthds : HeadingModuleConstructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_module', 'name' ),
                   has_mod_opt : false,
@@ -75,6 +139,15 @@
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_spacer_module' )
+            },
+
+            czr_divider_module : {
+                  mthds : DividerModuleConstructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_divider_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_divider_module' )
             },
       });
 })( wp.customize , jQuery, _ );

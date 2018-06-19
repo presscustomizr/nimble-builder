@@ -32,6 +32,12 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-id' => 'czr_spacer_module',
                   'title' => __( 'Spacer', 'text_domain_to_be_replaced' ),
                   'icon' => 'unfold_more'
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_divider_module',
+                  'title' => __( 'Divider', 'text_domain_to_be_replaced' ),
+                  'icon' => 'unfold_more'
                 )
                 // array(
                 //   'content-type' => 'module',
