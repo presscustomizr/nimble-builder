@@ -75,6 +75,11 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
             $properties_to_render['font-family'] = false != strstr( $value, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
         break;
+        case 'height_css' :
+            $properties_to_render['height'] = $value > 0 ? $value . 'px' : '1px';
+            //the height property is applied to the first leverl inside the .sek-module-inner.
+            $selector = $selector . ' .sek-module-inner > *';
+        break;
     }//switch
 
     if ( ! empty( $properties_to_render ) ) {

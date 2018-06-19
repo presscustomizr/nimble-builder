@@ -13,7 +13,8 @@ function sek_register_modules() {
         'czr_tiny_mce_editor_module',
         'czr_image_module',
         //'czr_featured_pages_module'
-        'czr_heading_module'
+        'czr_heading_module',
+        'czr_spacer_module'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
