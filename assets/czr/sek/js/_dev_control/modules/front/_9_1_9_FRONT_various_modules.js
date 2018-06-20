@@ -1,37 +1,22 @@
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var ModuleConstructor = {
-            // initialize: function( id, options ) {
-            //         //console.log('INITIALIZING IMAGE MODULE', id, options );
-            //         var module = this;
-            //         //run the parent initialize
-            //         api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-            //         // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-            //         //module.inputConstructor = api.CZRInput.extend( module.CCZRInputMths || {} );
-            //         // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-            //         // module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
-            // },//initialize
-
-            // CZRInputMths : {},//CZRInputMths
-
-            // CZRItemMethods : { },//CZRItemMethods
-      };
-
       //HEADING MODULE
       var HeadingModuleConstructor  = {
             initialize: function( id, options ) {
                     //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
-                    //run the parent initialize
-                    api.CZRDynModule.prototype.initialize.call( module, id, options );
 
                     //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                     module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
 
                     //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                     //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
+
+                    // run the parent initialize
+                    // Note : must be always invoked always after the input / item class extension
+                    // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                    api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
             CZRHeadingInputMths: {
@@ -69,14 +54,17 @@
             initialize: function( id, options ) {
                     //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
-                    //run the parent initialize
-                    api.CZRDynModule.prototype.initialize.call( module, id, options );
 
                     //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                     module.inputConstructor = api.CZRInput.extend( module.CZRDividerInputMths || {} );
 
                     //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                     //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
+
+                    // run the parent initialize
+                    // Note : must be always invoked always after the input / item class extension
+                    // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                    api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
 
@@ -133,7 +121,7 @@
             },
 
             czr_spacer_module : {
-                  mthds : ModuleConstructor,
+                  //mthds : ModuleConstructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_spacer_module', 'name' ),
                   has_mod_opt : false,
