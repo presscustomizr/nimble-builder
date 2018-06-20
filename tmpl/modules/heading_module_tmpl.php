@@ -14,7 +14,7 @@ if ( ! function_exists( '\Nimble\sek_print_tiny_mce_text_heading_content') ) {
     function sek_print_tiny_mce_text_heading_content( $tiny_mce_content, $input_id, $module_model, $args = array() ) {
         $defaults = array(
             'strip_tags'   => true,
-            'allowed_tags' => '<br><a><span><img><strong><em>',
+            'allowed_tags' => '<br><a><span><img><strong><em><del>',
             'echo'         => false
         );
         $args = wp_parse_args( $args, $defaults );

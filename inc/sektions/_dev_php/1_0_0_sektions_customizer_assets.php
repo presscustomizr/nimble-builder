@@ -162,11 +162,6 @@ function sek_enqueue_controls_js_css() {
                       'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
                   ),
 
-
-
-
-
-
                   // SPACING MODULE
                   'spacingUnits' => array(
                       'px' => __('Pixels', 'text_domain_to_be_replaced' ),
@@ -257,6 +252,7 @@ function sek_enqueue_controls_js_css() {
 
                 'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
 
+                'Select an icon'     => __( 'Select an icon', 'text_domain_to_be_replaced' ),
                 // 'Module' => __('Module', 'text_domain_to_be_replaced'),
                 // 'Module' => __('Module', 'text_domain_to_be_replaced'),
                 // 'Module' => __('Module', 'text_domain_to_be_replaced'),
