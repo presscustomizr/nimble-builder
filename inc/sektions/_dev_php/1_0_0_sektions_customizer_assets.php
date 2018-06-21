@@ -2,13 +2,6 @@
 // TINY MCE EDITOR
 require_once(  dirname( __FILE__ ) . '/customizer/seks_tiny_mce_editor_actions.php' );
 
-// CONTENT PICKER AJAX
-add_action( 'customize_register', '\Nimble\sek_setup_content_picker' );
-function sek_setup_content_picker() {
-    require_once(  dirname( __FILE__ ) . '/customizer/seks_content_picker-ajax_actions.php' );
-    new SEK_customize_ajax_content_picker_actions();
-}
-
 // ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
 add_action ( 'customize_controls_enqueue_scripts', '\Nimble\sek_enqueue_controls_js_css', 20 );
 function sek_enqueue_controls_js_css() {
