@@ -132,6 +132,7 @@ module.exports = {
       '<%= paths.czr_base_fmk %>_dev_php/0_3_czr-base-fmk-tmpl_builder.php',
       '<%= paths.czr_base_fmk %>_dev_php/0_4_czr-base-fmk-dynamic-setting-registration.php',
       '<%= paths.czr_base_fmk %>_dev_php/0_5_czr-base-fmk-dynamic-module-registration.php',
+      '<%= paths.czr_base_fmk %>_dev_php/0_6_czr-base-fmk-content_picker-ajax_actions.php',
       '<%= paths.czr_base_fmk %>_dev_php/0_9_czr-base-fmk-functions.php',
     ],
     dest: '<%= paths.czr_base_fmk %>czr-base-fmk.php',
