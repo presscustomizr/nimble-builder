@@ -149,7 +149,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // });
 
                         // POPULATE THE REGISTERED COLLECTION
+                        // 'czr-new-registered' is fired in api.CZR_Helpers.register()
                         api.bind( 'czr-new-registered', function( params ) {
+                              //console.log( 'czr-new-registered => ', params );
                               // Check that we have an origin property and that make sure we populate only the registration emitted by 'nimble'
                               if ( _.isUndefined( params.origin ) ) {
                                     throw new Error( 'czr-new-registered event => missing params.origin' );
@@ -169,7 +171,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     newRegistered.push( params );
                                     self.registered( newRegistered );
 
-                                    console.log('ALORS registered ?', self.registered() );
                                     // say it
                                     //this.trigger( [params.what, params.id , 'registered' ].join('__'), params );
                               }
@@ -236,13 +237,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // The parent panel for all ui sections + global options section
                   api.CZR_Helpers.register({
+                        origin : 'nimble',
                         what : 'panel',
                         id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
                         title: sektionsLocalizedData.i18n['Nimble Builder'],
                         priority : 1000,
                         constructWith : SektionPanelConstructor,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
-                        origin : 'nimble'
                   });
 
             },//mayBeRegisterAndSetupAddNewSektionSection()
