@@ -512,13 +512,6 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
 // TINY MCE EDITOR
 require_once(  dirname( __FILE__ ) . '/customizer/seks_tiny_mce_editor_actions.php' );
 
-// CONTENT PICKER AJAX
-add_action( 'customize_register', '\Nimble\sek_setup_content_picker' );
-function sek_setup_content_picker() {
-    require_once(  dirname( __FILE__ ) . '/customizer/seks_content_picker-ajax_actions.php' );
-    new SEK_customize_ajax_content_picker_actions();
-}
-
 // ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
 add_action ( 'customize_controls_enqueue_scripts', '\Nimble\sek_enqueue_controls_js_css', 20 );
 function sek_enqueue_controls_js_css() {
@@ -706,8 +699,6 @@ function sek_enqueue_controls_js_css() {
                 'Sections' => __( 'Sections', 'text_domain_to_be_replaced'),
 
                 'Nimble Builder' => __('Nimble Builder', 'text_domain_to_be_replaced'),
-
-                'Customizing' => __('Customizing', 'text_domain_to_be_replaced'),
 
                 "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_domain_to_be_replaced'),
                 "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
@@ -1000,6 +991,12 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'title' => __( 'Image', 'text_domain_to_be_replaced' ),
                   'icon' => 'image'
                 ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_heading_module',
+                  'title' => __( 'Heading', 'text_domain_to_be_replaced' ),
+                  'icon' => 'title'
+                )
                 // array(
                 //   'content-type' => 'module',
                 //   'content-id' => 'czr_simple_html_module',
@@ -1490,6 +1487,7 @@ function sek_register_modules() {
         'czr_tiny_mce_editor_module',
         'czr_image_module',
         //'czr_featured_pages_module'
+        'czr_heading_module'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
@@ -2399,6 +2397,65 @@ function sek_get_module_params_for_czr_image_module() {
         'placeholder_icon' => 'short_text'
     );
 }
+?><?php
+/* ------------------------------------------------------------------------- *
+ *  A FILE TO REGISTER SEVERAL MODULES, SO WE DON'T HAVE TO CONCATENATE IT WITH GRUNT
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+//Availabe input types
+// $.extend( api.czrInputMap, {
+//       text      : '',
+//       textarea  : '',
+//       check     : 'setupIcheck',
+//       gutencheck : 'setupGutenCheck',
+//       select    : 'setupSelect',
+//       radio     : 'setupRadio',
+//       number    : 'setupStepper',
+//       upload    : 'setupImageUploaderSaveAsId',
+//       upload_url : 'setupImageUploaderSaveAsUrl',
+//       color     : 'setupColorPicker',
+//       wp_color_alpha : 'setupColorPickerAlpha',
+//       wp_color  : 'setupWPColorPicker',//not used for the moment
+//       content_picker : 'setupContentPicker',
+//       tiny_mce_editor : 'setupTinyMceEditor',
+//       password : '',
+//       range : 'setupSimpleRange',
+//       range_slider : 'setupRangeSlider',
+//       hidden : '',
+//       h_alignment : 'setupHAlignement',
+//       h_text_alignment : 'setupHAlignement'
+// });
+function sek_get_module_params_for_czr_heading_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_heading_module',
+        'name' => __('Heading', 'text_domain_to_be_replaced'),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'starting_value' => array(
+            'heading_text' => 'This is a heading.'
+        ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'heading_text' => array(
+                    'input_type'  => 'tiny_mce_editor',
+                    'title'       => __('Heading text', 'text_domain'),
+                    'default'     => ''
+                ),
+                'heading_tag' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Heading tag', 'text_domain'),
+                    'default'     => 'h1'
+                ),
+            )
+        ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/heading_module_tmpl.php",
+        //'placeholder_icon' => 'code'
+    );
+}
+
+
+
 ?><?php
 if ( ! defined( 'ABSPATH' ) ) {
     exit;

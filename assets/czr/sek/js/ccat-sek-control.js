@@ -148,6 +148,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       api.errare( 'sek_import_attachment ajax action failed', _er_ );
                         // });
 
+                        // POPULATE THE REGISTERED COLLECTION
+                        // 'czr-new-registered' is fired in api.CZR_Helpers.register()
+                        api.bind( 'czr-new-registered', function( params ) {
+                              //console.log( 'czr-new-registered => ', params );
+                              // Check that we have an origin property and that make sure we populate only the registration emitted by 'nimble'
+                              if ( _.isUndefined( params.origin ) ) {
+                                    throw new Error( 'czr-new-registered event => missing params.origin' );
+                              }
+                              if ( 'nimble' !== params.origin )
+                                return;
+
+                              // when no collection is provided, we use
+                              if ( false !== params.track ) {
+                                    var currentlyRegistered = self.registered();
+                                    var newRegistered = $.extend( true, [], currentlyRegistered );
+                                    //Check for duplicates
+                                    var duplicateCandidate = _.findWhere( newRegistered, { id : params.id } );
+                                    if ( ! _.isEmpty( duplicateCandidate ) && _.isEqual( duplicateCandidate, params ) ) {
+                                          throw new Error( 'register => duplicated element in self.registered() collection ' + params.id );
+                                    }
+                                    newRegistered.push( params );
+                                    self.registered( newRegistered );
+
+                                    // say it
+                                    //this.trigger( [params.what, params.id , 'registered' ].join('__'), params );
+                              }
+                        });
+
                   });//api.bind( 'ready' )
             },// initialize()
 
@@ -208,13 +236,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   // The parent panel for all ui sections + global options section
-                  this.register({
+                  api.CZR_Helpers.register({
+                        origin : 'nimble',
                         what : 'panel',
                         id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
                         title: sektionsLocalizedData.i18n['Nimble Builder'],
                         priority : 1000,
                         constructWith : SektionPanelConstructor,
-                        track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                        track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                   });
 
             },//mayBeRegisterAndSetupAddNewSektionSection()
@@ -275,13 +304,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // if the collection setting is not registered yet
                   // => register it and bind it
                   if ( ! api.has( collectionSettingId ) ) {
-                        var __collectionSettingInstance__ = self.register({
+                        var __collectionSettingInstance__ = api.CZR_Helpers.register({
                               what : 'setting',
                               id : collectionSettingId,
                               value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.defaultSektionSettingValue ),
                               transport : 'postMessage',//'refresh'
                               type : 'option',
-                              track : false//don't register in the self.registered()
+                              track : false,//don't register in the self.registered()
+                              origin : 'nimble'
                         });
 
                         if ( sektionsLocalizedData.isDevMode ) {
@@ -305,7 +335,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // loop_start, before_content, after_content, loop_end
 
                   // Global Options : section
-                  // this.register({
+                  // api.CZR_Helpers.register({
                   //       what : 'section',
                   //       id : sektionsLocalizedData.optPrefixForSektionGlobalOptsSetting,//'__sektions__'
                   //       title: 'Global Options',
@@ -316,7 +346,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // // => register a control
                   // // Template
-                  // this.register({
+                  // api.CZR_Helpers.register({
                   //       what : 'control',
                   //       id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
                   //       title: 'Main sektions panel',
@@ -1188,7 +1218,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       api.errare('MODULE / SECTION PICKER SETTING CHANGED');
                                                 });
                                           });
-                                          self.register( {
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 what : 'setting',
                                                 id : _id_,
@@ -1199,7 +1230,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     }
 
-                                    self.register( {
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
                                           level : params.level,
                                           what : 'control',
                                           id : _id_,
@@ -1223,7 +1255,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
 
                               // MODULE / SECTION PICKER SECTION
-                              self.register({
+                              api.CZR_Helpers.register({
+                                    origin : 'nimble',
                                     what : 'section',
                                     id : _id_,
                                     title: 'module' === params.content_type ? sektionsLocalizedData.i18n['Module Picker'] : sektionsLocalizedData.i18n['Section Picker'],
@@ -1310,7 +1343,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                           });
 
-                                          self.register({
+                                          api.CZR_Helpers.register({
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 what : 'setting',
                                                 id : params.id,
@@ -1323,7 +1357,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-                                    self.register( {
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
                                           level : params.level,
                                           what : 'control',
                                           id : params.id,
@@ -1346,7 +1381,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
 
                               // MAIN CONTENT SECTION
-                              self.register({
+                              api.CZR_Helpers.register({
+                                    origin : 'nimble',
                                     what : 'section',
                                     id : params.id,
                                     title: sektionsLocalizedData.i18n['Content for'] + ' ' + api.czrModuleMap[ moduleType ].name,
@@ -1423,7 +1459,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 });//api( heightOptionsSetId, function( _setting_ ) {})
 
 
-                                                self.register( {
+                                                api.CZR_Helpers.register( {
+                                                      origin : 'nimble',
                                                       level : params.level,
                                                       what : 'setting',
                                                       id : sectionLayoutOptionsSetId,
@@ -1435,7 +1472,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }//if( ! api.has( sectionLayoutOptionsSetId ) ) {
 
 
-                                          self.register( {
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 level_id : params.id,
                                                 what : 'control',
@@ -1480,7 +1518,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });//api( bgBorderOptionsSetId, function( _setting_ ) {})
 
 
-                                          self.register( {
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 what : 'setting',
                                                 id : bgBorderOptionsSetId,
@@ -1491,7 +1530,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     }//if( ! api.has( bgBorderOptionsSetId ) ) {
 
-                                    self.register( {
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
                                           level : params.level,
                                           level_id : params.id,
                                           what : 'control',
@@ -1534,7 +1574,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });//api( spacingOptionsSetId, function( _setting_ ) {})
 
 
-                                          self.register( {
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 what : 'setting',
                                                 id : spacingOptionsSetId,
@@ -1547,7 +1588,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-                                    self.register( {
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
                                           level : params.level,
                                           what : 'control',
                                           id : spacingOptionsSetId,
@@ -1591,7 +1633,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });//api( heightOptionsSetId, function( _setting_ ) {})
 
 
-                                          self.register( {
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
                                                 level : params.level,
                                                 what : 'setting',
                                                 id : heightOptionsSetId,
@@ -1602,7 +1645,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     }//if( ! api.has( heightOptionsSetId ) ) {
 
-                                    self.register( {
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
                                           level : params.level,
                                           level_id : params.id,
                                           what : 'control',
@@ -1630,7 +1674,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     _do_register_();
                               });
 
-                              self.register({
+                              api.CZR_Helpers.register({
+                                    origin : 'nimble',
                                     what : 'section',
                                     id : params.id,
                                     title: sektionsLocalizedData.i18n['Settings for the'] + ' ' + params.level,
@@ -2853,170 +2898,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            register : function( params ) {
-                  if ( ! _.has( params, 'id' ) ){
-                        api.errare( 'register => missing id ', params );
-                        return;
-                  }
-                  // For the UI elements that we want to track, a level property is needed
-                  // if ( false !== params.track && ! _.has( params, 'level' ) ){
-                  //       api.errare( 'register => missing trackable level ', params );
-                  //       return;
-                  // }
-
-                  var __element__ = {}, defaults;
-
-                  switch ( params.what ) {
-                        // Register only if not registered already
-                        // For example, when saved as draft in a changeset, the setting is already dynamically registered server side
-                        // => in this case, we only need to register the associated control
-                        // @params args { id : , value : , transport : , type :  }
-                        case 'setting' :
-                              if ( api.has( params.id ) ) {
-                                    //api.consoleLog( 'registerSetting => setting Id already registered : ' + params.id );
-                                    return params;
-                              }
-                              defaults = $.extend( true, {}, api.Setting.prototype.defaults );
-                              var settingArgs = _.extend(
-                                  defaults ,
-                                    {
-                                          dirty : ! _.isUndefined( params.dirty ) ? params.dirty : false,
-                                          value : params.value || [],
-                                          transport : params.transport || 'refresh',
-                                          type : params.type || 'option'
-                                    }
-                              );
-                              // assign the value sent from the server
-
-
-                              // console.log('registerDynamicModuleSettingControl => SETTING DATA ?', params.id, settingArgs);
-                              var SettingConstructor = api.settingConstructor[ settingArgs.type ] || api.Setting;
-                              try { api.add( new SettingConstructor( params.id, settingArgs.value, settingArgs ) ); } catch ( er ) {
-                                    api.errare( 'czr_sektions::register => problem when adding a setting to the api', er );
-                              }
-                        break;
-
-
-                        case 'panel' :
-                              // Check if we have a correct section
-                              if ( ! _.has( params, 'id' ) ){
-                                    throw new Error( 'registerPanel => missing panel id ');
-                              }
-
-                              if ( api.section.has( params.id ) ) {
-                                    //api.errare( 'registerPanel => ' + params.id + ' is already registered');
-                                    break;
-                              }
-
-                              defaults = $.extend( true, {}, api.Panel.prototype.defaults );
-                              var panelParams = _.extend(
-                                  defaults , {
-                                        id: params.id,
-                                        title: params.title || params.id,
-                                        priority: _.has( params, 'priority' ) ? params.priority : 0
-                                  }
-                              );
-
-                              var PanelConstructor = _.isObject( params.constructWith ) ? params.constructWith : api.Panel;
-                              panelParams = _.extend( { params: panelParams }, panelParams ); // Inclusion of params alias is for back-compat for custom panels that expect to augment this property.
-
-                              try { __element__ = api.panel.add( new PanelConstructor( params.id, panelParams ) ); } catch ( er ) {
-                                    api.errare( 'czr_sektions::register => problem when adding a panel to the api', er );
-                              }
-                        break;
-
-
-                        case 'section' :
-                              // MAYBE REGISTER THE SECTION
-                              // Check if we have a correct section
-                              if ( ! _.has( params, 'id' ) ){
-                                    throw new Error( 'registerSection => missing section id ');
-                              }
-
-                              if ( api.section.has( params.id ) ) {
-                                    //api.errare( 'registerSection => ' + params.id + ' is already registered');
-                                    break;
-                              }
-
-                              defaults = $.extend( true, {}, api.Section.prototype.defaults );
-                              var sectionParams = _.extend(
-                                  defaults, {
-                                        content : '',
-                                        id: params.id,
-                                        title: params.title,
-                                        panel: params.panel,
-                                        priority: params.priority,
-                                        description_hidden : false,
-                                        customizeAction: sektionsLocalizedData.i18n['Customizing']
-                                  }
-                              );
-
-                              var SectionConstructor = ! _.isUndefined( params.constructWith ) ? params.constructWith : api.Section;
-                              sectionParams = _.extend( { params: sectionParams }, sectionParams ); // Inclusion of params alias is for back-compat for custom panels that expect to augment this property.
-                              try { __element__ = api.section.add( new SectionConstructor( params.id, sectionParams ) ); } catch ( er ) {
-                                    api.errare( 'czr_sektions::register => problem when adding a section to the api', er );
-                              }
-                        break;
-
-
-                        case 'control' :
-                              if ( api.control.has( params.id ) ) {
-                                    //api.errorLog( 'registerControl => ' + params.id + ' is already registered');
-                                    break;
-                              }
-
-                              //console.log('PARAMS BEFORE REGISTERING A CONTROL => ', params);
-
-                              //@see api.settings.controls,
-                              defaults = $.extend( true, {}, api.Control.prototype.defaults );
-                              var controlArgs = _.extend(
-                                        defaults,
-                                        {
-                                              content : '',
-                                              label : params.label || params.id,
-                                              priority : params.priority,
-                                              section : params.section,
-                                              settings: params.settings,
-                                              type : params.type, //'czr_module',
-                                              module_type : params.module_type,
-                                              input_attrs : params.input_attrs,//<= can be used with the builtin "button" type control
-                                              sek_registration_params : params// <= used when refreshing a level for example
-                                        }
-                                  ),
-                                  ControlConstructor = api.controlConstructor[ controlArgs.type ] || api.Control,
-                                  options;
-
-                              options = _.extend( { params: controlArgs }, controlArgs ); // Inclusion of params alias is for back-compat for custom controls that expect to augment this property.
-                              try { __element__ = api.control.add( new ControlConstructor( params.id, options ) ); } catch ( er ) {
-                                    api.errare( 'czr_sektions::register => problem when adding a control to the api', er );
-                              }
-                        break;
-                        default :
-                              api.errorLog('invalid "what" when invoking the register() method');
-                        break;
-
-                  }//switch
-                  __element__ = ! _.isEmpty( __element__ ) ?  __element__ : { deferred : { embedded : $.Deferred( function() { this.resolve(); }) } };
-
-                  // POPULATE THE REGISTERED COLLECTION
-                  if ( false !== params.track ) {
-                        var currentlyRegistered = this.registered();
-                        var newRegistered = $.extend( true, [], currentlyRegistered );
-                        //Check for duplicates
-                        var duplicateCandidate = _.findWhere( newRegistered, { id : params.id } );
-                        if ( ! _.isEmpty( duplicateCandidate ) && _.isEqual( duplicateCandidate, params ) ) {
-                              throw new Error( 'register => duplicated element in self.registered() collection ' + params.id );
-                        }
-                        newRegistered.push( params );
-                        this.registered( newRegistered );
-
-                        // say it
-                        //this.trigger( [params.what, params.id , 'registered' ].join('__'), params );
-                  }
-
-                  return 'setting' == params.what ? params : __element__.deferred.embedded;
-            },
-
             //@return void()
             //clean all registered control, section, panel tracked ids
             //preserve the settings
@@ -3945,7 +3826,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var input = this,
                       $wrapper = $('.sek-spacing-wrapper', input.container );
                   // Listen to user actions on the inputs and set the input value
-                  $wrapper.on( 'keyup mouseup change', 'input[type="number"]', function(evt) {
+                  $wrapper.on( 'input', 'input[type="number"]', function(evt) {
                         var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
                             _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
                             _rawVal = $(this).val();
@@ -5066,13 +4947,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             initialize: function( id, options ) {
                     //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
-                    //run the parent initialize
-                    api.CZRDynModule.prototype.initialize.call( module, id, options );
-
                     // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                     module.inputConstructor = api.CZRInput.extend( module.CZRImageInputMths || {} );
                     // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                     module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+
+                    // run the parent initialize
+                    // Note : must be always invoked always after the input / item class extension
+                    // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                    api.CZRDynModule.prototype.initialize.call( module, id, options );
 
                     //SET THE CONTENT PICKER DEFAULT OPTIONS
                     //@see ::setupContentPicker()
@@ -5221,26 +5104,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             initialize: function( id, options ) {
                     //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
-                    //run the parent initialize
-                    api.CZRDynModule.prototype.initialize.call( module, id, options );
-
                     // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                     module.inputConstructor = api.CZRInput.extend( module.CZRTextEditorInputMths || {} );
                     // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                     // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+
+                    // run the parent initialize
+                    // Note : must be always invoked always after the input / item class extension
+                    // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                    api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
             CZRTextEditorInputMths : {
                     initialize : function( name, options ) {
                           var input = this;
-                          api.CZRInput.prototype.initialize.call( input, name, options );
-
                           // Expand the editor when ready
                           if ( 'tiny_mce_editor' == input.type ) {
                                 input.isReady.then( function() {
                                       input.container.find('[data-czr-action="open-tinymce-editor"]').trigger('click');
                                 });
                           }
+                          api.CZRInput.prototype.initialize.call( input, name, options );
                     },
 
                     setupSelect : function() {
@@ -5292,6 +5176,51 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_tiny_mce_editor_module' )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      var ModuleConstructor = {
+            // initialize: function( id, options ) {
+            //         //console.log('INITIALIZING IMAGE MODULE', id, options );
+            //         var module = this;
+
+            //         // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+            //         //module.inputConstructor = api.CZRInput.extend( module.CCZRInputMths || {} );
+            //         // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+            //         // module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
+            //
+            //         //run the parent initialize
+            //         // Note : must be always invoked always after the input / item class extension
+                        // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+            //         api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+            // },//initialize
+
+            // CZRInputMths : {},//CZRInputMths
+
+            // CZRItemMethods : { },//CZRItemMethods
+      };//ModuleConstructor
+
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_heading_module : {
+                  mthds : ModuleConstructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_heading_module' )
             },
       });
 })( wp.customize , jQuery, _ );
