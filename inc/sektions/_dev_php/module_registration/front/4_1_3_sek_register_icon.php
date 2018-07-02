@@ -36,7 +36,7 @@ function sek_get_module_params_for_czr_icon_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'icon' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'fa_icon_picker',
                     'title'       => __('Select an Icon', 'text_domain_to_be_replaced'),
                     //'default'     => 'no-link'
                 ),
