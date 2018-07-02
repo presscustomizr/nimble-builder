@@ -1,6 +1,6 @@
 <?php
 /* ------------------------------------------------------------------------- *
- *  FONT PICKER INPUT
+ *  FONT AWESOME ICON PICKER INPUT
 /* ------------------------------------------------------------------------- */
 // @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___fa_icon_picker( $input_id, $input_data ) {
