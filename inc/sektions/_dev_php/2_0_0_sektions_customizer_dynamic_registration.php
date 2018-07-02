@@ -23,27 +23,28 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         //@action 'customize_register'
         function load_nimble_setting_class() {
-              require_once(  dirname( __FILE__ ) . '/customizer/seks_setting_class.php' );
+            require_once(  dirname( __FILE__ ) . '/customizer/seks_setting_class.php' );
         }
 
         //@filter 'customize_dynamic_setting_args'
         function set_dyn_setting_args( $setting_args, $setting_id ) {
             // shall start with "sek__"
             if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
-                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
+                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
                     'type' => 'option',
-                    'default' => array()
+                    'default' => array(),
                     //'sanitize_callback'    => array( $this, 'sanitize_callback' )
                     //'validate_callback'    => array( $this, 'validate_callback' )
                 );
             } else if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) ) {
-                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
+                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
                     'type' => '_nimble_ui_',//won't be saved as is,
-                    'default' => array()
+                    'default' => array(),
+                    'sanitize_callback' => array( $this, 'sanitize_callback' )
                 );
             }
 
@@ -51,6 +52,7 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
             return $setting_args;
             //return wp_parse_args( array( 'default' => array() ), $setting_args );
         }
+
 
         //@filter 'customize_dynamic_setting_class'
         function set_dyn_setting_class( $class, $setting_id, $args ) {
@@ -63,7 +65,23 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
 
         function sanitize_callback( $setting_data, $setting_instance ) {
-            sek_error_log( 'in_sek_sanitize_callback for setting id ' . $setting_instance->id, $setting_data );
+            if ( isset( $_POST['skope_id'] ) ) {
+                //sek_error_log( 'in_sek_sanitize_callback for setting id ' . $setting_instance->id, sek_get_skoped_seks( $_POST['skope_id'] ) );//sek_get_level_model( $setting_instance->id ) );
+                $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
+                if ( is_array( $sektionSettingValue ) ) {
+                    $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
+                    if ( is_array( $sektion_collection ) ) {
+                        $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
+                        if ( ! empty( $model['module_type'] ) ) {
+                            //sek_error_log( 'in_sek_sanitize_callback for setting id ' . $setting_instance->id, sek_get_level_model( $setting_instance->id, $sektion_collection ) );
+                            $module_params = CZR_Fmk_Base() -> czr_get_registered_dynamic_module( $model['module_type'] );
+                            if ( array_key_exists( 'sanitize_callback', $module_params ) && function_exists( $module_params[ 'sanitize_callback' ] ) ) {
+                                $setting_data = $module_params[ 'sanitize_callback' ]( $setting_data );
+                            }
+                        }
+                    }
+                }
+            }
             //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
             return $setting_data;
         }
