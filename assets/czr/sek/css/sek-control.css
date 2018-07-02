@@ -94,8 +94,9 @@ ul[id*="sub-accordion-section-__nimble__"] {
   display: block;
   padding: 10px 0 0;
 }
-[data-sek-content-type] .sek-module-icon .material-icons {
+[data-sek-content-type] .sek-module-icon .nimble-module-icons {
   font-size: 3rem;
+  max-width: 60%!important;
   color: #878787;
 }
 [data-sek-content-type] .sek-module-title {
