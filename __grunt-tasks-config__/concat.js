@@ -193,6 +193,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_4_sek_input_tmpl_bg_position.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_5_sek_input_tmpl_horizontal_alignment.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_6_sek_input_tmpl_vertical_alignment.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_71_sek_input_tmpl_fa_icon_picker.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_7_sek_input_tmpl_font_picker.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_8_sek_input_tmpl_font_size_line_height.php',
 
