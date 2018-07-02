@@ -28,29 +28,6 @@
                             return params;
                       });
 
-                      module.icons = {
-                        'fas' : [
-                          'address-book',
-                          'adjust'
-                        ],
-                        'far' : [
-                          'calendar',
-                          'calendar-alt'
-                        ],
-                        'fab' : [
-                          'adn',
-                          'adversal'
-                        ]
-                      };
-
-                      //to localize
-                      module.icon_groups = {
-                        'fas' : 'Solid',
-                        'far' : 'Regular',
-                        'fab' : 'Brand'
-                      };
-
-
                       // run the parent initialize
                       // Note : must be always invoked always after the input / item class extension
                       // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
@@ -65,59 +42,10 @@
                               var input  = this,
                                   item   = input.input_parent,
                                   module = input.module,
-                                  _model  = item(),
-                                  _selected_found = false;
+                                  _model  = item();
 
-                              //Icon select
-                              if ( 'icon' == input.id ) {
-                                  //generates the options
-                                  _.each( module.icons , function( icons, group ) {
-                                          var $_group =  $( '<optgroup>', { label: module.icon_groups[ group ] } );
-                                          $( 'select[data-czrtype="social-icon"]', input.container ).append( $( '<optgroup>', { label: module.icon_groups[ group ] } ) );
-                                          _.each( icons, function( icon ) {
-                                                var _attributes = {
-                                                          value: group + ' fa-' + icon,
-                                                          html: api.CZR_Helpers.capitalize( icon )
-                                                    };
-                                                if ( _attributes.value == _model['icon'] ) {
-                                                      $.extend( _attributes, { selected : "selected" } );
-                                                      _selected_found = true;
-                                                }
-                                                $_group.append( $('<option>', _attributes) );
-                                          });
-
-                                          $( 'select[data-czrtype]', input.container ).append( $_group );
-                                  });
-
-                                  var addIcon = function ( state ) {
-                                        if (! state.id) { return state.text; }
-
-                                        //two spans here because we cannot wrap the social text into the social icon span as the solid FA5 font-weight is bold
-                                        var  $state = $(
-                                          '<span class="' + state.element.value + '"></span><span class="social-name">&nbsp;&nbsp;' + state.text + '</span>'
-                                        );
-                                        return $state;
-                                  };
-
-                                  //blank option to allow placeholders
-                                  var $_placeholder;
-                                  if ( _selected_found ) {
-                                        $_placeholder = $('<option>');
-                                  } else {
-                                        $_placeholder = $('<option>', { selected: 'selected' } );
-                                  }
-                                  //Initialize select2
-                                  $( 'select[data-czrtype]', input.container )
-                                    .prepend( $_placeholder )
-                                    .select2({
-                                          templateResult: addIcon,
-                                          templateSelection: addIcon,
-                                          placeholder: sektionsLocalizedData.i18n['Select an icon'],
-                                          allowClear: true
-                                  });
-
-                              } //Link select
-                              else if ( 'link-to' == input.id ) {
+                               //Link select
+                              if ( 'link-to' == input.id ) {
                                     if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
                                           api.errare( 'Missing select options for input id => ' + input.id + ' in icon module');
                                           return;
@@ -140,8 +68,8 @@
                                           });
                                           $( 'select[data-czrtype]', input.container ).selecter();
                                     }
-                              }
-                      }
+                              }// if
+                      }//setupSelect
               },//CZRIconInputMths
       };//IconModuleConstructor
 
