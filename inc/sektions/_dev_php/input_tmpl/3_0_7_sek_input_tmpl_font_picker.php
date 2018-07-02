@@ -21,21 +21,9 @@ add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_li
 //
 // For czr_tiny_mce_editor_module, we request the font_list tmpl
 function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
-    // sek_error_log( __FUNCTION__ . ' => ajax posted params', $posted_params );
-    $css_attr = CZR_Fmk_Base() -> czr_css_attr;
-
     if ( empty( $requested_tmpl ) ) {
         wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
     }
-
-    // ob_start();
-    /*  ?>
-
-      <?php*/
-    // $html = ob_get_clean();
-    // if ( empty( $html ) ) {
-    //     wp_send_json_error( 'ac_get_all_modules_tmpl => no template was found for tmpl => ' . $requested_tmpl );
-    // }
 
     return wp_json_encode( array(
         'cfonts' => sek_get_cfonts(),
