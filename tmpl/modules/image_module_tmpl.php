@@ -69,7 +69,7 @@ if ( 'no-link' === $value['link-to'] ) {
 } else {
     printf('<a href="%1$s" %2$s>%3$s</a>',
         sek_get_img_module_img_link( $value ),
-        true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank"' : '',
+        true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
         sek_get_img_module_img_html( $value )
     );
 }
