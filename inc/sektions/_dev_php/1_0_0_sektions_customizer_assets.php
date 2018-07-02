@@ -47,214 +47,251 @@ function sek_enqueue_controls_js_css() {
     wp_localize_script(
         'czr-sektions',
         'sektionsLocalizedData',
-        array(
-            'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
-            'baseUrl' => NIMBLE_BASE_URL,
-            'sektionsPanelId' => '__sektions__',
-            'addNewSektionId' => 'sek_add_new_sektion',
-            'addNewColumnId' => 'sek_add_new_column',
-            'addNewModuleId' => 'sek_add_new_module',
+        apply_filters( 'nimble-sek-localized-customizer-control-params',
+            array(
+                'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
+                'baseUrl' => NIMBLE_BASE_URL,
+                'sektionsPanelId' => '__sektions__',
+                'addNewSektionId' => 'sek_add_new_sektion',
+                'addNewColumnId' => 'sek_add_new_column',
+                'addNewModuleId' => 'sek_add_new_module',
 
-            'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
-            'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__nimble__"
+                'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
+                'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__nimble__"
 
-            'defaultSektionSettingValue' => sek_get_default_sektions_value(),
+                'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 
-            'presetSections' => sek_get_preset_sektions(),
+                'presetSections' => sek_get_preset_sektions(),
 
-            'registeredModules' => CZR_Fmk_Base() -> registered_modules,
+                'registeredModules' => CZR_Fmk_Base() -> registered_modules,
 
-            // Dnd
-            'preDropElementClass' => 'sortable-placeholder',
-            'dropSelectors' => implode(',', [
-                // 'module' type
-                //'.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                //'[data-sek-level="location"]',
-                //'.sek-not-empty-col',// the drop zone when there is at least one module
-                //'.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
-                //'.sek-content-module-drop-zone',//between sections
-                '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
-                'body',// body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
+                // Dnd
+                'preDropElementClass' => 'sortable-placeholder',
+                'dropSelectors' => implode(',', [
+                    // 'module' type
+                    //'.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
+                    //'[data-sek-level="location"]',
+                    //'.sek-not-empty-col',// the drop zone when there is at least one module
+                    //'.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
+                    //'.sek-content-module-drop-zone',//between sections
+                    '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
+                    'body',// body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
 
-                // 'preset_section' type
-                '.sek-content-preset_section-drop-zone'//between sections
-            ]),
-
-
-            'selectOptions' => array(
-                  // IMAGE MODULE
-                  'link-to' => array(
-                      'no-link' => __('No link', 'text_domain_to_be_replaced' ),
-                      'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
-                      'img-file' => __('Image file', 'text_domain_to_be_replaced' ),
-                      'img-page' =>__('Image page', 'text_domain_to_be_replaced' )
-                  ),
-                  'img-size' => sek_get_img_sizes(),
-
-
-                  // FEATURED PAGE MODULE
-                  'img-type' => array(
-                      'none' => __('No image', 'text_domain_to_be_replaced' ),
-                      'featured' => __('Use the page featured image', 'text_domain_to_be_replaced' ),
-                      'custom' => __('Use a custom image', 'text_domain_to_be_replaced' ),
-                  ),
-                  'content-type' => array(
-                      'none' => __('No text', 'text_domain_to_be_replaced' ),
-                      'page-excerpt' => __('Use the page excerpt', 'text_domain_to_be_replaced' ),
-                      'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
-                  ),
-
-                  // HEADING MODULE
-                  'heading_tag' => array(
-                      /* Not totally sure these should be localized as they strictly refer to html tags */
-                      'h1' => __('H1', 'text_domain_to_be_replaced' ),
-                      'h2' => __('H2', 'text_domain_to_be_replaced' ),
-                      'h3' => __('H3', 'text_domain_to_be_replaced' ),
-                      'h4' => __('H4', 'text_domain_to_be_replaced' ),
-                      'h5' => __('H5', 'text_domain_to_be_replaced' ),
-                      'h6' => __('H6', 'text_domain_to_be_replaced' ),
-                  ),
-
-                  // GENERIC CSS MODIFIERS INPUT TYPES
-                  'font_weight_css' => array(
-                      'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
-                      'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
-                      'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
-                      'lighter'   => __( 'lighter', 'text_domain_to_be_replaced' ),
-                      100     => 100,
-                      200     => 200,
-                      300     => 300,
-                      400     => 400,
-                      500     => 500,
-                      600     => 600,
-                      700     => 700,
-                      800     => 800,
-                      900     => 900
-                  ),
-
-                  'font_style_css' => array(
-                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                      'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
-                      'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
-                      'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
-                  ),
-
-                  'text_decoration_css' =>  array(
-                      'none'      => __( 'none', 'text_domain_to_be_replaced' ),
-                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                      'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
-                      'overline'    => __( 'overline', 'text_domain_to_be_replaced' ),
-                      'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
-                  ),
-
-                  'text_transform_css' => array(
-                      'none'      => __( 'none', 'text_domain_to_be_replaced' ),
-                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                      'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
-                      'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
-                      'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
-                  ),
-
-                  // SPACING MODULE
-                  'spacingUnits' => array(
-                      'px' => __('Pixels', 'text_domain_to_be_replaced' ),
-                      'em' => __('Em', 'text_domain_to_be_replaced'),
-                      'percent' => __('Percents', 'text_domain_to_be_replaced' )
-                  ),
-
-                  // LAYOUT BACKGROUND BORDER
-                  'boxed-wide' => array(
-                      'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
-                      'fullwidth' => __('Full Width', 'text_domain_to_be_replaced')
-                  ),
-                  'height-type' => array(
-                      'default' => __('default', 'text_domain_to_be_replaced'),
-                      'fit-to-screen' => __('Fit to screen', 'text_domain_to_be_replaced'),
-                      'custom' => __('Custom', 'text_domain_to_be_replaced' )
-                  ),
-                  'bg-scale' => array(
-                      'default' => __('default', 'text_domain_to_be_replaced'),
-                      'auto' => __('auto', 'text_domain_to_be_replaced'),
-                      'cover' => __('scale to fill', 'text_domain_to_be_replaced'),
-                      'contain' => __('fit', 'text_domain_to_be_replaced'),
-                  ),
-                  'bg-position' => array(
-                      'default' => __('default', 'text_domain_to_be_replaced'),
-                  ),
-                  'border-type' => array(
-                      'none' => __('none', 'text_domain_to_be_replaced'),
-                      'solid' => __('solid', 'text_domain_to_be_replaced'),
-                      'double' => __('double', 'text_domain_to_be_replaced'),
-                      'dotted' => __('dotted', 'text_domain_to_be_replaced'),
-                      'dashed' => __('dashed', 'text_domain_to_be_replaced')
-                  )
-            ),
-
-
-            'i18n' => array(
-                'Sections' => __( 'Sections', 'text_domain_to_be_replaced'),
-
-                'Nimble Builder' => __('Nimble Builder', 'text_domain_to_be_replaced'),
-
-                "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_domain_to_be_replaced'),
-                "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
-                "A section must have at least one column." => __( "A section must have at least one column.", 'text_domain_to_be_replaced'),
-
-                'If this problem locks the Nimble builder, you might try to reset the sections for this page.' => __('If this problem locks the Nimble builder, you might try to reset the sections for this page.', 'text_domain_to_be_replaced'),
-                'Reset' => __('Reset', 'text_domain_to_be_replaced'),
-                'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
-
-                // Generated UI
-                'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
-                'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
-
-                'Section Picker' => __('Section Picker', 'text_domain_to_be_replaced'),
-
-                'Module' => __('Module', 'text_domain_to_be_replaced'),
-                'Content for' => __('Content for', 'text_domain_to_be_replaced'),
-                'Customize the options for module :' => __('Customize the options for module :', 'text_domain_to_be_replaced'),
-
-                'Layout settings for the' => __('Layout settings for the', 'text_domain_to_be_replaced'),
-                'Background and border settings for the' => __('Background and border settings for the', 'text_domain_to_be_replaced'),
-                'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_domain_to_be_replaced'),
-                'Height settings for the' => __('Height settings for the', 'text_domain_to_be_replaced'),
-
-                'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
-
-                // Levels
-                'location' => __('location', 'text_domain_to_be_replaced'),
-                'section' => __('section', 'text_domain_to_be_replaced'),
-                'column' => __('column', 'text_domain_to_be_replaced'),
-                'module' => __('module', 'text_domain_to_be_replaced'),
-
-                'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
-
-                // DRAG n DROP
-                'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
-                'Insert in a new section' => __('Insert in a new section', 'text_domain_to_be_replaced'),
-                'Insert a new section here' => __('Insert a new section here', 'text_domain_to_be_replaced'),
-
-                // MODULES
-                'Select a font family' => __('Select a font family', 'text_domain_to_be_replaced'),
-                'Web Safe Fonts' => __('Web Safe Fonts', 'text_domain_to_be_replaced'),
-                'Google Fonts' => __('Google Fonts', 'text_domain_to_be_replaced'),
-
-                'Set a custom url' => __('Set a custom url', 'text_domain_to_be_replaced'),
-
-                'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
-
-                'Select an icon'     => __( 'Select an icon', 'text_domain_to_be_replaced' ),
-                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-
-
+                    // 'preset_section' type
+                    '.sek-content-preset_section-drop-zone'//between sections
+                ])
             )
         )
-    );
-}
+    );//wp_localize_script()
+}//sek_enqueue_controls_js_css()
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  LOCALIZED PARAMS I18N
+/* ------------------------------------------------------------------------- */
+add_filter( 'nimble-sek-localized-customizer-control-params', '\Nimble\nimble_add_i18n_localized_control_params' );
+function nimble_add_i18n_localized_control_params( $params ) {
+    return array_merge( $params, array(
+        'i18n' => array(
+            'Sections' => __( 'Sections', 'text_domain_to_be_replaced'),
+
+            'Nimble Builder' => __('Nimble Builder', 'text_domain_to_be_replaced'),
+
+            "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_domain_to_be_replaced'),
+            "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
+            "A section must have at least one column." => __( "A section must have at least one column.", 'text_domain_to_be_replaced'),
+
+            'If this problem locks the Nimble builder, you might try to reset the sections for this page.' => __('If this problem locks the Nimble builder, you might try to reset the sections for this page.', 'text_domain_to_be_replaced'),
+            'Reset' => __('Reset', 'text_domain_to_be_replaced'),
+            'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
+
+            // Generated UI
+            'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
+            'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
+
+            'Section Picker' => __('Section Picker', 'text_domain_to_be_replaced'),
+
+            'Module' => __('Module', 'text_domain_to_be_replaced'),
+            'Content for' => __('Content for', 'text_domain_to_be_replaced'),
+            'Customize the options for module :' => __('Customize the options for module :', 'text_domain_to_be_replaced'),
+
+            'Layout settings for the' => __('Layout settings for the', 'text_domain_to_be_replaced'),
+            'Background and border settings for the' => __('Background and border settings for the', 'text_domain_to_be_replaced'),
+            'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_domain_to_be_replaced'),
+            'Height settings for the' => __('Height settings for the', 'text_domain_to_be_replaced'),
+
+            'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
+
+            // Levels
+            'location' => __('location', 'text_domain_to_be_replaced'),
+            'section' => __('section', 'text_domain_to_be_replaced'),
+            'column' => __('column', 'text_domain_to_be_replaced'),
+            'module' => __('module', 'text_domain_to_be_replaced'),
+
+            'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
+
+            // DRAG n DROP
+            'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
+            'Insert in a new section' => __('Insert in a new section', 'text_domain_to_be_replaced'),
+            'Insert a new section here' => __('Insert a new section here', 'text_domain_to_be_replaced'),
+
+            // MODULES
+            'Select a font family' => __('Select a font family', 'text_domain_to_be_replaced'),
+            'Web Safe Fonts' => __('Web Safe Fonts', 'text_domain_to_be_replaced'),
+            'Google Fonts' => __('Google Fonts', 'text_domain_to_be_replaced'),
+
+            'Set a custom url' => __('Set a custom url', 'text_domain_to_be_replaced'),
+
+            'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
+
+            'Select an icon'     => __( 'Select an icon', 'text_domain_to_be_replaced' ),
+            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+
+        )//array()
+    )//array()
+    );//array_merge
+}//'nimble_add_i18n_localized_control_params'
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  LOCALIZED PARAMS SELECT OPTIONS
+/* ------------------------------------------------------------------------- */
+add_filter( 'nimble-sek-localized-customizer-control-params', '\Nimble\nimble_add_select_options_localized_control_params' );
+function nimble_add_select_options_localized_control_params( $params ) {
+    return array_merge( $params, array(
+            'selectOptions' => array(
+                // IMAGE MODULE
+                'link-to' => array(
+                    'no-link' => __('No link', 'text_domain_to_be_replaced' ),
+                    'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
+                    'img-file' => __('Image file', 'text_domain_to_be_replaced' ),
+                    'img-page' =>__('Image page', 'text_domain_to_be_replaced' )
+                ),
+                'img-size' => sek_get_img_sizes(),
+
+                // FEATURED PAGE MODULE
+                'img-type' => array(
+                    'none' => __('No image', 'text_domain_to_be_replaced' ),
+                    'featured' => __('Use the page featured image', 'text_domain_to_be_replaced' ),
+                    'custom' => __('Use a custom image', 'text_domain_to_be_replaced' ),
+                ),
+                'content-type' => array(
+                    'none' => __('No text', 'text_domain_to_be_replaced' ),
+                    'page-excerpt' => __('Use the page excerpt', 'text_domain_to_be_replaced' ),
+                    'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
+                ),
+
+                // HEADING MODULE
+                'heading_tag' => array(
+                    /* Not totally sure these should be localized as they strictly refer to html tags */
+                    'h1' => __('H1', 'text_domain_to_be_replaced' ),
+                    'h2' => __('H2', 'text_domain_to_be_replaced' ),
+                    'h3' => __('H3', 'text_domain_to_be_replaced' ),
+                    'h4' => __('H4', 'text_domain_to_be_replaced' ),
+                    'h5' => __('H5', 'text_domain_to_be_replaced' ),
+                    'h6' => __('H6', 'text_domain_to_be_replaced' ),
+                ),
+
+                // GENERIC CSS MODIFIERS INPUT TYPES
+                'font_weight_css' => array(
+                    'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
+                    'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
+                    'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
+                    'lighter'   => __( 'lighter', 'text_domain_to_be_replaced' ),
+                    100     => 100,
+                    200     => 200,
+                    300     => 300,
+                    400     => 400,
+                    500     => 500,
+                    600     => 600,
+                    700     => 700,
+                    800     => 800,
+                    900     => 900
+                ),
+
+                'font_style_css' => array(
+                    'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                    'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
+                    'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
+                    'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
+                ),
+
+                'text_decoration_css' =>  array(
+                    'none'      => __( 'none', 'text_domain_to_be_replaced' ),
+                    'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                    'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
+                    'overline'    => __( 'overline', 'text_domain_to_be_replaced' ),
+                    'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
+                ),
+
+                'text_transform_css' => array(
+                    'none'      => __( 'none', 'text_domain_to_be_replaced' ),
+                    'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                    'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
+                    'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
+                    'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
+                ),
+
+                // SPACING MODULE
+                'spacingUnits' => array(
+                    'px' => __('Pixels', 'text_domain_to_be_replaced' ),
+                    'em' => __('Em', 'text_domain_to_be_replaced'),
+                    'percent' => __('Percents', 'text_domain_to_be_replaced' )
+                ),
+
+                // LAYOUT BACKGROUND BORDER
+                'boxed-wide' => array(
+                    'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
+                    'fullwidth' => __('Full Width', 'text_domain_to_be_replaced')
+                ),
+                'height-type' => array(
+                    'default' => __('default', 'text_domain_to_be_replaced'),
+                    'fit-to-screen' => __('Fit to screen', 'text_domain_to_be_replaced'),
+                    'custom' => __('Custom', 'text_domain_to_be_replaced' )
+                ),
+                'bg-scale' => array(
+                    'default' => __('default', 'text_domain_to_be_replaced'),
+                    'auto' => __('auto', 'text_domain_to_be_replaced'),
+                    'cover' => __('scale to fill', 'text_domain_to_be_replaced'),
+                    'contain' => __('fit', 'text_domain_to_be_replaced'),
+                ),
+                'bg-position' => array(
+                    'default' => __('default', 'text_domain_to_be_replaced'),
+                ),
+                'border-type' => array(
+                    'none' => __('none', 'text_domain_to_be_replaced'),
+                    'solid' => __('solid', 'text_domain_to_be_replaced'),
+                    'double' => __('double', 'text_domain_to_be_replaced'),
+                    'dotted' => __('dotted', 'text_domain_to_be_replaced'),
+                    'dashed' => __('dashed', 'text_domain_to_be_replaced')
+                )
+            )//'selectOptions array'
+        )//array()
+    );//array_merge()
+}//nimble_add_select_options_localized_control_params()
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
