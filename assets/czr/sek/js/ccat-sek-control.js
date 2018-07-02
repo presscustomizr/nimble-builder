@@ -5323,7 +5323,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         'fas' : 'Solid',
                         'far' : 'Regular',
                         'fab' : 'Brand'
-                      }
+                      };
 
 
                       // run the parent initialize
@@ -5364,7 +5364,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           $( 'select[data-czrtype]', input.container ).append( $_group );
                                   });
 
-                                  function addIcon( state ) {
+                                  var addIcon = function ( state ) {
                                         if (! state.id) { return state.text; }
 
                                         //two spans here because we cannot wrap the social text into the social icon span as the solid FA5 font-weight is bold
@@ -5372,7 +5372,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           '<span class="' + state.element.value + '"></span><span class="social-name">&nbsp;&nbsp;' + state.text + '</span>'
                                         );
                                         return $state;
-                                  }
+                                  };
 
                                   //blank option to allow placeholders
                                   var $_placeholder;

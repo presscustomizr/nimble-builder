@@ -76,7 +76,7 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
             $properties_to_render['font-family'] = false != strstr( $value, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
         break;
-    }//swtich
+    }//switch
 
 
     //Specific for the module level
