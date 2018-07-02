@@ -1224,7 +1224,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 what : 'setting',
                                                 id : _id_,
                                                 dirty : false,
-                                                value : '',
+                                                value : {},
                                                 transport : 'postMessage',// 'refresh',
                                                 type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
                                           });
