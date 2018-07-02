@@ -210,7 +210,10 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_7_sek_register_image.php',
       //'<%= paths.sektions %>_dev_php/module_registration/front/4_0_8_sek_register_featured_pages.php',
-      '<%= paths.sektions %>_dev_php/module_registration/front/4_1_0_sek_register_various_modules.php',
+      '<%= paths.sektions %>_dev_php/module_registration/front/4_1_0_sek_register_heading.php',
+      '<%= paths.sektions %>_dev_php/module_registration/front/4_1_1_sek_register_spacer.php',
+      '<%= paths.sektions %>_dev_php/module_registration/front/4_1_2_sek_register_divider.php',
+      '<%= paths.sektions %>_dev_php/module_registration/front/4_1_3_sek_register_icon.php',
 
       // DYN CSS
       '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_1_class-sek-dyn-css-builder.php',
@@ -253,10 +256,13 @@ module.exports = {
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_1_FRONT_tiny_mce_editor.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_4_FRONT_icon.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_5_FRONT_heading.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_6_FRONT_divider.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_7_FRONT_spacer.js',
+
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_2_FRONT_simple_html.js',
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_3_FRONT_featured_pages.js'
-
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_9_FRONT_various_modules.js'
     ],
     dest: '<%= paths.czr_assets %>sek/js/ccat-sek-control.js',
   },
