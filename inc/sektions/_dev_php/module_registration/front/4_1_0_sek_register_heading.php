@@ -31,7 +31,7 @@ function sek_get_module_params_for_czr_heading_module() {
         'dynamic_registration' => true,
         'module_type' => 'czr_heading_module',
         'name' => __('Heading', 'text_domain_to_be_replaced'),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sanitize_callback__czr_heading_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'starting_value' => array(
             'heading_text' => 'This is a heading.'
@@ -55,4 +55,9 @@ function sek_get_module_params_for_czr_heading_module() {
     );
 }
 
+
+function sanitize_callback__czr_heading_module( $setting_value ) {
+    //sek_error_log('Sanitizing the heading odule', $setting_value );
+    return $setting_value;
+}
 ?>
