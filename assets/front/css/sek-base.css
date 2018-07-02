@@ -555,6 +555,41 @@ fieldset[disabled] a.sek-btn {
   text-align: center;
 }
 
+[data-sek-module-type="czr_divider_module"] {
+  text-align: center;
+}
+
+[data-sek-module-type="czr_divider_module"] .sek-module-inner {
+  font-size: 0;
+  line-height: 0;
+}
+
+.sek-divider {
+  border-top: 1px solid #5a5a5a;
+  display: inline-block;
+  width: 100%;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.sek-spacer {
+  height: 20px;
+}
+
+[data-sek-module-type="czr_icon_module"] {
+  text-align: center;
+  color: #5a5a5a;
+  font-size: 15px;
+}
+
+[data-sek-module-type="czr_icon_module"] a.sek-icon,
+[data-sek-module-type="czr_icon_module"] a.sek-icon:hover,
+[data-sek-module-type="czr_icon_module"] a.sek-icon:focus,
+[data-sek-module-type="czr_icon_module"] a.sek-icon:active,
+[data-sek-module-type="czr_icon_module"] a.sek-icon.active {
+  color: inherit;
+}
+
 /* make sure that the location level occupies 100% of the width */
 [data-sek-level="location"] {
   clear: both;

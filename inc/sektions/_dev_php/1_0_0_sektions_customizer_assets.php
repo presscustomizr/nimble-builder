@@ -104,6 +104,17 @@ function sek_enqueue_controls_js_css() {
                       'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
                   ),
 
+                  // HEADING MODULE
+                  'heading_tag' => array(
+                      /* Not totally sure these should be localized as they strictly refer to html tags */
+                      'h1' => __('H1', 'text_domain_to_be_replaced' ),
+                      'h2' => __('H2', 'text_domain_to_be_replaced' ),
+                      'h3' => __('H3', 'text_domain_to_be_replaced' ),
+                      'h4' => __('H4', 'text_domain_to_be_replaced' ),
+                      'h5' => __('H5', 'text_domain_to_be_replaced' ),
+                      'h6' => __('H6', 'text_domain_to_be_replaced' ),
+                  ),
+
                   // GENERIC CSS MODIFIERS INPUT TYPES
                   'font_weight_css' => array(
                       'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
@@ -143,11 +154,6 @@ function sek_enqueue_controls_js_css() {
                       'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
                       'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
                   ),
-
-
-
-
-
 
                   // SPACING MODULE
                   'spacingUnits' => array(
@@ -237,6 +243,7 @@ function sek_enqueue_controls_js_css() {
 
                 'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
 
+                'Select an icon'     => __( 'Select an icon', 'text_domain_to_be_replaced' ),
                 // 'Module' => __('Module', 'text_domain_to_be_replaced'),
                 // 'Module' => __('Module', 'text_domain_to_be_replaced'),
                 // 'Module' => __('Module', 'text_domain_to_be_replaced'),
