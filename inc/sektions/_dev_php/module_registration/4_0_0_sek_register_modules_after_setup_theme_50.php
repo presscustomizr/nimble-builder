@@ -12,7 +12,7 @@ function sek_register_modules() {
         //'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
         'czr_image_module',
-        //'czr_featured_pages_module'
+        'czr_featured_pages_module',
         'czr_heading_module',
         'czr_spacer_module',
         'czr_divider_module',
