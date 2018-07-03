@@ -245,13 +245,19 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         break;
                     }
                     $module_type = $model['module_type'];
-
                     // Prepare the module value with the defaults
                     $default_value_model  = sek_get_default_module_model( $module_type );//walk the registered modules tree and generates the module default if not already cached
-                    $model['value'] = ( ! empty( $model['value'] ) && is_array( $model['value'] ) ) ? $model['value'] : array();
-                    $model['value'] = wp_parse_args( $model['value'], $default_value_model );
+                    $raw_module_value = ( ! empty( $model['value'] ) && is_array( $model['value'] ) ) ? $model['value'] : array();
 
-                    //sek_error_log( __FUNCTION__ , $model['value'] );
+                    // reset the model value and rewrite it normalized
+                    $model['value'] = array();
+                    if ( czr_is_multi_item_module( $module_type ) ) {
+                        foreach ( $raw_module_value as $item ) {
+                            $model['value'][] = wp_parse_args( $item, $default_value_model );
+                        }
+                    } else {
+                        $model['value'] = wp_parse_args( $raw_module_value, $default_value_model );
+                    }
 
                     // update the current cached model
                     $this -> model = $model;
