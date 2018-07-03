@@ -32,6 +32,7 @@ function sek_get_module_params_for_czr_spacer_module() {
         'dynamic_registration' => true,
         'module_type' => 'czr_spacer_module',
         'name' => __('Spacer', 'text_domain_to_be_replaced'),
+        'css_selectors' => array( '.sek-module-inner > *' ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
