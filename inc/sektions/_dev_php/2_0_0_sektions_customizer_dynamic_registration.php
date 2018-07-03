@@ -64,6 +64,7 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         }
 
 
+        // Use the sanitize_callback function specified on module registration if any
         function sanitize_callback( $setting_data, $setting_instance ) {
             if ( isset( $_POST['skope_id'] ) ) {
                 //sek_error_log( 'in_sek_sanitize_callback for setting id ' . $setting_instance->id, sek_get_skoped_seks( $_POST['skope_id'] ) );//sek_get_level_model( $setting_instance->id ) );
@@ -72,10 +73,10 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
                     if ( is_array( $sektion_collection ) ) {
                         $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
-                        if ( ! empty( $model['module_type'] ) ) {
+                        if ( is_array( $model ) && ! empty( $model['module_type'] ) ) {
                             //sek_error_log( 'in_sek_sanitize_callback for setting id ' . $setting_instance->id, sek_get_level_model( $setting_instance->id, $sektion_collection ) );
                             $module_params = CZR_Fmk_Base() -> czr_get_registered_dynamic_module( $model['module_type'] );
-                            if ( array_key_exists( 'sanitize_callback', $module_params ) && function_exists( $module_params[ 'sanitize_callback' ] ) ) {
+                            if ( is_array( $module_params ) && array_key_exists( 'sanitize_callback', $module_params ) && function_exists( $module_params[ 'sanitize_callback' ] ) ) {
                                 $setting_data = $module_params[ 'sanitize_callback' ]( $setting_data );
                             }
                         }
