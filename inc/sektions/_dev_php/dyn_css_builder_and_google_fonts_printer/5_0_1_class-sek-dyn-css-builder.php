@@ -61,6 +61,15 @@ class Sek_Dyn_CSS_Builder {
             $this -> parent_level_model = $parent_level;
         }
 
+        // If the current level is a module, check if the module has more specific css selectors specified on registration
+        $specific_css_selectors = null;
+        if ( ! empty( $parent_level['module_type'] ) ) {
+            $module_params = CZR_Fmk_Base() -> czr_get_registered_dynamic_module( $parent_level['module_type'] );
+            if ( is_array( $module_params ) &&  ! empty( $module_params['css_selectors'] ) ) {
+                $specific_css_selectors = $module_params['css_selectors'];
+            }
+        }
+
         foreach ( $level as $key => $entry ) {
              $rules = array();
             // Populate rules for sections / columns / modules
@@ -88,7 +97,7 @@ class Sek_Dyn_CSS_Builder {
                     // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
                     // The generic rules must be suffixed with '_css'
                     if ( false !== strpos( $key, '_css') ) {
-                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level_model );
+                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level_model, $specific_css_selectors );
                     }
                 }
             }
