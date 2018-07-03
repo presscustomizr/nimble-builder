@@ -350,40 +350,31 @@
 
             // FONT AWESOME ICON PICKER
             fa_icon_picker : function() {
-                  var input = this,
-                      item = input.input_parent,
-                      _selected_found = false,
-                      icon_groups = {
-                            'fas' : '@miss-i18n Solid',
-                            'far' : '@miss-i18n Regular',
-                            'fab' : '@miss-i18n Brand'
-                      };
+                  var input           = this,
+                      item            = input.input_parent,
+                      _selected_found = false;
 
                   //generates the options
                   var _generateOptions = function( iconCollection ) {
-                        _.each( iconCollection , function( icons, group ) {
-                              var $_group =  $( '<optgroup>', { label: icon_groups[ group ] } );
-                              //$( 'select[data-czrtype="' + input.id + '"]', input.container ).append( $( '<optgroup>', { label: icon_groups[ group ] } ) );
-                              _.each( icons, function( icon ) {
-                                    var _attributes = {
-                                              value: group + ' fa-' + icon,
-                                              html: api.CZR_Helpers.capitalize( icon )
-                                        };
-                                    if ( _attributes.value == item().icon ) {
-                                          $.extend( _attributes, { selected : "selected" } );
-                                          _selected_found = true;
-                                    }
-                                    $_group.append( $('<option>', _attributes) );
-                              });
+                        _.each( iconCollection , function( iconClass ) {
+                              var _attributes = {
+                                    value: iconClass,
+                                    //iconClass is in the form "fa(s|b|r) fa-{$name}" so the name starts at position 7
+                                    html: api.CZR_Helpers.capitalize( iconClass.substring( 7 ) )
+                              };
 
-                              $( 'select[data-czrtype]', input.container ).append( $_group );
+                              if ( _attributes.value == item().icon ) {
+                                    $.extend( _attributes, { selected : "selected" } );
+                                    _selected_found = true;
+                              }
+                              $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
                         });
 
 
                         var addIcon = function ( state ) {
                               if (! state.id) { return state.text; }
 
-                              //two spans here because we cannot wrap the social text into the social icon span as the solid FA5 font-weight is bold
+                              //two spans here because we cannot wrap the text into the icon span as the solid FA5 font-weight is bold
                               var  $state = $(
                                 '<span class="' + state.element.value + '"></span><span class="social-name">&nbsp;&nbsp;' + state.text + '</span>'
                               );
@@ -422,7 +413,7 @@
                               } ).done( function( _serverTmpl_ ) {
                                     console.log( "_serverTmpl_", _serverTmpl_ );
                                     // Ensure we have a string that's JSON.parse-able
-                                    if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '{' ) {
+                                    if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '[' ) {
                                           throw new Error( 'fa_icon_picker => server list is not JSON.parse-able');
                                     }
                                     input.sek_faIconCollection = JSON.parse( _serverTmpl_ );
