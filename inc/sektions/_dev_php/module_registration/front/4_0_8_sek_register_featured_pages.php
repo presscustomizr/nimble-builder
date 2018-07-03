@@ -7,7 +7,11 @@ function sek_get_module_params_for_czr_featured_pages_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_featured_pages_module',
-
+        'is_crud' => true,
+        'name' => __('Featured Pages', 'text_domain_to_be_replaced'),
+        // 'starting_value' => array(
+        //     'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
+        // ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
