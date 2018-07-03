@@ -62,7 +62,6 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             }
 
             $selector = implode(',', $new_selector);
-            sek_error_log( "sek_add_css_rules_for_input_id => " . $input_id, $selector);
             $properties_to_render['color'] = $value;
         break;
         case 'h_alignment_css' :
