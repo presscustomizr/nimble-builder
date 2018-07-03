@@ -152,6 +152,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     property : 'value',
                                     id : params.id
                               });
+
                               var moduleType = self.getLevelProperty({
                                     property : 'module_type',
                                     id : params.id
@@ -195,7 +196,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 transport : 'postMessage',// 'refresh',
                                                 type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
                                           });
-                                    }
+                                    }//if ( ! api.has( params.id ) )
 
 
 
@@ -235,6 +236,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
 
                         break;
+
+
+
+
+
+
+
+
+
 
 
 
@@ -545,6 +555,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
+
+
+
+
+
+
+
+
             // @params = {
             //     uiParams : params,
             //     options_type : 'spacing',
@@ -610,8 +629,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   } else {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing parentModuleInstance', params );
                   }
-
-                  //console.log('updateAPISettingAndExecutePreviewActions => ', params.settingParams, isMultiItemModule, rawModuleValue,  _.isObject( rawModuleValue ) );
 
                   // The new module value can be an single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
