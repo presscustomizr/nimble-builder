@@ -3,32 +3,32 @@
 ( function ( api, $, _ ) {
       var FeaturedPagesConstruct = {
             initialize: function( id, options ) {
-                    //console.log('INITIALIZING IMAGE MODULE', id, options );
-                    var module = this;
+                  //console.log('INITIALIZING FP MODULE', id, options );
+                  var module = this;
 
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                    module.inputConstructor = api.CZRInput.extend( module.CZRFPInputsMths || {} );
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                    // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                  module.inputConstructor = api.CZRInput.extend( module.CZRFPInputsMths || {} );
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
 
-                    // run the parent initialize
-                    // Note : must be always invoked always after the input / item class extension
-                    // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                    api.CZRDynModule.prototype.initialize.call( module, id, options );
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
 
-                    //SET THE CONTENT PICKER DEFAULT OPTIONS
-                    //@see ::setupContentPicker()
-                    // module.bind( 'set_default_content_picker_options', function( params ) {
-                    //       params.defaultContentPickerOption.defaultOption = {
-                    //             'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
-                    //             'type'       : '',
-                    //             'type_label' : '',
-                    //             'object'     : '',
-                    //             'id'         : '_custom_',
-                    //             'url'        : ''
-                    //       };
-                    //       return params;
-                    // });
+                  //SET THE CONTENT PICKER DEFAULT OPTIONS
+                  //@see ::setupContentPicker()
+                  // module.bind( 'set_default_content_picker_options', function( params ) {
+                  //       params.defaultContentPickerOption.defaultOption = {
+                  //             'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                  //             'type'       : '',
+                  //             'type_label' : '',
+                  //             'object'     : '',
+                  //             'id'         : '_custom_',
+                  //             'url'        : ''
+                  //       };
+                  //       return params;
+                  // });
             },//initialize
 
             CZRFPInputsMths : {
@@ -80,7 +80,7 @@
       $.extend( api.czrModuleMap, {
             czr_featured_pages_module : {
                   mthds : FeaturedPagesConstruct,
-                  crud : true,
+                  crud : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'is_crud' ),
                   hasPreItem : false,//a crud module has a pre item by default
                   refresh_on_add_item : false,// the preview is refreshed on item add
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'name' ),
