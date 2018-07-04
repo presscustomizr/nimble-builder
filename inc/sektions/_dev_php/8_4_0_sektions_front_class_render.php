@@ -245,11 +245,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         break;
                     }
                     $module_type = $model['module_type'];
-                    // Prepare the module value with the defaults
-                    $default_value_model  = sek_get_default_module_model( $module_type );//walk the registered modules tree and generates the module default if not already cached
+
+                    $default_value_model  = sek_get_default_module_model( $module_type );//<= walk the registered modules tree and generates the module default if not already cached
                     $raw_module_value = ( ! empty( $model['value'] ) && is_array( $model['value'] ) ) ? $model['value'] : array();
 
-                    // reset the model value and rewrite it normalized
+                    // reset the model value and rewrite it normalized with the defaults
                     $model['value'] = array();
                     if ( czr_is_multi_item_module( $module_type ) ) {
                         foreach ( $raw_module_value as $item ) {
