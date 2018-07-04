@@ -10,41 +10,33 @@ $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 // Utility to print the text content generated with tinyMce
 // should be wrapped in a specific selector when customizing,
 //  => so we can listen to user click actions and open the editor on for each separate tiny_mce_editor input
-if ( ! function_exists( '\Nimble\sek_print_tiny_mce_text_heading_content') ) {
-    function sek_print_tiny_mce_text_heading_content( $tiny_mce_content, $input_id, $module_model, $args = array() ) {
-        $defaults = array(
-            'strip_tags'   => true,
-            'allowed_tags' => '<br><a><span><img><strong><em><del>',
-            'echo'         => false
-        );
-        $args = wp_parse_args( $args, $defaults );
-
-        if ( empty( $tiny_mce_content ) ) {
+if ( ! function_exists( __NAMESPACE__ . '\sek_print_text_heading_content' ) ) {
+    function sek_print_text_heading_content( $heading_content, $input_id, $module_model, $echo = false ) {
+        if ( empty( $heading_content ) ) {
             $to_print = SEK_Front()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
         } else {
-            $content = apply_filters( 'the_content', $tiny_mce_content );
-            if ( $args[ 'strip_tags' ] ) {
-                $content = strip_tags( $content, $args[ 'allowed_tags' ] );
-            }
             if ( skp_is_customizing() ) {
-                $to_print = sprintf('<div title="%3$s" data-sek-input-type="tiny_mce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __('Click to edit', 'here') );
+                $to_print = sprintf('<div title="%3$s" data-sek-input-type="textarea" data-sek-input-id="%1$s">%2$s</div>', $input_id, $heading_content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
             } else {
-                $to_print = $content;
+                $to_print = $heading_content;
             }
         }
-        if ( $args[ 'echo' ] ) {
+        if ( $echo ) {
             echo $to_print;
         } else {
             return $to_print;
         }
+
     }
 }
+
+$value = sanitize_callback__czr_heading_module( $value );
 // print the module content if not empty
 if ( array_key_exists('heading_text', $value ) ) {
     $tag = empty( $value[ 'heading_tag' ] ) ? 'h1' : $value[ 'heading_tag' ];
 
-    printf( '<%1$s>%2$s</%1$s>',
+    printf( '<%1$s class="sek-heading">%2$s</%1$s>',
         $tag,
-        sek_print_tiny_mce_text_heading_content( $value['heading_text'], 'heading_text', $model )
+        sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model )
     );
 }

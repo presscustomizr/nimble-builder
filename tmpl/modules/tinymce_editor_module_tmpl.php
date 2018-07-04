@@ -17,7 +17,7 @@ if ( ! function_exists( '\Nimble\sek_print_tiny_mce_text_content') ) {
         } else {
             $content = apply_filters( 'the_content', $tiny_mce_content );
             if ( skp_is_customizing() ) {
-                printf('<div title="%3$s" data-sek-input-type="tiny_mce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __('Click to edit', 'here') );
+                printf('<div title="%3$s" data-sek-input-type="tiny_mce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
             } else {
                 echo $content;
             }
