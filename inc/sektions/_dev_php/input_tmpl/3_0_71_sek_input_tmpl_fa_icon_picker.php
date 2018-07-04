@@ -40,16 +40,19 @@ function sek_retrieve_decoded_font_awesome_icons() {
     // this file must be generated with: https://github.com/presscustomizr/nimble-builder/issues/57
     $faicons_json_path      = NIMBLE_BASE_PATH . '/assets/faicons.json';
     $faicons_transient_name = 'sek_font_awesome_july_2018';
-
     if ( false == get_transient( $faicons_transient_name ) ) {
-        $faicons_raw      = @file_get_contents( $faicons_json_path );
+        if ( file_exists( $faicons_json_path ) ) {
+            $faicons_raw      = @file_get_contents( $faicons_json_path );
 
-        if ( false === $faicons_raw ) {
-            $faicons_raw = wp_remote_fopen( $faicons_json_path );
+            if ( false === $faicons_raw ) {
+                $faicons_raw = wp_remote_fopen( $faicons_json_path );
+            }
+
+            $faicons_decoded   = json_decode( $faicons_raw, true );
+            set_transient( $faicons_transient_name , $faicons_decoded , 60*60*24*3000 );
+        } else {
+            wp_send_json_error( __FUNCTION__ . ' => the file faicons.json is missing' );
         }
-
-        $faicons_decoded   = json_decode( $faicons_raw, true );
-        set_transient( $faicons_transient_name , $faicons_decoded , 60*60*24*3000 );
     }
     else {
         $faicons_decoded = get_transient( $faicons_transient_name );
