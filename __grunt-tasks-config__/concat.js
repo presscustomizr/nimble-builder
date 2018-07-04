@@ -244,10 +244,19 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_2_0_sektions_register_utils.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_2_1_sektions_various_utils.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_4_1_sektions_setup_and_react_to_drop.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/_7_0_sektions_add_inputs_to_api.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_7_1_sektions_tinyMceEditor.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_8_0_sektions_instantiate.js',
 
+      // Inputs
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_0_spacing_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_1_bg_position_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_2_vertical_alignment_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_3_font_size_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_4_line_height_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_5_font_picker_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_6_font_awesome_icon_picker.js',
+
+      // Modules
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_bg_border_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_height_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_section_layout_module.js',
