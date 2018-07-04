@@ -71,7 +71,6 @@
                                     module_type: 'fa_icon_picker_input',
                                     module_id : input.module.id
                               } ).done( function( _serverTmpl_ ) {
-                                    console.log( "_serverTmpl_", _serverTmpl_ );
                                     // Ensure we have a string that's JSON.parse-able
                                     if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '[' ) {
                                           throw new Error( 'fa_icon_picker => server list is not JSON.parse-able');
@@ -87,7 +86,6 @@
 
                   // do
                   $.when( _getIconsCollections() ).done( function( iconCollection ) {
-                        console.log('_getIconsCollections', iconCollection );
                         _generateOptions( iconCollection );
                   }).fail( function( _r_ ) {
                         api.errare( 'fa_icon_picker => fail response =>', _r_ );
