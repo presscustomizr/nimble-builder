@@ -44,11 +44,10 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     'transport' => 'refresh',
                     'type' => '_nimble_ui_',//won't be saved as is,
                     'default' => array(),
-                    'sanitize_callback' => array( $this, 'sanitize_callback' )
+                    'sanitize_callback' => array( $this, 'sanitize_callback' ),
+                    'validate_callback' => array( $this, 'validate_callback' )
                 );
             }
-
-            //sek_error_log( print_r( $setting_args, true ) );
             return $setting_args;
             //return wp_parse_args( array( 'default' => array() ), $setting_args );
         }
@@ -64,20 +63,18 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         }
 
 
-        // Use the sanitize_callback function specified on module registration if any
+        // Uses the sanitize_callback function specified on module registration if any
         function sanitize_callback( $setting_data, $setting_instance ) {
             if ( isset( $_POST['skope_id'] ) ) {
-                //sek_error_log( 'in_sek_sanitize_callback for setting id ' . $setting_instance->id, sek_get_skoped_seks( $_POST['skope_id'] ) );//sek_get_level_model( $setting_instance->id ) );
                 $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
                 if ( is_array( $sektionSettingValue ) ) {
                     $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
                     if ( is_array( $sektion_collection ) ) {
                         $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
                         if ( is_array( $model ) && ! empty( $model['module_type'] ) ) {
-                            //sek_error_log( 'in_sek_sanitize_callback for setting id ' . $setting_instance->id, sek_get_level_model( $setting_instance->id, $sektion_collection ) );
-                            $module_params = CZR_Fmk_Base() -> czr_get_registered_dynamic_module( $model['module_type'] );
-                            if ( is_array( $module_params ) && array_key_exists( 'sanitize_callback', $module_params ) && function_exists( $module_params[ 'sanitize_callback' ] ) ) {
-                                $setting_data = $module_params[ 'sanitize_callback' ]( $setting_data );
+                            $sanitize_callback = sek_get_registered_module_type_property( $model['module_type'], 'sanitize_callback' );
+                            if ( ! empty( $sanitize_callback ) && is_string( $sanitize_callback ) && function_exists( $sanitize_callback ) ) {
+                                $setting_data = $sanitize_callback( $setting_data );
                             }
                         }
                     }
@@ -87,10 +84,36 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
             return $setting_data;
         }
 
+        // Uses the validate_callback function specified on module registration if any
+        // @return validity object
         function validate_callback( $validity, $setting_data, $setting_instance ) {
-            //sek_error_log( 'in sek_validate_callback for setting id ' . $setting_instance->id, $setting_data );
+            $validation_msg = 'pass_validation';
+            if ( isset( $_POST['skope_id'] ) ) {
+                $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
+                if ( is_array( $sektionSettingValue ) ) {
+                    $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
+                    if ( is_array( $sektion_collection ) ) {
+                        $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
+                        if ( is_array( $model ) && ! empty( $model['module_type'] ) ) {
+                            $validate_callback = sek_get_registered_module_type_property( $model['module_type'], 'validate_callback' );
+                            if ( ! empty( $validate_callback ) && is_string( $validate_callback ) && function_exists( $validate_callback ) ) {
+                                $validation_msg = $validate_callback( $setting_data );
+                            }
+                        }
+                    }
+                }
+            }
             //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
-            return null;
+            if ( 'pass_validation' !== $validation_msg ) {
+                if ( is_wp_error( $validation_msg ) ) {
+                    $validation_msg = $validation_msg->get_error_message();
+                }
+                $validity->add(
+                    'nimble_validation_error_in_' . $setting_instance->id ,
+                    $validation_msg
+                );
+            }
+            return $validity;
         }
 
 
