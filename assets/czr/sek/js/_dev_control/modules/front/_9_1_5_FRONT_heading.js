@@ -4,7 +4,6 @@
       //HEADING MODULE
       var HeadingModuleConstructor  = {
             initialize: function( id, options ) {
-                    //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
 
                     //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT

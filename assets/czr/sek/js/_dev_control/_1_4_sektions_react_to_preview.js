@@ -41,7 +41,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   },
                                   complete : function( params ) {
                                         // When a section is created ( not duplicated )
-                                        //console.log( "react to preview Msg, sek-add-section complete => ", params );
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
                                                     level : 'location',
@@ -142,7 +141,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        //console.log('PARAMS IN SEK REMOVE ', params );
                                         api.previewer.trigger( 'sek-pick-module', {});
                                         // always update the root fonts property after a removal
                                         // because the removed level(s) might had registered fonts
@@ -315,7 +313,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             'sek-resize-columns' : function( params ) {
                                   sendToPreview = true;
                                   uiParams = {};
-                                  //console.log( 'panel => reactToPreviewMsg => ', params );
                                   apiParams = params;
                                   return self.updateAPISetting( apiParams );
                             },
@@ -366,7 +363,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               break;
                                         }
                                         // When a section is created ( not duplicated )
-                                        //console.log( "react to preview Msg, sek-add-content-in-new-sektion complete => ", params );
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
                                                     level : 'location',
@@ -382,7 +378,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             // GENERATE UI ELEMENTS
                             'sek-pick-module' : function( params ) {
-                                  //console.log('sek-pick-module react to preview', params);
                                   sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
@@ -409,7 +404,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return self.generateUI( uiParams );
                             },
                             'sek-edit-options' : function( params ) {
-                                  //console.log('IN EDIT OPTIONS ', params );
                                   sendToPreview = true;
                                   apiParams = {};
                                   if ( _.isEmpty( params.id ) ) {
