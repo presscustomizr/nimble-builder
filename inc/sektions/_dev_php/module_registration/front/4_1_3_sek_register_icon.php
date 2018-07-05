@@ -33,7 +33,7 @@ function sek_get_module_params_for_czr_icon_module() {
         'name' => __('Icon', 'text_domain_to_be_replaced'),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'css_selectors' => array( '.sek-module-inner > *' ),
+        'css_selectors' => array( '.sek-module-inner' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'icon' => array(
