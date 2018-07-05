@@ -7,7 +7,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
             if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
 
-            // SCHEDULE THE ACITONS ON HOOKS AND CONTENT FILTERS
+            // SCHEDULE THE ACTIONS ON HOOKS AND CONTENT FILTERS
             foreach( sek_get_locations() as $hook ) {
                 switch ( $hook ) {
                     case 'loop_start' :
