@@ -20,6 +20,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         sek_action : params.apiParams.action,
                         is_nested : params.apiParams.is_nested
                   }).done( function( _r_ ) {
+                        var html_content = '';
+                        //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
+                        if ( _r_.data && _r_.data.contents ) {
+                              html_content = _r_.data.contents;
+                        } else {
+                              self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
+                        }
+
                         // Embed
                         // is it a nested sektion ?
                         var $parentColumn;
@@ -32,13 +40,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               $parentColumn.before( placeholderHtml );
                               // remove and re-render the entire column
                               $parentColumn.remove();
-                              $( '.sektion-wrapper').find( '.sek-placeholder' ).after( _r_.data );
+                              $( '.sektion-wrapper').find( '.sek-placeholder' ).after( html_content );
                               $( '.sektion-wrapper').find( '.sek-placeholder' ).remove();
                         } else {
                               // DUPLICATE CASE
                               // Insert the clone section right after its cloned sister
                               if ( 'sek-duplicate-section' == params.apiParams.action && ! _.isEmpty( params.cloneId ) ) {
-                                    $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).after( _r_.data );
+                                    $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).after( html_content );
                               }
                               // GENERATED WHEN ADDING A MODULE
                               else {
@@ -49,11 +57,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     $afterCandidate = $( '.sektion-wrapper[data-sek-id="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.after_section + '"]' );
 
                                     if ( ! _.isEmpty( params.apiParams.before_section ) && $beforeCandidate.length > 0 ) {
-                                          $beforeCandidate.before( _r_.data );
+                                          $beforeCandidate.before( html_content );
                                     } else if ( ! _.isEmpty( params.apiParams.after_section ) && $afterCandidate.length > 0 ) {
-                                          $afterCandidate.after( _r_.data );
+                                          $afterCandidate.after( html_content );
                                     } else {
-                                          $( '[data-sek-id="' + params.apiParams.location + '"]').append( _r_.data );
+                                          $( '[data-sek-id="' + params.apiParams.location + '"]').append( html_content );
                                     }
                               }
                         }

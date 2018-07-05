@@ -39,7 +39,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                     // listened to clean the loader just in time
                                                     $('[data-sek-id="' + params.apiParams.location + '"]').trigger( 'sek-level-refreshed');
                                               }
-                                              //console.log( params.apiParams.action, params );
                                               //self.ajaxRefreshModulesAndNestedSections( params );
                                         break;
                                         case 'sek-remove-column' :
@@ -99,6 +98,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         self.errare( 'ERROR reactToPanelMsg => sek-refresh-level => ' , _r_ );
                                         $( '[data-sek-id="' + params.apiParams.id + '"]' ).trigger( 'sek-ajax-error' );
                                   }).done( function( _r_ ) {
+                                        var html_content = '';
+                                        //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
+                                        if ( _r_.data && _r_.data.contents ) {
+                                              html_content = _r_.data.contents;
+                                        } else {
+                                              self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
+                                        }
+                                        // _r_ is an array
+                                        // @see SEK_Front_Ajax::sek_get_level_content_for_injection
+                                        // _r_ = array(
+                                        //     'contents' => $html,
+                                        //     'setting_validities' => $exported_setting_validities
+                                        // );
                                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.id + '"></span>',
                                             $currentLevelEl = $( 'div[data-sek-id="' + params.apiParams.id + '"]' );
                                         if ( $currentLevelEl.length < 1 ) {
@@ -107,8 +119,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         }
                                         $currentLevelEl.before( placeholderHtml );
                                         var $placeHolder = $( '[data-sek-placeholder-for="' + params.apiParams.id + '"]' );
+
                                         $currentLevelEl.remove();
-                                        $placeHolder.after( _r_.data );
+
+                                        if ( _.isUndefined( html_content ) ) {
+                                              self.errare( 'reactToPanelMsg => sek-refresh-level ajax done => missing html_content', _r_ );
+                                        } else {
+                                              $placeHolder.after( html_content );
+                                        }
+
                                         $placeHolder.remove();
 
                                         //=> 'sek-level-refreshed' is listened to clean the loader overalay in time
@@ -263,7 +282,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             //@params { type : module || preset_section }
                             'sek-drag-start' : function( params ) {
-                                  //console.log('PARAMS in sek-drag-start', params, $('.sektion-wrapper').children('[data-sek-level="section"]').length );
                                   // append the drop zones between sections
                                   var i = 1;
                                   $('.sektion-wrapper').children('[data-sek-level="section"]').each( function() {
@@ -284,7 +302,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                                   // Append the drop zone in empty locations
                                   $('.sek-empty-location-placeholder').each( function() {
-                                        //console.log('SEK-DRAG-START', params );
                                         $.when( $(this).append(
                                               '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="in-empty-location"></div>'
                                         ));
@@ -372,10 +389,29 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   uiParams : {}
                               }, params || {} );
 
+
+                              // If the ajax response is an array formed this way ( @see sek-refresh-level case ) :
+                              // @see SEK_Front_Ajax::sek_get_level_content_for_injection
+                              // _ajaxResponse_ = array(
+                              //     'contents' => $html,
+                              //     'setting_validities' => $exported_setting_validities
+                              // );
+                              // Then we send an additional setting-validity message to the control panel
+                              // This is the same mechanism used by WP to handle the setting validity of the partial refresh
+
+                              var sendSuccessDataToPanel = function( _ajaxResponse_ ) {
+                                    if ( _.isUndefined( _ajaxResponse_ ) )
+                                      return;
+                                    api.preview.send( [ msgId, 'done'].join('_'), params );
+                                    if ( _ajaxResponse_.data && _ajaxResponse_.data.setting_validities ) {
+                                          api.preview.send( 'selective-refresh-setting-validities', _ajaxResponse_.data.setting_validities );
+                                    }
+                              };
+
                               if ( _.isFunction( callbackFn ) ) {
                                     try {
-                                          $.when( callbackFn( params ) ).done( function() {
-                                                api.preview.send( [ msgId, 'done'].join('_'), params );
+                                          $.when( callbackFn( params ) ).done( function( _ajaxResponse_ ) {
+                                                sendSuccessDataToPanel( _ajaxResponse_ );
                                           }).fail( function() {
                                                 api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
                                           }).then( function() {
@@ -386,8 +422,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     }
                               } else {
                                     try {
-                                          $.when( self[callbackFn].call( self, params ) ).done( function() {
-                                                api.preview.send( [ msgId, 'done'].join('_'), params );
+                                          $.when( self[callbackFn].call( self, params ) ).done( function( _ajaxResponse_ ) {
+                                                sendSuccessDataToPanel( _ajaxResponse_ );
                                           }).fail( function() {
                                                 api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
                                           }).then( function() {

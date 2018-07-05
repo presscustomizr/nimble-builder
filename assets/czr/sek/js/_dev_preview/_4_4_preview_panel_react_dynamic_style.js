@@ -14,8 +14,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         skope_id : params.skope_id,
                         sek_action : 'sek-refresh-stylesheet'
                   }).done( function( _r_ ) {
-                        //console.log('sek-refresh-stylesheet done !',  _r_.data);
-                        self.appendDynStyleSheet( params.skope_id, _r_.data );
+                        var html_content = '';
+                        //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
+                        if ( _r_.data && _r_.data.contents ) {
+                              html_content = _r_.data.contents;
+                        } else {
+                              self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
+                        }
+
+                        //console.log('sek-refresh-stylesheet done !',  html_content);
+                        self.appendDynStyleSheet( params.skope_id, html_content );
                         //=> 'sek-level-refreshed' is listened to clean the loader overalay in time
                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
                               .trigger( 'sek-stylesheet-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );

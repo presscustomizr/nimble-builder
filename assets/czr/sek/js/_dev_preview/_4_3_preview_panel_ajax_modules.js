@@ -20,6 +20,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           sek_action : params.apiParams.action, // can be sek-add-module / refresh-modules-in-column
                           is_nested : params.apiParams.is_nested
                     }).done( function( _r_ ) {
+                          var html_content = '';
+                          //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
+                          if ( _r_.data && _r_.data.contents ) {
+                                html_content = _r_.data.contents;
+                          } else {
+                                self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
+                          }
+
                           var $parentColumn = $('[data-sek-id="' + params.apiParams.in_column + '"]' );
                           if ( 1 > $parentColumn.length ) {
                                 self.errare( 'reactToPanelMsg => ajaxRefreshModulesAndNestedSections => no DOM node for parent column => ', params.apiParams.in_column );
@@ -28,7 +36,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           $parentColumn.before( placeholderHtml );
                           // remove and re-render the entire column
                           $parentColumn.remove();
-                          $( '[data-sek-placeholder-for="' + params.apiParams.in_column + '"]' ).after( _r_.data );
+                          $( '[data-sek-placeholder-for="' + params.apiParams.in_column + '"]' ).after( html_content );
                           $( '[data-sek-placeholder-for="' + params.apiParams.in_column + '"]' ).remove();
 
                           // say it to the column

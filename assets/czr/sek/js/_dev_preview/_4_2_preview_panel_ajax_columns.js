@@ -19,6 +19,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         skope_id : params.skope_id,
                         sek_action : params.apiParams.action// sek-add-column || sek-remove-column
                   }).done( function( _r_ ) {
+                        var html_content = '';
+                        //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
+                        if ( _r_.data && _r_.data.contents ) {
+                              html_content = _r_.data.contents;
+                        } else {
+                              self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
+                        }
+
                         var $parentSektion = $( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' );
                         if ( 1 > $parentSektion.length ) {
                               self.errare( 'reactToPanelMsg => ' + params.apiParams.action + ' => no DOM node for parent sektion => ', params.apiParams.in_sektion );
@@ -27,7 +35,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $parentSektion.before( placeholderHtml );
                         // remove and re-render the entire sektion
                         $parentSektion.remove();
-                        $( '.sektion-wrapper').find( '.sek-placeholder' ).after( _r_.data );
+                        $( '.sektion-wrapper').find( '.sek-placeholder' ).after( html_content );
                         $( '.sektion-wrapper').find( '.sek-placeholder' ).remove();
 
 
@@ -37,8 +45,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               skope_id : params.skope_id,
                               sek_action : 'sek-refresh-stylesheet'// sek-add-column
                         }).done( function( _r_ ) {
-                              //console.log('sek-refresh-stylesheet done !',  _r_.data);
-                              self.appendDynStyleSheet( params.skope_id, _r_.data );
+                              //console.log('sek-refresh-stylesheet done !',  html_content);
+                              self.appendDynStyleSheet( params.skope_id, html_content );
                         }).fail( function( _r_ ) {
                               console.log('sek-refresh-stylesheet fail !');
                         });
@@ -69,7 +77,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         skope_id : params.skope_id,
                         sek_action : 'sek-resize-columns'
                   }).done( function( _r_ ) {
-                        //self.errare('sek-preview => resize-column ajax response => ', _r_.data );
+                        var html_content = '';
+                        //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
+                        if ( _r_.data && _r_.data.contents ) {
+                              html_content = _r_.data.contents;
+                        } else {
+                              self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
+                        }
+                        //self.errare('sek-preview => resize-column ajax response => ', html_content );
                         // Reset the automatic default resizable inline styling
                         $( '[data-sek-id="' + params.apiParams.resized_column + '"]' ).css({
                               width : '',
@@ -77,7 +92,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
 
                         //Append
-                        self.appendDynStyleSheet( params.skope_id, _r_.data );
+                        self.appendDynStyleSheet( params.skope_id, html_content );
 
                         // say it
                         // listened to clean the loader just in time
