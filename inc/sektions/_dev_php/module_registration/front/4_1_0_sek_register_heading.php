@@ -32,7 +32,7 @@ function sek_get_module_params_for_czr_heading_module() {
         'module_type' => 'czr_heading_module',
         'name' => __( 'Heading', 'text_domain_to_be_replaced' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_heading_module',
-        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'validate_callback' => '\Nimble\validate_callback__czr_heading_module',
         'starting_value' => array(
             'heading_text' => 'This is a heading.'
         ),
@@ -172,8 +172,14 @@ function sanitize_callback__czr_heading_module( $value ) {
         $value[ 'heading_text' ] = czr_heading_module_kses_text( $value[ 'heading_text' ] );
     }
     return $value;
+    //return new \WP_Error('required' ,'heading did not pass sanitization');
 }
 
+// @see SEK_CZR_Dyn_Register::set_dyn_setting_args
+function validate_callback__czr_heading_module( $value ) {
+    //return new \WP_Error('required' ,'heading did not pass ');
+    return $value;
+}
 
 /**
  * Filter headings text output WordPress's KSES API.
