@@ -56,18 +56,46 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error(  __FUNCTION__ . ' => missing sek_action' );
             }
             $sek_action = $_POST['sek_action'];
+
+            $exported_setting_validities = array();
+
+            // CHECK THE SETTING VALIDITIES BEFORE RENDERING
+            // When a module has been registered with a sanitize_callback, we can collect the possible problems here before sending the response.
+            // Then, on ajax.done(), in SekPreviewPrototype::schedulePanelMsgReactions, we will send the setting validities object to the panel
+            if ( is_customize_preview() ) {
+                global $wp_customize;
+                // prepare the setting validities so we can pass them when sending the ajax response
+                $setting_validities = $wp_customize->validate_setting_values( $wp_customize->unsanitized_post_values() );
+                $raw_exported_setting_validities = array_map( array( $wp_customize, 'prepare_setting_validity_for_js' ), $setting_validities );
+
+                // filter the setting validity to only keep the __nimble__ prefixed ui settings
+                $exported_setting_validities = array();
+                foreach( $raw_exported_setting_validities as $setting_id => $validity ) {
+                    // don't consider the not Nimble UI settings, not starting with __nimble__
+                    if ( false === strpos( $setting_id , NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) )
+                      continue;
+                    $exported_setting_validities[ $setting_id ] = $validity;
+                }
+            }
+
             // is this action possible ?
             if ( in_array( $sek_action, $this -> ajax_action_map ) ) {
                 $html = $this -> sek_ajax_fetch_content( $sek_action );
                 //sek_error_log('sek_ajax_fetch_content()', $html );
                 if ( is_wp_error( $html ) ) {
                     wp_send_json_error( $html );
+                } else {
+                    $response = array(
+                        'contents' => $html,
+                        'setting_validities' => $exported_setting_validities
+                    );
+                    wp_send_json_success( apply_filters( 'sek_content_results', $response, $sek_action ) );
                 }
             } else {
                 wp_send_json_error(  __FUNCTION__ . ' => this ajax action ( ' . $sek_action . ' ) is not listed in the map ' );
             }
 
-            wp_send_json_success( apply_filters( 'sek_content_results', $html, $sek_action ) );
+
         }//sek_get_content_for_injection()
 
 
