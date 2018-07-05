@@ -7,6 +7,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
             if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
 
+            // SCHEDULE THE ACITONS ON HOOKS AND CONTENT FILTERS
             foreach( sek_get_locations() as $hook ) {
                 switch ( $hook ) {
                     case 'loop_start' :
@@ -24,6 +25,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
 
+            // SCHEDULE THE ASSETS ENQUEUING
+            add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
             // add_filter( 'template_include', function( $template ) {
             //       // error_log( 'TEMPLATE ? => ' . $template );
             //       // error_log( 'DID_ACTION WP => ' . did_action('wp') );
@@ -276,6 +279,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
 
+
+
+
+
         /* MODULE AND PLACEHOLDER */
         // Fires the render callback of the module
         // The placeholder(s) rendering is delegated to each module template
@@ -333,31 +340,91 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
          * ( filtered by wp core when invoked in customize-preview )
          */
         function get_unfiltered_edit_post_link( $id = 0, $context = 'display' ) {
-          if ( ! $post = get_post( $id ) )
-            return;
+            if ( ! $post = get_post( $id ) )
+              return;
 
-          if ( 'revision' === $post->post_type )
-            $action = '';
-          elseif ( 'display' == $context )
-            $action = '&amp;action=edit';
-          else
-            $action = '&action=edit';
+            if ( 'revision' === $post->post_type )
+              $action = '';
+            elseif ( 'display' == $context )
+              $action = '&amp;action=edit';
+            else
+              $action = '&action=edit';
 
-          $post_type_object = get_post_type_object( $post->post_type );
-          if ( !$post_type_object )
-            return;
+            $post_type_object = get_post_type_object( $post->post_type );
+            if ( !$post_type_object )
+              return;
 
-          if ( !current_user_can( 'edit_post', $post->ID ) )
-            return;
+            if ( !current_user_can( 'edit_post', $post->ID ) )
+              return;
 
-          if ( $post_type_object->_edit_link ) {
-            $link = admin_url( sprintf( $post_type_object->_edit_link . $action, $post->ID ) );
-          } else {
-            $link = '';
-          }
-          return $link;
+            if ( $post_type_object->_edit_link ) {
+              $link = admin_url( sprintf( $post_type_object->_edit_link . $action, $post->ID ) );
+            } else {
+              $link = '';
+            }
+            return $link;
         }
 
+
+
+        // @hook wp_enqueue_scripts
+        function sek_enqueue_the_printed_module_assets() {
+            $skope_id = skp_get_skope_id();
+            $skoped_seks = sek_get_skoped_seks( $skope_id );
+
+            if ( ! is_array( $skoped_seks ) || empty( $skoped_seks['collection'] ) )
+              return;
+
+            $enqueueing_candidates = $this->sek_sniff_assets_to_enqueue( $skoped_seks['collection'] );
+
+            foreach ( $enqueueing_candidates as $handle => $asset_params ) {
+                if ( empty( $asset_params['type'] ) ) {
+                    sek_error_log( __FUNCTION__ . ' => missing asset type', $asset_params );
+                    continue;
+                }
+                switch ( $asset_params['type'] ) {
+                    case 'css' :
+                        wp_enqueue_style(
+                            $handle,
+                            array_key_exists( 'src', $asset_params ) ? $asset_params['src'] : null,
+                            array_key_exists( 'deps', $asset_params ) ? $asset_params['deps'] : array(),
+                            NIMBLE_ASSETS_VERSION,
+                            'all'
+                        );
+                    break;
+                    case 'js' :
+                        wp_enqueue_script(
+                            $handle,
+                            array_key_exists( 'src', $asset_params ) ? $asset_params['src'] : null,
+                            array_key_exists( 'deps', $asset_params ) ? $asset_params['deps'] : null,
+                            array_key_exists( 'ver', $asset_params ) ? $asset_params['ver'] : null,
+                            array_key_exists( 'in_footer', $asset_params ) ? $asset_params['in_footer'] : false
+                        );
+                    break;
+                }
+            }
+        }//sek_enqueue_the_printed_module_assets()
+
+        // @hook sek_sniff_assets_to_enqueue
+        function sek_sniff_assets_to_enqueue( $collection, $enqueuing_candidates = array() ) {
+            foreach ( $collection as $level_data ) {
+                if ( array_key_exists( 'level', $level_data ) && 'module' === $level_data['level'] && ! empty( $level_data['module_type'] ) ) {
+                    $front_assets = sek_get_registered_module_type_property( $level_data['module_type'], 'front_assets' );
+                    if ( is_array( $front_assets ) ) {
+                        foreach ( $front_assets as $handle => $asset_params ) {
+                            if ( is_string( $handle ) && ! array_key_exists( $handle, $enqueuing_candidates ) ) {
+                                $enqueuing_candidates[ $handle ] = $asset_params;
+                            }
+                        }
+                    }
+                } else {
+                    if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
+                        $enqueuing_candidates = $this -> sek_sniff_assets_to_enqueue( $level_data['collection'], $enqueuing_candidates );
+                    }
+                }
+            }//foreach
+            return $enqueuing_candidates;
+        }
     }//class
 endif;
 ?>
