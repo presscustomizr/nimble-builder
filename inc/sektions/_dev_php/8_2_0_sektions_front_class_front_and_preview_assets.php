@@ -69,7 +69,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 'all'
             );
             wp_enqueue_style(
-                'font-awesome',
+                'czr-font-awesome',
                 NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
                 array(),
                 NIMBLE_ASSETS_VERSION,
