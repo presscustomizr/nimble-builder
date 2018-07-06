@@ -3,31 +3,29 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-$model = SEK_Front() -> model;
-if ( ! is_array( $model ) ) {
-  error_log( 'module_tmpl => $model should be an array' );
-  return;
-}
-if ( ! array_key_exists( 'module_type', $model ) ) {
-    error_log( 'module_tmpl => a module type must be provided' );
-    return;
-}
-$module_type = $model['module_type'];
-// print the module content if not empty
-if ( ! array_key_exists( 'value', $model ) ) {
-  return;
-} else {
-  if ( array_key_exists('html_content', $model['value'] ) ) {
-      $module_content = $model['value']['html_content'];
-      if ( empty( $module_content ) ) {
-          // $placeholder_icon = sek_get_registered_module_type_property( $module_type, 'placeholder_icon' );
-          // sek_get_module_placeholder( $placeholder_icon );
-        SEK_Front() -> sek_get_input_placeholder_content( 'text', 'html_content' );
-      } else {
-          ?>
-            <p><?php echo $module_content; ?></p>
-          <?php
-      }
-  }
-}
 
+$model = SEK_Front() -> model;
+$module_type = $model['module_type'];
+$value = array_key_exists( 'value', $model ) ? $model['value'] : array();
+
+// Utility to print the html content
+// should be wrapped in a specific selector when customizing,
+if ( ! function_exists( '\Nimble\sek_print_html_content') ) {
+    function sek_print_html_content( $html_content, $input_id ) {
+        if ( empty( $html_content ) ) {
+            echo SEK_Front()->sek_get_input_placeholder_content( 'text', 'html_content' );
+        } else {
+            //TODO: move add_filter 'sek_html_content' somewhere else so it's called once
+            //and we won't need to remove it
+            //Also consider to add several other filter callbacks e.g. wptexturize, wpemoji... : see default-filters for 'the_content' in wp-incudes/default-filters.php
+            //The html widget for sure doesn't conver emojis
+            add_filter( 'sek_html_content', 'do_shortcode' );
+            echo apply_filters( 'sek_html_content', $html_content );
+            remove_filter( 'sek_html_content', 'do_shortcode' );
+        }
+    }
+}
+// print the module content if not empty
+if ( array_key_exists( 'html_content', $value ) ) {
+    sek_print_html_content( $value['html_content'], 'html_content' );
+}
