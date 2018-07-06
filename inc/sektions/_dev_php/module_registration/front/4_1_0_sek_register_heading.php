@@ -51,6 +51,7 @@ function sek_get_module_params_for_czr_heading_module() {
                                 // The following might be useful to me, but it generates a pretty long list of allowed HTML tags
                                 // would be great if we could have a "collapsible notice", collapsed by default that will expand on click
                                 // similar to the section description used by wp, e.g. in the Additional CSS section
+                                'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
                                 // 'notice_before'      => sprintf( __( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: %s' ),
                                 //     '<code>' . czr_heading_module_text_allowed_tags() . '</code>', 'text_domain_to_be_replaced' ),
 
@@ -324,7 +325,7 @@ function czr_heading_module_text_get_allowedtags() {
  */
 function czr_heading_module_text_allowed_tags() {
     $allowedtags = czr_heading_module_text_get_allowedtags();
-
+    $allowed = '';
     foreach ( (array) $allowedtags as $tag => $attributes ) {
         $allowed .= '<'.$tag;
         if ( 0 < count($attributes) ) {
