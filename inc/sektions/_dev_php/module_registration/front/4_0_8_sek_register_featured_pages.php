@@ -81,15 +81,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
             )
         ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/featured_pages_module_tmpl.php",
-        'placeholder_icon' => 'short_text',
-        'front_assets' => array(
-              'czr-font-awesome' => array(
-                  'type' => 'css',
-                  //'handle' => 'czr-font-awesome',
-                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
-                  //'deps' => array()
-              )
-        )
+        'placeholder_icon' => 'short_text'
     );
 }
 
