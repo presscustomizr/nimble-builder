@@ -278,7 +278,7 @@ module.exports = {
 
   czr_sektions_customizer_preview_js : {
      src: [
-      '<%= paths.czr_assets %>sek/js/_dev_preview/_1_0_preview_itinialize.js',
+      '<%= paths.czr_assets %>sek/js/_dev_preview/_1_0_preview_initialize.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_preview/_2_0_preview_sortable_setup.js',
       '<%= paths.czr_assets %>sek/js/_dev_preview/_2_1_preview_resizable_setup.js',
