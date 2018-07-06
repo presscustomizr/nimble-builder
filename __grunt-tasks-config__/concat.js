@@ -236,7 +236,7 @@ module.exports = {
 
   czr_sektions_customizer_control_js : {
     src: [
-      '<%= paths.czr_assets %>sek/js/_dev_control/_1_0_sektions_itinialize.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_0_sektions_initialize.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_2_sektions_setup_collection_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_4_sektions_react_to_preview.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_sektions_generate_UI.js',
