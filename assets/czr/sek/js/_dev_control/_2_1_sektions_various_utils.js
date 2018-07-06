@@ -317,6 +317,44 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   var starting_value = sektionsLocalizedData.registeredModules[ module_type ][ 'starting_value' ];
                   return _.isEmpty( starting_value ) ? 'no_starting_value' : starting_value;
+            },
+
+
+
+            /*
+            * Following two functions taken from jQuery.tabbable 1.0
+            * see https://github.com/marklagendijk/jquery.tabbable/blob/master/jquery.tabbable.js
+            *
+            * Copyright 2013, Mark Lagendijk
+            * Released under the MIT license
+            */
+            selectNextTabbableOrFocusable : function( selector ) {
+                  var selectables = $( selector );
+                  var current = $( ':focus' );
+                  var nextIndex = 0;
+                  if( current.length === 1 ) {
+                        var currentIndex = selectables.index( current );
+                        if( currentIndex + 1 < selectables.length ) {
+                              nextIndex = currentIndex + 1;
+                        }
+                  }
+
+                  selectables.eq( nextIndex ).focus();
+            },
+
+            selectPrevTabbableOrFocusable : function( selector ) {
+                  var selectables = $( selector );
+                  var current = $( ':focus' );
+                  var prevIndex = selectables.length - 1;
+                  if( current.length === 1 ) {
+                        var currentIndex = selectables.index( current );
+                        if( currentIndex > 0 ) {
+                              prevIndex = currentIndex - 1;
+                        }
+                  }
+
+                  selectables.eq( prevIndex ).focus();
             }
+
       });//$.extend()
 })( wp.customize, jQuery );

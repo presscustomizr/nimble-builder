@@ -196,6 +196,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_71_sek_input_tmpl_fa_icon_picker.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_7_sek_input_tmpl_font_picker.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_8_sek_input_tmpl_font_size_line_height.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_9_sek_input_tmpl_code_editor.php',
 
       // MODULE REGISTRATION
       '<%= paths.sektions %>_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php',
@@ -207,7 +208,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_height.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_4_sek_register_spacing.php',
 
-      //'<%= paths.sektions %>_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php',
+      '<%= paths.sektions %>_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_7_sek_register_image.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_8_sek_register_featured_pages.php',
@@ -255,6 +256,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_4_line_height_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_5_font_picker_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_6_font_awesome_icon_picker.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_7_code_editor.js',
 
       // Modules
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_bg_border_module.js',
@@ -270,8 +272,8 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_5_FRONT_heading.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_6_FRONT_divider.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_7_FRONT_spacer.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_3_FRONT_featured_pages.js'
-      //'<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_2_FRONT_simple_html.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_3_FRONT_featured_pages.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_2_FRONT_simple_html.js',
     ],
     dest: '<%= paths.czr_assets %>sek/js/ccat-sek-control.js',
   },
