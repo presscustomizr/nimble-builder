@@ -403,3 +403,8 @@ div[data-sek-align].selected {
 .sek-side-nimble-logo-wrapper .sek-nimble-logo {
   height: 45px;
 }
+
+[data-input-type="code_editor"] .czr-input {
+    width: 100%;
+    float: left;
+}
