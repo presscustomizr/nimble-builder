@@ -41,6 +41,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'line_height' :
             sek_set_input_tmpl___line_height( $input_id, $input_data );
         break;
+        case 'code_editor' :
+            sek_set_input_tmpl___code_editor( $input_id, $input_data );
+        break;
     }
 }
 ?>

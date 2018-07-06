@@ -148,6 +148,10 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
 
             'Select an icon'     => __( 'Select an icon', 'text_domain_to_be_replaced' ),
+
+            // Code Editor
+            'codeEditorSingular'   => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_domain_to_be_replaced' ),
+            'codeEditorPlural'     => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_domain_to_be_replaced' ),
             // 'Module' => __('Module', 'text_domain_to_be_replaced'),
             // 'Module' => __('Module', 'text_domain_to_be_replaced'),
             // 'Module' => __('Module', 'text_domain_to_be_replaced'),
