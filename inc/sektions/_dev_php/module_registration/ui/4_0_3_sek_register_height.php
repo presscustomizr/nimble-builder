@@ -28,7 +28,7 @@ function sek_get_module_params_for_sek_level_height_module() {
                 ),
                 'v_alignment_css' => array(
                     'input_type'  => 'v_alignment',
-                    'title'       => __('Vertical alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Inner vertical alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
                     'refresh-markup' => false,
                     'refresh-stylesheet' => true
