@@ -45,9 +45,10 @@ function sek_get_module_params_for_czr_heading_module() {
                         //'attributes' => 'data-sek-device="desktop"',
                         'inputs' => array(
                             'heading_text' => array(
-                                'input_type'         => 'textarea',
+                                'input_type'         => 'text',
                                 'title'              => __( 'Heading text', 'text_domain_to_be_replaced' ),
                                 'default'            => '',
+                                'width-100'         => true,
                                 // The following might be useful to me, but it generates a pretty long list of allowed HTML tags
                                 // would be great if we could have a "collapsible notice", collapsed by default that will expand on click
                                 // similar to the section description used by wp, e.g. in the Additional CSS section
@@ -177,9 +178,10 @@ function sanitize_callback__czr_heading_module( $value ) {
 }
 
 // @see SEK_CZR_Dyn_Register::set_dyn_setting_args
+// Only the boolean true or a WP_error object will be valid returned value considered when validating
 function validate_callback__czr_heading_module( $value ) {
     //return new \WP_Error('required' ,'heading did not pass ');
-    return $value;
+    return true;
 }
 
 /**
