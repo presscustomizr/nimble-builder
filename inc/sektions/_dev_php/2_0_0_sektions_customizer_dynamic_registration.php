@@ -87,7 +87,7 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         // Uses the validate_callback function specified on module registration if any
         // @return validity object
         function validate_callback( $validity, $setting_data, $setting_instance ) {
-            $validation_msg = 'pass_validation';
+            $validated = true;
             if ( isset( $_POST['skope_id'] ) ) {
                 $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
                 if ( is_array( $sektionSettingValue ) ) {
@@ -97,21 +97,22 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                         if ( is_array( $model ) && ! empty( $model['module_type'] ) ) {
                             $validate_callback = sek_get_registered_module_type_property( $model['module_type'], 'validate_callback' );
                             if ( ! empty( $validate_callback ) && is_string( $validate_callback ) && function_exists( $validate_callback ) ) {
-                                $validation_msg = $validate_callback( $setting_data );
+                                $validated = $validate_callback( $setting_data );
                             }
                         }
                     }
                 }
             }
             //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
-            if ( 'pass_validation' !== $validation_msg ) {
-                if ( is_wp_error( $validation_msg ) ) {
+            if ( true !== $validated ) {
+                if ( is_wp_error( $validated ) ) {
                     $validation_msg = $validation_msg->get_error_message();
+                    $validity->add(
+                        'nimble_validation_error_in_' . $setting_instance->id ,
+                        $validation_msg
+                    );
                 }
-                $validity->add(
-                    'nimble_validation_error_in_' . $setting_instance->id ,
-                    $validation_msg
-                );
+
             }
             return $validity;
         }
