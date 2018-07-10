@@ -11,7 +11,7 @@
                       module.inputConstructor = api.CZRInput.extend( module.CZRIconInputMths || {} );
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
+                      module.itemConstructor = api.CZRItem.extend( module.CZRIconItemConstructor || {} );
 
 
                       //SET THE CONTENT PICKER DEFAULT OPTIONS
@@ -71,6 +71,73 @@
                               }// if
                       }//setupSelect
               },//CZRIconInputMths
+              //////////////////////////////////////////////////////////
+              /// ITEM CONSTRUCTOR
+              //////////////////////////////////////////
+              CZRIconItemConstructor : {
+                    //overrides the parent ready
+                    ready : function() {
+                          var item = this;
+                          //wait for the input collection to be populated,
+                          //and then set the input visibility dependencies
+                          item.inputCollection.bind( function( col ) {
+                                if( _.isEmpty( col ) )
+                                  return;
+                                try { item.setInputVisibilityDeps(); } catch( er ) {
+                                      api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                                }
+                          });//item.inputCollection.bind()
+
+                          //fire the parent
+                          api.CZRItem.prototype.ready.call( item );
+                    },
+
+
+                    //Fired when the input collection is populated
+                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                    setInputVisibilityDeps : function() {
+                          var item = this,
+                              module = item.module;
+                          // input controller instance == this
+                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                                //Fire on init
+                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                                //React on change
+                                this.bind( function( to ) {
+                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                                });
+                          };
+                          //Internal item dependencies
+                          item.czr_Input.each( function( input ) {
+                                switch( input.id ) {
+                                      case 'link-to' :
+                                            _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
+                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        var bool = false;
+                                                        switch( _inputId_ ) {
+                                                              case 'link-custom-url' :
+                                                                    bool = 'url' == input() && '_custom_' == item.czr_Input('link-pick-url')().id;
+                                                              break;
+                                                              default :
+                                                                    bool = 'url' == input();
+                                                              break;
+                                                        }
+                                                        return bool;
+                                                  }); } catch( er ) {
+                                                        api.errare( 'Icon module => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
+                                      case 'link-pick-url' :
+                                            scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                                  return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
+                                            });
+                                      break;
+                                }
+                          });
+                    }
+              },//CZRIconItemConstructor
+
       };//IconModuleConstructor
 
 
