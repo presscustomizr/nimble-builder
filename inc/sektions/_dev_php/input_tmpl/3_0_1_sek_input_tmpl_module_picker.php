@@ -61,18 +61,21 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
             );
             $i = 0;
             foreach( $content_collection as $_params) {
-                if ( $i % 2 == 0 ) {
-                  //printf('<div class="sek-module-raw"></div');
+                // if ( $i % 2 == 0 ) {
+                //   //printf('<div class="sek-module-raw"></div');
+                // }
+                $icon_img_src = '';
+                if ( !empty( $_params['icon'] ) ) {
+                    $icon_img_src = NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' . $_params['icon'];
                 }
-                $icon_img_src = NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' . $_params['icon'];
+
                 printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><span class="sek-module-icon">%3$s</span><span class="sek-module-title">%4$s</span></div>',
-                    $_params['content-type'],
-                    $_params['content-id'],
-                    '<img title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>',
-                    $_params['title'],
-                    __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' )
+                      $_params['content-type'],
+                      $_params['content-id'],
+                      empty( $icon_img_src ) ? '<i style="color:red">Missing Icon</i>' : '<img title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>',
+                      $_params['title'],
+                      __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' )
                 );
-                $i++;
             }
           ?>
         </div>
