@@ -8,6 +8,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $model = array();//<= when rendering, the current level model
         public $parent_model = array();//<= when rendering, the current parent model
         public $default_models = array();// <= will be populated to cache the default models when invoking sek_get_default_module_model
+        public $cached_input_lists = array(); // <= will be populated to cache the input_list of each registered module. Useful when we need to get info like css_selector for a particular input type or id.
         public $ajax_action_map = array();
 
         public static function get_instance( $params ) {

@@ -129,6 +129,11 @@ function sek_get_registered_module_type_property( $module_type, $property = '' )
     return;
 }
 
+
+
+
+
+
 /* ------------------------------------------------------------------------- *
  *  REGISTERED MODULES => DEFAULT MODULE MODEL
 /* ------------------------------------------------------------------------- */
@@ -224,6 +229,110 @@ function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
 
     return $default_model;
 }
+
+
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  REGISTERED MODULES => INPUT LIST
+/* ------------------------------------------------------------------------- */
+// @param (string) module_type
+// Walk the registered modules tree and generates the module input list if not already cached
+// used :
+// - when filtering 'sek_add_css_rules_for_input_id' @see Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
+// @return array()
+function sek_get_module_input_list( $module_type = '' ) {
+    $input_list = array();
+    if ( empty( $module_type ) || is_null( $module_type ) )
+      return $input_list;
+
+    // Did we already cache it ?
+    $cached_input_lists = SEK_Front()->cached_input_lists;
+    if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
+        $input_list = $cached_input_lists[ $module_type ];
+    } else {
+        $registered_modules = CZR_Fmk_Base() -> registered_modules;
+        // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
+        if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+        }
+
+        if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+        }
+        // Build
+        $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
+
+        // Cache
+        $cached_input_lists[ $module_type ] = $input_list;
+        SEK_Front()->cached_input_lists = $cached_input_lists;
+        // sek_error_log( __FUNCTION__ . ' => $cached_input_lists', $cached_input_lists );
+    }
+    return $input_list;
+}
+
+// @return array() default model
+// Walk recursively the 'tmpl' property of the module
+// 'tmpl' => array(
+//     'pre-item' => array(
+//         'social-icon' => array(
+//             'input_type'  => 'select',
+//             'title'       => __('Select an icon', 'text_domain_to_be_replaced')
+//         ),
+//     ),
+//     'mod-opt' => array(
+//         'social-size' => array(
+//             'input_type'  => 'number',
+//             'title'       => __('Size in px', 'text_domain_to_be_replaced'),
+//             'step'        => 1,
+//             'min'         => 5,
+//             'transport' => 'postMessage'
+//         )
+//     ),
+//     'item-inputs' => array(
+//         'item-inputs' => array(
+                // 'tabs' => array(
+                //     array(
+                //         'title' => __('Content', 'text_domain_to_be_replaced'),
+                //         //'attributes' => 'data-sek-device="desktop"',
+                //         'inputs' => array(
+                //             'content' => array(
+                //                 'input_type'  => 'tiny_mce_editor',
+                //                 'title'       => __('Content', 'text_domain_to_be_replaced')
+                //             ),
+                //             'h_alignment_css' => array(
+                //                 'input_type'  => 'h_text_alignment',
+                //                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                //                 'default'     => is_rtl() ? 'right' : 'left',
+                //                 'refresh-markup' => false,
+                //                 'refresh-stylesheet' => true
+                //             )
+                //         )
+//         )
+//     )
+// )
+// Build the input list from item-inputs and modop-inputs
+function _sek_build_input_list( $module_tmpl_data, $input_list = null ) {
+    $input_list = is_array( $input_list ) ? $input_list : array();
+    //error_log( print_r(  $module_tmpl_data , true ) );
+    foreach( $module_tmpl_data as $key => $data ) {
+        if ( 'pre-item' === $key )
+          continue;
+        if ( is_array( $data ) && array_key_exists( 'input_type', $data ) ) {
+            $input_list[ $key ] = $data;
+        } else if ( is_array( $data ) ) {
+            $input_list = _sek_build_input_list( $data, $input_list );
+        }
+    }
+
+    return $input_list;
+}
+
 
 
 
