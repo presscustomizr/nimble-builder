@@ -9,14 +9,13 @@
       // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             code_editor : function( input_options ) {
-                  var input   = this,
-                      control = this.module.control,
-                      item    = input.input_parent(),
+                  var input          = this,
+                      control        = this.module.control,
+                      item           = input.input_parent(),
                       editorSettings = false,
-                      $textarea = input.container.find( 'textarea' ),
-                      $input_title = input.container.find( '.customize-control-title' ),
-                      editor_params = $textarea.data( 'editor-params' );
-
+                      $textarea      = input.container.find( 'textarea' ),
+                      $input_title   = input.container.find( '.customize-control-title' ),
+                      editor_params  = $textarea.data( 'editor-params' );
 
                   // // When using blocking notifications (type: error) the following block will append a checkbox to the
                   // // notification message block that once checked will allow to save and publish anyways
@@ -43,34 +42,13 @@
 
                   // Obtain editorSettings for instantiation.
                   if ( wp.codeEditor  && ( _.isUndefined( editor_params ) || false !== editor_params )  ) {
-                        // Obtain default editor settings.
-                        editorSettings = wp.codeEditor.defaultSettings ? _.clone( wp.codeEditor.defaultSettings ) : {};
-                        editorSettings.codemirror = _.extend (
-                              {},
-                              editorSettings.codemirror,
-                              {
-                                    indentUnit: 2,
-                                    tabSize: 2
-                              }
-                        );
-
-                        // Merge editor_settings param on top of defaults.
-                        if ( _.isObject( editor_params ) ) {
-                              _.each( editor_params, function( value, key ) {
-                                    if ( _.isObject( value ) ) {
-                                          editorSettings[ key ] = _.extend(
-                                                {},
-                                                editorSettings[ key ],
-                                                value
-                                          );
-                                    }
-                              } );
-                        }
+                        // Obtain this input editor settings (we don't have defaults).
+                        editorSettings = editor_params;
                   }
 
                   input.isReady.done( function() {
                         // the input should be visible otherwise the code mirror initializes wrongly:
-                        // e.g. bad ui (bad inline CSS maths), not visible content until click
+                        // e.g. bad ui (bad inline CSS maths), not visible content until click.
                         setTimeout( function() {
                               if ( editorSettings ) {
                                     initSyntaxHighlightingEditor( editorSettings );

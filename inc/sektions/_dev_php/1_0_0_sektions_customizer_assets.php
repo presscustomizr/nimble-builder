@@ -83,8 +83,266 @@ function sek_enqueue_controls_js_css() {
             )
         )
     );//wp_localize_script()
+
+    nimble_enqueue_code_editor();
 }//sek_enqueue_controls_js_css()
 
+
+
+
+
+/**
+ * Enqueue all code editor assets
+ */
+function nimble_enqueue_code_editor() {
+    wp_enqueue_script( 'code-editor' );
+    wp_enqueue_style( 'code-editor' );
+
+    wp_enqueue_script( 'csslint' );
+    wp_enqueue_script( 'htmlhint' );
+    wp_enqueue_script( 'csslint' );
+    wp_enqueue_script( 'jshint' );
+    wp_enqueue_script( 'htmlhint-kses' );
+    wp_enqueue_script( 'jshint' );
+    wp_enqueue_script( 'jsonlint' );
+}
+
+
+
+/**
+ * Enqueue assets needed by the code editor for the given settings.
+ *
+ * @param array $args {
+ *     Args.
+ *
+ *     @type string   $type       The MIME type of the file to be edited.
+ *     @type array    $codemirror Additional CodeMirror setting overrides.
+ *     @type array    $csslint    CSSLint rule overrides.
+ *     @type array    $jshint     JSHint rule overrides.
+ *     @type array    $htmlhint   JSHint rule overrides.
+ *     @returns array Settings for the enqueued code editor.
+ * }
+ */
+function nimble_get_code_editor_settings( $args ) {
+    $settings = array(
+        'codemirror' => array(
+            'indentUnit' => 2,
+            'tabSize' => 2,
+            'indentWithTabs' => true,
+            'inputStyle' => 'contenteditable',
+            'lineNumbers' => true,
+            'lineWrapping' => true,
+            'styleActiveLine' => true,
+            'continueComments' => true,
+            'extraKeys' => array(
+                'Ctrl-Space' => 'autocomplete',
+                'Ctrl-/' => 'toggleComment',
+                'Cmd-/' => 'toggleComment',
+                'Alt-F' => 'findPersistent',
+                'Ctrl-F'     => 'findPersistent',
+                'Cmd-F'      => 'findPersistent',
+            ),
+            'direction' => 'ltr', // Code is shown in LTR even in RTL languages.
+            'gutters' => array(),
+        ),
+        'csslint' => array(
+            'errors' => true, // Parsing errors.
+            'box-model' => true,
+            'display-property-grouping' => true,
+            'duplicate-properties' => true,
+            'known-properties' => true,
+            'outline-none' => true,
+        ),
+        'jshint' => array(
+            // The following are copied from <https://github.com/WordPress/wordpress-develop/blob/4.8.1/.jshintrc>.
+            'boss' => true,
+            'curly' => true,
+            'eqeqeq' => true,
+            'eqnull' => true,
+            'es3' => true,
+            'expr' => true,
+            'immed' => true,
+            'noarg' => true,
+            'nonbsp' => true,
+            'onevar' => true,
+            'quotmark' => 'single',
+            'trailing' => true,
+            'undef' => true,
+            'unused' => true,
+
+            'browser' => true,
+
+            'globals' => array(
+                '_' => false,
+                'Backbone' => false,
+                'jQuery' => false,
+                'JSON' => false,
+                'wp' => false,
+            ),
+        ),
+        'htmlhint' => array(
+            'tagname-lowercase' => true,
+            'attr-lowercase' => true,
+            'attr-value-double-quotes' => false,
+            'doctype-first' => false,
+            'tag-pair' => true,
+            'spec-char-escape' => true,
+            'id-unique' => true,
+            'src-not-empty' => true,
+            'attr-no-duplication' => true,
+            'alt-require' => true,
+            'space-tab-mixed-disabled' => 'tab',
+            'attr-unsafe-chars' => true,
+        ),
+    );
+
+    $type = '';
+
+    if ( isset( $args['type'] ) ) {
+        $type = $args['type'];
+
+        // Remap MIME types to ones that CodeMirror modes will recognize.
+        if ( 'application/x-patch' === $type || 'text/x-patch' === $type ) {
+            $type = 'text/x-diff';
+        }
+    } //we do not treat the "file" case
+
+
+    if ( 'text/css' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'css',
+            'lint' => true,
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+    } elseif ( 'text/x-scss' === $type || 'text/x-less' === $type || 'text/x-sass' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => $type,
+            'lint' => false,
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+    } elseif ( 'text/x-diff' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'diff',
+        ) );
+    } elseif ( 'text/html' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'htmlmixed',
+            'lint' => true,
+            'autoCloseBrackets' => true,
+            'autoCloseTags' => true,
+            'matchTags' => array(
+                'bothTags' => true,
+            ),
+        ) );
+
+        if ( ! current_user_can( 'unfiltered_html' ) ) {
+            $settings['htmlhint']['kses'] = wp_kses_allowed_html( 'post' );
+        }
+    } elseif ( 'text/x-gfm' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'gfm',
+            'highlightFormatting' => true,
+        ) );
+    } elseif ( 'application/javascript' === $type || 'text/javascript' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'javascript',
+            'lint' => true,
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+    } elseif ( false !== strpos( $type, 'json' ) ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => array(
+                'name' => 'javascript',
+            ),
+            'lint' => true,
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+        if ( 'application/ld+json' === $type ) {
+            $settings['codemirror']['mode']['jsonld'] = true;
+        } else {
+            $settings['codemirror']['mode']['json'] = true;
+        }
+    } elseif ( false !== strpos( $type, 'jsx' ) ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'jsx',
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+    } elseif ( 'text/x-markdown' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'markdown',
+            'highlightFormatting' => true,
+        ) );
+    } elseif ( 'text/nginx' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'nginx',
+        ) );
+    } elseif ( 'application/x-httpd-php' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'php',
+            'autoCloseBrackets' => true,
+            'autoCloseTags' => true,
+            'matchBrackets' => true,
+            'matchTags' => array(
+                'bothTags' => true,
+            ),
+        ) );
+    } elseif ( 'text/x-sql' === $type || 'text/x-mysql' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'sql',
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+    } elseif ( false !== strpos( $type, 'xml' ) ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'xml',
+            'autoCloseBrackets' => true,
+            'autoCloseTags' => true,
+            'matchTags' => array(
+                'bothTags' => true,
+            ),
+        ) );
+    } elseif ( 'text/x-yaml' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'yaml',
+        ) );
+    } else {
+        $settings['codemirror']['mode'] = $type;
+    }
+
+    if ( ! empty( $settings['codemirror']['lint'] ) ) {
+        $settings['codemirror']['gutters'][] = 'CodeMirror-lint-markers';
+    }
+
+    // Let settings supplied via args override any defaults.
+    foreach ( wp_array_slice_assoc( $args, array( 'codemirror', 'csslint', 'jshint', 'htmlhint' ) ) as $key => $value ) {
+        $settings[ $key ] = array_merge(
+            $settings[ $key ],
+            $value
+        );
+    }
+
+    $settings = apply_filters( 'nimble_code_editor_settings', $settings, $args );
+
+    if ( empty( $settings ) || empty( $settings['codemirror'] ) ) {
+        return false;
+    }
+
+    if ( isset( $settings['codemirror']['mode'] ) ) {
+        $mode = $settings['codemirror']['mode'];
+        if ( is_string( $mode ) ) {
+            $mode = array(
+                'name' => $mode,
+            );
+        }
+    }
+
+    return $settings;
+}
 
 
 
