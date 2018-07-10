@@ -2,27 +2,65 @@
 // filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
 add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_generic_css_input_types', 10, 5 );
-function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_id, $parent_level, $specific_css_selectors ) {
-
+function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_id, $parent_level, $module_level_css_selectors ) {
     if ( ! is_string( $input_id ) || empty( $input_id ) )
         return $rules;
 
     $selector = '[data-sek-id="'.$parent_level['id'].'"]';
 
+    // SPECIFIC CSS SELECTOR AT MODULE LEVEL
     // are there more specific css selectors specified on module registration ?
-    if ( ! is_null( $specific_css_selectors ) ) {
-        if ( is_array( $specific_css_selectors ) ) {
-            $new_selector = array();
-            foreach ( $specific_css_selectors as $spec_selector ) {
-                $new_selector[] = $selector . ' ' . $spec_selector;
+    if ( !is_null( $module_level_css_selectors ) && !empty( $module_level_css_selectors ) ) {
+        if ( is_array( $module_level_css_selectors ) ) {
+            $new_selectors = array();
+            foreach ( $module_level_css_selectors as $spec_selector ) {
+                $new_selectors[] = $selector . ' ' . $spec_selector;
             }
-            $new_selector = implode(',', $new_selector );
-            $selector = $new_selector;
-        } else if ( is_string( $specific_css_selectors ) ) {
-            $selector = $selector . ' ' . $specific_css_selectors;
+            $new_selectors = implode(',', $new_selectors );
+            $selector = $new_selectors;
+        } else if ( is_string( $module_level_css_selectors ) ) {
+            $selector = $selector . ' ' . $module_level_css_selectors;
         }
         //sek_error_log( "sek_add_css_rules_for_input_id => " . $input_id, $selector);
     }
+
+
+    // SPECIFIC CSS SELECTOR AT INPUT LEVEL
+    if ( 'module' === $parent_level['level'] ) {
+        $start = microtime(true) * 1000;
+        $input_list = sek_get_module_input_list( $parent_level['module_type'] );
+        if ( ! is_array( $input_list ) || empty( $input_list ) ) {
+            sek_error_log( __FUNCTION__ . ' => missing input list' );
+        } else if ( is_array( $input_list ) && empty( $input_list[ $input_id ] ) ) {
+            sek_error_log( __FUNCTION__ . ' => missing input id ' . $input_id . ' in input list for module type ' . $parent_level['module_type'] );
+        }
+        if ( is_array( $input_list ) && ! empty( $input_list[ $input_id ] ) && ! empty( $input_list[ $input_id ]['css_selectors'] ) ) {
+            $input_level_css_selectors = $input_list[ $input_id ]['css_selectors'];
+            // We may have several css module selectors, so let's make sure we apply the specific input css selector(s) to all of them
+            $module_selectors = explode(',', $selector );
+            $new_selectors = array();
+            foreach ( $module_selectors as $mod_selector ) {
+                if ( is_array( $input_level_css_selectors ) ) {
+                    foreach ( $input_level_css_selectors as $spec_selector ) {
+                        $new_selectors[] = $mod_selector . ' ' . $spec_selector;
+                    }
+                } else if ( is_string( $input_level_css_selectors ) ) {
+                    $new_selectors[] = $mod_selector . ' ' . $input_level_css_selectors;
+                }
+            }
+
+            $new_selectors = implode(',', $new_selectors );
+            $selector = $new_selectors;
+            //sek_error_log( '$input_level_css_selectors', $selector );
+        }
+        // sek_error_log( 'input_id', $input_id );
+        // sek_error_log( '$input_list', $input_list );
+
+        // $end = microtime(true) * 1000;
+        // $time_elapsed_secs = $end - $start;
+        // sek_error_log('$time_elapsed_secs to get module params', $time_elapsed_secs );
+    }
+
 
     $mq = null;
     $properties_to_render = array();
@@ -55,13 +93,13 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
         case 'color_hover_css' :
             //$selector = '[data-sek-id="'.$parent_level['id'].'"]:hover';
             // Add ':hover to each selectors'
-            $new_selector = array();
+            $new_selectors = array();
             $exploded = explode(',', $selector);
             foreach ( $exploded as $sel ) {
-                $new_selector[] = $sel.':hover';
+                $new_selectors[] = $sel.':hover';
             }
 
-            $selector = implode(',', $new_selector);
+            $selector = implode(',', $new_selectors);
             $properties_to_render['color'] = $value;
         break;
         case 'h_alignment_css' :
