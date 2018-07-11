@@ -66,14 +66,16 @@ function sek_get_module_params_for_czr_icon_module() {
                     'title'       => __('Size in pixels', 'text_domain_to_be_replaced'),
                     'default'     => '16px',
                     'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh-stylesheet' => true,
+                    'css_identifier' => 'font_size'
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'h_alignment',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
                     'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh-stylesheet' => true,
+                    'css_identifier' => 'h_alignment'
                 ),
                 'color_css' => array(
                     'input_type'  => 'wp_color_alpha',
@@ -81,7 +83,8 @@ function sek_get_module_params_for_czr_icon_module() {
                     'width-100'   => true,
                     'default'    => '#5a5a5a',
                     'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh-stylesheet' => true,
+                    'css_identifier' => 'color'
                 ),
                 'color_hover_css' => array(
                     'input_type'  => 'wp_color_alpha',
@@ -89,7 +92,8 @@ function sek_get_module_params_for_czr_icon_module() {
                     'width-100'   => true,
                     'default'    => '#5a5a5a',
                     'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh-stylesheet' => true,
+                    'css_identifier' => 'color_hover'
                 ),
             )
         ),

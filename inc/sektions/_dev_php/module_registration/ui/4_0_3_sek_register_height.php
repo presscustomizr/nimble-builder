@@ -26,12 +26,13 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'unit' => '%',
                     'default' => 50
                 ),
-                'v_alignment_css' => array(
+                'v_alignment' => array(
                     'input_type'  => 'v_alignment',
                     'title'       => __('Inner vertical alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
                     'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh-stylesheet' => true,
+                    'css_identifier' => 'v_alignment'
                 )
             )
         )//tmpl
@@ -49,27 +50,57 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
     if ( empty( $options[ 'height' ] ) )
       return $rules;
 
-    if ( empty( $options[ 'height' ][ 'height-type' ] ) )
-      return $rules;
+    if ( ! empty( $options[ 'height' ][ 'v_alignment' ] ) ) {
+        $v_alignment_value = $options[ 'height' ][ 'v_alignment' ];
+        switch ( $v_alignment_value ) {
+            case 'top' :
+                $v_align_value = "flex-start";
+            break;
+            case 'center' :
+                $v_align_value = "center";
+            break;
+            case 'bottom' :
+                $v_align_value = "flex-end";
+            break;
+            default :
+                $v_align_value = "center";
+            break;
+        }
+        $css_rules = '';
+        if ( isset( $v_align_value ) ) {
+            $css_rules .= 'align-items:' . $v_align_value;
+        }
 
-    if ( 'fit-to-screen' == $options[ 'height' ][ 'height-type' ] ) {
-        $height = '100';
-    }
-    elseif ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) && FALSE !== $height_value = filter_var( $options[ 'height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
-                array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
-        $height = $height_value;
-    }
-    $css_rules = '';
-    if ( isset( $height ) && FALSE !== $height ) {
-        $css_rules .= 'height:' . $height . 'vh;';
+        if ( !empty( $css_rules ) ) {
+            $rules[]     = array(
+                    'selector' => '[data-sek-id="'.$level['id'].'"]',
+                    'css_rules' => $css_rules,
+                    'mq' =>null
+            );
+        }
     }
 
-    if ( !empty( $css_rules ) ) {
-        $rules[]     = array(
-                'selector' => '[data-sek-id="'.$level['id'].'"]',
-                'css_rules' => $css_rules,
-                'mq' =>null
-        );
+    if ( ! empty( $options[ 'height' ][ 'height-type' ] ) ) {
+
+        if ( 'fit-to-screen' == $options[ 'height' ][ 'height-type' ] ) {
+            $height = '100';
+        }
+        elseif ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) && FALSE !== $height_value = filter_var( $options[ 'height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
+                    array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
+            $height = $height_value;
+        }
+        $css_rules = '';
+        if ( isset( $height ) && FALSE !== $height ) {
+            $css_rules .= 'height:' . $height . 'vh;';
+        }
+
+        if ( !empty( $css_rules ) ) {
+            $rules[]     = array(
+                    'selector' => '[data-sek-id="'.$level['id'].'"]',
+                    'css_rules' => $css_rules,
+                    'mq' =>null
+            );
+        }
     }
     //error_log( print_r($rules, true) );
     return $rules;

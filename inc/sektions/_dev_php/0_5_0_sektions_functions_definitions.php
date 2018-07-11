@@ -246,7 +246,7 @@ function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
 // used :
 // - when filtering 'sek_add_css_rules_for_input_id' @see Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // @return array()
-function sek_get_module_input_list( $module_type = '' ) {
+function sek_get_registered_module_input_list( $module_type = '' ) {
     $input_list = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
       return $input_list;
@@ -324,7 +324,12 @@ function _sek_build_input_list( $module_tmpl_data, $input_list = null ) {
         if ( 'pre-item' === $key )
           continue;
         if ( is_array( $data ) && array_key_exists( 'input_type', $data ) ) {
-            $input_list[ $key ] = $data;
+            // each input_id of a module should be unique
+            if ( array_key_exists( $key, $input_list ) ) {
+                sek_error_log( __FUNCTION__ . ' => error => duplicated input_id found => ' . $key );
+            } else {
+                $input_list[ $key ] = $data;
+            }
         } else if ( is_array( $data ) ) {
             $input_list = _sek_build_input_list( $data, $input_list );
         }
