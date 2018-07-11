@@ -40,6 +40,7 @@ class Sek_Dyn_CSS_Builder {
         /* ------------------------------------------------------------------------- *
          *  SCHEDULE CSS RULES FILTERING
         /* ------------------------------------------------------------------------- */
+        // filter fired in sek_css_rules_sniffer_walker()
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
 
         $this->sek_css_rules_sniffer_walker();
@@ -63,8 +64,10 @@ class Sek_Dyn_CSS_Builder {
 
         // If the current level is a module, check if the module has more specific css selectors specified on registration
         $module_level_css_selectors = null;
+        $registered_input_list = null;
         if ( ! empty( $parent_level['module_type'] ) ) {
             $module_level_css_selectors = sek_get_registered_module_type_property( $parent_level['module_type'], 'css_selectors' );
+            $registered_input_list = sek_get_registered_module_input_list( $parent_level['module_type'] );
         }
 
         foreach ( $level as $key => $entry ) {
@@ -87,17 +90,29 @@ class Sek_Dyn_CSS_Builder {
             // which makes it possible to target for example the font-family. Either in module values or in level options
             if ( empty( $entry[ 'level' ] ) && is_string( $key ) && 1 < strlen( $key ) ) {
                 // we need to have a level model set
-                if ( !empty( $this -> parent_level_model ) ) {
+                if ( !empty( $parent_level ) && is_array( $parent_level ) && ! empty( $parent_level['module_type'] ) ) {
                     // the input_id candidate to filter is the $key
                     $input_id_candidate = $key;
                     // let's skip the $key that are reserved for the structure of the sektion tree
                     // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
                     // The generic rules must be suffixed with '_css'
-                    if ( false !== strpos( $key, '_css') ) {
-                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level_model, $module_level_css_selectors );
+                    if ( false !== strpos( $input_id_candidate, '_css') ) {
+                        if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id_candidate ] ) && ! empty( $registered_input_list[ $input_id_candidate ]['css_identifier'] ) ) {
+                            $rules = apply_filters(
+                                "sek_add_css_rules_for_input_id",
+                                $rules,// <= the in-progress array of css rules to be populated
+                                $entry,// <= the css property value
+                                $input_id_candidate, // <= the unique input_id as it as been declared on module registration
+                                $registered_input_list,// <= the full list of input for the module
+                                $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                $module_level_css_selectors // <= if the parent is a module, a default set of css_selectors might have been specified on module registration
+                            );
+                        } else {
+                            sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $parent_level['module_type'] . ' for a css input candidate : ' . $key, $parent_level );
+                        }
                     }
-                }
-            }
+                }//if
+            }//if
 
             // populates the rules collection
             if ( !empty( $rules ) ) {

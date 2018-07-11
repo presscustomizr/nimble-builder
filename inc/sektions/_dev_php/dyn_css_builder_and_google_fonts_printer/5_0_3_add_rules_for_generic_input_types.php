@@ -1,12 +1,25 @@
 <?php
 // filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
-add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_generic_css_input_types', 10, 5 );
-function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_id, $parent_level, $module_level_css_selectors ) {
-    if ( ! is_string( $input_id ) || empty( $input_id ) )
+add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_css_sniffed_input_id', 10, 6 );
+function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, $registered_input_list, $parent_level, $module_level_css_selectors ) {
+
+    if ( ! is_string( $input_id ) || empty( $input_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing input_id', $parent_level);
         return $rules;
+    }
+    if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing input_list', $parent_level);
+        return $rules;
+    }
+    $input_registration_params = $registered_input_list[ $input_id ];
+    if ( ! is_string( $input_registration_params['css_identifier'] ) || empty( $input_registration_params['css_identifier'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing css_identifier', $parent_level );
+        return $rules;
+    }
 
     $selector = '[data-sek-id="'.$parent_level['id'].'"]';
+    $css_identifier = $input_registration_params['css_identifier'];
 
     // SPECIFIC CSS SELECTOR AT MODULE LEVEL
     // are there more specific css selectors specified on module registration ?
@@ -27,15 +40,14 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
 
     // SPECIFIC CSS SELECTOR AT INPUT LEVEL
     if ( 'module' === $parent_level['level'] ) {
-        $start = microtime(true) * 1000;
-        $input_list = sek_get_module_input_list( $parent_level['module_type'] );
-        if ( ! is_array( $input_list ) || empty( $input_list ) ) {
+        //$start = microtime(true) * 1000;
+        if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
             sek_error_log( __FUNCTION__ . ' => missing input list' );
-        } else if ( is_array( $input_list ) && empty( $input_list[ $input_id ] ) ) {
+        } else if ( is_array( $registered_input_list ) && empty( $registered_input_list[ $input_id ] ) ) {
             sek_error_log( __FUNCTION__ . ' => missing input id ' . $input_id . ' in input list for module type ' . $parent_level['module_type'] );
         }
-        if ( is_array( $input_list ) && ! empty( $input_list[ $input_id ] ) && ! empty( $input_list[ $input_id ]['css_selectors'] ) ) {
-            $input_level_css_selectors = $input_list[ $input_id ]['css_selectors'];
+        if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id ] ) && ! empty( $registered_input_list[ $input_id ]['css_selectors'] ) ) {
+            $input_level_css_selectors = $registered_input_list[ $input_id ]['css_selectors'];
             // We may have several css module selectors, so let's make sure we apply the specific input css selector(s) to all of them
             $module_selectors = explode(',', $selector );
             $new_selectors = array();
@@ -54,7 +66,7 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             //sek_error_log( '$input_level_css_selectors', $selector );
         }
         // sek_error_log( 'input_id', $input_id );
-        // sek_error_log( '$input_list', $input_list );
+        // sek_error_log( '$registered_input_list', $registered_input_list );
 
         // $end = microtime(true) * 1000;
         // $time_elapsed_secs = $end - $start;
@@ -65,32 +77,32 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
     $mq = null;
     $properties_to_render = array();
 
-    switch ( $input_id ) {
-        case 'font_size_css' :
+    switch ( $css_identifier ) {
+        case 'font_size' :
             $properties_to_render['font-size'] = $value;
         break;
-        case 'line_height_css' :
+        case 'line_height' :
             $properties_to_render['line-height'] = $value;
         break;
-        case 'font_weight_css' :
+        case 'font_weight' :
             $properties_to_render['font-weight'] = $value;
         break;
-        case 'font_style_css' :
+        case 'font_style' :
             $properties_to_render['font-style'] = $value;
         break;
-        case 'text_decoration_css' :
+        case 'text_decoration' :
             $properties_to_render['text-decoration'] = $value;
         break;
-        case 'text_transform_css' :
+        case 'text_transform' :
             $properties_to_render['text-transform'] = $value;
         break;
-        case 'letter_spacing_css' :
+        case 'letter_spacing' :
             $properties_to_render['letter-spacing'] = $value . 'px';
         break;
-        case 'color_css' :
+        case 'color' :
             $properties_to_render['color'] = $value;
         break;
-        case 'color_hover_css' :
+        case 'color_hover' :
             //$selector = '[data-sek-id="'.$parent_level['id'].'"]:hover';
             // Add ':hover to each selectors'
             $new_selectors = array();
@@ -102,10 +114,10 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             $selector = implode(',', $new_selectors);
             $properties_to_render['color'] = $value;
         break;
-        case 'h_alignment_css' :
+        case 'h_alignment' :
             $properties_to_render['text-align'] = $value;
         break;
-        case 'v_alignment_css' :
+        case 'v_alignment' :
             switch ( $value ) {
                 case 'top' :
                     $v_align_value = "flex-start";
@@ -122,7 +134,7 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             }
             $properties_to_render['align-items'] = $v_align_value;
         break;
-        case 'font_family_css' :
+        case 'font_family' :
             $family = $value;
             // Preprocess the selected font family
             //font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
@@ -141,23 +153,24 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
         break;
 
         /* Spacer */
-        case 'height_css' :
+        case 'height' :
             $properties_to_render['height'] = $value > 0 ? $value . 'px' : '1px';
         break;
+
         /* Divider */
-        case 'border_top_width_css' :
+        case 'border_top_width' :
             $properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
         break;
-        case 'border_top_style_css' :
+        case 'border_top_style' :
             $properties_to_render['border-top-style'] = $value ? $value : 'solid';
         break;
-        case 'border_top_color_css' :
+        case 'border_top_color' :
             $properties_to_render['border-top-color'] = $value ? $value : '#5a5a5a';
         break;
-        case 'width_css' :
+        case 'width' :
             $properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
         break;
-        case 'v_spacing_css' :
+        case 'v_spacing' :
             $value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
             $properties_to_render = array(
                 'margin-top'  => $value,
@@ -165,7 +178,7 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             );
         break;
         //not used at the moment, but it might if we want to display the divider as block (e.g. a div instead of a span)
-        case 'h_alignment_block_css' :
+        case 'h_alignment_block' :
             switch ( $value ) {
                 case 'right' :
                     $properties_to_render = array(
@@ -184,18 +197,20 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
                     );
             }
         break;
+
+        // The default is simply there to let us know if a css_identifier is missing
+        default :
+            sek_error_log( __FUNCTION__ . ' => the css_identifier : ' . $css_identifier . ' has no css rules defined for input id ' . $input_id );
+        break;
     }//switch
 
-
+    // when the module has an '*_flag_important' input,
+    // => check if the input_id belongs to the list of "important_input_list"
+    // => and maybe flag the css rules with !important
     if ( ! empty( $properties_to_render ) ) {
-        // is the important flag on ?
-        $important = false;
-        if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) && !empty( $parent_level['value']['important_css'] ) ) {
-            $important = (bool)sek_is_checked( $parent_level['value']['important_css'] );
-        }
-
+        $important = sek_is_flagged_important( $input_id, $parent_level, $registered_input_list );
         $css_rules = '';
-        foreach ($properties_to_render as $prop => $prop_val) {
+        foreach ( $properties_to_render as $prop => $prop_val ) {
             $css_rules .= sprintf( '%1$s:%2$s%3$s;', $prop, $prop_val, $important ? '!important' : '' );
         }//end foreach
 
@@ -206,5 +221,33 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
         );
     }
     return $rules;
+}
+
+
+// @return boolean
+function sek_is_flagged_important( $input_id, $parent_level, $registered_input_list ) {
+    // is the important flag on ?
+    $important = false;
+    if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+        // loop on the module input values, and find _flag_important.
+        // then check if the current input_id, is in the list of important_input_list
+        foreach( $parent_level['value'] as $id => $input_value ) {
+            if ( false !== strpos( $id, '_flag_important' ) ) {
+                //sek_error_log( __FUNCTION__ . ' => $registered_input_list ?', $registered_input_list );
+                if ( is_array( $registered_input_list ) && array_key_exists( $id, $registered_input_list ) ) {
+                    if ( empty( $registered_input_list[ $id ][ 'important_input_list' ] ) ) {
+                        sek_error_log( __FUNCTION__ . ' => missing important_input_list for input id ' . $id );
+                    } else {
+                        $important_list_candidate = $registered_input_list[ $id ][ 'important_input_list' ];
+                        //sek_error_log( __FUNCTION__ . ' => ALORS ?', $important_list_candidate );
+                        if ( in_array( $input_id, $important_list_candidate ) ) {
+                            $important = (bool)sek_is_checked( $input_value );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return $important;
 }
 ?>
