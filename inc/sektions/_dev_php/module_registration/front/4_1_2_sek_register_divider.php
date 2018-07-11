@@ -79,6 +79,7 @@ function sek_get_module_params_for_czr_divider_module() {
                     'default'     => 'center',
                     'refresh-markup' => false,
                     'refresh-stylesheet' => true,
+                    'css_selectors' => '.sek-module-inner',
                     'css_identifier' => 'h_alignment'
                 ),
                 'v_spacing_css' => array(
