@@ -39,6 +39,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
 
 
     // SPECIFIC CSS SELECTOR AT INPUT LEVEL
+    // => Overrides the module level specific selector, if it was set.
     if ( 'module' === $parent_level['level'] ) {
         //$start = microtime(true) * 1000;
         if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
@@ -47,18 +48,16 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             sek_error_log( __FUNCTION__ . ' => missing input id ' . $input_id . ' in input list for module type ' . $parent_level['module_type'] );
         }
         if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id ] ) && ! empty( $registered_input_list[ $input_id ]['css_selectors'] ) ) {
+            // reset the selector to the level id selector, in case it was previously set spcifically at the module level
+            $selector = '[data-sek-id="'.$parent_level['id'].'"]';
             $input_level_css_selectors = $registered_input_list[ $input_id ]['css_selectors'];
-            // We may have several css module selectors, so let's make sure we apply the specific input css selector(s) to all of them
-            $module_selectors = explode(',', $selector );
             $new_selectors = array();
-            foreach ( $module_selectors as $mod_selector ) {
-                if ( is_array( $input_level_css_selectors ) ) {
-                    foreach ( $input_level_css_selectors as $spec_selector ) {
-                        $new_selectors[] = $mod_selector . ' ' . $spec_selector;
-                    }
-                } else if ( is_string( $input_level_css_selectors ) ) {
-                    $new_selectors[] = $mod_selector . ' ' . $input_level_css_selectors;
+            if ( is_array( $input_level_css_selectors ) ) {
+                foreach ( $input_level_css_selectors as $spec_selector ) {
+                    $new_selectors[] = $selector . ' ' . $spec_selector;
                 }
+            } else if ( is_string( $input_level_css_selectors ) ) {
+                $new_selectors[] = $selector . ' ' . $input_level_css_selectors;
             }
 
             $new_selectors = implode(',', $new_selectors );
