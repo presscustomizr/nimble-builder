@@ -76,8 +76,10 @@ TO ASK: We're missing the title input
 $model          = SEK_Front() -> model;
 $module_type    = $model['module_type'];
 
-$value          = array_key_exists( 'value', $model ) ? $model['value'] : null;
+$value          = array_key_exists( 'value', $model ) ? $model['value'] : array();
+$value = is_array($value) ? $value : array();
 
+//sek_error_log('FP TMPL', $model  );
 
 /*
 * Columns definition
@@ -148,7 +150,7 @@ endif;
             <div class="sek-fp-widget sek-link-mask-p round">
         <?php
             // normalizes
-            $fp = wp_parse_args( $fp, $default_value_model );
+            //$fp = wp_parse_args( $fp, $default_value_model );
 
             $is_custom_url   = false;
             $is_wp_post_type = false;

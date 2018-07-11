@@ -129,6 +129,11 @@ function sek_get_registered_module_type_property( $module_type, $property = '' )
     return;
 }
 
+
+
+
+
+
 /* ------------------------------------------------------------------------- *
  *  REGISTERED MODULES => DEFAULT MODULE MODEL
 /* ------------------------------------------------------------------------- */
@@ -224,6 +229,110 @@ function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
 
     return $default_model;
 }
+
+
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  REGISTERED MODULES => INPUT LIST
+/* ------------------------------------------------------------------------- */
+// @param (string) module_type
+// Walk the registered modules tree and generates the module input list if not already cached
+// used :
+// - when filtering 'sek_add_css_rules_for_input_id' @see Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
+// @return array()
+function sek_get_module_input_list( $module_type = '' ) {
+    $input_list = array();
+    if ( empty( $module_type ) || is_null( $module_type ) )
+      return $input_list;
+
+    // Did we already cache it ?
+    $cached_input_lists = SEK_Front()->cached_input_lists;
+    if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
+        $input_list = $cached_input_lists[ $module_type ];
+    } else {
+        $registered_modules = CZR_Fmk_Base() -> registered_modules;
+        // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
+        if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+        }
+
+        if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+        }
+        // Build
+        $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
+
+        // Cache
+        $cached_input_lists[ $module_type ] = $input_list;
+        SEK_Front()->cached_input_lists = $cached_input_lists;
+        // sek_error_log( __FUNCTION__ . ' => $cached_input_lists', $cached_input_lists );
+    }
+    return $input_list;
+}
+
+// @return array() default model
+// Walk recursively the 'tmpl' property of the module
+// 'tmpl' => array(
+//     'pre-item' => array(
+//         'social-icon' => array(
+//             'input_type'  => 'select',
+//             'title'       => __('Select an icon', 'text_domain_to_be_replaced')
+//         ),
+//     ),
+//     'mod-opt' => array(
+//         'social-size' => array(
+//             'input_type'  => 'number',
+//             'title'       => __('Size in px', 'text_domain_to_be_replaced'),
+//             'step'        => 1,
+//             'min'         => 5,
+//             'transport' => 'postMessage'
+//         )
+//     ),
+//     'item-inputs' => array(
+//         'item-inputs' => array(
+                // 'tabs' => array(
+                //     array(
+                //         'title' => __('Content', 'text_domain_to_be_replaced'),
+                //         //'attributes' => 'data-sek-device="desktop"',
+                //         'inputs' => array(
+                //             'content' => array(
+                //                 'input_type'  => 'tiny_mce_editor',
+                //                 'title'       => __('Content', 'text_domain_to_be_replaced')
+                //             ),
+                //             'h_alignment_css' => array(
+                //                 'input_type'  => 'h_text_alignment',
+                //                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                //                 'default'     => is_rtl() ? 'right' : 'left',
+                //                 'refresh-markup' => false,
+                //                 'refresh-stylesheet' => true
+                //             )
+                //         )
+//         )
+//     )
+// )
+// Build the input list from item-inputs and modop-inputs
+function _sek_build_input_list( $module_tmpl_data, $input_list = null ) {
+    $input_list = is_array( $input_list ) ? $input_list : array();
+    //error_log( print_r(  $module_tmpl_data , true ) );
+    foreach( $module_tmpl_data as $key => $data ) {
+        if ( 'pre-item' === $key )
+          continue;
+        if ( is_array( $data ) && array_key_exists( 'input_type', $data ) ) {
+            $input_list[ $key ] = $data;
+        } else if ( is_array( $data ) ) {
+            $input_list = _sek_build_input_list( $data, $input_list );
+        }
+    }
+
+    return $input_list;
+}
+
 
 
 
@@ -557,214 +666,513 @@ function sek_enqueue_controls_js_css() {
     wp_localize_script(
         'czr-sektions',
         'sektionsLocalizedData',
-        array(
-            'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
-            'baseUrl' => NIMBLE_BASE_URL,
-            'sektionsPanelId' => '__sektions__',
-            'addNewSektionId' => 'sek_add_new_sektion',
-            'addNewColumnId' => 'sek_add_new_column',
-            'addNewModuleId' => 'sek_add_new_module',
+        apply_filters( 'nimble-sek-localized-customizer-control-params',
+            array(
+                'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
+                'baseUrl' => NIMBLE_BASE_URL,
+                'sektionsPanelId' => '__sektions__',
+                'addNewSektionId' => 'sek_add_new_sektion',
+                'addNewColumnId' => 'sek_add_new_column',
+                'addNewModuleId' => 'sek_add_new_module',
 
-            'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
-            'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__nimble__"
+                'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
+                'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__nimble__"
 
-            'defaultSektionSettingValue' => sek_get_default_sektions_value(),
+                'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 
-            'presetSections' => sek_get_preset_sektions(),
+                'presetSections' => sek_get_preset_sektions(),
 
-            'registeredModules' => CZR_Fmk_Base() -> registered_modules,
+                'registeredModules' => CZR_Fmk_Base() -> registered_modules,
 
-            // Dnd
-            'preDropElementClass' => 'sortable-placeholder',
-            'dropSelectors' => implode(',', [
-                // 'module' type
-                //'.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                //'[data-sek-level="location"]',
-                //'.sek-not-empty-col',// the drop zone when there is at least one module
-                //'.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
-                //'.sek-content-module-drop-zone',//between sections
-                '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
-                'body',// body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
+                // Dnd
+                'preDropElementClass' => 'sortable-placeholder',
+                'dropSelectors' => implode(',', [
+                    // 'module' type
+                    //'.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
+                    //'[data-sek-level="location"]',
+                    //'.sek-not-empty-col',// the drop zone when there is at least one module
+                    //'.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
+                    //'.sek-content-module-drop-zone',//between sections
+                    '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
+                    'body',// body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
 
-                // 'preset_section' type
-                '.sek-content-preset_section-drop-zone'//between sections
-            ]),
-
-
-            'selectOptions' => array(
-                  // IMAGE MODULE
-                  'link-to' => array(
-                      'no-link' => __('No link', 'text_domain_to_be_replaced' ),
-                      'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
-                      'img-file' => __('Image file', 'text_domain_to_be_replaced' ),
-                      'img-page' =>__('Image page', 'text_domain_to_be_replaced' )
-                  ),
-                  'img-size' => sek_get_img_sizes(),
-
-
-                  // FEATURED PAGE MODULE
-                  'img-type' => array(
-                      'none' => __('No image', 'text_domain_to_be_replaced' ),
-                      'featured' => __('Use the page featured image', 'text_domain_to_be_replaced' ),
-                      'custom' => __('Use a custom image', 'text_domain_to_be_replaced' ),
-                  ),
-                  'content-type' => array(
-                      'none' => __('No text', 'text_domain_to_be_replaced' ),
-                      'page-excerpt' => __('Use the page excerpt', 'text_domain_to_be_replaced' ),
-                      'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
-                  ),
-
-                  // HEADING MODULE
-                  'heading_tag' => array(
-                      /* Not totally sure these should be localized as they strictly refer to html tags */
-                      'h1' => __('H1', 'text_domain_to_be_replaced' ),
-                      'h2' => __('H2', 'text_domain_to_be_replaced' ),
-                      'h3' => __('H3', 'text_domain_to_be_replaced' ),
-                      'h4' => __('H4', 'text_domain_to_be_replaced' ),
-                      'h5' => __('H5', 'text_domain_to_be_replaced' ),
-                      'h6' => __('H6', 'text_domain_to_be_replaced' ),
-                  ),
-
-                  // GENERIC CSS MODIFIERS INPUT TYPES
-                  'font_weight_css' => array(
-                      'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
-                      'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
-                      'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
-                      'lighter'   => __( 'lighter', 'text_domain_to_be_replaced' ),
-                      100     => 100,
-                      200     => 200,
-                      300     => 300,
-                      400     => 400,
-                      500     => 500,
-                      600     => 600,
-                      700     => 700,
-                      800     => 800,
-                      900     => 900
-                  ),
-
-                  'font_style_css' => array(
-                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                      'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
-                      'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
-                      'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
-                  ),
-
-                  'text_decoration_css' =>  array(
-                      'none'      => __( 'none', 'text_domain_to_be_replaced' ),
-                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                      'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
-                      'overline'    => __( 'overline', 'text_domain_to_be_replaced' ),
-                      'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
-                  ),
-
-                  'text_transform_css' => array(
-                      'none'      => __( 'none', 'text_domain_to_be_replaced' ),
-                      'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                      'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
-                      'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
-                      'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
-                  ),
-
-                  // SPACING MODULE
-                  'spacingUnits' => array(
-                      'px' => __('Pixels', 'text_domain_to_be_replaced' ),
-                      'em' => __('Em', 'text_domain_to_be_replaced'),
-                      'percent' => __('Percents', 'text_domain_to_be_replaced' )
-                  ),
-
-                  // LAYOUT BACKGROUND BORDER
-                  'boxed-wide' => array(
-                      'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
-                      'fullwidth' => __('Full Width', 'text_domain_to_be_replaced')
-                  ),
-                  'height-type' => array(
-                      'default' => __('default', 'text_domain_to_be_replaced'),
-                      'fit-to-screen' => __('Fit to screen', 'text_domain_to_be_replaced'),
-                      'custom' => __('Custom', 'text_domain_to_be_replaced' )
-                  ),
-                  'bg-scale' => array(
-                      'default' => __('default', 'text_domain_to_be_replaced'),
-                      'auto' => __('auto', 'text_domain_to_be_replaced'),
-                      'cover' => __('scale to fill', 'text_domain_to_be_replaced'),
-                      'contain' => __('fit', 'text_domain_to_be_replaced'),
-                  ),
-                  'bg-position' => array(
-                      'default' => __('default', 'text_domain_to_be_replaced'),
-                  ),
-                  'border-type' => array(
-                      'none' => __('none', 'text_domain_to_be_replaced'),
-                      'solid' => __('solid', 'text_domain_to_be_replaced'),
-                      'double' => __('double', 'text_domain_to_be_replaced'),
-                      'dotted' => __('dotted', 'text_domain_to_be_replaced'),
-                      'dashed' => __('dashed', 'text_domain_to_be_replaced')
-                  )
-            ),
-
-
-            'i18n' => array(
-                'Sections' => __( 'Sections', 'text_domain_to_be_replaced'),
-
-                'Nimble Builder' => __('Nimble Builder', 'text_domain_to_be_replaced'),
-
-                "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_domain_to_be_replaced'),
-                "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
-                "A section must have at least one column." => __( "A section must have at least one column.", 'text_domain_to_be_replaced'),
-
-                'If this problem locks the Nimble builder, you might try to reset the sections for this page.' => __('If this problem locks the Nimble builder, you might try to reset the sections for this page.', 'text_domain_to_be_replaced'),
-                'Reset' => __('Reset', 'text_domain_to_be_replaced'),
-                'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
-
-                // Generated UI
-                'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
-                'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
-
-                'Section Picker' => __('Section Picker', 'text_domain_to_be_replaced'),
-
-                'Module' => __('Module', 'text_domain_to_be_replaced'),
-                'Content for' => __('Content for', 'text_domain_to_be_replaced'),
-                'Customize the options for module :' => __('Customize the options for module :', 'text_domain_to_be_replaced'),
-
-                'Layout settings for the' => __('Layout settings for the', 'text_domain_to_be_replaced'),
-                'Background and border settings for the' => __('Background and border settings for the', 'text_domain_to_be_replaced'),
-                'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_domain_to_be_replaced'),
-                'Height settings for the' => __('Height settings for the', 'text_domain_to_be_replaced'),
-
-                'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
-
-                // Levels
-                'location' => __('location', 'text_domain_to_be_replaced'),
-                'section' => __('section', 'text_domain_to_be_replaced'),
-                'column' => __('column', 'text_domain_to_be_replaced'),
-                'module' => __('module', 'text_domain_to_be_replaced'),
-
-                'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
-
-                // DRAG n DROP
-                'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
-                'Insert in a new section' => __('Insert in a new section', 'text_domain_to_be_replaced'),
-                'Insert a new section here' => __('Insert a new section here', 'text_domain_to_be_replaced'),
-
-                // MODULES
-                'Select a font family' => __('Select a font family', 'text_domain_to_be_replaced'),
-                'Web Safe Fonts' => __('Web Safe Fonts', 'text_domain_to_be_replaced'),
-                'Google Fonts' => __('Google Fonts', 'text_domain_to_be_replaced'),
-
-                'Set a custom url' => __('Set a custom url', 'text_domain_to_be_replaced'),
-
-                'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
-
-                'Select an icon'     => __( 'Select an icon', 'text_domain_to_be_replaced' ),
-                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-                // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-
-
+                    // 'preset_section' type
+                    '.sek-content-preset_section-drop-zone'//between sections
+                ])
             )
         )
-    );
+    );//wp_localize_script()
+
+    nimble_enqueue_code_editor();
+}//sek_enqueue_controls_js_css()
+
+
+
+
+
+/**
+ * Enqueue all code editor assets
+ */
+function nimble_enqueue_code_editor() {
+    wp_enqueue_script( 'code-editor' );
+    wp_enqueue_style( 'code-editor' );
+
+    wp_enqueue_script( 'csslint' );
+    wp_enqueue_script( 'htmlhint' );
+    wp_enqueue_script( 'csslint' );
+    wp_enqueue_script( 'jshint' );
+    wp_enqueue_script( 'htmlhint-kses' );
+    wp_enqueue_script( 'jshint' );
+    wp_enqueue_script( 'jsonlint' );
 }
+
+
+
+/**
+ * Enqueue assets needed by the code editor for the given settings.
+ *
+ * @param array $args {
+ *     Args.
+ *
+ *     @type string   $type       The MIME type of the file to be edited.
+ *     @type array    $codemirror Additional CodeMirror setting overrides.
+ *     @type array    $csslint    CSSLint rule overrides.
+ *     @type array    $jshint     JSHint rule overrides.
+ *     @type array    $htmlhint   JSHint rule overrides.
+ *     @returns array Settings for the enqueued code editor.
+ * }
+ */
+function nimble_get_code_editor_settings( $args ) {
+    $settings = array(
+        'codemirror' => array(
+            'indentUnit' => 2,
+            'tabSize' => 2,
+            'indentWithTabs' => true,
+            'inputStyle' => 'contenteditable',
+            'lineNumbers' => true,
+            'lineWrapping' => true,
+            'styleActiveLine' => true,
+            'continueComments' => true,
+            'extraKeys' => array(
+                'Ctrl-Space' => 'autocomplete',
+                'Ctrl-/' => 'toggleComment',
+                'Cmd-/' => 'toggleComment',
+                'Alt-F' => 'findPersistent',
+                'Ctrl-F'     => 'findPersistent',
+                'Cmd-F'      => 'findPersistent',
+            ),
+            'direction' => 'ltr', // Code is shown in LTR even in RTL languages.
+            'gutters' => array(),
+        ),
+        'csslint' => array(
+            'errors' => true, // Parsing errors.
+            'box-model' => true,
+            'display-property-grouping' => true,
+            'duplicate-properties' => true,
+            'known-properties' => true,
+            'outline-none' => true,
+        ),
+        'jshint' => array(
+            // The following are copied from <https://github.com/WordPress/wordpress-develop/blob/4.8.1/.jshintrc>.
+            'boss' => true,
+            'curly' => true,
+            'eqeqeq' => true,
+            'eqnull' => true,
+            'es3' => true,
+            'expr' => true,
+            'immed' => true,
+            'noarg' => true,
+            'nonbsp' => true,
+            'onevar' => true,
+            'quotmark' => 'single',
+            'trailing' => true,
+            'undef' => true,
+            'unused' => true,
+
+            'browser' => true,
+
+            'globals' => array(
+                '_' => false,
+                'Backbone' => false,
+                'jQuery' => false,
+                'JSON' => false,
+                'wp' => false,
+            ),
+        ),
+        'htmlhint' => array(
+            'tagname-lowercase' => true,
+            'attr-lowercase' => true,
+            'attr-value-double-quotes' => false,
+            'doctype-first' => false,
+            'tag-pair' => true,
+            'spec-char-escape' => true,
+            'id-unique' => true,
+            'src-not-empty' => true,
+            'attr-no-duplication' => true,
+            'alt-require' => true,
+            'space-tab-mixed-disabled' => 'tab',
+            'attr-unsafe-chars' => true,
+        ),
+    );
+
+    $type = '';
+
+    if ( isset( $args['type'] ) ) {
+        $type = $args['type'];
+
+        // Remap MIME types to ones that CodeMirror modes will recognize.
+        if ( 'application/x-patch' === $type || 'text/x-patch' === $type ) {
+            $type = 'text/x-diff';
+        }
+    } //we do not treat the "file" case
+
+
+    if ( 'text/css' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'css',
+            'lint' => true,
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+    } elseif ( 'text/x-scss' === $type || 'text/x-less' === $type || 'text/x-sass' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => $type,
+            'lint' => false,
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+    } elseif ( 'text/x-diff' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'diff',
+        ) );
+    } elseif ( 'text/html' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'htmlmixed',
+            'lint' => true,
+            'autoCloseBrackets' => true,
+            'autoCloseTags' => true,
+            'matchTags' => array(
+                'bothTags' => true,
+            ),
+        ) );
+
+        if ( ! current_user_can( 'unfiltered_html' ) ) {
+            $settings['htmlhint']['kses'] = wp_kses_allowed_html( 'post' );
+        }
+    } elseif ( 'text/x-gfm' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'gfm',
+            'highlightFormatting' => true,
+        ) );
+    } elseif ( 'application/javascript' === $type || 'text/javascript' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'javascript',
+            'lint' => true,
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+    } elseif ( false !== strpos( $type, 'json' ) ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => array(
+                'name' => 'javascript',
+            ),
+            'lint' => true,
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+        if ( 'application/ld+json' === $type ) {
+            $settings['codemirror']['mode']['jsonld'] = true;
+        } else {
+            $settings['codemirror']['mode']['json'] = true;
+        }
+    } elseif ( false !== strpos( $type, 'jsx' ) ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'jsx',
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+    } elseif ( 'text/x-markdown' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'markdown',
+            'highlightFormatting' => true,
+        ) );
+    } elseif ( 'text/nginx' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'nginx',
+        ) );
+    } elseif ( 'application/x-httpd-php' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'php',
+            'autoCloseBrackets' => true,
+            'autoCloseTags' => true,
+            'matchBrackets' => true,
+            'matchTags' => array(
+                'bothTags' => true,
+            ),
+        ) );
+    } elseif ( 'text/x-sql' === $type || 'text/x-mysql' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'sql',
+            'autoCloseBrackets' => true,
+            'matchBrackets' => true,
+        ) );
+    } elseif ( false !== strpos( $type, 'xml' ) ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'xml',
+            'autoCloseBrackets' => true,
+            'autoCloseTags' => true,
+            'matchTags' => array(
+                'bothTags' => true,
+            ),
+        ) );
+    } elseif ( 'text/x-yaml' === $type ) {
+        $settings['codemirror'] = array_merge( $settings['codemirror'], array(
+            'mode' => 'yaml',
+        ) );
+    } else {
+        $settings['codemirror']['mode'] = $type;
+    }
+
+    if ( ! empty( $settings['codemirror']['lint'] ) ) {
+        $settings['codemirror']['gutters'][] = 'CodeMirror-lint-markers';
+    }
+
+    // Let settings supplied via args override any defaults.
+    foreach ( wp_array_slice_assoc( $args, array( 'codemirror', 'csslint', 'jshint', 'htmlhint' ) ) as $key => $value ) {
+        $settings[ $key ] = array_merge(
+            $settings[ $key ],
+            $value
+        );
+    }
+
+    $settings = apply_filters( 'nimble_code_editor_settings', $settings, $args );
+
+    if ( empty( $settings ) || empty( $settings['codemirror'] ) ) {
+        return false;
+    }
+
+    if ( isset( $settings['codemirror']['mode'] ) ) {
+        $mode = $settings['codemirror']['mode'];
+        if ( is_string( $mode ) ) {
+            $mode = array(
+                'name' => $mode,
+            );
+        }
+    }
+
+    return $settings;
+}
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  LOCALIZED PARAMS I18N
+/* ------------------------------------------------------------------------- */
+add_filter( 'nimble-sek-localized-customizer-control-params', '\Nimble\nimble_add_i18n_localized_control_params' );
+function nimble_add_i18n_localized_control_params( $params ) {
+    return array_merge( $params, array(
+        'i18n' => array(
+            'Sections' => __( 'Sections', 'text_domain_to_be_replaced'),
+
+            'Nimble Builder' => __('Nimble Builder', 'text_domain_to_be_replaced'),
+
+            "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_domain_to_be_replaced'),
+            "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
+            "A section must have at least one column." => __( "A section must have at least one column.", 'text_domain_to_be_replaced'),
+
+            'If this problem locks the Nimble builder, you might try to reset the sections for this page.' => __('If this problem locks the Nimble builder, you might try to reset the sections for this page.', 'text_domain_to_be_replaced'),
+            'Reset' => __('Reset', 'text_domain_to_be_replaced'),
+            'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
+
+            // Generated UI
+            'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
+            'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
+
+            'Section Picker' => __('Section Picker', 'text_domain_to_be_replaced'),
+
+            'Module' => __('Module', 'text_domain_to_be_replaced'),
+            'Content for' => __('Content for', 'text_domain_to_be_replaced'),
+            'Customize the options for module :' => __('Customize the options for module :', 'text_domain_to_be_replaced'),
+
+            'Layout settings for the' => __('Layout settings for the', 'text_domain_to_be_replaced'),
+            'Background and border settings for the' => __('Background and border settings for the', 'text_domain_to_be_replaced'),
+            'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_domain_to_be_replaced'),
+            'Height settings for the' => __('Height settings for the', 'text_domain_to_be_replaced'),
+
+            'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
+
+            // Levels
+            'location' => __('location', 'text_domain_to_be_replaced'),
+            'section' => __('section', 'text_domain_to_be_replaced'),
+            'column' => __('column', 'text_domain_to_be_replaced'),
+            'module' => __('module', 'text_domain_to_be_replaced'),
+
+            'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
+
+            // DRAG n DROP
+            'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
+            'Insert in a new section' => __('Insert in a new section', 'text_domain_to_be_replaced'),
+            'Insert a new section here' => __('Insert a new section here', 'text_domain_to_be_replaced'),
+
+            // MODULES
+            'Select a font family' => __('Select a font family', 'text_domain_to_be_replaced'),
+            'Web Safe Fonts' => __('Web Safe Fonts', 'text_domain_to_be_replaced'),
+            'Google Fonts' => __('Google Fonts', 'text_domain_to_be_replaced'),
+
+            'Set a custom url' => __('Set a custom url', 'text_domain_to_be_replaced'),
+
+            'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
+
+            'Select an icon'     => __( 'Select an icon', 'text_domain_to_be_replaced' ),
+
+            // Code Editor
+            'codeEditorSingular'   => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_domain_to_be_replaced' ),
+            'codeEditorPlural'     => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_domain_to_be_replaced' ),
+            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
+
+        )//array()
+    )//array()
+    );//array_merge
+}//'nimble_add_i18n_localized_control_params'
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  LOCALIZED PARAMS SELECT OPTIONS
+/* ------------------------------------------------------------------------- */
+add_filter( 'nimble-sek-localized-customizer-control-params', '\Nimble\nimble_add_select_options_localized_control_params' );
+function nimble_add_select_options_localized_control_params( $params ) {
+    return array_merge( $params, array(
+            'selectOptions' => array(
+                // IMAGE MODULE
+                'link-to' => array(
+                    'no-link' => __('No link', 'text_domain_to_be_replaced' ),
+                    'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
+                    'img-file' => __('Image file', 'text_domain_to_be_replaced' ),
+                    'img-page' =>__('Image page', 'text_domain_to_be_replaced' )
+                ),
+                'img-size' => sek_get_img_sizes(),
+
+                // FEATURED PAGE MODULE
+                'img-type' => array(
+                    'none' => __('No image', 'text_domain_to_be_replaced' ),
+                    'featured' => __('Use the page featured image', 'text_domain_to_be_replaced' ),
+                    'custom' => __('Use a custom image', 'text_domain_to_be_replaced' ),
+                ),
+                'content-type' => array(
+                    'none' => __('No text', 'text_domain_to_be_replaced' ),
+                    'page-excerpt' => __('Use the page excerpt', 'text_domain_to_be_replaced' ),
+                    'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
+                ),
+
+                // HEADING MODULE
+                'heading_tag' => array(
+                    /* Not totally sure these should be localized as they strictly refer to html tags */
+                    'h1' => __('H1', 'text_domain_to_be_replaced' ),
+                    'h2' => __('H2', 'text_domain_to_be_replaced' ),
+                    'h3' => __('H3', 'text_domain_to_be_replaced' ),
+                    'h4' => __('H4', 'text_domain_to_be_replaced' ),
+                    'h5' => __('H5', 'text_domain_to_be_replaced' ),
+                    'h6' => __('H6', 'text_domain_to_be_replaced' ),
+                ),
+
+                // GENERIC CSS MODIFIERS INPUT TYPES
+                'font_weight_css' => array(
+                    'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
+                    'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
+                    'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
+                    'lighter'   => __( 'lighter', 'text_domain_to_be_replaced' ),
+                    100     => 100,
+                    200     => 200,
+                    300     => 300,
+                    400     => 400,
+                    500     => 500,
+                    600     => 600,
+                    700     => 700,
+                    800     => 800,
+                    900     => 900
+                ),
+
+                'font_style_css' => array(
+                    'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                    'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
+                    'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
+                    'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
+                ),
+
+                'text_decoration_css' =>  array(
+                    'none'      => __( 'none', 'text_domain_to_be_replaced' ),
+                    'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                    'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
+                    'overline'    => __( 'overline', 'text_domain_to_be_replaced' ),
+                    'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
+                ),
+
+                'text_transform_css' => array(
+                    'none'      => __( 'none', 'text_domain_to_be_replaced' ),
+                    'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                    'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
+                    'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
+                    'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
+                ),
+
+                // SPACING MODULE
+                'spacingUnits' => array(
+                    'px' => __('Pixels', 'text_domain_to_be_replaced' ),
+                    'em' => __('Em', 'text_domain_to_be_replaced'),
+                    'percent' => __('Percents', 'text_domain_to_be_replaced' )
+                ),
+
+                // LAYOUT BACKGROUND BORDER
+                'boxed-wide' => array(
+                    'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
+                    'fullwidth' => __('Full Width', 'text_domain_to_be_replaced')
+                ),
+                'height-type' => array(
+                    'default' => __('default', 'text_domain_to_be_replaced'),
+                    'fit-to-screen' => __('Fit to screen', 'text_domain_to_be_replaced'),
+                    'custom' => __('Custom', 'text_domain_to_be_replaced' )
+                ),
+                'bg-scale' => array(
+                    'default' => __('default', 'text_domain_to_be_replaced'),
+                    'auto' => __('auto', 'text_domain_to_be_replaced'),
+                    'cover' => __('scale to fill', 'text_domain_to_be_replaced'),
+                    'contain' => __('fit', 'text_domain_to_be_replaced'),
+                ),
+                'bg-position' => array(
+                    'default' => __('default', 'text_domain_to_be_replaced'),
+                ),
+                'border-type' => array(
+                    'none' => __('none', 'text_domain_to_be_replaced'),
+                    'solid' => __('solid', 'text_domain_to_be_replaced'),
+                    'double' => __('double', 'text_domain_to_be_replaced'),
+                    'dotted' => __('dotted', 'text_domain_to_be_replaced'),
+                    'dashed' => __('dashed', 'text_domain_to_be_replaced')
+                )
+            )//'selectOptions array'
+        )//array()
+    );//array_merge()
+}//nimble_add_select_options_localized_control_params()
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
@@ -878,34 +1286,35 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         //@action 'customize_register'
         function load_nimble_setting_class() {
-              require_once(  dirname( __FILE__ ) . '/customizer/seks_setting_class.php' );
+            require_once(  dirname( __FILE__ ) . '/customizer/seks_setting_class.php' );
         }
 
         //@filter 'customize_dynamic_setting_args'
         function set_dyn_setting_args( $setting_args, $setting_id ) {
             // shall start with "sek__"
             if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
-                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
+                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
                     'type' => 'option',
-                    'default' => array()
+                    'default' => array(),
                     //'sanitize_callback'    => array( $this, 'sanitize_callback' )
                     //'validate_callback'    => array( $this, 'validate_callback' )
                 );
             } else if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) ) {
-                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id );
+                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
                     'type' => '_nimble_ui_',//won't be saved as is,
-                    'default' => array()
+                    'default' => array(),
+                    'sanitize_callback' => array( $this, 'sanitize_callback' ),
+                    'validate_callback' => array( $this, 'validate_callback' )
                 );
             }
-
-            //sek_error_log( print_r( $setting_args, true ) );
             return $setting_args;
             //return wp_parse_args( array( 'default' => array() ), $setting_args );
         }
+
 
         //@filter 'customize_dynamic_setting_class'
         function set_dyn_setting_class( $class, $setting_id, $args ) {
@@ -917,16 +1326,58 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         }
 
 
+        // Uses the sanitize_callback function specified on module registration if any
         function sanitize_callback( $setting_data, $setting_instance ) {
-            sek_error_log( 'in_sek_sanitize_callback for setting id ' . $setting_instance->id, $setting_data );
+            if ( isset( $_POST['skope_id'] ) ) {
+                $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
+                if ( is_array( $sektionSettingValue ) ) {
+                    $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
+                    if ( is_array( $sektion_collection ) ) {
+                        $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
+                        if ( is_array( $model ) && ! empty( $model['module_type'] ) ) {
+                            $sanitize_callback = sek_get_registered_module_type_property( $model['module_type'], 'sanitize_callback' );
+                            if ( ! empty( $sanitize_callback ) && is_string( $sanitize_callback ) && function_exists( $sanitize_callback ) ) {
+                                $setting_data = $sanitize_callback( $setting_data );
+                            }
+                        }
+                    }
+                }
+            }
             //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
             return $setting_data;
         }
 
+        // Uses the validate_callback function specified on module registration if any
+        // @return validity object
         function validate_callback( $validity, $setting_data, $setting_instance ) {
-            //sek_error_log( 'in sek_validate_callback for setting id ' . $setting_instance->id, $setting_data );
+            $validated = true;
+            if ( isset( $_POST['skope_id'] ) ) {
+                $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
+                if ( is_array( $sektionSettingValue ) ) {
+                    $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
+                    if ( is_array( $sektion_collection ) ) {
+                        $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
+                        if ( is_array( $model ) && ! empty( $model['module_type'] ) ) {
+                            $validate_callback = sek_get_registered_module_type_property( $model['module_type'], 'validate_callback' );
+                            if ( ! empty( $validate_callback ) && is_string( $validate_callback ) && function_exists( $validate_callback ) ) {
+                                $validated = $validate_callback( $setting_data );
+                            }
+                        }
+                    }
+                }
+            }
             //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
-            return null;
+            if ( true !== $validated ) {
+                if ( is_wp_error( $validated ) ) {
+                    $validation_msg = $validation_msg->get_error_message();
+                    $validity->add(
+                        'nimble_validation_error_in_' . $setting_instance->id ,
+                        $validation_msg
+                    );
+                }
+
+            }
+            return $validity;
         }
 
 
@@ -967,11 +1418,17 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'font_picker' :
             sek_set_input_tmpl___font_picker( $input_id, $input_data );
         break;
+        case 'fa_icon_picker' :
+            sek_set_input_tmpl___fa_icon_picker( $input_id, $input_data );
+        break;
         case 'font_size' :
             sek_set_input_tmpl___font_size( $input_id, $input_data );
         break;
         case 'line_height' :
             sek_set_input_tmpl___line_height( $input_id, $input_data );
+        break;
+        case 'code_editor' :
+            sek_set_input_tmpl___code_editor( $input_id, $input_data );
         break;
     }
 }
@@ -990,62 +1447,69 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-type' => 'module',
                   'content-id' => 'czr_tiny_mce_editor_module',
                   'title' => __( 'Text Editor', 'text_domain_to_be_replaced' ),
-                  'icon' => 'short_text'
+                  'icon' => 'Nimble__text_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_image_module',
                   'title' => __( 'Image', 'text_domain_to_be_replaced' ),
-                  'icon' => 'image'
+                  'icon' => 'Nimble__image_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_heading_module',
                   'title' => __( 'Heading', 'text_domain_to_be_replaced' ),
-                  'icon' => 'title'
+                  'icon' => 'Nimble__heading_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_spacer_module',
                   'title' => __( 'Spacer', 'text_domain_to_be_replaced' ),
-                  'icon' => 'unfold_more'
+                  'icon' => 'Nimble__spacer_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_divider_module',
                   'title' => __( 'Divider', 'text_domain_to_be_replaced' ),
-                  'icon' => 'unfold_more'
+                  'icon' => 'Nimble__divider_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_icon_module',
                   'title' => __( 'Icon', 'text_domain_to_be_replaced' ),
-                )
-                // array(
-                //   'content-type' => 'module',
-                //   'content-id' => 'czr_simple_html_module',
-                //   'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
-                // ),
-                // array(
-                //   'content-type' => 'module',
-                //   'content-id' => 'czr_featured_pages_module',
-                //   'title' => __( 'Featured pages',  'text_domain_to_be_replaced' )
-                // ),
+                  'icon' => 'Nimble__icon_icon.svg'
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_featured_pages_module',
+                  'title' => __( 'Featured pages',  'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble__featured_icon.svg'
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_simple_html_module',
+                  'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
+                ),
+
 
             );
             $i = 0;
             foreach( $content_collection as $_params) {
-                if ( $i % 2 == 0 ) {
-                  //printf('<div class="sek-module-raw"></div');
+                // if ( $i % 2 == 0 ) {
+                //   //printf('<div class="sek-module-raw"></div');
+                // }
+                $icon_img_src = '';
+                if ( !empty( $_params['icon'] ) ) {
+                    $icon_img_src = NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' . $_params['icon'];
                 }
+
                 printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><span class="sek-module-icon">%3$s</span><span class="sek-module-title">%4$s</span></div>',
-                    $_params['content-type'],
-                    $_params['content-id'],
-                    '<i class="material-icons">' . $_params['icon'] .'</i>',
-                    $_params['title'],
-                    __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' )
+                      $_params['content-type'],
+                      $_params['content-id'],
+                      empty( $icon_img_src ) ? '<i style="color:red">Missing Icon</i>' : '<img title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>',
+                      $_params['title'],
+                      __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' )
                 );
-                $i++;
             }
           ?>
         </div>
@@ -1312,6 +1776,70 @@ function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
 
 ?><?php
 /* ------------------------------------------------------------------------- *
+ *  FONT AWESOME ICON PICKER INPUT
+/* ------------------------------------------------------------------------- */
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
+function sek_set_input_tmpl___fa_icon_picker( $input_id, $input_data ) {
+    ?>
+        <select data-czrtype="<?php echo $input_id; ?>"></select>
+    <?php
+}
+
+
+// this dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
+// It allows us to populate the server response with the relevant module html template
+// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
+add_filter( "ac_set_ajax_czr_tmpl___fa_icon_picker_input", '\Nimble\sek_get_fa_icon_list_tmpl', 10, 3 );
+// hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
+// this dynamic filter is declared on wp_ajax_ac_get_template
+// It allows us to populate the server response with the relevant module html template
+// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
+//
+// For czr_tiny_mce_editor_module, we request the font_list tmpl
+function sek_get_fa_icon_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
+    if ( empty( $requested_tmpl ) ) {
+        wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
+    }
+
+    return wp_json_encode(
+        sek_retrieve_decoded_font_awesome_icons()
+    );//will be sent by wp_send_json_success() in ::ac_set_ajax_czr_tmpl()
+}
+
+
+
+//retrieves faicons:
+// 1) from faicons.json if needed (transient doesn't exists, or is new version => set in TC_wfc ) and decodes them
+// otherwise
+// 2) from the transient set if it exists
+function sek_retrieve_decoded_font_awesome_icons() {
+    // this file must be generated with: https://github.com/presscustomizr/nimble-builder/issues/57
+    $faicons_json_path      = NIMBLE_BASE_PATH . '/assets/faicons.json';
+    $faicons_transient_name = 'sek_font_awesome_july_2018';
+    if ( false == get_transient( $faicons_transient_name ) ) {
+        if ( file_exists( $faicons_json_path ) ) {
+            $faicons_raw      = @file_get_contents( $faicons_json_path );
+
+            if ( false === $faicons_raw ) {
+                $faicons_raw = wp_remote_fopen( $faicons_json_path );
+            }
+
+            $faicons_decoded   = json_decode( $faicons_raw, true );
+            set_transient( $faicons_transient_name , $faicons_decoded , 60*60*24*3000 );
+        } else {
+            wp_send_json_error( __FUNCTION__ . ' => the file faicons.json is missing' );
+        }
+    }
+    else {
+        $faicons_decoded = get_transient( $faicons_transient_name );
+    }
+
+    return $faicons_decoded;
+}
+
+?>
+<?php
+/* ------------------------------------------------------------------------- *
  *  FONT PICKER INPUT
 /* ------------------------------------------------------------------------- */
 // @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
@@ -1333,21 +1861,9 @@ add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_li
 //
 // For czr_tiny_mce_editor_module, we request the font_list tmpl
 function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
-    // sek_error_log( __FUNCTION__ . ' => ajax posted params', $posted_params );
-    $css_attr = CZR_Fmk_Base() -> czr_css_attr;
-
     if ( empty( $requested_tmpl ) ) {
         wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
     }
-
-    // ob_start();
-    /*  ?>
-
-      <?php*/
-    // $html = ob_get_clean();
-    // if ( empty( $html ) ) {
-    //     wp_send_json_error( 'ac_get_all_modules_tmpl => no template was found for tmpl => ' . $requested_tmpl );
-    // }
 
     return wp_json_encode( array(
         'cfonts' => sek_get_cfonts(),
@@ -1497,6 +2013,23 @@ function sek_set_input_tmpl___line_height( $input_id, $input_data ) {
     <?php
 }
 ?><?php
+/* ------------------------------------------------------------------------- *
+ *  CODE EDITOR INPUT TEMPLATE
+/* ------------------------------------------------------------------------- */
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
+function sek_set_input_tmpl___code_editor( $input_id, $input_data ) {
+    /*
+    * Needed to form the correct params to pass to the code mirror editor, based on the code type
+    */
+    $code_editor_params = nimble_get_code_editor_settings( array(
+        'type' => ! empty( $input_data[ 'code_type' ] ) ? $input_data[ 'code_type' ] : 'text/html',
+    ));
+    ?>
+        <textarea data-czrtype="<?php echo $input_id; ?>" class="width-100" name="textarea" rows="10" cols="" data-editor-params="<?php echo htmlspecialchars( json_encode( $code_editor_params ) ); ?>">{{ data.value }}</textarea>
+    <?php
+}
+?>
+<?php
 // The base fmk is loaded @after_setup_theme:10
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
@@ -1507,10 +2040,10 @@ function sek_register_modules() {
         'sek_level_section_layout_module',
         'sek_level_height_module',
         'sek_spacing_module',
-        //'czr_simple_html_module',
+        'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
         'czr_image_module',
-        //'czr_featured_pages_module'
+        'czr_featured_pages_module',
         'czr_heading_module',
         'czr_spacer_module',
         'czr_divider_module',
@@ -2009,7 +2542,7 @@ function sek_get_module_params_for_sek_level_height_module() {
                 ),
                 'v_alignment_css' => array(
                     'input_type'  => 'v_alignment',
-                    'title'       => __('Vertical alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Inner vertical alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
                     'refresh-markup' => false,
                     'refresh-stylesheet' => true
@@ -2224,6 +2757,67 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
 
 ?><?php
 /* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER SIMPLE HTML MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+//Availabe input types
+// $.extend( api.czrInputMap, {
+//       text      : '',
+//       textarea  : '',
+//       check     : 'setupIcheck',
+//       gutencheck : 'setupGutenCheck',
+//       select    : 'setupSelect',
+//       radio     : 'setupRadio',
+//       number    : 'setupStepper',
+//       upload    : 'setupImageUploaderSaveAsId',
+//       upload_url : 'setupImageUploaderSaveAsUrl',
+//       color     : 'setupColorPicker',
+//       wp_color_alpha : 'setupColorPickerAlpha',
+//       wp_color  : 'setupWPColorPicker',//not used for the moment
+//       content_picker : 'setupContentPicker',
+//       tiny_mce_editor : 'setupTinyMceEditor',
+//       password : '',
+//       range : 'setupSimpleRange',
+//       range_slider : 'setupRangeSlider',
+//       hidden : '',
+//       h_alignment : 'setupHAlignement',
+//       h_text_alignment : 'setupHAlignement'
+// });
+function sek_get_module_params_for_czr_simple_html_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_simple_html_module',
+        'name' => __( 'Html Content', 'text_domain_to_be_replaced' ),
+        'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_html_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'starting_value' => array(
+            'html_content' => '<!-- Write your Html code here --><pre>html code goes here</pre>'
+        ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'html_content' => array(
+                    'input_type'  => 'code_editor',
+                    'title'       => __( 'HTML Content' , 'text_domain_to_be_replaced' ),
+                    //'code_type' => 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
+                )
+            )
+        ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/simple_html_module_tmpl.php",
+        'placeholder_icon' => 'code'
+    );
+}
+
+function sanitize_callback__czr_simple_html_module( $value ) {
+    if ( array_key_exists( 'html_content', $value ) ) {
+        if ( !current_user_can( 'unfiltered_html' ) ) {
+            $value[ 'html_content' ] = wp_kses_post( $value[ 'html_content' ] );
+        }
+    }
+    return $value;
+}
+?>
+<?php
+/* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER THE TEXT EDITOR MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
@@ -2426,7 +3020,94 @@ function sek_get_module_params_for_czr_image_module() {
 }
 ?><?php
 /* ------------------------------------------------------------------------- *
- *  A FILE TO REGISTER SEVERAL MODULES, SO WE DON'T HAVE TO CONCATENATE IT WITH GRUNT
+ *  LOAD AND REGISTER FEATURED PAGES MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_czr_featured_pages_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_featured_pages_module',
+        'is_crud' => true,
+        'name' => __('Featured Pages', 'text_domain_to_be_replaced'),
+        // 'starting_value' => array(
+        //     'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
+        // ),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'pre-item' => array(
+                // 'page-id' => array(
+                //     'input_type'  => 'content_picker',
+                //     'title'       => __('Pick a page', 'text_domain_to_be_replaced')
+                // ),
+                'img-type' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Display an image', 'text_domain_to_be_replaced'),
+                    'default'     => 'featured'
+                ),
+            ),
+            // 'mod-opt' => array(
+            //     // 'page-id' => array(
+            //     //     'input_type'  => 'content_picker',
+            //     //     'title'       => __('Pick a page', 'text_domain_to_be_replaced')
+            //     // ),
+            //     'mod_opt_test' => array(
+            //         'input_type'  => 'select',
+            //         'title'       => __('Display an image', 'text_domain_to_be_replaced'),
+            //         'default'     => 'featured'
+            //     ),
+            // ),
+            'item-inputs' => array(
+                'page-id' => array(
+                    'input_type'  => 'content_picker',
+                    'title'       => __('Pick a page', 'text_domain_to_be_replaced'),
+                    'default'     => ''
+                ),
+                'img-type' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Display an image', 'text_domain_to_be_replaced'),
+                    'default'     => 'featured'
+                ),
+                'img-id' => array(
+                    'input_type'  => 'upload',
+                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
+                    'default'     => ''
+                ),
+                'img-size' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
+                    'default'     => 'large'
+                ),
+                'content-type' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Display a text', 'text_domain_to_be_replaced'),
+                    'default'     => 'page-excerpt'
+                ),
+                'content-custom-text' => array(
+                    'input_type'  => 'tiny_mce_editor',
+                    'title'       => __('Custom text content', 'text_domain_to_be_replaced'),
+                    'default'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
+                ),
+                'btn-display' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display a call to action button', 'text_domain_to_be_replaced'),
+                    'default'     => true
+                ),
+                'btn-custom-text' => array(
+                    'input_type'  => 'tiny_mce_editor',
+                    'title'       => __('Custom button text', 'text_domain_to_be_replaced'),
+                    'default'     => __('Read More', 'text_domain_to_be_replaced'),
+                )
+            )
+        ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/featured_pages_module_tmpl.php",
+        'placeholder_icon' => 'short_text'
+    );
+}
+
+?><?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER HEADING MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 //Availabe input types
@@ -2456,36 +3137,351 @@ function sek_get_module_params_for_czr_heading_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_heading_module',
-        'name' => __('Heading', 'text_domain_to_be_replaced'),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
-        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'name' => __( 'Heading', 'text_domain_to_be_replaced' ),
+        'sanitize_callback' => '\Nimble\sanitize_callback__czr_heading_module',
+        'validate_callback' => '\Nimble\validate_callback__czr_heading_module',
         'starting_value' => array(
             'heading_text' => 'This is a heading.'
         ),
+        'css_selectors' => array( '.sek-module-inner > .sek-heading' ),
         'tmpl' => array(
             'item-inputs' => array(
-                'heading_text' => array(
-                    'input_type'  => 'tiny_mce_editor',
-                    'title'       => __('Heading text', 'text_domain'),
-                    'default'     => ''
-                ),
-                'heading_tag' => array(
-                    'input_type'  => 'select',
-                    'title'       => __('Heading tag', 'text_domain'),
-                    'default'     => 'h1'
-                ),
+                'tabs' => array(
+                    array(
+                        'title' => __( 'Heading', 'text_domain_to_be_replaced' ),
+                        //'attributes' => 'data-sek-device="desktop"',
+                        'inputs' => array(
+                            'heading_text' => array(
+                                'input_type'         => 'text',
+                                'title'              => __( 'Heading text', 'text_domain_to_be_replaced' ),
+                                'default'            => '',
+                                'width-100'         => true,
+                                // The following might be useful to me, but it generates a pretty long list of allowed HTML tags
+                                // would be great if we could have a "collapsible notice", collapsed by default that will expand on click
+                                // similar to the section description used by wp, e.g. in the Additional CSS section
+                                'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
+                                // 'notice_before'      => sprintf( __( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: %s' ),
+                                //     '<code>' . czr_heading_module_text_allowed_tags() . '</code>', 'text_domain_to_be_replaced' ),
+
+                            ),
+                            'heading_tag' => array(
+                                'input_type'         => 'select',
+                                'title'              => __( 'Heading tag', 'text_domain_to_be_replaced' ),
+                                'default'            => 'h1'
+                            ),
+                            'h_alignment_css'        => array(
+                                'input_type'         => 'h_text_alignment',
+                                'title'              => __( 'Alignment', 'text_domain_to_be_replaced' ),
+                                'default'            => is_rtl() ? 'right' : 'left',
+                                'refresh-markup'     => false,
+                                'refresh-stylesheet' => true
+                            ),
+                        )
+                    ),
+                    array(
+                        'title' => __( 'Font style', 'text_domain_to_be_replaced' ),
+                        'attributes' => 'data-sek-google-font-tab="true"',
+                        'inputs' => array(
+                            'font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true,
+                                'refresh-fonts' => true,
+                            ),
+                            'font_size_css'       => array(
+                                'input_type'  => 'font_size',
+                                'title'       => __( 'Font size in pixels', 'text_domain_to_be_replaced' ),
+                                'default'     => '16px',
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
+                            ),//16,//"14px",
+                            'line_height_css'     => array(
+                                'input_type'  => 'line_height',
+                                'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
+                                'default'     => '24px',
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
+                            ),//24,//"20px",
+                            'font_weight_css'     => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
+                                'default'     => 400,
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
+                            ),//null,
+                            'font_style_css'      => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
+                                'default'     => 'inherit',
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true,
+                            ),//null,
+                            'text_decoration_css' => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
+                                'default'     => 'none',
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
+                            ),//null,
+                            'text_transform_css'  => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
+                                'default'     => 'none',
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
+                            ),//null,
+
+                            'letter_spacing_css'  => array(
+                                'input_type'  => 'number',
+                                'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                                'default'     => 0,
+                                'min'         => 0,
+                                'step'        => 1,
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
+                            ),//0,
+                            'color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true,
+                                'width-100'   => true
+                            ),//"#000000",
+                            'color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100'
+                            ),//"#000000",
+                            'important_css'       => array(
+                                'input_type'  => 'gutencheck',
+                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                                'default'     => 0,
+                                'refresh-markup' => false,
+                                'refresh-stylesheet' => true
+                            ),//false
+                        )
+                    )
+                )
             )
         ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/heading_module_tmpl.php",
-        //'placeholder_icon' => 'code'
     );
 }
+
+function sanitize_callback__czr_heading_module( $value ) {
+    if ( array_key_exists('heading_text', $value ) ) {
+        //sanitize heading_text
+        $value[ 'heading_text' ] = czr_heading_module_kses_text( $value[ 'heading_text' ] );
+    }
+    return $value;
+    //return new \WP_Error('required' ,'heading did not pass sanitization');
+}
+
+// @see SEK_CZR_Dyn_Register::set_dyn_setting_args
+// Only the boolean true or a WP_error object will be valid returned value considered when validating
+function validate_callback__czr_heading_module( $value ) {
+    //return new \WP_Error('required' ,'heading did not pass ');
+    return true;
+}
+
+/**
+ * Filter headings text output WordPress's KSES API.
+ */
+function czr_heading_module_kses_text( $content = '' ) {
+    $allowed_tags = czr_heading_module_text_get_allowedtags();
+
+    // Return KSES'ed content, allowing the above tags.
+    return wp_kses( $content, $allowed_tags );
+}
+
+
+/**
+ * Get headings text allowed tags
+ */
+function czr_heading_module_text_get_allowedtags() {
+    // limit wp_kses allowed tags.
+    return array(
+        'a' => array(
+            'href' => 1,
+            'rel' => 1,
+            'rev' => 1,
+            'name' => 1,
+            'target' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'b' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'big' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'br' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'del' => array(
+            'datetime' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'em' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'i' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'ins' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'span' => array(
+            'dir'   => 1,
+            'align' => 1,
+            'lang'  => 1,
+            'xml:lang' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'small' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'strike' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'strong' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'sub' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'sup' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'u' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+    );
+}
+
+/**
+ * Display all of the allowed tags in HTML format with attributes.
+ *
+ * This is useful for displaying which elements and attributes are supported
+ * see wp-includes/general-template::allowed_tags()
+ */
+function czr_heading_module_text_allowed_tags() {
+    $allowedtags = czr_heading_module_text_get_allowedtags();
+    $allowed = '';
+    foreach ( (array) $allowedtags as $tag => $attributes ) {
+        $allowed .= '<'.$tag;
+        if ( 0 < count($attributes) ) {
+            foreach ( $attributes as $attribute => $limits ) {
+                $allowed .= ' '.$attribute.'=""';
+            }
+        }
+        $allowed .= '> ';
+    }
+    return htmlentities( $allowed );
+}
+?>
+<?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER SPACER MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+//Availabe input types
+// $.extend( api.czrInputMap, {
+//       text      : '',
+//       textarea  : '',
+//       check     : 'setupIcheck',
+//       gutencheck : 'setupGutenCheck',
+//       select    : 'setupSelect',
+//       radio     : 'setupRadio',
+//       number    : 'setupStepper',
+//       upload    : 'setupImageUploaderSaveAsId',
+//       upload_url : 'setupImageUploaderSaveAsUrl',
+//       color     : 'setupColorPicker',
+//       wp_color_alpha : 'setupColorPickerAlpha',
+//       wp_color  : 'setupWPColorPicker',//not used for the moment
+//       content_picker : 'setupContentPicker',
+//       tiny_mce_editor : 'setupTinyMceEditor',
+//       password : '',
+//       range : 'setupSimpleRange',
+//       range_slider : 'setupRangeSlider',
+//       hidden : '',
+//       h_alignment : 'setupHAlignement',
+//       h_text_alignment : 'setupHAlignement'
+// });
 
 function sek_get_module_params_for_czr_spacer_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_spacer_module',
         'name' => __('Spacer', 'text_domain_to_be_replaced'),
+        'css_selectors' => array( '.sek-module-inner > *' ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -2503,12 +3499,40 @@ function sek_get_module_params_for_czr_spacer_module() {
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/spacer_module_tmpl.php",
     );
 }
-
+?><?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER DIVIDER MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+//Availabe input types
+// $.extend( api.czrInputMap, {
+//       text      : '',
+//       textarea  : '',
+//       check     : 'setupIcheck',
+//       gutencheck : 'setupGutenCheck',
+//       select    : 'setupSelect',
+//       radio     : 'setupRadio',
+//       number    : 'setupStepper',
+//       upload    : 'setupImageUploaderSaveAsId',
+//       upload_url : 'setupImageUploaderSaveAsUrl',
+//       color     : 'setupColorPicker',
+//       wp_color_alpha : 'setupColorPickerAlpha',
+//       wp_color  : 'setupWPColorPicker',//not used for the moment
+//       content_picker : 'setupContentPicker',
+//       tiny_mce_editor : 'setupTinyMceEditor',
+//       password : '',
+//       range : 'setupSimpleRange',
+//       range_slider : 'setupRangeSlider',
+//       hidden : '',
+//       h_alignment : 'setupHAlignement',
+//       h_text_alignment : 'setupHAlignement'
+// });
 function sek_get_module_params_for_czr_divider_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_divider_module',
         'name' => __('Divider', 'text_domain_to_be_replaced'),
+        'css_selectors' => array( '.sek-module-inner > *' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'border_top_width_css' => array(
@@ -2567,19 +3591,46 @@ function sek_get_module_params_for_czr_divider_module() {
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/divider_module_tmpl.php",
     );
 }
-
-
+?><?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER ICON MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+//Availabe input types
+// $.extend( api.czrInputMap, {
+//       text      : '',
+//       textarea  : '',
+//       check     : 'setupIcheck',
+//       gutencheck : 'setupGutenCheck',
+//       select    : 'setupSelect',
+//       radio     : 'setupRadio',
+//       number    : 'setupStepper',
+//       upload    : 'setupImageUploaderSaveAsId',
+//       upload_url : 'setupImageUploaderSaveAsUrl',
+//       color     : 'setupColorPicker',
+//       wp_color_alpha : 'setupColorPickerAlpha',
+//       wp_color  : 'setupWPColorPicker',//not used for the moment
+//       content_picker : 'setupContentPicker',
+//       tiny_mce_editor : 'setupTinyMceEditor',
+//       password : '',
+//       range : 'setupSimpleRange',
+//       range_slider : 'setupRangeSlider',
+//       hidden : '',
+//       h_alignment : 'setupHAlignement',
+//       h_text_alignment : 'setupHAlignement'
+// });
 function sek_get_module_params_for_czr_icon_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_module',
         'name' => __('Icon', 'text_domain_to_be_replaced'),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'css_selectors' => array( '.sek-module-inner' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'icon' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'fa_icon_picker',
                     'title'       => __('Select an Icon', 'text_domain_to_be_replaced'),
                     //'default'     => 'no-link'
                 ),
@@ -2636,6 +3687,14 @@ function sek_get_module_params_for_czr_icon_module() {
             )
         ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/icon_module_tmpl.php",
+        'front_assets' => array(
+              'czr-font-awesome' => array(
+                  'type' => 'css',
+                  //'handle' => 'czr-font-awesome',
+                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
+                  //'deps' => array()
+              )
+        )
     );
 }
 ?><?php
@@ -2701,6 +3760,12 @@ class Sek_Dyn_CSS_Builder {
             $this -> parent_level_model = $parent_level;
         }
 
+        // If the current level is a module, check if the module has more specific css selectors specified on registration
+        $module_level_css_selectors = null;
+        if ( ! empty( $parent_level['module_type'] ) ) {
+            $module_level_css_selectors = sek_get_registered_module_type_property( $parent_level['module_type'], 'css_selectors' );
+        }
+
         foreach ( $level as $key => $entry ) {
              $rules = array();
             // Populate rules for sections / columns / modules
@@ -2728,7 +3793,7 @@ class Sek_Dyn_CSS_Builder {
                     // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
                     // The generic rules must be suffixed with '_css'
                     if ( false !== strpos( $key, '_css') ) {
-                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level_model );
+                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level_model, $module_level_css_selectors );
                     }
                 }
             }
@@ -3602,12 +4667,67 @@ class Sek_Dyn_CSS_Handler {
 ?><?php
 // filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
-add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_generic_css_input_types', 10, 4 );
-function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_id, $parent_level ) {
-
+add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_generic_css_input_types', 10, 5 );
+function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_id, $parent_level, $module_level_css_selectors ) {
     if ( ! is_string( $input_id ) || empty( $input_id ) )
         return $rules;
+
     $selector = '[data-sek-id="'.$parent_level['id'].'"]';
+
+    // SPECIFIC CSS SELECTOR AT MODULE LEVEL
+    // are there more specific css selectors specified on module registration ?
+    if ( !is_null( $module_level_css_selectors ) && !empty( $module_level_css_selectors ) ) {
+        if ( is_array( $module_level_css_selectors ) ) {
+            $new_selectors = array();
+            foreach ( $module_level_css_selectors as $spec_selector ) {
+                $new_selectors[] = $selector . ' ' . $spec_selector;
+            }
+            $new_selectors = implode(',', $new_selectors );
+            $selector = $new_selectors;
+        } else if ( is_string( $module_level_css_selectors ) ) {
+            $selector = $selector . ' ' . $module_level_css_selectors;
+        }
+        //sek_error_log( "sek_add_css_rules_for_input_id => " . $input_id, $selector);
+    }
+
+
+    // SPECIFIC CSS SELECTOR AT INPUT LEVEL
+    if ( 'module' === $parent_level['level'] ) {
+        $start = microtime(true) * 1000;
+        $input_list = sek_get_module_input_list( $parent_level['module_type'] );
+        if ( ! is_array( $input_list ) || empty( $input_list ) ) {
+            sek_error_log( __FUNCTION__ . ' => missing input list' );
+        } else if ( is_array( $input_list ) && empty( $input_list[ $input_id ] ) ) {
+            sek_error_log( __FUNCTION__ . ' => missing input id ' . $input_id . ' in input list for module type ' . $parent_level['module_type'] );
+        }
+        if ( is_array( $input_list ) && ! empty( $input_list[ $input_id ] ) && ! empty( $input_list[ $input_id ]['css_selectors'] ) ) {
+            $input_level_css_selectors = $input_list[ $input_id ]['css_selectors'];
+            // We may have several css module selectors, so let's make sure we apply the specific input css selector(s) to all of them
+            $module_selectors = explode(',', $selector );
+            $new_selectors = array();
+            foreach ( $module_selectors as $mod_selector ) {
+                if ( is_array( $input_level_css_selectors ) ) {
+                    foreach ( $input_level_css_selectors as $spec_selector ) {
+                        $new_selectors[] = $mod_selector . ' ' . $spec_selector;
+                    }
+                } else if ( is_string( $input_level_css_selectors ) ) {
+                    $new_selectors[] = $mod_selector . ' ' . $input_level_css_selectors;
+                }
+            }
+
+            $new_selectors = implode(',', $new_selectors );
+            $selector = $new_selectors;
+            //sek_error_log( '$input_level_css_selectors', $selector );
+        }
+        // sek_error_log( 'input_id', $input_id );
+        // sek_error_log( '$input_list', $input_list );
+
+        // $end = microtime(true) * 1000;
+        // $time_elapsed_secs = $end - $start;
+        // sek_error_log('$time_elapsed_secs to get module params', $time_elapsed_secs );
+    }
+
+
     $mq = null;
     $properties_to_render = array();
 
@@ -3637,7 +4757,15 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             $properties_to_render['color'] = $value;
         break;
         case 'color_hover_css' :
-            $selector = '[data-sek-id="'.$parent_level['id'].'"]:hover';
+            //$selector = '[data-sek-id="'.$parent_level['id'].'"]:hover';
+            // Add ':hover to each selectors'
+            $new_selectors = array();
+            $exploded = explode(',', $selector);
+            foreach ( $exploded as $sel ) {
+                $new_selectors[] = $sel.':hover';
+            }
+
+            $selector = implode(',', $new_selectors);
             $properties_to_render['color'] = $value;
         break;
         case 'h_alignment_css' :
@@ -3677,60 +4805,53 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
             $properties_to_render['font-family'] = false != strstr( $value, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
         break;
+
+        /* Spacer */
+        case 'height_css' :
+            $properties_to_render['height'] = $value > 0 ? $value . 'px' : '1px';
+        break;
+        /* Divider */
+        case 'border_top_width_css' :
+            $properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
+        break;
+        case 'border_top_style_css' :
+            $properties_to_render['border-top-style'] = $value ? $value : 'solid';
+        break;
+        case 'border_top_color_css' :
+            $properties_to_render['border-top-color'] = $value ? $value : '#5a5a5a';
+        break;
+        case 'width_css' :
+            $properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
+        break;
+        case 'v_spacing_css' :
+            $value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
+            $properties_to_render = array(
+                'margin-top'  => $value,
+                'margin-bottom' => $value
+            );
+        break;
+        //not used at the moment, but it might if we want to display the divider as block (e.g. a div instead of a span)
+        case 'h_alignment_block_css' :
+            switch ( $value ) {
+                case 'right' :
+                    $properties_to_render = array(
+                        'margin-right'  => '0'
+                    );
+                break;
+                case 'left' :
+                    $properties_to_render = array(
+                        'margin-left'  => '0'
+                    );
+                break;
+                default :
+                    $properties_to_render = array(
+                        'margin-left'  => 'auto',
+                        'margin-right' => 'auto'
+                    );
+            }
+        break;
     }//switch
 
-
-    //Specific for the module level
-    if ( 'module' == $parent_level[ 'level' ] && empty( $properties_to_render ) ) {
-        //properties are usually applied to the first level child inside the .sek-module-inner.
-        $selector = $selector . ' .sek-module-inner > *';
-        switch ( $input_id ) {
-            /* Spacer */
-            case 'height_css' :
-                $properties_to_render['height'] = $value > 0 ? $value . 'px' : '1px';
-            break;
-            /* Divider */
-            case 'border_top_width_css' :
-                $properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
-            break;
-            case 'border_top_style_css' :
-                $properties_to_render['border-top-style'] = $value ? $value : 'solid';
-            break;
-            case 'border_top_color_css' :
-                $properties_to_render['border-top-color'] = $value ? $value : '#5a5a5a';
-            break;
-            case 'width_css' :
-                $properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
-            break;
-            case 'v_spacing_css' :
-                $value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
-                $properties_to_render = array(
-                    'margin-top'  => $value,
-                    'margin-bottom' => $value
-                );
-            break;
-            //not used at the moment, but it might if we want to display the divider as block (e.g. a div instead of a span)
-            case 'h_alignment_block_css' :
-                switch ( $value ) {
-                    case 'right' :
-                        $properties_to_render = array(
-                            'margin-right'  => '0'
-                        );
-                    break;
-                    case 'left' :
-                        $properties_to_render = array(
-                            'margin-left'  => '0'
-                        );
-                    break;
-                    default :
-                        $properties_to_render = array(
-                            'margin-left'  => 'auto',
-                            'margin-right' => 'auto'
-                        );
-                }
-            break;
-        }//switch
-    }//Specific for the module level
 
     if ( ! empty( $properties_to_render ) ) {
         // is the important flag on ?
@@ -3762,6 +4883,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $model = array();//<= when rendering, the current level model
         public $parent_model = array();//<= when rendering, the current parent model
         public $default_models = array();// <= will be populated to cache the default models when invoking sek_get_default_module_model
+        public $cached_input_lists = array(); // <= will be populated to cache the input_list of each registered module. Useful when we need to get info like css_selector for a particular input type or id.
         public $ajax_action_map = array();
 
         public static function get_instance( $params ) {
@@ -3930,18 +5052,46 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error(  __FUNCTION__ . ' => missing sek_action' );
             }
             $sek_action = $_POST['sek_action'];
+
+            $exported_setting_validities = array();
+
+            // CHECK THE SETTING VALIDITIES BEFORE RENDERING
+            // When a module has been registered with a sanitize_callback, we can collect the possible problems here before sending the response.
+            // Then, on ajax.done(), in SekPreviewPrototype::schedulePanelMsgReactions, we will send the setting validities object to the panel
+            if ( is_customize_preview() ) {
+                global $wp_customize;
+                // prepare the setting validities so we can pass them when sending the ajax response
+                $setting_validities = $wp_customize->validate_setting_values( $wp_customize->unsanitized_post_values() );
+                $raw_exported_setting_validities = array_map( array( $wp_customize, 'prepare_setting_validity_for_js' ), $setting_validities );
+
+                // filter the setting validity to only keep the __nimble__ prefixed ui settings
+                $exported_setting_validities = array();
+                foreach( $raw_exported_setting_validities as $setting_id => $validity ) {
+                    // don't consider the not Nimble UI settings, not starting with __nimble__
+                    if ( false === strpos( $setting_id , NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) )
+                      continue;
+                    $exported_setting_validities[ $setting_id ] = $validity;
+                }
+            }
+
             // is this action possible ?
             if ( in_array( $sek_action, $this -> ajax_action_map ) ) {
                 $html = $this -> sek_ajax_fetch_content( $sek_action );
                 //sek_error_log('sek_ajax_fetch_content()', $html );
                 if ( is_wp_error( $html ) ) {
                     wp_send_json_error( $html );
+                } else {
+                    $response = array(
+                        'contents' => $html,
+                        'setting_validities' => $exported_setting_validities
+                    );
+                    wp_send_json_success( apply_filters( 'sek_content_results', $response, $sek_action ) );
                 }
             } else {
                 wp_send_json_error(  __FUNCTION__ . ' => this ajax action ( ' . $sek_action . ' ) is not listed in the map ' );
             }
 
-            wp_send_json_success( apply_filters( 'sek_content_results', $html, $sek_action ) );
+
         }//sek_get_content_for_injection()
 
 
@@ -4252,7 +5402,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 'all'
             );
             wp_enqueue_style(
-                'font-awesome',
+                'czr-font-awesome',
                 NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
                 array(),
                 NIMBLE_ASSETS_VERSION,
@@ -4429,6 +5579,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
             if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
 
+            // SCHEDULE THE ACTIONS ON HOOKS AND CONTENT FILTERS
             foreach( sek_get_locations() as $hook ) {
                 switch ( $hook ) {
                     case 'loop_start' :
@@ -4446,6 +5597,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
 
+            // SCHEDULE THE ASSETS ENQUEUING
+            add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
             // add_filter( 'template_include', function( $template ) {
             //       // error_log( 'TEMPLATE ? => ' . $template );
             //       // error_log( 'DID_ACTION WP => ' . did_action('wp') );
@@ -4668,12 +5821,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
                     $module_type = $model['module_type'];
 
-                    // Prepare the module value with the defaults
-                    $default_value_model  = sek_get_default_module_model( $module_type );//walk the registered modules tree and generates the module default if not already cached
-                    $model['value'] = ( ! empty( $model['value'] ) && is_array( $model['value'] ) ) ? $model['value'] : array();
-                    $model['value'] = wp_parse_args( $model['value'], $default_value_model );
+                    $default_value_model  = sek_get_default_module_model( $module_type );//<= walk the registered modules tree and generates the module default if not already cached
+                    $raw_module_value = ( ! empty( $model['value'] ) && is_array( $model['value'] ) ) ? $model['value'] : array();
 
-                    //sek_error_log( __FUNCTION__ , $model['value'] );
+                    // reset the model value and rewrite it normalized with the defaults
+                    $model['value'] = array();
+                    if ( czr_is_multi_item_module( $module_type ) ) {
+                        foreach ( $raw_module_value as $item ) {
+                            $model['value'][] = wp_parse_args( $item, $default_value_model );
+                        }
+                    } else {
+                        $model['value'] = wp_parse_args( $raw_module_value, $default_value_model );
+                    }
 
                     // update the current cached model
                     $this -> model = $model;
@@ -4689,6 +5848,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             $this -> parent_model = $parent_model;
         }//render
+
+
+
+
 
 
 
@@ -4749,31 +5912,91 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
          * ( filtered by wp core when invoked in customize-preview )
          */
         function get_unfiltered_edit_post_link( $id = 0, $context = 'display' ) {
-          if ( ! $post = get_post( $id ) )
-            return;
+            if ( ! $post = get_post( $id ) )
+              return;
 
-          if ( 'revision' === $post->post_type )
-            $action = '';
-          elseif ( 'display' == $context )
-            $action = '&amp;action=edit';
-          else
-            $action = '&action=edit';
+            if ( 'revision' === $post->post_type )
+              $action = '';
+            elseif ( 'display' == $context )
+              $action = '&amp;action=edit';
+            else
+              $action = '&action=edit';
 
-          $post_type_object = get_post_type_object( $post->post_type );
-          if ( !$post_type_object )
-            return;
+            $post_type_object = get_post_type_object( $post->post_type );
+            if ( !$post_type_object )
+              return;
 
-          if ( !current_user_can( 'edit_post', $post->ID ) )
-            return;
+            if ( !current_user_can( 'edit_post', $post->ID ) )
+              return;
 
-          if ( $post_type_object->_edit_link ) {
-            $link = admin_url( sprintf( $post_type_object->_edit_link . $action, $post->ID ) );
-          } else {
-            $link = '';
-          }
-          return $link;
+            if ( $post_type_object->_edit_link ) {
+              $link = admin_url( sprintf( $post_type_object->_edit_link . $action, $post->ID ) );
+            } else {
+              $link = '';
+            }
+            return $link;
         }
 
+
+
+        // @hook wp_enqueue_scripts
+        function sek_enqueue_the_printed_module_assets() {
+            $skope_id = skp_get_skope_id();
+            $skoped_seks = sek_get_skoped_seks( $skope_id );
+
+            if ( ! is_array( $skoped_seks ) || empty( $skoped_seks['collection'] ) )
+              return;
+
+            $enqueueing_candidates = $this->sek_sniff_assets_to_enqueue( $skoped_seks['collection'] );
+
+            foreach ( $enqueueing_candidates as $handle => $asset_params ) {
+                if ( empty( $asset_params['type'] ) ) {
+                    sek_error_log( __FUNCTION__ . ' => missing asset type', $asset_params );
+                    continue;
+                }
+                switch ( $asset_params['type'] ) {
+                    case 'css' :
+                        wp_enqueue_style(
+                            $handle,
+                            array_key_exists( 'src', $asset_params ) ? $asset_params['src'] : null,
+                            array_key_exists( 'deps', $asset_params ) ? $asset_params['deps'] : array(),
+                            NIMBLE_ASSETS_VERSION,
+                            'all'
+                        );
+                    break;
+                    case 'js' :
+                        wp_enqueue_script(
+                            $handle,
+                            array_key_exists( 'src', $asset_params ) ? $asset_params['src'] : null,
+                            array_key_exists( 'deps', $asset_params ) ? $asset_params['deps'] : null,
+                            array_key_exists( 'ver', $asset_params ) ? $asset_params['ver'] : null,
+                            array_key_exists( 'in_footer', $asset_params ) ? $asset_params['in_footer'] : false
+                        );
+                    break;
+                }
+            }
+        }//sek_enqueue_the_printed_module_assets()
+
+        // @hook sek_sniff_assets_to_enqueue
+        function sek_sniff_assets_to_enqueue( $collection, $enqueuing_candidates = array() ) {
+            foreach ( $collection as $level_data ) {
+                if ( array_key_exists( 'level', $level_data ) && 'module' === $level_data['level'] && ! empty( $level_data['module_type'] ) ) {
+                    $front_assets = sek_get_registered_module_type_property( $level_data['module_type'], 'front_assets' );
+                    if ( is_array( $front_assets ) ) {
+                        foreach ( $front_assets as $handle => $asset_params ) {
+                            if ( is_string( $handle ) && ! array_key_exists( $handle, $enqueuing_candidates ) ) {
+                                $enqueuing_candidates[ $handle ] = $asset_params;
+                            }
+                        }
+                    }
+                } else {
+                    if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
+                        $enqueuing_candidates = $this -> sek_sniff_assets_to_enqueue( $level_data['collection'], $enqueuing_candidates );
+                    }
+                }
+            }//foreach
+            return $enqueuing_candidates;
+        }
     }//class
 endif;
 ?><?php

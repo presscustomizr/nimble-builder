@@ -604,7 +604,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   },
                                   complete : function( params ) {
                                         // When a section is created ( not duplicated )
-                                        //console.log( "react to preview Msg, sek-add-section complete => ", params );
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
                                                     level : 'location',
@@ -705,7 +704,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        //console.log('PARAMS IN SEK REMOVE ', params );
                                         api.previewer.trigger( 'sek-pick-module', {});
                                         // always update the root fonts property after a removal
                                         // because the removed level(s) might had registered fonts
@@ -878,7 +876,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             'sek-resize-columns' : function( params ) {
                                   sendToPreview = true;
                                   uiParams = {};
-                                  //console.log( 'panel => reactToPreviewMsg => ', params );
                                   apiParams = params;
                                   return self.updateAPISetting( apiParams );
                             },
@@ -929,7 +926,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               break;
                                         }
                                         // When a section is created ( not duplicated )
-                                        //console.log( "react to preview Msg, sek-add-content-in-new-sektion complete => ", params );
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
                                                     level : 'location',
@@ -945,7 +941,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             // GENERATE UI ELEMENTS
                             'sek-pick-module' : function( params ) {
-                                  //console.log('sek-pick-module react to preview', params);
                                   sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
@@ -972,7 +967,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return self.generateUI( uiParams );
                             },
                             'sek-edit-options' : function( params ) {
-                                  //console.log('IN EDIT OPTIONS ', params );
                                   sendToPreview = true;
                                   apiParams = {};
                                   if ( _.isEmpty( params.id ) ) {
@@ -1310,6 +1304,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     property : 'value',
                                     id : params.id
                               });
+
                               var moduleType = self.getLevelProperty({
                                     property : 'module_type',
                                     id : params.id
@@ -1353,7 +1348,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 transport : 'postMessage',// 'refresh',
                                                 type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
                                           });
-                                    }
+                                    }//if ( ! api.has( params.id ) )
 
 
 
@@ -1393,6 +1388,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
 
                         break;
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1703,6 +1707,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
+
+
+
+
+
+
+
+
             // @params = {
             //     uiParams : params,
             //     options_type : 'spacing',
@@ -1768,8 +1781,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   } else {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing parentModuleInstance', params );
                   }
-
-                  //console.log('updateAPISettingAndExecutePreviewActions => ', params.settingParams, isMultiItemModule, rawModuleValue,  _.isObject( rawModuleValue ) );
 
                   // The new module value can be an single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
@@ -3246,7 +3257,45 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   var starting_value = sektionsLocalizedData.registeredModules[ module_type ][ 'starting_value' ];
                   return _.isEmpty( starting_value ) ? 'no_starting_value' : starting_value;
+            },
+
+
+
+            /*
+            * Following two functions taken from jQuery.tabbable 1.0
+            * see https://github.com/marklagendijk/jquery.tabbable/blob/master/jquery.tabbable.js
+            *
+            * Copyright 2013, Mark Lagendijk
+            * Released under the MIT license
+            */
+            selectNextTabbableOrFocusable : function( selector ) {
+                  var selectables = $( selector );
+                  var current = $( ':focus' );
+                  var nextIndex = 0;
+                  if( current.length === 1 ) {
+                        var currentIndex = selectables.index( current );
+                        if( currentIndex + 1 < selectables.length ) {
+                              nextIndex = currentIndex + 1;
+                        }
+                  }
+
+                  selectables.eq( nextIndex ).focus();
+            },
+
+            selectPrevTabbableOrFocusable : function( selector ) {
+                  var selectables = $( selector );
+                  var current = $( ':focus' );
+                  var prevIndex = selectables.length - 1;
+                  if( current.length === 1 ) {
+                        var currentIndex = selectables.index( current );
+                        if( currentIndex > 0 ) {
+                              prevIndex = currentIndex - 1;
+                        }
+                  }
+
+                  selectables.eq( prevIndex ).focus();
             }
+
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 /**
@@ -3813,341 +3862,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }//reactToDrop
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
-( function ( api, $, _ ) {
-      // all available input type as a map
-      api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
-      $.extend( api.czrInputMap, {
-            spacing : function( input_options ) {
-                  var input = this,
-                      $wrapper = $('.sek-spacing-wrapper', input.container );
-                  // Listen to user actions on the inputs and set the input value
-                  $wrapper.on( 'input', 'input[type="number"]', function(evt) {
-                        var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
-                            _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
-                            _rawVal = $(this).val();
-
-                        // Validates
-                        // @fixes https://github.com/presscustomizr/nimble-builder/issues/26
-                        if ( ( _.isString( _rawVal ) && ! _.isEmpty( _rawVal ) ) || _.isNumber( _rawVal ) ) {
-                              _newInputVal[ _type_ ] = _rawVal;
-                        } else {
-                              // this allow users to reset a given padding / margin instead of reseting them all at once with the "reset all spacing" option
-                              _newInputVal = _.omit( _type_, _newInputVal );
-                        }
-
-                        input( _newInputVal );
-                  });
-                  // Schedule a reset action
-                  // Note : this has to be done by device
-                  $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
-                        evt.preventDefault();
-                        $wrapper.find('input[type="number"]').each( function() {
-                              $(this).val('');
-                        });
-                        // [] is the default value
-                        // we could have get it with api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_spacing_module' )
-                        // @see php spacing module registration
-                        input( [] );
-                  });
-
-                  // Synchronize on init
-                  if ( _.isObject( input() ) ) {
-                        _.each( input(), function( _val_, _key_ ) {
-                              $( '[data-sek-spacing="' + _key_ +'"]', $wrapper ).find( 'input[type="number"]' ).val( _val_ );
-                        });
-                  }
-            },
-            bg_position : function( input_options ) {
-                  var input = this;
-                  // Listen to user actions on the inputs and set the input value
-                  $('.sek-bg-pos-wrapper', input.container ).on( 'change', 'input[type="radio"]', function(evt) {
-                        input( $(this).val() );
-                  });
-
-                  // Synchronize on init
-                  if ( ! _.isEmpty( input() ) ) {
-                        input.container.find('input[value="'+ input() +'"]').attr('checked', true).trigger('click');
-                  }
-            },
-            v_alignment : function( input_options ) {
-                  var input = this,
-                      $wrapper = $('.sek-v-align-wrapper', input.container );
-                  // on init
-                  $wrapper.find( 'div[data-sek-align="' + input() +'"]' ).addClass('selected');
-
-                  // on click
-                  $wrapper.on( 'click', '[data-sek-align]', function(evt) {
-                        evt.preventDefault();
-                        $wrapper.find('.selected').removeClass('selected');
-                        $.when( $(this).addClass('selected') ).done( function() {
-                              input( $(this).data('sek-align') );
-                        });
-                  });
-            },
-            font_size : function( obj ) {
-                  var input      = this,
-                      $wrapper = $('.sek-font-size-wrapper', input.container ),
-                      unit = 'px';
-
-                  $wrapper.find( 'input[type="number"]').on('change', function() {
-                        input( $(this).val() + unit );
-                  }).stepper();
-
-            },
-
-            line_height : function( obj ) {
-                  var input      = this,
-                      $wrapper = $('.sek-line-height-wrapper', input.container ),
-                      unit = 'px';
-
-                  $wrapper.find( 'input[type="number"]').on('change', function() {
-                        input( $(this).val() + unit );
-                  }).stepper();
-            },
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // FONT PICKER
-            font_picker : function( input_options ) {
-                  var input = this,
-                      item = input.input_parent;
-
-                  var _getFontCollections = function() {
-                        var dfd = $.Deferred();
-                        if ( ! _.isEmpty( input.sek_fontCollections ) ) {
-                              dfd.resolve( input.sek_fontCollections );
-                        } else {
-                              // This utility handles a cached version of the font_list once fetched the first time
-                              // @see api.CZR_Helpers.czr_cachedTmpl
-                              api.CZR_Helpers.getModuleTmpl( {
-                                    tmpl : 'font_list',
-                                    module_type: 'font_picker_input',
-                                    module_id : input.module.id
-                              } ).done( function( _serverTmpl_ ) {
-                                    // Ensure we have a string that's JSON.parse-able
-                                    if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '{' ) {
-                                          throw new Error( 'font_picker => server list is not JSON.parse-able');
-                                    }
-                                    input.sek_fontCollections = JSON.parse( _serverTmpl_ );
-                                    dfd.resolve( input.sek_fontCollections );
-                              }).fail( function( _r_ ) {
-                                    dfd.reject( _r_ );
-                              });
-                        }
-                        return dfd.promise();
-                  };
-                  var _preprocessSelect2ForFontFamily = function() {
-                        /*
-                        * Override select2 Results Adapter in order to select on highlight
-                        * deferred needed cause the selects needs to be instantiated when this override is complete
-                        * selec2.amd.require is asynchronous
-                        */
-                        var selectFocusResults = $.Deferred();
-                        if ( 'undefined' !== typeof $.fn.select2 && 'undefined' !== typeof $.fn.select2.amd && 'function' === typeof $.fn.select2.amd.require ) {
-                              $.fn.select2.amd.require(['select2/results', 'select2/utils'], function (Result, Utils) {
-                                    var ResultsAdapter = function($element, options, dataAdapter) {
-                                      ResultsAdapter.__super__.constructor.call(this, $element, options, dataAdapter);
-                                    };
-                                    Utils.Extend(ResultsAdapter, Result);
-                                    ResultsAdapter.prototype.bind = function (container, $container) {
-                                      var _self = this;
-                                      container.on('results:focus', function (params) {
-                                        if ( params.element.attr('aria-selected') != 'true') {
-                                          _self.trigger('select', {
-                                              data: params.data
-                                          });
-                                        }
-                                      });
-                                      ResultsAdapter.__super__.bind.call(this, container, $container);
-                                    };
-                                    selectFocusResults.resolve( ResultsAdapter );
-                              });
-                        }
-                        else {
-                              selectFocusResults.resolve( false );
-                        }
-
-                        return selectFocusResults.promise();
-
-                  };//_preprocessSelect2ForFontFamily
-
-                  // @return void();
-                  // Instantiates a select2 select input
-                  // http://ivaynberg.github.io/select2/#documentation
-                  var _setupSelectForFontFamilySelector = function( customResultsAdapter, fontCollections ) {
-                        var _model = item(),
-                            _googleFontsFilteredBySubset = function() {
-                                  var subset = item.czr_Input('subset')(),
-                                      filtered = _.filter( fontCollections.gfonts, function( data ) {
-                                            return data.subsets && _.contains( data.subsets, subset );
-                                      });
-
-                                  if ( ! _.isUndefined( subset ) && ! _.isNull( subset ) && 'all-subsets' != subset ) {
-                                        return filtered;
-                                  } else {
-                                        return fontCollections.gfonts;
-                                  }
-
-                            },
-                            $fontSelectElement = $( 'select[data-czrtype="' + input.id + '"]', input.container );
-
-                        // generates the options
-                        // @param type = cfont or gfont
-                        var _generateFontOptions = function( fontList, type ) {
-                              var _html_ = '';
-                              _.each( fontList , function( font_data ) {
-                                    var _value = font_data.name,
-                                        optionTitle = _.isString( _value ) ? _value.replace(/[+|:]/g, ' ' ) : _value,
-                                        _setFontTypePrefix = function( val, type ) {
-                                              return _.isString( val ) ? [ '[', type, ']', val ].join('') : '';//<= Example : [gfont]Aclonica:regular
-                                        };
-
-                                    _value = _setFontTypePrefix( _value, type );
-
-                                    if ( _value == input() ) {
-                                          _html_ += '<option selected="selected" value="' + _value + '">' + optionTitle + '</option>';
-                                    } else {
-                                          _html_ += '<option value="' + _value + '">' + optionTitle + '</option>';
-                                    }
-                              });
-                              return _html_;
-                        };
-
-                        //add the first option
-                        if ( _.isNull( input() ) || _.isEmpty( input() ) ) {
-                              $fontSelectElement.append( '<option value="none" selected="selected">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
-                        } else {
-                              $fontSelectElement.append( '<option value="none">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
-                        }
-
-
-                        // generate the cfont and gfont html
-                        _.each( [
-                              {
-                                    title : sektionsLocalizedData.i18n['Web Safe Fonts'],
-                                    type : 'cfont',
-                                    list : fontCollections.cfonts
-                              },
-                              {
-                                    title : sektionsLocalizedData.i18n['Google Fonts'],
-                                    type : 'gfont',
-                                    list : fontCollections.gfonts//_googleFontsFilteredBySubset()
-                              }
-                        ], function( fontData ) {
-                              var $optGroup = $('<optgroup>', { label : fontData.title , html : _generateFontOptions( fontData.list, fontData.type ) });
-                              $fontSelectElement.append( $optGroup );
-                        });
-
-                        var _fonts_select2_params = {
-                                //minimumResultsForSearch: -1, //no search box needed
-                            //templateResult: paintFontOptionElement,
-                            //templateSelection: paintFontOptionElement,
-                            escapeMarkup: function(m) { return m; },
-                        };
-                        /*
-                        * Maybe use custom adapter
-                        */
-                        if ( customResultsAdapter ) {
-                              $.extend( _fonts_select2_params, {
-                                    resultsAdapter: customResultsAdapter,
-                                    closeOnSelect: false,
-                              } );
-                        }
-
-                        //http://ivaynberg.github.io/select2/#documentation
-                        //FONTS
-                        $fontSelectElement.select2( _fonts_select2_params );
-                        $( '.select2-selection__rendered', input.container ).css( getInlineFontStyle( input() ) );
-
-                  };//_setupSelectForFontFamilySelector
-
-                  // @return {} used to set $.css()
-                  // @param font {string}.
-                  // Example : Aclonica:regular
-                  // Example : Helvetica Neue, Helvetica, Arial, sans-serif
-                  var getInlineFontStyle = function( _fontFamily_ ){
-                        // the font is set to 'none' when "Select a font family" option is picked
-                        if ( ! _.isString( _fontFamily_ ) || _.isEmpty( _fontFamily_ ) )
-                          return {};
-
-                        //always make sure we remove the prefix.
-                        _fontFamily_ = _fontFamily_.replace('[gfont]', '').replace('[cfont]', '');
-
-                        var module = this,
-                            split = _fontFamily_.split(':'), font_family, font_weight, font_style;
-
-                        font_family       = getFontFamilyName( _fontFamily_ );
-
-                        font_weight       = split[1] ? split[1].replace( /[^0-9.]+/g , '') : 400; //removes all characters
-                        font_weight       = _.isNumber( font_weight ) ? font_weight : 400;
-                        font_style        = ( split[1] && -1 != split[1].indexOf('italic') ) ? 'italic' : '';
-
-
-                        return {
-                              'font-family' : 'none' == font_family ? 'inherit' : font_family.replace(/[+|:]/g, ' '),//removes special characters
-                              'font-weight' : font_weight || 400,
-                              'font-style'  : font_style || 'normal'
-                        };
-                  };
-
-                  // @return the font family name only from a pre Google formated
-                  // Example : input is Inknut+Antiqua:regular
-                  // Should return Inknut Antiqua
-                  var getFontFamilyName = function( rawFontFamily ) {
-                        if ( ! _.isString( rawFontFamily ) || _.isEmpty( rawFontFamily ) )
-                            return rawFontFamily;
-
-                        rawFontFamily = rawFontFamily.replace('[gfont]', '').replace('[cfont]', '');
-                        var split         = rawFontFamily.split(':');
-                        return _.isString( split[0] ) ? split[0].replace(/[+|:]/g, ' ') : '';//replaces special characters ( + ) by space
-                  };
-
-
-
-                  // defer the loading of the fonts when the font tab gets switched to
-                  // then fetch the google fonts from the server
-                  // and instantiate the select input when done
-                  // @see this.trigger( 'tab-switch', { id : tabIdSwitchedTo } ); in Item::initialize()
-                  item.bind( 'tab-switch', function( params ) {
-                        // try { var isGFontTab = 'sek-google-font-tab' = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
-                        //       api.errare( 'spacing input => error when binding the tab switch event', er );
-                        // }
-                        //console.log( 'ALORS ????', item.container.find('[data-tab-id="' + params.id + '"]').data('sek-google-font-tab'), input.module );
-                        // $.when( _getFontCollections() ).done( function( fontCollections ) {
-                        //       console.log('FONT COLLECTION ?', fontCollections );
-                        // }).fail( function( _r_ ) {
-                        //       api.errare( 'font_picker => fail response =>', _r_ );
-                        // });
-                        $.when( _getFontCollections() ).done( function( fontCollections ) {
-                              //console.log('FONT COLLECTION ?', fontCollections );
-                              _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
-                                    _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
-                              });
-                        }).fail( function( _r_ ) {
-                              api.errare( 'font_picker => fail response =>', _r_ );
-                        });
-
-                  });
-            }//font_picker()
-      });//$.extend( api.czrInputMap, {})
-
-
-})( wp.customize, jQuery, _ );//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
@@ -4485,7 +4199,701 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       try { api.czr_sektions = new CZR_SeksConstructor(); } catch( er ) {
             api.errare( 'api.czr_sektions => problem on instantiation', er );
       }
-})( wp.customize, jQuery );//global sektionsLocalizedData, serverControlParams
+})( wp.customize, jQuery );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            spacing : function( input_options ) {
+                  var input = this,
+                      $wrapper = $('.sek-spacing-wrapper', input.container );
+                  // Listen to user actions on the inputs and set the input value
+                  $wrapper.on( 'input', 'input[type="number"]', function(evt) {
+                        var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
+                            _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
+                            _rawVal = $(this).val();
+
+                        // Validates
+                        // @fixes https://github.com/presscustomizr/nimble-builder/issues/26
+                        if ( ( _.isString( _rawVal ) && ! _.isEmpty( _rawVal ) ) || _.isNumber( _rawVal ) ) {
+                              _newInputVal[ _type_ ] = _rawVal;
+                        } else {
+                              // this allow users to reset a given padding / margin instead of reseting them all at once with the "reset all spacing" option
+                              _newInputVal = _.omit( _type_, _newInputVal );
+                        }
+
+                        input( _newInputVal );
+                  });
+                  // Schedule a reset action
+                  // Note : this has to be done by device
+                  $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
+                        evt.preventDefault();
+                        $wrapper.find('input[type="number"]').each( function() {
+                              $(this).val('');
+                        });
+                        // [] is the default value
+                        // we could have get it with api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_spacing_module' )
+                        // @see php spacing module registration
+                        input( [] );
+                  });
+
+                  // Synchronize on init
+                  if ( _.isObject( input() ) ) {
+                        _.each( input(), function( _val_, _key_ ) {
+                              $( '[data-sek-spacing="' + _key_ +'"]', $wrapper ).find( 'input[type="number"]' ).val( _val_ );
+                        });
+                  }
+            }
+      });//$.extend( api.czrInputMap, {})
+
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            bg_position : function( input_options ) {
+                  var input = this;
+                  // Listen to user actions on the inputs and set the input value
+                  $('.sek-bg-pos-wrapper', input.container ).on( 'change', 'input[type="radio"]', function(evt) {
+                        input( $(this).val() );
+                  });
+
+                  // Synchronize on init
+                  if ( ! _.isEmpty( input() ) ) {
+                        input.container.find('input[value="'+ input() +'"]').attr('checked', true).trigger('click');
+                  }
+            }
+      });//$.extend( api.czrInputMap, {})
+
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            v_alignment : function( input_options ) {
+                  var input = this,
+                      $wrapper = $('.sek-v-align-wrapper', input.container );
+                  // on init
+                  $wrapper.find( 'div[data-sek-align="' + input() +'"]' ).addClass('selected');
+
+                  // on click
+                  $wrapper.on( 'click', '[data-sek-align]', function(evt) {
+                        evt.preventDefault();
+                        $wrapper.find('.selected').removeClass('selected');
+                        $.when( $(this).addClass('selected') ).done( function() {
+                              input( $(this).data('sek-align') );
+                        });
+                  });
+            }
+      });//$.extend( api.czrInputMap, {})
+
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            font_size : function( obj ) {
+                  var input      = this,
+                      $wrapper = $('.sek-font-size-wrapper', input.container ),
+                      unit = 'px';
+
+                  $wrapper.find( 'input[type="number"]').on('change', function() {
+                        input( $(this).val() + unit );
+                  }).stepper();
+
+            },
+
+      });//$.extend( api.czrInputMap, {})
+
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            line_height : function( obj ) {
+                  var input      = this,
+                      $wrapper = $('.sek-line-height-wrapper', input.container ),
+                      unit = 'px';
+
+                  $wrapper.find( 'input[type="number"]').on('change', function() {
+                        input( $(this).val() + unit );
+                  }).stepper();
+            }
+      });//$.extend( api.czrInputMap, {})
+
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            // FONT PICKER
+            font_picker : function( input_options ) {
+                  var input = this,
+                      item = input.input_parent;
+
+                  var _getFontCollections = function() {
+                        var dfd = $.Deferred();
+                        if ( ! _.isEmpty( input.sek_fontCollections ) ) {
+                              dfd.resolve( input.sek_fontCollections );
+                        } else {
+                              // This utility handles a cached version of the font_list once fetched the first time
+                              // @see api.CZR_Helpers.czr_cachedTmpl
+                              api.CZR_Helpers.getModuleTmpl( {
+                                    tmpl : 'font_list',
+                                    module_type: 'font_picker_input',
+                                    module_id : input.module.id
+                              } ).done( function( _serverTmpl_ ) {
+                                    // Ensure we have a string that's JSON.parse-able
+                                    if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '{' ) {
+                                          throw new Error( 'font_picker => server list is not JSON.parse-able');
+                                    }
+                                    input.sek_fontCollections = JSON.parse( _serverTmpl_ );
+                                    dfd.resolve( input.sek_fontCollections );
+                              }).fail( function( _r_ ) {
+                                    dfd.reject( _r_ );
+                              });
+                        }
+                        return dfd.promise();
+                  };
+                  var _preprocessSelect2ForFontFamily = function() {
+                        /*
+                        * Override select2 Results Adapter in order to select on highlight
+                        * deferred needed cause the selects needs to be instantiated when this override is complete
+                        * selec2.amd.require is asynchronous
+                        */
+                        var selectFocusResults = $.Deferred();
+                        if ( 'undefined' !== typeof $.fn.select2 && 'undefined' !== typeof $.fn.select2.amd && 'function' === typeof $.fn.select2.amd.require ) {
+                              $.fn.select2.amd.require(['select2/results', 'select2/utils'], function (Result, Utils) {
+                                    var ResultsAdapter = function($element, options, dataAdapter) {
+                                      ResultsAdapter.__super__.constructor.call(this, $element, options, dataAdapter);
+                                    };
+                                    Utils.Extend(ResultsAdapter, Result);
+                                    ResultsAdapter.prototype.bind = function (container, $container) {
+                                      var _self = this;
+                                      container.on('results:focus', function (params) {
+                                        if ( params.element.attr('aria-selected') != 'true') {
+                                          _self.trigger('select', {
+                                              data: params.data
+                                          });
+                                        }
+                                      });
+                                      ResultsAdapter.__super__.bind.call(this, container, $container);
+                                    };
+                                    selectFocusResults.resolve( ResultsAdapter );
+                              });
+                        }
+                        else {
+                              selectFocusResults.resolve( false );
+                        }
+
+                        return selectFocusResults.promise();
+
+                  };//_preprocessSelect2ForFontFamily
+
+                  // @return void();
+                  // Instantiates a select2 select input
+                  // http://ivaynberg.github.io/select2/#documentation
+                  var _setupSelectForFontFamilySelector = function( customResultsAdapter, fontCollections ) {
+                        var _model = item(),
+                            _googleFontsFilteredBySubset = function() {
+                                  var subset = item.czr_Input('subset')(),
+                                      filtered = _.filter( fontCollections.gfonts, function( data ) {
+                                            return data.subsets && _.contains( data.subsets, subset );
+                                      });
+
+                                  if ( ! _.isUndefined( subset ) && ! _.isNull( subset ) && 'all-subsets' != subset ) {
+                                        return filtered;
+                                  } else {
+                                        return fontCollections.gfonts;
+                                  }
+
+                            },
+                            $fontSelectElement = $( 'select[data-czrtype="' + input.id + '"]', input.container );
+
+                        // generates the options
+                        // @param type = cfont or gfont
+                        var _generateFontOptions = function( fontList, type ) {
+                              var _html_ = '';
+                              _.each( fontList , function( font_data ) {
+                                    var _value = font_data.name,
+                                        optionTitle = _.isString( _value ) ? _value.replace(/[+|:]/g, ' ' ) : _value,
+                                        _setFontTypePrefix = function( val, type ) {
+                                              return _.isString( val ) ? [ '[', type, ']', val ].join('') : '';//<= Example : [gfont]Aclonica:regular
+                                        };
+
+                                    _value = _setFontTypePrefix( _value, type );
+
+                                    if ( _value == input() ) {
+                                          _html_ += '<option selected="selected" value="' + _value + '">' + optionTitle + '</option>';
+                                    } else {
+                                          _html_ += '<option value="' + _value + '">' + optionTitle + '</option>';
+                                    }
+                              });
+                              return _html_;
+                        };
+
+                        //add the first option
+                        if ( _.isNull( input() ) || _.isEmpty( input() ) ) {
+                              $fontSelectElement.append( '<option value="none" selected="selected">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
+                        } else {
+                              $fontSelectElement.append( '<option value="none">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
+                        }
+
+
+                        // generate the cfont and gfont html
+                        _.each( [
+                              {
+                                    title : sektionsLocalizedData.i18n['Web Safe Fonts'],
+                                    type : 'cfont',
+                                    list : fontCollections.cfonts
+                              },
+                              {
+                                    title : sektionsLocalizedData.i18n['Google Fonts'],
+                                    type : 'gfont',
+                                    list : fontCollections.gfonts//_googleFontsFilteredBySubset()
+                              }
+                        ], function( fontData ) {
+                              var $optGroup = $('<optgroup>', { label : fontData.title , html : _generateFontOptions( fontData.list, fontData.type ) });
+                              $fontSelectElement.append( $optGroup );
+                        });
+
+                        var _fonts_select2_params = {
+                                //minimumResultsForSearch: -1, //no search box needed
+                            //templateResult: paintFontOptionElement,
+                            //templateSelection: paintFontOptionElement,
+                            escapeMarkup: function(m) { return m; },
+                        };
+                        /*
+                        * Maybe use custom adapter
+                        */
+                        if ( customResultsAdapter ) {
+                              $.extend( _fonts_select2_params, {
+                                    resultsAdapter: customResultsAdapter,
+                                    closeOnSelect: false,
+                              } );
+                        }
+
+                        //http://ivaynberg.github.io/select2/#documentation
+                        //FONTS
+                        $fontSelectElement.select2( _fonts_select2_params );
+                        $( '.select2-selection__rendered', input.container ).css( getInlineFontStyle( input() ) );
+
+                  };//_setupSelectForFontFamilySelector
+
+                  // @return {} used to set $.css()
+                  // @param font {string}.
+                  // Example : Aclonica:regular
+                  // Example : Helvetica Neue, Helvetica, Arial, sans-serif
+                  var getInlineFontStyle = function( _fontFamily_ ){
+                        // the font is set to 'none' when "Select a font family" option is picked
+                        if ( ! _.isString( _fontFamily_ ) || _.isEmpty( _fontFamily_ ) )
+                          return {};
+
+                        //always make sure we remove the prefix.
+                        _fontFamily_ = _fontFamily_.replace('[gfont]', '').replace('[cfont]', '');
+
+                        var module = this,
+                            split = _fontFamily_.split(':'), font_family, font_weight, font_style;
+
+                        font_family       = getFontFamilyName( _fontFamily_ );
+
+                        font_weight       = split[1] ? split[1].replace( /[^0-9.]+/g , '') : 400; //removes all characters
+                        font_weight       = _.isNumber( font_weight ) ? font_weight : 400;
+                        font_style        = ( split[1] && -1 != split[1].indexOf('italic') ) ? 'italic' : '';
+
+
+                        return {
+                              'font-family' : 'none' == font_family ? 'inherit' : font_family.replace(/[+|:]/g, ' '),//removes special characters
+                              'font-weight' : font_weight || 400,
+                              'font-style'  : font_style || 'normal'
+                        };
+                  };
+
+                  // @return the font family name only from a pre Google formated
+                  // Example : input is Inknut+Antiqua:regular
+                  // Should return Inknut Antiqua
+                  var getFontFamilyName = function( rawFontFamily ) {
+                        if ( ! _.isString( rawFontFamily ) || _.isEmpty( rawFontFamily ) )
+                            return rawFontFamily;
+
+                        rawFontFamily = rawFontFamily.replace('[gfont]', '').replace('[cfont]', '');
+                        var split         = rawFontFamily.split(':');
+                        return _.isString( split[0] ) ? split[0].replace(/[+|:]/g, ' ') : '';//replaces special characters ( + ) by space
+                  };
+
+
+
+                  // defer the loading of the fonts when the font tab gets switched to
+                  // then fetch the google fonts from the server
+                  // and instantiate the select input when done
+                  // @see this.trigger( 'tab-switch', { id : tabIdSwitchedTo } ); in Item::initialize()
+                  item.bind( 'tab-switch', function( params ) {
+                        // try { var isGFontTab = 'sek-google-font-tab' = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
+                        //       api.errare( 'spacing input => error when binding the tab switch event', er );
+                        // }
+                        //console.log( 'ALORS ????', item.container.find('[data-tab-id="' + params.id + '"]').data('sek-google-font-tab'), input.module );
+                        // $.when( _getFontCollections() ).done( function( fontCollections ) {
+                        //       console.log('FONT COLLECTION ?', fontCollections );
+                        // }).fail( function( _r_ ) {
+                        //       api.errare( 'font_picker => fail response =>', _r_ );
+                        // });
+                        $.when( _getFontCollections() ).done( function( fontCollections ) {
+                              //console.log('FONT COLLECTION ?', fontCollections );
+                              _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
+                                    _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
+                              });
+                        }).fail( function( _r_ ) {
+                              api.errare( 'font_picker => fail response =>', _r_ );
+                        });
+
+                  });
+            }//font_picker()
+      });//$.extend( api.czrInputMap, {})
+
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            // FONT AWESOME ICON PICKER
+            // FONT AWESOME ICON PICKER
+            fa_icon_picker : function() {
+                  var input           = this,
+                      item            = input.input_parent,
+                      _selected_found = false;
+
+                  //generates the options
+                  var _generateOptions = function( iconCollection ) {
+                        _.each( iconCollection , function( iconClass ) {
+                              var _attributes = {
+                                    value: iconClass,
+                                    //iconClass is in the form "fa(s|b|r) fa-{$name}" so the name starts at position 7
+                                    html: api.CZR_Helpers.capitalize( iconClass.substring( 7 ) )
+                              };
+
+                              if ( _attributes.value == item().icon ) {
+                                    $.extend( _attributes, { selected : "selected" } );
+                                    _selected_found = true;
+                              }
+                              $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                        });
+
+
+                        var addIcon = function ( state ) {
+                              if (! state.id) { return state.text; }
+
+                              //two spans here because we cannot wrap the text into the icon span as the solid FA5 font-weight is bold
+                              var  $state = $(
+                                '<span class="' + state.element.value + '"></span><span class="social-name">&nbsp;&nbsp;' + state.text + '</span>'
+                              );
+                              return $state;
+                        };
+
+                        //blank option to allow placeholders
+                        var $_placeholder;
+                        if ( _selected_found ) {
+                              $_placeholder = $('<option>');
+                        } else {
+                              $_placeholder = $('<option>', { selected: 'selected' } );
+                        }
+                        //Initialize select2
+                        $( 'select[data-czrtype]', input.container )
+                          .prepend( $_placeholder )
+                          .select2({
+                                templateResult: addIcon,
+                                templateSelection: addIcon,
+                                placeholder: sektionsLocalizedData.i18n['Select an icon'],
+                                allowClear: true
+                        });
+                  };//_generateOptions
+
+                  var _getIconsCollections = function() {
+                        var dfd = $.Deferred();
+                        if ( ! _.isEmpty( input.sek_faIconCollection ) ) {
+                              dfd.resolve( input.sek_faIconCollection );
+                        } else {
+                              // This utility handles a cached version of the font_list once fetched the first time
+                              // @see api.CZR_Helpers.czr_cachedTmpl
+                              api.CZR_Helpers.getModuleTmpl( {
+                                    tmpl : 'icon_list',
+                                    module_type: 'fa_icon_picker_input',
+                                    module_id : input.module.id
+                              } ).done( function( _serverTmpl_ ) {
+                                    // Ensure we have a string that's JSON.parse-able
+                                    if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '[' ) {
+                                          throw new Error( 'fa_icon_picker => server list is not JSON.parse-able');
+                                    }
+                                    input.sek_faIconCollection = JSON.parse( _serverTmpl_ );
+                                    dfd.resolve( input.sek_faIconCollection );
+                              }).fail( function( _r_ ) {
+                                    dfd.reject( _r_ );
+                              });
+                        }
+                        return dfd.promise();
+                  };//_getIconsCollections
+
+                  // do
+                  $.when( _getIconsCollections() ).done( function( iconCollection ) {
+                        _generateOptions( iconCollection );
+                  }).fail( function( _r_ ) {
+                        api.errare( 'fa_icon_picker => fail response =>', _r_ );
+                  });
+
+            }
+      });//$.extend( api.czrInputMap, {})
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            code_editor : function( input_options ) {
+                  var input          = this,
+                      control        = this.module.control,
+                      item           = input.input_parent(),
+                      editorSettings = false,
+                      $textarea      = input.container.find( 'textarea' ),
+                      $input_title   = input.container.find( '.customize-control-title' ),
+                      editor_params  = $textarea.data( 'editor-params' );
+
+                  // // When using blocking notifications (type: error) the following block will append a checkbox to the
+                  // // notification message block that once checked will allow to save and publish anyways
+
+                  // // Note that rendering is debounced so the props will be used when rendering happens after add event.
+                  // control.notifications.bind( 'add', function( notification ) {
+                  //       // Skip if control notification is not from setting csslint_error notification.
+                  //       if ( notification.code !== control.setting.id + ':' + input.id ) {
+                  //             return;
+                  //       }
+
+                  //       // Customize the template and behavior of csslint_error notifications.
+                  //       notification.templateId = 'customize-code-editor-lint-error-notification';
+                  //       notification.render = (function( render ) {
+                  //             return function() {
+                  //                   var li = render.call( this );
+                  //                   li.find( 'input[type=checkbox]' ).on( 'click', function() {
+                  //                         control.setting.notifications.remove( input.id );
+                  //                   } );
+                  //                   return li;
+                  //             };
+                  //       })( notification.render );
+                  // } );
+
+                  // Obtain editorSettings for instantiation.
+                  if ( wp.codeEditor  && ( _.isUndefined( editor_params ) || false !== editor_params )  ) {
+                        // Obtain this input editor settings (we don't have defaults).
+                        editorSettings = editor_params;
+                  }
+
+                  input.isReady.done( function() {
+                        // the input should be visible otherwise the code mirror initializes wrongly:
+                        // e.g. bad ui (bad inline CSS maths), not visible content until click.
+                        setTimeout( function() {
+                              if ( editorSettings ) {
+                                    initSyntaxHighlightingEditor( editorSettings );
+                              } else {
+                                    initPlainTextareaEditor();
+                              }
+                              //focus the editor
+                             $input_title.click();
+                        }, 10 );
+                  });
+
+
+                  /**
+                   * Initialize syntax-highlighting editor.
+                   */
+                  var initSyntaxHighlightingEditor = function( codeEditorSettings ) {
+                        var suspendEditorUpdate = false,
+                            settings;
+
+                        settings = _.extend( {}, codeEditorSettings, {
+                              onTabNext: onTabNext,
+                              onTabPrevious: onTabPrevious,
+                              onUpdateErrorNotice: onUpdateErrorNotice
+                        });
+
+                        input.editor = wp.codeEditor.initialize( $textarea, settings );
+
+
+                        // Improve the editor accessibility.
+                        $( input.editor.codemirror.display.lineDiv )
+                              .attr({
+                                    role: 'textbox',
+                                    'aria-multiline': 'true',
+                                    'aria-label': $input_title.html(),
+                                    'aria-describedby': 'editor-keyboard-trap-help-1 editor-keyboard-trap-help-2 editor-keyboard-trap-help-3 editor-keyboard-trap-help-4'
+                              });
+
+                        // Focus the editor when clicking on its title.
+                        $input_title.on( 'click', function() {
+                              input.editor.codemirror.focus();
+                        });
+
+
+                        /*
+                         * When the CodeMirror instance changes, mirror to the textarea,
+                         * where we have our "true" change event handler bound.
+                         */
+                        input.editor.codemirror.on( 'change', function( codemirror ) {
+                              suspendEditorUpdate = true;
+                              $textarea.val( codemirror.getValue() ).trigger( 'change' );
+                              suspendEditorUpdate = false;
+                        });
+
+                        input.editor.codemirror.setValue( input.input_parent().html_content );
+
+                        // Update CodeMirror when the setting is changed by another plugin.
+                        /* TODO: check this */
+                        input.bind( input.id + ':changed', function( value ) {
+                              if ( ! suspendEditorUpdate ) {
+                                    input.editor.codemirror.setValue( value );
+                              }
+                        });
+
+                        // Prevent collapsing section when hitting Esc to tab out of editor.
+                        input.editor.codemirror.on( 'keydown', function onKeydown( codemirror, event ) {
+                              var escKeyCode = 27;
+                              if ( escKeyCode === event.keyCode ) {
+                                    event.stopPropagation();
+                              }
+                        });
+                  };
+
+
+
+                  /**
+                   * Initialize plain-textarea editor when syntax highlighting is disabled.
+                   */
+                  var initPlainTextareaEditor = function() {
+                        var textarea  = $textarea[0];
+
+                        $textarea.on( 'blur', function onBlur() {
+                              $textarea.data( 'next-tab-blurs', false );
+                        } );
+
+                        $textarea.on( 'keydown', function onKeydown( event ) {
+                              var selectionStart, selectionEnd, value, tabKeyCode = 9, escKeyCode = 27;
+
+                              if ( escKeyCode === event.keyCode ) {
+                                    if ( ! $textarea.data( 'next-tab-blurs' ) ) {
+                                          $textarea.data( 'next-tab-blurs', true );
+                                          event.stopPropagation(); // Prevent collapsing the section.
+                                    }
+                                    return;
+                              }
+
+                              // Short-circuit if tab key is not being pressed or if a modifier key *is* being pressed.
+                              if ( tabKeyCode !== event.keyCode || event.ctrlKey || event.altKey || event.shiftKey ) {
+                                    return;
+                              }
+
+                              // Prevent capturing Tab characters if Esc was pressed.
+                              if ( $textarea.data( 'next-tab-blurs' ) ) {
+                                    return;
+                              }
+
+                              selectionStart = textarea.selectionStart;
+                              selectionEnd = textarea.selectionEnd;
+                              value = textarea.value;
+
+                              if ( selectionStart >= 0 ) {
+                                    textarea.value = value.substring( 0, selectionStart ).concat( '\t', value.substring( selectionEnd ) );
+                                    $textarea.selectionStart = textarea.selectionEnd = selectionStart + 1;
+                              }
+
+                              event.stopPropagation();
+                              event.preventDefault();
+                        });
+                  },
+
+
+
+                  /**
+                   * Update error notice.
+                   */
+                  onUpdateErrorNotice = function( errorAnnotations ) {
+                        var message;
+
+                        control.setting.notifications.remove( input.id );
+                        if ( 0 !== errorAnnotations.length ) {
+                              if ( 1 === errorAnnotations.length ) {
+                                    message = sektionsLocalizedData.i18n.codeEditorSingular.replace( '%d', '1' ).replace( '%s', $input_title.html() );
+                              } else {
+                                    message = sektionsLocalizedData.i18n.codeEditorPlural.replace( '%d', String( errorAnnotations.length ) ).replace( '%s', $input_title.html() );
+                              }
+                              control.setting.notifications.add( input.id, new api.Notification( input.id, {
+                                    message: message,
+                                    type: 'warning'
+                              } ) );
+                        }
+                  },
+
+
+
+                  /**
+                   * Handle tabbing to the tabbable element before the editor.
+                   */
+                  onTabNext = function() {
+                        CZRSeksPrototype.selectNextTabbableOrFocusable( ':tabbable' );
+                  },
+
+
+
+                  /**
+                   * Handle tabbing to the tabbable element after the editor.
+                   */
+                  onTabPrevious = function() {
+                        CZRSeksPrototype.selectPrevTabbableOrFocusable( ':tabbable' );
+                  }
+            }
+      });//$.extend( api.czrInputMap, {})
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
@@ -5134,7 +5542,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   _options_ = {};
 
                             if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in image module');
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.id );
                                   return;
                             } else {
                                   //generates the options
@@ -5181,10 +5589,171 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
+      //ICON MODULE
+      var IconModuleConstructor = {
+              initialize: function( id, options ) {
+                      //console.log('INITIALIZING IMAGE MODULE', id, options );
+                      var module = this;
+
+                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                      module.inputConstructor = api.CZRInput.extend( module.CZRIconInputMths || {} );
+
+                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                      module.itemConstructor = api.CZRItem.extend( module.CZRIconItemConstructor || {} );
+
+
+                      //SET THE CONTENT PICKER DEFAULT OPTIONS
+                      //@see ::setupContentPicker()
+                      module.bind( 'set_default_content_picker_options', function( params ) {
+                            params.defaultContentPickerOption.defaultOption = {
+                                  'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                                  'type'       : '',
+                                  'type_label' : '',
+                                  'object'     : '',
+                                  'id'         : '_custom_',
+                                  'url'        : ''
+                            };
+                            return params;
+                      });
+
+                      // run the parent initialize
+                      // Note : must be always invoked always after the input / item class extension
+                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                      api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+              },//initialize
+
+              /* Helpers */
+
+              CZRIconInputMths: {
+                      setupSelect : function() {
+                              var input  = this,
+                                  item   = input.input_parent,
+                                  module = input.module,
+                                  _model  = item();
+
+                               //Link select
+                              if ( 'link-to' == input.id ) {
+                                    if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
+                                          api.errare( 'Missing select options for input id => ' + input.id + ' in icon module');
+                                          return;
+                                    } else {
+                                          //generates the options
+                                          _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
+                                                //get only no-link and url
+                                                if ( !(  _.contains([ 'no-link', 'url' ], value) ) ) {
+                                                      return;
+                                                }
+                                                var _attributes = {
+                                                          value : value,
+                                                          html: title
+                                                    };
+                                                if ( value == input() ) {
+                                                      $.extend( _attributes, { selected : "selected" } );
+                                                }
+
+                                                $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                          });
+                                          $( 'select[data-czrtype]', input.container ).selecter();
+                                    }
+                              }// if
+                      }//setupSelect
+              },//CZRIconInputMths
+              //////////////////////////////////////////////////////////
+              /// ITEM CONSTRUCTOR
+              //////////////////////////////////////////
+              CZRIconItemConstructor : {
+                    //overrides the parent ready
+                    ready : function() {
+                          var item = this;
+                          //wait for the input collection to be populated,
+                          //and then set the input visibility dependencies
+                          item.inputCollection.bind( function( col ) {
+                                if( _.isEmpty( col ) )
+                                  return;
+                                try { item.setInputVisibilityDeps(); } catch( er ) {
+                                      api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                                }
+                          });//item.inputCollection.bind()
+
+                          //fire the parent
+                          api.CZRItem.prototype.ready.call( item );
+                    },
+
+
+                    //Fired when the input collection is populated
+                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                    setInputVisibilityDeps : function() {
+                          var item = this,
+                              module = item.module;
+                          // input controller instance == this
+                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                                //Fire on init
+                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                                //React on change
+                                this.bind( function( to ) {
+                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                                });
+                          };
+                          //Internal item dependencies
+                          item.czr_Input.each( function( input ) {
+                                switch( input.id ) {
+                                      case 'link-to' :
+                                            _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
+                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        var bool = false;
+                                                        switch( _inputId_ ) {
+                                                              case 'link-custom-url' :
+                                                                    bool = 'url' == input() && '_custom_' == item.czr_Input('link-pick-url')().id;
+                                                              break;
+                                                              default :
+                                                                    bool = 'url' == input();
+                                                              break;
+                                                        }
+                                                        return bool;
+                                                  }); } catch( er ) {
+                                                        api.errare( 'Icon module => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
+                                      case 'link-pick-url' :
+                                            scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                                  return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
+                                            });
+                                      break;
+                                }
+                          });
+                    }
+              },//CZRIconItemConstructor
+
+      };//IconModuleConstructor
+
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_icon_module : {
+                  mthds : IconModuleConstructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_icon_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_icon_module' )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
       //HEADING MODULE
       var HeadingModuleConstructor  = {
             initialize: function( id, options ) {
-                    //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
 
                     //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
@@ -5229,6 +5798,29 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//CZRHeadingsInputMths
       };//HeadingModuleConstructor
 
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_heading_module : {
+                  mthds : HeadingModuleConstructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_heading_module' )
+            }
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
       //DIVIDER MODULE
       var DividerModuleConstructor = {
             initialize: function( id, options ) {
@@ -5276,149 +5868,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//CZRDividerInputMths
       };//DividerModuleConstructor
 
-      //ICON MODULE
-      var IconModuleConstructor = {
-              initialize: function( id, options ) {
-                      //console.log('INITIALIZING IMAGE MODULE', id, options );
-                      var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend( module.CZRIconInputMths || {} );
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
-
-
-                      //SET THE CONTENT PICKER DEFAULT OPTIONS
-                      //@see ::setupContentPicker()
-                      module.bind( 'set_default_content_picker_options', function( params ) {
-                            params.defaultContentPickerOption.defaultOption = {
-                                  'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
-                                  'type'       : '',
-                                  'type_label' : '',
-                                  'object'     : '',
-                                  'id'         : '_custom_',
-                                  'url'        : ''
-                            };
-                            return params;
-                      });
-
-                      module.icons = {
-                        'fas' : [
-                          'address-book',
-                          'adjust'
-                        ],
-                        'far' : [
-                          'calendar',
-                          'calendar-alt'
-                        ],
-                        'fab' : [
-                          'adn',
-                          'adversal'
-                        ]
-                      };
-
-                      //to localize
-                      module.icon_groups = {
-                        'fas' : 'Solid',
-                        'far' : 'Regular',
-                        'fab' : 'Brand'
-                      };
-
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                      api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-              },//initialize
-
-              /* Helpers */
-
-              CZRIconInputMths: {
-                      setupSelect : function() {
-                              var input  = this,
-                                  item   = input.input_parent,
-                                  module = input.module,
-                                  _model  = item(),
-                                  _selected_found = false;
-
-                              //Icon select
-                              if ( 'icon' == input.id ) {
-                                  //generates the options
-                                  _.each( module.icons , function( icons, group ) {
-                                          var $_group =  $( '<optgroup>', { label: module.icon_groups[ group ] } );
-                                          $( 'select[data-czrtype="social-icon"]', input.container ).append( $( '<optgroup>', { label: module.icon_groups[ group ] } ) );
-                                          _.each( icons, function( icon ) {
-                                                var _attributes = {
-                                                          value: group + ' fa-' + icon,
-                                                          html: api.CZR_Helpers.capitalize( icon )
-                                                    };
-                                                if ( _attributes.value == _model['icon'] ) {
-                                                      $.extend( _attributes, { selected : "selected" } );
-                                                      _selected_found = true;
-                                                }
-                                                $_group.append( $('<option>', _attributes) );
-                                          });
-
-                                          $( 'select[data-czrtype]', input.container ).append( $_group );
-                                  });
-
-                                  var addIcon = function ( state ) {
-                                        if (! state.id) { return state.text; }
-
-                                        //two spans here because we cannot wrap the social text into the social icon span as the solid FA5 font-weight is bold
-                                        var  $state = $(
-                                          '<span class="' + state.element.value + '"></span><span class="social-name">&nbsp;&nbsp;' + state.text + '</span>'
-                                        );
-                                        return $state;
-                                  };
-
-                                  //blank option to allow placeholders
-                                  var $_placeholder;
-                                  if ( _selected_found ) {
-                                        $_placeholder = $('<option>');
-                                  } else {
-                                        $_placeholder = $('<option>', { selected: 'selected' } );
-                                  }
-                                  //Initialize select2
-                                  $( 'select[data-czrtype]', input.container )
-                                    .prepend( $_placeholder )
-                                    .select2({
-                                          templateResult: addIcon,
-                                          templateSelection: addIcon,
-                                          placeholder: sektionsLocalizedData.i18n['Select an icon'],
-                                          allowClear: true
-                                  });
-
-                              } //Link select
-                              else if ( 'link-to' == input.id ) {
-                                    if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                          api.errare( 'Missing select options for input id => ' + input.id + ' in icon module');
-                                          return;
-                                    } else {
-                                          //generates the options
-                                          _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
-                                                //get only no-link and url
-                                                if ( !(  _.contains([ 'no-link', 'url' ], value) ) ) {
-                                                      return;
-                                                }
-                                                var _attributes = {
-                                                          value : value,
-                                                          html: title
-                                                    };
-                                                if ( value == input() ) {
-                                                      $.extend( _attributes, { selected : "selected" } );
-                                                }
-
-                                                $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                          });
-                                          $( 'select[data-czrtype]', input.container ).selecter();
-                                    }
-                              }
-                      }
-              },//CZRIconInputMths
-      };//IconModuleConstructor
 
       //provides a description of each module
       //=> will determine :
@@ -5430,24 +5880,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            czr_heading_module : {
-                  mthds : HeadingModuleConstructor,
-                  crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_module', 'name' ),
-                  has_mod_opt : false,
-                  ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_heading_module' )
-            },
-
-            czr_spacer_module : {
-                  //mthds : ModuleConstructor,
-                  crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_spacer_module', 'name' ),
-                  has_mod_opt : false,
-                  ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_spacer_module' )
-            },
-
             czr_divider_module : {
                   mthds : DividerModuleConstructor,
                   crud : false,
@@ -5455,15 +5887,141 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_divider_module' )
-            },
-
-            czr_icon_module : {
-                  mthds : IconModuleConstructor,
+            }
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_spacer_module : {
+                  //mthds : ModuleConstructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_icon_module', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_spacer_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_icon_module' )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_spacer_module' )
+            }
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      var FeaturedPagesConstruct = {
+            initialize: function( id, options ) {
+                  //console.log('INITIALIZING FP MODULE', id, options );
+                  var module = this;
+
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                  module.inputConstructor = api.CZRInput.extend( module.CZRFPInputsMths || {} );
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+                  //SET THE CONTENT PICKER DEFAULT OPTIONS
+                  //@see ::setupContentPicker()
+                  // module.bind( 'set_default_content_picker_options', function( params ) {
+                  //       params.defaultContentPickerOption.defaultOption = {
+                  //             'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                  //             'type'       : '',
+                  //             'type_label' : '',
+                  //             'object'     : '',
+                  //             'id'         : '_custom_',
+                  //             'url'        : ''
+                  //       };
+                  //       return params;
+                  // });
+            },//initialize
+
+            CZRFPInputsMths : {
+                    // initialize : function( name, options ) {
+                    //       var input = this;
+                    //       api.CZRInput.prototype.initialize.call( input, name, options );
+                    // },
+
+                    setupSelect : function() {
+                            var input  = this,
+                                  item   = input.input_parent,
+                                  module = input.module,
+                                  _options_ = {};
+
+                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in featured pages module');
+                                  return;
+                            } else {
+                                  //generates the options
+                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
+                                        var _attributes = {
+                                                  value : value,
+                                                  html: title
+                                            };
+                                        if ( value == input() ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        } else if ( 'px' === value ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        }
+                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                  });
+                                  $( 'select[data-czrtype]', input.container ).selecter();
+                            }
+                    }
+            },//CZRFPInputsMths
+
+            // CZRSocialsItem : { },//CZRSocialsItem
+      };//FeaturedPagesConstruct
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_featured_pages_module : {
+                  mthds : FeaturedPagesConstruct,
+                  crud : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'is_crud' ),
+                  hasPreItem : false,//a crud module has a pre item by default
+                  refresh_on_add_item : false,// the preview is refreshed on item add
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_featured_pages_module' )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_simple_html_module : {
+                  //mthds : SimpleHtmlModuleConstructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_html_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_html_module' )
             },
       });
 })( wp.customize , jQuery, _ );

@@ -35,7 +35,7 @@
                                   _options_ = {};
 
                             if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in image module');
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.id );
                                   return;
                             } else {
                                   //generates the options
