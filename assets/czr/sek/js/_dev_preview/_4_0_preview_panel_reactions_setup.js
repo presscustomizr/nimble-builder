@@ -400,38 +400,27 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               // This is the same mechanism used by WP to handle the setting validity of the partial refresh
 
                               var sendSuccessDataToPanel = function( _ajaxResponse_ ) {
+                                    // always send back the {msgId}_done message, so the control panel can fire the "complete" callback.
+                                    // @see api.czr_sektions::reactToPreviewMsg
+                                    api.preview.send( [ msgId, 'done'].join('_'), params );
                                     if ( _.isUndefined( _ajaxResponse_ ) )
                                       return;
-                                    api.preview.send( [ msgId, 'done'].join('_'), params );
+
                                     if ( _ajaxResponse_.data && _ajaxResponse_.data.setting_validities ) {
                                           api.preview.send( 'selective-refresh-setting-validities', _ajaxResponse_.data.setting_validities );
                                     }
                               };
 
-                              if ( _.isFunction( callbackFn ) ) {
-                                    try {
-                                          $.when( callbackFn( params ) ).done( function( _ajaxResponse_ ) {
-                                                sendSuccessDataToPanel( _ajaxResponse_ );
-                                          }).fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
-                                          }).then( function() {
-                                                api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
-                                          });
-                                    } catch( _er_ ) {
-                                          self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
-                                    }
-                              } else {
-                                    try {
-                                          $.when( self[callbackFn].call( self, params ) ).done( function( _ajaxResponse_ ) {
-                                                sendSuccessDataToPanel( _ajaxResponse_ );
-                                          }).fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
-                                          }).then( function() {
-                                                api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
-                                          });
-                                    } catch( _er_ ) {
-                                          self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
-                                    }
+                              try {
+                                    $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) ).done( function( _ajaxResponse_ ) {
+                                          sendSuccessDataToPanel( _ajaxResponse_ );
+                                    }).fail( function() {
+                                          api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
+                                    }).then( function() {
+                                          api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
+                                    });
+                              } catch( _er_ ) {
+                                    self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
                               }
 
 
