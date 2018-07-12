@@ -15,8 +15,8 @@
 
                   var _getFontCollections = function() {
                         var dfd = $.Deferred();
-                        if ( ! _.isEmpty( input.sek_fontCollections ) ) {
-                              dfd.resolve( input.sek_fontCollections );
+                        if ( ! _.isEmpty( api.sek_fontCollections ) ) {
+                              dfd.resolve( api.sek_fontCollections );
                         } else {
                               // This utility handles a cached version of the font_list once fetched the first time
                               // @see api.CZR_Helpers.czr_cachedTmpl
@@ -29,8 +29,8 @@
                                     if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '{' ) {
                                           throw new Error( 'font_picker => server list is not JSON.parse-able');
                                     }
-                                    input.sek_fontCollections = JSON.parse( _serverTmpl_ );
-                                    dfd.resolve( input.sek_fontCollections );
+                                    api.sek_fontCollections = JSON.parse( _serverTmpl_ );
+                                    dfd.resolve( api.sek_fontCollections );
                               }).fail( function( _r_ ) {
                                     dfd.reject( _r_ );
                               });
