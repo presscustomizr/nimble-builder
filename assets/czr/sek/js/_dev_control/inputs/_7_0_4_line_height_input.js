@@ -10,10 +10,10 @@
       $.extend( api.czrInputMap, {
             line_height : function( obj ) {
                   var input      = this,
-                      $wrapper = $('.sek-line-height-wrapper', input.container ),
+                      $wrapper = $('.sek-font-size-line-height-wrapper', input.container ),
                       unit = 'px';
 
-                  $wrapper.find( 'input[type="number"]').on('change', function() {
+                  $wrapper.find( 'input[type="number"]').on('input change', function() {
                         input( $(this).val() + unit );
                   }).stepper();
             }
