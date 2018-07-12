@@ -221,6 +221,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            // <RECURSIVE UTILITIES USING THE sektionsLocalizedData.registeredModules>
+            //-------------------------------------------------------------------------------------------------
             // @return a mixed type default value
             // @param input_id string
             // @param module_type string
@@ -262,6 +279,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return _defaultVal_;
             },
 
+
+
             // @return input_type string
             // @param input_id string
             // @param module_type string
@@ -277,7 +296,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
-                        api.errare( 'getInputDefaultValue => missing sektionsLocalizedData.registeredModules' );
+                        api.errare( 'getInputType => missing sektionsLocalizedData.registeredModules' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
@@ -302,6 +321,63 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   return _inputType_;
             },
+
+
+            // @return object of registration params
+            // @param input_id string
+            // @param module_type string
+            // @param level array || object
+            getInputRegistrationParams : function( input_id, module_type, level ) {
+                  var self = this;
+
+                  // Do we have a cached default value ?
+                  self.cachedInputRegistrationParams = self.cachedInputRegistrationParams || {};
+                  self.cachedInputRegistrationParams[ module_type ] = self.cachedInputRegistrationParams[ module_type ] || {};
+                  if ( _.has( self.cachedInputRegistrationParams[ module_type ], input_id ) ) {
+                        return self.cachedInputRegistrationParams[ module_type ][ input_id ];
+                  }
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
+                        api.errare( 'getInputRegistrationParams => missing sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( _.isUndefined( level ) ) {
+                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                  }
+                  var _params_ = {};
+                  _.each( level, function( levelData, _key_ ) {
+                        // we found a match skip next levels
+                        if ( ! _.isEmpty( _params_ ) )
+                          return;
+                        if ( input_id === _key_ && ! _.isUndefined( levelData.input_type ) ) {
+                              _params_ = levelData;
+                        }
+                        // if we have still no match, and the data are sniffable, let's go ahead recursively
+                        if ( _.isEmpty( _params_ ) && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
+                              _params_ = self.getInputRegistrationParams( input_id, module_type, levelData );
+                        }
+                        if ( ! _.isEmpty( _params_ ) ) {
+                              // cache it
+                              self.cachedInputRegistrationParams[ module_type ][ input_id ] = _params_;
+                        }
+                  });
+                  return _params_;
+            },
+
+            //-------------------------------------------------------------------------------------------------
+            // </RECURSIVE UTILITIES USING THE sektionsLocalizedData.registeredModules>
+            //-------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
