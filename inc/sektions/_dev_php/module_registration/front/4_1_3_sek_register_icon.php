@@ -31,6 +31,11 @@ function sek_get_module_params_for_czr_icon_module() {
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_module',
         'name' => __('Icon', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'icon' =>  'far fa-star',
+            'font_size_css' => '40px',
+            'color_css' => '#707070'
+        ),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '.sek-module-inner' ),
