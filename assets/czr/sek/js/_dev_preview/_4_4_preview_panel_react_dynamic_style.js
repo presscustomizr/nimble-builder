@@ -4,7 +4,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
       $.extend( SekPreviewPrototype, {
             ajaxRefreshStylesheet : function( params ) {
                   var self = this;
-                  //console.log('preview => panel react => ajax refresh dyn style', params );
                   // will be cleaned on 'sek-module-refreshed'
                   self.mayBePrintLoader({
                         loader_located_in_level_id : params.apiParams.id
@@ -21,10 +20,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         } else {
                               self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
                         }
-
-                        //console.log('sek-refresh-stylesheet done !',  html_content);
                         self.appendDynStyleSheet( params.skope_id, html_content );
-                        //=> 'sek-level-refreshed' is listened to clean the loader overalay in time
+                        //=> 'sek-level-refreshed' is listened to clean the loader overlay in time
                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
                               .trigger( 'sek-stylesheet-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                   }).fail( function( _r_ ) {
@@ -37,8 +34,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             appendDynStyleSheet : function( skope_id, styleMarkup ) {
                 var _stylesheet_id_ = '#sek-' + skope_id,//@see php Sek_Dyn_CSS_Handler
                     _gfonts_id_ = '#sek-gfonts-' + skope_id;//@see php Sek_Dyn_CSS_Handler
-
-                //console.log('IN APPEND DYN STYLESHEET', styleMarkup, _stylesheet_id_, $('head').find( _stylesheet_id_ ) );
 
                 // Remove a dynamic inline stylesheet if already printed
                 if ( 0 < $('head').find( _stylesheet_id_ ).length ) {

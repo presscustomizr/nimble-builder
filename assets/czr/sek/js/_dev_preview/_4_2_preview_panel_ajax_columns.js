@@ -6,7 +6,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // 1) Add a new column
             // 2) re-render the column collection in a sektion
             ajaxRefreshColumns : function( params ) {
-                  //console.log('PARAMS in ajaxRefreshColumns', params );
                   var self = this;
                   // will be cleaned on 'sek-columns-refreshed'
                   self.mayBePrintLoader({
@@ -38,18 +37,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $( '.sektion-wrapper').find( '.sek-placeholder' ).after( html_content );
                         $( '.sektion-wrapper').find( '.sek-placeholder' ).remove();
 
-
                         // re-generate the stylesheet => this will take into account the reset width of each column
-                        self.doAjax( {
-                              action : 'sek_get_content',
-                              skope_id : params.skope_id,
-                              sek_action : 'sek-refresh-stylesheet'// sek-add-column
-                        }).done( function( _r_ ) {
-                              //console.log('sek-refresh-stylesheet done !',  html_content);
-                              self.appendDynStyleSheet( params.skope_id, html_content );
-                        }).fail( function( _r_ ) {
-                              console.log('sek-refresh-stylesheet fail !');
-                        });
+                        api.preview.trigger( 'sek-refresh-stylesheet', params );
 
                         // say it to the parent sektion
                         //=> will be listened to by the column to re-instantiate sortable, resizable
@@ -64,7 +53,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
             ajaxResizeColumns : function( params ) {
-                  //console.log('PREVIEW => REACT TO PANEL MSG => sek-resize-columns => ', params );
                   var self = this;
                   // will be cleaned on 'sek-module-refreshed'
                   self.mayBePrintLoader({
