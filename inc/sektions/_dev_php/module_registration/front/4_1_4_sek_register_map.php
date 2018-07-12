@@ -62,7 +62,8 @@ function sek_get_module_params_for_czr_map_module() {
                     'default' => 200,
                     'css_selectors' => array( '.sek-embed::before' ),
                     'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh-stylesheet' => true,
+                    'css_identifier' => 'height'
                 ),
             )
         ),
