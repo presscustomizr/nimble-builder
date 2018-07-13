@@ -310,6 +310,24 @@
   white-space: normal;
 }
 
+.sek-embed {
+  position: relative;
+}
+
+.sek-embed::before {
+  display: block;
+  content: '';
+}
+
+.sek-embed .sek-embed-inner,
+.sek-embed iframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
 .sek-btn {
   display: inline-block;
   font-weight: normal;
