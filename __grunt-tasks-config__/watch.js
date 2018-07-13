@@ -274,7 +274,9 @@ module.exports = {
     ],
     tasks : [
       'sass:sek_main',
-      'postcss:sek_main'
+      'postcss:sek_main',
+      'sass:sek_main_rtl',
+      'postcss:sek_main_rtl',
     ]
   },
 };

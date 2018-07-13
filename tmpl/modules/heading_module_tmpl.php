@@ -31,6 +31,7 @@ if ( ! function_exists( __NAMESPACE__ . '\sek_print_text_heading_content' ) ) {
 }
 
 $value = sanitize_callback__czr_heading_module( $value );
+
 // print the module content if not empty
 if ( array_key_exists('heading_text', $value ) ) {
     $tag = empty( $value[ 'heading_tag' ] ) ? 'h1' : $value[ 'heading_tag' ];

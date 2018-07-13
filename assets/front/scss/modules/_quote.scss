@@ -1,0 +1,58 @@
+.#{$project-prefix}quote.sek-quote-design {
+    //reset
+    background: none;
+    padding: 15px 0;
+    margin-right: 0;
+    margin-left: 0;
+    font-style: inherit;
+    border: none;
+    &::before, &::after {
+        display: none;
+    }
+    .#{$project-prefix}content{
+        margin-right: 0;
+        margin-left: 0;
+    }
+    .#{$project-prefix}cite {
+        clear: both;
+        display: block;
+        margin-top: 1.5em;
+        position: relative;
+        @if ( true == $is_rtl ) {
+          padding-right: 2.2em;
+          padding-left: 0.25em;
+        }
+        @else {
+          padding-left: 2.2em;
+          padding-right: 0.25em;
+        }
+        &::before {
+            content: '';
+            top: 1em;
+            position: absolute;
+            background: none;
+            width: 2em;
+            height: auto;
+            @if ( true == $is_rtl ) {
+              right: 0;
+            }
+            @else {
+              left: 0;
+            }
+            //border color inherited from the text color
+            border-top: 1px solid;
+        }
+    }
+
+    //border before
+    &.sek-border-before {
+        @if ( true == $is_rtl ) {
+          padding-right: 15px;
+          border-right: 5px solid;
+        }
+        @else {
+          padding-left: 15px;
+          border-left: 5px solid;
+        }
+    }
+}

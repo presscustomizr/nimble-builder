@@ -16,7 +16,8 @@ function sek_register_modules() {
         'czr_heading_module',
         'czr_spacer_module',
         'czr_divider_module',
-        'czr_icon_module'
+        'czr_icon_module',
+        'czr_quote_module'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {

@@ -40,7 +40,7 @@ module.exports = {
   sek_front_css: {
     expand: true,
     cwd: '<%= paths.front_assets %>css/',
-    src: ['sek-base.css'],
+    src: ['sek-base.css', 'sek-base-rtl.css'],
     dest: '<%= paths.front_assets %>css/',
     ext: '.min.css'
   }

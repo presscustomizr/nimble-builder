@@ -512,6 +512,12 @@ function nimble_add_select_options_localized_control_params( $params ) {
                     'percent' => __('Percents', 'text_domain_to_be_replaced' )
                 ),
 
+                //QUOTE MODULE
+                'quote_design' => array(
+                    'none' => __( 'No design', 'text_domain_to_be_replaced' ),
+                    'border-before' => __( 'Border on the left (right for RTL users)', 'text_domain_to_be_replaced' ),
+                ),
+
                 // LAYOUT BACKGROUND BORDER
                 'boxed-wide' => array(
                     'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
@@ -537,7 +543,8 @@ function nimble_add_select_options_localized_control_params( $params ) {
                     'double' => __('double', 'text_domain_to_be_replaced'),
                     'dotted' => __('dotted', 'text_domain_to_be_replaced'),
                     'dashed' => __('dashed', 'text_domain_to_be_replaced')
-                )
+                ),
+
             )//'selectOptions array'
         )//array()
     );//array_merge()
