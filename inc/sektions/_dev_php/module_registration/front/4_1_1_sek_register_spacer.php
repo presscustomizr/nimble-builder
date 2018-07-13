@@ -42,8 +42,8 @@ function sek_get_module_params_for_czr_spacer_module() {
                     'min'         => 1,
                     'title'       => __('Space in pixels', 'text_domain_to_be_replaced'),
                     'default'     => 20,
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'height'
                 ),
             )

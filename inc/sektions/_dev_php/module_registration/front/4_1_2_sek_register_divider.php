@@ -41,16 +41,16 @@ function sek_get_module_params_for_czr_divider_module() {
                     'max' => 50,
                     'unit' => 'px',
                     'default' => 1,
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'border_top_width'
                 ),
                 'border_top_style_css' => array(
                     'input_type'  => 'select',
                     'title'       => __('Style', 'text_domain_to_be_replaced'),
                     'default' => 'solid',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'border_top_style'
                 ),
                 'border_top_color_css' => array(
@@ -58,8 +58,8 @@ function sek_get_module_params_for_czr_divider_module() {
                     'title'       => __('Color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
                     'default'    => '#5a5a5a',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'border_top_color'
                 ),
                 'width_css' => array(
@@ -69,16 +69,16 @@ function sek_get_module_params_for_czr_divider_module() {
                     'max' => 100,
                     'unit' => '%',
                     'default' => 100,
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'width'
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'h_alignment',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_selectors' => '.sek-module-inner',
                     'css_identifier' => 'h_alignment'
                 ),
@@ -88,8 +88,8 @@ function sek_get_module_params_for_czr_divider_module() {
                     'min'         => 1,
                     'max'         => 100,
                     'default'     => 15,
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'v_spacing'
                 ),
             )

@@ -29,8 +29,8 @@ function sek_get_module_params_for_czr_image_module() {
                     'input_type'  => 'h_alignment',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'h_alignment'
                 ),
                 'link-to' => array(
