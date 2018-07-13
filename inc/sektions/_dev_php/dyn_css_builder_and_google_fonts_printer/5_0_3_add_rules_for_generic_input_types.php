@@ -32,9 +32,13 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             $new_selectors = implode(',', $new_selectors );
             $selector = $new_selectors;
         } else if ( is_string( $module_level_css_selectors ) ) {
-            $selector = $selector . ' ' . $module_level_css_selectors;
+            $selector .= ' ' . $module_level_css_selectors;
         }
-        //sek_error_log( "sek_add_css_rules_for_input_id => " . $input_id, $selector);
+    }
+    // for a module level, increase the default specifity to the .sek-module-inner container by default
+    // @fixes https://github.com/presscustomizr/nimble-builder/issues/85
+    else if ( 'module' === $parent_level['level'] ) {
+        $selector .= ' .sek-module-inner';
     }
 
 

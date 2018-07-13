@@ -15,8 +15,8 @@ function sek_get_module_params_for_sek_level_section_layout_module() {
                 'boxed-wide' => array(
                     'input_type'  => 'select',
                     'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
-                    'refresh-markup' => true,
-                    'refresh-stylesheet' => false,
+                    'refresh_markup' => true,
+                    'refresh_stylesheet' => false,
                     'default'     => 'fullwidth'
                 ),
 

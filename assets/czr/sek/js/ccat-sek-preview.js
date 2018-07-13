@@ -1394,38 +1394,27 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               // This is the same mechanism used by WP to handle the setting validity of the partial refresh
 
                               var sendSuccessDataToPanel = function( _ajaxResponse_ ) {
+                                    // always send back the {msgId}_done message, so the control panel can fire the "complete" callback.
+                                    // @see api.czr_sektions::reactToPreviewMsg
+                                    api.preview.send( [ msgId, 'done'].join('_'), params );
                                     if ( _.isUndefined( _ajaxResponse_ ) )
                                       return;
-                                    api.preview.send( [ msgId, 'done'].join('_'), params );
+
                                     if ( _ajaxResponse_.data && _ajaxResponse_.data.setting_validities ) {
                                           api.preview.send( 'selective-refresh-setting-validities', _ajaxResponse_.data.setting_validities );
                                     }
                               };
 
-                              if ( _.isFunction( callbackFn ) ) {
-                                    try {
-                                          $.when( callbackFn( params ) ).done( function( _ajaxResponse_ ) {
-                                                sendSuccessDataToPanel( _ajaxResponse_ );
-                                          }).fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
-                                          }).then( function() {
-                                                api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
-                                          });
-                                    } catch( _er_ ) {
-                                          self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
-                                    }
-                              } else {
-                                    try {
-                                          $.when( self[callbackFn].call( self, params ) ).done( function( _ajaxResponse_ ) {
-                                                sendSuccessDataToPanel( _ajaxResponse_ );
-                                          }).fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
-                                          }).then( function() {
-                                                api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
-                                          });
-                                    } catch( _er_ ) {
-                                          self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
-                                    }
+                              try {
+                                    $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) ).done( function( _ajaxResponse_ ) {
+                                          sendSuccessDataToPanel( _ajaxResponse_ );
+                                    }).fail( function() {
+                                          api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
+                                    }).then( function() {
+                                          api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
+                                    });
+                              } catch( _er_ ) {
+                                    self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
                               }
 
 
@@ -1542,7 +1531,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // 1) Add a new column
             // 2) re-render the column collection in a sektion
             ajaxRefreshColumns : function( params ) {
-                  //console.log('PARAMS in ajaxRefreshColumns', params );
                   var self = this;
                   // will be cleaned on 'sek-columns-refreshed'
                   self.mayBePrintLoader({
@@ -1574,18 +1562,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $( '.sektion-wrapper').find( '.sek-placeholder' ).after( html_content );
                         $( '.sektion-wrapper').find( '.sek-placeholder' ).remove();
 
-
                         // re-generate the stylesheet => this will take into account the reset width of each column
-                        self.doAjax( {
-                              action : 'sek_get_content',
-                              skope_id : params.skope_id,
-                              sek_action : 'sek-refresh-stylesheet'// sek-add-column
-                        }).done( function( _r_ ) {
-                              //console.log('sek-refresh-stylesheet done !',  html_content);
-                              self.appendDynStyleSheet( params.skope_id, html_content );
-                        }).fail( function( _r_ ) {
-                              console.log('sek-refresh-stylesheet fail !');
-                        });
+                        api.preview.trigger( 'sek-refresh-stylesheet', params );
 
                         // say it to the parent sektion
                         //=> will be listened to by the column to re-instantiate sortable, resizable
@@ -1600,7 +1578,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
             ajaxResizeColumns : function( params ) {
-                  //console.log('PREVIEW => REACT TO PANEL MSG => sek-resize-columns => ', params );
                   var self = this;
                   // will be cleaned on 'sek-module-refreshed'
                   self.mayBePrintLoader({
@@ -1700,7 +1677,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
       $.extend( SekPreviewPrototype, {
             ajaxRefreshStylesheet : function( params ) {
                   var self = this;
-                  //console.log('preview => panel react => ajax refresh dyn style', params );
                   // will be cleaned on 'sek-module-refreshed'
                   self.mayBePrintLoader({
                         loader_located_in_level_id : params.apiParams.id
@@ -1717,10 +1693,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         } else {
                               self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
                         }
-
-                        //console.log('sek-refresh-stylesheet done !',  html_content);
                         self.appendDynStyleSheet( params.skope_id, html_content );
-                        //=> 'sek-level-refreshed' is listened to clean the loader overalay in time
+                        //=> 'sek-level-refreshed' is listened to clean the loader overlay in time
                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
                               .trigger( 'sek-stylesheet-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                   }).fail( function( _r_ ) {
@@ -1733,8 +1707,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             appendDynStyleSheet : function( skope_id, styleMarkup ) {
                 var _stylesheet_id_ = '#sek-' + skope_id,//@see php Sek_Dyn_CSS_Handler
                     _gfonts_id_ = '#sek-gfonts-' + skope_id;//@see php Sek_Dyn_CSS_Handler
-
-                //console.log('IN APPEND DYN STYLESHEET', styleMarkup, _stylesheet_id_, $('head').find( _stylesheet_id_ ) );
 
                 // Remove a dynamic inline stylesheet if already printed
                 if ( 0 < $('head').find( _stylesheet_id_ ).length ) {

@@ -31,6 +31,11 @@ function sek_get_module_params_for_czr_icon_module() {
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_module',
         'name' => __('Icon', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'icon' =>  'far fa-star',
+            'font_size_css' => '40px',
+            'color_css' => '#707070'
+        ),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '.sek-module-inner' ),
@@ -65,16 +70,16 @@ function sek_get_module_params_for_czr_icon_module() {
                     'input_type'  => 'font_size',
                     'title'       => __('Size in pixels', 'text_domain_to_be_replaced'),
                     'default'     => '16px',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'font_size'
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'h_alignment',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'h_alignment'
                 ),
                 'color_css' => array(
@@ -82,8 +87,8 @@ function sek_get_module_params_for_czr_icon_module() {
                     'title'       => __('Color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
                     'default'    => '#5a5a5a',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'color'
                 ),
                 'color_hover_css' => array(
@@ -91,8 +96,8 @@ function sek_get_module_params_for_czr_icon_module() {
                     'title'       => __('Hover color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
                     'default'    => '#5a5a5a',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'color_hover'
                 ),
             )

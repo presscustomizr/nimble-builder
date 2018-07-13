@@ -15,25 +15,33 @@
 
                   var _getFontCollections = function() {
                         var dfd = $.Deferred();
-                        if ( ! _.isEmpty( input.sek_fontCollections ) ) {
-                              dfd.resolve( input.sek_fontCollections );
+                        if ( ! _.isEmpty( api.sek_fontCollections ) ) {
+                              dfd.resolve( api.sek_fontCollections );
                         } else {
-                              // This utility handles a cached version of the font_list once fetched the first time
-                              // @see api.CZR_Helpers.czr_cachedTmpl
-                              api.CZR_Helpers.getModuleTmpl( {
-                                    tmpl : 'font_list',
-                                    module_type: 'font_picker_input',
-                                    module_id : input.module.id
-                              } ).done( function( _serverTmpl_ ) {
+                              var _ajaxRequest_;
+                              if ( ! _.isUndefined( api.sek_fetchingFontCollection ) && 'pending' == api.sek_fetchingFontCollection.state() ) {
+                                    _ajaxRequest_ = api.sek_fetchingFontCollection;
+                              } else {
+                                    // This utility handles a cached version of the font_list once fetched the first time
+                                    // @see api.CZR_Helpers.czr_cachedTmpl
+                                    _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
+                                          tmpl : 'font_list',
+                                          module_type: 'font_picker_input',
+                                          module_id : input.module.id
+                                    } );
+                                    api.sek_fetchingFontCollection = _ajaxRequest_;
+                              }
+                              _ajaxRequest_.done( function( _serverTmpl_ ) {
                                     // Ensure we have a string that's JSON.parse-able
                                     if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '{' ) {
                                           throw new Error( 'font_picker => server list is not JSON.parse-able');
                                     }
-                                    input.sek_fontCollections = JSON.parse( _serverTmpl_ );
-                                    dfd.resolve( input.sek_fontCollections );
+                                    api.sek_fontCollections = JSON.parse( _serverTmpl_ );
+                                    dfd.resolve( api.sek_fontCollections );
                               }).fail( function( _r_ ) {
                                     dfd.reject( _r_ );
                               });
+
                         }
                         return dfd.promise();
                   };
@@ -203,31 +211,12 @@
                         return _.isString( split[0] ) ? split[0].replace(/[+|:]/g, ' ') : '';//replaces special characters ( + ) by space
                   };
 
-
-
-                  // defer the loading of the fonts when the font tab gets switched to
-                  // then fetch the google fonts from the server
-                  // and instantiate the select input when done
-                  // @see this.trigger( 'tab-switch', { id : tabIdSwitchedTo } ); in Item::initialize()
-                  item.bind( 'tab-switch', function( params ) {
-                        // try { var isGFontTab = 'sek-google-font-tab' = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
-                        //       api.errare( 'spacing input => error when binding the tab switch event', er );
-                        // }
-                        //console.log( 'ALORS ????', item.container.find('[data-tab-id="' + params.id + '"]').data('sek-google-font-tab'), input.module );
-                        // $.when( _getFontCollections() ).done( function( fontCollections ) {
-                        //       console.log('FONT COLLECTION ?', fontCollections );
-                        // }).fail( function( _r_ ) {
-                        //       api.errare( 'font_picker => fail response =>', _r_ );
-                        // });
-                        $.when( _getFontCollections() ).done( function( fontCollections ) {
-                              //console.log('FONT COLLECTION ?', fontCollections );
-                              _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
-                                    _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
-                              });
-                        }).fail( function( _r_ ) {
-                              api.errare( 'font_picker => fail response =>', _r_ );
+                  $.when( _getFontCollections() ).done( function( fontCollections ) {
+                        _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
+                              _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
                         });
-
+                  }).fail( function( _r_ ) {
+                        api.errare( 'font_picker => fail response =>', _r_ );
                   });
             }//font_picker()
       });//$.extend( api.czrInputMap, {})

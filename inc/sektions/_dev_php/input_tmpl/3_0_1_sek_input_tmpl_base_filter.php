@@ -36,10 +36,8 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___fa_icon_picker( $input_id, $input_data );
         break;
         case 'font_size' :
-            sek_set_input_tmpl___font_size( $input_id, $input_data );
-        break;
         case 'line_height' :
-            sek_set_input_tmpl___line_height( $input_id, $input_data );
+            sek_set_input_tmpl___font_size_line_height( $input_id, $input_data );
         break;
         case 'code_editor' :
             sek_set_input_tmpl___code_editor( $input_id, $input_data );

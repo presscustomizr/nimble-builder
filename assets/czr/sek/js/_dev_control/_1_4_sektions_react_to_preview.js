@@ -506,7 +506,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 );
                                           } else {
                                                 // if nothing was sent to the preview, trigger the '*_done' action so we can execute the 'complete' callback
-                                                api.previewer.trigger( [msgId, 'done'].join('_'), { apiParams : apiParams, uiParams : uiParams } );
+                                                api.previewer.trigger( [ msgId, 'done' ].join('_'), { apiParams : apiParams, uiParams : uiParams } );
                                           }
                                           // say it
                                           self.trigger( [ msgId, 'done' ].join('_'), params );
@@ -535,7 +535,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Schedule actions when callback done msg is sent by the preview
                   _.each( msgCollection, function( callbackFn, msgId ) {
-                        api.previewer.bind( [msgId, 'done'].join('_'), function( params ) {
+                        api.previewer.bind( [ msgId, 'done' ].join('_'), function( params ) {
                               if ( _.isFunction( callbackFn.complete ) ) {
                                     try { callbackFn.complete( params ); } catch( _er_ ) {
                                           api.errare( 'reactToPreviewMsg done => error when receiving ' + [msgId, 'done'].join('_') , _er_ );
@@ -544,6 +544,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });
             },//reactToPreview();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             // Fired in initialized on api(ready)
             schedulePrintSectionJson : function() {
@@ -585,6 +599,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var sectionModel = $.extend( true, {}, self.getLevelModel( params.id ) );
                         popupCenter( JSON.stringify( cleanIds( sectionModel ) ) );
                   });
-            }
+            }//schedulePrintSectionJson
       });//$.extend()
 })( wp.customize, jQuery );

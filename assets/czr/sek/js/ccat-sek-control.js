@@ -1069,7 +1069,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 );
                                           } else {
                                                 // if nothing was sent to the preview, trigger the '*_done' action so we can execute the 'complete' callback
-                                                api.previewer.trigger( [msgId, 'done'].join('_'), { apiParams : apiParams, uiParams : uiParams } );
+                                                api.previewer.trigger( [ msgId, 'done' ].join('_'), { apiParams : apiParams, uiParams : uiParams } );
                                           }
                                           // say it
                                           self.trigger( [ msgId, 'done' ].join('_'), params );
@@ -1098,7 +1098,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Schedule actions when callback done msg is sent by the preview
                   _.each( msgCollection, function( callbackFn, msgId ) {
-                        api.previewer.bind( [msgId, 'done'].join('_'), function( params ) {
+                        api.previewer.bind( [ msgId, 'done' ].join('_'), function( params ) {
                               if ( _.isFunction( callbackFn.complete ) ) {
                                     try { callbackFn.complete( params ); } catch( _er_ ) {
                                           api.errare( 'reactToPreviewMsg done => error when receiving ' + [msgId, 'done'].join('_') , _er_ );
@@ -1107,6 +1107,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });
             },//reactToPreview();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             // Fired in initialized on api(ready)
             schedulePrintSectionJson : function() {
@@ -1148,7 +1162,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var sectionModel = $.extend( true, {}, self.getLevelModel( params.id ) );
                         popupCenter( JSON.stringify( cleanIds( sectionModel ) ) );
                   });
-            }
+            }//schedulePrintSectionJson
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
@@ -1793,7 +1807,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   }
 
-                  // What to do in the preview ?
+                  // WHAT TO REFRESH IN THE PREVIEW ? Markup, stylesheet, font ?
                   // The action to trigger is determined by the changed input
                   // For the options of a level, the default action is to refresh the stylesheet.
                   // But we might need to refresh the markup in some cases. Like for example when a css class is added. @see the boxed-wide layout example
@@ -1807,17 +1821,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       refresh_fonts = 'refresh_fonts' === params.defaultPreviewAction;
 
                   // Maybe set the input based value
-                  // Note : the inputRegistrationParams are passed in the args only when an module input is changed
-                  // Example : For a crud module, when an item is added, there are no inputRegistrationParams, so we fallback on the default 'refresh_markup'
-                  if ( ! _.isEmpty( params.settingParams.args.inputRegistrationParams ) ) {
-                        if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_stylesheet ) ) {
-                              refresh_stylesheet = Boolean( params.settingParams.args.inputRegistrationParams.refresh_stylesheet );
+                  var input_id = params.settingParams.args.input_changed;
+                  var inputRegistrationParams;
+                  if ( ! _.isUndefined( input_id ) ) {
+                        inputRegistrationParams = self.getInputRegistrationParams( input_id, parentModuleType );
+                        if ( ! _.isUndefined( inputRegistrationParams.refresh_stylesheet ) ) {
+                              refresh_stylesheet = Boolean( inputRegistrationParams.refresh_stylesheet );
                         }
-                        if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_markup ) ) {
-                              refresh_markup = Boolean( params.settingParams.args.inputRegistrationParams.refresh_markup );
+                        if ( ! _.isUndefined( inputRegistrationParams.refresh_markup ) ) {
+                              refresh_markup = Boolean( inputRegistrationParams.refresh_markup );
                         }
-                        if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_fonts ) ) {
-                              refresh_fonts = Boolean( params.settingParams.args.inputRegistrationParams.refresh_fonts );
+                        if ( ! _.isUndefined( inputRegistrationParams.refresh_fonts ) ) {
+                              refresh_fonts = Boolean( inputRegistrationParams.refresh_fonts );
                         }
                   }
 
@@ -1860,25 +1875,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//self.updateAPISetting()
                   };//_doUpdateWithRequestedAction
 
-                  // if the changed input is a google font modifier ( <=> font_family_css input)
-                  // => we want to first refresh the google font collection, and then proceed to the requested action
+                  // if the changed input is a google font modifier ( <=> true === refresh_fonts )
+                  // => we want to first refresh the google font collection, and then proceed the requested action
                   // this way we make sure that the customized value used when ajaxing will take into account when writing the google font http request link
                   if ( true === refresh_fonts ) {
-                        var _getChangedFontFamily = function() {
-                              if ( 'font_family_css' != params.settingParams.args.input_changed ) {
-                                    api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts => the input id is not font_family_css', params );
-                                    return;
-                              } else {
-                                    return params.settingParams.args.input_value;
-                              }
-                        };
-                        var newFontFamily = '';
-                        try { newFontFamily = _getChangedFontFamily(); } catch( er) {
-                              api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts', er );
-                              return;
-                        }
+                        var newFontFamily = params.settingParams.args.input_value;
                         if ( ! _.isString( newFontFamily ) ) {
-                              api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', er );
+                              api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', newFontFamily );
                               return;
                         }
                         // add it only if gfont
@@ -3134,9 +3137,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // Walk the main sektion setting and populate an array of google fonts
             // This method is used when processing the 'sek-update-fonts' action to update the .fonts property
-            // To be a candidate for sniffing, a google font should meet 2 criteria :
-            // 1) be the value of a 'font_family_css' property
-            // 2) start with [gfont]
+            // To be a candidate for sniffing, an input font value  should meet those criteria :
+            // 1) be the value of a '{...}_css' input id
+            // 2) this input must be a font modifier ( @see 'refresh_fonts' params set on parent module registration )
+            // 2) the font should start with [gfont]
             // @return array
             sniffGFonts : function( gfonts, level ) {
                   var self = this;
@@ -3147,9 +3151,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
                   }
                   _.each( level, function( levelData, _key_ ) {
-                        if ( 'font_family_css' == _key_ ) {
-                              if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
-                                    gfonts.push( levelData );
+                        // example of input_id candidate 'font_family_css'
+                        if ( _.isString( _key_ ) && '_css' === _key_.substr( _key_.length - 4 ) ) {
+                              if ( true === self.inputIsAFontFamilyModifier( _key_ ) ) {
+                                    if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
+                                          gfonts.push( levelData );
+                                    }
                               }
                         }
 
@@ -3161,6 +3168,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            // <RECURSIVE UTILITIES USING THE sektionsLocalizedData.registeredModules>
+            //-------------------------------------------------------------------------------------------------
             // @return a mixed type default value
             // @param input_id string
             // @param module_type string
@@ -3202,6 +3226,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return _defaultVal_;
             },
 
+
+
             // @return input_type string
             // @param input_id string
             // @param module_type string
@@ -3217,7 +3243,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
-                        api.errare( 'getInputDefaultValue => missing sektionsLocalizedData.registeredModules' );
+                        api.errare( 'getInputType => missing sektionsLocalizedData.registeredModules' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
@@ -3242,6 +3268,103 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   return _inputType_;
             },
+
+
+            // @return object of registration params
+            // @param input_id string
+            // @param module_type string
+            // @param level array || object
+            getInputRegistrationParams : function( input_id, module_type, level ) {
+                  var self = this;
+
+                  // Do we have a cached default value ?
+                  self.cachedInputRegistrationParams = self.cachedInputRegistrationParams || {};
+                  self.cachedInputRegistrationParams[ module_type ] = self.cachedInputRegistrationParams[ module_type ] || {};
+                  if ( _.has( self.cachedInputRegistrationParams[ module_type ], input_id ) ) {
+                        return self.cachedInputRegistrationParams[ module_type ][ input_id ];
+                  }
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
+                        api.errare( 'getInputRegistrationParams => missing sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( _.isUndefined( level ) ) {
+                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                  }
+                  var _params_ = {};
+                  _.each( level, function( levelData, _key_ ) {
+                        // we found a match skip next levels
+                        if ( ! _.isEmpty( _params_ ) )
+                          return;
+                        if ( input_id === _key_ && ! _.isUndefined( levelData.input_type ) ) {
+                              _params_ = levelData;
+                        }
+                        // if we have still no match, and the data are sniffable, let's go ahead recursively
+                        if ( _.isEmpty( _params_ ) && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
+                              _params_ = self.getInputRegistrationParams( input_id, module_type, levelData );
+                        }
+                        if ( ! _.isEmpty( _params_ ) ) {
+                              // cache it
+                              self.cachedInputRegistrationParams[ module_type ][ input_id ] = _params_;
+                        }
+                  });
+                  return _params_;
+            },
+
+
+            // @return bool
+            // @param input_id string
+            // @param module_type string
+            // @param level array || object
+            inputIsAFontFamilyModifier : function( input_id, level ) {
+                  var self = this;
+
+                  // Do we have a cached default value ?
+                  self.cachedFontFamilyModifier = self.cachedFontFamilyModifier || {};
+                  if ( _.has( self.cachedFontFamilyModifier, input_id ) ) {
+                        return self.cachedFontFamilyModifier[ input_id ];
+                  }
+                  //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
+                        api.errare( 'getInputType => missing sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( _.isUndefined( level ) ) {
+                        level = sektionsLocalizedData.registeredModules;
+                  }
+                  var _bool_ = 'not_set';
+                  _.each( level, function( levelData, _key_ ) {
+                        // we found a match skip next levels
+                        if ( 'not_set' !== _bool_ )
+                          return;
+                        if ( input_id === _key_ && ! _.isUndefined( levelData.input_type ) ) {
+                              _bool_ = _.isUndefined( levelData.refresh_fonts ) ? false : levelData.refresh_fonts;
+                        }
+                        // if we have still no match, and the data are sniffable, let's go ahead recursively
+                        if ( 'not_set' === _bool_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
+                              _bool_ = self.inputIsAFontFamilyModifier( input_id, levelData );
+                        }
+                        if ( 'not_set' !== _bool_ ) {
+                              // cache it
+                              self.cachedFontFamilyModifier[ input_id ] = _bool_;
+                        }
+                  });
+                  return _bool_;
+            },
+            //-------------------------------------------------------------------------------------------------
+            // </RECURSIVE UTILITIES USING THE sektionsLocalizedData.registeredModules>
+            //-------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4317,10 +4440,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( api.czrInputMap, {
             font_size : function( obj ) {
                   var input      = this,
-                      $wrapper = $('.sek-font-size-wrapper', input.container ),
+                      $wrapper = $('.sek-font-size-line-height-wrapper', input.container ),
                       unit = 'px';
 
-                  $wrapper.find( 'input[type="number"]').on('change', function() {
+                  $wrapper.find( 'input[type="number"]').on('input change', function( evt ) {
                         input( $(this).val() + unit );
                   }).stepper();
 
@@ -4341,10 +4464,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( api.czrInputMap, {
             line_height : function( obj ) {
                   var input      = this,
-                      $wrapper = $('.sek-line-height-wrapper', input.container ),
+                      $wrapper = $('.sek-font-size-line-height-wrapper', input.container ),
                       unit = 'px';
 
-                  $wrapper.find( 'input[type="number"]').on('change', function() {
+                  $wrapper.find( 'input[type="number"]').on('input change', function() {
                         input( $(this).val() + unit );
                   }).stepper();
             }
@@ -4368,25 +4491,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   var _getFontCollections = function() {
                         var dfd = $.Deferred();
-                        if ( ! _.isEmpty( input.sek_fontCollections ) ) {
-                              dfd.resolve( input.sek_fontCollections );
+                        if ( ! _.isEmpty( api.sek_fontCollections ) ) {
+                              dfd.resolve( api.sek_fontCollections );
                         } else {
-                              // This utility handles a cached version of the font_list once fetched the first time
-                              // @see api.CZR_Helpers.czr_cachedTmpl
-                              api.CZR_Helpers.getModuleTmpl( {
-                                    tmpl : 'font_list',
-                                    module_type: 'font_picker_input',
-                                    module_id : input.module.id
-                              } ).done( function( _serverTmpl_ ) {
+                              var _ajaxRequest_;
+                              if ( ! _.isUndefined( api.sek_fetchingFontCollection ) && 'pending' == api.sek_fetchingFontCollection.state() ) {
+                                    _ajaxRequest_ = api.sek_fetchingFontCollection;
+                              } else {
+                                    // This utility handles a cached version of the font_list once fetched the first time
+                                    // @see api.CZR_Helpers.czr_cachedTmpl
+                                    _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
+                                          tmpl : 'font_list',
+                                          module_type: 'font_picker_input',
+                                          module_id : input.module.id
+                                    } );
+                                    api.sek_fetchingFontCollection = _ajaxRequest_;
+                              }
+                              _ajaxRequest_.done( function( _serverTmpl_ ) {
                                     // Ensure we have a string that's JSON.parse-able
                                     if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '{' ) {
                                           throw new Error( 'font_picker => server list is not JSON.parse-able');
                                     }
-                                    input.sek_fontCollections = JSON.parse( _serverTmpl_ );
-                                    dfd.resolve( input.sek_fontCollections );
+                                    api.sek_fontCollections = JSON.parse( _serverTmpl_ );
+                                    dfd.resolve( api.sek_fontCollections );
                               }).fail( function( _r_ ) {
                                     dfd.reject( _r_ );
                               });
+
                         }
                         return dfd.promise();
                   };
@@ -4556,31 +4687,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return _.isString( split[0] ) ? split[0].replace(/[+|:]/g, ' ') : '';//replaces special characters ( + ) by space
                   };
 
-
-
-                  // defer the loading of the fonts when the font tab gets switched to
-                  // then fetch the google fonts from the server
-                  // and instantiate the select input when done
-                  // @see this.trigger( 'tab-switch', { id : tabIdSwitchedTo } ); in Item::initialize()
-                  item.bind( 'tab-switch', function( params ) {
-                        // try { var isGFontTab = 'sek-google-font-tab' = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
-                        //       api.errare( 'spacing input => error when binding the tab switch event', er );
-                        // }
-                        //console.log( 'ALORS ????', item.container.find('[data-tab-id="' + params.id + '"]').data('sek-google-font-tab'), input.module );
-                        // $.when( _getFontCollections() ).done( function( fontCollections ) {
-                        //       console.log('FONT COLLECTION ?', fontCollections );
-                        // }).fail( function( _r_ ) {
-                        //       api.errare( 'font_picker => fail response =>', _r_ );
-                        // });
-                        $.when( _getFontCollections() ).done( function( fontCollections ) {
-                              //console.log('FONT COLLECTION ?', fontCollections );
-                              _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
-                                    _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
-                              });
-                        }).fail( function( _r_ ) {
-                              api.errare( 'font_picker => fail response =>', _r_ );
+                  $.when( _getFontCollections() ).done( function( fontCollections ) {
+                        _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
+                              _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
                         });
-
+                  }).fail( function( _r_ ) {
+                        api.errare( 'font_picker => fail response =>', _r_ );
                   });
             }//font_picker()
       });//$.extend( api.czrInputMap, {})
@@ -5589,6 +5701,119 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_simple_html_module : {
+                  //mthds : SimpleHtmlModuleConstructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_html_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_html_module' )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      var FeaturedPagesConstruct = {
+            initialize: function( id, options ) {
+                  //console.log('INITIALIZING FP MODULE', id, options );
+                  var module = this;
+
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                  module.inputConstructor = api.CZRInput.extend( module.CZRFPInputsMths || {} );
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
+
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+                  //SET THE CONTENT PICKER DEFAULT OPTIONS
+                  //@see ::setupContentPicker()
+                  // module.bind( 'set_default_content_picker_options', function( params ) {
+                  //       params.defaultContentPickerOption.defaultOption = {
+                  //             'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                  //             'type'       : '',
+                  //             'type_label' : '',
+                  //             'object'     : '',
+                  //             'id'         : '_custom_',
+                  //             'url'        : ''
+                  //       };
+                  //       return params;
+                  // });
+            },//initialize
+
+            CZRFPInputsMths : {
+                    // initialize : function( name, options ) {
+                    //       var input = this;
+                    //       api.CZRInput.prototype.initialize.call( input, name, options );
+                    // },
+
+                    setupSelect : function() {
+                            var input  = this,
+                                  item   = input.input_parent,
+                                  module = input.module,
+                                  _options_ = {};
+
+                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
+                                  api.errare( 'Missing select options for input id => ' + input.id + ' in featured pages module');
+                                  return;
+                            } else {
+                                  //generates the options
+                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
+                                        var _attributes = {
+                                                  value : value,
+                                                  html: title
+                                            };
+                                        if ( value == input() ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        } else if ( 'px' === value ) {
+                                              $.extend( _attributes, { selected : "selected" } );
+                                        }
+                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                  });
+                                  $( 'select[data-czrtype]', input.container ).selecter();
+                            }
+                    }
+            },//CZRFPInputsMths
+
+            // CZRSocialsItem : { },//CZRSocialsItem
+      };//FeaturedPagesConstruct
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_featured_pages_module : {
+                  mthds : FeaturedPagesConstruct,
+                  crud : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'is_crud' ),
+                  hasPreItem : false,//a crud module has a pre item by default
+                  refresh_on_add_item : false,// the preview is refreshed on item add
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_featured_pages_module' )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
       //ICON MODULE
       var IconModuleConstructor = {
               initialize: function( id, options ) {
@@ -5914,73 +6139,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var FeaturedPagesConstruct = {
-            initialize: function( id, options ) {
-                  //console.log('INITIALIZING FP MODULE', id, options );
-                  var module = this;
-
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRFPInputsMths || {} );
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-                  //SET THE CONTENT PICKER DEFAULT OPTIONS
-                  //@see ::setupContentPicker()
-                  // module.bind( 'set_default_content_picker_options', function( params ) {
-                  //       params.defaultContentPickerOption.defaultOption = {
-                  //             'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
-                  //             'type'       : '',
-                  //             'type_label' : '',
-                  //             'object'     : '',
-                  //             'id'         : '_custom_',
-                  //             'url'        : ''
-                  //       };
-                  //       return params;
-                  // });
-            },//initialize
-
-            CZRFPInputsMths : {
-                    // initialize : function( name, options ) {
-                    //       var input = this;
-                    //       api.CZRInput.prototype.initialize.call( input, name, options );
-                    // },
-
-                    setupSelect : function() {
-                            var input  = this,
-                                  item   = input.input_parent,
-                                  module = input.module,
-                                  _options_ = {};
-
-                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in featured pages module');
-                                  return;
-                            } else {
-                                  //generates the options
-                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
-                                        var _attributes = {
-                                                  value : value,
-                                                  html: title
-                                            };
-                                        if ( value == input() ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        } else if ( 'px' === value ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        }
-                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                  });
-                                  $( 'select[data-czrtype]', input.container ).selecter();
-                            }
-                    }
-            },//CZRFPInputsMths
-
-            // CZRSocialsItem : { },//CZRSocialsItem
-      };//FeaturedPagesConstruct
-
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -5991,37 +6149,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            czr_featured_pages_module : {
-                  mthds : FeaturedPagesConstruct,
-                  crud : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'is_crud' ),
-                  hasPreItem : false,//a crud module has a pre item by default
-                  refresh_on_add_item : false,// the preview is refreshed on item add
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'name' ),
-                  has_mod_opt : false,
-                  ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_featured_pages_module' )
-            },
-      });
-})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
-( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
-      api.czrModuleMap = api.czrModuleMap || {};
-      $.extend( api.czrModuleMap, {
-            czr_simple_html_module : {
-                  //mthds : SimpleHtmlModuleConstructor,
+            czr_map_module : {
+                  //mthds : ModuleConstructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_html_module', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_map_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_html_module' )
-            },
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_map_module' )
+            }
       });
 })( wp.customize , jQuery, _ );

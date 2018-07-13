@@ -29,8 +29,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'input_type'  => 'h_text_alignment',
                                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                                 'default'     => is_rtl() ? 'right' : 'left',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'css_identifier' => 'h_alignment'
                             )
                         )
@@ -43,57 +43,57 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'input_type'  => 'font_picker',
                                 'title'       => __('Font family', 'text_domain_to_be_replaced'),
                                 'default'     => '',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
-                                'refresh-fonts' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
                                 'css_identifier' => 'font_family'
                             ),
                             'font_size_css'       => array(
                                 'input_type'  => 'font_size',
                                 'title'       => __('Font size in pixels', 'text_domain_to_be_replaced'),
                                 'default'     => '16px',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size'
                             ),//16,//"14px",
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __('Line height in pixels', 'text_domain_to_be_replaced'),
                                 'default'     => '24px',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height'
                             ),//24,//"20px",
                             'font_weight_css'     => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Font weight', 'text_domain_to_be_replaced'),
                                 'default'     => 400,
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_weight'
                             ),//null,
                             'font_style_css'      => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Font style', 'text_domain_to_be_replaced'),
                                 'default'     => 'inherit',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_style'
                             ),//null,
                             'text_decoration_css' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Text decoration', 'text_domain_to_be_replaced'),
                                 'default'     => 'none',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'css_identifier' => 'text_decoration'
                             ),//null,
                             'text_transform_css'  => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Text transform', 'text_domain_to_be_replaced'),
                                 'default'     => 'none',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'css_identifier' => 'text_transform'
                             ),//null,
 
@@ -103,16 +103,16 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'css_identifier' => 'letter_spacing'
                             ),//0,
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Text color', 'text_domain_to_be_replaced'),
                                 'default'     => '',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'width-100'   => true,
                                 'css_identifier' => 'color'
                             ),//"#000000",
@@ -120,8 +120,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced'),
                                 'default'     => '',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'width-100'   => true,
                                 'title_width' => 'width-100',
                                 'css_identifier' => 'color_hover'
@@ -131,8 +131,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Make those style options win if other rules are applied.', 'text_domain_to_be_replaced'),
                                 'default'     => 0,
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 // declare the list of input_id that will be flagged with !important when the option is checked
                                 // @see sek_add_css_rules_for_css_sniffed_input_id
                                 // @see Nsek_is_flagged_important

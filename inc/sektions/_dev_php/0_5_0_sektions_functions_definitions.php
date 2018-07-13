@@ -206,8 +206,8 @@ function sek_get_default_module_model( $module_type = '' ) {
                 //                 'input_type'  => 'h_text_alignment',
                 //                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                 //                 'default'     => is_rtl() ? 'right' : 'left',
-                //                 'refresh-markup' => false,
-                //                 'refresh-stylesheet' => true
+                //                 'refresh_markup' => false,
+                //                 'refresh_stylesheet' => true
                 //             )
                 //         )
 //         )
@@ -309,8 +309,8 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
                 //                 'input_type'  => 'h_text_alignment',
                 //                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                 //                 'default'     => is_rtl() ? 'right' : 'left',
-                //                 'refresh-markup' => false,
-                //                 'refresh-stylesheet' => true
+                //                 'refresh_markup' => false,
+                //                 'refresh_stylesheet' => true
                 //             )
                 //         )
 //         )

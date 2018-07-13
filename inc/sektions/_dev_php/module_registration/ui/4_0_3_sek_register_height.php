@@ -30,8 +30,8 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'input_type'  => 'v_alignment',
                     'title'       => __('Inner vertical alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'css_identifier' => 'v_alignment'
                 )
             )

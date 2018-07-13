@@ -194,9 +194,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // Walk the main sektion setting and populate an array of google fonts
             // This method is used when processing the 'sek-update-fonts' action to update the .fonts property
-            // To be a candidate for sniffing, a google font should meet 2 criteria :
-            // 1) be the value of a 'font_family_css' property
-            // 2) start with [gfont]
+            // To be a candidate for sniffing, an input font value  should meet those criteria :
+            // 1) be the value of a '{...}_css' input id
+            // 2) this input must be a font modifier ( @see 'refresh_fonts' params set on parent module registration )
+            // 2) the font should start with [gfont]
             // @return array
             sniffGFonts : function( gfonts, level ) {
                   var self = this;
@@ -207,9 +208,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
                   }
                   _.each( level, function( levelData, _key_ ) {
-                        if ( 'font_family_css' == _key_ ) {
-                              if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
-                                    gfonts.push( levelData );
+                        // example of input_id candidate 'font_family_css'
+                        if ( _.isString( _key_ ) && '_css' === _key_.substr( _key_.length - 4 ) ) {
+                              if ( true === self.inputIsAFontFamilyModifier( _key_ ) ) {
+                                    if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
+                                          gfonts.push( levelData );
+                                    }
                               }
                         }
 
@@ -221,6 +225,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            // <RECURSIVE UTILITIES USING THE sektionsLocalizedData.registeredModules>
+            //-------------------------------------------------------------------------------------------------
             // @return a mixed type default value
             // @param input_id string
             // @param module_type string
@@ -262,6 +283,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return _defaultVal_;
             },
 
+
+
             // @return input_type string
             // @param input_id string
             // @param module_type string
@@ -277,7 +300,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
-                        api.errare( 'getInputDefaultValue => missing sektionsLocalizedData.registeredModules' );
+                        api.errare( 'getInputType => missing sektionsLocalizedData.registeredModules' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
@@ -302,6 +325,103 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   return _inputType_;
             },
+
+
+            // @return object of registration params
+            // @param input_id string
+            // @param module_type string
+            // @param level array || object
+            getInputRegistrationParams : function( input_id, module_type, level ) {
+                  var self = this;
+
+                  // Do we have a cached default value ?
+                  self.cachedInputRegistrationParams = self.cachedInputRegistrationParams || {};
+                  self.cachedInputRegistrationParams[ module_type ] = self.cachedInputRegistrationParams[ module_type ] || {};
+                  if ( _.has( self.cachedInputRegistrationParams[ module_type ], input_id ) ) {
+                        return self.cachedInputRegistrationParams[ module_type ][ input_id ];
+                  }
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
+                        api.errare( 'getInputRegistrationParams => missing sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( _.isUndefined( level ) ) {
+                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                  }
+                  var _params_ = {};
+                  _.each( level, function( levelData, _key_ ) {
+                        // we found a match skip next levels
+                        if ( ! _.isEmpty( _params_ ) )
+                          return;
+                        if ( input_id === _key_ && ! _.isUndefined( levelData.input_type ) ) {
+                              _params_ = levelData;
+                        }
+                        // if we have still no match, and the data are sniffable, let's go ahead recursively
+                        if ( _.isEmpty( _params_ ) && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
+                              _params_ = self.getInputRegistrationParams( input_id, module_type, levelData );
+                        }
+                        if ( ! _.isEmpty( _params_ ) ) {
+                              // cache it
+                              self.cachedInputRegistrationParams[ module_type ][ input_id ] = _params_;
+                        }
+                  });
+                  return _params_;
+            },
+
+
+            // @return bool
+            // @param input_id string
+            // @param module_type string
+            // @param level array || object
+            inputIsAFontFamilyModifier : function( input_id, level ) {
+                  var self = this;
+
+                  // Do we have a cached default value ?
+                  self.cachedFontFamilyModifier = self.cachedFontFamilyModifier || {};
+                  if ( _.has( self.cachedFontFamilyModifier, input_id ) ) {
+                        return self.cachedFontFamilyModifier[ input_id ];
+                  }
+                  //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
+                        api.errare( 'getInputType => missing sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( _.isUndefined( level ) ) {
+                        level = sektionsLocalizedData.registeredModules;
+                  }
+                  var _bool_ = 'not_set';
+                  _.each( level, function( levelData, _key_ ) {
+                        // we found a match skip next levels
+                        if ( 'not_set' !== _bool_ )
+                          return;
+                        if ( input_id === _key_ && ! _.isUndefined( levelData.input_type ) ) {
+                              _bool_ = _.isUndefined( levelData.refresh_fonts ) ? false : levelData.refresh_fonts;
+                        }
+                        // if we have still no match, and the data are sniffable, let's go ahead recursively
+                        if ( 'not_set' === _bool_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
+                              _bool_ = self.inputIsAFontFamilyModifier( input_id, levelData );
+                        }
+                        if ( 'not_set' !== _bool_ ) {
+                              // cache it
+                              self.cachedFontFamilyModifier[ input_id ] = _bool_;
+                        }
+                  });
+                  return _bool_;
+            },
+            //-------------------------------------------------------------------------------------------------
+            // </RECURSIVE UTILITIES USING THE sektionsLocalizedData.registeredModules>
+            //-------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -55,13 +55,19 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-type' => 'module',
                   'content-id' => 'czr_simple_html_module',
                   'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_html_icon.svg'
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_map_module',
+                  'title' => __( 'Map', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_map_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_quote_module',
                   'title' => __( 'Quote', 'text_domain_to_be_replaced' ),
                 ),
-
             );
             $i = 0;
             foreach( $content_collection as $_params) {

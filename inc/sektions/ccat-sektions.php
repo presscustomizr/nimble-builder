@@ -206,8 +206,8 @@ function sek_get_default_module_model( $module_type = '' ) {
                 //                 'input_type'  => 'h_text_alignment',
                 //                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                 //                 'default'     => is_rtl() ? 'right' : 'left',
-                //                 'refresh-markup' => false,
-                //                 'refresh-stylesheet' => true
+                //                 'refresh_markup' => false,
+                //                 'refresh_stylesheet' => true
                 //             )
                 //         )
 //         )
@@ -246,7 +246,7 @@ function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
 // used :
 // - when filtering 'sek_add_css_rules_for_input_id' @see Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // @return array()
-function sek_get_module_input_list( $module_type = '' ) {
+function sek_get_registered_module_input_list( $module_type = '' ) {
     $input_list = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
       return $input_list;
@@ -309,8 +309,8 @@ function sek_get_module_input_list( $module_type = '' ) {
                 //                 'input_type'  => 'h_text_alignment',
                 //                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                 //                 'default'     => is_rtl() ? 'right' : 'left',
-                //                 'refresh-markup' => false,
-                //                 'refresh-stylesheet' => true
+                //                 'refresh_markup' => false,
+                //                 'refresh_stylesheet' => true
                 //             )
                 //         )
 //         )
@@ -324,7 +324,12 @@ function _sek_build_input_list( $module_tmpl_data, $input_list = null ) {
         if ( 'pre-item' === $key )
           continue;
         if ( is_array( $data ) && array_key_exists( 'input_type', $data ) ) {
-            $input_list[ $key ] = $data;
+            // each input_id of a module should be unique
+            if ( array_key_exists( $key, $input_list ) ) {
+                sek_error_log( __FUNCTION__ . ' => error => duplicated input_id found => ' . $key );
+            } else {
+                $input_list[ $key ] = $data;
+            }
         } else if ( is_array( $data ) ) {
             $input_list = _sek_build_input_list( $data, $input_list );
         }
@@ -1422,10 +1427,8 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___fa_icon_picker( $input_id, $input_data );
         break;
         case 'font_size' :
-            sek_set_input_tmpl___font_size( $input_id, $input_data );
-        break;
         case 'line_height' :
-            sek_set_input_tmpl___line_height( $input_id, $input_data );
+            sek_set_input_tmpl___font_size_line_height( $input_id, $input_data );
         break;
         case 'code_editor' :
             sek_set_input_tmpl___code_editor( $input_id, $input_data );
@@ -1490,7 +1493,11 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-id' => 'czr_simple_html_module',
                   'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
                 ),
-
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_map_module',
+                  'title' => __( 'Map', 'text_domain_to_be_replaced' ),
+                ),
 
             );
             $i = 0;
@@ -1983,33 +1990,26 @@ function sek_get_gfonts( $what = null ) {
  *  HORIZONTAL ALIGNMENT INPUT FOR TEXT => includes the 'justify' icon
 /* ------------------------------------------------------------------------- */
 // @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___font_size( $input_id, $input_data ) {
+function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
     ?>
-        <div class="sek-font-size-wrapper">
+        <div class="sek-font-size-line-height-wrapper">
           <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
           <?php
-              printf( '<input type="number" %1$s %2$s %3$s value="16" />',
+            // we save the int value + unit
+            // we want to keep only the numbers when printing the tmpl
+          ?>
+          <#
+            var value = data['<?php echo $input_id; ?>'];
+            value = _.isString( value ) ? value.replace(/\D+/g, '') : '';
+          #>
+          <?php
+              printf( '<input type="number" %1$s %2$s %3$s value="{{ value }}" />',
                   ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
                   ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : '',
                   ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
                 );
           ?>
         </div><?php // sek-font-size-wrapper ?>
-    <?php
-}
-
-function sek_set_input_tmpl___line_height( $input_id, $input_data ) {
-    ?>
-        <div class="sek-line-height-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-          <?php
-              printf( '<input type="number" %1$s %2$s %3$s value="24" />',
-                  ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
-                  ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : '',
-                  ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
-                );
-          ?>
-        </div><?php // sek-line-height-wrapper ?>
     <?php
 }
 ?><?php
@@ -2047,7 +2047,8 @@ function sek_register_modules() {
         'czr_heading_module',
         'czr_spacer_module',
         'czr_divider_module',
-        'czr_icon_module'
+        'czr_icon_module',
+        'czr_map_module'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
@@ -2494,8 +2495,8 @@ function sek_get_module_params_for_sek_level_section_layout_module() {
                 'boxed-wide' => array(
                     'input_type'  => 'select',
                     'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
-                    'refresh-markup' => true,
-                    'refresh-stylesheet' => false,
+                    'refresh_markup' => true,
+                    'refresh_stylesheet' => false,
                     'default'     => 'fullwidth'
                 ),
 
@@ -2540,12 +2541,13 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'unit' => '%',
                     'default' => 50
                 ),
-                'v_alignment_css' => array(
+                'v_alignment' => array(
                     'input_type'  => 'v_alignment',
                     'title'       => __('Inner vertical alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'v_alignment'
                 )
             )
         )//tmpl
@@ -2563,27 +2565,57 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
     if ( empty( $options[ 'height' ] ) )
       return $rules;
 
-    if ( empty( $options[ 'height' ][ 'height-type' ] ) )
-      return $rules;
+    if ( ! empty( $options[ 'height' ][ 'v_alignment' ] ) ) {
+        $v_alignment_value = $options[ 'height' ][ 'v_alignment' ];
+        switch ( $v_alignment_value ) {
+            case 'top' :
+                $v_align_value = "flex-start";
+            break;
+            case 'center' :
+                $v_align_value = "center";
+            break;
+            case 'bottom' :
+                $v_align_value = "flex-end";
+            break;
+            default :
+                $v_align_value = "center";
+            break;
+        }
+        $css_rules = '';
+        if ( isset( $v_align_value ) ) {
+            $css_rules .= 'align-items:' . $v_align_value;
+        }
 
-    if ( 'fit-to-screen' == $options[ 'height' ][ 'height-type' ] ) {
-        $height = '100';
-    }
-    elseif ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) && FALSE !== $height_value = filter_var( $options[ 'height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
-                array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
-        $height = $height_value;
-    }
-    $css_rules = '';
-    if ( isset( $height ) && FALSE !== $height ) {
-        $css_rules .= 'height:' . $height . 'vh;';
+        if ( !empty( $css_rules ) ) {
+            $rules[]     = array(
+                    'selector' => '[data-sek-id="'.$level['id'].'"]',
+                    'css_rules' => $css_rules,
+                    'mq' =>null
+            );
+        }
     }
 
-    if ( !empty( $css_rules ) ) {
-        $rules[]     = array(
-                'selector' => '[data-sek-id="'.$level['id'].'"]',
-                'css_rules' => $css_rules,
-                'mq' =>null
-        );
+    if ( ! empty( $options[ 'height' ][ 'height-type' ] ) ) {
+
+        if ( 'fit-to-screen' == $options[ 'height' ][ 'height-type' ] ) {
+            $height = '100';
+        }
+        elseif ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) && FALSE !== $height_value = filter_var( $options[ 'height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
+                    array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
+            $height = $height_value;
+        }
+        $css_rules = '';
+        if ( isset( $height ) && FALSE !== $height ) {
+            $css_rules .= 'height:' . $height . 'vh;';
+        }
+
+        if ( !empty( $css_rules ) ) {
+            $rules[]     = array(
+                    'selector' => '[data-sek-id="'.$level['id'].'"]',
+                    'css_rules' => $css_rules,
+                    'mq' =>null
+            );
+        }
     }
     //error_log( print_r($rules, true) );
     return $rules;
@@ -2835,7 +2867,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
             'item-inputs' => array(
                 'tabs' => array(
                     array(
-                        'title' => __('Content', 'text_domain_to_be_replaced'),
+                        'title' => __( 'Content', 'text_domain_to_be_replaced' ),
                         //'attributes' => 'data-sek-device="desktop"',
                         'inputs' => array(
                             'content' => array(
@@ -2847,8 +2879,9 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'input_type'  => 'h_text_alignment',
                                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                                 'default'     => is_rtl() ? 'right' : 'left',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'h_alignment'
                             )
                         )
                     ),
@@ -2860,51 +2893,58 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'input_type'  => 'font_picker',
                                 'title'       => __('Font family', 'text_domain_to_be_replaced'),
                                 'default'     => '',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
-                                'refresh-fonts' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family'
                             ),
                             'font_size_css'       => array(
                                 'input_type'  => 'font_size',
                                 'title'       => __('Font size in pixels', 'text_domain_to_be_replaced'),
                                 'default'     => '16px',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size'
                             ),//16,//"14px",
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __('Line height in pixels', 'text_domain_to_be_replaced'),
                                 'default'     => '24px',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height'
                             ),//24,//"20px",
                             'font_weight_css'     => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Font weight', 'text_domain_to_be_replaced'),
                                 'default'     => 400,
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight'
                             ),//null,
                             'font_style_css'      => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Font style', 'text_domain_to_be_replaced'),
                                 'default'     => 'inherit',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style'
                             ),//null,
                             'text_decoration_css' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Text decoration', 'text_domain_to_be_replaced'),
                                 'default'     => 'none',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_decoration'
                             ),//null,
                             'text_transform_css'  => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Text transform', 'text_domain_to_be_replaced'),
                                 'default'     => 'none',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform'
                             ),//null,
 
                             'letter_spacing_css'  => array(
@@ -2913,32 +2953,51 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'letter_spacing'
                             ),//0,
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Text color', 'text_domain_to_be_replaced'),
                                 'default'     => '',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
-                                'width-100'   => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color'
                             ),//"#000000",
                             'color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced'),
                                 'default'     => '',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'width-100'   => true,
-                                'title_width' => 'width-100'
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover'
                             ),//"#000000",
-                            'important_css'       => array(
+                            // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
+                            'tiny_mce___flag_important'  => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Make those style options win if other rules are applied.', 'text_domain_to_be_replaced'),
                                 'default'     => 0,
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                // declare the list of input_id that will be flagged with !important when the option is checked
+                                // @see sek_add_css_rules_for_css_sniffed_input_id
+                                // @see Nsek_is_flagged_important
+                                'important_input_list' => array(
+                                    'font_family_css',
+                                    'font_size_css',
+                                    'line_height_css',
+                                    'font_weight_css',
+                                    'font_style_css',
+                                    'text_decoration_css',
+                                    'text_transform_css',
+                                    'letter_spacing_css',
+                                    'color_css',
+                                    'color_hover_css'
+                                )
                             ),//false
                         )
                     )
@@ -2982,8 +3041,9 @@ function sek_get_module_params_for_czr_image_module() {
                     'input_type'  => 'h_alignment',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'h_alignment'
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',
@@ -3173,8 +3233,9 @@ function sek_get_module_params_for_czr_heading_module() {
                                 'input_type'         => 'h_text_alignment',
                                 'title'              => __( 'Alignment', 'text_domain_to_be_replaced' ),
                                 'default'            => is_rtl() ? 'right' : 'left',
-                                'refresh-markup'     => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup'     => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'h_alignment'
                             ),
                         )
                     ),
@@ -3186,51 +3247,58 @@ function sek_get_module_params_for_czr_heading_module() {
                                 'input_type'  => 'font_picker',
                                 'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
                                 'default'     => '',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
-                                'refresh-fonts' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family'
                             ),
                             'font_size_css'       => array(
                                 'input_type'  => 'font_size',
                                 'title'       => __( 'Font size in pixels', 'text_domain_to_be_replaced' ),
                                 'default'     => '16px',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size'
                             ),//16,//"14px",
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
                                 'default'     => '24px',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height'
                             ),//24,//"20px",
                             'font_weight_css'     => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
                                 'default'     => 400,
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight'
                             ),//null,
                             'font_style_css'      => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
                                 'default'     => 'inherit',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style'
                             ),//null,
                             'text_decoration_css' => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
                                 'default'     => 'none',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_decoration'
                             ),//null,
                             'text_transform_css'  => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
                                 'default'     => 'none',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform'
                             ),//null,
 
                             'letter_spacing_css'  => array(
@@ -3239,32 +3307,51 @@ function sek_get_module_params_for_czr_heading_module() {
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'letter_spacing'
                             ),//0,
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
                                 'default'     => '',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
-                                'width-100'   => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color'
                             ),//"#000000",
                             'color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
                                 'default'     => '',
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
                                 'width-100'   => true,
-                                'title_width' => 'width-100'
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover'
                             ),//"#000000",
-                            'important_css'       => array(
+                            // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
+                            'heading___flag_important'       => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
                                 'default'     => 0,
-                                'refresh-markup' => false,
-                                'refresh-stylesheet' => true
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                // declare the list of input_id that will be flagged with !important when the option is checked
+                                // @see sek_add_css_rules_for_css_sniffed_input_id
+                                // @see Nsek_is_flagged_important
+                                'important_input_list' => array(
+                                    'font_family_css',
+                                    'font_size_css',
+                                    'line_height_css',
+                                    'font_weight_css',
+                                    'font_style_css',
+                                    'text_decoration_css',
+                                    'text_transform_css',
+                                    'letter_spacing_css',
+                                    'color_css',
+                                    'color_hover_css'
+                                )
                             ),//false
                         )
                     )
@@ -3491,8 +3578,9 @@ function sek_get_module_params_for_czr_spacer_module() {
                     'min'         => 1,
                     'title'       => __('Space in pixels', 'text_domain_to_be_replaced'),
                     'default'     => 20,
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'height'
                 ),
             )
         ),
@@ -3532,7 +3620,7 @@ function sek_get_module_params_for_czr_divider_module() {
         'dynamic_registration' => true,
         'module_type' => 'czr_divider_module',
         'name' => __('Divider', 'text_domain_to_be_replaced'),
-        'css_selectors' => array( '.sek-module-inner > *' ),
+        'css_selectors' => array( '.sek-divider' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'border_top_width_css' => array(
@@ -3542,23 +3630,26 @@ function sek_get_module_params_for_czr_divider_module() {
                     'max' => 50,
                     'unit' => 'px',
                     'default' => 1,
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'border_top_width'
                 ),
                 'border_top_style_css' => array(
                     'input_type'  => 'select',
                     'title'       => __('Style', 'text_domain_to_be_replaced'),
                     'default' => 'solid',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'border_top_style'
                 ),
                 'border_top_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __('Color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
                     'default'    => '#5a5a5a',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'border_top_color'
                 ),
                 'width_css' => array(
                     'input_type'  => 'range_slider',
@@ -3567,15 +3658,18 @@ function sek_get_module_params_for_czr_divider_module() {
                     'max' => 100,
                     'unit' => '%',
                     'default' => 100,
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'width'
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'h_alignment',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_selectors' => '.sek-module-inner',
+                    'css_identifier' => 'h_alignment'
                 ),
                 'v_spacing_css' => array(
                     'input_type'  => 'number',
@@ -3583,8 +3677,9 @@ function sek_get_module_params_for_czr_divider_module() {
                     'min'         => 1,
                     'max'         => 100,
                     'default'     => 15,
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'v_spacing'
                 ),
             )
         ),
@@ -3624,6 +3719,11 @@ function sek_get_module_params_for_czr_icon_module() {
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_module',
         'name' => __('Icon', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'icon' =>  'far fa-star',
+            'font_size_css' => '40px',
+            'color_css' => '#707070'
+        ),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '.sek-module-inner' ),
@@ -3658,31 +3758,35 @@ function sek_get_module_params_for_czr_icon_module() {
                     'input_type'  => 'font_size',
                     'title'       => __('Size in pixels', 'text_domain_to_be_replaced'),
                     'default'     => '16px',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'font_size'
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'h_alignment',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
                     'default'     => 'center',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'h_alignment'
                 ),
                 'color_css' => array(
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __('Color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
                     'default'    => '#5a5a5a',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'color'
                 ),
                 'color_hover_css' => array(
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __('Hover color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
                     'default'    => '#5a5a5a',
-                    'refresh-markup' => false,
-                    'refresh-stylesheet' => true
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'color_hover'
                 ),
             )
         ),
@@ -3695,6 +3799,78 @@ function sek_get_module_params_for_czr_icon_module() {
                   //'deps' => array()
               )
         )
+    );
+}
+?><?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER MAP MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+//Availabe input types
+// $.extend( api.czrInputMap, {
+//       text      : '',
+//       textarea  : '',
+//       check     : 'setupIcheck',
+//       gutencheck : 'setupGutenCheck',
+//       select    : 'setupSelect',
+//       radio     : 'setupRadio',
+//       number    : 'setupStepper',
+//       upload    : 'setupImageUploaderSaveAsId',
+//       upload_url : 'setupImageUploaderSaveAsUrl',
+//       color     : 'setupColorPicker',
+//       wp_color_alpha : 'setupColorPickerAlpha',
+//       wp_color  : 'setupWPColorPicker',//not used for the moment
+//       content_picker : 'setupContentPicker',
+//       tiny_mce_editor : 'setupTinyMceEditor',
+//       password : '',
+//       range : 'setupSimpleRange',
+//       range_slider : 'setupRangeSlider',
+//       hidden : '',
+//       h_alignment : 'setupHAlignement',
+//       h_text_alignment : 'setupHAlignement'
+// });
+function sek_get_module_params_for_czr_map_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_map_module',
+        'name' => __('Map', 'text_domain_to_be_replaced'),
+        // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_gmap_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        //'css_selectors' => array( '.sek-module-inner' ),
+        'starting_value' => array(
+            'address'       => 'Nice, France',
+            'zoom'          => 10,
+            'height_css'    => 200
+        ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'address' => array(
+                    'input_type'  => 'text',
+                    'title'       => __( 'Address', 'text_domain_to_be_replaced'),
+                    'width-100'   => true,
+                    'default'    => '',
+                ),
+                'zoom' => array(
+                    'input_type'  => 'range_slider',
+                    'title'       => __( 'Zoom', 'text_domain_to_be_replaced' ),
+                    'min' => 1,
+                    'max' => 20,
+                    'unit' => '',
+                    'default' => 10,
+                ),
+                'height_css' => array(
+                    'input_type'  => 'number',
+                    'title'       => __( 'Height in pixels', 'text_domain_to_be_replaced' ),
+                    'min' => 1,
+                    'default' => 200,
+                    'css_selectors' => array( '.sek-embed::before' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'height'
+                ),
+            )
+        ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/map_module_tmpl.php",
     );
 }
 ?><?php
@@ -3739,6 +3915,7 @@ class Sek_Dyn_CSS_Builder {
         /* ------------------------------------------------------------------------- *
          *  SCHEDULE CSS RULES FILTERING
         /* ------------------------------------------------------------------------- */
+        // filter fired in sek_css_rules_sniffer_walker()
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
 
         $this->sek_css_rules_sniffer_walker();
@@ -3762,8 +3939,10 @@ class Sek_Dyn_CSS_Builder {
 
         // If the current level is a module, check if the module has more specific css selectors specified on registration
         $module_level_css_selectors = null;
+        $registered_input_list = null;
         if ( ! empty( $parent_level['module_type'] ) ) {
             $module_level_css_selectors = sek_get_registered_module_type_property( $parent_level['module_type'], 'css_selectors' );
+            $registered_input_list = sek_get_registered_module_input_list( $parent_level['module_type'] );
         }
 
         foreach ( $level as $key => $entry ) {
@@ -3786,17 +3965,29 @@ class Sek_Dyn_CSS_Builder {
             // which makes it possible to target for example the font-family. Either in module values or in level options
             if ( empty( $entry[ 'level' ] ) && is_string( $key ) && 1 < strlen( $key ) ) {
                 // we need to have a level model set
-                if ( !empty( $this -> parent_level_model ) ) {
+                if ( !empty( $parent_level ) && is_array( $parent_level ) && ! empty( $parent_level['module_type'] ) ) {
                     // the input_id candidate to filter is the $key
                     $input_id_candidate = $key;
                     // let's skip the $key that are reserved for the structure of the sektion tree
                     // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
                     // The generic rules must be suffixed with '_css'
-                    if ( false !== strpos( $key, '_css') ) {
-                        $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $entry, $input_id_candidate, $this -> parent_level_model, $module_level_css_selectors );
+                    if ( false !== strpos( $input_id_candidate, '_css') ) {
+                        if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id_candidate ] ) && ! empty( $registered_input_list[ $input_id_candidate ]['css_identifier'] ) ) {
+                            $rules = apply_filters(
+                                "sek_add_css_rules_for_input_id",
+                                $rules,// <= the in-progress array of css rules to be populated
+                                $entry,// <= the css property value
+                                $input_id_candidate, // <= the unique input_id as it as been declared on module registration
+                                $registered_input_list,// <= the full list of input for the module
+                                $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                $module_level_css_selectors // <= if the parent is a module, a default set of css_selectors might have been specified on module registration
+                            );
+                        } else {
+                            sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $parent_level['module_type'] . ' for a css input candidate : ' . $key, $parent_level );
+                        }
                     }
-                }
-            }
+                }//if
+            }//if
 
             // populates the rules collection
             if ( !empty( $rules ) ) {
@@ -4667,12 +4858,25 @@ class Sek_Dyn_CSS_Handler {
 ?><?php
 // filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
-add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_generic_css_input_types', 10, 5 );
-function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_id, $parent_level, $module_level_css_selectors ) {
-    if ( ! is_string( $input_id ) || empty( $input_id ) )
+add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_css_sniffed_input_id', 10, 6 );
+function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, $registered_input_list, $parent_level, $module_level_css_selectors ) {
+
+    if ( ! is_string( $input_id ) || empty( $input_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing input_id', $parent_level);
         return $rules;
+    }
+    if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing input_list', $parent_level);
+        return $rules;
+    }
+    $input_registration_params = $registered_input_list[ $input_id ];
+    if ( ! is_string( $input_registration_params['css_identifier'] ) || empty( $input_registration_params['css_identifier'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing css_identifier', $parent_level );
+        return $rules;
+    }
 
     $selector = '[data-sek-id="'.$parent_level['id'].'"]';
+    $css_identifier = $input_registration_params['css_identifier'];
 
     // SPECIFIC CSS SELECTOR AT MODULE LEVEL
     // are there more specific css selectors specified on module registration ?
@@ -4685,34 +4889,36 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             $new_selectors = implode(',', $new_selectors );
             $selector = $new_selectors;
         } else if ( is_string( $module_level_css_selectors ) ) {
-            $selector = $selector . ' ' . $module_level_css_selectors;
+            $selector .= ' ' . $module_level_css_selectors;
         }
-        //sek_error_log( "sek_add_css_rules_for_input_id => " . $input_id, $selector);
+    }
+    // for a module level, increase the default specifity to the .sek-module-inner container by default
+    // @fixes https://github.com/presscustomizr/nimble-builder/issues/85
+    else if ( 'module' === $parent_level['level'] ) {
+        $selector .= ' .sek-module-inner';
     }
 
 
     // SPECIFIC CSS SELECTOR AT INPUT LEVEL
+    // => Overrides the module level specific selector, if it was set.
     if ( 'module' === $parent_level['level'] ) {
-        $start = microtime(true) * 1000;
-        $input_list = sek_get_module_input_list( $parent_level['module_type'] );
-        if ( ! is_array( $input_list ) || empty( $input_list ) ) {
+        //$start = microtime(true) * 1000;
+        if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
             sek_error_log( __FUNCTION__ . ' => missing input list' );
-        } else if ( is_array( $input_list ) && empty( $input_list[ $input_id ] ) ) {
+        } else if ( is_array( $registered_input_list ) && empty( $registered_input_list[ $input_id ] ) ) {
             sek_error_log( __FUNCTION__ . ' => missing input id ' . $input_id . ' in input list for module type ' . $parent_level['module_type'] );
         }
-        if ( is_array( $input_list ) && ! empty( $input_list[ $input_id ] ) && ! empty( $input_list[ $input_id ]['css_selectors'] ) ) {
-            $input_level_css_selectors = $input_list[ $input_id ]['css_selectors'];
-            // We may have several css module selectors, so let's make sure we apply the specific input css selector(s) to all of them
-            $module_selectors = explode(',', $selector );
+        if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id ] ) && ! empty( $registered_input_list[ $input_id ]['css_selectors'] ) ) {
+            // reset the selector to the level id selector, in case it was previously set spcifically at the module level
+            $selector = '[data-sek-id="'.$parent_level['id'].'"]';
+            $input_level_css_selectors = $registered_input_list[ $input_id ]['css_selectors'];
             $new_selectors = array();
-            foreach ( $module_selectors as $mod_selector ) {
-                if ( is_array( $input_level_css_selectors ) ) {
-                    foreach ( $input_level_css_selectors as $spec_selector ) {
-                        $new_selectors[] = $mod_selector . ' ' . $spec_selector;
-                    }
-                } else if ( is_string( $input_level_css_selectors ) ) {
-                    $new_selectors[] = $mod_selector . ' ' . $input_level_css_selectors;
+            if ( is_array( $input_level_css_selectors ) ) {
+                foreach ( $input_level_css_selectors as $spec_selector ) {
+                    $new_selectors[] = $selector . ' ' . $spec_selector;
                 }
+            } else if ( is_string( $input_level_css_selectors ) ) {
+                $new_selectors[] = $selector . ' ' . $input_level_css_selectors;
             }
 
             $new_selectors = implode(',', $new_selectors );
@@ -4720,7 +4926,7 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             //sek_error_log( '$input_level_css_selectors', $selector );
         }
         // sek_error_log( 'input_id', $input_id );
-        // sek_error_log( '$input_list', $input_list );
+        // sek_error_log( '$registered_input_list', $registered_input_list );
 
         // $end = microtime(true) * 1000;
         // $time_elapsed_secs = $end - $start;
@@ -4731,32 +4937,32 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
     $mq = null;
     $properties_to_render = array();
 
-    switch ( $input_id ) {
-        case 'font_size_css' :
+    switch ( $css_identifier ) {
+        case 'font_size' :
             $properties_to_render['font-size'] = $value;
         break;
-        case 'line_height_css' :
+        case 'line_height' :
             $properties_to_render['line-height'] = $value;
         break;
-        case 'font_weight_css' :
+        case 'font_weight' :
             $properties_to_render['font-weight'] = $value;
         break;
-        case 'font_style_css' :
+        case 'font_style' :
             $properties_to_render['font-style'] = $value;
         break;
-        case 'text_decoration_css' :
+        case 'text_decoration' :
             $properties_to_render['text-decoration'] = $value;
         break;
-        case 'text_transform_css' :
+        case 'text_transform' :
             $properties_to_render['text-transform'] = $value;
         break;
-        case 'letter_spacing_css' :
+        case 'letter_spacing' :
             $properties_to_render['letter-spacing'] = $value . 'px';
         break;
-        case 'color_css' :
+        case 'color' :
             $properties_to_render['color'] = $value;
         break;
-        case 'color_hover_css' :
+        case 'color_hover' :
             //$selector = '[data-sek-id="'.$parent_level['id'].'"]:hover';
             // Add ':hover to each selectors'
             $new_selectors = array();
@@ -4768,10 +4974,10 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             $selector = implode(',', $new_selectors);
             $properties_to_render['color'] = $value;
         break;
-        case 'h_alignment_css' :
+        case 'h_alignment' :
             $properties_to_render['text-align'] = $value;
         break;
-        case 'v_alignment_css' :
+        case 'v_alignment' :
             switch ( $value ) {
                 case 'top' :
                     $v_align_value = "flex-start";
@@ -4788,7 +4994,7 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             }
             $properties_to_render['align-items'] = $v_align_value;
         break;
-        case 'font_family_css' :
+        case 'font_family' :
             $family = $value;
             // Preprocess the selected font family
             //font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
@@ -4807,23 +5013,24 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
         break;
 
         /* Spacer */
-        case 'height_css' :
+        case 'height' :
             $properties_to_render['height'] = $value > 0 ? $value . 'px' : '1px';
         break;
+
         /* Divider */
-        case 'border_top_width_css' :
+        case 'border_top_width' :
             $properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
         break;
-        case 'border_top_style_css' :
+        case 'border_top_style' :
             $properties_to_render['border-top-style'] = $value ? $value : 'solid';
         break;
-        case 'border_top_color_css' :
+        case 'border_top_color' :
             $properties_to_render['border-top-color'] = $value ? $value : '#5a5a5a';
         break;
-        case 'width_css' :
+        case 'width' :
             $properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
         break;
-        case 'v_spacing_css' :
+        case 'v_spacing' :
             $value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
             $properties_to_render = array(
                 'margin-top'  => $value,
@@ -4831,7 +5038,7 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
             );
         break;
         //not used at the moment, but it might if we want to display the divider as block (e.g. a div instead of a span)
-        case 'h_alignment_block_css' :
+        case 'h_alignment_block' :
             switch ( $value ) {
                 case 'right' :
                     $properties_to_render = array(
@@ -4850,18 +5057,20 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
                     );
             }
         break;
+
+        // The default is simply there to let us know if a css_identifier is missing
+        default :
+            sek_error_log( __FUNCTION__ . ' => the css_identifier : ' . $css_identifier . ' has no css rules defined for input id ' . $input_id );
+        break;
     }//switch
 
-
+    // when the module has an '*_flag_important' input,
+    // => check if the input_id belongs to the list of "important_input_list"
+    // => and maybe flag the css rules with !important
     if ( ! empty( $properties_to_render ) ) {
-        // is the important flag on ?
-        $important = false;
-        if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) && !empty( $parent_level['value']['important_css'] ) ) {
-            $important = (bool)sek_is_checked( $parent_level['value']['important_css'] );
-        }
-
+        $important = sek_is_flagged_important( $input_id, $parent_level, $registered_input_list );
         $css_rules = '';
-        foreach ($properties_to_render as $prop => $prop_val) {
+        foreach ( $properties_to_render as $prop => $prop_val ) {
             $css_rules .= sprintf( '%1$s:%2$s%3$s;', $prop, $prop_val, $important ? '!important' : '' );
         }//end foreach
 
@@ -4872,6 +5081,34 @@ function sek_add_css_rules_for_generic_css_input_types( $rules, $value, $input_i
         );
     }
     return $rules;
+}
+
+
+// @return boolean
+function sek_is_flagged_important( $input_id, $parent_level, $registered_input_list ) {
+    // is the important flag on ?
+    $important = false;
+    if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+        // loop on the module input values, and find _flag_important.
+        // then check if the current input_id, is in the list of important_input_list
+        foreach( $parent_level['value'] as $id => $input_value ) {
+            if ( false !== strpos( $id, '_flag_important' ) ) {
+                //sek_error_log( __FUNCTION__ . ' => $registered_input_list ?', $registered_input_list );
+                if ( is_array( $registered_input_list ) && array_key_exists( $id, $registered_input_list ) ) {
+                    if ( empty( $registered_input_list[ $id ][ 'important_input_list' ] ) ) {
+                        sek_error_log( __FUNCTION__ . ' => missing important_input_list for input id ' . $id );
+                    } else {
+                        $important_list_candidate = $registered_input_list[ $id ][ 'important_input_list' ];
+                        //sek_error_log( __FUNCTION__ . ' => ALORS ?', $important_list_candidate );
+                        if ( in_array( $input_id, $important_list_candidate ) ) {
+                            $important = (bool)sek_is_checked( $input_value );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return $important;
 }
 ?><?php
 ////////////////////////////////////////////////////////////////
@@ -5153,7 +5390,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                         wp_send_json_error(  __FUNCTION__ . ' sek-remove-section => the section must be nested in this ajax action' );
                         break;
                     } else {
-                        // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
+                        // we need to set the parent_model here to access it later in the ::render method to calculate the column width.
                         $this -> parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     }

@@ -641,7 +641,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   }
 
-                  // What to do in the preview ?
+                  // WHAT TO REFRESH IN THE PREVIEW ? Markup, stylesheet, font ?
                   // The action to trigger is determined by the changed input
                   // For the options of a level, the default action is to refresh the stylesheet.
                   // But we might need to refresh the markup in some cases. Like for example when a css class is added. @see the boxed-wide layout example
@@ -655,17 +655,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       refresh_fonts = 'refresh_fonts' === params.defaultPreviewAction;
 
                   // Maybe set the input based value
-                  // Note : the inputRegistrationParams are passed in the args only when an module input is changed
-                  // Example : For a crud module, when an item is added, there are no inputRegistrationParams, so we fallback on the default 'refresh_markup'
-                  if ( ! _.isEmpty( params.settingParams.args.inputRegistrationParams ) ) {
-                        if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_stylesheet ) ) {
-                              refresh_stylesheet = Boolean( params.settingParams.args.inputRegistrationParams.refresh_stylesheet );
+                  var input_id = params.settingParams.args.input_changed;
+                  var inputRegistrationParams;
+                  if ( ! _.isUndefined( input_id ) ) {
+                        inputRegistrationParams = self.getInputRegistrationParams( input_id, parentModuleType );
+                        if ( ! _.isUndefined( inputRegistrationParams.refresh_stylesheet ) ) {
+                              refresh_stylesheet = Boolean( inputRegistrationParams.refresh_stylesheet );
                         }
-                        if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_markup ) ) {
-                              refresh_markup = Boolean( params.settingParams.args.inputRegistrationParams.refresh_markup );
+                        if ( ! _.isUndefined( inputRegistrationParams.refresh_markup ) ) {
+                              refresh_markup = Boolean( inputRegistrationParams.refresh_markup );
                         }
-                        if ( ! _.isUndefined( params.settingParams.args.inputRegistrationParams.refresh_fonts ) ) {
-                              refresh_fonts = Boolean( params.settingParams.args.inputRegistrationParams.refresh_fonts );
+                        if ( ! _.isUndefined( inputRegistrationParams.refresh_fonts ) ) {
+                              refresh_fonts = Boolean( inputRegistrationParams.refresh_fonts );
                         }
                   }
 
@@ -708,25 +709,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//self.updateAPISetting()
                   };//_doUpdateWithRequestedAction
 
-                  // if the changed input is a google font modifier ( <=> font_family_css input)
-                  // => we want to first refresh the google font collection, and then proceed to the requested action
+                  // if the changed input is a google font modifier ( <=> true === refresh_fonts )
+                  // => we want to first refresh the google font collection, and then proceed the requested action
                   // this way we make sure that the customized value used when ajaxing will take into account when writing the google font http request link
                   if ( true === refresh_fonts ) {
-                        var _getChangedFontFamily = function() {
-                              if ( 'font_family_css' != params.settingParams.args.input_changed ) {
-                                    api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts => the input id is not font_family_css', params );
-                                    return;
-                              } else {
-                                    return params.settingParams.args.input_value;
-                              }
-                        };
-                        var newFontFamily = '';
-                        try { newFontFamily = _getChangedFontFamily(); } catch( er) {
-                              api.errare( 'updateAPISettingAndExecutePreviewActions => Error when refreshing fonts', er );
-                              return;
-                        }
+                        var newFontFamily = params.settingParams.args.input_value;
                         if ( ! _.isString( newFontFamily ) ) {
-                              api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', er );
+                              api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', newFontFamily );
                               return;
                         }
                         // add it only if gfont

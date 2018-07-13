@@ -157,7 +157,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                         wp_send_json_error(  __FUNCTION__ . ' sek-remove-section => the section must be nested in this ajax action' );
                         break;
                     } else {
-                        // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
+                        // we need to set the parent_model here to access it later in the ::render method to calculate the column width.
                         $this -> parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     }
