@@ -49,12 +49,7 @@ function sek_get_module_params_for_czr_heading_module() {
                                 'title'              => __( 'Heading text', 'text_domain_to_be_replaced' ),
                                 'default'            => '',
                                 'width-100'         => true,
-                                // The following might be useful to me, but it generates a pretty long list of allowed HTML tags
-                                // would be great if we could have a "collapsible notice", collapsed by default that will expand on click
-                                // similar to the section description used by wp, e.g. in the Additional CSS section
                                 'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
-                                // 'notice_before'      => sprintf( __( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: %s' ),
-                                //     '<code>' . czr_heading_module_text_allowed_tags() . '</code>', 'text_domain_to_be_replaced' ),
 
                             ),
                             'heading_tag' => array(
@@ -195,8 +190,9 @@ function sek_get_module_params_for_czr_heading_module() {
     );
 }
 
+
 function sanitize_callback__czr_heading_module( $value ) {
-    if ( array_key_exists('heading_text', $value ) ) {
+    if (  !current_user_can( 'unfiltered_html' ) && array_key_exists('heading_text', $value ) ) {
         //sanitize heading_text
         $value[ 'heading_text' ] = czr_heading_module_kses_text( $value[ 'heading_text' ] );
     }
@@ -211,163 +207,5 @@ function validate_callback__czr_heading_module( $value ) {
     return true;
 }
 
-/**
- * Filter headings text output WordPress's KSES API.
- */
-function czr_heading_module_kses_text( $content = '' ) {
-    $allowed_tags = wp_kses_allowed_html( 'sek-heading_text' );
 
-    // Return KSES'ed content, allowing the above tags.
-    return wp_kses( $content, $allowed_tags );
-}
-
-add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\czr_heading_module_text_get_allowedtags', 10, 2 );
-/**
- * Get headings text allowed tags
- */
-function czr_heading_module_text_get_allowedtags( $tags, $context ) {
-    if ( 'sek-heading_text' != $context ) {
-        return $tags;
-    }
-
-    // limit wp_kses allowed tags.
-    return array(
-        'a' => array(
-            'href' => 1,
-            'rel' => 1,
-            'rev' => 1,
-            'name' => 1,
-            'target' => 1,
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'b' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'big' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'br' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'del' => array(
-            'datetime' => 1,
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'em' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'i' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'ins' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'span' => array(
-            'dir'   => 1,
-            'align' => 1,
-            'lang'  => 1,
-            'xml:lang' => 1,
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'small' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'strike' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'strong' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'sub' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'sup' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-        'u' => array(
-            'class' => 1,
-            'id' => 1,
-            'style' => 1,
-            'title' => 1,
-            'role' => 1,
-        ),
-    );
-}
-
-/**
- * Display all of the allowed tags in HTML format with attributes.
- *
- * This is useful for displaying which elements and attributes are supported
- * see wp-includes/general-template::allowed_tags()
- */
-function czr_heading_module_text_allowed_tags() {
-    $allowedtags = wp_kses_allowed_html( 'sek-heading_text' );
-    $allowed = '';
-    foreach ( (array) $allowedtags as $tag => $attributes ) {
-        $allowed .= '<'.$tag;
-        if ( 0 < count($attributes) ) {
-            foreach ( $attributes as $attribute => $limits ) {
-                $allowed .= ' '.$attribute.'=""';
-            }
-        }
-        $allowed .= '> ';
-    }
-    return htmlentities( $allowed );
-}
 ?>
