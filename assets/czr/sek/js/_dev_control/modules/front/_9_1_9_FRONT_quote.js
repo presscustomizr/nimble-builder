@@ -58,8 +58,6 @@
                           };
                           //Internal item dependencies
                           item.czr_Input.each( function( input ) {
-                            console.log( input.id );
-                            console.log( input() );
                                 switch( input.id ) {
 
                                       case 'quote_design' :
