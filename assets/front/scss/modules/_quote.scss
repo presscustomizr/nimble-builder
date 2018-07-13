@@ -1,58 +1,63 @@
-.#{$project-prefix}quote.sek-quote-design {
-    //reset
-    background: none;
-    padding: 15px 0;
-    margin-right: 0;
-    margin-left: 0;
-    font-style: inherit;
-    border: none;
-    &::before, &::after {
-        display: none;
+.#{$project-prefix}quote {
+    p {
+        margin: 0 0 .5em;
+        padding: 0;
     }
-    .#{$project-prefix}content{
+    &.sek-quote-design {
+        //reset
+        background: none;
+        font-style: inherit;
         margin-right: 0;
         margin-left: 0;
-    }
-    .#{$project-prefix}cite {
-        clear: both;
-        display: block;
-        margin-top: 1.5em;
-        position: relative;
-        @if ( true == $is_rtl ) {
-          padding-right: 2.2em;
-          padding-left: 0.25em;
+        padding: 15px 0;
+        border: none;
+        &::before, &::after {
+            display: none;
         }
-        @else {
-          padding-left: 2.2em;
-          padding-right: 0.25em;
+        .#{$project-prefix}content{
+            margin-right: 0;
+            margin-left: 0;
         }
-        &::before {
-            content: '';
-            top: 1em;
-            position: absolute;
-            background: none;
-            width: 2em;
-            height: auto;
+        .#{$project-prefix}cite {
+            clear: both;
+            display: block;
+            margin-top: 1.5em;
+            position: relative;
             @if ( true == $is_rtl ) {
-              right: 0;
+              padding-right: 2.2em;
+              padding-left: 0.25em;
             }
             @else {
-              left: 0;
+              padding-left: 2.2em;
+              padding-right: 0.25em;
             }
-            //border color inherited from the text color
-            border-top: 1px solid;
+            &::before {
+                content: '';
+                top: 1em;
+                position: absolute;
+                background: none;
+                width: 2em;
+                height: auto;
+                @if ( true == $is_rtl ) {
+                  right: 0;
+                }
+                @else {
+                  left: 0;
+                }
+                //border color inherited from the text color
+                border-top: 1px solid;
+            }
         }
-    }
-
-    //border before
-    &.sek-border-before {
-        @if ( true == $is_rtl ) {
-          padding-right: 15px;
-          border-right: 5px solid;
-        }
-        @else {
-          padding-left: 15px;
-          border-left: 5px solid;
+        //border before
+        &.sek-border-before {
+            @if ( true == $is_rtl ) {
+              padding-right: 15px;
+              border-right: 5px solid;
+            }
+            @else {
+              padding-left: 15px;
+              border-left: 5px solid;
+            }
         }
     }
 }
