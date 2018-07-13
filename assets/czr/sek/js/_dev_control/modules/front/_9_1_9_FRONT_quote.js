@@ -4,7 +4,6 @@
       //QUOTE MODULE
       var QuoteModuleConstructor = {
               initialize: function( id, options ) {
-                      //console.log('INITIALIZING IMAGE MODULE', id, options );
                       var module = this;
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
@@ -58,8 +57,6 @@
                           };
                           //Internal item dependencies
                           item.czr_Input.each( function( input ) {
-                            console.log( input.id );
-                            console.log( input() );
                                 switch( input.id ) {
 
                                       case 'quote_design' :
