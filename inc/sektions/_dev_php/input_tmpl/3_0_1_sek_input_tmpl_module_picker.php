@@ -67,6 +67,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-type' => 'module',
                   'content-id' => 'czr_quote_module',
                   'title' => __( 'Quote', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_quote_icon.svg'
                 ),
             );
             $i = 0;
