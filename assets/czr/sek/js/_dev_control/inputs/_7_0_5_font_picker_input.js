@@ -18,13 +18,20 @@
                         if ( ! _.isEmpty( api.sek_fontCollections ) ) {
                               dfd.resolve( api.sek_fontCollections );
                         } else {
-                              // This utility handles a cached version of the font_list once fetched the first time
-                              // @see api.CZR_Helpers.czr_cachedTmpl
-                              api.CZR_Helpers.getModuleTmpl( {
-                                    tmpl : 'font_list',
-                                    module_type: 'font_picker_input',
-                                    module_id : input.module.id
-                              } ).done( function( _serverTmpl_ ) {
+                              var _ajaxRequest_;
+                              if ( ! _.isUndefined( api.sek_fetchingFontCollection ) && 'pending' == api.sek_fetchingFontCollection.state() ) {
+                                    _ajaxRequest_ = api.sek_fetchingFontCollection;
+                              } else {
+                                    // This utility handles a cached version of the font_list once fetched the first time
+                                    // @see api.CZR_Helpers.czr_cachedTmpl
+                                    _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
+                                          tmpl : 'font_list',
+                                          module_type: 'font_picker_input',
+                                          module_id : input.module.id
+                                    } );
+                                    api.sek_fetchingFontCollection = _ajaxRequest_;
+                              }
+                              _ajaxRequest_.done( function( _serverTmpl_ ) {
                                     // Ensure we have a string that's JSON.parse-able
                                     if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '{' ) {
                                           throw new Error( 'font_picker => server list is not JSON.parse-able');
@@ -34,6 +41,7 @@
                               }).fail( function( _r_ ) {
                                     dfd.reject( _r_ );
                               });
+
                         }
                         return dfd.promise();
                   };
