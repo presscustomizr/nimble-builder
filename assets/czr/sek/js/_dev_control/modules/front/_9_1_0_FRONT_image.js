@@ -3,65 +3,42 @@
 ( function ( api, $, _ ) {
       var ImageModuleConstructor = {
             initialize: function( id, options ) {
-                    //console.log('INITIALIZING IMAGE MODULE', id, options );
-                    var module = this;
-                    // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                    module.inputConstructor = api.CZRInput.extend( module.CZRImageInputMths || {} );
-                    // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                    module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+                  //console.log('INITIALIZING IMAGE MODULE', id, options );
+                  var module = this;
+                  // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                  module.inputConstructor = api.CZRInput.extend( module.CZRImageInputMths || {} );
+                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
-                    // run the parent initialize
-                    // Note : must be always invoked always after the input / item class extension
-                    // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                    api.CZRDynModule.prototype.initialize.call( module, id, options );
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
 
-                    //SET THE CONTENT PICKER DEFAULT OPTIONS
-                    //@see ::setupContentPicker()
-                    module.bind( 'set_default_content_picker_options', function( params ) {
-                          params.defaultContentPickerOption.defaultOption = {
-                                'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
-                                'type'       : '',
-                                'type_label' : '',
-                                'object'     : '',
-                                'id'         : '_custom_',
-                                'url'        : ''
-                          };
-                          return params;
-                    });
+                  //SET THE CONTENT PICKER DEFAULT OPTIONS
+                  //@see ::setupContentPicker()
+                  module.bind( 'set_default_content_picker_options', function( params ) {
+                        params.defaultContentPickerOption.defaultOption = {
+                              'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                              'type'       : '',
+                              'type_label' : '',
+                              'object'     : '',
+                              'id'         : '_custom_',
+                              'url'        : ''
+                        };
+                        return params;
+                  });
             },//initialize
 
             CZRImageInputMths : {
-                    // initialize : function( name, options ) {
-                    //       var input = this;
-                    //       api.CZRInput.prototype.initialize.call( input, name, options );
-                    // },
+                  // initialize : function( name, options ) {
+                  //       var input = this;
+                  //       api.CZRInput.prototype.initialize.call( input, name, options );
+                  // },
 
-                    setupSelect : function() {
-                            var input  = this,
-                                  item   = input.input_parent,
-                                  module = input.module,
-                                  _options_ = {};
-
-                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in image module');
-                                  return;
-                            } else {
-                                  //generates the options
-                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
-                                        var _attributes = {
-                                                  value : value,
-                                                  html: title
-                                            };
-                                        if ( value == input() ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        } else if ( 'px' === value ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        }
-                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                  });
-                                  $( 'select[data-czrtype]', input.container ).selecter();
-                            }
-                    }
+                  setupSelect : function() {
+                        api.czr_sektions.setupSelectInput.call( this );
+                  }
             },//CZRImageInputMths
 
             // _isChecked : function( v ) {

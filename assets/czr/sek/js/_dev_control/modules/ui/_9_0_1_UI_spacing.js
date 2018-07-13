@@ -3,58 +3,41 @@
 ( function ( api, $, _ ) {
       var SpacingModuleConstructor = {
             initialize: function( id, options ) {
-                    var module = this;
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                    module.inputConstructor = api.CZRInput.extend( module.CZRSpacingInputMths || {} );
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                    module.itemConstructor = api.CZRItem.extend( module.CZRSpacingItemMths || {} );
-                    //run the parent initialize
-                    api.CZRDynModule.prototype.initialize.call( module, id, options );
+                  var module = this;
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                  module.inputConstructor = api.CZRInput.extend( module.CZRSpacingInputMths || {} );
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRSpacingItemMths || {} );
+                  //run the parent initialize
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
             CZRSpacingInputMths : {
-                    // initialize : function( name, options ) {
-                    //       var input = this;
-                    //       api.CZRInput.prototype.initialize.call( input, name, options );
-                    // },
-
-                    setupSelect : function() {
-                             var input              = this,
-                                  item               = input.input_parent,
-                                  module             = input.module;
-                           //generates the options
-                            _.each( sektionsLocalizedData.selectOptions.spacingUnits , function( title, value ) {
-                                  var _attributes = {
-                                            value : value,
-                                            html: title
-                                      };
-                                  if ( value == input() ) {
-                                        $.extend( _attributes, { selected : "selected" } );
-                                  } else if ( 'px' === value ) {
-                                        $.extend( _attributes, { selected : "selected" } );
-                                  }
-                                  $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                            });
-                            $( 'select[data-czrtype]', input.container ).selecter();
-                    },
+                  // initialize : function( name, options ) {
+                  //       var input = this;
+                  //       api.CZRInput.prototype.initialize.call( input, name, options );
+                  // },
+                  setupSelect : function() {
+                        api.czr_sektions.setupSelectInput.call( this );
+                  }
             },//CZRSpacingInputMths
 
             CZRSpacingItemMths : {
-                    initialize : function( id, options ) {
-                          api.CZRItem.prototype.initialize.call( this, id, options );
-                          var item = this;
-                          // Listen to tab switch event
-                          // @params { id : (string) }
-                          item.bind( 'tab-switch', function( params ) {
-                                device = 'desktop';
-                                try { device = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
-                                      api.errare( 'spacing input => error when binding the tab switch event', er );
-                                }
-                                try { api.previewedDevice( device ); } catch( er ) {
-                                      api.errare( 'spacing input => error when setting the device on tab switch', er );
-                                }
-                          });
-                    }
+                  initialize : function( id, options ) {
+                        api.CZRItem.prototype.initialize.call( this, id, options );
+                        var item = this;
+                        // Listen to tab switch event
+                        // @params { id : (string) }
+                        item.bind( 'tab-switch', function( params ) {
+                              device = 'desktop';
+                              try { device = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
+                                    api.errare( 'spacing input => error when binding the tab switch event', er );
+                              }
+                              try { api.previewedDevice( device ); } catch( er ) {
+                                    api.errare( 'spacing input => error when setting the device on tab switch', er );
+                              }
+                        });
+                  }
             },//CZRSpacingItemMths
       };
 

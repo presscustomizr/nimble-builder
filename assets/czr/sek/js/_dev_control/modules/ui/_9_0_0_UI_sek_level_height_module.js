@@ -14,32 +14,9 @@
             },//initialize
 
             CZRInputMths : {
-                    setupSelect : function() {
-                            var input  = this,
-                                  item   = input.input_parent,
-                                  module = input.module,
-                                  _options_ = {};
-
-                            if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.module_type );
-                                  return;
-                            } else {
-                                  //generates the options
-                                  _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
-                                        var _attributes = {
-                                                  value : value,
-                                                  html: title
-                                            };
-                                        if ( value == input() ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        } else if ( 'px' === value ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        }
-                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                  });
-                                  $( 'select[data-czrtype]', input.container ).selecter();
-                            }
-                    },
+                  setupSelect : function() {
+                        api.czr_sektions.setupSelectInput.call( this );
+                  }
             },//CZRInputMths
 
             CZRItemConstructor : {

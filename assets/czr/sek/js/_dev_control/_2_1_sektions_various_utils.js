@@ -474,6 +474,42 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   selectables.eq( prevIndex ).focus();
+            },
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            // GENERIC WAY TO SETUP SELECT INPUTS
+            //-------------------------------------------------------------------------------------------------
+            // used in the module input constructors
+            // "this" is the input
+            setupSelectInput : function() {
+                  var input  = this,
+                      item   = input.input_parent,
+                      module = input.module,
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      selectOptions = inputRegistrationParams.choices;
+
+                  if ( _.isEmpty( selectOptions ) ) {
+                        api.errare( 'api.czr_sektions.setupSelectInput => missing select options for input id => ' + input.id + ' in image module');
+                        return;
+                  } else {
+                        //generates the options
+                        _.each( selectOptions , function( title, value ) {
+                              var _attributes = {
+                                        value : value,
+                                        html: title
+                                  };
+                              if ( value == input() ) {
+                                    $.extend( _attributes, { selected : "selected" } );
+                              } else if ( 'px' === value ) {
+                                    $.extend( _attributes, { selected : "selected" } );
+                              }
+                              $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                        });
+                        $( 'select[data-czrtype]', input.container ).selecter();
+                  }
             }
 
       });//$.extend()

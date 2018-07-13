@@ -38,38 +38,37 @@
               /* Helpers */
 
               CZRIconInputMths: {
-                      setupSelect : function() {
-                              var input  = this,
-                                  item   = input.input_parent,
-                                  module = input.module,
-                                  _model  = item();
+                    setupSelect : function() {
+                          var input  = this,
+                              item   = input.input_parent,
+                              module = input.module,
+                              inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                              selectOptions = inputRegistrationParams.choices;
 
-                               //Link select
-                              if ( 'link-to' == input.id ) {
-                                    if ( _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ) {
-                                          api.errare( 'Missing select options for input id => ' + input.id + ' in icon module');
-                                          return;
-                                    } else {
-                                          //generates the options
-                                          _.each( sektionsLocalizedData.selectOptions[input.id] , function( title, value ) {
-                                                //get only no-link and url
-                                                if ( !(  _.contains([ 'no-link', 'url' ], value) ) ) {
-                                                      return;
-                                                }
-                                                var _attributes = {
-                                                          value : value,
-                                                          html: title
-                                                    };
-                                                if ( value == input() ) {
-                                                      $.extend( _attributes, { selected : "selected" } );
-                                                }
+                           //Link select
+                          if ( _.isEmpty( selectOptions ) ) {
+                                api.errare( 'Missing select options for input id => ' + input.id + ' in icon module');
+                                return;
+                          } else {
+                                //generates the options
+                                _.each( selectOptions , function( title, value ) {
+                                      //get only no-link and url
+                                      if ( !(  _.contains([ 'no-link', 'url' ], value) ) ) {
+                                            return;
+                                      }
+                                      var _attributes = {
+                                                value : value,
+                                                html: title
+                                          };
+                                      if ( value == input() ) {
+                                            $.extend( _attributes, { selected : "selected" } );
+                                      }
 
-                                                $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                          });
-                                          $( 'select[data-czrtype]', input.container ).selecter();
-                                    }
-                              }// if
-                      }//setupSelect
+                                      $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                });
+                                $( 'select[data-czrtype]', input.container ).selecter();
+                          }
+                    }//setupSelect
               },//CZRIconInputMths
               //////////////////////////////////////////////////////////
               /// ITEM CONSTRUCTOR

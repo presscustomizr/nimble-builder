@@ -74,34 +74,9 @@
               },
               /* Helpers */
               CZRQuoteInputMths: {
-                      setupSelect : function() {
-                              var input  = this,
-                                    item   = input.input_parent,
-                                    module = input.module,
-                                    _options_ = {};
-
-                              var localization_id =  _.isEmpty( sektionsLocalizedData.selectOptions[input.id] ) ? input.id.replace( 'quote_', '').replace( 'cite_', '', input.id ) : input.id;
-
-                              if ( _.isEmpty( sektionsLocalizedData.selectOptions[localization_id] ) ) {
-                                    api.errare( 'Missing select options for input id => ' + input.id + ' in module ' + module.id );
-                                    return;
-                              } else {
-                                    //generates the options
-                                    _.each( sektionsLocalizedData.selectOptions[localization_id] , function( title, value ) {
-                                          var _attributes = {
-                                                    value : value,
-                                                    html: title
-                                              };
-                                          if ( value == input() ) {
-                                                $.extend( _attributes, { selected : "selected" } );
-                                          } else if ( 'px' === value ) {
-                                                $.extend( _attributes, { selected : "selected" } );
-                                          }
-                                          $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                    });
-                                    $( 'select[data-czrtype]', input.container ).selecter();
-                              }
-                      }
+                    setupSelect : function() {
+                        api.czr_sektions.setupSelectInput.call( this );
+                    }
               },//CZRQuoteInputMths
       };
       //provides a description of each module

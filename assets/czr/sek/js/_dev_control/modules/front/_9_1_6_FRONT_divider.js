@@ -4,47 +4,26 @@
       //DIVIDER MODULE
       var DividerModuleConstructor = {
             initialize: function( id, options ) {
-                    //console.log('INITIALIZING IMAGE MODULE', id, options );
-                    var module = this;
+                  //console.log('INITIALIZING IMAGE MODULE', id, options );
+                  var module = this;
 
-                    //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                    module.inputConstructor = api.CZRInput.extend( module.CZRDividerInputMths || {} );
+                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                  module.inputConstructor = api.CZRInput.extend( module.CZRDividerInputMths || {} );
 
-                    //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                    //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
+                  //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
 
-                    // run the parent initialize
-                    // Note : must be always invoked always after the input / item class extension
-                    // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                    api.CZRDynModule.prototype.initialize.call( module, id, options );
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
 
             CZRDividerInputMths: {
-                    setupSelect : function() {
-                            var input  = this,
-                                  item   = input.input_parent,
-                                  module = input.module,
-                                  _options_ = {};
-
-                            if ( _.isEmpty( sektionsLocalizedData.selectOptions['border-type'] ) ) {
-                                  api.errare( 'Missing select options for input id => ' + input.id + ' in divider module');
-                                  return;
-                            } else {
-                                  //generates the options
-                                  _.each( sektionsLocalizedData.selectOptions['border-type'] , function( title, value ) {
-                                        var _attributes = {
-                                                  value : value,
-                                                  html: title
-                                            };
-                                        if ( value == input() ) {
-                                              $.extend( _attributes, { selected : "selected" } );
-                                        }
-                                        $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                  });
-                                  $( 'select[data-czrtype]', input.container ).selecter();
-                            }
-                    }
+                  setupSelect : function() {
+                        api.czr_sektions.setupSelectInput.call( this );
+                  }
             },//CZRDividerInputMths
       };//DividerModuleConstructor
 
