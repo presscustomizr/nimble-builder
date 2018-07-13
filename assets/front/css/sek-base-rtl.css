@@ -631,8 +631,8 @@ fieldset[disabled] a.sek-btn {
   display: block;
   margin-top: 1.5em;
   position: relative;
-  padding-left: 2.2em;
-  padding-right: 0.25em;
+  padding-right: 2.2em;
+  padding-left: 0.25em;
 }
 
 .sek-quote.sek-quote-design .sek-cite::before {
@@ -642,13 +642,13 @@ fieldset[disabled] a.sek-btn {
   background: none;
   width: 2em;
   height: auto;
-  left: 0;
+  right: 0;
   border-top: 1px solid;
 }
 
 .sek-quote.sek-quote-design.sek-border-before {
-  padding-left: 15px;
-  border-left: 5px solid;
+  padding-right: 15px;
+  border-right: 5px solid;
 }
 
 /* make sure that the location level occupies 100% of the width */
@@ -727,4 +727,4 @@ fieldset[disabled] a.sek-btn {
   font-size: inherit;
   color: #cfcfcf;
 }
-/*# sourceMappingURL=sek-base.css.map */
+/*# sourceMappingURL=sek-base-rtl.css.map */

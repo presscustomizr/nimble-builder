@@ -1050,135 +1050,6 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
 
 
-/* ------------------------------------------------------------------------- *
- *  LOCALIZED PARAMS SELECT OPTIONS
-/* ------------------------------------------------------------------------- */
-add_filter( 'nimble-sek-localized-customizer-control-params', '\Nimble\nimble_add_select_options_localized_control_params' );
-function nimble_add_select_options_localized_control_params( $params ) {
-    return array_merge( $params, array(
-            'selectOptions' => array(
-                // IMAGE MODULE
-                'link-to' => array(
-                    'no-link' => __('No link', 'text_domain_to_be_replaced' ),
-                    'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
-                    'img-file' => __('Image file', 'text_domain_to_be_replaced' ),
-                    'img-page' =>__('Image page', 'text_domain_to_be_replaced' )
-                ),
-                'img-size' => sek_get_img_sizes(),
-
-                // FEATURED PAGE MODULE
-                'img-type' => array(
-                    'none' => __('No image', 'text_domain_to_be_replaced' ),
-                    'featured' => __('Use the page featured image', 'text_domain_to_be_replaced' ),
-                    'custom' => __('Use a custom image', 'text_domain_to_be_replaced' ),
-                ),
-                'content-type' => array(
-                    'none' => __('No text', 'text_domain_to_be_replaced' ),
-                    'page-excerpt' => __('Use the page excerpt', 'text_domain_to_be_replaced' ),
-                    'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
-                ),
-
-                // HEADING MODULE
-                'heading_tag' => array(
-                    /* Not totally sure these should be localized as they strictly refer to html tags */
-                    'h1' => __('H1', 'text_domain_to_be_replaced' ),
-                    'h2' => __('H2', 'text_domain_to_be_replaced' ),
-                    'h3' => __('H3', 'text_domain_to_be_replaced' ),
-                    'h4' => __('H4', 'text_domain_to_be_replaced' ),
-                    'h5' => __('H5', 'text_domain_to_be_replaced' ),
-                    'h6' => __('H6', 'text_domain_to_be_replaced' ),
-                ),
-
-                // GENERIC CSS MODIFIERS INPUT TYPES
-                'font_weight_css' => array(
-                    'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
-                    'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
-                    'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
-                    'lighter'   => __( 'lighter', 'text_domain_to_be_replaced' ),
-                    100     => 100,
-                    200     => 200,
-                    300     => 300,
-                    400     => 400,
-                    500     => 500,
-                    600     => 600,
-                    700     => 700,
-                    800     => 800,
-                    900     => 900
-                ),
-
-                'font_style_css' => array(
-                    'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                    'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
-                    'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
-                    'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
-                ),
-
-                'text_decoration_css' =>  array(
-                    'none'      => __( 'none', 'text_domain_to_be_replaced' ),
-                    'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                    'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
-                    'overline'    => __( 'overline', 'text_domain_to_be_replaced' ),
-                    'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
-                ),
-
-                'text_transform_css' => array(
-                    'none'      => __( 'none', 'text_domain_to_be_replaced' ),
-                    'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                    'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
-                    'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
-                    'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
-                ),
-
-                // SPACING MODULE
-                'spacingUnits' => array(
-                    'px' => __('Pixels', 'text_domain_to_be_replaced' ),
-                    'em' => __('Em', 'text_domain_to_be_replaced'),
-                    'percent' => __('Percents', 'text_domain_to_be_replaced' )
-                ),
-
-                // LAYOUT BACKGROUND BORDER
-                'boxed-wide' => array(
-                    'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
-                    'fullwidth' => __('Full Width', 'text_domain_to_be_replaced')
-                ),
-                'height-type' => array(
-                    'default' => __('default', 'text_domain_to_be_replaced'),
-                    'fit-to-screen' => __('Fit to screen', 'text_domain_to_be_replaced'),
-                    'custom' => __('Custom', 'text_domain_to_be_replaced' )
-                ),
-                'bg-scale' => array(
-                    'default' => __('default', 'text_domain_to_be_replaced'),
-                    'auto' => __('auto', 'text_domain_to_be_replaced'),
-                    'cover' => __('scale to fill', 'text_domain_to_be_replaced'),
-                    'contain' => __('fit', 'text_domain_to_be_replaced'),
-                ),
-                'bg-position' => array(
-                    'default' => __('default', 'text_domain_to_be_replaced'),
-                ),
-                'border-type' => array(
-                    'none' => __('none', 'text_domain_to_be_replaced'),
-                    'solid' => __('solid', 'text_domain_to_be_replaced'),
-                    'double' => __('double', 'text_domain_to_be_replaced'),
-                    'dotted' => __('dotted', 'text_domain_to_be_replaced'),
-                    'dashed' => __('dashed', 'text_domain_to_be_replaced')
-                )
-            )//'selectOptions array'
-        )//array()
-    );//array_merge()
-}//nimble_add_select_options_localized_control_params()
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
 add_filter( 'skp_json_export_ready_skopes', '\Nimble\add_sektion_values_to_skope_export' );
@@ -1492,13 +1363,20 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-type' => 'module',
                   'content-id' => 'czr_simple_html_module',
                   'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_html_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_map_module',
                   'title' => __( 'Map', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_map_icon.svg'
                 ),
-
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_quote_module',
+                  'title' => __( 'Quote', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_quote_icon.svg'
+                ),
             );
             $i = 0;
             foreach( $content_collection as $_params) {
@@ -2048,7 +1926,8 @@ function sek_register_modules() {
         'czr_spacer_module',
         'czr_divider_module',
         'czr_icon_module',
-        'czr_map_module'
+        'czr_map_module',
+        'czr_quote_module'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
@@ -2064,6 +1943,162 @@ function sek_register_modules() {
     }
 
 }//sek_register_modules()
+
+
+// HELPERS
+// Used when registrating a select input in a module
+// @return an array of options that will be used to populate the select input in js
+function sek_get_select_options_for_input_id( $input_id ) {
+    $options = array();
+    switch( $input_id ) {
+        // IMAGE MODULE
+        case 'link-to' :
+            $options = array(
+                'no-link' => __('No link', 'text_domain_to_be_replaced' ),
+                'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
+                'img-file' => __('Image file', 'text_domain_to_be_replaced' ),
+                'img-page' =>__('Image page', 'text_domain_to_be_replaced' )
+            );
+        break;
+        case 'img-size' :
+            $options = sek_get_img_sizes();
+        break;
+
+        // FEATURED PAGE MODULE
+        case 'img-type' :
+            $options = array(
+                'none' => __('No text', 'text_domain_to_be_replaced' ),
+                'page-excerpt' => __('Use the page excerpt', 'text_domain_to_be_replaced' ),
+                'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
+            );
+        break;
+        case 'content-type' :
+            $options = array(
+                'none' => __('No image', 'text_domain_to_be_replaced' ),
+                'featured' => __('Use the page featured image', 'text_domain_to_be_replaced' ),
+                'custom' => __('Use a custom image', 'text_domain_to_be_replaced' ),
+            );
+        break;
+
+        // HEADING MODULE
+        case 'heading_tag':
+            $options = array(
+                /* Not totally sure these should be localized as they strictly refer to html tags */
+                'h1' => __('H1', 'text_domain_to_be_replaced' ),
+                'h2' => __('H2', 'text_domain_to_be_replaced' ),
+                'h3' => __('H3', 'text_domain_to_be_replaced' ),
+                'h4' => __('H4', 'text_domain_to_be_replaced' ),
+                'h5' => __('H5', 'text_domain_to_be_replaced' ),
+                'h6' => __('H6', 'text_domain_to_be_replaced' ),
+            );
+        break;
+
+        // CSS MODIFIERS INPUT ID
+        case 'font_weight_css' :
+            $options = array(
+                'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
+                'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
+                'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
+                'lighter'   => __( 'lighter', 'text_domain_to_be_replaced' ),
+                100     => 100,
+                200     => 200,
+                300     => 300,
+                400     => 400,
+                500     => 500,
+                600     => 600,
+                700     => 700,
+                800     => 800,
+                900     => 900
+            );
+        break;
+        case 'font_style_css' :
+            $options = array(
+                'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
+                'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
+                'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
+            );
+        break;
+        case 'text_decoration_css'  :
+            $options = array(
+                'none'      => __( 'none', 'text_domain_to_be_replaced' ),
+                'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
+                'overline'    => __( 'overline', 'text_domain_to_be_replaced' ),
+                'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
+            );
+        break;
+        case 'text_transform_css' :
+            $options = array(
+                'none'      => __( 'none', 'text_domain_to_be_replaced' ),
+                'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
+                'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
+                'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
+                'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
+            );
+        break;
+
+        // SPACING MODULE
+        case 'css_unit' :
+            $options = array(
+                'px' => __('Pixels', 'text_domain_to_be_replaced' ),
+                'em' => __('Em', 'text_domain_to_be_replaced'),
+                'percent' => __('Percents', 'text_domain_to_be_replaced' )
+            );
+        break;
+
+        //QUOTE MODULE
+        case 'quote_design' :
+            $options = array(
+                'none' => __( 'No design', 'text_domain_to_be_replaced' ),
+                'border-before' => __( 'Border on the left (right for RTL users)', 'text_domain_to_be_replaced' ),
+            );
+        break;
+
+        // LAYOUT BACKGROUND BORDER
+        case 'boxed-wide' :
+            $options = array(
+                'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
+                'fullwidth' => __('Full Width', 'text_domain_to_be_replaced')
+            );
+        break;
+        case 'height-type' :
+            $options = array(
+                'default' => __('default', 'text_domain_to_be_replaced'),
+                'fit-to-screen' => __('Fit to screen', 'text_domain_to_be_replaced'),
+                'custom' => __('Custom', 'text_domain_to_be_replaced' )
+            );
+        break;
+        case 'bg-scale' :
+            $options = array(
+                'default' => __('default', 'text_domain_to_be_replaced'),
+                'auto' => __('auto', 'text_domain_to_be_replaced'),
+                'cover' => __('scale to fill', 'text_domain_to_be_replaced'),
+                'contain' => __('fit', 'text_domain_to_be_replaced'),
+            );
+        break;
+        case 'bg-position' :
+            $options = array(
+                'default' => __('default', 'text_domain_to_be_replaced'),
+            );
+        break;
+        case 'border-type' :
+            $options = array(
+                'none' => __('none', 'text_domain_to_be_replaced'),
+                'solid' => __('solid', 'text_domain_to_be_replaced'),
+                'double' => __('double', 'text_domain_to_be_replaced'),
+                'dotted' => __('dotted', 'text_domain_to_be_replaced'),
+                'dashed' => __('dashed', 'text_domain_to_be_replaced')
+            );
+        break;
+
+
+        default :
+            sek_error_log( __FUNCTION__ . ' => no case set for input id : '. $input_id );
+        break;
+    }
+    return $options;
+}
 
 ?><?php
 
@@ -2142,7 +2177,8 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                             'bg-scale' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('scale', 'text_domain_to_be_replaced'),
-                                'default'     => 'cover'
+                                'default'     => 'cover',
+                                'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
                             ),
                             // 'bg-video' => array(
                             //     'input_type'  => 'text',
@@ -2187,7 +2223,8 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                             'border-type' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Border shape', 'text_domain_to_be_replaced'),
-                                'default' => 'none'
+                                'default' => 'none',
+                                'choices'     => sek_get_select_options_for_input_id( 'border-type' )
                             ),
                             'border-color' => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -2497,7 +2534,8 @@ function sek_get_module_params_for_sek_level_section_layout_module() {
                     'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
                     'refresh_markup' => true,
                     'refresh_stylesheet' => false,
-                    'default'     => 'fullwidth'
+                    'default'     => 'fullwidth',
+                    'choices'     => sek_get_select_options_for_input_id( 'boxed-wide' )
                 ),
 
                 /* suspended, needs more thoughts
@@ -2530,7 +2568,8 @@ function sek_get_module_params_for_sek_level_height_module() {
                 'height-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Height : fit to screen or custom', 'text_domain_to_be_replaced'),
-                    'default'     => 'default'
+                    'default'     => 'default',
+                    'choices'     => sek_get_select_options_for_input_id( 'height-type' )
                 ),
                 'custom-height' => array(
                     'input_type'  => 'range_slider',
@@ -2651,7 +2690,8 @@ function sek_get_module_params_for_sek_spacing_module() {
                             'desktop_unit' =>  array(
                                 'input_type'  => 'select',
                                 'title'       => __('Unit', 'text_domain_to_be_replaced'),
-                                'default'     => 'px'
+                                'default'     => 'px',
+                                'choices'     => sek_get_select_options_for_input_id( 'css_unit' )
                             )
                         )
                     ),
@@ -2669,7 +2709,8 @@ function sek_get_module_params_for_sek_spacing_module() {
                             'tablet_unit' =>  array(
                                 'input_type'  => 'select',
                                 'title'       => __('Unit', 'text_domain_to_be_replaced'),
-                                'default'     => 'px'
+                                'default'     => 'px',
+                                'choices'     => sek_get_select_options_for_input_id( 'css_unit' )
                             )
                         )
                     ),
@@ -2687,7 +2728,8 @@ function sek_get_module_params_for_sek_spacing_module() {
                             'mobile_unit' =>  array(
                                 'input_type'  => 'select',
                                 'title'       => __('Unit', 'text_domain_to_be_replaced'),
-                                'default'     => 'px'
+                                'default'     => 'px',
+                                'choices'     => sek_get_select_options_for_input_id( 'css_unit' )
                             )
                         )
                     )
@@ -2920,7 +2962,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => 400,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_weight'
+                                'css_identifier' => 'font_weight',
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'font_style_css'      => array(
                                 'input_type'  => 'select',
@@ -2928,7 +2971,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_style'
+                                'css_identifier' => 'font_style',
+                                'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'text_decoration_css' => array(
                                 'input_type'  => 'select',
@@ -2936,7 +2980,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_decoration'
+                                'css_identifier' => 'text_decoration',
+                                'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'text_transform_css'  => array(
                                 'input_type'  => 'select',
@@ -2944,7 +2989,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_transform'
+                                'css_identifier' => 'text_transform',
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
                             ),//null,
 
                             'letter_spacing_css'  => array(
@@ -3035,7 +3081,8 @@ function sek_get_module_params_for_czr_image_module() {
                 'img-size' => array(
                     'input_type'  => 'select',
                     'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
-                    'default'     => 'large'
+                    'default'     => 'large',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'h_alignment',
@@ -3048,7 +3095,8 @@ function sek_get_module_params_for_czr_image_module() {
                 'link-to' => array(
                     'input_type'  => 'select',
                     'title'       => __('Link to', 'text_domain_to_be_replaced'),
-                    'default'     => 'no-link'
+                    'default'     => 'no-link',
+                    'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
@@ -3103,7 +3151,8 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 'img-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Display an image', 'text_domain_to_be_replaced'),
-                    'default'     => 'featured'
+                    'default'     => 'featured',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-type' )
                 ),
             ),
             // 'mod-opt' => array(
@@ -3126,7 +3175,8 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 'img-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Display an image', 'text_domain_to_be_replaced'),
-                    'default'     => 'featured'
+                    'default'     => 'featured',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-type' )
                 ),
                 'img-id' => array(
                     'input_type'  => 'upload',
@@ -3136,12 +3186,14 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 'img-size' => array(
                     'input_type'  => 'select',
                     'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
-                    'default'     => 'large'
+                    'default'     => 'large',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
                 'content-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Display a text', 'text_domain_to_be_replaced'),
-                    'default'     => 'page-excerpt'
+                    'default'     => 'page-excerpt',
+                    'choices'     => sek_get_select_options_for_input_id( 'content-type' )
                 ),
                 'content-custom-text' => array(
                     'input_type'  => 'tiny_mce_editor',
@@ -3227,7 +3279,8 @@ function sek_get_module_params_for_czr_heading_module() {
                             'heading_tag' => array(
                                 'input_type'         => 'select',
                                 'title'              => __( 'Heading tag', 'text_domain_to_be_replaced' ),
-                                'default'            => 'h1'
+                                'default'            => 'h1',
+                                'choices'            => sek_get_select_options_for_input_id( 'heading_tag' )
                             ),
                             'h_alignment_css'        => array(
                                 'input_type'         => 'h_text_alignment',
@@ -3274,7 +3327,8 @@ function sek_get_module_params_for_czr_heading_module() {
                                 'default'     => 400,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_weight'
+                                'css_identifier' => 'font_weight',
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'font_style_css'      => array(
                                 'input_type'  => 'select',
@@ -3282,7 +3336,8 @@ function sek_get_module_params_for_czr_heading_module() {
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_style'
+                                'css_identifier' => 'font_style',
+                                'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'text_decoration_css' => array(
                                 'input_type'  => 'select',
@@ -3290,7 +3345,8 @@ function sek_get_module_params_for_czr_heading_module() {
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_decoration'
+                                'css_identifier' => 'text_decoration',
+                                'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'text_transform_css'  => array(
                                 'input_type'  => 'select',
@@ -3298,7 +3354,8 @@ function sek_get_module_params_for_czr_heading_module() {
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_transform'
+                                'css_identifier' => 'text_transform',
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
                             ),//null,
 
                             'letter_spacing_css'  => array(
@@ -3382,17 +3439,21 @@ function validate_callback__czr_heading_module( $value ) {
  * Filter headings text output WordPress's KSES API.
  */
 function czr_heading_module_kses_text( $content = '' ) {
-    $allowed_tags = czr_heading_module_text_get_allowedtags();
+    $allowed_tags = wp_kses_allowed_html( 'sek-heading_text' );
 
     // Return KSES'ed content, allowing the above tags.
     return wp_kses( $content, $allowed_tags );
 }
 
-
+add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\czr_heading_module_text_get_allowedtags', 10, 2 );
 /**
  * Get headings text allowed tags
  */
-function czr_heading_module_text_get_allowedtags() {
+function czr_heading_module_text_get_allowedtags( $tags, $context ) {
+    if ( 'sek-heading_text' != $context ) {
+        return $tags;
+    }
+
     // limit wp_kses allowed tags.
     return array(
         'a' => array(
@@ -3520,7 +3581,7 @@ function czr_heading_module_text_get_allowedtags() {
  * see wp-includes/general-template::allowed_tags()
  */
 function czr_heading_module_text_allowed_tags() {
-    $allowedtags = czr_heading_module_text_get_allowedtags();
+    $allowedtags = wp_kses_allowed_html( 'sek-heading_text' );
     $allowed = '';
     foreach ( (array) $allowedtags as $tag => $attributes ) {
         $allowed .= '<'.$tag;
@@ -3640,7 +3701,8 @@ function sek_get_module_params_for_czr_divider_module() {
                     'default' => 'solid',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'border_top_style'
+                    'css_identifier' => 'border_top_style',
+                    'choices'    => sek_get_select_options_for_input_id( 'border-type' )
                 ),
                 'border_top_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
@@ -3737,7 +3799,8 @@ function sek_get_module_params_for_czr_icon_module() {
                 'link-to' => array(
                     'input_type'  => 'select',
                     'title'       => __('Link to', 'text_domain_to_be_replaced'),
-                    'default'     => 'no-link'
+                    'default'     => 'no-link',
+                    'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
@@ -3874,6 +3937,779 @@ function sek_get_module_params_for_czr_map_module() {
     );
 }
 ?><?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER QUOTE MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+//Availabe input types
+// $.extend( api.czrInputMap, {
+//       text      : '',
+//       textarea  : '',
+//       check     : 'setupIcheck',
+//       gutencheck : 'setupGutenCheck',
+//       select    : 'setupSelect',
+//       radio     : 'setupRadio',
+//       number    : 'setupStepper',
+//       upload    : 'setupImageUploaderSaveAsId',
+//       upload_url : 'setupImageUploaderSaveAsUrl',
+//       color     : 'setupColorPicker',
+//       wp_color_alpha : 'setupColorPickerAlpha',
+//       wp_color  : 'setupWPColorPicker',//not used for the moment
+//       content_picker : 'setupContentPicker',
+//       tiny_mce_editor : 'setupTinyMceEditor',
+//       password : '',
+//       range : 'setupSimpleRange',
+//       range_slider : 'setupRangeSlider',
+//       hidden : '',
+//       h_alignment : 'setupHAlignement',
+//       h_text_alignment : 'setupHAlignement'
+// });
+function sek_get_module_params_for_czr_quote_module() {
+    $quote_font_selectors = array( '.sek-quote-content', '.sek-quote-content p', '.sek-quote-content ul', '.sek-quote-content ol', '.sek-quote-content a' );
+    $cite_font_selectors  = array( '.sek-cite', '.sek-cite a' );
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_quote_module',
+        'name' => __('Quote', 'text_domain_to_be_replaced' ),
+        'sanitize_callback' => __NAMESPACE__ . '\sanitize_callback__czr_quote_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'starting_value' => array(
+            'quote_text'  => 'Hey, careful, man, there\'s a beverage here!',
+            'cite_text'   => 'The Dude in <a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>',
+            'quote_design' => 'border-before'
+        ),
+        'css_selectors' => array( '.sek-module-inner' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'tabs' => array(
+                    array(
+                        'title' => __( 'Quote', 'text_domain_to_be_replaced' ),
+                        'inputs' => array(
+                            'quote_text' => array(
+                                'input_type'         => 'textarea',
+                                'title'              => __( 'Quote text', 'text_domain_to_be_replaced' ),
+                                'default'            => '',
+                                'width-100'         => true,
+                                'notice_before'      => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
+                            ),
+                            'quote_font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $quote_font_selectors,
+                            ),
+                            'quote_font_size_css'       => array(
+                                'input_type'  => 'font_size',
+                                'title'       => __( 'Font size in pixels', 'text_domain_to_be_replaced' ),
+                                'default'     => '16px',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $quote_font_selectors,
+                            ),//16,//"14px",
+                            'quote_line_height_css'     => array(
+                                'input_type'  => 'line_height',
+                                'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
+                                'default'     => '24px',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $quote_font_selectors,
+                            ),//24,//"20px",
+                            'quote_font_weight_css'     => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
+                                'default'     => 400,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight',
+                                'css_selectors' => $quote_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
+                            ),//null,
+                            'quote_font_style_css'      => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
+                                'default'     => 'inherit',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style',
+                                'css_selectors' => $quote_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
+                            ),//null,
+                            'quote_text_decoration_css' => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
+                                'default'     => 'none',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_decoration',
+                                'css_selectors' => $quote_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
+                            ),//null,
+                            'quote_text_transform_css'  => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
+                                'default'     => 'none',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform',
+                                'css_selectors' => $quote_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
+                            ),//null,
+                            'quote_letter_spacing_css'  => array(
+                                'input_type'  => 'number',
+                                'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                                'default'     => 0,
+                                'min'         => 0,
+                                'step'        => 1,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'letter_spacing',
+                                'css_selectors' => $quote_font_selectors,
+                            ),//0,
+                            'quote_color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $quote_font_selectors,
+                            ),//"#000000",
+                            'quote_color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover',
+                                'css_selectors' => $quote_font_selectors,
+                            ),//"#000000",
+                            // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
+                            'quote___flag_important'       => array(
+                                'input_type'  => 'gutencheck',
+                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                                'default'     => 0,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                // declare the list of input_id that will be flagged with !important when the option is checked
+                                // @see sek_add_css_rules_for_css_sniffed_input_id
+                                // @see Nsek_is_flagged_important
+                                'important_input_list' => array(
+                                    'quote_font_family_css',
+                                    'quote_font_size_css',
+                                    'quote_line_height_css',
+                                    'quote_font_weight_css',
+                                    'quote_font_style_css',
+                                    'quote_text_decoration_css',
+                                    'quote_text_transform_css',
+                                    'quote_letter_spacing_css',
+                                    'quote_color_css',
+                                    'quote_color_hover_css'
+                                )
+                            ),
+                        )
+
+                    ),
+                    array(
+                        'title' => __( 'Cite', 'text_domain_to_be_replaced' ),
+                        'inputs' => array(
+                            'cite_text' => array(
+                                'input_type'         => 'textarea',
+                                'title'              => __( 'Cite text', 'text_domain_to_be_replaced' ),
+                                'default'            => '',
+                                'width-100'         => true,
+                                'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
+                            ),
+                            'cite_font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $cite_font_selectors,
+                            ),
+                            'cite_font_size_css'       => array(
+                                'input_type'  => 'font_size',
+                                'title'       => __( 'Font size in pixels', 'text_domain_to_be_replaced' ),
+                                'default'     => '16px',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $cite_font_selectors,
+                            ),//16,//"14px",
+                            'line_height_css'     => array(
+                                'input_type'  => 'line_height',
+                                'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
+                                'default'     => '24px',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $cite_font_selectors,
+                            ),//24,//"20px",
+                            'cite_font_weight_css'     => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
+                                'default'     => 400,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight',
+                                'css_selectors' => $cite_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
+                            ),//null,
+                            'cite_font_style_css'      => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
+                                'default'     => 'inherit',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style',
+                                'css_selectors' => $cite_font_selectors,
+                                'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
+                            ),//null,
+                            'cite_text_decoration_css' => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
+                                'default'     => 'none',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_decoration',
+                                'css_selectors' => $cite_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
+                            ),//null,
+                            'cite_text_transform_css'  => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
+                                'default'     => 'none',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform',
+                                'css_selectors' => $cite_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
+                            ),//null,
+                            'cite_letter_spacing_css'  => array(
+                                'input_type'  => 'number',
+                                'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                                'default'     => 0,
+                                'min'         => 0,
+                                'step'        => 1,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'letter_spacing',
+                                'css_selectors' => $cite_font_selectors,
+                            ),//0,
+                            'cite_color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $cite_font_selectors,
+                            ),//"#000000",
+                            'cite_color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover',
+                                'css_selectors' => $cite_font_selectors,
+                            ),//"#000000",
+                            // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
+                            'cite___flag_important'       => array(
+                                'input_type'  => 'gutencheck',
+                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                                'default'     => 0,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                // declare the list of input_id that will be flagged with !important when the option is checked
+                                // @see sek_add_css_rules_for_css_sniffed_input_id
+                                // @see Nsek_is_flagged_important
+                                'important_input_list' => array(
+                                    'cite_font_family_css',
+                                    'cite_font_size_css',
+                                    'cite_line_height_css',
+                                    'cite_font_weight_css',
+                                    'cite_font_style_css',
+                                    'cite_text_decoration_css',
+                                    'cite_text_transform_css',
+                                    'cite_letter_spacing_css',
+                                    'cite_color_css',
+                                    'cite_color_hover_css'
+                                )
+                            ),
+                        ),
+                    ),
+                    array(
+                        'title' => __( 'Design', 'text_domain_to_be_replaced' ),
+                        'inputs' => array(
+                            'quote_design' => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Design', 'text_domain_to_be_replaced' ),
+                                'default'     => 'none',
+                                'choices'     => sek_get_select_options_for_input_id( 'quote_design' )
+                            ),
+                            'border_width_css' => array(
+                                'input_type'  => 'range_slider',
+                                'title'       => __( 'Border weight', 'text_domain_to_be_replaced' ),
+                                'min' => 1,
+                                'max' => 80,
+                                'unit' => 'px',
+                                'default' => 5,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'border_width',
+                                'css_selectors' => '.sek-quote.sek-quote-design.sek-border-before'
+                            ),
+                            'border_color_css' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Border Color', 'text_domain_to_be_replaced' ),
+                                'width-100'   => true,
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'border_color',
+                                'css_selectors' => '.sek-quote.sek-quote-design.sek-border-before'
+                            ),
+                        )
+                    )
+                )
+            )
+        ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/quote_module_tmpl.php",
+    );
+}
+
+
+
+
+function sanitize_callback__czr_quote_module( $value ) {
+    if ( array_key_exists( 'quote_text', $value ) ) {
+        //sanitize quote_text
+        $value[ 'quote_text' ] = czr_quote_module_kses_quote_text( $value[ 'quote_text' ] );
+    }
+    if ( array_key_exists( 'cite_text', $value ) ) {
+        //sanitize cite_text
+        $value[ 'cite_text' ] = czr_quote_module_kses_cite_text( $value[ 'cite_text' ] );
+    }
+    return $value;
+}
+
+
+/**
+ * Filter quote text output WordPress's KSES API.
+ */
+function czr_quote_module_kses_quote_text( $content = '' ) {
+    $allowed_tags = wp_kses_allowed_html( 'sek-quote_text' );
+
+    // Return KSES'ed content, allowing the above tags.
+    return wp_kses( $content, $allowed_tags );
+}
+
+
+/**
+ * Filter cite text output WordPress's KSES API.
+ */
+function czr_quote_module_kses_cite_text( $content = '' ) {
+    $allowed_tags = wp_kses_allowed_html( 'sek-cite_text' );
+
+    // Return KSES'ed content, allowing the above tags.
+    return wp_kses( $content, $allowed_tags );
+}
+
+
+
+add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\czr_quote_module_quote_text_get_allowedtags', 10, 2 );
+add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\czr_quote_module_cite_text_get_allowedtags', 10, 2 );
+/**
+ * Get quote text allowed tags
+ * blockquote specifications:
+ * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/blockquote
+ * can contain: https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Flow_content
+ *
+ * here we use just a subset of the allowed tags in a blockquote
+ */
+function czr_quote_module_quote_text_get_allowedtags( $tags, $context ) {
+    if ( 'sek-quote_text' != $context ) {
+        return $tags;
+    }
+
+    // limit wp_kses allowed tags.
+    return array(
+        'a' => array(
+            'href' => 1,
+            'rel' => 1,
+            'rev' => 1,
+            'name' => 1,
+            'target' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'abbr' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'b' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'big' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'br' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'button' => array(
+            'disabled' => 1,
+            'name' => 1,
+            'type' => 1,
+            'value' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'code' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'del' => array(
+            'datetime' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'em' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'i' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'ins' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'li' => array(
+            'align' => 1,
+            'value' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'p' => array(
+            'dir'   => 1,
+            'align' => 1,
+            'lang'  => 1,
+            'xml:lang' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'q' => array(
+            'cite' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'section' => array(
+            'dir'   => 1,
+            'align' => 1,
+            'lang'  => 1,
+            'xml:lang' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'small' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'span' => array(
+            'dir'   => 1,
+            'align' => 1,
+            'lang'  => 1,
+            'xml:lang' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'strike' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'strong' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'sub' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'sup' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'u' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'ol' => array(
+            'start' => 1,
+            'type' => 1,
+            'reversed' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'ul' => array(
+            'type' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+    );
+}
+
+
+/**
+ * Get quote text allowed tags
+ * cite specifications:
+ * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/cite
+ * can contain: https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
+ *
+ * here we use just a subset of the allowed tags in a cite
+ */
+function czr_quote_module_cite_text_get_allowedtags( $tags, $context ) {
+    if ( 'sek-cite_text' != $context ) {
+        return $tags;
+    }
+
+
+    // limit wp_kses allowed tags.
+    return array(
+        'a' => array(
+            'href' => 1,
+            'rel' => 1,
+            'rev' => 1,
+            'name' => 1,
+            'target' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'abbr' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'b' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'big' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'br' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'button' => array(
+            'disabled' => 1,
+            'name' => 1,
+            'type' => 1,
+            'value' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'code' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'del' => array(
+            'datetime' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'em' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'i' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'ins' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'span' => array(
+            'dir'   => 1,
+            'align' => 1,
+            'lang'  => 1,
+            'xml:lang' => 1,
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'small' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'strike' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'strong' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'sub' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'sup' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+        'u' => array(
+            'class' => 1,
+            'id' => 1,
+            'style' => 1,
+            'title' => 1,
+            'role' => 1,
+        ),
+    );
+}
+?>
+<?php
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -5016,7 +5852,13 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         case 'height' :
             $properties_to_render['height'] = $value > 0 ? $value . 'px' : '1px';
         break;
-
+        /* Quote border */
+        case 'border_width' :
+            $properties_to_render['border-width'] = $value > 0 ? $value . 'px' : '1px';
+        break;
+        case 'border_color' :
+            $properties_to_render['border-color'] = $value ? $value : '';
+        break;
         /* Divider */
         case 'border_top_width' :
             $properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
@@ -5581,6 +6423,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
         // hook : 'wp_enqueue_scripts'
         function sek_enqueue_front_assets() {
+            $rtl_suffix = is_rtl() ? '-rtl' : '';
+
             //wp_enqueue_style( 'google-material-icons', '//fonts.googleapis.com/icon?family=Material+Icons', array(), null, 'all' );
             //base custom CSS bootstrap inspired
             wp_enqueue_style(
@@ -5588,7 +6432,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/front/css/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-base.css' : 'sek-base.min.css'
+                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? "sek-base{$rtl_suffix}.css" : "sek-base{$rtl_suffix}.min.css"
                 ),
                 array(),
                 NIMBLE_ASSETS_VERSION,
