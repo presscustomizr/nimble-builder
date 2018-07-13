@@ -1946,7 +1946,7 @@ function sek_register_modules() {
 
 
 // HELPERS
-// Used when registrating a select input in a module
+// Used when registering a select input in a module
 // @return an array of options that will be used to populate the select input in js
 function sek_get_select_options_for_input_id( $input_id ) {
     $options = array();
