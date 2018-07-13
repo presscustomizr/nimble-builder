@@ -11,6 +11,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
         // hook : 'wp_enqueue_scripts'
         function sek_enqueue_front_assets() {
+            $rtl_suffix = is_rtl() ? '-rtl' : '';
+
             //wp_enqueue_style( 'google-material-icons', '//fonts.googleapis.com/icon?family=Material+Icons', array(), null, 'all' );
             //base custom CSS bootstrap inspired
             wp_enqueue_style(
@@ -18,7 +20,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/front/css/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-base.css' : 'sek-base.min.css'
+                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? "sek-base{$rtl_suffix}.css" : "sek-base{$rtl_suffix}.min.css"
                 ),
                 array(),
                 NIMBLE_ASSETS_VERSION,

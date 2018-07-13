@@ -215,17 +215,21 @@ function validate_callback__czr_heading_module( $value ) {
  * Filter headings text output WordPress's KSES API.
  */
 function czr_heading_module_kses_text( $content = '' ) {
-    $allowed_tags = czr_heading_module_text_get_allowedtags();
+    $allowed_tags = wp_kses_allowed_html( 'sek-heading_text' );
 
     // Return KSES'ed content, allowing the above tags.
     return wp_kses( $content, $allowed_tags );
 }
 
-
+add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\czr_heading_module_text_get_allowedtags', 10, 2 );
 /**
  * Get headings text allowed tags
  */
-function czr_heading_module_text_get_allowedtags() {
+function czr_heading_module_text_get_allowedtags( $tags, $context ) {
+    if ( 'sek-heading_text' != $context ) {
+        return $tags;
+    }
+
     // limit wp_kses allowed tags.
     return array(
         'a' => array(
@@ -353,7 +357,7 @@ function czr_heading_module_text_get_allowedtags() {
  * see wp-includes/general-template::allowed_tags()
  */
 function czr_heading_module_text_allowed_tags() {
-    $allowedtags = czr_heading_module_text_get_allowedtags();
+    $allowedtags = wp_kses_allowed_html( 'sek-heading_text' );
     $allowed = '';
     foreach ( (array) $allowedtags as $tag => $attributes ) {
         $allowed .= '<'.$tag;

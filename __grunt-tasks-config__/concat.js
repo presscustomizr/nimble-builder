@@ -217,6 +217,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/front/4_1_2_sek_register_divider.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_1_3_sek_register_icon.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_1_4_sek_register_map.php',
+      '<%= paths.sektions %>_dev_php/module_registration/front/4_1_5_sek_register_quote.php',
 
       // DYN CSS
       '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_1_class-sek-dyn-css-builder.php',
@@ -276,6 +277,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_6_FRONT_divider.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_7_FRONT_spacer.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_8_FRONT_map.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_9_FRONT_quote.js',
     ],
     dest: '<%= paths.czr_assets %>sek/js/ccat-sek-control.js',
   },

@@ -159,7 +159,13 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         case 'height' :
             $properties_to_render['height'] = $value > 0 ? $value . 'px' : '1px';
         break;
-
+        /* Quote border */
+        case 'border_width' :
+            $properties_to_render['border-width'] = $value > 0 ? $value . 'px' : '1px';
+        break;
+        case 'border_color' :
+            $properties_to_render['border-color'] = $value ? $value : '';
+        break;
         /* Divider */
         case 'border_top_width' :
             $properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
