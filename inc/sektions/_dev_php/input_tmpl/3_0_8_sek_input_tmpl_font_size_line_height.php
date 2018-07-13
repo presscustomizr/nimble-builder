@@ -27,6 +27,11 @@ function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
                   ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
                 );
           ?>
+          <div aria-label="Font Size" class="components-button-group" role="group">
+            <button type="button" aria-pressed="true" class="components-button is-button is-default is-large">px</button>
+            <button type="button" aria-pressed="false" class="components-button is-button is-default is-large">em</button>
+            <button type="button" aria-pressed="false" class="components-button is-button is-default is-large">%</button>
+          </div>
         </div><?php // sek-font-size-wrapper ?>
     <?php
 }
