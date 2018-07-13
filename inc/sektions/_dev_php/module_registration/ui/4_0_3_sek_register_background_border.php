@@ -48,7 +48,8 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                             'bg-scale' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('scale', 'text_domain_to_be_replaced'),
-                                'default'     => 'cover'
+                                'default'     => 'cover',
+                                'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
                             ),
                             // 'bg-video' => array(
                             //     'input_type'  => 'text',
@@ -93,7 +94,8 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                             'border-type' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Border shape', 'text_domain_to_be_replaced'),
-                                'default' => 'none'
+                                'default' => 'none',
+                                'choices'     => sek_get_select_options_for_input_id( 'border-type' )
                             ),
                             'border-color' => array(
                                 'input_type'  => 'wp_color_alpha',

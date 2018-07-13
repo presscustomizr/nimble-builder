@@ -90,6 +90,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_weight',
                                 'css_selectors' => $quote_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'quote_font_style_css'      => array(
                                 'input_type'  => 'select',
@@ -99,6 +100,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_style',
                                 'css_selectors' => $quote_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'quote_text_decoration_css' => array(
                                 'input_type'  => 'select',
@@ -108,6 +110,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'text_decoration',
                                 'css_selectors' => $quote_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'quote_text_transform_css'  => array(
                                 'input_type'  => 'select',
@@ -117,6 +120,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'text_transform',
                                 'css_selectors' => $quote_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
                             ),//null,
                             'quote_letter_spacing_css'  => array(
                                 'input_type'  => 'number',
@@ -222,6 +226,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_weight',
                                 'css_selectors' => $cite_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'cite_font_style_css'      => array(
                                 'input_type'  => 'select',
@@ -231,6 +236,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_style',
                                 'css_selectors' => $cite_font_selectors,
+                                'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'cite_text_decoration_css' => array(
                                 'input_type'  => 'select',
@@ -240,6 +246,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'text_decoration',
                                 'css_selectors' => $cite_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'cite_text_transform_css'  => array(
                                 'input_type'  => 'select',
@@ -249,6 +256,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'text_transform',
                                 'css_selectors' => $cite_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
                             ),//null,
                             'cite_letter_spacing_css'  => array(
                                 'input_type'  => 'number',
@@ -314,6 +322,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'input_type'  => 'select',
                                 'title'       => __( 'Design', 'text_domain_to_be_replaced' ),
                                 'default'     => 'none',
+                                'choices'     => sek_get_select_options_for_input_id( 'quote_design' )
                             ),
                             'border_width_css' => array(
                                 'input_type'  => 'range_slider',

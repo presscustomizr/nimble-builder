@@ -51,7 +51,8 @@ function sek_get_module_params_for_czr_divider_module() {
                     'default' => 'solid',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'border_top_style'
+                    'css_identifier' => 'border_top_style',
+                    'choices'    => sek_get_select_options_for_input_id( 'border-type' )
                 ),
                 'border_top_color_css' => array(
                     'input_type'  => 'wp_color_alpha',

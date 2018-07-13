@@ -49,7 +49,8 @@ function sek_get_module_params_for_czr_icon_module() {
                 'link-to' => array(
                     'input_type'  => 'select',
                     'title'       => __('Link to', 'text_domain_to_be_replaced'),
-                    'default'     => 'no-link'
+                    'default'     => 'no-link',
+                    'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',

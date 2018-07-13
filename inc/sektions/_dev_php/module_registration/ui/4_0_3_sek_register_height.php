@@ -15,7 +15,8 @@ function sek_get_module_params_for_sek_level_height_module() {
                 'height-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Height : fit to screen or custom', 'text_domain_to_be_replaced'),
-                    'default'     => 'default'
+                    'default'     => 'default',
+                    'choices'     => sek_get_select_options_for_input_id( 'height-type' )
                 ),
                 'custom-height' => array(
                     'input_type'  => 'range_slider',

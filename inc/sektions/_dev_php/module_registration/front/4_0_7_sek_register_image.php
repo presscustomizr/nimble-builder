@@ -23,7 +23,8 @@ function sek_get_module_params_for_czr_image_module() {
                 'img-size' => array(
                     'input_type'  => 'select',
                     'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
-                    'default'     => 'large'
+                    'default'     => 'large',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'h_alignment',
@@ -36,7 +37,8 @@ function sek_get_module_params_for_czr_image_module() {
                 'link-to' => array(
                     'input_type'  => 'select',
                     'title'       => __('Link to', 'text_domain_to_be_replaced'),
-                    'default'     => 'no-link'
+                    'default'     => 'no-link',
+                    'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',

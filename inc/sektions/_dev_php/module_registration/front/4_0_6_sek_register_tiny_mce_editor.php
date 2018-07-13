@@ -70,7 +70,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => 400,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_weight'
+                                'css_identifier' => 'font_weight',
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'font_style_css'      => array(
                                 'input_type'  => 'select',
@@ -78,7 +79,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_style'
+                                'css_identifier' => 'font_style',
+                                'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'text_decoration_css' => array(
                                 'input_type'  => 'select',
@@ -86,7 +88,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_decoration'
+                                'css_identifier' => 'text_decoration',
+                                'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'text_transform_css'  => array(
                                 'input_type'  => 'select',
@@ -94,7 +97,8 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_transform'
+                                'css_identifier' => 'text_transform',
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
                             ),//null,
 
                             'letter_spacing_css'  => array(

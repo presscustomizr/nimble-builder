@@ -23,7 +23,8 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 'img-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Display an image', 'text_domain_to_be_replaced'),
-                    'default'     => 'featured'
+                    'default'     => 'featured',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-type' )
                 ),
             ),
             // 'mod-opt' => array(
@@ -46,7 +47,8 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 'img-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Display an image', 'text_domain_to_be_replaced'),
-                    'default'     => 'featured'
+                    'default'     => 'featured',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-type' )
                 ),
                 'img-id' => array(
                     'input_type'  => 'upload',
@@ -56,12 +58,14 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 'img-size' => array(
                     'input_type'  => 'select',
                     'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
-                    'default'     => 'large'
+                    'default'     => 'large',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
                 'content-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Display a text', 'text_domain_to_be_replaced'),
-                    'default'     => 'page-excerpt'
+                    'default'     => 'page-excerpt',
+                    'choices'     => sek_get_select_options_for_input_id( 'content-type' )
                 ),
                 'content-custom-text' => array(
                     'input_type'  => 'tiny_mce_editor',

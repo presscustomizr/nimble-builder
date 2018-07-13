@@ -28,7 +28,8 @@ function sek_get_module_params_for_sek_spacing_module() {
                             'desktop_unit' =>  array(
                                 'input_type'  => 'select',
                                 'title'       => __('Unit', 'text_domain_to_be_replaced'),
-                                'default'     => 'px'
+                                'default'     => 'px',
+                                'choices'     => sek_get_select_options_for_input_id( 'css_unit' )
                             )
                         )
                     ),
@@ -46,7 +47,8 @@ function sek_get_module_params_for_sek_spacing_module() {
                             'tablet_unit' =>  array(
                                 'input_type'  => 'select',
                                 'title'       => __('Unit', 'text_domain_to_be_replaced'),
-                                'default'     => 'px'
+                                'default'     => 'px',
+                                'choices'     => sek_get_select_options_for_input_id( 'css_unit' )
                             )
                         )
                     ),
@@ -64,7 +66,8 @@ function sek_get_module_params_for_sek_spacing_module() {
                             'mobile_unit' =>  array(
                                 'input_type'  => 'select',
                                 'title'       => __('Unit', 'text_domain_to_be_replaced'),
-                                'default'     => 'px'
+                                'default'     => 'px',
+                                'choices'     => sek_get_select_options_for_input_id( 'css_unit' )
                             )
                         )
                     )
