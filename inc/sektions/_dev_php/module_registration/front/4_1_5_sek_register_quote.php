@@ -37,7 +37,8 @@ function sek_get_module_params_for_czr_quote_module() {
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'starting_value' => array(
             'quote_text'  => 'Hey, careful, man, there\'s a beverage here!',
-            'cite_text'   => 'The Dude in <a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>'
+            'cite_text'   => 'The Dude in <a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>',
+            'quote_design' => 'border-before'
         ),
         'css_selectors' => array( '.sek-module-inner' ),
         'tmpl' => array(
