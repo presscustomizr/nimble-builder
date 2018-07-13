@@ -17,9 +17,6 @@
   position: relative;
   padding: 23px 10px 0;/* <= Needed for the placement of the ui icons container revealed on hover */
 }
-.sek-section h2 { color:black;}
-
-.sek-column h3 { color:blue;}
 
 .sek-column-inner.sek-empty-col {
   min-height: 100px;
@@ -33,8 +30,6 @@
 .sek-module-inner {
   position: relative;
 }
-
-.sek-module h4 { color:red;}
 
 
 
