@@ -83,7 +83,7 @@ function sek_get_module_params_for_czr_heading_module() {
                             ),
                             'font_size_css'       => array(
                                 'input_type'  => 'font_size',
-                                'title'       => __( 'Font size in pixels', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
                                 'default'     => '16px',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -91,7 +91,7 @@ function sek_get_module_params_for_czr_heading_module() {
                             ),//16,//"14px",
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
-                                'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
                                 'default'     => '24px',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,

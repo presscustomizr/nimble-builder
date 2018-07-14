@@ -1870,16 +1870,20 @@ function sek_get_gfonts( $what = null ) {
 // @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
     ?>
-        <div class="sek-font-size-line-height-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-          <?php
+      <?php
             // we save the int value + unit
             // we want to keep only the numbers when printing the tmpl
           ?>
           <#
-            var value = data['<?php echo $input_id; ?>'];
+            var value = data['<?php echo $input_id; ?>'],
+                unit = data['<?php echo $input_id; ?>'];
             value = _.isString( value ) ? value.replace(/\D+/g, '') : '';
+            unit = _.isString( unit ) ? unit.replace(/[0-9]/g, '') : 'px';
+            unit = _.isEmpty( unit ) ? 'px' : unit;
           #>
+        <div class="sek-font-size-line-height-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
+
           <?php
               printf( '<input type="number" %1$s %2$s %3$s value="{{ value }}" />',
                   ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
@@ -1887,6 +1891,8 @@ function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
                   ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
                 );
           ?>
+          <div aria-label="Font Size" class="sek-ui-button-group" role="group">
+              <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_domain');?>" data-sek-unit="%"><?php _e('%', 'text_domain');?></button></div>
         </div><?php // sek-font-size-wrapper ?>
     <?php
 }
@@ -2942,7 +2948,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             ),
                             'font_size_css'       => array(
                                 'input_type'  => 'font_size',
-                                'title'       => __('Font size in pixels', 'text_domain_to_be_replaced'),
+                                'title'       => __('Font size', 'text_domain_to_be_replaced'),
                                 'default'     => '16px',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -2950,7 +2956,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             ),//16,//"14px",
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
-                                'title'       => __('Line height in pixels', 'text_domain_to_be_replaced'),
+                                'title'       => __('Line height', 'text_domain_to_be_replaced'),
                                 'default'     => '24px',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -3302,7 +3308,7 @@ function sek_get_module_params_for_czr_heading_module() {
                             ),
                             'font_size_css'       => array(
                                 'input_type'  => 'font_size',
-                                'title'       => __( 'Font size in pixels', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
                                 'default'     => '16px',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -3310,7 +3316,7 @@ function sek_get_module_params_for_czr_heading_module() {
                             ),//16,//"14px",
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
-                                'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
                                 'default'     => '24px',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
