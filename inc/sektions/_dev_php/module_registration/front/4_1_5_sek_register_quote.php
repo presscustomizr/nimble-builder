@@ -76,7 +76,7 @@ function sek_get_module_params_for_czr_quote_module() {
                             'quote_line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
-                                'default'     => '24px',
+                                'default'     => '1.5em',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height',
@@ -212,7 +212,7 @@ function sek_get_module_params_for_czr_quote_module() {
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
-                                'default'     => '24px',
+                                'default'     => '1.5em',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height',
