@@ -510,7 +510,53 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                         $( 'select[data-czrtype]', input.container ).selecter();
                   }
-            }
+            },
 
+
+            //-------------------------------------------------------------------------------------------------
+            // GENERIC WAY TO SETUP FONT SIZE AND LINE HEIGHT INPUTS
+            //-------------------------------------------------------------------------------------------------
+            // "this" is the input
+            setupFontSizeAndLineHeightInputs : function( obj ) {
+                  var input      = this,
+                      $wrapper = $('.sek-font-size-line-height-wrapper', input.container ),
+                      initial_unit = $wrapper.find('input[data-czrtype]').data('sek-unit'),
+                      validateUnit = function( unit ) {
+                            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
+                                  api.errare( 'error : invalid unit for input ' + input.id, unit );
+                                  unit = 'px';
+                            }
+                            return unit;
+                      };
+                  // initialize the unit with the value provided in the dom
+                  input.css_unit = new api.Value( _.isEmpty( initial_unit ) ? 'px' : validateUnit( initial_unit ) );
+                  // React to a unit change
+                  input.css_unit.bind( function( to ) {
+                        to = _.isEmpty( to ) ? 'px' : to;
+                        $wrapper.find( 'input[type="number"]').trigger('change');
+                  });
+
+                  // instantiate stepper and schedule change reactions
+                  $wrapper.find( 'input[type="number"]').on('input change', function( evt ) {
+                        input( $(this).val() + validateUnit( input.css_unit() ) );
+                  }).stepper();
+
+
+                  // Schedule unit changes on button click
+                  $wrapper.on( 'click', '.sek-ui-button', function(evt) {
+                        evt.preventDefault();
+                        // handle the is-selected css class toggling
+                        $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
+                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
+                        // update the initial unit ( not mandatory)
+                        $wrapper.find('input[data-czrtype]').data('sek-unit', $(this).data('sek-unit') );
+                        // set the current unit Value
+                        input.css_unit( $(this).data('sek-unit') );
+                  });
+
+                  // add is-selected button on init to the relevant unit button
+                  $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
+
+            },
       });//$.extend()
 })( wp.customize, jQuery );

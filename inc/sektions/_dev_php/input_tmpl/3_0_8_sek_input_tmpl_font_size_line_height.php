@@ -1,11 +1,11 @@
 <?php
 
 /* ------------------------------------------------------------------------- *
- *  HORIZONTAL ALIGNMENT INPUT
+ *  FONT SIZE
 /* ------------------------------------------------------------------------- */
 // AND
 /* ------------------------------------------------------------------------- *
- *  HORIZONTAL ALIGNMENT INPUT FOR TEXT => includes the 'justify' icon
+ *  LINE HEIGHT INPUT TMPLS
 /* ------------------------------------------------------------------------- */
 // @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
@@ -13,12 +13,13 @@ function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
       <?php
             // we save the int value + unit
             // we want to keep only the numbers when printing the tmpl
+            // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
           ?>
           <#
             var value = data['<?php echo $input_id; ?>'],
                 unit = data['<?php echo $input_id; ?>'];
-            value = _.isString( value ) ? value.replace(/\D+/g, '') : '';
-            unit = _.isString( unit ) ? unit.replace(/[0-9]/g, '') : 'px';
+            value = _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
+            unit = _.isString( unit ) ? unit.replace(/[0-9]|\.|,/g, '') : 'px';
             unit = _.isEmpty( unit ) ? 'px' : unit;
           #>
         <div class="sek-font-size-line-height-wrapper">
