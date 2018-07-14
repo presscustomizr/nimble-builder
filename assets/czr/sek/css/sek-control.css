@@ -408,3 +408,94 @@ div[data-sek-align].selected {
     width: 100%;
     float: left;
 }
+
+
+
+/* UNIT PICKER */
+.sek-ui-button-group {
+    display: inline-block;
+    float: right;
+}
+.sek-ui-button-group .sek-ui-button:first-child {
+    border-radius: 3px 0 0 3px;
+}
+.sek-ui-button-group .sek-ui-button+.sek-ui-button {
+    margin-left: -1px;
+}
+.sek-ui-button-group .sek-ui-button:last-child {
+    border-radius: 0 3px 3px 0;
+}
+.sek-ui-button {
+    height: 28px;
+    line-height: 28px;
+    padding: 0 12px 2px;
+    border-radius: 3px;
+    white-space: nowrap;
+    border-width: 1px;
+    border-style: solid;
+    display: inline-flex;
+    text-decoration: none;
+    font-size: 13px;
+    margin: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    background: none;
+    color: #555;
+    border-color: #ccc;
+    background: #f7f7f7;
+    box-shadow: inset 0 -1px 0 #ccc;
+    vertical-align: top;
+}
+
+
+.sek-ui-button:hover {
+    background: #fafafa;
+    border-color: #999;
+    box-shadow: inset 0 -1px 0 #999;
+    color: #23282d;
+}
+.sek-ui-button:active:not(:disabled) {
+    background: #eee;
+    border-color: #999;
+    box-shadow: inset 0 1px 0 #999;
+}
+.sek-ui-button:focus:not(:disabled) {
+    background: #fafafa;
+    color: #23282d;
+    border-color: #999;
+    box-shadow: inset 0 -1px 0 #999, 0 0 0 2px #bfe7f3;
+}
+
+.sek-ui-button.is-selected:focus:not(:disabled) {
+    box-shadow: inset 0 -1px 0 #00435d, 0 0 0 2px #bfe7f3;
+}
+
+.sek-ui-button.is-selected {
+    background: #0085ba;
+    border-color: #006a95 #00648c #00648c;
+    box-shadow: inset 0 -1px 0 #00648c;
+    color: #fff;
+    text-decoration: none;
+    text-shadow: 0 -1px 1px #005d82, 1px 0 1px #005d82, 0 1px 1px #005d82, -1px 0 1px #005d82;
+}
+.sek-ui-button.is-selected:focus:not(:disabled), .sek-ui-button.is-selected:hover {
+    background: #007eb1;
+    border-color: #00435d;
+    box-shadow: inset 0 -1px 0 #00435d;
+    color: #fff;
+}
+.sek-ui-button.is-selected:focus:not(:disabled) {
+    box-shadow: inset 0 -1px 0 #00435d, 0 0 0 2px #bfe7f3;
+}
+.sek-ui-button.is-selected:focus:not(:disabled), .sek-ui-button.is-selected:hover {
+    background: #007eb1;
+    border-color: #00435d;
+    box-shadow: inset 0 -1px 0 #00435d;
+    color: #fff;
+}
+.sek-ui-button.is-selected:focus:not(:disabled), .sek-ui-button.is-selected:hover {
+    background: #007eb1;
+    border-color: #00435d;
+    box-shadow: inset 0 -1px 0 #00435d;
+    color: #fff;
+}
