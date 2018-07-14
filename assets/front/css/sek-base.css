@@ -608,12 +608,17 @@ fieldset[disabled] a.sek-btn {
   color: inherit;
 }
 
+.sek-quote p {
+  margin: 0 0 .5em;
+  padding: 0;
+}
+
 .sek-quote.sek-quote-design {
   background: none;
-  padding: 15px 0;
+  font-style: inherit;
   margin-right: 0;
   margin-left: 0;
-  font-style: inherit;
+  padding: 15px 0;
   border: none;
 }
 
