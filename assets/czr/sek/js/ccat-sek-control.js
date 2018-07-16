@@ -1425,6 +1425,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
                         case 'sek-generate-level-options-ui' :
                               // Generate the UI for level options
                               //console.log("PARAMS IN sek-generate-level-options-ui", params );
@@ -1452,6 +1464,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               _do_register_ = function() {
                                     if ( 'section' === params.level ) {
+
+
+
+
+
                                           // REGISTER SECTION LAYOUT
                                           // Make sure this setting is bound only once !
                                           if( ! api.has( heightOptionsSetId ) ) {
@@ -1511,6 +1528,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
+
+
+
+
+
+
+
+
+
                                     // REGISTER BACKGROUND BORDER OPTIONS
                                     // Make sure this setting is bound only once !
                                     if( ! api.has( bgBorderOptionsSetId ) ) {
@@ -1567,6 +1594,104 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    var testSpacingOptionsSetId = params.id + '__spacing_options_test';
+                                    // TEST REGISTER SPAGING OPTIONS
+                                    // Make sure this setting is bound only once !
+                                    if( ! api.has( testSpacingOptionsSetId ) ) {
+                                          // Schedule the binding to synchronize the options with the main collection setting
+                                          // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
+                                          // They need to be kept in order to keep track of the changes in the customizer.
+                                          // => that's why we check if ! api.has( ... )
+                                          api( testSpacingOptionsSetId, function( _setting_ ) {
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      try { self.updateAPISettingAndExecutePreviewActions({
+                                                            defaultPreviewAction : 'refresh_stylesheet',
+                                                            uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                            options_type : 'spacing',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
+                                                            settingParams : {
+                                                                  to : to,
+                                                                  from : from,
+                                                                  args : args
+                                                            }
+                                                      }); } catch( er ) {
+                                                            api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                                      }
+                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          });//api( spacingOptionsSetId, function( _setting_ ) {})
+
+
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
+                                                level : params.level,
+                                                what : 'setting',
+                                                id : testSpacingOptionsSetId,
+                                                dirty : false,
+                                                value : optionDBValue.spacing || {},
+                                                transport : 'postMessage',// 'refresh',
+                                                type : '_nimble_ui_'//will be dynamically registered but not saved in db as option //sekData.settingType
+                                          });
+                                    }
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
+                                          level : params.level,
+                                          what : 'control',
+                                          id : testSpacingOptionsSetId,
+                                          label : 'TEST/////// => ' + sektionsLocalizedData.i18n['Padding and margin settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                                          type : 'czr_module',//sekData.controlType,
+                                          module_type : 'sek_test_spacing_module',
+                                          section : params.id,
+                                          priority : 0,
+                                          settings : { default : testSpacingOptionsSetId }
+                                    }).done( function() {
+                                          // synchronize the options with the main collection setting
+                                          api.control( testSpacingOptionsSetId ).focus({
+                                                completeCallback : function() {}
+                                          });
+                                    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                     // REGISTER SPAGING OPTIONS
                                     // Make sure this setting is bound only once !
                                     if( ! api.has( spacingOptionsSetId ) ) {
@@ -1603,9 +1728,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 type : '_nimble_ui_'//will be dynamically registered but not saved in db as option //sekData.settingType
                                           });
                                     }
-
-
-
                                     api.CZR_Helpers.register( {
                                           origin : 'nimble',
                                           level : params.level,
@@ -1623,6 +1745,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 completeCallback : function() {}
                                           });
                                     });
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1682,6 +1814,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
 
                               };//_do_register_
+
+
+
+
+
+
 
 
 
@@ -3453,8 +3591,54 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                         $( 'select[data-czrtype]', input.container ).selecter();
                   }
-            }
+            },
 
+
+            //-------------------------------------------------------------------------------------------------
+            // GENERIC WAY TO SETUP FONT SIZE AND LINE HEIGHT INPUTS
+            //-------------------------------------------------------------------------------------------------
+            // "this" is the input
+            setupFontSizeAndLineHeightInputs : function( obj ) {
+                  var input      = this,
+                      $wrapper = $('.sek-font-size-line-height-wrapper', input.container ),
+                      initial_unit = $wrapper.find('input[data-czrtype]').data('sek-unit'),
+                      validateUnit = function( unit ) {
+                            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
+                                  api.errare( 'error : invalid unit for input ' + input.id, unit );
+                                  unit = 'px';
+                            }
+                            return unit;
+                      };
+                  // initialize the unit with the value provided in the dom
+                  input.css_unit = new api.Value( _.isEmpty( initial_unit ) ? 'px' : validateUnit( initial_unit ) );
+                  // React to a unit change
+                  input.css_unit.bind( function( to ) {
+                        to = _.isEmpty( to ) ? 'px' : to;
+                        $wrapper.find( 'input[type="number"]').trigger('change');
+                  });
+
+                  // instantiate stepper and schedule change reactions
+                  $wrapper.find( 'input[type="number"]').on('input change', function( evt ) {
+                        input( $(this).val() + validateUnit( input.css_unit() ) );
+                  }).stepper();
+
+
+                  // Schedule unit changes on button click
+                  $wrapper.on( 'click', '.sek-ui-button', function(evt) {
+                        evt.preventDefault();
+                        // handle the is-selected css class toggling
+                        $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
+                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
+                        // update the initial unit ( not mandatory)
+                        $wrapper.find('input[data-czrtype]').data('sek-unit', $(this).data('sek-unit') );
+                        // set the current unit Value
+                        input.css_unit( $(this).data('sek-unit') );
+                  });
+
+                  // add is-selected button on init to the relevant unit button
+                  $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
+
+            },
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 /**
@@ -4474,46 +4658,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       // For example, a content picker can be given params to display only taxonomies
       // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
-            font_size : function( obj ) {
-                  var input      = this,
-                      $wrapper = $('.sek-font-size-line-height-wrapper', input.container ),
-                      initial_unit = $wrapper.find('input[data-czrtype]').data('sek-unit'),
-                      validateVal = function( num, unit ) {
-                            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
-                                  api.errare( 'error : invalid unit for input ' + input.id );
-                                  unit = 'px';
-                            }
-                            return num + unit;
-                      };
-                  // initialize the unit with the value provided in the dom
-                  input.css_unit = new api.Value( _.isEmpty( initial_unit ) ? 'px' : initial_unit );
-                  // React to a unit change
-                  input.css_unit.bind( function( to ) {
-                        to = _.isEmpty( to ) ? 'px' : to;
-                        $wrapper.find( 'input[type="number"]').trigger('change');
-                  });
-
-                  // instantiate stepper and schedule change reactions
-                  $wrapper.find( 'input[type="number"]').on('input change', function( evt ) {
-                        input( validateVal( $(this).val(), input.css_unit() ) );
-                  }).stepper();
-
-
-                  // Schedule unit changes on button click
-                  $wrapper.on( 'click', '.sek-ui-button', function(evt) {
-                        evt.preventDefault();
-                        // handle the is-selected css class toggling
-                        $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
-                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        // update the initial unit ( not mandatory)
-                        $wrapper.find('input[data-czrtype]').data('sek-unit', $(this).data('sek-unit') );
-                        // set the current unit Value
-                        input.css_unit( $(this).data('sek-unit') );
-                  });
-
-                  // add is-selected button on init to the relevant unit button
-                  $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
-
+            font_size : function( params ) {
+                  api.czr_sektions.setupFontSizeAndLineHeightInputs.call(this);
             },
 
       });//$.extend( api.czrInputMap, {})
@@ -4529,14 +4675,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       // For example, a content picker can be given params to display only taxonomies
       // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
-            line_height : function( obj ) {
-                  var input      = this,
-                      $wrapper = $('.sek-font-size-line-height-wrapper', input.container ),
-                      unit = 'px';
-
-                  $wrapper.find( 'input[type="number"]').on('input change', function() {
-                        input( $(this).val() + unit );
-                  }).stepper();
+            line_height : function( params ) {
+                  api.czr_sektions.setupFontSizeAndLineHeightInputs.call(this);
             }
       });//$.extend( api.czrInputMap, {})
 
@@ -5388,6 +5528,87 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_spacing_module' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      var SpacingModuleConstructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                  // module.inputConstructor = api.CZRInput.extend( module.CZRSpacingInputMths || {} );
+                  // // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  // module.itemConstructor = api.CZRItem.extend( module.CZRSpacingItemMths || {} );
+                  //run the parent initialize
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+            },//initialize
+
+            // CZRSpacingInputMths : {
+            //       // initialize : function( name, options ) {
+            //       //       var input = this;
+            //       //       api.CZRInput.prototype.initialize.call( input, name, options );
+            //       // },
+            //       setupSelect : function() {
+            //             api.czr_sektions.setupSelectInput.call( this );
+            //       }
+            // },//CZRSpacingInputMths
+
+            // CZRSpacingItemMths : {
+            //       initialize : function( id, options ) {
+            //             api.CZRItem.prototype.initialize.call( this, id, options );
+            //             var item = this;
+            //             // Listen to tab switch event
+            //             // @params { id : (string) }
+            //             item.bind( 'tab-switch', function( params ) {
+            //                   device = 'desktop';
+            //                   try { device = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
+            //                         api.errare( 'spacing input => error when binding the tab switch event', er );
+            //                   }
+            //                   try { api.previewedDevice( device ); } catch( er ) {
+            //                         api.errare( 'spacing input => error when setting the device on tab switch', er );
+            //                   }
+            //             });
+            //       }
+            // },//CZRSpacingItemMths
+      };
+
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_test_spacing_module : {
+                  mthds : "",//SpacingModuleConstructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_test_spacing_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_test_spacing_module' )
                   )
             },
       });

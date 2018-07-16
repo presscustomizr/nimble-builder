@@ -9,6 +9,9 @@ function sek_register_modules() {
         'sek_level_section_layout_module',
         'sek_level_height_module',
         'sek_spacing_module',
+
+        'sek_test_spacing_module',
+
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
         'czr_image_module',

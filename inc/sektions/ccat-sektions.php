@@ -1861,11 +1861,11 @@ function sek_get_gfonts( $what = null ) {
 ?><?php
 
 /* ------------------------------------------------------------------------- *
- *  HORIZONTAL ALIGNMENT INPUT
+ *  FONT SIZE
 /* ------------------------------------------------------------------------- */
 // AND
 /* ------------------------------------------------------------------------- *
- *  HORIZONTAL ALIGNMENT INPUT FOR TEXT => includes the 'justify' icon
+ *  LINE HEIGHT INPUT TMPLS
 /* ------------------------------------------------------------------------- */
 // @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
@@ -1873,12 +1873,13 @@ function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
       <?php
             // we save the int value + unit
             // we want to keep only the numbers when printing the tmpl
+            // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
           ?>
           <#
             var value = data['<?php echo $input_id; ?>'],
                 unit = data['<?php echo $input_id; ?>'];
-            value = _.isString( value ) ? value.replace(/\D+/g, '') : '';
-            unit = _.isString( unit ) ? unit.replace(/[0-9]/g, '') : 'px';
+            value = _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
+            unit = _.isString( unit ) ? unit.replace(/[0-9]|\.|,/g, '') : 'px';
             unit = _.isEmpty( unit ) ? 'px' : unit;
           #>
         <div class="sek-font-size-line-height-wrapper">
@@ -1924,6 +1925,9 @@ function sek_register_modules() {
         'sek_level_section_layout_module',
         'sek_level_height_module',
         'sek_spacing_module',
+
+        'sek_test_spacing_module',
+
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
         'czr_image_module',
@@ -2746,6 +2750,9 @@ function sek_get_module_params_for_sek_spacing_module() {
     );
 }
 
+
+
+
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
@@ -2831,10 +2838,63 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
             'mq' =>$_spacing_rules[ 'mq' ]
         );
     }
-
+    sek_error_log('SPACING RULES', $rules );
     return $rules;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SPACING MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_test_spacing_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_test_spacing_module',
+        'name' => __('Test spacing options', 'text_domain_to_be_replaced'),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+
+        'tmpl' => array(
+            'item-inputs' => array(
+                'pad_marg' => array(
+                    'input_type'  => 'spacing',
+                    'title'       => __('Set padding and margin for desktops', 'text_domain_to_be_replaced'),
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'default'     => array()
+                )
+            )
+        )
+    );
+}
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER SIMPLE HTML MODULE
@@ -2957,7 +3017,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __('Line height', 'text_domain_to_be_replaced'),
-                                'default'     => '24px',
+                                'default'     => '1.5em',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height'
@@ -3317,7 +3377,7 @@ function sek_get_module_params_for_czr_heading_module() {
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
-                                'default'     => '24px',
+                                'default'     => '1.5em',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height'
@@ -3858,7 +3918,7 @@ function sek_get_module_params_for_czr_quote_module() {
                             'quote_line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
-                                'default'     => '24px',
+                                'default'     => '1.5em',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height',
@@ -3994,7 +4054,7 @@ function sek_get_module_params_for_czr_quote_module() {
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
-                                'default'     => '24px',
+                                'default'     => '1.5em',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height',

@@ -259,6 +259,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
                         case 'sek-generate-level-options-ui' :
                               // Generate the UI for level options
                               //console.log("PARAMS IN sek-generate-level-options-ui", params );
@@ -286,6 +298,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               _do_register_ = function() {
                                     if ( 'section' === params.level ) {
+
+
+
+
+
                                           // REGISTER SECTION LAYOUT
                                           // Make sure this setting is bound only once !
                                           if( ! api.has( heightOptionsSetId ) ) {
@@ -345,6 +362,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
+
+
+
+
+
+
+
+
+
                                     // REGISTER BACKGROUND BORDER OPTIONS
                                     // Make sure this setting is bound only once !
                                     if( ! api.has( bgBorderOptionsSetId ) ) {
@@ -401,6 +428,104 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    var testSpacingOptionsSetId = params.id + '__spacing_options_test';
+                                    // TEST REGISTER SPAGING OPTIONS
+                                    // Make sure this setting is bound only once !
+                                    if( ! api.has( testSpacingOptionsSetId ) ) {
+                                          // Schedule the binding to synchronize the options with the main collection setting
+                                          // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
+                                          // They need to be kept in order to keep track of the changes in the customizer.
+                                          // => that's why we check if ! api.has( ... )
+                                          api( testSpacingOptionsSetId, function( _setting_ ) {
+                                                _setting_.bind( _.debounce( function( to, from, args ) {
+                                                      try { self.updateAPISettingAndExecutePreviewActions({
+                                                            defaultPreviewAction : 'refresh_stylesheet',
+                                                            uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                            options_type : 'spacing',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
+                                                            settingParams : {
+                                                                  to : to,
+                                                                  from : from,
+                                                                  args : args
+                                                            }
+                                                      }); } catch( er ) {
+                                                            api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                                      }
+                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          });//api( spacingOptionsSetId, function( _setting_ ) {})
+
+
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
+                                                level : params.level,
+                                                what : 'setting',
+                                                id : testSpacingOptionsSetId,
+                                                dirty : false,
+                                                value : optionDBValue.spacing || {},
+                                                transport : 'postMessage',// 'refresh',
+                                                type : '_nimble_ui_'//will be dynamically registered but not saved in db as option //sekData.settingType
+                                          });
+                                    }
+                                    api.CZR_Helpers.register( {
+                                          origin : 'nimble',
+                                          level : params.level,
+                                          what : 'control',
+                                          id : testSpacingOptionsSetId,
+                                          label : 'TEST/////// => ' + sektionsLocalizedData.i18n['Padding and margin settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                                          type : 'czr_module',//sekData.controlType,
+                                          module_type : 'sek_test_spacing_module',
+                                          section : params.id,
+                                          priority : 0,
+                                          settings : { default : testSpacingOptionsSetId }
+                                    }).done( function() {
+                                          // synchronize the options with the main collection setting
+                                          api.control( testSpacingOptionsSetId ).focus({
+                                                completeCallback : function() {}
+                                          });
+                                    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                     // REGISTER SPAGING OPTIONS
                                     // Make sure this setting is bound only once !
                                     if( ! api.has( spacingOptionsSetId ) ) {
@@ -437,9 +562,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 type : '_nimble_ui_'//will be dynamically registered but not saved in db as option //sekData.settingType
                                           });
                                     }
-
-
-
                                     api.CZR_Helpers.register( {
                                           origin : 'nimble',
                                           level : params.level,
@@ -457,6 +579,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 completeCallback : function() {}
                                           });
                                     });
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -516,6 +648,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
 
                               };//_do_register_
+
+
+
+
+
+
 
 
 
