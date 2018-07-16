@@ -38,7 +38,7 @@ function sek_get_module_params_for_czr_button_module() {
             'button_text' => 'This is a button.',
             'color_css'  => '#ffffff',
             'background_color_css' => '#3b3b3b',
-            'background_color_hover_css' => '#1c1c1c', //darken 12%,
+            //'background_color_hover_css' => '#1c1c1c', //darken 12%,
             'border_radius_css' => '2',
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-button' ),
@@ -91,23 +91,23 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_identifier' => 'background_color',
                                 'css_selectors'=> $css_selectors
                             ),
-                            'background_color_hover_custom' => array(
-                                'input_type'  => 'gutencheck',
-                                'title'       => __( 'Do you want to set a custom background color on mouse hover?', 'text_domain_to_be_replaced' ),
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'default'     => 0,
-                            ),
-                            'background_color_hover_css' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Background color on mouse hover', 'text_domain_to_be_replaced' ),
-                                'width-100'   => true,
-                                'default'    => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'background_color_hover',
-                                'css_selectors'=> $css_selectors
-                            ),
+                            // 'background_color_hover_custom' => array(
+                            //     'input_type'  => 'gutencheck',
+                            //     'title'       => __( 'Do you want to set a custom background color on mouse hover?', 'text_domain_to_be_replaced' ),
+                            //     'refresh_markup' => false,
+                            //     'refresh_stylesheet' => true,
+                            //     'default'     => 0,
+                            // ),
+                            // 'background_color_hover_css' => array(
+                            //     'input_type'  => 'wp_color_alpha',
+                            //     'title'       => __( 'Background color on mouse hover', 'text_domain_to_be_replaced' ),
+                            //     'width-100'   => true,
+                            //     'default'    => '',
+                            //     'refresh_markup' => false,
+                            //     'refresh_stylesheet' => true,
+                            //     'css_identifier' => 'background_color_hover',
+                            //     'css_selectors'=> $css_selectors
+                            // ),
                             'border_radius_css'       => array(
                                 'input_type'  => 'number',
                                 'title'       => __( 'Rounded corners in pixels', 'text_domain_to_be_replaced' ),
