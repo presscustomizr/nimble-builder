@@ -37,8 +37,8 @@ function sek_get_module_params_for_czr_button_module() {
         'starting_value' => array(
             'button_text' => 'This is a button.',
             'color_css'  => '#ffffff',
-            'background_color_css' => '#3b3b3b',
-            //'background_color_hover_css' => '#1c1c1c', //darken 12%,
+            'bg_color_css' => '#020202',
+            'bg_color_hover' => '#1c1c1c', //lighten 12%,
             'border_radius_css' => '2',
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-button' ),
@@ -81,7 +81,7 @@ function sek_get_module_params_for_czr_button_module() {
                                 'title'       => __( 'Select an Icon that will appear before the button text', 'text_domain_to_be_replaced' ),
                                 //'default'     => 'no-link'
                             ),
-                            'background_color_css' => array(
+                            'bg_color_css' => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __( 'Background color', 'text_domain_to_be_replaced' ),
                                 'width-100'   => true,
@@ -91,23 +91,24 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_identifier' => 'background_color',
                                 'css_selectors'=> $css_selectors
                             ),
-                            // 'background_color_hover_custom' => array(
-                            //     'input_type'  => 'gutencheck',
-                            //     'title'       => __( 'Do you want to set a custom background color on mouse hover?', 'text_domain_to_be_replaced' ),
-                            //     'refresh_markup' => false,
-                            //     'refresh_stylesheet' => true,
-                            //     'default'     => 0,
-                            // ),
-                            // 'background_color_hover_css' => array(
-                            //     'input_type'  => 'wp_color_alpha',
-                            //     'title'       => __( 'Background color on mouse hover', 'text_domain_to_be_replaced' ),
-                            //     'width-100'   => true,
-                            //     'default'    => '',
-                            //     'refresh_markup' => false,
-                            //     'refresh_stylesheet' => true,
-                            //     'css_identifier' => 'background_color_hover',
-                            //     'css_selectors'=> $css_selectors
-                            // ),
+                            'use_custom_bg_color_on_hover' => array(
+                                'input_type'  => 'gutencheck',
+                                'title'       => __( 'Set a custom background color on mouse hover', 'text_domain_to_be_replaced' ),
+                                'title_width' => 'width-100',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'default'     => 0,
+                            ),
+                            'bg_color_hover' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Background color on mouse hover', 'text_domain_to_be_replaced' ),
+                                'width-100'   => true,
+                                'default'    => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                //'css_identifier' => 'background_color_hover',
+                                'css_selectors'=> $css_selectors
+                            ),
                             'border_radius_css'       => array(
                                 'input_type'  => 'number',
                                 'title'       => __( 'Rounded corners in pixels', 'text_domain_to_be_replaced' ),
@@ -261,6 +262,45 @@ function sek_get_module_params_for_czr_button_module() {
 function sanitize_callback__czr_button_module( $value ) {
     $value[ 'button_text' ] = sanitize_text_field( $value[ 'button_text' ] );
     return $value;
+}
+
+
+/* ------------------------------------------------------------------------- *
+ *  SCHEDULE CSS RULES FILTERING
+/* ------------------------------------------------------------------------- */
+add_filter( 'sek_add_css_rules_for_modules', '\Nimble\sek_add_css_rules_for_button_front_module', 10, 3 );
+// filter documented in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker
+// Note : $complete_modul_model has been normalized
+// @return populated $rules
+function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_model ) {
+    if ( !is_array( $complete_modul_model ) || empty( $complete_modul_model['module_type'] ) || 'czr_button_module' !== $complete_modul_model['module_type'] )
+      return $rules;
+
+    if ( empty( $complete_modul_model['value'] ) )
+      return $rules;
+
+    $value = $complete_modul_model['value'];
+    $bg_color = $value['bg_color_css'];
+    if ( sek_booleanize_checkbox_val( $value['use_custom_bg_color_on_hover'] ) ) {
+        $bg_color_hover = $value['bg_color_hover'];
+    } else {
+        // Build the lighter rgb from the user picked bg color
+        if ( 0 === strpos( $bg_color, 'rgba' ) ) {
+            list( $rgb, $alpha ) = sek_rgba2rgb_a( $bg_color );
+            $darken_rgb          = sek_lighten_rgb( $rgb, $percent=12, $array = true );
+            $bg_color_hover      = sek_rgb2rgba( $darken_rgb, $alpha, $array = false, $make_prop_value = true );
+        } else if ( 0 === strpos( $bg_color, 'rgb' ) ) {
+            $bg_color_hover      = sek_lighten_rgb( $bg_color, $percent=12 );
+        } else {
+            $bg_color_hover      = sek_lighten_hex( $bg_color, $percent=12 );
+        }
+    }
+    $rules[] = array(
+        'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-btn:hover',
+        'css_rules' => 'background-color:' . $value['bg_color_hover'] . ';',
+        'mq' =>null
+    );
+    return $rules;
 }
 
 ?>
