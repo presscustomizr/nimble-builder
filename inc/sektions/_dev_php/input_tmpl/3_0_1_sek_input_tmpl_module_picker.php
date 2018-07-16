@@ -69,6 +69,12 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'title' => __( 'Quote', 'text_domain_to_be_replaced' ),
                   'icon' => 'Nimble_quote_icon.svg'
                 ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_button_module',
+                  'title' => __( 'Button', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_button_icon.svg'
+                ),
             );
             $i = 0;
             foreach( $content_collection as $_params) {
