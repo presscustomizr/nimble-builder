@@ -279,7 +279,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_7_FRONT_spacer.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_8_FRONT_map.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_9_FRONT_quote.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_10_FRONT_button.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_2_0_FRONT_button.js',
     ],
     dest: '<%= paths.czr_assets %>sek/js/ccat-sek-control.js',
   },

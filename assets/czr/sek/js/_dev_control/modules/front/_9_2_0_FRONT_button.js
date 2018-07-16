@@ -58,8 +58,8 @@
                           //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
-                                      case 'background_color_hover_custom' :
-                                            _.each( [ 'background_color_hover_css' ] , function( _inputId_ ) {
+                                      case 'use_custom_bg_color_on_hover' :
+                                            _.each( [ 'bg_color_hover' ] , function( _inputId_ ) {
                                                   try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
