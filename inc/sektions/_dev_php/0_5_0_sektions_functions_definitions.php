@@ -342,8 +342,28 @@ function _sek_build_input_list( $module_tmpl_data, $input_list = null ) {
 
 
 
+/* ------------------------------------------------------------------------- *
+ *  NORMALIZE MODULE VALUE WITH DEFAULT
+ *  used before rendering or generating css
+/* ------------------------------------------------------------------------- */
+function sek_normalize_module_value_with_defaults( $raw_module_model ) {
+    $normalized_model = $raw_module_model;
+    $module_type = $normalized_model['module_type'];
+    $default_value_model  = sek_get_default_module_model( $module_type );//<= walk the registered modules tree and generates the module default if not already cached
+    $raw_module_value = ( ! empty( $raw_module_model['value'] ) && is_array( $raw_module_model['value'] ) ) ? $raw_module_model['value'] : array();
 
+    // reset the model value and rewrite it normalized with the defaults
+    $normalized_model['value'] = array();
+    if ( czr_is_multi_item_module( $module_type ) ) {
+        foreach ( $raw_module_value as $item ) {
+            $normalized_model['value'][] = wp_parse_args( $item, $default_value_model );
+        }
+    } else {
+        $normalized_model['value'] = wp_parse_args( $raw_module_value, $default_value_model );
+    }
 
+    return $normalized_model;
+}
 
 
 
