@@ -51,23 +51,22 @@ if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_link' ) ) {
             return $link;
         }
         if ( 'url' == $value['link-to'] ) {
-        	if ( ! empty( $value['link-pick-url'] ) && ! empty( $value['link-pick-url']['id'] ) ) {
-        	    if ( '_custom_' == $value['link-pick-url']['id']  && ! empty( $value['link-custom-url'] ) ) {
-        	        $link = esc_url( $value['link-custom-url'] );
-        	    } else if ( ! empty( $value['link-pick-url']['url'] ) ) {
-        	        $link = esc_url( $value['link-pick-url']['url'] );
-        	    }
-        	}
+            if ( ! empty( $value['link-pick-url'] ) && ! empty( $value['link-pick-url']['id'] ) ) {
+                if ( '_custom_' == $value['link-pick-url']['id']  && ! empty( $value['link-custom-url'] ) ) {
+                    $link = esc_url( $value['link-custom-url'] );
+                } else if ( ! empty( $value['link-pick-url']['url'] ) ) {
+                    $link = esc_url( $value['link-pick-url']['url'] );
+                }
+            }
         }
         return $link;
     }
 }
 // Print
 if ( 'no-link' === $value['link-to'] ) :
-	printf('<div class="sek-icon">%2$s</div>',
-	    sek_get_icon_module_icon_link( $value ),
-	    sek_get_icon_module_icon_html( $value )
-	);
+    printf('<div class="sek-icon">%1$s</div>',
+        sek_get_icon_module_icon_html( $value )
+    );
 else :
     printf('<a class="sek-icon" href="%1$s" %2$s>%3$s</a>',
         sek_get_icon_module_icon_link( $value ),
