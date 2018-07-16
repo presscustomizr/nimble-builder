@@ -119,38 +119,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
         case 'background_color' :
             $properties_to_render['background-color'] = $value;
-            // //Background on hover
-            // if ( isset( $parent_level['value']['background_color_hover_custom']  ) && !sek_booleanize_checkbox_val( $parent_level['value']['background_color_hover_custom'] ) ) {
-            //     if ( 0 === strpos( $value, 'rgba' ) ) {
-            //         list( $rgb, $alpha )                        = sek_rgba2rgb_a( $parent_level['value']['background_color_css'] );
-            //         $darken_rgb                                 = sek_darken_rgb( $rgb, $percent=12, $array = true );
-            //         $value                                      = sek_rgb2rgba( $darken_rgb, $alpha, $array = false, $make_prop_value = true );
-            //     } else if ( 0 === strpos( $value, 'rgb' ) ) {
-            //         $value                                      = sek_darken_rgb( $parent_level['value']['background_color_css'], $percent=12 );
-            //     } else {
-            //         $value                                      = sek_darken_hex( $parent_level['value']['background_color_css'], $percent=12 );
-            //     }
-            //     //call this again
-            //     //trick: see below
-            //     $parent_level_copy = $parent_level;
-            //     unset( $parent_level_copy['value']['background_color_hover_custom'] );
-            //     $rules = sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, 'background_color_hover_css', $registered_input_list, $parent_level_copy, $module_level_css_selectors );
-            // }
         break;
-        // case 'background_color_hover' :
-        //     //$selector = '[data-sek-id="'.$parent_level['id'].'"]:hover';
-        //     // Add ':hover to each selectors'
-        //     $new_selectors = array();
-        //     $exploded = explode(',', $selector);
-        //     foreach ( $exploded as $sel ) {
-        //         $new_selectors[] = $sel.':hover';
-        //     }
-
-        //     $selector = implode(',', $new_selectors);
-        //     if ( !isset( $parent_level['value']['background_color_hover_custom'] ) || isset( $parent_level['value']['background_color_hover_custom'] ) && sek_booleanize_checkbox_val( $parent_level['value']['background_color_hover_custom'] ) ) {
-        //         $properties_to_render['background-color'] = $value;
-        //     }
-        // break;
         case 'h_alignment' :
             $properties_to_render['text-align'] = $value;
         break;
