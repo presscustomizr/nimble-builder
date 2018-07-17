@@ -38,8 +38,11 @@ function sek_get_module_params_for_czr_button_module() {
             'button_text' => 'This is a button.',
             'color_css'  => '#ffffff',
             'bg_color_css' => '#020202',
-            'bg_color_hover' => '#1c1c1c', //lighten 12%,
+            'bg_color_hover' => '#282828', //lighten 15%,
+            'use_custom_bg_color_on_hover' => 0,
             'border_radius_css' => '2',
+            'use_box_shadow' => 1,
+            'push_effect' => 1
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-button' ),
         'tmpl' => array(
@@ -118,7 +121,26 @@ function sek_get_module_params_for_czr_button_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'border_radius',
                                 'css_selectors'=> $css_selectors
-                            ),//16,//"14px",
+                            ),
+                            'h_alignment_css'        => array(
+                                'input_type'         => 'h_text_alignment',
+                                'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
+                                'default'            => is_rtl() ? 'right' : 'left',
+                                    'refresh_markup'     => false,
+                                    'refresh_stylesheet' => true,
+                                    'css_identifier' => 'h_alignment',
+                                    'css_selectors'=> '.sek-module-inner'
+                            ),
+                            'use_box_shadow' => array(
+                                'input_type'  => 'gutencheck',
+                                'title'       => __( 'Apply box shadow', 'text_domain_to_be_replaced' ),
+                                'default'     => 1,
+                            ),
+                            'push_effect' => array(
+                                'input_type'  => 'gutencheck',
+                                'title'       => __( 'Push visual effect', 'text_domain_to_be_replaced' ),
+                                'default'     => 1,
+                            ),
                         )
                     ),
                     array(
@@ -264,7 +286,6 @@ function sanitize_callback__czr_button_module( $value ) {
     return $value;
 }
 
-
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
@@ -287,12 +308,12 @@ function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_mode
         // Build the lighter rgb from the user picked bg color
         if ( 0 === strpos( $bg_color, 'rgba' ) ) {
             list( $rgb, $alpha ) = sek_rgba2rgb_a( $bg_color );
-            $darken_rgb          = sek_lighten_rgb( $rgb, $percent=12, $array = true );
+            $darken_rgb          = sek_lighten_rgb( $rgb, $percent=28, $array = true );
             $bg_color_hover      = sek_rgb2rgba( $darken_rgb, $alpha, $array = false, $make_prop_value = true );
         } else if ( 0 === strpos( $bg_color, 'rgb' ) ) {
-            $bg_color_hover      = sek_lighten_rgb( $bg_color, $percent=12 );
+            $bg_color_hover      = sek_lighten_rgb( $bg_color, $percent=28 );
         } else {
-            $bg_color_hover      = sek_lighten_hex( $bg_color, $percent=12 );
+            $bg_color_hover      = sek_lighten_hex( $bg_color, $percent=28 );
         }
     }
     $rules[] = array(
