@@ -104,7 +104,7 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
     }
 
     if ( ! empty( $_pad_marg[ 'tablet' ] ) ) {
-        $_pad_marg[ 'tablet' ][ 'mq' ]  = 'max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['lg'] - 1 ) . 'px'; //max-width: 991
+        $_pad_marg[ 'tablet' ][ 'mq' ]  = 'max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px'; //max-width: 767
     }
 
     if ( ! empty( $_pad_marg[ 'mobile' ] ) ) {
