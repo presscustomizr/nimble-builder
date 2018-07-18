@@ -116,7 +116,7 @@ ul[id*="sub-accordion-section-__nimble__"] {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
-    margin: 10px auto 0px auto;
+    margin: 10px auto 10px auto;
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
         -ms-flex-direction: column;
@@ -280,7 +280,7 @@ ul[id*="sub-accordion-section-__nimble__"] {
             flex: 0;
 }
 .reset-spacing-wrap {
-    padding: 10px;
+    padding: 10px 0 0;
     font-size: 0.8em;
     text-decoration: underline;
     cursor: pointer;
@@ -412,9 +412,11 @@ div[data-sek-align].selected {
 
 
 /* UNIT PICKER */
+.sek-unit-wrapper {
+  text-align: center;
+}
 .sek-ui-button-group {
     display: inline-block;
-    float: right;
 }
 .sek-ui-button-group .sek-ui-button:first-child {
     border-radius: 3px 0 0 3px;
@@ -498,4 +500,77 @@ div[data-sek-align].selected {
     border-color: #00435d;
     box-shadow: inset 0 -1px 0 #00435d;
     color: #fff;
+}
+
+
+
+
+/* DEVICE SWITCHER */
+.sek-input-device-switcher .sek-switcher:before {
+  display: inline-block;
+  -webkit-font-smoothing: antialiased;
+  font: normal 20px/30px "dashicons";
+  vertical-align: top;
+/*  margin: 3px 0;
+  padding: 4px 8px;*/
+  color: #656a6f;
+  position: relative;
+  top: -5px
+}
+.sek-input-device-switcher .sek-switcher {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0 1px;
+  margin: 0 0 0 -2px;
+  box-shadow: none;
+  border-top: 1px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: .15s color ease-in-out,
+              .15s background-color ease-in-out,
+              .15s border-color ease-in-out;
+}
+
+/*.sek-input-device-switcher .sek-switcher.active {
+  color: #0073aa;
+}*/
+
+.sek-input-device-switcher .sek-switcher:hover,
+.sek-input-device-switcher .sek-switcher:focus {
+  background-color: #fff;
+}
+
+/*.sek-input-device-switcher .sek-switcher:focus,
+.sek-input-device-switcher .sek-switcher.active:hover {
+  border-bottom-color: #0073aa;
+}*/
+
+.sek-input-device-switcher .sek-switcher.active:before {
+  color: #191e23;
+}
+
+.sek-input-device-switcher .sek-switcher:hover:before,
+.sek-input-device-switcher .sek-switcher:focus:before {
+  color: #0073aa;
+}
+
+.sek-input-device-switcher .preview-desktop:before {
+  content: "\f472";
+}
+
+.sek-input-device-switcher .preview-tablet:before {
+  content: "\f471";
+}
+
+.sek-input-device-switcher .preview-mobile:before {
+  content: "\f470";
+}
+
+
+
+
+
+/* Various */
+.sek-float-right {
+  float: right;
 }
