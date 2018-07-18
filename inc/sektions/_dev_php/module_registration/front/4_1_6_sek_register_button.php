@@ -38,7 +38,7 @@ function sek_get_module_params_for_czr_button_module() {
             'button_text' => 'This is a button.',
             'color_css'  => '#ffffff',
             'bg_color_css' => '#020202',
-            'bg_color_hover' => '#282828', //lighten 15%,
+            'bg_color_hover' => '#151515', //lighten 15%,
             'use_custom_bg_color_on_hover' => 0,
             'border_radius_css' => '2',
             'use_box_shadow' => 1,
@@ -308,12 +308,12 @@ function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_mode
         // Build the lighter rgb from the user picked bg color
         if ( 0 === strpos( $bg_color, 'rgba' ) ) {
             list( $rgb, $alpha ) = sek_rgba2rgb_a( $bg_color );
-            $darken_rgb          = sek_lighten_rgb( $rgb, $percent=28, $array = true );
-            $bg_color_hover      = sek_rgb2rgba( $darken_rgb, $alpha, $array = false, $make_prop_value = true );
+            $bg_color_hover_rgb  = sek_lighten_rgb( $rgb, $percent=15, $array = true );
+            $bg_color_hover      = sek_rgb2rgba( $bg_color_hover_rgb, $alpha, $array = false, $make_prop_value = true );
         } else if ( 0 === strpos( $bg_color, 'rgb' ) ) {
-            $bg_color_hover      = sek_lighten_rgb( $bg_color, $percent=28 );
+            $bg_color_hover      = sek_lighten_rgb( $bg_color, $percent=15 );
         } else {
-            $bg_color_hover      = sek_lighten_hex( $bg_color, $percent=28 );
+            $bg_color_hover      = sek_lighten_hex( $bg_color, $percent=15 );
         }
     }
     $rules[] = array(
