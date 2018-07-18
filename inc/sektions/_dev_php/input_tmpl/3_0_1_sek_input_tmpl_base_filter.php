@@ -15,6 +15,7 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___section_picker( $input_id, $input_data );
         break;
         case 'spacing' :
+        case 'spacingWithDeviceSwitcher' :
             sek_set_input_tmpl___spacing( $input_id, $input_data );
         break;
         case 'bg_position' :

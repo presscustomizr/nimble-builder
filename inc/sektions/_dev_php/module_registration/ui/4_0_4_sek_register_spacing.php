@@ -7,76 +7,25 @@ function sek_get_module_params_for_sek_spacing_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_spacing_module',
-
+        'name' => __('Spacing options', 'text_domain_to_be_replaced'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
 
         'tmpl' => array(
             'item-inputs' => array(
-                'tabs' => array(
-                    array(
-                        'title' => __('Desktop', 'text_domain_to_be_replaced'),
-                        'attributes' => 'data-sek-device="desktop"',
-                        'inputs' => array(
-                            'desktop_pad_marg' => array(
-                                'input_type'  => 'spacing',
-                                'title'       => __('Set padding and margin for desktops', 'text_domain_to_be_replaced'),
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'default'     => array()
-                            ),
-                            'desktop_unit' =>  array(
-                                'input_type'  => 'select',
-                                'title'       => __('Unit', 'text_domain_to_be_replaced'),
-                                'default'     => 'px',
-                                'choices'     => sek_get_select_options_for_input_id( 'css_unit' )
-                            )
-                        )
-                    ),
-                    array(
-                        'title' => __('Tablet', 'text_domain_to_be_replaced'),
-                        'attributes' => 'data-sek-device="tablet"',
-                        'inputs' => array(
-                            'tablet_pad_marg' => array(
-                                'input_type'  => 'spacing',
-                                'title'       => __('Set padding and margin for tablet devices', 'text_domain_to_be_replaced'),
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'default'     => array()
-                            ),
-                            'tablet_unit' =>  array(
-                                'input_type'  => 'select',
-                                'title'       => __('Unit', 'text_domain_to_be_replaced'),
-                                'default'     => 'px',
-                                'choices'     => sek_get_select_options_for_input_id( 'css_unit' )
-                            )
-                        )
-                    ),
-                    array(
-                        'title' => __('Mobile', 'text_domain_to_be_replaced'),
-                        'attributes' => 'data-sek-device="mobile"',
-                        'inputs' => array(
-                            'mobile_pad_marg' => array(
-                                'input_type'  => 'spacing',
-                                'title'       => __('Set padding and margin for mobile devices', 'text_domain_to_be_replaced'),
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'default'     => array()
-                            ),
-                            'mobile_unit' =>  array(
-                                'input_type'  => 'select',
-                                'title'       => __('Unit', 'text_domain_to_be_replaced'),
-                                'default'     => 'px',
-                                'choices'     => sek_get_select_options_for_input_id( 'css_unit' )
-                            )
-                        )
-                    )
-
+                'pad_marg' => array(
+                    'input_type'  => 'spacingWithDeviceSwitcher',
+                    'title'       => __('Set padding and margin', 'text_domain_to_be_replaced'),
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'default'     => array( 'desktop' => array() ),
+                    'has_device_switcher' => true
                 )
             )
         )
     );
 }
+
 
 
 
@@ -92,7 +41,7 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
 
     //spacing
-    if ( empty( $options[ 'spacing' ] ) )
+    if ( empty( $options[ 'spacing' ] ) || empty( $options[ 'spacing' ][ 'pad_marg' ] ) )
       return $rules;
 
 
@@ -101,10 +50,11 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
     //not mobile first
     $_desktop_rules = $_mobile_rules = $_tablet_rules = null;
 
-    if ( !empty( $options[ 'spacing' ][ 'desktop_pad_marg' ] ) ) {
-         $_desktop_rules = array( 'rules' => $options[ 'spacing' ][ 'desktop_pad_marg' ] );
+    if ( !empty( $options[ 'spacing' ][ 'pad_marg' ]['desktop'] ) ) {
+         $_desktop_rules = array( 'rules' => $options[ 'spacing' ][ 'pad_marg' ]['desktop'] );
     }
 
+    // POPULATES AN ARRAY FROM THE RAW SAVED OPTIONS
     $_pad_marg = array(
         'desktop' => array(),
         'tablet' => array(),
@@ -112,11 +62,11 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
     );
 
     foreach( array_keys( $_pad_marg ) as $device  ) {
-        if ( !empty( $options[ 'spacing' ][ "{$device}_pad_marg" ] ) ) {
-            $_pad_marg[ $device ] = array( 'rules' => $options[ 'spacing' ][ "{$device}_pad_marg" ] );
+        if ( !empty( $options[ 'spacing' ][ 'pad_marg' ][ $device ] ) ) {
+            $_pad_marg[ $device ] = array( 'rules' => $options[ 'spacing' ][ 'pad_marg' ][ $device ] );
 
             //add unit and sanitize padding (cannot have negative padding)
-            $unit                 = !empty( $options[ 'spacing' ][ "{$device}_unit" ] ) ? $options[ 'spacing' ][ "{$device}_unit" ] : $default_unit;
+            $unit                 = !empty( $options[ 'spacing' ][ 'pad_marg' ][ $device ]['unit'] ) ? $options[ 'spacing' ][ 'pad_marg' ][ $device ]['unit'] : $default_unit;
             $unit                 = 'percent' == $unit ? '%' : $unit;
             array_walk( $_pad_marg[ $device ][ 'rules' ],
                 function( &$val, $key, $unit ) {
@@ -166,61 +116,8 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
             'mq' =>$_spacing_rules[ 'mq' ]
         );
     }
-    sek_error_log('SPACING RULES', $rules );
+    //sek_error_log('SPACING RULES', $rules );
     return $rules;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ------------------------------------------------------------------------- *
- *  SPACING MODULE
-/* ------------------------------------------------------------------------- */
-//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_test_spacing_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'sek_test_spacing_module',
-        'name' => __('Test spacing options', 'text_domain_to_be_replaced'),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
-        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-
-        'tmpl' => array(
-            'item-inputs' => array(
-                'pad_marg' => array(
-                    'input_type'  => 'spacing',
-                    'title'       => __('Set padding and margin for desktops', 'text_domain_to_be_replaced'),
-                    'title_width' => 'width-100',
-                    'width-100'   => true,
-                    'default'     => array()
-                )
-            )
-        )
-    );
-}
 ?>

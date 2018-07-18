@@ -556,7 +556,41 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // add is-selected button on init to the relevant unit button
                   $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
-
             },
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            // PREPARE INPUT REGISTERED WITH has_device_switcher set to true
+            //-------------------------------------------------------------------------------------------------
+            // "this" is the input
+            maybeSetupDeviceSwitcherForInput : function() {
+                  var input = this;
+                  // render the device switcher before the input title
+                  var deviceSwitcherHtml = [
+                        '<span class="sek-input-device-switcher">',
+                          '<i data-sek-device="desktop" class="sek-switcher preview-desktop active"></i>',
+                          '<i data-sek-device="tablet" class="sek-switcher preview-tablet"></i>',
+                          '<i data-sek-device="mobile" class="sek-switcher preview-mobile"></i>',
+                        '</span>'
+                  ].join(' ');
+
+                  input.container.find('.customize-control-title').prepend( deviceSwitcherHtml );
+                  input.previewedDevice = new api.Value( api.previewedDevice() );
+
+                  input.container.on( 'click', '[data-sek-device]', function() {
+                        input.container.find( '[data-sek-device]' ).removeClass('active');
+                        $(this).addClass('active');
+                        var device = 'desktop';
+                        try { device = $(this).data('sek-device'); } catch( er ) {
+                              api.errare( 'maybeSetupDeviceSwitcherForInput => error when binding sek-switcher', er );
+                        }
+                        try { api.previewedDevice( device ); } catch( er ) {
+                              api.errare( 'maybeSetupDeviceSwitcherForInput => error when setting the previewed device', er );
+                        }
+                        input.previewedDevice( device );
+                  });
+
+            }
       });//$.extend()
 })( wp.customize, jQuery );

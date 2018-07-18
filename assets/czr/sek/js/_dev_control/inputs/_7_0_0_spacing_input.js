@@ -3,14 +3,25 @@
       // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
 
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             spacing : function( input_options ) {
                   var input = this,
-                      $wrapper = $('.sek-spacing-wrapper', input.container );
+                      $wrapper = $('.sek-spacing-wrapper', input.container ),
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : [];
+
+                  var validateUnit = function( unit ) {
+                            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
+                                  api.errare( 'error : invalid unit for input ' + input.id, unit );
+                                  unit = 'px';
+                            }
+                            return unit;
+                      },
+                      stripUnit = function( value ) {
+                            return _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
+                      },
+                      initial_unit;
+
                   // Listen to user actions on the inputs and set the input value
                   $wrapper.on( 'input', 'input[type="number"]', function(evt) {
                         var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
@@ -38,7 +49,9 @@
                         // [] is the default value
                         // we could have get it with api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_spacing_module' )
                         // @see php spacing module registration
-                        input( [] );
+                        input( defaultVal );
+                        // Reset unit to pixels
+                        $('.sek-unit-wrapper').find('[data-sek-unit="px"]').trigger('click');
                   });
 
                   // Synchronize on init
@@ -46,7 +59,206 @@
                         _.each( input(), function( _val_, _key_ ) {
                               $( '[data-sek-spacing="' + _key_ +'"]', $wrapper ).find( 'input[type="number"]' ).val( _val_ );
                         });
+                        // loop on the unit button and check which one should be clicked
+                        var unitToActivate = 'px';
+                        $( '.sek-ui-button', '.sek-unit-wrapper').each( function() {
+                              var unit = $(this).data('sek-unit');
+                              // do we have a unit for the current device ?
+                              if ( ! _.isEmpty( input() ) ) {
+                                    if ( ! _.isEmpty( input()[ 'unit' ] ) ) {
+                                          if ( unit === input()[ 'unit' ] ) {
+                                                unitToActivate = unit;
+                                          }
+                                    }
+                              }
+                        });
+                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit( unitToActivate ) + '"]').trigger('click');
                   }
+
+                  // Set the initial unit
+                  var initial_value = input();
+                  if ( ! _.isEmpty( initial_value ) && ! _.isEmpty( initial_value[ input.previewedDevice() ] ) ) {
+                        initial_unit = _.isEmpty( initial_value[ input.previewedDevice() ]['unit'] ) ? 'px' : initial_value[ input.previewedDevice() ]['unit'];
+                  }
+
+                  // initialize the unit with the value provided in the dom
+                  input.css_unit = new api.Value( validateUnit( initial_unit ) );
+
+                  // React to a unit change
+                  input.css_unit.bind( function( to ) {
+                        to = _.isEmpty( to ) ? 'px' : to;
+                        var _newInputVal,
+                            previewedDevice = input.previewedDevice() || 'desktop';
+
+                        _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                        _newInputVal[ previewedDevice ] = $.extend( true, {}, _newInputVal[ previewedDevice ] || {} );
+                        _newInputVal[ previewedDevice ][ 'unit' ] = to;
+                        input( _newInputVal );
+                  });
+
+                  // Schedule unit changes on button click
+                  $wrapper.on( 'click', '.sek-ui-button', function(evt) {
+                        evt.preventDefault();
+                        // handle the is-selected css class toggling
+                        $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
+                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
+                        // set the current unit Value
+                        input.css_unit( $(this).data('sek-unit') );
+                  });
+
+                  // add is-selected button on init to the relevant unit button
+                  $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
+            }
+      });//$.extend( api.czrInputMap, {})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            spacingWithDeviceSwitcher : function( input_options ) {
+                  var input = this,
+                      $wrapper = $('.sek-spacing-wrapper', input.container ),
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : [];
+
+
+                  var validateUnit = function( unit ) {
+                            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
+                                  api.errare( 'error : invalid unit for input ' + input.id, unit );
+                                  unit = 'px';
+                            }
+                            return unit;
+                      },
+                      stripUnit = function( value ) {
+                            return _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
+                      },
+                      initial_unit;
+
+                  api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
+
+                  // Listen to user actions on the inputs and set the input value
+                  $wrapper.on( 'input', 'input[type="number"]', function(evt) {
+                        var changedSpacingType    = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
+                            changedNumberInputVal = $(this).val(),
+                            _newInputVal,
+                            previewedDevice = api.previewedDevice() || 'desktop';
+
+                        _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                        _newInputVal[ previewedDevice ] = $.extend( true, {}, _newInputVal[ previewedDevice ] || {} );
+                        // Validates
+                        // @fixes https://github.com/presscustomizr/nimble-builder/issues/26
+                        if ( ( _.isString( changedNumberInputVal ) && ! _.isEmpty( changedNumberInputVal ) ) || _.isNumber( changedNumberInputVal ) ) {
+                              _newInputVal[ previewedDevice ][ changedSpacingType ] = changedNumberInputVal;
+                        } else {
+                              // this allow users to reset a given padding / margin instead of reseting them all at once with the "reset all spacing" option
+                              _newInputVal[ previewedDevice ] = _.omit( changedSpacingType, _newInputVal[ previewedDevice ] );
+                        }
+
+                        input( _newInputVal );
+                  });
+
+                  // Schedule a reset action
+                  // Note : this has to be done by device
+                  $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
+                        evt.preventDefault();
+                        $wrapper.find('input[type="number"]').each( function() {
+                              $(this).val('');
+                        });
+
+                        input( defaultVal );
+                        // Reset unit to pixels
+                        $('.sek-unit-wrapper').find('[data-sek-unit="px"]').trigger('click');
+                  });
+
+                  // Synchronizes on init + refresh on previewed device changes
+                  var syncWithPreviewedDevice = function( currentDevice ) {
+                        var inputValues = $.extend( true, {}, input() || {} ),
+                            clonedDefault = $.extend( true, {}, defaultVal );
+                        inputValues = _.isObject( inputValues ) ? $.extend( clonedDefault, inputValues ) : clonedDefault;
+
+                        // loop on each sek spacing and check if we find a value to write for this device
+                        $( '[data-sek-spacing]', $wrapper ).each( function() {
+                              var spacingType = $(this).data('sek-spacing'),
+                                  _val_ = '';
+                              // do we have a val for the current device ?
+                              if ( ! _.isEmpty( inputValues[ currentDevice ] ) ) {
+                                    if ( ! _.isEmpty( inputValues[ currentDevice ][ spacingType ] ) ) {
+                                          _val_ = inputValues[ currentDevice ][ spacingType ];
+                                    }
+                              }
+                              $(this).find( 'input[type="number"]' ).val( _val_ );
+                        });
+
+                        // loop on the unit button and check which one should be clicked
+                        var unitToActivate = 'px';
+                        $( '.sek-ui-button', '.sek-unit-wrapper').each( function() {
+                              var unit = $(this).data('sek-unit');
+                              // do we have a unit for the current device ?
+                              if ( ! _.isEmpty( inputValues[ currentDevice ] ) ) {
+                                    if ( ! _.isEmpty( inputValues[ currentDevice ][ 'unit' ] ) ) {
+                                          if ( unit === inputValues[ currentDevice ][ 'unit' ] ) {
+                                                unitToActivate = unit;
+                                          }
+                                    }
+                              }
+                        });
+                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit( unitToActivate ) + '"]').trigger('click');
+                  };
+
+                  syncWithPreviewedDevice( api.previewedDevice() );
+
+                  // react to previewed device changes
+                  // input.previewedDevice is updated in api.czr_sektions.maybeSetupDeviceSwitcherForInput()
+                  input.previewedDevice.bind( syncWithPreviewedDevice );
+
+                  // Set the initial unit
+                  var initial_value = input();
+                  if ( ! _.isEmpty( initial_value ) && ! _.isEmpty( initial_value[ input.previewedDevice() ] ) ) {
+                        initial_unit = _.isEmpty( initial_value[ input.previewedDevice() ]['unit'] ) ? 'px' : initial_value[ input.previewedDevice() ]['unit'];
+                  }
+
+                  // initialize the unit with the value provided in the dom
+                  input.css_unit = new api.Value( validateUnit( initial_unit ) );
+
+                  // React to a unit change
+                  input.css_unit.bind( function( to ) {
+                        to = _.isEmpty( to ) ? 'px' : to;
+                        var _newInputVal,
+                            previewedDevice = input.previewedDevice() || 'desktop';
+
+                        _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                        _newInputVal[ previewedDevice ] = $.extend( true, {}, _newInputVal[ previewedDevice ] || {} );
+                        _newInputVal[ previewedDevice ][ 'unit' ] = to;
+                        input( _newInputVal );
+                  });
+
+                  // Schedule unit changes on button click
+                  $wrapper.on( 'click', '.sek-ui-button', function(evt) {
+                        evt.preventDefault();
+                        // handle the is-selected css class toggling
+                        $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
+                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
+                        // set the current unit Value
+                        input.css_unit( $(this).data('sek-unit') );
+                  });
+
+                  // add is-selected button on init to the relevant unit button
+                  $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
             }
       });//$.extend( api.czrInputMap, {})
 
