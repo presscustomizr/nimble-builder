@@ -65,17 +65,17 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
 
     foreach( array_keys( $_pad_marg ) as $device  ) {
         if ( !empty( $options[ 'spacing' ][ 'pad_marg' ][ $device ] ) ) {
-            //$rules_candidates = $options[ 'spacing' ][ 'pad_marg' ][ $device ];
-
-            $rules_candidates = array_filter( $options[ 'spacing' ][ 'pad_marg' ][ $device ], function( $k ) {
-                return 'unit' !== $k;
-            }, ARRAY_FILTER_USE_KEY );
-
-            $_pad_marg[ $device ] = array( 'rules' => $rules_candidates );
-
+            $rules_candidates = $options[ 'spacing' ][ 'pad_marg' ][ $device ];
             //add unit and sanitize padding (cannot have negative padding)
             $unit                 = !empty( $rules_candidates['unit'] ) ? $rules_candidates['unit'] : $default_unit;
             $unit                 = 'percent' == $unit ? '%' : $unit;
+
+            $filtered_rules_candidates = array_filter( $rules_candidates, function( $k ) {
+                return 'unit' !== $k;
+            }, ARRAY_FILTER_USE_KEY );
+
+            $_pad_marg[ $device ] = array( 'rules' => $filtered_rules_candidates );
+
             array_walk( $_pad_marg[ $device ][ 'rules' ],
                 function( &$val, $key, $unit ) {
                     //make sure paddings are positive values
