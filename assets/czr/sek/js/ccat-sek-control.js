@@ -1602,96 +1602,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-                                    var testSpacingOptionsSetId = params.id + '__spacing_options_test';
-                                    // TEST REGISTER SPAGING OPTIONS
-                                    // Make sure this setting is bound only once !
-                                    if( ! api.has( testSpacingOptionsSetId ) ) {
-                                          // Schedule the binding to synchronize the options with the main collection setting
-                                          // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
-                                          // They need to be kept in order to keep track of the changes in the customizer.
-                                          // => that's why we check if ! api.has( ... )
-                                          api( testSpacingOptionsSetId, function( _setting_ ) {
-                                                _setting_.bind( _.debounce( function( to, from, args ) {
-                                                      try { self.updateAPISettingAndExecutePreviewActions({
-                                                            defaultPreviewAction : 'refresh_stylesheet',
-                                                            uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
-                                                            options_type : 'spacing',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
-                                                            settingParams : {
-                                                                  to : to,
-                                                                  from : from,
-                                                                  args : args
-                                                            }
-                                                      }); } catch( er ) {
-                                                            api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
-                                                      }
-                                                }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
-                                          });//api( spacingOptionsSetId, function( _setting_ ) {})
-
-
-                                          api.CZR_Helpers.register( {
-                                                origin : 'nimble',
-                                                level : params.level,
-                                                what : 'setting',
-                                                id : testSpacingOptionsSetId,
-                                                dirty : false,
-                                                value : optionDBValue.spacing || {},
-                                                transport : 'postMessage',// 'refresh',
-                                                type : '_nimble_ui_'//will be dynamically registered but not saved in db as option //sekData.settingType
-                                          });
-                                    }
-                                    api.CZR_Helpers.register( {
-                                          origin : 'nimble',
-                                          level : params.level,
-                                          what : 'control',
-                                          id : testSpacingOptionsSetId,
-                                          label : 'TEST/////// => ' + sektionsLocalizedData.i18n['Padding and margin settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
-                                          type : 'czr_module',//sekData.controlType,
-                                          module_type : 'sek_test_spacing_module',
-                                          section : params.id,
-                                          priority : 0,
-                                          settings : { default : testSpacingOptionsSetId }
-                                    }).done( function() {
-                                          // synchronize the options with the main collection setting
-                                          api.control( testSpacingOptionsSetId ).focus({
-                                                completeCallback : function() {}
-                                          });
-                                    });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                                     // REGISTER SPAGING OPTIONS
                                     // Make sure this setting is bound only once !
                                     if( ! api.has( spacingOptionsSetId ) ) {
@@ -3637,8 +3547,42 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // add is-selected button on init to the relevant unit button
                   $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
-
             },
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            // PREPARE INPUT REGISTERED WITH has_device_switcher set to true
+            //-------------------------------------------------------------------------------------------------
+            // "this" is the input
+            maybeSetupDeviceSwitcherForInput : function() {
+                  var input = this;
+                  // render the device switcher before the input title
+                  var deviceSwitcherHtml = [
+                        '<span class="sek-input-device-switcher">',
+                          '<i data-sek-device="desktop" class="sek-switcher preview-desktop active"></i>',
+                          '<i data-sek-device="tablet" class="sek-switcher preview-tablet"></i>',
+                          '<i data-sek-device="mobile" class="sek-switcher preview-mobile"></i>',
+                        '</span>'
+                  ].join(' ');
+
+                  input.container.find('.customize-control-title').prepend( deviceSwitcherHtml );
+                  input.previewedDevice = new api.Value( api.previewedDevice() );
+
+                  input.container.on( 'click', '[data-sek-device]', function() {
+                        input.container.find( '[data-sek-device]' ).removeClass('active');
+                        $(this).addClass('active');
+                        var device = 'desktop';
+                        try { device = $(this).data('sek-device'); } catch( er ) {
+                              api.errare( 'maybeSetupDeviceSwitcherForInput => error when binding sek-switcher', er );
+                        }
+                        try { api.previewedDevice( device ); } catch( er ) {
+                              api.errare( 'maybeSetupDeviceSwitcherForInput => error when setting the previewed device', er );
+                        }
+                        input.previewedDevice( device );
+                  });
+
+            }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 /**
@@ -4547,14 +4491,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
 
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             spacing : function( input_options ) {
                   var input = this,
-                      $wrapper = $('.sek-spacing-wrapper', input.container );
+                      $wrapper = $('.sek-spacing-wrapper', input.container ),
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : [];
+
+                  var validateUnit = function( unit ) {
+                            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
+                                  api.errare( 'error : invalid unit for input ' + input.id, unit );
+                                  unit = 'px';
+                            }
+                            return unit;
+                      },
+                      stripUnit = function( value ) {
+                            return _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
+                      },
+                      initial_unit;
+
                   // Listen to user actions on the inputs and set the input value
                   $wrapper.on( 'input', 'input[type="number"]', function(evt) {
                         var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
@@ -4582,7 +4537,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // [] is the default value
                         // we could have get it with api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_spacing_module' )
                         // @see php spacing module registration
-                        input( [] );
+                        input( defaultVal );
+                        // Reset unit to pixels
+                        $('.sek-unit-wrapper').find('[data-sek-unit="px"]').trigger('click');
                   });
 
                   // Synchronize on init
@@ -4590,7 +4547,206 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _.each( input(), function( _val_, _key_ ) {
                               $( '[data-sek-spacing="' + _key_ +'"]', $wrapper ).find( 'input[type="number"]' ).val( _val_ );
                         });
+                        // loop on the unit button and check which one should be clicked
+                        var unitToActivate = 'px';
+                        $( '.sek-ui-button', '.sek-unit-wrapper').each( function() {
+                              var unit = $(this).data('sek-unit');
+                              // do we have a unit for the current device ?
+                              if ( ! _.isEmpty( input() ) ) {
+                                    if ( ! _.isEmpty( input()[ 'unit' ] ) ) {
+                                          if ( unit === input()[ 'unit' ] ) {
+                                                unitToActivate = unit;
+                                          }
+                                    }
+                              }
+                        });
+                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit( unitToActivate ) + '"]').trigger('click');
                   }
+
+                  // Set the initial unit
+                  var initial_value = input();
+                  if ( ! _.isEmpty( initial_value ) && ! _.isEmpty( initial_value[ input.previewedDevice() ] ) ) {
+                        initial_unit = _.isEmpty( initial_value[ input.previewedDevice() ]['unit'] ) ? 'px' : initial_value[ input.previewedDevice() ]['unit'];
+                  }
+
+                  // initialize the unit with the value provided in the dom
+                  input.css_unit = new api.Value( validateUnit( initial_unit ) );
+
+                  // React to a unit change
+                  input.css_unit.bind( function( to ) {
+                        to = _.isEmpty( to ) ? 'px' : to;
+                        var _newInputVal,
+                            previewedDevice = input.previewedDevice() || 'desktop';
+
+                        _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                        _newInputVal[ previewedDevice ] = $.extend( true, {}, _newInputVal[ previewedDevice ] || {} );
+                        _newInputVal[ previewedDevice ][ 'unit' ] = to;
+                        input( _newInputVal );
+                  });
+
+                  // Schedule unit changes on button click
+                  $wrapper.on( 'click', '.sek-ui-button', function(evt) {
+                        evt.preventDefault();
+                        // handle the is-selected css class toggling
+                        $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
+                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
+                        // set the current unit Value
+                        input.css_unit( $(this).data('sek-unit') );
+                  });
+
+                  // add is-selected button on init to the relevant unit button
+                  $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
+            }
+      });//$.extend( api.czrInputMap, {})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            spacingWithDeviceSwitcher : function( input_options ) {
+                  var input = this,
+                      $wrapper = $('.sek-spacing-wrapper', input.container ),
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : [];
+
+
+                  var validateUnit = function( unit ) {
+                            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
+                                  api.errare( 'error : invalid unit for input ' + input.id, unit );
+                                  unit = 'px';
+                            }
+                            return unit;
+                      },
+                      stripUnit = function( value ) {
+                            return _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
+                      },
+                      initial_unit;
+
+                  api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
+
+                  // Listen to user actions on the inputs and set the input value
+                  $wrapper.on( 'input', 'input[type="number"]', function(evt) {
+                        var changedSpacingType    = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
+                            changedNumberInputVal = $(this).val(),
+                            _newInputVal,
+                            previewedDevice = api.previewedDevice() || 'desktop';
+
+                        _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                        _newInputVal[ previewedDevice ] = $.extend( true, {}, _newInputVal[ previewedDevice ] || {} );
+                        // Validates
+                        // @fixes https://github.com/presscustomizr/nimble-builder/issues/26
+                        if ( ( _.isString( changedNumberInputVal ) && ! _.isEmpty( changedNumberInputVal ) ) || _.isNumber( changedNumberInputVal ) ) {
+                              _newInputVal[ previewedDevice ][ changedSpacingType ] = changedNumberInputVal;
+                        } else {
+                              // this allow users to reset a given padding / margin instead of reseting them all at once with the "reset all spacing" option
+                              _newInputVal[ previewedDevice ] = _.omit( changedSpacingType, _newInputVal[ previewedDevice ] );
+                        }
+
+                        input( _newInputVal );
+                  });
+
+                  // Schedule a reset action
+                  // Note : this has to be done by device
+                  $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
+                        evt.preventDefault();
+                        $wrapper.find('input[type="number"]').each( function() {
+                              $(this).val('');
+                        });
+
+                        input( defaultVal );
+                        // Reset unit to pixels
+                        $('.sek-unit-wrapper').find('[data-sek-unit="px"]').trigger('click');
+                  });
+
+                  // Synchronizes on init + refresh on previewed device changes
+                  var syncWithPreviewedDevice = function( currentDevice ) {
+                        var inputValues = $.extend( true, {}, input() || {} ),
+                            clonedDefault = $.extend( true, {}, defaultVal );
+                        inputValues = _.isObject( inputValues ) ? $.extend( clonedDefault, inputValues ) : clonedDefault;
+
+                        // loop on each sek spacing and check if we find a value to write for this device
+                        $( '[data-sek-spacing]', $wrapper ).each( function() {
+                              var spacingType = $(this).data('sek-spacing'),
+                                  _val_ = '';
+                              // do we have a val for the current device ?
+                              if ( ! _.isEmpty( inputValues[ currentDevice ] ) ) {
+                                    if ( ! _.isEmpty( inputValues[ currentDevice ][ spacingType ] ) ) {
+                                          _val_ = inputValues[ currentDevice ][ spacingType ];
+                                    }
+                              }
+                              $(this).find( 'input[type="number"]' ).val( _val_ );
+                        });
+
+                        // loop on the unit button and check which one should be clicked
+                        var unitToActivate = 'px';
+                        $( '.sek-ui-button', '.sek-unit-wrapper').each( function() {
+                              var unit = $(this).data('sek-unit');
+                              // do we have a unit for the current device ?
+                              if ( ! _.isEmpty( inputValues[ currentDevice ] ) ) {
+                                    if ( ! _.isEmpty( inputValues[ currentDevice ][ 'unit' ] ) ) {
+                                          if ( unit === inputValues[ currentDevice ][ 'unit' ] ) {
+                                                unitToActivate = unit;
+                                          }
+                                    }
+                              }
+                        });
+                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit( unitToActivate ) + '"]').trigger('click');
+                  };
+
+                  syncWithPreviewedDevice( api.previewedDevice() );
+
+                  // react to previewed device changes
+                  // input.previewedDevice is updated in api.czr_sektions.maybeSetupDeviceSwitcherForInput()
+                  input.previewedDevice.bind( syncWithPreviewedDevice );
+
+                  // Set the initial unit
+                  var initial_value = input();
+                  if ( ! _.isEmpty( initial_value ) && ! _.isEmpty( initial_value[ input.previewedDevice() ] ) ) {
+                        initial_unit = _.isEmpty( initial_value[ input.previewedDevice() ]['unit'] ) ? 'px' : initial_value[ input.previewedDevice() ]['unit'];
+                  }
+
+                  // initialize the unit with the value provided in the dom
+                  input.css_unit = new api.Value( validateUnit( initial_unit ) );
+
+                  // React to a unit change
+                  input.css_unit.bind( function( to ) {
+                        to = _.isEmpty( to ) ? 'px' : to;
+                        var _newInputVal,
+                            previewedDevice = input.previewedDevice() || 'desktop';
+
+                        _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                        _newInputVal[ previewedDevice ] = $.extend( true, {}, _newInputVal[ previewedDevice ] || {} );
+                        _newInputVal[ previewedDevice ][ 'unit' ] = to;
+                        input( _newInputVal );
+                  });
+
+                  // Schedule unit changes on button click
+                  $wrapper.on( 'click', '.sek-ui-button', function(evt) {
+                        evt.preventDefault();
+                        // handle the is-selected css class toggling
+                        $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
+                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
+                        // set the current unit Value
+                        input.css_unit( $(this).data('sek-unit') );
+                  });
+
+                  // add is-selected button on init to the relevant unit button
+                  $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
             }
       });//$.extend( api.czrInputMap, {})
 
@@ -5468,47 +5624,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var SpacingModuleConstructor = {
-            initialize: function( id, options ) {
-                  var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRSpacingInputMths || {} );
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  module.itemConstructor = api.CZRItem.extend( module.CZRSpacingItemMths || {} );
-                  //run the parent initialize
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-            },//initialize
-
-            CZRSpacingInputMths : {
-                  // initialize : function( name, options ) {
-                  //       var input = this;
-                  //       api.CZRInput.prototype.initialize.call( input, name, options );
-                  // },
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRSpacingInputMths
-
-            CZRSpacingItemMths : {
-                  initialize : function( id, options ) {
-                        api.CZRItem.prototype.initialize.call( this, id, options );
-                        var item = this;
-                        // Listen to tab switch event
-                        // @params { id : (string) }
-                        item.bind( 'tab-switch', function( params ) {
-                              device = 'desktop';
-                              try { device = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
-                                    api.errare( 'spacing input => error when binding the tab switch event', er );
-                              }
-                              try { api.previewedDevice( device ); } catch( er ) {
-                                    api.errare( 'spacing input => error when setting the device on tab switch', er );
-                              }
-                        });
-                  }
-            },//CZRSpacingItemMths
-      };
-
-
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -5520,7 +5635,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_spacing_module : {
-                  mthds : SpacingModuleConstructor,
+                  mthds : '',
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_spacing_module', 'name' ),
                   has_mod_opt : false,
@@ -5532,87 +5647,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
-( function ( api, $, _ ) {
-      var SpacingModuleConstructor = {
-            initialize: function( id, options ) {
-                  var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  // module.inputConstructor = api.CZRInput.extend( module.CZRSpacingInputMths || {} );
-                  // // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  // module.itemConstructor = api.CZRItem.extend( module.CZRSpacingItemMths || {} );
-                  //run the parent initialize
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-            },//initialize
-
-            // CZRSpacingInputMths : {
-            //       // initialize : function( name, options ) {
-            //       //       var input = this;
-            //       //       api.CZRInput.prototype.initialize.call( input, name, options );
-            //       // },
-            //       setupSelect : function() {
-            //             api.czr_sektions.setupSelectInput.call( this );
-            //       }
-            // },//CZRSpacingInputMths
-
-            // CZRSpacingItemMths : {
-            //       initialize : function( id, options ) {
-            //             api.CZRItem.prototype.initialize.call( this, id, options );
-            //             var item = this;
-            //             // Listen to tab switch event
-            //             // @params { id : (string) }
-            //             item.bind( 'tab-switch', function( params ) {
-            //                   device = 'desktop';
-            //                   try { device = item.container.find('[data-tab-id="' + params.id + '"]').data('sek-device'); } catch( er ) {
-            //                         api.errare( 'spacing input => error when binding the tab switch event', er );
-            //                   }
-            //                   try { api.previewedDevice( device ); } catch( er ) {
-            //                         api.errare( 'spacing input => error when setting the device on tab switch', er );
-            //                   }
-            //             });
-            //       }
-            // },//CZRSpacingItemMths
-      };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
-      api.czrModuleMap = api.czrModuleMap || {};
-      $.extend( api.czrModuleMap, {
-            sek_test_spacing_module : {
-                  mthds : "",//SpacingModuleConstructor,
-                  crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_test_spacing_module', 'name' ),
-                  has_mod_opt : false,
-                  ready_on_section_expanded : true,
-                  defaultItemModel : _.extend(
-                        { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_test_spacing_module' )
-                  )
-            },
-      });
-})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
       //provides a description of each module
@@ -6346,6 +6381,129 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_quote_module' )
+            }
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      //BUTTON MODULE
+      var ButtonModuleConstructor = {
+              initialize: function( id, options ) {
+                      var module = this;
+
+                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
+                      module.inputConstructor = api.CZRInput.extend( module.CZRButtonInputMths || {} );
+
+                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                      module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
+
+
+                      // run the parent initialize
+                      // Note : must be always invoked always after the input / item class extension
+                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                      api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+              },//initialize
+
+              //////////////////////////////////////////////////////////
+              /// ITEM CONSTRUCTOR
+              //////////////////////////////////////////
+              CZRButtonItemConstructor : {
+                    //overrides the parent ready
+                    ready : function() {
+                          var item = this;
+                          //wait for the input collection to be populated,
+                          //and then set the input visibility dependencies
+                          item.inputCollection.bind( function( col ) {
+                                if( _.isEmpty( col ) )
+                                  return;
+                                try { item.setInputVisibilityDeps(); } catch( er ) {
+                                      api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                                }
+                          });//item.inputCollection.bind()
+
+                          //fire the parent
+                          api.CZRItem.prototype.ready.call( item );
+                    },
+
+                    //Fired when the input collection is populated
+                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                    setInputVisibilityDeps : function() {
+                          var item = this,
+                              module = item.module;
+                          // input controller instance == this
+                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                                //Fire on init
+                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                                //React on change
+                                this.bind( function( to ) {
+                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                                });
+                          };
+                          //Internal item dependencies
+                          item.czr_Input.each( function( input ) {
+                                switch( input.id ) {
+                                      case 'use_custom_bg_color_on_hover' :
+                                            _.each( [ 'bg_color_hover' ] , function( _inputId_ ) {
+                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        return input();
+                                                  }); } catch( er ) {
+                                                        api.errare( 'Button module => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
+                                      case 'link-to' :
+                                            _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
+                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        var bool = false;
+                                                        switch( _inputId_ ) {
+                                                              case 'link-custom-url' :
+                                                                    bool = 'url' == input() && '_custom_' == item.czr_Input('link-pick-url')().id;
+                                                              break;
+                                                              default :
+                                                                    bool = 'url' == input();
+                                                              break;
+                                                        }
+                                                        return bool;
+                                                  }); } catch( er ) {
+                                                        api.errare( 'Button module => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
+                                      case 'link-pick-url' :
+                                            scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                                  return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
+                                            });
+                                      break;
+                                }
+                          });
+                    }
+              },
+
+              /* Helpers */
+              CZRButtonInputMths: {
+                    setupSelect : function() {
+                        api.czr_sektions.setupSelectInput.call( this );
+                    }
+              },//CZRButtonInputMths
+      };
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_button_module : {
+                  mthds : ButtonModuleConstructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_button_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_button_module' )
             }
       });
 })( wp.customize , jQuery, _ );
