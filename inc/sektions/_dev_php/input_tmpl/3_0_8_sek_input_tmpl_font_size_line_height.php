@@ -32,7 +32,7 @@ function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
                   ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
                 );
           ?>
-          <div aria-label="Font Size" class="sek-ui-button-group" role="group">
+          <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group sek-float-right" role="group">
               <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_domain');?>" data-sek-unit="%"><?php _e('%', 'text_domain');?></button></div>
         </div><?php // sek-font-size-wrapper ?>
     <?php
