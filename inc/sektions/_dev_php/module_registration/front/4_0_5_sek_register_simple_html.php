@@ -34,7 +34,8 @@ function sek_get_module_params_for_czr_simple_html_module() {
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_html_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'starting_value' => array(
-            'html_content' => '<!-- Write your Html code here --><pre>html code goes here</pre>'
+            'html_content' => '<!-- Write your Html code here -->
+<pre>html code goes here</pre>'
         ),
         'tmpl' => array(
             'item-inputs' => array(
