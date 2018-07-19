@@ -67,6 +67,15 @@
                                                   }
                                             });
                                       break;
+                                      case 'use_box_shadow' :
+                                            _.each( [ 'push_effect' ] , function( _inputId_ ) {
+                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        return input();
+                                                  }); } catch( er ) {
+                                                        api.errare( 'Button module => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
                                       case 'link-to' :
                                             _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
                                                   try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
@@ -99,6 +108,11 @@
               CZRButtonInputMths: {
                     setupSelect : function() {
                         api.czr_sektions.setupSelectInput.call( this );
+                    },
+                    // for this module we don't need the justification h-alignment
+                    setupHAlignement : function() {
+                        $( '[data-sek-align="justify"]', this.container ).detach();
+                        api.CZRInput.prototype.setupHAlignement.call( this );
                     }
               },//CZRButtonInputMths
       };
