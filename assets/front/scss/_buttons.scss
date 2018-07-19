@@ -4,7 +4,7 @@
 %btn_base {
   display: inline-block;
   font-weight: normal;
-  line-height: 1.25;
+  line-height: 1.25em;
   text-align: center;
   /*white-space: nowrap;*/
   white-space: normal;
@@ -20,6 +20,7 @@
   @extend .service-font;
   cursor: pointer;
   text-decoration: none;
+  text-transform: none;
   transition: all 0.2s ease-in-out;
 
   // Share hover and focus styles
@@ -38,7 +39,6 @@
     cursor: $cursor-disabled;
     opacity: .65;
     box-shadow: none;
-
   }
 
   &:active,
