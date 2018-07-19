@@ -12,6 +12,19 @@
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
 
+                      //SET THE CONTENT PICKER DEFAULT OPTIONS
+                      //@see ::setupContentPicker()
+                      module.bind( 'set_default_content_picker_options', function( params ) {
+                            params.defaultContentPickerOption.defaultOption = {
+                                  'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                                  'type'       : '',
+                                  'type_label' : '',
+                                  'object'     : '',
+                                  'id'         : '_custom_',
+                                  'url'        : ''
+                            };
+                            return params;
+                      });
 
                       // run the parent initialize
                       // Note : must be always invoked always after the input / item class extension
@@ -107,8 +120,36 @@
               /* Helpers */
               CZRButtonInputMths: {
                     setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                    },
+                          var input  = this,
+                              item   = input.input_parent,
+                              module = input.module,
+                              inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                              selectOptions = inputRegistrationParams.choices;
+
+                           //Link select
+                          if ( _.isEmpty( selectOptions ) ) {
+                                api.errare( 'Missing select options for input id => ' + input.id + ' in button module');
+                                return;
+                          } else {
+                                //generates the options
+                                _.each( selectOptions , function( title, value ) {
+                                      //get only no-link and url
+                                      if ( !(  _.contains([ 'no-link', 'url' ], value) ) ) {
+                                            return;
+                                      }
+                                      var _attributes = {
+                                                value : value,
+                                                html: title
+                                          };
+                                      if ( value == input() ) {
+                                            $.extend( _attributes, { selected : "selected" } );
+                                      }
+
+                                      $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                });
+                                $( 'select[data-czrtype]', input.container ).selecter();
+                          }
+                    },//setupSelect
                     // for this module we don't need the justification h-alignment
                     setupHAlignement : function() {
                         $( '[data-sek-align="justify"]', this.container ).detach();
