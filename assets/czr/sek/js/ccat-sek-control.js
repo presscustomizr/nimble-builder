@@ -5706,7 +5706,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //console.log('INITIALIZING IMAGE MODULE', id, options );
                   var module = this;
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRImageInputMths || {} );
+                  module.inputConstructor = api.CZRInput.extend({
+                        setupSelect : function() {
+                              api.czr_sektions.setupSelectInput.call( this );
+                        }
+                  });
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
@@ -5730,16 +5734,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },//initialize
 
-            CZRImageInputMths : {
-                  // initialize : function( name, options ) {
-                  //       var input = this;
-                  //       api.CZRInput.prototype.initialize.call( input, name, options );
-                  // },
-
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRImageInputMths
 
             // _isChecked : function( v ) {
             //       return 0 !== v && '0' !== v && false !== v && 'off' !== v;
@@ -5990,7 +5984,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       var module = this;
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend( module.CZRIconInputMths || {} );
+                      module.inputConstructor = api.CZRInput.extend({
+                            setupSelect : function() {
+                                  api.czr_sektions.setupSelectInput.call( this );
+                            }
+                      });
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRIconItemConstructor || {} );
@@ -6019,39 +6017,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
               /* Helpers */
 
-              CZRIconInputMths: {
-                    setupSelect : function() {
-                          var input  = this,
-                              item   = input.input_parent,
-                              module = input.module,
-                              inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
-                              selectOptions = inputRegistrationParams.choices;
-
-                           //Link select
-                          if ( _.isEmpty( selectOptions ) ) {
-                                api.errare( 'Missing select options for input id => ' + input.id + ' in icon module');
-                                return;
-                          } else {
-                                //generates the options
-                                _.each( selectOptions , function( title, value ) {
-                                      //get only no-link and url
-                                      if ( !(  _.contains([ 'no-link', 'url' ], value) ) ) {
-                                            return;
-                                      }
-                                      var _attributes = {
-                                                value : value,
-                                                html: title
-                                          };
-                                      if ( value == input() ) {
-                                            $.extend( _attributes, { selected : "selected" } );
-                                      }
-
-                                      $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                });
-                                $( 'select[data-czrtype]', input.container ).selecter();
-                          }
-                    }//setupSelect
-              },//CZRIconInputMths
               //////////////////////////////////////////////////////////
               /// ITEM CONSTRUCTOR
               //////////////////////////////////////////
@@ -6392,11 +6357,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       var module = this;
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend( module.CZRButtonInputMths || {} );
+                      module.inputConstructor = api.CZRInput.extend({
+                            setupSelect : function() {
+                                  api.czr_sektions.setupSelectInput.call( this );
+                            }
+                      });
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
 
+                      //SET THE CONTENT PICKER DEFAULT OPTIONS
+                      //@see ::setupContentPicker()
+                      module.bind( 'set_default_content_picker_options', function( params ) {
+                            params.defaultContentPickerOption.defaultOption = {
+                                  'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                                  'type'       : '',
+                                  'type_label' : '',
+                                  'object'     : '',
+                                  'id'         : '_custom_',
+                                  'url'        : ''
+                            };
+                            return params;
+                      });
 
                       // run the parent initialize
                       // Note : must be always invoked always after the input / item class extension
@@ -6452,6 +6434,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                   }
                                             });
                                       break;
+                                      case 'use_box_shadow' :
+                                            _.each( [ 'push_effect' ] , function( _inputId_ ) {
+                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        return input();
+                                                  }); } catch( er ) {
+                                                        api.errare( 'Button module => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
                                       case 'link-to' :
                                             _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
                                                   try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
@@ -6478,14 +6469,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 }
                           });
                     }
-              },
-
-              /* Helpers */
-              CZRButtonInputMths: {
-                    setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                    }
-              },//CZRButtonInputMths
+              }
       };
       //provides a description of each module
       //=> will determine :
