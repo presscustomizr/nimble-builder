@@ -57,7 +57,7 @@ ul[id*="sub-accordion-section-__nimble__"] {
 [data-sek-content-type] {
     float: left;
     padding: 0%;
-    margin: 3%;
+    margin: 1.8%;
     text-align: center;
     cursor: move;
     /*cursor: -webkit-grab;*/
@@ -72,7 +72,8 @@ ul[id*="sub-accordion-section-__nimble__"] {
     border-radius: 4px;
 }
 [data-sek-content-type="module"] {
-  width: 40%;
+  width: 29%;
+  height: 130px;
 }
 [data-sek-content-type="preset_section"] {
   width: 90%;
@@ -85,30 +86,44 @@ ul[id*="sub-accordion-section-__nimble__"] {
 }
 
 .sek-dragging [data-sek-content-type] {
-  -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.35)!important;
-  box-shadow: 0 2px 6px rgba(0,0,0,.35)!important;
+  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.25)!important;
+  box-shadow: 0 2px 5px rgba(0,0,0,.25)!important;
 }
-
+.sek-dragged {
+  background: #33b3db3d;
+  background: rgba(51, 179, 219, 0.24);
+}
 
 [data-sek-content-type] .sek-module-icon {
   display: block;
-  padding: 10px 0 0;
+  padding: 0;
 }
 [data-sek-content-type] .sek-module-icon .nimble-module-icons {
   font-size: 3rem;
-  max-width: 60%!important;
+  max-width: 100%;/*60%!important;*/
   color: #878787;
 }
 [data-sek-content-type] .sek-module-title {
-  display: block;
-  padding: 10px;
-  font-size: 0.9em;
+  display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 0 6px 0px;
+  font-size: 0.75rem;
+  height: 45px;
+  justify-content: center;
+  position: relative;
+  top: -18px;
 }
 /*.sek-grabbing {
   cursor: -webkit-grabbing;
 }
 */
-
 
 /* PADDING MARGIN SPACING INPUT */
 .sek-pad-marg-inner {
@@ -479,8 +494,10 @@ div[data-sek-align].selected {
 .sek-ui-button.is-selected:focus:not(:disabled), .sek-ui-button.is-selected:hover {
     background: #555d66;
     border-color: #4f4f4f;
-    box-shadow: inset 0 -1px 0 #4f4f4f;
     color: #fff;
+}
+.sek-ui-button.is-selected:focus:not(:disabled) {
+  box-shadow: inset 0 -1px 0 #4f4f4f;
 }
 .sek-ui-button.is-selected:focus:not(:disabled) {
     /*box-shadow: inset 0 -1px 0 #00435d, 0 0 0 2px #bfe7f3;*/

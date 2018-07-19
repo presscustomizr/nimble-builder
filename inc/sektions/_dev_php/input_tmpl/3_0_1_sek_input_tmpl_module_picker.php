@@ -12,8 +12,8 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_tiny_mce_editor_module',
-                  'title' => __( 'Text Editor', 'text_domain_to_be_replaced' ),
-                  'icon' => 'Nimble__text_icon.svg'
+                  'title' => __( 'WordPress Editor', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_rich-text-editor_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
@@ -86,10 +86,10 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                     $icon_img_src = NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' . $_params['icon'];
                 }
 
-                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><span class="sek-module-icon">%3$s</span><span class="sek-module-title">%4$s</span></div>',
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><div class="sek-module-icon">%3$s</div><div class="sek-module-title"><div class="sek-centered-module-title">%4$s</div></div></div>',
                       $_params['content-type'],
                       $_params['content-id'],
-                      empty( $icon_img_src ) ? '<i style="color:red">Missing Icon</i>' : '<img title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>',
+                      empty( $icon_img_src ) ? '<i style="color:red">Missing Icon</i>' : '<img draggable="false" title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>',
                       $_params['title'],
                       __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' )
                 );

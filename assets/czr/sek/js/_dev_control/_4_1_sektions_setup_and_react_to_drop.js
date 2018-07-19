@@ -117,12 +117,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         // Set the dragged type property now : module or preset_section
                         self.dnd_draggedType = $(this).data('sek-content-type');
+                        $(this).addClass('sek-dragged');
                         $('body').addClass('sek-dragging');
                         api.previewer.send( 'sek-drag-start', { type : self.dnd_draggedType } );//fires the rendering of the dropzones
                   };
 
                   var _onEnd = function( evt ) {
                         $('body').removeClass('sek-dragging');
+                        $(this).removeClass('sek-dragged');
                         api.previewer.send( 'sek-drag-stop' );
                   };
 
