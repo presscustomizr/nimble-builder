@@ -3,24 +3,59 @@
       // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
 
+
+      // HELPERS USED IN ALL SPACING INPUT TYPES
+      // "this" is input
+      var validateUnit = function( unit ) {
+            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
+                  api.errare( 'error : invalid unit for input ' + this.id, unit );
+                  unit = 'px';
+            }
+            return unit;
+          },
+          stripUnit = function( value ) {
+                return _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
+          },
+          unitButtonsSetup = function( $wrapper ) {
+                var input = this;
+                // Schedule unit changes on button click
+                $wrapper.on( 'click', '.sek-ui-button', function(evt) {
+                      evt.preventDefault();
+                      // handle the is-selected css class toggling
+                      $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
+                      $(this).addClass('is-selected').attr( 'aria-pressed', true );
+                      // set the current unit Value
+                      input.css_unit( $(this).data('sek-unit') );
+                });
+
+                // add is-selected button on init to the relevant unit button
+                $wrapper.find( '.sek-ui-button[data-sek-unit="'+ ( input.initial_unit || 'px' ) +'"]').addClass('is-selected').attr( 'aria-pressed', true );
+          },
+          setupResetAction = function( $wrapper, defaultVal ) {
+                var input = this;
+                $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
+                      evt.preventDefault();
+                      $wrapper.find('input[type="number"]').each( function() {
+                            $(this).val('');
+                      });
+
+                      input( defaultVal );
+                      // Reset unit to pixels
+                      $('.sek-unit-wrapper', $wrapper ).find('[data-sek-unit="px"]').trigger('click');
+                });
+          };
+
+
+
+      /* ------------------------------------------------------------------------- *
+       *  SPACING CLASSIC
+      /* ------------------------------------------------------------------------- */
       $.extend( api.czrInputMap, {
             spacing : function( input_options ) {
                   var input = this,
                       $wrapper = $('.sek-spacing-wrapper', input.container ),
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                       defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : [];
-
-                  var validateUnit = function( unit ) {
-                            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
-                                  api.errare( 'error : invalid unit for input ' + input.id, unit );
-                                  unit = 'px';
-                            }
-                            return unit;
-                      },
-                      stripUnit = function( value ) {
-                            return _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
-                      },
-                      initial_unit;
 
                   // Listen to user actions on the inputs and set the input value
                   $wrapper.on( 'input', 'input[type="number"]', function(evt) {
@@ -34,25 +69,12 @@
                               _newInputVal[ _type_ ] = _rawVal;
                         } else {
                               // this allow users to reset a given padding / margin instead of reseting them all at once with the "reset all spacing" option
-                              _newInputVal = _.omit( _type_, _newInputVal );
+                              _newInputVal = _.omit( _newInputVal, _type_ );
                         }
-
                         input( _newInputVal );
                   });
                   // Schedule a reset action
-                  // Note : this has to be done by device
-                  $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
-                        evt.preventDefault();
-                        $wrapper.find('input[type="number"]').each( function() {
-                              $(this).val('');
-                        });
-                        // [] is the default value
-                        // we could have get it with api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_spacing_module' )
-                        // @see php spacing module registration
-                        input( defaultVal );
-                        // Reset unit to pixels
-                        $('.sek-unit-wrapper').find('[data-sek-unit="px"]').trigger('click');
-                  });
+                  setupResetAction.call( input, $wrapper, defaultVal );
 
                   // Synchronize on init
                   if ( _.isObject( input() ) ) {
@@ -72,42 +94,32 @@
                                     }
                               }
                         });
-                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit( unitToActivate ) + '"]').trigger('click');
+                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
                   }
 
                   // Set the initial unit
                   var initial_value = input();
-                  if ( ! _.isEmpty( initial_value ) && ! _.isEmpty( initial_value[ input.previewedDevice() ] ) ) {
-                        initial_unit = _.isEmpty( initial_value[ input.previewedDevice() ]['unit'] ) ? 'px' : initial_value[ input.previewedDevice() ]['unit'];
+                  input.initial_unit = 'px';
+                  if ( ! _.isEmpty( initial_value )  ) {
+                        input.initial_unit = _.isEmpty( initial_value['unit'] ) ? 'px' : initial_value['unit'];
                   }
 
                   // initialize the unit with the value provided in the dom
-                  input.css_unit = new api.Value( validateUnit( initial_unit ) );
+                  input.css_unit = new api.Value( validateUnit.call( input, input.initial_unit ) );
 
                   // React to a unit change
                   input.css_unit.bind( function( to ) {
                         to = _.isEmpty( to ) ? 'px' : to;
-                        var _newInputVal,
-                            previewedDevice = input.previewedDevice() || 'desktop';
+                        var _newInputVal;
 
                         _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
-                        _newInputVal[ previewedDevice ] = $.extend( true, {}, _newInputVal[ previewedDevice ] || {} );
-                        _newInputVal[ previewedDevice ][ 'unit' ] = to;
+                        _newInputVal[ 'unit' ] = to;
                         input( _newInputVal );
                   });
 
                   // Schedule unit changes on button click
-                  $wrapper.on( 'click', '.sek-ui-button', function(evt) {
-                        evt.preventDefault();
-                        // handle the is-selected css class toggling
-                        $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
-                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        // set the current unit Value
-                        input.css_unit( $(this).data('sek-unit') );
-                  });
-
                   // add is-selected button on init to the relevant unit button
-                  $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
+                  unitButtonsSetup.call( input, $wrapper );
             }
       });//$.extend( api.czrInputMap, {})
 
@@ -125,6 +137,9 @@
 
 
 
+      /* ------------------------------------------------------------------------- *
+       *  SPACING WITH DEVICE SWITCHER
+      /* ------------------------------------------------------------------------- */
       // input_type => callback fn to fire in the Input constructor on initialize
       // the callback can receive specific params define in each module constructor
       // For example, a content picker can be given params to display only taxonomies
@@ -135,19 +150,6 @@
                       $wrapper = $('.sek-spacing-wrapper', input.container ),
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                       defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : [];
-
-
-                  var validateUnit = function( unit ) {
-                            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
-                                  api.errare( 'error : invalid unit for input ' + input.id, unit );
-                                  unit = 'px';
-                            }
-                            return unit;
-                      },
-                      stripUnit = function( value ) {
-                            return _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
-                      },
-                      initial_unit;
 
                   api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
 
@@ -166,24 +168,14 @@
                               _newInputVal[ previewedDevice ][ changedSpacingType ] = changedNumberInputVal;
                         } else {
                               // this allow users to reset a given padding / margin instead of reseting them all at once with the "reset all spacing" option
-                              _newInputVal[ previewedDevice ] = _.omit( changedSpacingType, _newInputVal[ previewedDevice ] );
+                              _newInputVal[ previewedDevice ] = _.omit( _newInputVal[ previewedDevice ], changedSpacingType );
                         }
 
                         input( _newInputVal );
                   });
 
                   // Schedule a reset action
-                  // Note : this has to be done by device
-                  $wrapper.on( 'click', '.reset-spacing-wrap', function(evt) {
-                        evt.preventDefault();
-                        $wrapper.find('input[type="number"]').each( function() {
-                              $(this).val('');
-                        });
-
-                        input( defaultVal );
-                        // Reset unit to pixels
-                        $('.sek-unit-wrapper').find('[data-sek-unit="px"]').trigger('click');
-                  });
+                  setupResetAction.call( input, $wrapper, defaultVal );
 
                   // Synchronizes on init + refresh on previewed device changes
                   var syncWithPreviewedDevice = function( currentDevice ) {
@@ -217,7 +209,7 @@
                                     }
                               }
                         });
-                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit( unitToActivate ) + '"]').trigger('click');
+                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
                   };
 
                   syncWithPreviewedDevice( api.previewedDevice() );
@@ -228,12 +220,13 @@
 
                   // Set the initial unit
                   var initial_value = input();
+                  input.initial_unit = 'px';
                   if ( ! _.isEmpty( initial_value ) && ! _.isEmpty( initial_value[ input.previewedDevice() ] ) ) {
-                        initial_unit = _.isEmpty( initial_value[ input.previewedDevice() ]['unit'] ) ? 'px' : initial_value[ input.previewedDevice() ]['unit'];
+                        input.initial_unit = _.isEmpty( initial_value[ input.previewedDevice() ]['unit'] ) ? 'px' : initial_value[ input.previewedDevice() ]['unit'];
                   }
 
                   // initialize the unit with the value provided in the dom
-                  input.css_unit = new api.Value( validateUnit( initial_unit ) );
+                  input.css_unit = new api.Value( validateUnit.call( input, input.initial_unit ) );
 
                   // React to a unit change
                   input.css_unit.bind( function( to ) {
@@ -248,17 +241,8 @@
                   });
 
                   // Schedule unit changes on button click
-                  $wrapper.on( 'click', '.sek-ui-button', function(evt) {
-                        evt.preventDefault();
-                        // handle the is-selected css class toggling
-                        $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
-                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        // set the current unit Value
-                        input.css_unit( $(this).data('sek-unit') );
-                  });
-
                   // add is-selected button on init to the relevant unit button
-                  $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
+                  unitButtonsSetup.call( input, $wrapper );
             }
       });//$.extend( api.czrInputMap, {})
 
