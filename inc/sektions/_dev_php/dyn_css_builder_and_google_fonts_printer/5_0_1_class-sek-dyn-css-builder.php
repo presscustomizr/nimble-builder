@@ -80,9 +80,12 @@ class Sek_Dyn_CSS_Builder {
 
             // populate rules for modules values
             if ( !empty( $entry[ 'level' ] ) && 'module' === $entry['level'] ) {
-                // build rules for modules
-                // applying sek_normalize_module_value_with_defaults() allows us to access all the value properties of the module without needing to check their existence
-                $rules = apply_filters( 'sek_add_css_rules_for_modules', $rules, sek_normalize_module_value_with_defaults( $entry ) );
+                if ( ! empty( $entry['module_type'] ) ) {
+                    $module_type = $entry['module_type'];
+                    // build rules for modules
+                    // applying sek_normalize_module_value_with_defaults() allows us to access all the value properties of the module without needing to check their existence
+                    $rules = apply_filters( "sek_add_css_rules_for_module_type___{$module_type}", $rules, sek_normalize_module_value_with_defaults( $entry ) );
+                }
             }
 
             // When we are inside the associative arrays of the module 'value' or the level 'options' entries

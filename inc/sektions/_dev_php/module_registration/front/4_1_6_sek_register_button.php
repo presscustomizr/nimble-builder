@@ -291,14 +291,11 @@ function sanitize_callback__czr_button_module( $value ) {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_modules', '\Nimble\sek_add_css_rules_for_button_front_module', 10, 3 );
+add_filter( 'sek_add_css_rules_for_module_type___czr_button_module', '\Nimble\sek_add_css_rules_for_button_front_module', 10, 2 );
 // filter documented in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker
 // Note : $complete_modul_model has been normalized
 // @return populated $rules
 function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_model ) {
-    if ( !is_array( $complete_modul_model ) || empty( $complete_modul_model['module_type'] ) || 'czr_button_module' !== $complete_modul_model['module_type'] )
-      return $rules;
-
     if ( empty( $complete_modul_model['value'] ) )
       return $rules;
 
