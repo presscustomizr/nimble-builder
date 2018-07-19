@@ -135,7 +135,13 @@ function sek_get_module_params_for_czr_button_module() {
                             'spacing_css'        => array(
                                 'input_type'         => 'spacing',
                                 'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
-                                'default'            => array(),
+                                'default'            => array(
+                                    'padding-top'    => .5,
+                                    'padding-bottom' => .5,
+                                    'padding-right'  => 1,
+                                    'padding-left'   => 1,
+                                    'unit' => 'em'
+                                ),
                                 'width-100'   => true,
                                 'refresh_markup'     => false,
                                 'refresh_stylesheet' => true,
@@ -171,7 +177,7 @@ function sek_get_module_params_for_czr_button_module() {
                             'font_size_css'       => array(
                                 'input_type'  => 'font_size',
                                 'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
-                                'default'     => '16px',
+                                'default'     => '1em',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size',
@@ -180,7 +186,7 @@ function sek_get_module_params_for_czr_button_module() {
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
-                                'default'     => '1.5em',
+                                'default'     => '1.25em',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height',
@@ -189,7 +195,7 @@ function sek_get_module_params_for_czr_button_module() {
                             'font_weight_css'     => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
-                                'default'     => 400,
+                                'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_weight',
@@ -230,8 +236,7 @@ function sek_get_module_params_for_czr_button_module() {
                             'letter_spacing_css'  => array(
                                 'input_type'  => 'number',
                                 'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
-                                'default'     => 0,
-                                'min'         => 0,
+                                'default'     => 1,
                                 'step'        => 1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
