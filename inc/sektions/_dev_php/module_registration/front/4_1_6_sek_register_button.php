@@ -124,7 +124,7 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_selectors'=> $css_selectors
                             ),
                             'h_alignment_css'        => array(
-                                'input_type'         => 'h_text_alignment',
+                                'input_type'         => 'h_alignment',
                                 'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
                                 'default'            => is_rtl() ? 'right' : 'left',
                                 'refresh_markup'     => false,
