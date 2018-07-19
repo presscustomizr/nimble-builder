@@ -207,6 +207,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_section_layout.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_height.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_4_sek_register_spacing.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_5_sek_register_width.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php',
@@ -264,6 +265,7 @@ module.exports = {
       // Modules
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_bg_border_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_height_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_width_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_section_layout_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_1_UI_spacing.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_2_UI_module_picker.js',

@@ -380,6 +380,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Background and border settings for the' => __('Background and border settings for the', 'text_domain_to_be_replaced'),
             'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_domain_to_be_replaced'),
             'Height settings for the' => __('Height settings for the', 'text_domain_to_be_replaced'),
+            'Width settings for the' => __('Width settings for the', 'text_domain_to_be_replaced'),
 
             'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
 

@@ -9,6 +9,7 @@ function sek_register_modules() {
         'sek_level_section_layout_module',
         'sek_level_height_module',
         'sek_spacing_module',
+        'sek_level_width_module',
 
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
@@ -156,7 +157,7 @@ function sek_get_select_options_for_input_id( $input_id ) {
             );
         break;
 
-        // LAYOUT BACKGROUND BORDER
+        // LEVELS UI : LAYOUT BACKGROUND BORDER HEIGHT WIDTH
         case 'boxed-wide' :
             $options = array(
                 'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
@@ -167,6 +168,12 @@ function sek_get_select_options_for_input_id( $input_id ) {
             $options = array(
                 'default' => __('default', 'text_domain_to_be_replaced'),
                 'fit-to-screen' => __('Fit to screen', 'text_domain_to_be_replaced'),
+                'custom' => __('Custom', 'text_domain_to_be_replaced' )
+            );
+        break;
+        case 'width-type' :
+            $options = array(
+                'default' => __('default', 'text_domain_to_be_replaced'),
                 'custom' => __('Custom', 'text_domain_to_be_replaced' )
             );
         break;

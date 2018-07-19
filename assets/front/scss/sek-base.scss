@@ -30,6 +30,42 @@
   flex: 0 0 100%;
   max-width: 100%;
 }
+
+/* To allow horizontal centering of modules
+  @see https://github.com/presscustomizr/nimble-builder/issues/119
+*/
+/*  - sections in locations */
+// .sektion-wrapper {
+//   display: flex;
+//   flex-direction: column;
+// }
+
+// .sek-section {
+//   align-self: center;
+//   max-width: 100%;
+//   width: 100%;
+// }
+/*  - columns in sections */
+// .sek-sektion-inner {
+//   flex-direction: column;
+// }
+// .sek-column {
+//   align-self: center
+// }
+
+/*  - modules in columns */
+.sek-column-inner {
+  display: flex;
+  flex-direction: column;
+}
+.sek-module {
+  align-self: center;
+  width: 100%;
+}
+
+
+
+
 /* a nested sektion should reset its parent column padding
 @see https://github.com/presscustomizr/nimble-builder/issues/25
 */

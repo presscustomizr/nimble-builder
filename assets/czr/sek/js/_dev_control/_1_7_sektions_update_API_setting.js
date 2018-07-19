@@ -676,6 +676,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           case 'spacing' :
                                                 _candidate_.options.spacing = _valueCandidate;
                                           break;
+                                          case 'width' :
+                                                _candidate_.options.width = _valueCandidate;
+                                          break;
+                                          default :
+                                                api.errare( 'updateAPISetting => unknown options_type param ' + options_type );
+                                          break;
                                     }
                               break;
 

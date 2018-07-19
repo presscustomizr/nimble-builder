@@ -277,7 +277,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               var sectionLayoutOptionsSetId = params.id + '__sectionLayout_options',
                                   bgBorderOptionsSetId = params.id + '__bgBorder_options',
                                   heightOptionsSetId = params.id + '__height_options',
-                                  spacingOptionsSetId = params.id + '__spacing_options';
+                                  spacingOptionsSetId = params.id + '__spacing_options',
+                                  widthOptionsSetId = params.id + '__width_options';
 
                               // Is the UI currently displayed the one that is being requested ?
                               // If so, don't generate the ui again, simply focus on the section
@@ -298,14 +299,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               _do_register_ = function() {
                                     if ( 'section' === params.level ) {
-
-
-
-
-
                                           // REGISTER SECTION LAYOUT
                                           // Make sure this setting is bound only once !
-                                          if( ! api.has( heightOptionsSetId ) ) {
+                                          if( ! api.has( sectionLayoutOptionsSetId ) ) {
                                                 // Schedule the binding to synchronize the options with the main collection setting
                                                 // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
                                                 // They need to be kept in order to keep track of the changes in the customizer.
@@ -556,6 +552,67 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 completeCallback : function() {}
                                           });
                                     });
+
+
+
+
+
+                                    // REGISTER WIDTH OPTIONS
+                                    // For module levels only
+                                    if ( 'module' === params.level ) {
+                                          if( ! api.has( widthOptionsSetId ) ) {
+                                                // Schedule the binding to synchronize the options with the main collection setting
+                                                // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
+                                                // They need to be kept in order to keep track of the changes in the customizer.
+                                                // => that's why we check if ! api.has( ... )
+                                                api( widthOptionsSetId, function( _setting_ ) {
+                                                      _setting_.bind( _.debounce( function( to, from, args ) {
+                                                            try { self.updateAPISettingAndExecutePreviewActions({
+                                                                  defaultPreviewAction : 'refresh_stylesheet',
+                                                                  uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
+                                                                  options_type : 'width',// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
+                                                                  settingParams : {
+                                                                        to : to,
+                                                                        from : from,
+                                                                        args : args
+                                                                  }
+                                                            }); } catch( er ) {
+                                                                  api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                                            }
+                                                      }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                                });//api( widthOptionsSetId, function( _setting_ ) {})
+
+
+                                                api.CZR_Helpers.register( {
+                                                      origin : 'nimble',
+                                                      level : params.level,
+                                                      what : 'setting',
+                                                      id : widthOptionsSetId,
+                                                      dirty : false,
+                                                      value : optionDBValue.width || {},
+                                                      transport : 'postMessage',// 'refresh',
+                                                      type : '_nimble_ui_'//will be dynamically registered but not saved in db as option //sekData.settingType
+                                                });
+                                          }//if( ! api.has( widthOptionsSetId ) ) {
+
+                                          api.CZR_Helpers.register( {
+                                                origin : 'nimble',
+                                                level : params.level,
+                                                level_id : params.id,
+                                                what : 'control',
+                                                id : widthOptionsSetId,
+                                                label : sektionsLocalizedData.i18n['Width settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                                                type : 'czr_module',//sekData.controlType,
+                                                module_type : 'sek_level_width_module',
+                                                section : params.id,
+                                                priority : 20,
+                                                settings : { default : widthOptionsSetId }
+                                          }).done( function() {
+                                                api.control( widthOptionsSetId ).focus({
+                                                      completeCallback : function() {}
+                                                });
+                                          });
+                                    }//if ( 'module' === params.level )
 
                               };//_do_register_
 
