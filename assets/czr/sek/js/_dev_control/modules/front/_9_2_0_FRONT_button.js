@@ -126,28 +126,32 @@
                               inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                               selectOptions = inputRegistrationParams.choices;
 
-                           //Link select
-                          if ( _.isEmpty( selectOptions ) ) {
-                                api.errare( 'Missing select options for input id => ' + input.id + ' in button module');
-                                return;
-                          } else {
-                                //generates the options
-                                _.each( selectOptions , function( title, value ) {
-                                      //get only no-link and url
-                                      if ( !(  _.contains([ 'no-link', 'url' ], value) ) ) {
-                                            return;
-                                      }
-                                      var _attributes = {
-                                                value : value,
-                                                html: title
-                                          };
-                                      if ( value == input() ) {
-                                            $.extend( _attributes, { selected : "selected" } );
-                                      }
+                          //Link select
+                          if ( 'link-to' === input.id ) {
+                                if ( _.isEmpty( selectOptions ) ) {
+                                      api.errare( 'Missing select options for input id => ' + input.id + ' in button module');
+                                      api.czr_sektions.setupSelectInput.call( this );
+                                } else {
+                                      //generates the options
+                                      _.each( selectOptions , function( title, value ) {
+                                            //get only no-link and url
+                                            if ( !(  _.contains([ 'no-link', 'url' ], value) ) ) {
+                                                  return;
+                                            }
+                                            var _attributes = {
+                                                      value : value,
+                                                      html: title
+                                                };
+                                            if ( value == input() ) {
+                                                  $.extend( _attributes, { selected : "selected" } );
+                                            }
 
-                                      $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                });
-                                $( 'select[data-czrtype]', input.container ).selecter();
+                                            $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                      });
+                                      $( 'select[data-czrtype]', input.container ).selecter();
+                                }
+                          } else {
+                                api.czr_sektions.setupSelectInput.call( this );
                           }
                     },//setupSelect
                     // for this module we don't need the justification h-alignment
