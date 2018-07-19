@@ -34,22 +34,28 @@ if ( ! function_exists( 'Nimble\sek_get_button_module_icon' ) ) {
     }
 }
 
-//icon
-if ( ! empty( $value[ 'icon' ] ) ) {
-    $icon = sprintf( '<i class="%1$s"></i>', $value[ 'icon' ] );
+$visual_effect_class = '';
+//visual effect classes
+if ( isset( $value['use_box_shadow'] ) && true === sek_booleanize_checkbox_val( $value['use_box_shadow'] ) ) {
+    $visual_effect_class = ' box-shadow';
+    if ( isset( $value['push_effect'] ) && true === sek_booleanize_checkbox_val( $value['push_effect'] ) ) {
+        $visual_effect_class .= ' push-effect';
+    }
 }
 
 // Print
-if ( 'no-link' === $value['link-to'] ) :
-    printf('<button class="sek-btn">%1$s<span class="sek-btn-text">%2$s</span></button>',
+if ( !isset( $value['link-to'] ) || isset( $value['link-to'] ) && 'no-link' === $value['link-to'] ) :
+    printf('<button class="sek-btn%3$s"><span class="sek-btn-inner">%1$s<span class="sek-btn-text">%2$s</span></span></button>',
         sek_get_button_module_icon( $value ),
-        strip_tags( $value[ 'button_text' ] )
+        strip_tags( $value[ 'button_text' ] ),
+        $visual_effect_class
     );
 else :
-    printf('<a class="sek-btn" href="%1$s" %2$s><span class="sek-btn-inner">%3$s<span class="sek-btn-text">%4$s</span></span></a>',
+    printf('<a class="sek-btn%5$s" href="%1$s" %2$s><span class="sek-btn-inner">%3$s<span class="sek-btn-text">%4$s</span></span></a>',
         sek_get_button_module_link( $value ),
         true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
         sek_get_button_module_icon( $value ),
-        strip_tags( $value['button_text'] )
+        strip_tags( $value['button_text'] ),
+        $visual_effect_class
     );
 endif;
