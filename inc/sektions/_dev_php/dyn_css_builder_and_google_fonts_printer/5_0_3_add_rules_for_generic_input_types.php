@@ -212,7 +212,29 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
                     );
             }
         break;
+        case 'padding_margin_spacing' :
+            $default_unit = 'px';
+            $rules_candidates = $value;
+            //add unit and sanitize padding (cannot have negative padding)
+            $unit                 = !empty( $rules_candidates['unit'] ) ? $rules_candidates['unit'] : $default_unit;
+            $unit                 = 'percent' == $unit ? '%' : $unit;
 
+            $filtered_rules_candidates = array_filter( $rules_candidates, function( $k ) {
+                return 'unit' !== $k;
+            }, ARRAY_FILTER_USE_KEY );
+
+            $properties_to_render = $filtered_rules_candidates;
+
+            array_walk( $properties_to_render,
+                function( &$val, $key, $unit ) {
+                    //make sure paddings are positive values
+                    if ( FALSE !== strpos( 'padding', $key ) ) {
+                        $val = abs( $val );
+                    }
+
+                    $val .= $unit;
+            }, $unit );
+        break;
         // The default is simply there to let us know if a css_identifier is missing
         default :
             sek_error_log( __FUNCTION__ . ' => the css_identifier : ' . $css_identifier . ' has no css rules defined for input id ' . $input_id );
