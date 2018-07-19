@@ -132,6 +132,16 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_identifier' => 'h_alignment',
                                 'css_selectors'=> '.sek-module-inner'
                             ),
+                            'spacing_css'        => array(
+                                'input_type'         => 'spacing',
+                                'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
+                                'default'            => array(),
+                                'width-100'   => true,
+                                'refresh_markup'     => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'padding_margin_spacing',
+                                'css_selectors'=> '.sek-module-inner .sek-btn'
+                            ),
                             'use_box_shadow' => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
