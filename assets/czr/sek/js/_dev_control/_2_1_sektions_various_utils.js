@@ -569,9 +569,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // render the device switcher before the input title
                   var deviceSwitcherHtml = [
                         '<span class="sek-input-device-switcher">',
-                          '<i data-sek-device="desktop" class="sek-switcher preview-desktop active"></i>',
-                          '<i data-sek-device="tablet" class="sek-switcher preview-tablet"></i>',
-                          '<i data-sek-device="mobile" class="sek-switcher preview-mobile"></i>',
+                          '<i data-sek-device="desktop" class="sek-switcher preview-desktop active" title="'+ sektionsLocalizedData.i18n['Settings on desktops'] +'"></i>',
+                          '<i data-sek-device="tablet" class="sek-switcher preview-tablet" title="'+ sektionsLocalizedData.i18n['Settings on tablets'] +'"></i>',
+                          '<i data-sek-device="mobile" class="sek-switcher preview-mobile" title="'+ sektionsLocalizedData.i18n['Settings on mobiles'] +'"></i>',
                         '</span>'
                   ].join(' ');
 
