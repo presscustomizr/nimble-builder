@@ -41,6 +41,7 @@ function sek_get_module_params_for_czr_button_module() {
             'bg_color_hover' => '#151515', //lighten 15%,
             'use_custom_bg_color_on_hover' => 0,
             'border_radius_css' => '2',
+            'h_alignment_css' => 'center',
             'use_box_shadow' => 1,
             'push_effect' => 1
         ),
@@ -81,7 +82,7 @@ function sek_get_module_params_for_czr_button_module() {
                             ),
                             'icon' => array(
                                 'input_type'  => 'fa_icon_picker',
-                                'title'       => __( 'Select an Icon that will appear before the button text', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Icon next to the button text', 'text_domain_to_be_replaced' ),
                                 //'default'     => 'no-link'
                             ),
                             'bg_color_css' => array(
@@ -126,14 +127,14 @@ function sek_get_module_params_for_czr_button_module() {
                                 'input_type'         => 'h_text_alignment',
                                 'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
                                 'default'            => is_rtl() ? 'right' : 'left',
-                                    'refresh_markup'     => false,
-                                    'refresh_stylesheet' => true,
-                                    'css_identifier' => 'h_alignment',
-                                    'css_selectors'=> '.sek-module-inner'
+                                'refresh_markup'     => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'h_alignment',
+                                'css_selectors'=> '.sek-module-inner'
                             ),
                             'use_box_shadow' => array(
                                 'input_type'  => 'gutencheck',
-                                'title'       => __( 'Apply box shadow', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
                                 'default'     => 1,
                             ),
                             'push_effect' => array(
@@ -252,6 +253,7 @@ function sek_get_module_params_for_czr_button_module() {
                             'button___flag_important'       => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                                'title_width' => 'width-100',
                                 'default'     => 0,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
