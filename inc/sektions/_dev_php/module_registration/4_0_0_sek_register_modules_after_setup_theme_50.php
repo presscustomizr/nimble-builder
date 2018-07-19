@@ -45,7 +45,7 @@ function sek_get_select_options_for_input_id( $input_id ) {
     $options = array();
     switch( $input_id ) {
         // IMAGE MODULE
-        case 'link-to' :
+        case 'img-link-to' :
             $options = array(
                 'no-link' => __('No link', 'text_domain_to_be_replaced' ),
                 'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
@@ -55,6 +55,14 @@ function sek_get_select_options_for_input_id( $input_id ) {
         break;
         case 'img-size' :
             $options = sek_get_img_sizes();
+        break;
+
+        // ALL MODULES
+        case 'link-to' :
+            $options = array(
+                'no-link' => __('No link', 'text_domain_to_be_replaced' ),
+                'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
+            );
         break;
 
         // FEATURED PAGE MODULE

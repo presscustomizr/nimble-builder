@@ -6,7 +6,11 @@
                   //console.log('INITIALIZING IMAGE MODULE', id, options );
                   var module = this;
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRImageInputMths || {} );
+                  module.inputConstructor = api.CZRInput.extend({
+                        setupSelect : function() {
+                              api.czr_sektions.setupSelectInput.call( this );
+                        }
+                  });
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
@@ -30,16 +34,6 @@
                   });
             },//initialize
 
-            CZRImageInputMths : {
-                  // initialize : function( name, options ) {
-                  //       var input = this;
-                  //       api.CZRInput.prototype.initialize.call( input, name, options );
-                  // },
-
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRImageInputMths
 
             // _isChecked : function( v ) {
             //       return 0 !== v && '0' !== v && false !== v && 'off' !== v;

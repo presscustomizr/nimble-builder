@@ -8,7 +8,11 @@
                       var module = this;
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend( module.CZRIconInputMths || {} );
+                      module.inputConstructor = api.CZRInput.extend({
+                            setupSelect : function() {
+                                  api.czr_sektions.setupSelectInput.call( this );
+                            }
+                      });
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRIconItemConstructor || {} );
@@ -37,39 +41,6 @@
 
               /* Helpers */
 
-              CZRIconInputMths: {
-                    setupSelect : function() {
-                          var input  = this,
-                              item   = input.input_parent,
-                              module = input.module,
-                              inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
-                              selectOptions = inputRegistrationParams.choices;
-
-                           //Link select
-                          if ( _.isEmpty( selectOptions ) ) {
-                                api.errare( 'Missing select options for input id => ' + input.id + ' in icon module');
-                                return;
-                          } else {
-                                //generates the options
-                                _.each( selectOptions , function( title, value ) {
-                                      //get only no-link and url
-                                      if ( !(  _.contains([ 'no-link', 'url' ], value) ) ) {
-                                            return;
-                                      }
-                                      var _attributes = {
-                                                value : value,
-                                                html: title
-                                          };
-                                      if ( value == input() ) {
-                                            $.extend( _attributes, { selected : "selected" } );
-                                      }
-
-                                      $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                                });
-                                $( 'select[data-czrtype]', input.container ).selecter();
-                          }
-                    }//setupSelect
-              },//CZRIconInputMths
               //////////////////////////////////////////////////////////
               /// ITEM CONSTRUCTOR
               //////////////////////////////////////////
