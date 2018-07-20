@@ -168,7 +168,9 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
         /* Quote border */
         case 'border_width' :
-            $properties_to_render['border-width'] = $value > 0 ? $value . 'px' : '1px';
+            $numeric = sek_extract_numeric_value( $value );
+            $unit = sek_extract_unit( $value );
+            $properties_to_render['border-width'] = $numeric . $unit;
         break;
         case 'border_color' :
             $properties_to_render['border-color'] = $value ? $value : '';
