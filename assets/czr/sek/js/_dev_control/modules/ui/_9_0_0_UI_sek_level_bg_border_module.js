@@ -86,6 +86,15 @@
                                                 }
                                           });
                                     break;
+                                    case 'border-type' :
+                                          _.each( [ 'border-width', 'border-color' ] , function(_inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'none' !== input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
                               }
                         });
                   }
