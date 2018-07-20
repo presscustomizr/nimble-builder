@@ -28,7 +28,7 @@
 // });
 function sek_get_module_params_for_czr_quote_module() {
     $quote_font_selectors = array( '.sek-quote-content', '.sek-quote-content p', '.sek-quote-content ul', '.sek-quote-content ol', '.sek-quote-content a' );
-    $cite_font_selectors  = array( '.sek-cite', '.sek-cite a' );
+    $cite_font_selectors  = array( '.sek-quote-design .sek-cite', '.sek-quote-design .sek-cite a' );
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_module',
@@ -203,7 +203,7 @@ function sek_get_module_params_for_czr_quote_module() {
                             'cite_font_size_css'       => array(
                                 'input_type'  => 'font_size',
                                 'title'       => __( 'Font size in pixels', 'text_domain_to_be_replaced' ),
-                                'default'     => '16px',
+                                'default'     => '13px',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size',
