@@ -48,17 +48,19 @@ function sek_get_module_params_for_czr_map_module() {
                     'default'    => '',
                 ),
                 'zoom' => array(
-                    'input_type'  => 'range_slider',
+                    'input_type'  => 'range_simple',
                     'title'       => __( 'Zoom', 'text_domain_to_be_replaced' ),
                     'min' => 1,
                     'max' => 20,
                     'unit' => '',
                     'default' => 10,
+                    'width-100'   => true
                 ),
                 'height_css' => array(
                     'input_type'  => 'range_with_unit_picker',
                     'title'       => __( 'Height', 'text_domain_to_be_replaced' ),
                     'min' => 1,
+                    'max' => 400,
                     'default' => '200px',
                     'width-100'   => true,
                     'css_selectors' => array( '.sek-embed::before' ),

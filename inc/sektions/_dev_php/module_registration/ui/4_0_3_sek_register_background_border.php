@@ -8,6 +8,10 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
         'dynamic_registration' => true,
         'module_type' => 'sek_level_bg_border_module',
         'name' => __('Background and borders', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'bg-color-overlay'  => '#000000',
+            'bg-opacity-overlay' => '50'
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -70,13 +74,15 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                                 'default'     => ''
                             ),
                             'bg-opacity-overlay' => array(
-                                'input_type'  => 'range_slider',
-                                'title'       => __('Opacity', 'text_domain_to_be_replaced'),
+                                'input_type'  => 'range_simple',
+                                'title'       => __('Opacity (in percents)', 'text_domain_to_be_replaced'),
                                 'orientation' => 'horizontal',
                                 'min' => 0,
                                 'max' => 100,
                                 'unit' => '%',
-                                'default'  => 50
+                                'default'  => '50%',
+                                'width-100'   => true,
+                                'title_width' => 'width-100'
                             )
                         )
                     ),
