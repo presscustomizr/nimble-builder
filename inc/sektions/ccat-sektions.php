@@ -1024,6 +1024,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Background and border settings for the' => __('Background and border settings for the', 'text_domain_to_be_replaced'),
             'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_domain_to_be_replaced'),
             'Height settings for the' => __('Height settings for the', 'text_domain_to_be_replaced'),
+            'Width settings for the' => __('Width settings for the', 'text_domain_to_be_replaced'),
 
             'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
 
@@ -1054,6 +1055,13 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // Code Editor
             'codeEditorSingular'   => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_domain_to_be_replaced' ),
             'codeEditorPlural'     => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_domain_to_be_replaced' ),
+
+            // Various
+            'Settings on desktops' => __('Settings on desktops', 'text_domain_to_be_replaced'),
+            'Settings on tablets' => __('Settings on tablets', 'text_domain_to_be_replaced'),
+            'Settings on mobiles' => __('Settings on mobiles', 'text_domain_to_be_replaced')
+
+
             // 'Module' => __('Module', 'text_domain_to_be_replaced'),
             // 'Module' => __('Module', 'text_domain_to_be_replaced'),
             // 'Module' => __('Module', 'text_domain_to_be_replaced'),
@@ -1325,6 +1333,12 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'code_editor' :
             sek_set_input_tmpl___code_editor( $input_id, $input_data );
         break;
+        case 'range_with_unit_picker' :
+            sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data );
+        break;
+        case 'range_simple' :
+            sek_set_input_tmpl___range_simple( $input_id, $input_data );
+        break;
     }
 }
 ?><?php
@@ -1341,8 +1355,8 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_tiny_mce_editor_module',
-                  'title' => __( 'Text Editor', 'text_domain_to_be_replaced' ),
-                  'icon' => 'Nimble__text_icon.svg'
+                  'title' => __( 'WordPress Editor', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_rich-text-editor_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
@@ -1415,10 +1429,10 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                     $icon_img_src = NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' . $_params['icon'];
                 }
 
-                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><span class="sek-module-icon">%3$s</span><span class="sek-module-title">%4$s</span></div>',
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><div class="sek-module-icon">%3$s</div><div class="sek-module-title"><div class="sek-centered-module-title">%4$s</div></div></div>',
                       $_params['content-type'],
                       $_params['content-id'],
-                      empty( $icon_img_src ) ? '<i style="color:red">Missing Icon</i>' : '<img title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>',
+                      empty( $icon_img_src ) ? '<i style="color:red">Missing Icon</i>' : '<img draggable="false" title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>',
                       $_params['title'],
                       __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' )
                 );
@@ -1947,6 +1961,88 @@ function sek_set_input_tmpl___code_editor( $input_id, $input_data ) {
 }
 ?>
 <?php
+/* ------------------------------------------------------------------------- *
+ *  CODE EDITOR INPUT TEMPLATE
+/* ------------------------------------------------------------------------- */
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
+function sek_set_input_tmpl___range_simple( $input_id, $input_data ) {
+    ?>
+    <?php
+      // we save the int value + unit
+      // we want to keep only the numbers when printing the tmpl
+      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
+    ?>
+    <#
+      var value = data['<?php echo $input_id; ?>'],
+          unit = data['<?php echo $input_id; ?>'];
+      value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
+      unit = _.isString( unit ) ? unit.replace(/[0-9]|\.|,/g, '') : 'px';
+      unit = _.isEmpty( unit ) ? 'px' : unit;
+    #>
+    <div class="sek-range-with-unit-picker-wrapper sek-no-unit-picker">
+        <# //console.log( 'IN php::sek_set_input_tmpl___range_simple() => data range_slide => ', data ); #>
+        <div class="sek-range-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
+          <?php
+          printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
+            ! empty( $input_data['orientation'] ) ? 'data-orientation="'. $input_data['orientation'] .'"' : '',
+            ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
+            ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
+            ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
+          );
+          ?>
+        </div>
+        <div class="sek-number-wrapper">
+            <input class="sek-pm-input" value="{{ value }}" type="number"  >
+        </div>
+    </div><?php // sek-spacing-wrapper ?>
+  <?php
+}
+?>
+<?php
+/* ------------------------------------------------------------------------- *
+ *  CODE EDITOR INPUT TEMPLATE
+/* ------------------------------------------------------------------------- */
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
+function sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data ) {
+    ?>
+    <?php
+      // we save the int value + unit
+      // we want to keep only the numbers when printing the tmpl
+      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
+    ?>
+    <#
+      var value = data['<?php echo $input_id; ?>'],
+          unit = data['<?php echo $input_id; ?>'];
+      value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
+      unit = _.isString( unit ) ? unit.replace(/[0-9]|\.|,/g, '') : 'px';
+      unit = _.isEmpty( unit ) ? 'px' : unit;
+    #>
+    <div class="sek-range-with-unit-picker-wrapper">
+        <# //console.log( 'IN php::sek_set_input_tmpl___range_with_unit_picker() => data range_slide => ', data ); #>
+        <div class="sek-range-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
+          <?php
+          printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
+            ! empty( $input_data['orientation'] ) ? 'data-orientation="'. $input_data['orientation'] .'"' : '',
+            ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
+            ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
+            ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
+          );
+          ?>
+        </div>
+        <div class="sek-number-wrapper">
+            <input class="sek-pm-input" value="{{ value }}" type="number"  >
+        </div>
+        <div class="sek-unit-wrapper">
+          <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_domain');?>" data-sek-unit="%"><?php _e('%', 'text_domain');?></button></div>
+        </div>
+    </div><?php // sek-spacing-wrapper ?>
+  <?php
+}
+?>
+<?php
 // The base fmk is loaded @after_setup_theme:10
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
@@ -1957,6 +2053,7 @@ function sek_register_modules() {
         'sek_level_section_layout_module',
         'sek_level_height_module',
         'sek_spacing_module',
+        'sek_level_width_module',
 
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
@@ -2104,7 +2201,7 @@ function sek_get_select_options_for_input_id( $input_id ) {
             );
         break;
 
-        // LAYOUT BACKGROUND BORDER
+        // LEVELS UI : LAYOUT BACKGROUND BORDER HEIGHT WIDTH
         case 'boxed-wide' :
             $options = array(
                 'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
@@ -2113,8 +2210,13 @@ function sek_get_select_options_for_input_id( $input_id ) {
         break;
         case 'height-type' :
             $options = array(
+                'auto' => __('Adapt to content', 'text_domain_to_be_replaced'),
+                'custom' => __('Custom', 'text_domain_to_be_replaced' )
+            );
+        break;
+        case 'width-type' :
+            $options = array(
                 'default' => __('default', 'text_domain_to_be_replaced'),
-                'fit-to-screen' => __('Fit to screen', 'text_domain_to_be_replaced'),
                 'custom' => __('Custom', 'text_domain_to_be_replaced' )
             );
         break;
@@ -2186,6 +2288,10 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
         'dynamic_registration' => true,
         'module_type' => 'sek_level_bg_border_module',
         'name' => __('Background and borders', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'bg-color-overlay'  => '#000000',
+            'bg-opacity-overlay' => '50'
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -2248,32 +2354,34 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                                 'default'     => ''
                             ),
                             'bg-opacity-overlay' => array(
-                                'input_type'  => 'range_slider',
-                                'title'       => __('Opacity', 'text_domain_to_be_replaced'),
+                                'input_type'  => 'range_simple',
+                                'title'       => __('Opacity (in percents)', 'text_domain_to_be_replaced'),
                                 'orientation' => 'horizontal',
                                 'min' => 0,
                                 'max' => 100,
                                 'unit' => '%',
-                                'default'  => 50
+                                'default'  => '50%',
+                                'width-100'   => true,
+                                'title_width' => 'width-100'
                             )
                         )
                     ),
                     array(
                         'title' => __('Border', 'text_domain_to_be_replaced'),
                         'inputs' => array(
-                            'border-width' => array(
-                                'input_type'  => 'range_slider',
-                                'title'       => __('Border width', 'text_domain_to_be_replaced'),
-                                'min' => 0,
-                                'max' => 100,
-                                'unit' => 'px',
-                                'default' => 1
-                            ),
                             'border-type' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Border shape', 'text_domain_to_be_replaced'),
                                 'default' => 'none',
                                 'choices'     => sek_get_select_options_for_input_id( 'border-type' )
+                            ),
+                            'border-width' => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __('Border width', 'text_domain_to_be_replaced'),
+                                'min' => 0,
+                                'max' => 100,
+                                'default' => '1px',
+                                'width-100'   => true,
                             ),
                             'border-color' => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -2488,13 +2596,17 @@ function sek_add_css_rules_for_bg_border_border( $rules, $level ) {
     if ( empty( $bg_border_options ) )
       return $rules;
 
-    $border_width = ! empty( $bg_border_options[ 'border-width' ] ) ? filter_var( $bg_border_options[ 'border-width' ], FILTER_VALIDATE_INT ) : FALSE;
+    $border_width = ! empty( $bg_border_options[ 'border-width' ] ) ? $bg_border_options[ 'border-width' ] : FALSE;
     $border_type  = FALSE !== $border_width && ! empty( $bg_border_options[ 'border-type' ] ) && 'none' != $bg_border_options[ 'border-type' ] ? $bg_border_options[ 'border-type' ] : FALSE;
 
     //border width
     if ( $border_type ) {
         $border_properties = array();
-        $border_properties[] = $border_width . 'px';
+        // border width
+        $numeric = sek_extract_numeric_value( $border_width );
+        $unit = sek_extract_unit( $border_width );
+        $unit = '%' === $unit ? 'vw' : $unit;
+        $border_properties[] = $numeric . $unit;
 
         //border type
         $border_properties[] = $border_type;
@@ -2616,18 +2728,17 @@ function sek_get_module_params_for_sek_level_height_module() {
             'item-inputs' => array(
                 'height-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Height : fit to screen or custom', 'text_domain_to_be_replaced'),
+                    'title'       => __('Height : auto or custom', 'text_domain_to_be_replaced'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'height-type' )
                 ),
                 'custom-height' => array(
-                    'input_type'  => 'range_slider',
+                    'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Custom height', 'text_domain_to_be_replaced'),
-                    'orientation' => 'horizontal',
                     'min' => 0,
                     'max' => 100,
-                    'unit' => '%',
-                    'default' => 50
+                    'default' => '50%',
+                    'width-100'   => true
                 ),
                 'v_alignment' => array(
                     'input_type'  => 'v_alignment',
@@ -2682,27 +2793,23 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             );
         }
     }
-
     if ( ! empty( $options[ 'height' ][ 'height-type' ] ) ) {
-
-        if ( 'fit-to-screen' == $options[ 'height' ][ 'height-type' ] ) {
-            $height = '100';
-        }
-        elseif ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) && FALSE !== $height_value = filter_var( $options[ 'height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
-                    array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
-            $height = $height_value;
-        }
-        $css_rules = '';
-        if ( isset( $height ) && FALSE !== $height ) {
-            $css_rules .= 'height:' . $height . 'vh;';
-        }
-
-        if ( !empty( $css_rules ) ) {
-            $rules[]     = array(
-                    'selector' => '[data-sek-id="'.$level['id'].'"]',
-                    'css_rules' => $css_rules,
-                    'mq' =>null
-            );
+        if ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) ) {
+            $height = $options[ 'height' ][ 'custom-height' ];
+            $css_rules = '';
+            if ( isset( $height ) && FALSE !== $height ) {
+                $numeric = sek_extract_numeric_value( $height );
+                $unit = sek_extract_unit( $height );
+                $unit = '%' === $unit ? 'vh' : $unit;
+                $css_rules .= 'height:' . $numeric . $unit . ';';
+            }
+            if ( !empty( $css_rules ) ) {
+                $rules[]     = array(
+                        'selector' => '[data-sek-id="'.$level['id'].'"]',
+                        'css_rules' => $css_rules,
+                        'mq' =>null
+                );
+            }
         }
     }
     //error_log( print_r($rules, true) );
@@ -2843,6 +2950,111 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
 
 ?><?php
 /* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_level_width_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_level_width_module',
+        'name' => __('Width options', 'text_domain_to_be_replaced'),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'width-type' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Width : 100% or custom', 'text_domain_to_be_replaced'),
+                    'default'     => 'default',
+                    'choices'     => sek_get_select_options_for_input_id( 'width-type' )
+                ),
+                'custom-width' => array(
+                    'input_type'  => 'range_with_unit_picker',
+                    'title'       => __('Custom width', 'text_domain_to_be_replaced'),
+                    'min' => 0,
+                    'max' => 100,
+                    'default' => '100%',
+                    'width-100'   => true,
+                ),
+                'h_alignment' => array(
+                    'input_type'  => 'h_alignment',
+                    'title'       => __('Horizontal alignment', 'text_domain_to_be_replaced'),
+                    'default'     => 'center',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'h_alignment'
+                )
+            )
+        )//tmpl
+    );
+}
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SCHEDULE CSS RULES FILTERING
+/* ------------------------------------------------------------------------- */
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_level_width', 10, 3 );
+function sek_add_css_rules_for_level_width( $rules, $level ) {
+    $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
+    if ( empty( $options[ 'width' ] ) )
+      return $rules;
+
+    if ( ! empty( $options[ 'width' ][ 'h_alignment' ] ) ) {
+        $h_alignment_value = $options[ 'width' ][ 'h_alignment' ];
+        switch ( $h_alignment_value ) {
+            case 'left' :
+                $h_align_value = "flex-start";
+            break;
+            case 'center' :
+                $h_align_value = "center";
+            break;
+            case 'right' :
+                $h_align_value = "flex-end";
+            break;
+            default :
+                $h_align_value = "center";
+            break;
+        }
+        $css_rules = '';
+        if ( isset( $h_align_value ) ) {
+            $css_rules .= 'align-self:' . $h_align_value;
+        }
+
+        if ( !empty( $css_rules ) ) {
+            $rules[]     = array(
+                    'selector' => '[data-sek-id="'.$level['id'].'"]',
+                    'css_rules' => $css_rules,
+                    'mq' =>null
+            );
+        }
+    }
+
+    if ( ! empty( $options[ 'width' ][ 'width-type' ] ) ) {
+        if ( 'custom' == $options[ 'width' ][ 'width-type' ] && array_key_exists( 'custom-width', $options[ 'width' ] ) ) {
+            $width = $options[ 'width' ][ 'custom-width' ];
+            $css_rules = '';
+            if ( isset( $width ) && FALSE !== $width ) {
+                $numeric = sek_extract_numeric_value( $width );
+                $unit = sek_extract_unit( $width );
+                $unit = '%' === $unit ? 'vw' : $unit;
+                $css_rules .= 'width:' . $numeric . $unit . ';';
+            }
+            if ( !empty( $css_rules ) ) {
+                $rules[]     = array(
+                        'selector' => '[data-sek-id="'.$level['id'].'"]',
+                        'css_rules' => $css_rules,
+                        'mq' =>null
+                );
+            }
+        }
+    }
+    //error_log( print_r($rules, true) );
+    return $rules;
+}
+
+?><?php
+/* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER SIMPLE HTML MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
@@ -2877,7 +3089,8 @@ function sek_get_module_params_for_czr_simple_html_module() {
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_html_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'starting_value' => array(
-            'html_content' => '<!-- Write your Html code here --><pre>html code goes here</pre>'
+            'html_content' => '<!-- Write your Html code here -->
+<pre>html code goes here</pre>'
         ),
         'tmpl' => array(
             'item-inputs' => array(
@@ -3265,7 +3478,8 @@ function sek_get_module_params_for_czr_heading_module() {
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_heading_module',
         'validate_callback' => '\Nimble\validate_callback__czr_heading_module',
         'starting_value' => array(
-            'heading_text' => 'This is a heading.'
+            'heading_text' => 'This is a heading.',
+            'h_alignment_css' => 'center'
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-heading' ),
         'tmpl' => array(
@@ -3485,12 +3699,16 @@ function sek_get_module_params_for_czr_spacer_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'height_css' => array(
-                    'input_type'  => 'number',
-                    'min'         => 1,
-                    'title'       => __('Space in pixels', 'text_domain_to_be_replaced'),
-                    'default'     => 20,
+                    'input_type'  => 'range_with_unit_picker',
+                    'min'         => 0,
+                    'max'         => 100,
+                    'step'        => 1,
+                    'title'       => __('Space', 'text_domain_to_be_replaced'),
+                    'default'     => '20px',
+                    'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
+                    'css_selectors' => array( '.sek-spacer' ),
                     'css_identifier' => 'height'
                 ),
             )
@@ -3535,12 +3753,13 @@ function sek_get_module_params_for_czr_divider_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'border_top_width_css' => array(
-                    'input_type'  => 'range_slider',
+                    'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Weight', 'text_domain_to_be_replaced'),
                     'min' => 1,
                     'max' => 50,
-                    'unit' => 'px',
-                    'default' => 1,
+                    //'unit' => 'px',
+                    'default' => '1px',
+                    'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'border_top_width'
@@ -3564,12 +3783,13 @@ function sek_get_module_params_for_czr_divider_module() {
                     'css_identifier' => 'border_top_color'
                 ),
                 'width_css' => array(
-                    'input_type'  => 'range_slider',
+                    'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Width', 'text_domain_to_be_replaced'),
                     'min' => 1,
                     'max' => 100,
-                    'unit' => '%',
-                    'default' => 100,
+                    //'unit' => '%',
+                    'default' => '100%',
+                    'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'width'
@@ -3584,11 +3804,12 @@ function sek_get_module_params_for_czr_divider_module() {
                     'css_identifier' => 'h_alignment'
                 ),
                 'v_spacing_css' => array(
-                    'input_type'  => 'number',
-                    'title'       => __('Space before and after in pixels', 'text_domain_to_be_replaced'),
+                    'input_type'  => 'range_with_unit_picker',
+                    'title'       => __('Space before and after', 'text_domain_to_be_replaced'),
                     'min'         => 1,
                     'max'         => 100,
-                    'default'     => 15,
+                    'default'     => '15px',
+                    'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'v_spacing'
@@ -3669,7 +3890,7 @@ function sek_get_module_params_for_czr_icon_module() {
                 ),
                 'font_size_css' => array(
                     'input_type'  => 'font_size',
-                    'title'       => __('Size in pixels', 'text_domain_to_be_replaced'),
+                    'title'       => __('Size', 'text_domain_to_be_replaced'),
                     'default'     => '16px',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -3753,7 +3974,7 @@ function sek_get_module_params_for_czr_map_module() {
         'starting_value' => array(
             'address'       => 'Nice, France',
             'zoom'          => 10,
-            'height_css'    => 200
+            'height_css'    => '200px'
         ),
         'tmpl' => array(
             'item-inputs' => array(
@@ -3764,18 +3985,21 @@ function sek_get_module_params_for_czr_map_module() {
                     'default'    => '',
                 ),
                 'zoom' => array(
-                    'input_type'  => 'range_slider',
+                    'input_type'  => 'range_simple',
                     'title'       => __( 'Zoom', 'text_domain_to_be_replaced' ),
                     'min' => 1,
                     'max' => 20,
                     'unit' => '',
                     'default' => 10,
+                    'width-100'   => true
                 ),
                 'height_css' => array(
-                    'input_type'  => 'number',
-                    'title'       => __( 'Height in pixels', 'text_domain_to_be_replaced' ),
+                    'input_type'  => 'range_with_unit_picker',
+                    'title'       => __( 'Height', 'text_domain_to_be_replaced' ),
                     'min' => 1,
-                    'default' => 200,
+                    'max' => 400,
+                    'default' => '200px',
+                    'width-100'   => true,
                     'css_selectors' => array( '.sek-embed::before' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -3816,7 +4040,7 @@ function sek_get_module_params_for_czr_map_module() {
 // });
 function sek_get_module_params_for_czr_quote_module() {
     $quote_font_selectors = array( '.sek-quote-content', '.sek-quote-content p', '.sek-quote-content ul', '.sek-quote-content ol', '.sek-quote-content a' );
-    $cite_font_selectors  = array( '.sek-cite', '.sek-cite a' );
+    $cite_font_selectors  = array( '.sek-quote-design .sek-cite', '.sek-quote-design .sek-cite a' );
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_module',
@@ -3991,7 +4215,7 @@ function sek_get_module_params_for_czr_quote_module() {
                             'cite_font_size_css'       => array(
                                 'input_type'  => 'font_size',
                                 'title'       => __( 'Font size in pixels', 'text_domain_to_be_replaced' ),
-                                'default'     => '16px',
+                                'default'     => '13px',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size',
@@ -4293,6 +4517,22 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_identifier' => 'h_alignment',
                                 'css_selectors'=> '.sek-module-inner'
                             ),
+                            'spacing_css'        => array(
+                                'input_type'         => 'spacing',
+                                'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
+                                'default'            => array(
+                                    'padding-top'    => .5,
+                                    'padding-bottom' => .5,
+                                    'padding-right'  => 1,
+                                    'padding-left'   => 1,
+                                    'unit' => 'em'
+                                ),
+                                'width-100'   => true,
+                                'refresh_markup'     => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'padding_margin_spacing',
+                                'css_selectors'=> '.sek-module-inner .sek-btn'
+                            ),
                             'use_box_shadow' => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
@@ -4322,7 +4562,7 @@ function sek_get_module_params_for_czr_button_module() {
                             'font_size_css'       => array(
                                 'input_type'  => 'font_size',
                                 'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
-                                'default'     => '16px',
+                                'default'     => '1em',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size',
@@ -4331,7 +4571,7 @@ function sek_get_module_params_for_czr_button_module() {
                             'line_height_css'     => array(
                                 'input_type'  => 'line_height',
                                 'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
-                                'default'     => '1.5em',
+                                'default'     => '1.25em',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height',
@@ -4340,7 +4580,7 @@ function sek_get_module_params_for_czr_button_module() {
                             'font_weight_css'     => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
-                                'default'     => 400,
+                                'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_weight',
@@ -4381,8 +4621,7 @@ function sek_get_module_params_for_czr_button_module() {
                             'letter_spacing_css'  => array(
                                 'input_type'  => 'number',
                                 'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
-                                'default'     => 0,
-                                'min'         => 0,
+                                'default'     => 1,
                                 'step'        => 1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -5632,8 +5871,12 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
 
         /* Spacer */
+        // The unit should be included in the $value
         case 'height' :
-            $properties_to_render['height'] = $value > 0 ? $value . 'px' : '1px';
+            $numeric = sek_extract_numeric_value( $value );
+            $unit = sek_extract_unit( $value );
+            $unit = '%' === $unit ? 'vh' : $unit;
+            $properties_to_render['height'] = $numeric . $unit;
         break;
         /* Quote border */
         case 'border_width' :
@@ -5644,7 +5887,11 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
         /* Divider */
         case 'border_top_width' :
-            $properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
+            $numeric = sek_extract_numeric_value( $value );
+            $unit = sek_extract_unit( $value );
+            $unit = '%' === $unit ? 'vh' : $unit;
+            $properties_to_render['border-top-width'] = $numeric . $unit;
+            //$properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
         break;
         case 'border_top_style' :
             $properties_to_render['border-top-style'] = $value ? $value : 'solid';
@@ -5656,13 +5903,24 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             $properties_to_render['border-radius'] = $value > 0 ? $value . 'px' : '0px';
         break;
         case 'width' :
-            $properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
+            $numeric = sek_extract_numeric_value( $value );
+            $unit = sek_extract_unit( $value );
+            $unit = '%' === $unit ? 'vw' : $unit;
+
+            $properties_to_render['width'] = $numeric . $unit;
+            // sek_error_log(' WIDTH ? for '. $input_id, $properties_to_render );
+            // sek_error_log('$parent_level', $parent_level );
+            //$properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
         break;
         case 'v_spacing' :
-            $value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
+            //$value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
+            $numeric = sek_extract_numeric_value( $value );
+            $unit = sek_extract_unit( $value );
+            $unit = '%' === $unit ? 'vh' : $unit;
+
             $properties_to_render = array(
-                'margin-top'  => $value,
-                'margin-bottom' => $value
+                'margin-top'  => $numeric . $unit,
+                'margin-bottom' => $numeric . $unit
             );
         break;
         //not used at the moment, but it might if we want to display the divider as block (e.g. a div instead of a span)
@@ -5685,7 +5943,29 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
                     );
             }
         break;
+        case 'padding_margin_spacing' :
+            $default_unit = 'px';
+            $rules_candidates = $value;
+            //add unit and sanitize padding (cannot have negative padding)
+            $unit                 = !empty( $rules_candidates['unit'] ) ? $rules_candidates['unit'] : $default_unit;
+            $unit                 = 'percent' == $unit ? '%' : $unit;
 
+            $filtered_rules_candidates = array_filter( $rules_candidates, function( $k ) {
+                return 'unit' !== $k;
+            }, ARRAY_FILTER_USE_KEY );
+
+            $properties_to_render = $filtered_rules_candidates;
+
+            array_walk( $properties_to_render,
+                function( &$val, $key, $unit ) {
+                    //make sure paddings are positive values
+                    if ( FALSE !== strpos( 'padding', $key ) ) {
+                        $val = abs( $val );
+                    }
+
+                    $val .= $unit;
+            }, $unit );
+        break;
         // The default is simply there to let us know if a css_identifier is missing
         default :
             sek_error_log( __FUNCTION__ . ' => the css_identifier : ' . $css_identifier . ' has no css rules defined for input id ' . $input_id );
@@ -5721,13 +6001,11 @@ function sek_is_flagged_important( $input_id, $parent_level, $registered_input_l
         // then check if the current input_id, is in the list of important_input_list
         foreach( $parent_level['value'] as $id => $input_value ) {
             if ( false !== strpos( $id, '_flag_important' ) ) {
-                //sek_error_log( __FUNCTION__ . ' => $registered_input_list ?', $registered_input_list );
                 if ( is_array( $registered_input_list ) && array_key_exists( $id, $registered_input_list ) ) {
                     if ( empty( $registered_input_list[ $id ][ 'important_input_list' ] ) ) {
                         sek_error_log( __FUNCTION__ . ' => missing important_input_list for input id ' . $id );
                     } else {
                         $important_list_candidate = $registered_input_list[ $id ][ 'important_input_list' ];
-                        //sek_error_log( __FUNCTION__ . ' => ALORS ?', $important_list_candidate );
                         if ( in_array( $input_id, $important_list_candidate ) ) {
                             $important = (bool)sek_is_checked( $input_value );
                         }
@@ -6098,6 +6376,19 @@ function sek_hex_invert( $hex, $make_prop_value = true )  {
     $rgb_inverted  = sek_rgb_invert( $rgb );
 
     return sek_rgb2hex( $rgb_inverted, $make_prop_value );
+}
+
+// 1.5em => em
+function sek_extract_unit( $value ) {
+    $unit = preg_replace('/[0-9]|\.|,/', '', $value );
+    return  0 === preg_match( "/(px|em|%)/i", $unit ) ? 'px' : $unit;
+}
+
+// 1.5em => 1.5
+// note : using preg_replace('/[^0-9]/', '', $data); would remove the dots or comma.
+function sek_extract_numeric_value( $value ) {
+    $numeric = preg_replace('/px|em|%/', '', $value);
+    return ( is_int( (int)$numeric ) && $numeric > 0 )? $numeric : 1;
 }
 
 ?><?php

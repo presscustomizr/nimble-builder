@@ -331,7 +331,7 @@
 .sek-btn {
   display: inline-block;
   font-weight: normal;
-  line-height: 1.25;
+  line-height: 1.25em;
   text-align: center;
   /*white-space: nowrap;*/
   white-space: normal;
@@ -349,6 +349,7 @@
   font-size: 1em;
   cursor: pointer;
   text-decoration: none;
+  text-transform: none;
   transition: all 0.2s ease-in-out;
 }
 
@@ -625,6 +626,7 @@ button.sek-btn,
   width: 100%;
   margin-top: 15px;
   margin-bottom: 15px;
+  font-size: 1rem;
 }
 
 .sek-spacer {
@@ -669,6 +671,7 @@ button.sek-btn,
 }
 
 .sek-quote.sek-quote-design .sek-cite {
+  font-size: 13px;
   clear: both;
   display: block;
   margin-top: 1.5em;
@@ -726,6 +729,25 @@ button.sek-btn,
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
   max-width: 100%;
+}
+
+/* To allow horizontal centering of modules
+  @see https://github.com/presscustomizr/nimble-builder/issues/119
+*/
+/*  - sections in locations */
+/*  - columns in sections */
+/*  - modules in columns */
+.sek-column-inner {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.sek-module {
+  -ms-flex-item-align: center;
+  align-self: center;
+  width: 100%;
 }
 
 /* a nested sektion should reset its parent column padding
