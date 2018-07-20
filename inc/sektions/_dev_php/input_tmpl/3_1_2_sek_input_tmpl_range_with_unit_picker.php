@@ -13,7 +13,7 @@ function sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data ) {
     <#
       var value = data['<?php echo $input_id; ?>'],
           unit = data['<?php echo $input_id; ?>'];
-      value = _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
+      value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
       unit = _.isString( unit ) ? unit.replace(/[0-9]|\.|,/g, '') : 'px';
       unit = _.isEmpty( unit ) ? 'px' : unit;
     #>
