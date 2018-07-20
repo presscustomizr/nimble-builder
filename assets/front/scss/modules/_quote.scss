@@ -11,12 +11,12 @@
         margin-left: 0;
         padding: 15px 0;
         border: none;
+        > * {
+            padding: 0;
+            margin: 0;
+        }
         &::before, &::after {
             display: none;
-        }
-        .#{$project-prefix}content{
-            margin-right: 0;
-            margin-left: 0;
         }
         .#{$project-prefix}cite {
             clear: both;
