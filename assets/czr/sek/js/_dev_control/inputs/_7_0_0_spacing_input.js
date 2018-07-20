@@ -81,9 +81,9 @@
                         _.each( input(), function( _val_, _key_ ) {
                               $( '[data-sek-spacing="' + _key_ +'"]', $wrapper ).find( 'input[type="number"]' ).val( _val_ );
                         });
-                        // loop on the unit button and check which one should be clicked
+                        // loop on the unit buttons and check which one should be clicked
                         var unitToActivate = 'px';
-                        $( '.sek-ui-button', '.sek-unit-wrapper').each( function() {
+                        $('.sek-unit-wrapper .sek-ui-button', input.container ).each( function() {
                               var unit = $(this).data('sek-unit');
                               // do we have a unit for the current device ?
                               if ( ! _.isEmpty( input() ) ) {
@@ -94,7 +94,7 @@
                                     }
                               }
                         });
-                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
+                        $('.sek-unit-wrapper', input.container ).find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
                   }
 
                   // Set the initial unit
@@ -198,7 +198,7 @@
 
                         // loop on the unit button and check which one should be clicked
                         var unitToActivate = 'px';
-                        $( '.sek-ui-button', '.sek-unit-wrapper').each( function() {
+                        $( '.sek-unit-wrapper .sek-ui-button', input.container).each( function() {
                               var unit = $(this).data('sek-unit');
                               // do we have a unit for the current device ?
                               if ( ! _.isEmpty( inputValues[ currentDevice ] ) ) {
@@ -209,7 +209,7 @@
                                     }
                               }
                         });
-                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
+                        $('.sek-unit-wrapper', input.container ).find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
                   };
 
                   syncWithPreviewedDevice( api.previewedDevice() );
