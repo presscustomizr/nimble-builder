@@ -166,8 +166,7 @@ function sek_get_select_options_for_input_id( $input_id ) {
         break;
         case 'height-type' :
             $options = array(
-                'default' => __('default', 'text_domain_to_be_replaced'),
-                'fit-to-screen' => __('Fit to screen', 'text_domain_to_be_replaced'),
+                'auto' => __('Adapt to content', 'text_domain_to_be_replaced'),
                 'custom' => __('Custom', 'text_domain_to_be_replaced' )
             );
         break;
