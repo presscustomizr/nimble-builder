@@ -39,7 +39,7 @@
                         $rangeInput.val( $(this).val() );
                   });
                   // trigger a change on init to sync the range input
-                  $rangeInput.val( $numberInput.val() );
+                  $rangeInput.val( $numberInput.val() || 0 );
 
                   // Schedule unit changes on button click
                   $wrapper.on( 'click', '.sek-ui-button', function(evt) {
