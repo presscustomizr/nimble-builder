@@ -197,6 +197,9 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_7_sek_input_tmpl_font_picker.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_8_sek_input_tmpl_font_size_line_height.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_9_sek_input_tmpl_code_editor.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_1_1_sek_input_tmpl_range_simple.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_1_2_sek_input_tmpl_range_with_unit_picker.php',
+
 
       // MODULE REGISTRATION
       '<%= paths.sektions %>_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php',
@@ -261,6 +264,8 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_5_font_picker_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_6_font_awesome_icon_picker.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_7_code_editor.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_8_range_simple.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_9_range_with_unit_picker.js',
 
       // Modules
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_bg_border_module.js',
