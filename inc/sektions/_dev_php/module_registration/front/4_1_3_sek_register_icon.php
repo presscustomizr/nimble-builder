@@ -38,7 +38,7 @@ function sek_get_module_params_for_czr_icon_module() {
         ),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'css_selectors' => array( '.sek-module-inner' ),
+        'css_selectors' => array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'icon' => array(
@@ -68,9 +68,12 @@ function sek_get_module_params_for_czr_icon_module() {
                     'default'     => false
                 ),
                 'font_size_css' => array(
-                    'input_type'  => 'font_size',
+                    'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Size', 'text_domain_to_be_replaced'),
                     'default'     => '16px',
+                    'min' => 0,
+                    'max' => 100,
+                    'width-100'       => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'font_size'
@@ -81,7 +84,8 @@ function sek_get_module_params_for_czr_icon_module() {
                     'default'     => 'center',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'h_alignment'
+                    'css_identifier' => 'h_alignment',
+                    'css_selectors' => '.sek-icon'
                 ),
                 'color_css' => array(
                     'input_type'  => 'wp_color_alpha',

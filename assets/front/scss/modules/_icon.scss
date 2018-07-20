@@ -10,4 +10,9 @@
     a.sek-icon.active {
         color: inherit;
     }
+    .sek-icon i{
+      -webkit-transition: all 0.15s ease-in-out;
+      -o-transition: all 0.15s ease-in-out;
+      transition: all 0.15s ease-in-out;
+    }
 }
