@@ -85,9 +85,11 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             $css_rules = '';
             if ( isset( $height ) && FALSE !== $height ) {
                 $numeric = sek_extract_numeric_value( $height );
-                $unit = sek_extract_unit( $height );
-                $unit = '%' === $unit ? 'vh' : $unit;
-                $css_rules .= 'height:' . $numeric . $unit . ';';
+                if ( !empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $height );
+                    $unit = '%' === $unit ? 'vh' : $unit;
+                    $css_rules .= 'height:' . $numeric . $unit . ';';
+                }
             }
             if ( !empty( $css_rules ) ) {
                 $rules[]     = array(

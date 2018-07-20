@@ -82,7 +82,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
 
     switch ( $css_identifier ) {
         case 'font_size' :
-            $properties_to_render['font-size'] = $value;
+            $numeric = sek_extract_numeric_value( $value);
+            if ( ! empty( $numeric ) ) {
+                $properties_to_render['font-size'] = $value;
+            }
         break;
         case 'line_height' :
             $properties_to_render['line-height'] = $value;
@@ -162,15 +165,19 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         // The unit should be included in the $value
         case 'height' :
             $numeric = sek_extract_numeric_value( $value );
-            $unit = sek_extract_unit( $value );
-            $unit = '%' === $unit ? 'vh' : $unit;
-            $properties_to_render['height'] = $numeric . $unit;
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $value );
+                $unit = '%' === $unit ? 'vh' : $unit;
+                $properties_to_render['height'] = $numeric . $unit;
+            }
         break;
         /* Quote border */
         case 'border_width' :
             $numeric = sek_extract_numeric_value( $value );
-            $unit = sek_extract_unit( $value );
-            $properties_to_render['border-width'] = $numeric . $unit;
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $value );
+                $properties_to_render['border-width'] = $numeric . $unit;
+            }
         break;
         case 'border_color' :
             $properties_to_render['border-color'] = $value ? $value : '';
@@ -178,10 +185,12 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         /* Divider */
         case 'border_top_width' :
             $numeric = sek_extract_numeric_value( $value );
-            $unit = sek_extract_unit( $value );
-            $unit = '%' === $unit ? 'vh' : $unit;
-            $properties_to_render['border-top-width'] = $numeric . $unit;
-            //$properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $value );
+                $unit = '%' === $unit ? 'vh' : $unit;
+                $properties_to_render['border-top-width'] = $numeric . $unit;
+                //$properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
+            }
         break;
         case 'border_top_style' :
             $properties_to_render['border-top-style'] = $value ? $value : 'solid';
@@ -194,24 +203,28 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
         case 'width' :
             $numeric = sek_extract_numeric_value( $value );
-            $unit = sek_extract_unit( $value );
-            $unit = '%' === $unit ? 'vw' : $unit;
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $value );
+                $unit = '%' === $unit ? 'vw' : $unit;
 
-            $properties_to_render['width'] = $numeric . $unit;
-            // sek_error_log(' WIDTH ? for '. $input_id, $properties_to_render );
-            // sek_error_log('$parent_level', $parent_level );
-            //$properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
+                $properties_to_render['width'] = $numeric . $unit;
+                // sek_error_log(' WIDTH ? for '. $input_id, $properties_to_render );
+                // sek_error_log('$parent_level', $parent_level );
+                //$properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
+            }
         break;
         case 'v_spacing' :
             //$value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
             $numeric = sek_extract_numeric_value( $value );
-            $unit = sek_extract_unit( $value );
-            $unit = '%' === $unit ? 'vh' : $unit;
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $value );
+                $unit = '%' === $unit ? 'vh' : $unit;
 
-            $properties_to_render = array(
-                'margin-top'  => $numeric . $unit,
-                'margin-bottom' => $numeric . $unit
-            );
+                $properties_to_render = array(
+                    'margin-top'  => $numeric . $unit,
+                    'margin-bottom' => $numeric . $unit
+                );
+            }
         break;
         //not used at the moment, but it might if we want to display the divider as block (e.g. a div instead of a span)
         case 'h_alignment_block' :
@@ -678,7 +691,7 @@ function sek_extract_unit( $value ) {
 // note : using preg_replace('/[^0-9]/', '', $data); would remove the dots or comma.
 function sek_extract_numeric_value( $value ) {
     $numeric = preg_replace('/px|em|%/', '', $value);
-    return ( is_int( (int)$numeric ) && $numeric > 0 )? $numeric : 1;
+    return ( !empty( $numeric ) && is_int( (int)$numeric ) && $numeric > 0 )? $numeric : null;
 }
 
 ?>

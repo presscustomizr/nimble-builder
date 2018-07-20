@@ -324,9 +324,11 @@ function sek_add_css_rules_for_bg_border_border( $rules, $level ) {
         $border_properties = array();
         // border width
         $numeric = sek_extract_numeric_value( $border_width );
-        $unit = sek_extract_unit( $border_width );
-        $unit = '%' === $unit ? 'vw' : $unit;
-        $border_properties[] = $numeric . $unit;
+        if ( !empty( $numeric ) ) {
+            $unit = sek_extract_unit( $border_width );
+            $unit = '%' === $unit ? 'vw' : $unit;
+            $border_properties[] = $numeric . $unit;
+        }
 
         //border type
         $border_properties[] = $border_type;
