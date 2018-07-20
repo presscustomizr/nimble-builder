@@ -49,17 +49,24 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'css_identifier' => 'font_family'
                             ),
                             'font_size_css'       => array(
-                                'input_type'  => 'font_size',
-                                'title'       => __('Font size', 'text_domain_to_be_replaced'),
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
                                 'default'     => '16px',
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size'
                             ),//16,//"14px",
                             'line_height_css'     => array(
-                                'input_type'  => 'line_height',
-                                'title'       => __('Line height', 'text_domain_to_be_replaced'),
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
                                 'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height'
@@ -102,14 +109,15 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             ),//null,
 
                             'letter_spacing_css'  => array(
-                                'input_type'  => 'number',
-                                'title'       => __('Letter spacing', 'text_domain_to_be_replaced'),
+                                'input_type'  => 'range_simple',
+                                'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'letter_spacing'
+                                'css_identifier' => 'letter_spacing',
+                                'width-100'   => true,
                             ),//0,
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',

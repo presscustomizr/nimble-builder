@@ -177,22 +177,30 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_selectors' => $css_font_selectors
                             ),
                             'font_size_css'       => array(
-                                'input_type'  => 'font_size',
+                                'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
                                 'default'     => '1em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size',
-                                'css_selectors' => $css_font_selectors
+                                'css_selectors' => $css_font_selectors,
+                                'width-100'         => true,
                             ),//16,//"14px",
                             'line_height_css'     => array(
-                                'input_type'  => 'line_height',
+                                'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
                                 'default'     => '1.25em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height',
-                                'css_selectors' => $css_font_selectors
+                                'css_selectors' => $css_font_selectors,
+                                'width-100'         => true,
                             ),//24,//"20px",
                             'font_weight_css'     => array(
                                 'input_type'  => 'select',
@@ -236,14 +244,16 @@ function sek_get_module_params_for_czr_button_module() {
                             ),//null,
 
                             'letter_spacing_css'  => array(
-                                'input_type'  => 'number',
+                                'input_type'  => 'range_simple',
                                 'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
-                                'default'     => 1,
+                                'default'     => 0,
+                                'min'         => 0,
                                 'step'        => 1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'letter_spacing',
-                                'css_selectors' => $css_font_selectors
+                                'css_selectors' => $css_font_selectors,
+                                'width-100'   => true,
                             ),//0,
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
