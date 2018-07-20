@@ -582,6 +582,9 @@ div[data-sek-align].selected {
   width: 44%;
   margin-right: 4px;
 }
+.sek-no-unit-picker .sek-range-wrapper {
+  width: 70%;
+}
 .sek-number-wrapper {
   width: 50px;
   margin-right: 5px;
