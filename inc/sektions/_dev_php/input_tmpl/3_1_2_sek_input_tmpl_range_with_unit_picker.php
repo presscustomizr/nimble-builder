@@ -23,7 +23,7 @@ function sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data ) {
           <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
           <?php
           printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
-            ! empty( $input_data['orientation'] ) ? 'data-orientation="'. $input_data['orientation'] .'"' : '',
+            ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
             ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
             ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
             ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
