@@ -69,7 +69,7 @@ function sek_get_module_params_for_czr_icon_module() {
                 ),
                 'font_size_css' => array(
                     'input_type'  => 'font_size',
-                    'title'       => __('Size in pixels', 'text_domain_to_be_replaced'),
+                    'title'       => __('Size', 'text_domain_to_be_replaced'),
                     'default'     => '16px',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,

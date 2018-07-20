@@ -35,12 +35,13 @@ function sek_get_module_params_for_czr_divider_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'border_top_width_css' => array(
-                    'input_type'  => 'range_slider',
+                    'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Weight', 'text_domain_to_be_replaced'),
                     'min' => 1,
                     'max' => 50,
-                    'unit' => 'px',
-                    'default' => 1,
+                    //'unit' => 'px',
+                    'default' => '1px',
+                    'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'border_top_width'
@@ -64,12 +65,13 @@ function sek_get_module_params_for_czr_divider_module() {
                     'css_identifier' => 'border_top_color'
                 ),
                 'width_css' => array(
-                    'input_type'  => 'range_slider',
+                    'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Width', 'text_domain_to_be_replaced'),
                     'min' => 1,
                     'max' => 100,
-                    'unit' => '%',
-                    'default' => 100,
+                    //'unit' => '%',
+                    'default' => '100%',
+                    'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'width'
@@ -84,11 +86,12 @@ function sek_get_module_params_for_czr_divider_module() {
                     'css_identifier' => 'h_alignment'
                 ),
                 'v_spacing_css' => array(
-                    'input_type'  => 'number',
-                    'title'       => __('Space before and after in pixels', 'text_domain_to_be_replaced'),
+                    'input_type'  => 'range_with_unit_picker',
+                    'title'       => __('Space before and after', 'text_domain_to_be_replaced'),
                     'min'         => 1,
                     'max'         => 100,
-                    'default'     => 15,
+                    'default'     => '15px',
+                    'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'v_spacing'

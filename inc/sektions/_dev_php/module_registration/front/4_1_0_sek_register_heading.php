@@ -34,7 +34,8 @@ function sek_get_module_params_for_czr_heading_module() {
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_heading_module',
         'validate_callback' => '\Nimble\validate_callback__czr_heading_module',
         'starting_value' => array(
-            'heading_text' => 'This is a heading.'
+            'heading_text' => 'This is a heading.',
+            'h_alignment_css' => 'center'
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-heading' ),
         'tmpl' => array(

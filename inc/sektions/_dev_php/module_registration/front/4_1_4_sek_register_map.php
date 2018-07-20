@@ -37,7 +37,7 @@ function sek_get_module_params_for_czr_map_module() {
         'starting_value' => array(
             'address'       => 'Nice, France',
             'zoom'          => 10,
-            'height_css'    => 200
+            'height_css'    => '200px'
         ),
         'tmpl' => array(
             'item-inputs' => array(
@@ -56,10 +56,11 @@ function sek_get_module_params_for_czr_map_module() {
                     'default' => 10,
                 ),
                 'height_css' => array(
-                    'input_type'  => 'number',
-                    'title'       => __( 'Height in pixels', 'text_domain_to_be_replaced' ),
+                    'input_type'  => 'range_with_unit_picker',
+                    'title'       => __( 'Height', 'text_domain_to_be_replaced' ),
                     'min' => 1,
-                    'default' => 200,
+                    'default' => '200px',
+                    'width-100'   => true,
                     'css_selectors' => array( '.sek-embed::before' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,

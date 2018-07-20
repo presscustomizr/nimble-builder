@@ -19,13 +19,12 @@ function sek_get_module_params_for_sek_level_width_module() {
                     'choices'     => sek_get_select_options_for_input_id( 'width-type' )
                 ),
                 'custom-width' => array(
-                    'input_type'  => 'range_slider',
+                    'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Custom width', 'text_domain_to_be_replaced'),
-                    'orientation' => 'horizontal',
                     'min' => 0,
                     'max' => 100,
-                    'unit' => '%',
-                    'default' => 100
+                    'default' => '100%',
+                    'width-100'   => true,
                 ),
                 'h_alignment' => array(
                     'input_type'  => 'h_alignment',
@@ -82,22 +81,22 @@ function sek_add_css_rules_for_level_width( $rules, $level ) {
     }
 
     if ( ! empty( $options[ 'width' ][ 'width-type' ] ) ) {
-
-        if ( 'custom' == $options[ 'width' ][ 'width-type' ] && array_key_exists( 'custom-width', $options[ 'width' ] ) && FALSE !== $width_value = filter_var( $options[ 'width' ][ 'custom-width' ], FILTER_VALIDATE_INT, array( 'options' =>
-                    array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
-            $width = $width_value;
-        }
-        $css_rules = '';
-        if ( isset( $width ) && FALSE !== $width ) {
-            $css_rules .= 'width:' . $width . '%;';
-        }
-
-        if ( !empty( $css_rules ) ) {
-            $rules[]     = array(
-                    'selector' => '[data-sek-id="'.$level['id'].'"]',
-                    'css_rules' => $css_rules,
-                    'mq' =>null
-            );
+        if ( 'custom' == $options[ 'width' ][ 'width-type' ] && array_key_exists( 'custom-width', $options[ 'width' ] ) ) {
+            $width = $options[ 'width' ][ 'custom-width' ];
+            $css_rules = '';
+            if ( isset( $width ) && FALSE !== $width ) {
+                $numeric = sek_extract_numeric_value( $width );
+                $unit = sek_extract_unit( $width );
+                $unit = '%' === $unit ? 'vw' : $unit;
+                $css_rules .= 'width:' . $numeric . $unit . ';';
+            }
+            if ( !empty( $css_rules ) ) {
+                $rules[]     = array(
+                        'selector' => '[data-sek-id="'.$level['id'].'"]',
+                        'css_rules' => $css_rules,
+                        'mq' =>null
+                );
+            }
         }
     }
     //error_log( print_r($rules, true) );

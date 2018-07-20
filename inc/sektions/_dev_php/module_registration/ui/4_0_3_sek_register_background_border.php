@@ -83,19 +83,19 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                     array(
                         'title' => __('Border', 'text_domain_to_be_replaced'),
                         'inputs' => array(
-                            'border-width' => array(
-                                'input_type'  => 'range_slider',
-                                'title'       => __('Border width', 'text_domain_to_be_replaced'),
-                                'min' => 0,
-                                'max' => 100,
-                                'unit' => 'px',
-                                'default' => 1
-                            ),
                             'border-type' => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Border shape', 'text_domain_to_be_replaced'),
                                 'default' => 'none',
                                 'choices'     => sek_get_select_options_for_input_id( 'border-type' )
+                            ),
+                            'border-width' => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __('Border width', 'text_domain_to_be_replaced'),
+                                'min' => 0,
+                                'max' => 100,
+                                'default' => '1px',
+                                'width-100'   => true,
                             ),
                             'border-color' => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -310,13 +310,17 @@ function sek_add_css_rules_for_bg_border_border( $rules, $level ) {
     if ( empty( $bg_border_options ) )
       return $rules;
 
-    $border_width = ! empty( $bg_border_options[ 'border-width' ] ) ? filter_var( $bg_border_options[ 'border-width' ], FILTER_VALIDATE_INT ) : FALSE;
+    $border_width = ! empty( $bg_border_options[ 'border-width' ] ) ? $bg_border_options[ 'border-width' ] : FALSE;
     $border_type  = FALSE !== $border_width && ! empty( $bg_border_options[ 'border-type' ] ) && 'none' != $bg_border_options[ 'border-type' ] ? $bg_border_options[ 'border-type' ] : FALSE;
 
     //border width
     if ( $border_type ) {
         $border_properties = array();
-        $border_properties[] = $border_width . 'px';
+        // border width
+        $numeric = sek_extract_numeric_value( $border_width );
+        $unit = sek_extract_unit( $border_width );
+        $unit = '%' === $unit ? 'vw' : $unit;
+        $border_properties[] = $numeric . $unit;
 
         //border type
         $border_properties[] = $border_type;

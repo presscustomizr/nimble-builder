@@ -14,18 +14,17 @@ function sek_get_module_params_for_sek_level_height_module() {
             'item-inputs' => array(
                 'height-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Height : fit to screen or custom', 'text_domain_to_be_replaced'),
+                    'title'       => __('Height : auto or custom', 'text_domain_to_be_replaced'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'height-type' )
                 ),
                 'custom-height' => array(
-                    'input_type'  => 'range_slider',
+                    'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Custom height', 'text_domain_to_be_replaced'),
-                    'orientation' => 'horizontal',
                     'min' => 0,
                     'max' => 100,
-                    'unit' => '%',
-                    'default' => 50
+                    'default' => '50%',
+                    'width-100'   => true
                 ),
                 'v_alignment' => array(
                     'input_type'  => 'v_alignment',
@@ -80,27 +79,23 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             );
         }
     }
-
     if ( ! empty( $options[ 'height' ][ 'height-type' ] ) ) {
-
-        if ( 'fit-to-screen' == $options[ 'height' ][ 'height-type' ] ) {
-            $height = '100';
-        }
-        elseif ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) && FALSE !== $height_value = filter_var( $options[ 'height' ][ 'custom-height' ], FILTER_VALIDATE_INT, array( 'options' =>
-                    array( "min_range"=>0, "max_range"=>100 ) ) ) ) {
-            $height = $height_value;
-        }
-        $css_rules = '';
-        if ( isset( $height ) && FALSE !== $height ) {
-            $css_rules .= 'height:' . $height . 'vh;';
-        }
-
-        if ( !empty( $css_rules ) ) {
-            $rules[]     = array(
-                    'selector' => '[data-sek-id="'.$level['id'].'"]',
-                    'css_rules' => $css_rules,
-                    'mq' =>null
-            );
+        if ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) ) {
+            $height = $options[ 'height' ][ 'custom-height' ];
+            $css_rules = '';
+            if ( isset( $height ) && FALSE !== $height ) {
+                $numeric = sek_extract_numeric_value( $height );
+                $unit = sek_extract_unit( $height );
+                $unit = '%' === $unit ? 'vh' : $unit;
+                $css_rules .= 'height:' . $numeric . $unit . ';';
+            }
+            if ( !empty( $css_rules ) ) {
+                $rules[]     = array(
+                        'selector' => '[data-sek-id="'.$level['id'].'"]',
+                        'css_rules' => $css_rules,
+                        'mq' =>null
+                );
+            }
         }
     }
     //error_log( print_r($rules, true) );
