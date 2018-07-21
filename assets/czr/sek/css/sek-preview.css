@@ -3,24 +3,28 @@
   min-height: 50px;
 }
 .sek-section {
-  padding: 23px 0px 0;
+  /*padding: 23px 0px 0;*/
   position: relative;/* <= Needed for the placement of the ui icons container revealed on hover */
 }
 
 /* only when previewing */
 /* @fixed since https://github.com/presscustomizr/nimble-builder/issues/24 */
 .sek-sektion-inner{
-  padding: 15px;/* <= Needed for the placement of the ui icons container revealed on hover */
+  /*padding: 15px;*//* <= Needed for the placement of the ui icons container revealed on hover */
 }
 
 .sek-column {
   position: relative;
-  padding: 23px 10px 0;/* <= Needed for the placement of the ui icons container revealed on hover */
+  /*padding: 23px 10px 0;*//* <= Needed for the placement of the ui icons container revealed on hover */
 }
 
 .sek-column-inner.sek-empty-col {
   min-height: 100px;
   height: 100%;
+}
+.sek-has-modules .sek-column-inner.sek-empty-col {
+  min-height: auto;
+  height: auto;
 }
 
 .sek-module {
@@ -112,7 +116,7 @@
   text-align: center;
   width: 1em;
 }
-.sek-dyn-left-icons .sek-dyn-ui-icons i {
+.sek-dyn-left-icons .sek-dyn-ui-icons i, .sek-dyn-right-icons .sek-dyn-ui-icons i {
     /*margin: 0px 5px;*/
     margin: 0 0.30em;
 }
@@ -197,7 +201,7 @@
     border: 2px dotted #000;
 }
 .sek-section > .sek-section-dyn-ui .sek-dyn-ui-inner {
-  top:0px;
+  top:-22px;
   z-index: 1000;
 }
 .sek-section.sek-highlight-active-ui {
