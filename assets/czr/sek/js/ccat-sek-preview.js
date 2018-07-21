@@ -26,6 +26,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         self.schedulePanelMsgReactions();
                   });
+
+                  // Make sure we don't force a minimum height to empty columns when a section has at least one module
+                  // => allow a better previewing experience and more realistic spacing adjustments
+                  // The css class .sek-has-modules is also printed server side
+                  // @see php SEK_Front_Render::render()
+                  $('body').on('sek-columns-refreshed sek-modules-refreshed', function( evt, params ) {
+                        if ( !_.isUndefined( params ) && !_.isUndefined( params.in_sektion ) && $('[data-sek-id="' + params.in_sektion +'"]').length > 0 ) {
+                              var $updatedSektion = $('[data-sek-id="' + params.in_sektion +'"]');
+                              $updatedSektion.toggleClass( 'sek-has-modules', $updatedSektion.find('[data-sek-level="module"]').length > 0 );
+                        }
+                  });
             },
 
             // Hightlight the currently level in the preview, corresponding to the active ui in the panel
@@ -785,14 +796,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               clickedOn = 'moduleWrapper';
                         } else if ( 'column' == $closestLevelWrapper.data('sek-level') && true === $closestLevelWrapper.data('sek-no-modules') ) {
                               clickedOn = 'noModulesColumn';
+                        } else if ( $el.hasClass('sek-to-json') ) {
+                              clickedOn = 'sekToJson';
                         } else if ( 'column' == $closestLevelWrapper.data('sek-level') ) {
                               clickedOn = 'columnOutsideModules';
                         } else if ( 'section' == $closestLevelWrapper.data('sek-level') ) {
                               clickedOn = 'sectionOutsideColumns';
                         } else if ( ! _.isEmpty( $el.data( 'sek-add' ) ) ) {
                               clickedOn = 'addSektion';
-                        } else if ( $el.hasClass('sek-to-json') ) {
-                              clickedOn = 'sekToJson';
                         } else if ( $el.hasClass('sek-wp-content-wrapper') || $el.hasClass( 'sek-wp-content-dyn-ui') ) {
                               clickedOn = 'wpContent';
                         } else if ( $el.hasClass('sek-edit-wp-content') ) {
@@ -800,7 +811,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         } else {
                               clickedOn = 'inactiveZone';
                         }
-
 
                         //console.log('CLICKED', clickedOn, _action );
 
@@ -1568,7 +1578,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         // say it to the parent sektion
                         //=> will be listened to by the column to re-instantiate sortable, resizable
                         //=> also listened to clean the loader overalay in time
-                        $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
+                        $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed', { in_sektion : params.apiParams.in_sektion } );
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
@@ -1661,7 +1671,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                           // say it to the column
                           //=> will be listened to by the column to re-instantiate sortable, resizable and fittext
-                          $( '[data-sek-id="' + params.apiParams.in_column + '"]' ).trigger('sek-modules-refreshed');
+                          $( '[data-sek-id="' + params.apiParams.in_column + '"]' ).trigger('sek-modules-refreshed', { in_column : params.apiParams.in_column, in_sektion : params.apiParams.in_sektion });
 
                     }).fail( function( _r_ ) {
                           self.errare( 'ERROR reactToPanelMsg => sek-add-module => ' , _r_ );

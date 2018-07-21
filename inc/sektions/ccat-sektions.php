@@ -107,8 +107,29 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
     return $_parent_level_data;
 }
 
-
-
+// @return boolean
+// Indicates if a section level contains at least on module
+// Used in SEK_Front_Render::render() to maybe print a css class on the section level
+function sek_section_has_modules( $model, $has_module = null ) {
+    $has_module = is_null( $has_module ) ? false : (bool)$has_module;
+    foreach ( $model as $level_data ) {
+        // stop here and return if a match was recursively found
+        if ( true === $has_module )
+          break;
+        if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
+            foreach ( $level_data['collection'] as $child_level_data ) {
+                if ( 'module'== $child_level_data['level'] ) {
+                    $has_module = true;
+                    //match found, break this loop
+                    break;
+                } else {
+                    $has_module = sek_section_has_modules( $child_level_data, $has_module );
+                }
+            }
+        }
+    }
+    return $has_module;
+}
 
 
 
@@ -1125,8 +1146,10 @@ function add_sektion_values_to_skope_export( $skopes ) {
 function sek_get_preset_sektions() {
     return array(
         'alternate_text_right' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}]}]}',
-
         'alternate_text_left' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""}]}',
+        'two_columns' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
+        'three_columns' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
+        'four_columns' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}'
     );
 }
 
@@ -1417,6 +1440,24 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-id' => 'czr_button_module',
                   'title' => __( 'Button', 'text_domain_to_be_replaced' ),
                   'icon' => 'Nimble_button_icon.svg'
+                ),
+                array(
+                  'content-type' => 'preset_section',
+                  'content-id' => 'two_columns',
+                  'title' => __( 'Two Columns', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_2-columns_icon.svg'
+                ),
+                array(
+                  'content-type' => 'preset_section',
+                  'content-id' => 'three_columns',
+                  'title' => __( 'Three Columns', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_3-columns_icon.svg'
+                ),
+                array(
+                  'content-type' => 'preset_section',
+                  'content-id' => 'four_columns',
+                  'title' => __( 'Four Columns', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_4-columns_icon.svg'
                 ),
             );
             $i = 0;
@@ -1985,7 +2026,7 @@ function sek_set_input_tmpl___range_simple( $input_id, $input_data ) {
           <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
           <?php
           printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
-            ! empty( $input_data['orientation'] ) ? 'data-orientation="'. $input_data['orientation'] .'"' : '',
+            ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
             ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
             ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
             ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
@@ -2024,7 +2065,7 @@ function sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data ) {
           <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
           <?php
           printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
-            ! empty( $input_data['orientation'] ) ? 'data-orientation="'. $input_data['orientation'] .'"' : '',
+            ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
             ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
             ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
             ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
@@ -2604,9 +2645,11 @@ function sek_add_css_rules_for_bg_border_border( $rules, $level ) {
         $border_properties = array();
         // border width
         $numeric = sek_extract_numeric_value( $border_width );
-        $unit = sek_extract_unit( $border_width );
-        $unit = '%' === $unit ? 'vw' : $unit;
-        $border_properties[] = $numeric . $unit;
+        if ( !empty( $numeric ) ) {
+            $unit = sek_extract_unit( $border_width );
+            $unit = '%' === $unit ? 'vw' : $unit;
+            $border_properties[] = $numeric . $unit;
+        }
 
         //border type
         $border_properties[] = $border_type;
@@ -2799,9 +2842,11 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             $css_rules = '';
             if ( isset( $height ) && FALSE !== $height ) {
                 $numeric = sek_extract_numeric_value( $height );
-                $unit = sek_extract_unit( $height );
-                $unit = '%' === $unit ? 'vh' : $unit;
-                $css_rules .= 'height:' . $numeric . $unit . ';';
+                if ( !empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $height );
+                    $unit = '%' === $unit ? 'vh' : $unit;
+                    $css_rules .= 'height:' . $numeric . $unit . ';';
+                }
             }
             if ( !empty( $css_rules ) ) {
                 $rules[]     = array(
@@ -3036,9 +3081,11 @@ function sek_add_css_rules_for_level_width( $rules, $level ) {
             $css_rules = '';
             if ( isset( $width ) && FALSE !== $width ) {
                 $numeric = sek_extract_numeric_value( $width );
-                $unit = sek_extract_unit( $width );
-                $unit = '%' === $unit ? 'vw' : $unit;
-                $css_rules .= 'width:' . $numeric . $unit . ';';
+                if ( !empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $width );
+                    $unit = '%' === $unit ? 'vw' : $unit;
+                    $css_rules .= 'width:' . $numeric . $unit . ';';
+                }
             }
             if ( !empty( $css_rules ) ) {
                 $rules[]     = array(
@@ -3166,17 +3213,24 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'css_identifier' => 'font_family'
                             ),
                             'font_size_css'       => array(
-                                'input_type'  => 'font_size',
-                                'title'       => __('Font size', 'text_domain_to_be_replaced'),
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
                                 'default'     => '16px',
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size'
                             ),//16,//"14px",
                             'line_height_css'     => array(
-                                'input_type'  => 'line_height',
-                                'title'       => __('Line height', 'text_domain_to_be_replaced'),
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
                                 'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height'
@@ -3219,14 +3273,15 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             ),//null,
 
                             'letter_spacing_css'  => array(
-                                'input_type'  => 'number',
-                                'title'       => __('Letter spacing', 'text_domain_to_be_replaced'),
+                                'input_type'  => 'range_simple',
+                                'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'letter_spacing'
+                                'css_identifier' => 'letter_spacing',
+                                'width-100'   => true,
                             ),//0,
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -3527,17 +3582,24 @@ function sek_get_module_params_for_czr_heading_module() {
                                 'css_identifier' => 'font_family'
                             ),
                             'font_size_css'       => array(
-                                'input_type'  => 'font_size',
+                                'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
                                 'default'     => '16px',
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size'
                             ),//16,//"14px",
                             'line_height_css'     => array(
-                                'input_type'  => 'line_height',
+                                'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
                                 'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height'
@@ -3580,14 +3642,15 @@ function sek_get_module_params_for_czr_heading_module() {
                             ),//null,
 
                             'letter_spacing_css'  => array(
-                                'input_type'  => 'number',
+                                'input_type'  => 'range_simple',
                                 'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'letter_spacing'
+                                'css_identifier' => 'letter_spacing',
+                                'width-100'   => true,
                             ),//0,
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -3855,11 +3918,12 @@ function sek_get_module_params_for_czr_icon_module() {
         'starting_value' => array(
             'icon' =>  'far fa-star',
             'font_size_css' => '40px',
-            'color_css' => '#707070'
+            'color_css' => '#707070',
+            'color_hover_css' => '#969696'
         ),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'css_selectors' => array( '.sek-module-inner' ),
+        'css_selectors' => array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'icon' => array(
@@ -3889,9 +3953,12 @@ function sek_get_module_params_for_czr_icon_module() {
                     'default'     => false
                 ),
                 'font_size_css' => array(
-                    'input_type'  => 'font_size',
+                    'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Size', 'text_domain_to_be_replaced'),
                     'default'     => '16px',
+                    'min' => 0,
+                    'max' => 100,
+                    'width-100'       => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'font_size'
@@ -3902,7 +3969,8 @@ function sek_get_module_params_for_czr_icon_module() {
                     'default'     => 'center',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'h_alignment'
+                    'css_identifier' => 'h_alignment',
+                    'css_selectors' => '.sek-icon'
                 ),
                 'color_css' => array(
                     'input_type'  => 'wp_color_alpha',
@@ -4077,18 +4145,25 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'css_selectors' => $quote_font_selectors,
                             ),
                             'quote_font_size_css'       => array(
-                                'input_type'  => 'font_size',
-                                'title'       => __( 'Font size in pixels', 'text_domain_to_be_replaced' ),
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
                                 'default'     => '16px',
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size',
                                 'css_selectors' => $quote_font_selectors,
                             ),//16,//"14px",
                             'quote_line_height_css'     => array(
-                                'input_type'  => 'line_height',
-                                'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
                                 'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height',
@@ -4135,7 +4210,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
                             ),//null,
                             'quote_letter_spacing_css'  => array(
-                                'input_type'  => 'number',
+                                'input_type'  => 'range_simple',
                                 'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
                                 'default'     => 0,
                                 'min'         => 0,
@@ -4144,6 +4219,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'letter_spacing',
                                 'css_selectors' => $quote_font_selectors,
+                                'width-100'   => true,
                             ),//0,
                             'quote_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -4213,18 +4289,25 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'css_selectors' => $cite_font_selectors,
                             ),
                             'cite_font_size_css'       => array(
-                                'input_type'  => 'font_size',
-                                'title'       => __( 'Font size in pixels', 'text_domain_to_be_replaced' ),
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
                                 'default'     => '13px',
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size',
                                 'css_selectors' => $cite_font_selectors,
                             ),//16,//"14px",
                             'line_height_css'     => array(
-                                'input_type'  => 'line_height',
-                                'title'       => __( 'Line height in pixels', 'text_domain_to_be_replaced' ),
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
                                 'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height',
@@ -4271,7 +4354,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
                             ),//null,
                             'cite_letter_spacing_css'  => array(
-                                'input_type'  => 'number',
+                                'input_type'  => 'range_simple',
                                 'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
                                 'default'     => 0,
                                 'min'         => 0,
@@ -4280,6 +4363,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'letter_spacing',
                                 'css_selectors' => $cite_font_selectors,
+                                'width-100'   => true,
                             ),//0,
                             'cite_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -4337,12 +4421,12 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'choices'     => sek_get_select_options_for_input_id( 'quote_design' )
                             ),
                             'border_width_css' => array(
-                                'input_type'  => 'range_slider',
+                                'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Border weight', 'text_domain_to_be_replaced' ),
                                 'min' => 1,
                                 'max' => 80,
-                                'unit' => 'px',
-                                'default' => 5,
+                                'default' => '5px',
+                                'width-100'   => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'border_width',
@@ -4499,9 +4583,11 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_selectors'=> $css_selectors
                             ),
                             'border_radius_css'       => array(
-                                'input_type'  => 'number',
+                                'input_type'  => 'range_simple',
                                 'title'       => __( 'Rounded corners in pixels', 'text_domain_to_be_replaced' ),
-                                'default'     => '2',
+                                'default'     => '2px',
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
                                 'min'         => '0',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -4560,22 +4646,30 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_selectors' => $css_font_selectors
                             ),
                             'font_size_css'       => array(
-                                'input_type'  => 'font_size',
+                                'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
                                 'default'     => '1em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size',
-                                'css_selectors' => $css_font_selectors
+                                'css_selectors' => $css_font_selectors,
+                                'width-100'         => true,
                             ),//16,//"14px",
                             'line_height_css'     => array(
-                                'input_type'  => 'line_height',
+                                'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
                                 'default'     => '1.25em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height',
-                                'css_selectors' => $css_font_selectors
+                                'css_selectors' => $css_font_selectors,
+                                'width-100'         => true,
                             ),//24,//"20px",
                             'font_weight_css'     => array(
                                 'input_type'  => 'select',
@@ -4619,14 +4713,16 @@ function sek_get_module_params_for_czr_button_module() {
                             ),//null,
 
                             'letter_spacing_css'  => array(
-                                'input_type'  => 'number',
+                                'input_type'  => 'range_simple',
                                 'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
-                                'default'     => 1,
+                                'default'     => 0,
+                                'min'         => 0,
                                 'step'        => 1,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'letter_spacing',
-                                'css_selectors' => $css_font_selectors
+                                'css_selectors' => $css_font_selectors,
+                                'width-100'   => true,
                             ),//0,
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -5794,7 +5890,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
 
     switch ( $css_identifier ) {
         case 'font_size' :
-            $properties_to_render['font-size'] = $value;
+            $numeric = sek_extract_numeric_value( $value);
+            if ( ! empty( $numeric ) ) {
+                $properties_to_render['font-size'] = $value;
+            }
         break;
         case 'line_height' :
             $properties_to_render['line-height'] = $value;
@@ -5874,13 +5973,19 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         // The unit should be included in the $value
         case 'height' :
             $numeric = sek_extract_numeric_value( $value );
-            $unit = sek_extract_unit( $value );
-            $unit = '%' === $unit ? 'vh' : $unit;
-            $properties_to_render['height'] = $numeric . $unit;
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $value );
+                $unit = '%' === $unit ? 'vh' : $unit;
+                $properties_to_render['height'] = $numeric . $unit;
+            }
         break;
         /* Quote border */
         case 'border_width' :
-            $properties_to_render['border-width'] = $value > 0 ? $value . 'px' : '1px';
+            $numeric = sek_extract_numeric_value( $value );
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $value );
+                $properties_to_render['border-width'] = $numeric . $unit;
+            }
         break;
         case 'border_color' :
             $properties_to_render['border-color'] = $value ? $value : '';
@@ -5888,10 +5993,12 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         /* Divider */
         case 'border_top_width' :
             $numeric = sek_extract_numeric_value( $value );
-            $unit = sek_extract_unit( $value );
-            $unit = '%' === $unit ? 'vh' : $unit;
-            $properties_to_render['border-top-width'] = $numeric . $unit;
-            //$properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $value );
+                $unit = '%' === $unit ? 'vh' : $unit;
+                $properties_to_render['border-top-width'] = $numeric . $unit;
+                //$properties_to_render['border-top-width'] = $value > 0 ? $value . 'px' : '1px';
+            }
         break;
         case 'border_top_style' :
             $properties_to_render['border-top-style'] = $value ? $value : 'solid';
@@ -5904,24 +6011,28 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
         case 'width' :
             $numeric = sek_extract_numeric_value( $value );
-            $unit = sek_extract_unit( $value );
-            $unit = '%' === $unit ? 'vw' : $unit;
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $value );
+                //$unit = '%' === $unit ? 'vw' : $unit;
 
-            $properties_to_render['width'] = $numeric . $unit;
-            // sek_error_log(' WIDTH ? for '. $input_id, $properties_to_render );
-            // sek_error_log('$parent_level', $parent_level );
-            //$properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
+                $properties_to_render['width'] = $numeric . $unit;
+                // sek_error_log(' WIDTH ? for '. $input_id, $properties_to_render );
+                // sek_error_log('$parent_level', $parent_level );
+                //$properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
+            }
         break;
         case 'v_spacing' :
             //$value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
             $numeric = sek_extract_numeric_value( $value );
-            $unit = sek_extract_unit( $value );
-            $unit = '%' === $unit ? 'vh' : $unit;
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $value );
+                $unit = '%' === $unit ? 'vh' : $unit;
 
-            $properties_to_render = array(
-                'margin-top'  => $numeric . $unit,
-                'margin-bottom' => $numeric . $unit
-            );
+                $properties_to_render = array(
+                    'margin-top'  => $numeric . $unit,
+                    'margin-bottom' => $numeric . $unit
+                );
+            }
         break;
         //not used at the moment, but it might if we want to display the divider as block (e.g. a div instead of a span)
         case 'h_alignment_block' :
@@ -6388,7 +6499,7 @@ function sek_extract_unit( $value ) {
 // note : using preg_replace('/[^0-9]/', '', $data); would remove the dots or comma.
 function sek_extract_numeric_value( $value ) {
     $numeric = preg_replace('/px|em|%/', '', $value);
-    return ( is_int( (int)$numeric ) && $numeric > 0 )? $numeric : 1;
+    return ( !empty( $numeric ) && is_int( (int)$numeric ) && $numeric > 0 )? $numeric : null;
 }
 
 ?><?php
@@ -7028,7 +7139,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
               <script type="text/html" id="sek-dyn-ui-tmpl-column">
                   <?php //<# console.log( 'data', data ); #> ?>
                   <div class="sek-dyn-ui-wrapper sek-column-dyn-ui">
-                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
+                    <div class="sek-dyn-ui-inner <?php echo $icon_right_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-ellipsis-v sek-move-column" title="<?php _e( 'Move column', 'text_domain' ); ?>"></i>
                         <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">settings</i>
@@ -7265,13 +7376,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                 case 'section' :
                     $is_nested            = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
+                    $has_at_least_one_module = sek_section_has_modules( $collection );
                     $column_container_class = 'sek-container-fluid';
                     //when boxed use proper container class
                     if ( ! empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
                         $column_container_class = 'sek-container';
                     }
                     ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section">', $id, $is_nested ? 'data-sek-is-nested="true"' : '' ); ?>
+                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s">', $id, $is_nested ? 'data-sek-is-nested="true"' : '', $has_at_least_one_module ? 'sek-has-modules' : '' ); ?>
                           <div class="<?php echo $column_container_class ?>">
                             <div class="sek-row sek-sektion-inner">
                                 <?php
