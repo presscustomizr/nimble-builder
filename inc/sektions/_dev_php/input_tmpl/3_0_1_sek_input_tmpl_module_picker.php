@@ -75,6 +75,24 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'title' => __( 'Button', 'text_domain_to_be_replaced' ),
                   'icon' => 'Nimble_button_icon.svg'
                 ),
+                array(
+                  'content-type' => 'preset_section',
+                  'content-id' => 'two_columns',
+                  'title' => __( 'Two Columns', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_2-columns_icon.svg'
+                ),
+                array(
+                  'content-type' => 'preset_section',
+                  'content-id' => 'three_columns',
+                  'title' => __( 'Three Columns', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_3-columns_icon.svg'
+                ),
+                array(
+                  'content-type' => 'preset_section',
+                  'content-id' => 'four_columns',
+                  'title' => __( 'Four Columns', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_4-columns_icon.svg'
+                ),
             );
             $i = 0;
             foreach( $content_collection as $_params) {

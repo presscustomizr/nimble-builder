@@ -481,8 +481,10 @@ function add_sektion_values_to_skope_export( $skopes ) {
 function sek_get_preset_sektions() {
     return array(
         'alternate_text_right' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}]}]}',
-
         'alternate_text_left' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""}]}',
+        'two_columns' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
+        'three_columns' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
+        'four_columns' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}'
     );
 }
 
