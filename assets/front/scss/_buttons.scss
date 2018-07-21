@@ -17,7 +17,7 @@
   border-width: 2px;
   border-style: solid;
   font-size: 1em;
-  @extend .service-font;
+  @extend .#{$project-prefix}service-font;
   cursor: pointer;
   text-decoration: none;
   text-transform: none;
