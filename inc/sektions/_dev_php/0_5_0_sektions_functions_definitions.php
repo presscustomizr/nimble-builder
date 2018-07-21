@@ -107,8 +107,27 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
     return $_parent_level_data;
 }
 
-
-
+// @return boolean
+function sek_section_has_modules( $model, $has_module = null ) {
+    $has_module = is_null( $has_module ) ? false : (bool)$has_module;
+    foreach ( $model as $level_data ) {
+        // stop here and return if a match was recursively found
+        if ( true === $has_module )
+          break;
+        if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
+            foreach ( $level_data['collection'] as $child_level_data ) {
+                if ( 'module'== $child_level_data['level'] ) {
+                    $has_module = true;
+                    //match found, break this loop
+                    break;
+                } else {
+                    $has_module = sek_section_has_modules( $child_level_data, $has_module );
+                }
+            }
+        }
+    }
+    return $has_module;
+}
 
 
 

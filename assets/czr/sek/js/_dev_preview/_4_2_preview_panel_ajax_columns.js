@@ -43,7 +43,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         // say it to the parent sektion
                         //=> will be listened to by the column to re-instantiate sortable, resizable
                         //=> also listened to clean the loader overalay in time
-                        $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
+                        $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed', { in_sektion : params.apiParams.in_sektion } );
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
                         $( '[data-sek-id="' + params.apiParams.id + '"]' )

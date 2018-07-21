@@ -26,6 +26,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         self.schedulePanelMsgReactions();
                   });
+
+                  // Make sure we don't force a minimum height to empty columns when a section has at least one module
+                  // => allow a better previewing experience and more realistic spacing adjustments
+                  $('body').on('sek-columns-refreshed sek-modules-refreshed', function( evt, params ) {
+                        if ( !_.isUndefined( params ) && !_.isUndefined( params.in_sektion ) && $('[data-sek-id="' + params.in_sektion +'"]').length > 0 ) {
+                              var $updatedSektion = $('[data-sek-id="' + params.in_sektion +'"]');
+                              // @see php SEK_Front_Render::render()
+                              $updatedSektion.toggleClass( 'sek-has-modules', $updatedSektion.find('[data-sek-level="module"]').length > 0 );
+                        }
+                  });
             },
 
             // Hightlight the currently level in the preview, corresponding to the active ui in the panel

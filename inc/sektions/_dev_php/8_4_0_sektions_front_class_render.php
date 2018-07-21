@@ -173,13 +173,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                 case 'section' :
                     $is_nested            = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
+                    $has_at_least_one_module = sek_section_has_modules( $collection );
                     $column_container_class = 'sek-container-fluid';
                     //when boxed use proper container class
                     if ( ! empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
                         $column_container_class = 'sek-container';
                     }
                     ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section">', $id, $is_nested ? 'data-sek-is-nested="true"' : '' ); ?>
+                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s">', $id, $is_nested ? 'data-sek-is-nested="true"' : '', $has_at_least_one_module ? 'sek-has-modules' : '' ); ?>
                           <div class="<?php echo $column_container_class ?>">
                             <div class="sek-row sek-sektion-inner">
                                 <?php

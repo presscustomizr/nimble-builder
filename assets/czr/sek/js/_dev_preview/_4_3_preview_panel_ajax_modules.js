@@ -41,7 +41,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                           // say it to the column
                           //=> will be listened to by the column to re-instantiate sortable, resizable and fittext
-                          $( '[data-sek-id="' + params.apiParams.in_column + '"]' ).trigger('sek-modules-refreshed');
+                          $( '[data-sek-id="' + params.apiParams.in_column + '"]' ).trigger('sek-modules-refreshed', { in_column : params.apiParams.in_column, in_sektion : params.apiParams.in_sektion });
 
                     }).fail( function( _r_ ) {
                           self.errare( 'ERROR reactToPanelMsg => sek-add-module => ' , _r_ );
