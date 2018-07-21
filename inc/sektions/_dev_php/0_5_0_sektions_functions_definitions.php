@@ -108,6 +108,8 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
 }
 
 // @return boolean
+// Indicates if a section level contains at least on module
+// Used in SEK_Front_Render::render() to maybe print a css class on the section level
 function sek_section_has_modules( $model, $has_module = null ) {
     $has_module = is_null( $has_module ) ? false : (bool)$has_module;
     foreach ( $model as $level_data ) {
