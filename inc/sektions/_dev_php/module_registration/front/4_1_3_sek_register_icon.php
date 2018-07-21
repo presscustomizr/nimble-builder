@@ -34,7 +34,8 @@ function sek_get_module_params_for_czr_icon_module() {
         'starting_value' => array(
             'icon' =>  'far fa-star',
             'font_size_css' => '40px',
-            'color_css' => '#707070'
+            'color_css' => '#707070',
+            'color_hover_css' => '#969696'
         ),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
