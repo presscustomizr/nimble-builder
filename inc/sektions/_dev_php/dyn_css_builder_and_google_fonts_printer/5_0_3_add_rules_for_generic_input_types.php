@@ -205,7 +205,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             $numeric = sek_extract_numeric_value( $value );
             if ( ! empty( $numeric ) ) {
                 $unit = sek_extract_unit( $value );
-                $unit = '%' === $unit ? 'vw' : $unit;
+                //$unit = '%' === $unit ? 'vw' : $unit;
 
                 $properties_to_render['width'] = $numeric . $unit;
                 // sek_error_log(' WIDTH ? for '. $input_id, $properties_to_render );
