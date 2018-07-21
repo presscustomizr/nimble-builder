@@ -1,6 +1,7 @@
 /* BASIC STYLING */
 .sektion-wrapper {
   min-height: 50px;
+  margin-top: 21px;/* <= Needed to see the ui button of the first section, if the container of the parent location is overflow:hidden; */
 }
 .sek-section {
   /*padding: 23px 0px 0;*/
@@ -287,6 +288,51 @@
     -webkit-box-shadow: 0 0 2px rgba(0, 133, 186, 0.8);
     box-shadow: 0 0 2px rgba(0, 133, 186, 0.8);
 }
+
+
+
+
+/* HAMBURGER MENU */
+.ham__toggler-span-wrapper {
+    height: 12px;
+    position: relative;
+    width: 20px;
+    display: block;
+}
+.ham__toggler-span-wrapper .line.line-1 {top: 0;}
+.ham__toggler-span-wrapper .line.line-2 {top: 50%;}
+.ham__toggler-span-wrapper .line.line-3 {top: 100%;}
+
+.ham__toggler-span-wrapper .line {
+    background: #313131;
+    display: block;
+    width: 20px;
+    height: 1.4px;
+    position: absolute;
+    -webkit-border-radius: 5px;
+    -webkit-background-clip: padding-box;
+    -moz-border-radius: 5px;
+    -moz-background-clip: padding;
+    border-radius: 5px;
+    background-clip: padding-box;
+    transition: all ease 0.35s;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.sek-dyn-ui-hamb-menu-wrapper:hover .line {
+    background-color: rgba(49, 49, 49, 0.7);
+    -webkit-transform: translate(-3px, 0);
+    transform: translate(-3px, 0);
+    width: 26px;
+}
+
+
+
+
+
+
+
+
 
 
 
