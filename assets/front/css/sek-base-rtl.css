@@ -14,7 +14,7 @@
   overflow: hidden;
 }
 
-.service-font, .sek-btn {
+.sek-service-font, .sek-btn {
   font-family: sans-serif;
   letter-spacing: 1px;
 }
@@ -326,6 +326,36 @@
   height: 100%;
   top: 0;
   left: 0;
+}
+
+.sektion-wrapper {
+  word-wrap: break-word;
+}
+
+.sek-module .sek-module-inner ul {
+  list-style: disc;
+}
+
+.sek-module .sek-module-inner ol {
+  list-style: decimal;
+}
+
+.sek-module .sek-module-inner ol > li::before {
+  content: none;
+}
+
+.sek-module .sek-module-inner ul, .sek-module .sek-module-inner ol {
+  padding: 0;
+  line-height: 1.5;
+  margin: 0 1.5rem 1.5rem 0;
+}
+
+.sek-module .sek-module-inner ul > li, .sek-module .sek-module-inner ol > li {
+  padding: 0;
+}
+
+.sek-module .sek-module-inner li > ul, .sek-module .sek-module-inner li > ol {
+  margin-bottom: 0;
 }
 
 .sek-btn {
@@ -647,6 +677,10 @@ button.sek-btn,
   color: inherit;
 }
 
+[data-sek-module-type="czr_icon_module"] .sek-icon i {
+  transition: all 0.15s ease-in-out;
+}
+
 .sek-quote p {
   margin: 0 0 .5em;
   padding: 0;
@@ -661,13 +695,13 @@ button.sek-btn,
   border: none;
 }
 
-.sek-quote.sek-quote-design::before, .sek-quote.sek-quote-design::after {
-  display: none;
+.sek-quote.sek-quote-design > * {
+  padding: 0;
+  margin: 0;
 }
 
-.sek-quote.sek-quote-design .sek-content {
-  margin-right: 0;
-  margin-left: 0;
+.sek-quote.sek-quote-design::before, .sek-quote.sek-quote-design::after {
+  display: none;
 }
 
 .sek-quote.sek-quote-design .sek-cite {

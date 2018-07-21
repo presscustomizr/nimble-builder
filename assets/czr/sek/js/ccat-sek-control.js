@@ -4634,9 +4634,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _.each( input(), function( _val_, _key_ ) {
                               $( '[data-sek-spacing="' + _key_ +'"]', $wrapper ).find( 'input[type="number"]' ).val( _val_ );
                         });
-                        // loop on the unit button and check which one should be clicked
+                        // loop on the unit buttons and check which one should be clicked
                         var unitToActivate = 'px';
-                        $( '.sek-ui-button', '.sek-unit-wrapper').each( function() {
+                        $('.sek-unit-wrapper .sek-ui-button', input.container ).each( function() {
                               var unit = $(this).data('sek-unit');
                               // do we have a unit for the current device ?
                               if ( ! _.isEmpty( input() ) ) {
@@ -4647,7 +4647,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               }
                         });
-                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
+                        $('.sek-unit-wrapper', input.container ).find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
                   }
 
                   // Set the initial unit
@@ -4751,7 +4751,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // loop on the unit button and check which one should be clicked
                         var unitToActivate = 'px';
-                        $( '.sek-ui-button', '.sek-unit-wrapper').each( function() {
+                        $( '.sek-unit-wrapper .sek-ui-button', input.container).each( function() {
                               var unit = $(this).data('sek-unit');
                               // do we have a unit for the current device ?
                               if ( ! _.isEmpty( inputValues[ currentDevice ] ) ) {
@@ -4762,7 +4762,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               }
                         });
-                        $('.sek-unit-wrapper').find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
+                        $('.sek-unit-wrapper', input.container ).find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
                   };
 
                   syncWithPreviewedDevice( api.previewedDevice() );
@@ -5443,7 +5443,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $rangeInput.val( $(this).val() );
                   });
                   // trigger a change on init to sync the range input
-                  $rangeInput.val( $numberInput.val() );
+                  $rangeInput.val( $numberInput.val() || 0 );
             },
 
       });//$.extend( api.czrInputMap, {})
@@ -5490,7 +5490,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $rangeInput.val( $(this).val() );
                   });
                   // trigger a change on init to sync the range input
-                  $rangeInput.val( $numberInput.val() );
+                  $rangeInput.val( $numberInput.val() || 0 );
 
                   // Schedule unit changes on button click
                   $wrapper.on( 'click', '.sek-ui-button', function(evt) {
