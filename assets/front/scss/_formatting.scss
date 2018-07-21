@@ -3,131 +3,131 @@
 }
 
 // customizr like
-.#{$project-prefix}module .#{$project-prefix}module-inner {
-    ul, ol {
-      margin: 0;
-      padding:0;
-      list-style: none;
-      li {
-        line-height: 1.5;
-      }
-    }
-
-    //formatting
-    //http://www.456bereastreet.com/archive/201105/styling_ordered_list_numbers/
-    //https://css-tricks.com/almanac/properties/l/list-style/
-    //https://en.oxforddictionaries.com/punctuation/bullet-points
-    ol {
-      counter-reset: item;
-      > li {
-        position: relative;
-        padding: 0.25rem 0.5rem;
-      }
-      > li::before {
-        content: counters(item, ".") ".";
-        counter-increment: item;
-        word-wrap: normal;
-        word-break: normal;
-        position: absolute;
-        width: 1em;
-      }
-      @if ( true == $is_rtl ) {
-        > li::before {
-          margin-left: 0.5em;
-          right: -1em;
-          padding-left: .5em;
-        }
-        > li li::before {
-            right: -1.8em;
-        }
-        > li li li::before {
-            right: -2.5em;
-        }
-      }
-      @else {
-        > li::before {
-          margin-right: 0.5em;
-          left: -1em;
-          padding-right: .5em;
-        }
-        > li li::before {
-            left: -1.8em;
-        }
-        > li li li::before {
-            left: -2.5em;
-        }
-      }
-    }
-    ul {
-        list-style: square outside;
-        > li {
-          padding: 0.25rem 0.5rem;
-        }
-    }
-
-    ol, ul {
-        @if ( true == $is_rtl ) {
-          padding: 0.5rem 1.5rem 1rem 0;
-          @include media-breakpoint-down(xs) {
-            padding: 0.5rem 1rem 1rem 0;
-          }
-        }
-        @else {
-          padding: 0.5rem 0 1rem 1.5rem;
-          //(max-width: 576px)
-          @include media-breakpoint-down(xs) {
-            padding: 0.5rem 0 1rem 1rem;
-          }
-        }
-    }
-
-    ol, ul {
-      ol, ul {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        @if ( true == $is_rtl ) {
-          margin-right: 1em;
-          @include media-breakpoint-down(xs) {
-            margin-right: 0;
-          }
-        }
-        @else {
-          margin-left: 1em;
-          @include media-breakpoint-down(xs) {
-            margin-left: 0;
-          }
-        }
-      }
-    }
-}
-
-// Conservative
 // .#{$project-prefix}module .#{$project-prefix}module-inner {
-//     ul {
-//       list-style: disc;
+//     ul, ol {
+//       margin: 0;
+//       padding:0;
+//       list-style: none;
+//       li {
+//         line-height: 1.5;
+//       }
 //     }
+
+//     //formatting
+//     //http://www.456bereastreet.com/archive/201105/styling_ordered_list_numbers/
+//     //https://css-tricks.com/almanac/properties/l/list-style/
+//     //https://en.oxforddictionaries.com/punctuation/bullet-points
 //     ol {
-//       list-style: decimal;
-//       & > li {
-//         &::before {
-//           content: none;
+//       counter-reset: item;
+//       > li {
+//         position: relative;
+//         padding: 0.25rem 0.5rem;
+//       }
+//       > li::before {
+//         content: counters(item, ".") ".";
+//         counter-increment: item;
+//         word-wrap: normal;
+//         word-break: normal;
+//         position: absolute;
+//         width: 1em;
+//       }
+//       @if ( true == $is_rtl ) {
+//         > li::before {
+//           margin-left: 0.5em;
+//           right: -1em;
+//           padding-left: .5em;
+//         }
+//         > li li::before {
+//             right: -1.8em;
+//         }
+//         > li li li::before {
+//             right: -2.5em;
+//         }
+//       }
+//       @else {
+//         > li::before {
+//           margin-right: 0.5em;
+//           left: -1em;
+//           padding-right: .5em;
+//         }
+//         > li li::before {
+//             left: -1.8em;
+//         }
+//         > li li li::before {
+//             left: -2.5em;
 //         }
 //       }
 //     }
-//     ul, ol {
-//       padding: 0;
-//       line-height: 1.5;
-//       @if ( true == $is_rtl ) {
-//           margin: 0 1.5rem 1.5rem 0;
-//       }
-//       @else {
-//           margin: 0 0 1.5rem 1.5rem;
-//       }
-//       & > li {
-//         padding: 0;
-//       }
+//     ul {
+//         list-style: square outside;
+//         > li {
+//           padding: 0.25rem 0.5rem;
+//         }
 //     }
-//     li > ul, li > ol {
+
+//     ol, ul {
+//         @if ( true == $is_rtl ) {
+//           padding: 0.5rem 1.5rem 1rem 0;
+//           @include media-breakpoint-down(xs) {
+//             padding: 0.5rem 1rem 1rem 0;
+//           }
+//         }
+//         @else {
+//           padding: 0.5rem 0 1rem 1.5rem;
+//           //(max-width: 576px)
+//           @include media-breakpoint-down(xs) {
+//             padding: 0.5rem 0 1rem 1rem;
+//           }
+//         }
+//     }
+
+//     ol, ul {
+//       ol, ul {
 //         margin-bottom: 0;
+//         padding-bottom: 0;
+//         @if ( true == $is_rtl ) {
+//           margin-right: 1em;
+//           @include media-breakpoint-down(xs) {
+//             margin-right: 0;
+//           }
+//         }
+//         @else {
+//           margin-left: 1em;
+//           @include media-breakpoint-down(xs) {
+//             margin-left: 0;
+//           }
+//         }
+//       }
 //     }
 // }
+
+// Conservative
+.#{$project-prefix}module .#{$project-prefix}module-inner {
+    ul {
+      list-style: disc;
+    }
+    ol {
+      list-style: decimal;
+      & > li {
+        &::before {
+          content: none;
+        }
+      }
+    }
+    ul, ol {
+      padding: 0;
+      line-height: 1.5;
+      @if ( true == $is_rtl ) {
+          margin: 0 1.5rem 1.5rem 0;
+      }
+      @else {
+          margin: 0 0 1.5rem 1.5rem;
+      }
+      & > li {
+        padding: 0;
+      }
+    }
+    li > ul, li > ol {
+        margin-bottom: 0;
+    }
+}
