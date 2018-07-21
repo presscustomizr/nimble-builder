@@ -25,14 +25,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               clickedOn = 'moduleWrapper';
                         } else if ( 'column' == $closestLevelWrapper.data('sek-level') && true === $closestLevelWrapper.data('sek-no-modules') ) {
                               clickedOn = 'noModulesColumn';
+                        } else if ( $el.hasClass('sek-to-json') ) {
+                              clickedOn = 'sekToJson';
                         } else if ( 'column' == $closestLevelWrapper.data('sek-level') ) {
                               clickedOn = 'columnOutsideModules';
                         } else if ( 'section' == $closestLevelWrapper.data('sek-level') ) {
                               clickedOn = 'sectionOutsideColumns';
                         } else if ( ! _.isEmpty( $el.data( 'sek-add' ) ) ) {
                               clickedOn = 'addSektion';
-                        } else if ( $el.hasClass('sek-to-json') ) {
-                              clickedOn = 'sekToJson';
                         } else if ( $el.hasClass('sek-wp-content-wrapper') || $el.hasClass( 'sek-wp-content-dyn-ui') ) {
                               clickedOn = 'wpContent';
                         } else if ( $el.hasClass('sek-edit-wp-content') ) {
@@ -40,7 +40,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         } else {
                               clickedOn = 'inactiveZone';
                         }
-
 
                         //console.log('CLICKED', clickedOn, _action );
 
