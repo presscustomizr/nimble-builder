@@ -177,7 +177,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
               <script type="text/html" id="sek-dyn-ui-tmpl-column">
                   <?php //<# console.log( 'data', data ); #> ?>
                   <div class="sek-dyn-ui-wrapper sek-column-dyn-ui">
-                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
+                    <div class="sek-dyn-ui-inner <?php echo $icon_right_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-ellipsis-v sek-move-column" title="<?php _e( 'Move column', 'text_domain' ); ?>"></i>
                         <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">settings</i>
