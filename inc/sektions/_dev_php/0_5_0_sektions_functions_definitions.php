@@ -116,7 +116,7 @@ function sek_section_has_modules( $model, $has_module = null ) {
         // stop here and return if a match was recursively found
         if ( true === $has_module )
           break;
-        if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
+        if ( is_array( $level_data ) && array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
             foreach ( $level_data['collection'] as $child_level_data ) {
                 if ( 'module'== $child_level_data['level'] ) {
                     $has_module = true;
