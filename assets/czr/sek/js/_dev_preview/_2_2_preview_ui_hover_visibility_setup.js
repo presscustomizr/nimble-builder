@@ -63,7 +63,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     complete : function() {}
                               } );
                         });
-                  };
+                  };//printLevelUI()
 
                   var removeLevelUI = function() {
                         $levelEl = $(this);
@@ -79,7 +79,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     $levelEl.data( 'UIisFadingOut', false );
                               }
                         });
-                  };
+                  };//removeLevelUI
 
                   // Level's UI icons with delegation
                   // $('body').on( 'mouseenter', '[data-sek-level]', function( evt ) {
@@ -172,6 +172,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
 
 
+
+                  // ADD SECTION BUTTONS
                   // Add content button between sections
                   // <script type="text/html" id="sek-tmpl-add-content-button">
                   //     <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
@@ -274,7 +276,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   };
 
 
-                  // Schedule the printing / removal of the add content button
+                  // SCHEDULE
+                  // - the printing / removal of the add content button
+                  // - the printing of the level's UI
                   self.mouseMovedRecently = new api.Value( {} );
                   self.mouseMovedRecently.bind( function( position ) {
                         if ( ! _.isEmpty( position) ) {
@@ -293,17 +297,29 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               });
                         }
                   });
+                  // @return void()
+                  var resetMouseMoveTrack = function() {
+                        clearTimeout( $(window).data('_scroll_move_timer_') );
+                        self.mouseMovedRecently.set( {} );
+                  };
+
                   $(window).on( 'mousemove scroll', _.throttle( function( evt ) {
                         self.mouseMovedRecently( { x : evt.clientX, y : evt.clientY } );
-                        clearTimeout( $.data( this, '_scroll_move_timer_') );
-                        $.data( this, '_scroll_move_timer_', setTimeout(function() {
+                        clearTimeout( $(window).data('_scroll_move_timer_') );
+                        $(window).data('_scroll_move_timer_', setTimeout(function() {
                               self.mouseMovedRecently.set( {} );
                         }, 4000 ) );
                   }, 50 ) );
 
-                  // Always remove when a dragging action is started
+                  // Always reset the move timer and the mouseMove Value when
+                  // - a dragging action is started
+                  // - a section is added <= fixes the addition of multiple "Add Section" button in the same location
                   api.preview.bind( 'sek-drag-start', function() {
-                        self.mouseMovedRecently.set( {} );
+                        resetMouseMoveTrack();
+                  });
+
+                  $( 'body').on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
+                        resetMouseMoveTrack();
                   });
 
                   return this;
