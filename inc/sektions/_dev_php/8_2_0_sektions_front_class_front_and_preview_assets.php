@@ -98,7 +98,10 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
                         'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
                         'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
-                        'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' )
+                        'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
+
+                        'section' => __('section', 'text_domain_to_be_replaced'),
+                        'nested section' => __('nested section', 'text_domain_to_be_replaced')
                     ),
                     'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -150,13 +153,13 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <# //console.log( 'data', data ); #>
                   <div class="sek-dyn-ui-wrapper sek-section-dyn-ui">
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
-                      <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>"><div class="sek-dyn-ui-level-type"><?php _e( 'section', 'text_domain' ); ?></div></div>
+                      <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>"><div class="sek-dyn-ui-level-type"><# if ( ! data.is_nested ) { #>{{ sekPreviewLocalized.i18n['section'] }}<# } else { #>{{ sekPreviewLocalized.i18n['nested section'] }}<# } #></div></div>
                       <div class="sek-dyn-ui-icons">
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
                         <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
-                        <# if ( ! data.is_last_possible_section ) { #>
+                        <# if ( ! data.is_nested ) { #>
                           <i class="fas fa-ellipsis-v sek-move-section" title="<?php _e( 'Move section', 'text_domain' ); ?>"></i>
                         <# } #>
                         <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>">settings</i>
