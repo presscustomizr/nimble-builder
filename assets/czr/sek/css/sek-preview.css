@@ -20,7 +20,7 @@
 }
 
 .sek-column-inner.sek-empty-col {
-  min-height: 100px;
+  min-height: 130px;
   height: 100%;
 }
 .sek-has-modules .sek-column-inner.sek-empty-col {
@@ -216,8 +216,12 @@
     border: 2px dotted #000;
 }
 .sek-section > .sek-section-dyn-ui .sek-dyn-ui-inner {
-      top: -1px;
+  top: -1px;
   z-index: 1000;
+}
+/* When the section is nested, we need space on top to see the parent section ui */
+.sek-section[data-sek-is-nested="true"] > .sek-section-dyn-ui .sek-dyn-ui-inner {
+  top: 18px;
 }
 .sek-section.sek-highlight-active-ui {
     -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
