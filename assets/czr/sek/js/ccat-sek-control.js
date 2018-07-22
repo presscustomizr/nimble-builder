@@ -3907,7 +3907,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             isCloseVertically = ( mouseToBottom < isCloseThreshold ) || ( mouseToTop < isCloseThreshold ),
                             isCloseHorizontally =  ( mouseToRight > 0 && mouseToRight < isCloseThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isCloseThreshold ),
                             isInHorizontally = xPos <= dzoneRect.right && dzoneRect.left <= xPos,
-                            isInVertically = yPos <= dzoneRect.top && dzoneRect.bottom <= yPos,
+                            isInVertically = yPos >= dzoneRect.top && dzoneRect.bottom >= yPos,
                             isApproachingVertically = ( mouseToBottom < isApproachingThreshold ) || ( mouseToTop < isApproachingThreshold ),
                             isApproachingHorizontally = ( mouseToRight > 0 && mouseToRight < isApproachingThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isApproachingThreshold );
 

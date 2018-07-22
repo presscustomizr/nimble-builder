@@ -542,10 +542,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                       params,
                       $levelEl;
 
-                  // Level's UI icons with delegation
-                  $('body').on( 'mouseenter', '[data-sek-level]', function( evt ) {
-                        // if ( $(this).children('.sek-dyn-ui-wrapper').length > 0 )
-                        //   return;
+                  var printLevelUI = function() {
                         level = $(this).data('sek-level');
                         // we don't print a ui for locations
                         if ( 'location' == level )
@@ -554,9 +551,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $levelEl = $(this);
 
                         // stop here if the .sek-dyn-ui-wrapper is already printed for this level AND is not being faded out.
-                        if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 && true !== $levelEl.data( 'UIisFadingOut' ) )
-                          return;
+                        // if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 && true !== $levelEl.data( 'UIisFadingOut' ) )
+                        //   return;
 
+                        if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 )
+                          return;
                         params = {
                               id : $levelEl.data('sek-id'),
                               level : $levelEl.data('sek-level')
@@ -596,12 +595,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     complete : function() {}
                               } );
                         });
+                  };
 
-                  }).on( 'mouseleave', '[data-sek-level]', function( evt ) {
+                  var removeLevelUI = function() {
                         $levelEl = $(this);
+                        if ( $levelEl.children('.sek-dyn-ui-wrapper').length < 1 )
+                          return;
                         //stores ths status of 200 ms fading out. => will let us know if we can print again when moving the mouse fast back and forth between two levels.
                         $levelEl.data( 'UIisFadingOut', true );//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
-
 
                         $levelEl.children('.sek-dyn-ui-wrapper').stop( true, true ).fadeOut( {
                               duration : 150,
@@ -610,7 +611,67 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     $levelEl.data( 'UIisFadingOut', false );
                               }
                         });
+                  };
+
+                  // Level's UI icons with delegation
+                  // $('body').on( 'mouseenter', '[data-sek-level]', function( evt ) {
+                  //       // if ( $(this).children('.sek-dyn-ui-wrapper').length > 0 )
+                  //       //   return;
+
+
+                  // }).on( 'mouseleave', '[data-sek-level]', function( evt ) {
+                  //       console.log('MOUSE LEAVE');
+
+                  // });
+
+
+
+                  // UI MENU
+                  // React to click
+                  // + schedule auto collapse after n seconds of ui inactivity
+                  var autoCollapser = function( $menu, $dynUiWrapper ) {
+                        clearTimeout( $menu.data('_toggle_ui_menu_') );
+                        $menu.data( '_toggle_ui_menu_', setTimeout(function() {
+                              $menu.addClass('sek-collapsed');
+                              $dynUiWrapper.removeClass('sek-is-expanded');
+                        }, 5000 ) );
+                  };
+                  $('body').on( 'click', '.sek-dyn-ui-location-inner', function( evt )  {
+                        var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper'),
+                            $dynUiWrapper = $menu.closest( '.sek-dyn-ui-wrapper').find('.sek-dyn-ui-inner'),
+                            $parentColumn = $(this).closest('[data-sek-level="column"]');
+                        // Close all other expanded ui menu of the column
+                        $parentColumn.find('.sek-dyn-ui-hamb-menu-wrapper').each( function() {
+                              $(this).toggleClass('sek-collapsed');
+                              $(this).closest( '.sek-dyn-ui-wrapper').find('.sek-dyn-ui-inner').removeClass('sek-is-expanded');
+                        });
+
+                        // expand the ui menu of the clicked level
+                        $menu.removeClass('sek-collapsed');
+                        $dynUiWrapper.addClass('sek-is-expanded');
+                        autoCollapser( $menu, $dynUiWrapper );
                   });
+                  // maintain expanded as long as it's being hovered
+                  $('body').on( 'mouseenter mouseover mouseleave', '.sek-dyn-ui-wrapper', _.throttle( function( evt )  {
+                        var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper'),
+                            $dynUiWrapper = $(this).find('.sek-dyn-ui-inner');
+                        if ( _.isUndefined( $menu.data('_toggle_ui_menu_') ) || $menu.hasClass('sek-collapsed') )
+                          return;
+                        if ( $menu.length > 0 ) {
+                              autoCollapser( $menu, $dynUiWrapper );
+                        }
+                  }, 50 ) );
+
+                  // minimize on click
+                  // solves the problem of a level ui on top of another one
+                  // @ee https://github.com/presscustomizr/nimble-builder/issues/138
+                  $('body').on( 'click', '.sek-minimize-ui', function( evt )  {
+                        $(this).closest('.sek-dyn-ui-location-type').slideToggle('fast');
+                  });
+
+
+
+
 
 
                   // Ui for the WP content.
@@ -668,7 +729,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                                     $.when( $(this).prepend( tmpl({ location : _location }) ) ).done( function() {
                                           $btn_el = $(this).find('.sek-add-content-button');
-                                          //console.log( "$(this).data('sek-id') ", $btn_el, $(this).data('sek-id')  );
                                           if ( $(this).data('sek-id') ) {
                                                 $btn_el.attr('data-sek-before-section', $(this).data('sek-id') );//Will be used to insert the section at the right place
                                           }
@@ -717,7 +777,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   isCloseVertically = ( mouseToBottom < isCloseThreshold ) || ( mouseToTop < isCloseThreshold ),
                                   isCloseHorizontally =  ( mouseToRight > 0 && mouseToRight < isCloseThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isCloseThreshold ),
                                   isInHorizontally = xPos <= btnWrapperRect.right && btnWrapperRect.left <= xPos,
-                                  isInVertically = yPos <= btnWrapperRect.top && btnWrapperRect.bottom <= yPos;
+                                  isInVertically = yPos >= btnWrapperRect.top && btnWrapperRect.bottom >= yPos;
 
                               // var html = '';
                               // html += ' | mouseToBottom : ' + mouseToBottom + ' | mouseToTop : ' + mouseToTop;
@@ -731,6 +791,21 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   };
 
+                  var _sniffLevelsAndPrintUI = function( position ) {
+                        $('body').find('[data-sek-level]').each( function() {
+                              var levelWrapperRect = $(this)[0].getBoundingClientRect(),
+                                isInHorizontally = position.x <= levelWrapperRect.right && levelWrapperRect.left <= position.x,
+                                isInVertically = position.y >= levelWrapperRect.top && levelWrapperRect.bottom >= position.y;
+
+                              if ( isInHorizontally && isInVertically ) {
+                                    printLevelUI.call( $(this) );
+                              } else {
+                                    removeLevelUI.call( $(this) );
+                              }
+                        });
+                  };
+
+
                   // Schedule the printing / removal of the add content button
                   self.mouseMovedRecently = new api.Value( {} );
                   self.mouseMovedRecently.bind( function( position ) {
@@ -739,6 +814,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               _printAddContentButtons();
                               // sniff sections around pointer and reveal add content button for the collection of candidates
                               _sniffAndRevealButtons( position );
+                              // sniff levels and print UI
+                              _sniffLevelsAndPrintUI( position );
                         } else {
                               $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
                                     $(this).fadeOut( {
@@ -762,11 +839,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
 
                   return this;
-            },//setupUiHoverVisibility
+            }//setupUiHoverVisibility
 
-            // setupSectionUiOverlay : function( eventType, id ) {
-
-            // }
       });//$.extend()
 })( wp.customize, jQuery, _ );
 //global sekPreviewLocalized
