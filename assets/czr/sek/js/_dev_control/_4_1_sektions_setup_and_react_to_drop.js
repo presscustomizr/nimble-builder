@@ -498,6 +498,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     dropCase = 'content-in-a-section-to-create';
                               break;
                               case 'in-empty-location' :
+                                    params.is_first_section = true;
+                                    params.send_to_preview = false;
                                     dropCase = 'content-in-empty-location';
                               break;
                               case 'between-columns' :
@@ -508,8 +510,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // case of a preset_section content_type being added to an existing but empty section
                         if ( 'preset_section' === params.content_type ) {
                               if ( $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ) ) {
-                                    dropCase = 'content-in-a-section-to-replace';
+                                    var $parentSektion = $dropTarget.closest('div[data-sek-level="section"]');
+                                    //calculate the number of column in this section, excluding the columns inside nested sections if any
+                                    var colNumber = $parentSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).length;
+                                    // if the parent section has more than 1 column, we will need to inject the preset_section inside a nested_section
+                                    if ( colNumber > 1 ) {
+                                          dropCase = 'content-in-a-nested-section-to-create';
+                                          params.is_nested = true;
+                                          params.in_column = $dropTarget.closest('[data-sek-level="column"]').data('sek-id');
+                                          params.in_sektion = $parentSektion.data('sek-id');
+                                          //params.after_section = params.sektion_to_replace;
+                                    } else {
+                                          params.sektion_to_replace = $parentSektion.data('sek-id');
+                                          params.after_section = params.sektion_to_replace;
+                                          dropCase = 'content-in-a-section-to-replace';
+                                    }
+                              } else {
+                                    dropCase = 'no_dropcase';
                               }
+
+
+
                         }
 
                         var focusOnAddedContentEditor;
@@ -543,14 +564,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'content-in-a-section-to-create' :
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
+                              // this case fixes https://github.com/presscustomizr/nimble-builder/issues/139
                               case 'content-in-a-section-to-replace' :
-                                    params.sektion_to_replace = $dropTarget.closest('div[data-sek-level="section"]').data('sek-id');
-                                    params.after_section = params.sektion_to_replace;
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
+                              case 'content-in-a-nested-section-to-create' :
+                                    api.previewer.trigger( 'sek-add-content-in-new-nested-sektion', params );
+                              break;
                               case 'content-in-empty-location' :
-                                    params.is_first_section = true;
-                                    params.send_to_preview = false;
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
 

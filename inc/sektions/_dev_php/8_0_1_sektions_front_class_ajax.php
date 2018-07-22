@@ -11,6 +11,9 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                   'sek-add-section',
                   'sek-remove-section',
                   'sek-duplicate-section',
+
+                  // fired when dropping a module or a preset_section
+                  'sek-add-content-in-new-nested-sektion',
                   'sek-add-content-in-new-sektion',
 
                   // add, duplicate, remove column is a re-rendering of the parent sektion collection
@@ -142,6 +145,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 case 'sek-add-section' :
                 // when 'sek-add-content-in-new-sektion' is fired, the section has already been populated with a column and a module
                 case 'sek-add-content-in-new-sektion' :
+                case 'sek-add-content-in-new-nested-sektion' :
                     if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
                         $this -> parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );

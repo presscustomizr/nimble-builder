@@ -385,6 +385,35 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
 
 
+                            // @params {
+                            //       drop_target_element : $(this),
+                            //       position : _position,
+                            //       before_section : $(this).data('sek-before-section'),
+                            //       after_section : $(this).data('sek-after-section'),
+                            //       content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                            //       content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+                            // }
+                            'sek-add-content-in-new-nested-sektion' : {
+                                  callback : function( params ) {
+                                        sendToPreview = false;//<= when the level is refreshed when complete, we don't need to send to preview.
+                                        uiParams = {};
+                                        apiParams = params;
+                                        apiParams.action = 'sek-add-content-in-new-nested-sektion';
+                                        apiParams.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
+
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        api.previewer.trigger( 'sek-refresh-level', {
+                                              level : 'section',
+                                              id :  params.apiParams.in_sektion
+                                        });
+                                  }
+                            },
+
+
+
+
 
 
 

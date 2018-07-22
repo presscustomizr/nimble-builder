@@ -11,6 +11,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             // DOM MODIFICATION CASES
                             'sek-add-section' : 'ajaxAddSektion',
                             'sek-add-content-in-new-sektion' : 'ajaxAddSektion',
+                            'sek-add-content-in-new-nested-sektion' : 'ajaxAddSektion',
                             'sek-add-column' : 'ajaxRefreshColumns',
                             'sek-add-module' : 'ajaxRefreshModulesAndNestedSections',
                             'sek-refresh-stylesheet' : 'ajaxRefreshStylesheet',

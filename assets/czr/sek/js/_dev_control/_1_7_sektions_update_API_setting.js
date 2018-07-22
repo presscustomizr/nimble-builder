@@ -132,7 +132,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     var _position_ = self.getLevelPositionInCollection( params.id, newSetValue.collection );
-                                    //console.log('_position_ ', _position_ );
                                     // Is this a nested sektion ?
                                     if ( true === params.is_nested ) {
                                           columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
@@ -786,6 +785,78 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }//switch( params.content_type)
                               break;
+
+
+
+                              //-------------------------------------------------------------------------------------------------
+                              //-- CONTENT IN NEW NESTED SEKTION
+                              //-------------------------------------------------------------------------------------------------
+                              // @params {
+                              //   drop_target_element : $(this),
+                              //   position : _position,// <= top or bottom
+                              //   before_section : $(this).data('sek-before-section'),
+                              //   after_section : $(this).data('sek-after-section'),
+                              //   content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ), //<= module or preset_section
+                              //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+                              // }
+                              case 'sek-add-content-in-new-nested-sektion' :
+                                    // an id must be provided
+                                    if ( _.isEmpty( params.id ) ) {
+                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
+                                    }
+
+                                    columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
+
+                                    // can we add this nested sektion ?
+                                    // if the parent sektion of the column has is_nested = true, then we can't
+                                    var parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
+                                    if ( 'no_match' == parentSektionCandidate ) {
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
+                                          break;
+                                    }
+                                    if ( true === parentSektionCandidate.is_nested ) {
+                                          dfd.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
+                                          break;
+                                    }
+                                    if ( 'no_match' == columnCandidate ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                          break;
+                                    }
+                                    columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+
+                                    // insert the section in the collection at the right place
+                                    var presetColumnCollection;
+                                    try { presetColumnCollection = self.getPresetSectionCollection({
+                                                presetSectionType : params.content_id,
+                                                section_id : params.id//<= we need to use the section id already generated, and passed for ajax action @see ::reactToPreviewMsg, case "sek-add-section"
+                                          });
+                                    } catch( _er_ ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                                          break;
+                                    }
+                                    if ( ! _.isObject( presetColumnCollection ) || _.isEmpty( presetColumnCollection ) ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnCollection );
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
+                                          break;
+                                    }
+                                    columnCandidate.collection.push({
+                                          id : params.id,
+                                          level : 'section',
+                                          collection : presetColumnCollection.collection,
+                                          is_nested : true
+                                    });
+                              break;
+
+
+
+
+
+
+
+
+
 
 
 
