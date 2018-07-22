@@ -150,6 +150,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <# //console.log( 'data', data ); #>
                   <div class="sek-dyn-ui-wrapper sek-section-dyn-ui">
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
+                      <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>"><div class="sek-dyn-ui-level-type"><?php _e( 'section', 'text_domain' ); ?></div></div>
                       <div class="sek-dyn-ui-icons">
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
                         <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
@@ -167,10 +168,6 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'text_domain' ); ?>">delete_forever</i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
-                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>"><?php _e( 'section', 'text_domain' ); ?></span>
-                    <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
-                      <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
-                    <?php endif; ?>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 
@@ -194,10 +191,16 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <# } #>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
-                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>"><?php _e( 'column', 'text_domain' ); ?></span>
-                    <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
-                      <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
-                    <?php endif; ?>
+
+                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">
+                      <div class="sek-minimize-ui" title="<?php _e('Hide', 'text-domain'); ?>"><i class="fas fa-angle-down"></i></div>
+                      <div class="sek-dyn-ui-location-inner">
+                        <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
+                          <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
+                        </div>
+                        <div class="sek-dyn-ui-level-type"><?php _e( 'column', 'text_domain' ); ?></div>
+                      </div>
+                    </div>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 
@@ -215,10 +218,15 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <#
                       var module_name = ! _.isEmpty( data.module_name ) ? data.module_name + ' ' + '<?php _e("module", "text_domain"); ?>' : '<?php _e("module", "text_domain"); ?>';
                     #>
-                    <span class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">{{module_name}}</span>
-                    <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
-                      <!-- <div class="dev-level-data">{{ data.level}} : {{ data.id }}</div> -->
-                    <?php endif; ?>
+                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">
+                      <div class="sek-dyn-ui-location-inner">
+                        <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
+                          <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
+                        </div>
+                        <div class="sek-dyn-ui-level-type">{{module_name}}</div>
+                      </div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide', 'text-domain'); ?>"><i class="fas fa-angle-down"></i></div>
+                    </div>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 

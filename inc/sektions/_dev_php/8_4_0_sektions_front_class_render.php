@@ -252,8 +252,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $model = sek_normalize_module_value_with_defaults( $model );
                     // update the current cached model
                     $this -> model = $model;
+                    $title_attribute = '';
+                    if ( skp_is_customizing() ) {
+                        $title_attribute = __('Edit module settings', 'text-domain');
+                        $title_attribute = 'title="'.$title_attribute.'"';
+                    }
                     ?>
-                      <div data-sek-level="module" data-sek-id="<?php echo $id; ?>" data-sek-module-type="<?php echo $module_type; ?>" class="sek-module">
+                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module" %3$s>', $id, $module_type, $title_attribute ); ?>
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>
                             </div>
