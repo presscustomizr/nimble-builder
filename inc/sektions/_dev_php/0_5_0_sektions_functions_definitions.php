@@ -178,10 +178,12 @@ function sek_get_default_module_model( $module_type = '' ) {
         // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+            return $default;
         }
 
         if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+            return $default;
         }
         // Build
         $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
@@ -281,10 +283,12 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
         // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+            return $input_list;
         }
 
         if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+            return $input_list;
         }
         // Build
         $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
