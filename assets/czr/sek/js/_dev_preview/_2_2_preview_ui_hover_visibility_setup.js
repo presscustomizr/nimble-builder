@@ -32,7 +32,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               case 'section' :
                                     //$el = $('.sektion-wrapper').find('[data-sek-id="' + id + '"]');
                                     params = _.extend( params, {
-                                          is_last_possible_section : true === $(this).data('sek-is-nested'),
+                                          is_nested : true === $(this).data('sek-is-nested'),
                                           can_have_more_columns : $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12
                                     });
                               break;
