@@ -715,7 +715,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
                                     }
                                     // get the position of the before or after section
-                                    var position = 0;
+                                    position = 0;
                                     locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                     if ( 'no_match' == locationCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
@@ -763,8 +763,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // When a preset section is dropped
                                           case 'preset_section' :
                                                 // insert the section in the collection at the right place
-                                                var presetSectionCandidate;
-                                                try { presetSectionCandidate = self.getPresetSectionCollection({
+                                                var presetColumnCollection;
+                                                try { presetColumnCollection = self.getPresetSectionCollection({
                                                             presetSectionType : params.content_id,
                                                             section_id : params.id//<= we need to use the section id already generated, and passed for ajax action @see ::reactToPreviewMsg, case "sek-add-section"
                                                       });
@@ -773,12 +773,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       dfd.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
                                                       break;
                                                 }
-                                                if ( ! _.isObject( presetSectionCandidate ) || _.isEmpty( presetSectionCandidate ) ) {
-                                                      api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetSectionCandidate );
+                                                if ( ! _.isObject( presetColumnCollection ) || _.isEmpty( presetColumnCollection ) ) {
+                                                      api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnCollection );
                                                       dfd.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                                       break;
                                                 }
-                                                locationCandidate.collection.splice( position, 0, presetSectionCandidate );
+                                                locationCandidate.collection.splice( position, 0, {
+                                                      id : params.id,
+                                                      level : 'section',
+                                                      collection : presetColumnCollection.collection
+                                                });
                                           break;
                                     }//switch( params.content_type)
                               break;

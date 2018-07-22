@@ -137,6 +137,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                         in_column : params.in_column
                                                   };
                                               break;
+                                              default :
+                                                  api.errare( '::reactToPreviewMsg => sek-remove => missing level ', params );
+                                              break;
                                         }
                                         return self.updateAPISetting( apiParams );
                                   },
@@ -362,11 +365,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     });
                                               break;
                                         }
-                                        // When a section is created ( not duplicated )
+                                        // Refresh when a section is created ( not duplicated )
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
                                                     level : 'location',
                                                     id :  params.apiParams.location
+                                              });
+                                        }
+
+                                        // Remove the sektion_to_replace when dropping a preset_section in an empty section ( <= the one to replace )
+                                        if ( params.apiParams.sektion_to_replace ) {
+                                              api.previewer.trigger( 'sek-remove', {
+                                                    id : params.apiParams.sektion_to_replace,
+                                                    location : params.apiParams.location,
+                                                    level : 'section'
                                               });
                                         }
                                   }

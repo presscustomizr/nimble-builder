@@ -130,12 +130,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Schedule
                   $draggableWrapper.find( '[draggable]' ).each( function() {
-                        $(this).on( 'dragstart', function( evt ) {
-                                    _onStart.call( $(this), evt );
-                              })
-                              .on( 'dragend', function( evt ) {
-                                    _onEnd.call( $(this), evt );
-                              });
+                        $(this).on( 'dragstart', function( evt ) { _onStart.call( $(this), evt ); })
+                              .on( 'dragend', function( evt ) { _onEnd.call( $(this), evt ); });
                   });
             },//setupNimbleZones()
 
@@ -334,8 +330,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Note : the class "sek-content-preset_section-drop-zone" is dynamically generated in preview::schedulePanelMsgReactions() sek-drag-start case
             dnd_canDrop : function( $dropTarget ) {
                   //console.log("$dropTarget.hasClass('sek-drop-zone') ?", $dropTarget, $dropTarget.hasClass('sek-drop-zone') );
-                  var isSectionDropZone = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' );
-                  return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === this.dnd_draggedType && isSectionDropZone ) || ( 'module' === this.dnd_draggedType && ! isSectionDropZone ) );
+                  var isSectionDropZone = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' ),
+                      sectionHasNoModule = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' );
+                  return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === this.dnd_draggedType && isSectionDropZone ) || ( 'module' === this.dnd_draggedType && ! isSectionDropZone ) || ( 'preset_section' === this.dnd_draggedType && sectionHasNoModule ) );
             },
 
             // @return void()
@@ -492,20 +489,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               throw new Error( 'Invalid drop_target_element' );
                         }
 
-                        var dropCase = 'content-in-column';
-                        if ( 'between-sections' === params.drop_target_element.data('sek-location') ) {
-                              dropCase = 'content-in-new-section';
+                        var $dropTarget = params.drop_target_element,
+                            dropCase = 'content-in-column';
+
+                        // If the data('sek-location') is available, let's use it
+                        switch( $dropTarget.data('sek-location') ) {
+                              case 'between-sections' :
+                                    dropCase = 'content-in-a-section-to-create';
+                              break;
+                              case 'in-empty-location' :
+                                    dropCase = 'content-in-empty-location';
+                              break;
+                              case 'between-columns' :
+                                    dropCase = 'content-in-new-column';
+                              break;
                         }
-                        if ( 'in-empty-location' === params.drop_target_element.data('sek-location') ) {
-                              dropCase = 'content-in-empty-location';
+
+                        // case of a preset_section content_type being added to an existing but empty section
+                        if ( 'preset_section' === params.content_type ) {
+                              if ( $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ) ) {
+                                    dropCase = 'content-in-a-section-to-replace';
+                              }
                         }
-                        if ( 'between-columns' === params.drop_target_element.data('sek-location') ) {
-                              dropCase = 'content-in-new-column';
-                        }
+
                         var focusOnAddedContentEditor;
                         switch( dropCase ) {
                               case 'content-in-column' :
-                                    var $closestLevelWrapper = params.drop_target_element.closest('div[data-sek-level]');
+                                    var $closestLevelWrapper = $dropTarget.closest('div[data-sek-level]');
                                     if ( 1 > $closestLevelWrapper.length ) {
                                         throw new Error( 'No valid level dom element found' );
                                     }
@@ -516,12 +526,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         throw new Error( 'No valid level id found' );
                                     }
 
-                                    //console.log(' reactToDrop => drop module in column', params );
                                     api.previewer.trigger( 'sek-add-module', {
                                           level : _level,
                                           id : _id,
-                                          in_column : params.drop_target_element.closest('div[data-sek-level="column"]').data( 'sek-id'),
-                                          in_sektion : params.drop_target_element.closest('div[data-sek-level="section"]').data( 'sek-id'),
+                                          in_column : $dropTarget.closest('div[data-sek-level="column"]').data( 'sek-id'),
+                                          in_sektion : $dropTarget.closest('div[data-sek-level="section"]').data( 'sek-id'),
 
                                           before_module : params.before_module,
                                           after_module : params.after_module,
@@ -531,19 +540,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               break;
 
-                              case 'content-in-new-section' :
+                              case 'content-in-a-section-to-create' :
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
-
+                              case 'content-in-a-section-to-replace' :
+                                    params.sektion_to_replace = $dropTarget.closest('div[data-sek-level="section"]').data('sek-id');
+                                    params.after_section = params.sektion_to_replace;
+                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
+                              break;
                               case 'content-in-empty-location' :
                                     params.is_first_section = true;
                                     params.send_to_preview = false;
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
 
-                              case 'content-in-new-column' :
-
+                              default :
+                                    api.errare( 'sek control panel => ::reactToDrop => invalid drop case : ' + dropCase );
                               break;
+                              // case 'content-in-new-column' :
+
+                              // break;
                         }
                   };
 
