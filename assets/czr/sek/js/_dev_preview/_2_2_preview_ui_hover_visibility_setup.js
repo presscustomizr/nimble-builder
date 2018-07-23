@@ -81,52 +81,52 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   };//removeLevelUI
 
-                  // Level's UI icons with delegation
-                  // $('body').on( 'mouseenter', '[data-sek-level]', function( evt ) {
-                  //       // if ( $(this).children('.sek-dyn-ui-wrapper').length > 0 )
-                  //       //   return;
-
-
-                  // }).on( 'mouseleave', '[data-sek-level]', function( evt ) {
-                  //       console.log('MOUSE LEAVE');
-
-                  // });
 
 
 
                   // UI MENU
-                  // React to click
+                  // React to click and mouse actions. Uses delegation.
                   // + schedule auto collapse after n seconds of ui inactivity
-                  var autoCollapser = function( $menu, $dynUiWrapper ) {
+                  var autoCollapser = function() {
+                        var $menu = $(this);
                         clearTimeout( $menu.data('_toggle_ui_menu_') );
                         $menu.data( '_toggle_ui_menu_', setTimeout(function() {
-                              $menu.addClass('sek-collapsed');
-                              $dynUiWrapper.removeClass('sek-is-expanded');
+                              setClassesAndVisibilities.call( $menu );
                         }, 5000 ) );
-                  };
+                      },
+                      setClassesAndVisibilities = function( expand ) {
+                            var $menu = $(this),
+                                $levelTypeAndMenuWrapper = $(this).closest('.sek-dyn-ui-location-type'),
+                                $dynUiWrapper = $menu.closest( '.sek-dyn-ui-wrapper').find('.sek-dyn-ui-inner');
+                            if ( true === expand ) {
+                                  $menu.removeClass('sek-collapsed');
+                                  $dynUiWrapper.addClass('sek-is-expanded');
+                                  $levelTypeAndMenuWrapper.hide();
+                            } else {
+                                  $menu.addClass('sek-collapsed');
+                                  $dynUiWrapper.removeClass('sek-is-expanded');
+                                  $levelTypeAndMenuWrapper.show();
+                            }
+                      };
                   $('body').on( 'click', '.sek-dyn-ui-location-inner', function( evt )  {
                         var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper'),
-                            $dynUiWrapper = $menu.closest( '.sek-dyn-ui-wrapper').find('.sek-dyn-ui-inner'),
-                            $parentColumn = $(this).closest('[data-sek-level="column"]');
+                            $parentSection = $(this).closest('[data-sek-level="section"]');
                         // Close all other expanded ui menu of the column
-                        $parentColumn.find('.sek-dyn-ui-hamb-menu-wrapper').each( function() {
-                              $(this).toggleClass('sek-collapsed');
-                              $(this).closest( '.sek-dyn-ui-wrapper').find('.sek-dyn-ui-inner').removeClass('sek-is-expanded');
+                        $parentSection.find('.sek-dyn-ui-hamb-menu-wrapper').each( function() {
+                              setClassesAndVisibilities.call( $(this) );
                         });
-
                         // expand the ui menu of the clicked level
-                        $menu.removeClass('sek-collapsed');
-                        $dynUiWrapper.addClass('sek-is-expanded');
-                        autoCollapser( $menu, $dynUiWrapper );
+                        setClassesAndVisibilities.call( $menu, true );
+                        // schedule autocollapsing
+                        autoCollapser.call( $menu );
                   });
                   // maintain expanded as long as it's being hovered
                   $('body').on( 'mouseenter mouseover mouseleave', '.sek-dyn-ui-wrapper', _.throttle( function( evt )  {
-                        var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper'),
-                            $dynUiWrapper = $(this).find('.sek-dyn-ui-inner');
+                        var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper');
                         if ( _.isUndefined( $menu.data('_toggle_ui_menu_') ) || $menu.hasClass('sek-collapsed') )
                           return;
                         if ( $menu.length > 0 ) {
-                              autoCollapser( $menu, $dynUiWrapper );
+                              autoCollapser.call( $menu );
                         }
                   }, 50 ) );
 

@@ -153,7 +153,6 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <# //console.log( 'data', data ); #>
                   <div class="sek-dyn-ui-wrapper sek-section-dyn-ui">
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
-                      <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>"><div class="sek-dyn-ui-level-type"><# if ( ! data.is_nested ) { #>{{ sekPreviewLocalized.i18n['section'] }}<# } else { #>{{ sekPreviewLocalized.i18n['nested section'] }}<# } #></div></div>
                       <div class="sek-dyn-ui-icons">
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
                         <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
@@ -171,6 +170,15 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'text_domain' ); ?>">delete_forever</i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
+                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>">
+                      <div class="sek-dyn-ui-location-inner">
+                        <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
+                          <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
+                        </div>
+                        <div class="sek-dyn-ui-level-type"><# if ( ! data.is_nested ) { #>{{ sekPreviewLocalized.i18n['section'] }}<# } else { #>{{ sekPreviewLocalized.i18n['nested section'] }}<# } #></div>
+                      </div><?php // .sek-dyn-ui-location-inner ?>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu', 'text-domain'); ?>"><i class="fa fa-times"></i></div>
+                    </div><?php // .sek-dyn-ui-location-type ?>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 
@@ -196,14 +204,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     </div><?php // .sek-dyn-ui-inner ?>
 
                     <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">
-                      <div class="sek-minimize-ui" title="<?php _e('Hide', 'text-domain'); ?>"><i class="fas fa-angle-down"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu', 'text-domain'); ?>"><i class="fa fa-times"></i></div>
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
                           <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
                         </div>
                         <div class="sek-dyn-ui-level-type"><?php _e( 'column', 'text_domain' ); ?></div>
-                      </div>
-                    </div>
+                      </div><?php // .sek-dyn-ui-location-inner ?>
+                    </div><?php // .sek-dyn-ui-location-type ?>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 
@@ -228,7 +236,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         </div>
                         <div class="sek-dyn-ui-level-type">{{module_name}}</div>
                       </div>
-                      <div class="sek-minimize-ui" title="<?php _e('Hide', 'text-domain'); ?>"><i class="fas fa-angle-down"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu', 'text-domain'); ?>"><i class="fa fa-times"></i></div>
                     </div>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
