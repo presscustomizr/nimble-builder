@@ -75,9 +75,10 @@ ul[id*="sub-accordion-section-__nimble__"] {
   width: 29%;
   height: 130px;
 }
-/*[data-sek-content-type="preset_section"] {
-  width: 90%;
-}*/
+[data-sek-content-type="preset_section"] {
+  width: 29%;
+  height: 130px;
+}
 
 
 [data-sek-content-type]:hover {
