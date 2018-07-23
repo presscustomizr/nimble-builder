@@ -526,7 +526,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           dropCase = 'content-in-a-section-to-replace';
                                     }
                               } else {
-                                    dropCase = 'no_dropcase';
+                                    if ( 'between-sections' === $dropTarget.data('sek-location') ) {
+                                          dropCase = 'content-in-a-section-to-create';
+                                    }
                               }
 
 
