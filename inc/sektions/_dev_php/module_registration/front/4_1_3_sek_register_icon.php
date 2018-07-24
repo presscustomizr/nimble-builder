@@ -35,7 +35,7 @@ function sek_get_module_params_for_czr_icon_module() {
             'icon' =>  'far fa-star',
             'font_size_css' => '40px',
             'color_css' => '#707070',
-            'color_hover_css' => '#969696'
+            'color_hover' => '#969696'
         ),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -92,20 +92,28 @@ function sek_get_module_params_for_czr_icon_module() {
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __('Color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
-                    'default'    => '#5a5a5a',
+                    'default'    => '#707070',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'color'
                 ),
-                'color_hover_css' => array(
+                'use_custom_color_on_hover' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __( 'Set a custom icon color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'default'     => 0,
+                ),
+                'color_hover' => array(
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __('Hover color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
-                    'default'    => '#5a5a5a',
+                    'default'    => '#969696',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'color_hover'
-                ),
+                    //'css_identifier' => 'color_hover'
+                )
             )
         ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/icon_module_tmpl.php",
@@ -118,5 +126,40 @@ function sek_get_module_params_for_czr_icon_module() {
               )
         )
     );
+}
+
+/* ------------------------------------------------------------------------- *
+ *  SCHEDULE CSS RULES FILTERING
+/* ------------------------------------------------------------------------- */
+add_filter( 'sek_add_css_rules_for_module_type___czr_icon_module', '\Nimble\sek_add_css_rules_for_icon_front_module', 10, 2 );
+// filter documented in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker
+// Note : $complete_modul_model has been normalized
+// @return populated $rules
+function sek_add_css_rules_for_icon_front_module( $rules, $complete_modul_model ) {
+    if ( empty( $complete_modul_model['value'] ) )
+      return $rules;
+
+    $value = $complete_modul_model['value'];
+    $icon_color = $value['color_css'];
+    if ( sek_booleanize_checkbox_val( $value['use_custom_color_on_hover'] ) ) {
+        $color_hover = $value['color_hover'];
+    } else {
+        // Build the lighter rgb from the user picked bg color
+        if ( 0 === strpos( $icon_color, 'rgba' ) ) {
+            list( $rgb, $alpha ) = sek_rgba2rgb_a( $icon_color );
+            $color_hover_rgb  = sek_lighten_rgb( $rgb, $percent=15, $array = true );
+            $color_hover      = sek_rgb2rgba( $color_hover_rgb, $alpha, $array = false, $make_prop_value = true );
+        } else if ( 0 === strpos( $icon_color, 'rgb' ) ) {
+            $color_hover      = sek_lighten_rgb( $icon_color, $percent=15 );
+        } else {
+            $color_hover      = sek_lighten_hex( $icon_color, $percent=15 );
+        }
+    }
+    $rules[] = array(
+        'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-icon i:hover',
+        'css_rules' => 'color:' . $color_hover . ';',
+        'mq' =>null
+    );
+    return $rules;
 }
 ?>

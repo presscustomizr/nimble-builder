@@ -94,13 +94,22 @@
                                                         }
                                                         return bool;
                                                   }); } catch( er ) {
-                                                        api.errare( 'Icon module => error in setInputVisibilityDeps', er );
+                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
                                                   }
                                             });
                                       break;
                                       case 'link-pick-url' :
                                             scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                   return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
+                                            });
+                                      break;
+                                      case 'use_custom_color_on_hover' :
+                                            _.each( [ 'color_hover' ] , function( _inputId_ ) {
+                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        return input();
+                                                  }); } catch( er ) {
+                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                  }
                                             });
                                       break;
                                 }
