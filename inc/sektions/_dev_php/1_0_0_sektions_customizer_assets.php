@@ -504,7 +504,7 @@ function sek_get_img_sizes() {
     foreach ( get_intermediate_image_sizes() as $_size ) {
 
         $first_to_upper_size = ucfirst(strtolower($_size));
-        $first_to_upper_size = preg_replace_callback('/[.!?].*?\w/', create_function('$matches', 'return strtoupper($matches[0]);'), $first_to_upper_size);
+        $first_to_upper_size = preg_replace_callback( '/[.!?].*?\w/', '\Nimble\sek_img_sizes_preg_replace_callback', $first_to_upper_size );
 
         if ( in_array( $_size, array('thumbnail', 'medium', 'medium_large', 'large') ) ) {
             $sizes[ $_size ]['width']  = get_option( "{$_size}_size_w" );
@@ -525,5 +525,9 @@ function sek_get_img_sizes() {
     }
 
     return $to_return;
+}
+
+function sek_img_sizes_preg_replace_callback( $matches ) {
+    return strtoupper( $matches[0] );
 }
 ?>
