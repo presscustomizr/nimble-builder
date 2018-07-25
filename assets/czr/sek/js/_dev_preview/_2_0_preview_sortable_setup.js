@@ -37,6 +37,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   $('body').on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
                         self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                   });
+                  // this case occurs when moving a section from one location to another for example
+                  $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                        $(this).find( '[data-sek-level="section"]' ).each( function() {
+                              self.makeColumnsSortableInSektion( $(this).data('sek-id') );
+                        });
+                  });
 
 
                   // MODULES
@@ -55,7 +61,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
-                  // this case occurs when moving a section from a location to another for example
+                  // this case occurs when moving a section from one location to another for example
                   $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
