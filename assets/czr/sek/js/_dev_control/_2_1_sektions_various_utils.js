@@ -155,7 +155,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var data = sektionsLocalizedData.registeredModules[ moduleType ]['tmpl']['item-inputs'],
                       // title, id are always included in the defaultItemModel but those properties don't need to be saved in database
                       // title and id are legacy entries that can be used in multi-items modules to identify and name the item
-                      defaultItemModem = {
+                      defaultItemModel = {
                             id : '',
                             title : ''
                       },
@@ -166,16 +166,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'tabs' :
                                     _.each( _d_ , function( _tabData_ ) {
                                           _.each( _tabData_['inputs'], function( _inputData_, _id_ ) {
-                                                defaultItemModem[ _id_ ] = _inputData_['default'] || '';
+                                                defaultItemModel[ _id_ ] = _inputData_['default'] || '';
                                           });
                                     });
                               break;
                               default :
-                                    defaultItemModem[ _key_ ] = _d_['default'] || '';
+                                    defaultItemModel[ _key_ ] = _d_['default'] || '';
                               break;
                         }
                   });
-                  return defaultItemModem;
+                  return defaultItemModel;
             },
 
             //@return mixed
@@ -255,7 +255,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.has( self.cachedDefaultInputValues[ module_type ], input_id ) ) {
                         return self.cachedDefaultInputValues[ module_type ][ input_id ];
                   }
-                  //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
                         api.errare( 'getInputDefaultValue => missing sektionsLocalizedData.registeredModules' );
                         return;
@@ -298,7 +297,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.has( self.cachedInputTypes[ module_type ], input_id ) ) {
                         return self.cachedInputTypes[ module_type ][ input_id ];
                   }
-                  //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
                         api.errare( 'getInputType => missing sektionsLocalizedData.registeredModules' );
                         return;
@@ -380,7 +378,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.has( self.cachedFontFamilyModifier, input_id ) ) {
                         return self.cachedFontFamilyModifier[ input_id ];
                   }
-                  //console.log('DEFAULT INPUT VALUE NO CACHED', input_id, module_type );
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
                         api.errare( 'getInputType => missing sektionsLocalizedData.registeredModules' );
                         return;
