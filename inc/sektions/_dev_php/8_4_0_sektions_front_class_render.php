@@ -204,6 +204,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $col_number = 12 < $col_number ? 12 : $col_number;
                     $col_width_in_percent = 100/$col_number;
 
+                    //@note : we use the same logic in the customizer preview js to compute the column css classes when dragging them
+                    //@see sek_preview::makeColumnsSortableInSektion
                     //TODO, we might want to be sure the $col_suffix is related to an allowed size
                     $col_suffix = floor( $col_width_in_percent );
                     ?>
