@@ -69,16 +69,16 @@ function sek_get_select_options_for_input_id( $input_id ) {
         // FEATURED PAGE MODULE
         case 'img-type' :
             $options = array(
-                'none' => __('No text', 'text_domain_to_be_replaced' ),
-                'page-excerpt' => __('Use the page excerpt', 'text_domain_to_be_replaced' ),
-                'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
+                'none' => __( 'No image', 'text_domain_to_be_replaced' ),
+                'featured' => __( 'Use the page featured image', 'text_domain_to_be_replaced' ),
+                'custom' => __( 'Use a custom image', 'text_domain_to_be_replaced' ),
             );
         break;
         case 'content-type' :
             $options = array(
-                'none' => __('No image', 'text_domain_to_be_replaced' ),
-                'featured' => __('Use the page featured image', 'text_domain_to_be_replaced' ),
-                'custom' => __('Use a custom image', 'text_domain_to_be_replaced' ),
+                'none' => __( 'No text', 'text_domain_to_be_replaced' ),
+                'page-excerpt' => __( 'Use the page excerpt', 'text_domain_to_be_replaced' ),
+                'custom' => __( 'Use a custom text', 'text_domain_to_be_replaced' ),
             );
         break;
 
