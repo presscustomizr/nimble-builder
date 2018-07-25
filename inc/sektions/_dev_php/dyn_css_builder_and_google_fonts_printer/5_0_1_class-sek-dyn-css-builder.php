@@ -234,6 +234,7 @@ class Sek_Dyn_CSS_Builder {
             foreach ( $selectors as $selector => $css_rules ) {
                 $css_rules = is_array( $css_rules ) ? implode( ';', $css_rules ) : $css_rules;
                 $_css .=  $selector . '{' . $css_rules . '}';
+                $_css =  str_replace(';;', ';', $_css);//@fixes https://github.com/presscustomizr/nimble-builder/issues/137
             }
             $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_device );
             $css .= $_css;
