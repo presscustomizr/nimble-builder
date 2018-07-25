@@ -10,7 +10,7 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
         'name' => __('Background and borders', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'bg-color-overlay'  => '#000000',
-            'bg-opacity-overlay' => '50'
+            'bg-opacity-overlay' => '40'
         ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -79,8 +79,8 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                                 'orientation' => 'horizontal',
                                 'min' => 0,
                                 'max' => 100,
-                                'unit' => '%',
-                                'default'  => '50%',
+                                // 'unit' => '%',
+                                // 'default'  => '40%',
                                 'width-100'   => true,
                                 'title_width' => 'width-100'
                             )
