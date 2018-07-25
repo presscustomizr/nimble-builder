@@ -10,6 +10,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         //handle: '.fa-arrows-alt',<= set by level
                         placeholder: "sortable-placeholder",
                         over: function( event, ui ) {},
+                        cursorAt: { top:0, left: 0 },//@fixes https://github.com/presscustomizr/nimble-builder/issues/114
+                        tolerance: "pointer",//@fixes https://github.com/presscustomizr/nimble-builder/issues/114
                   };
 
                   // SEKTIONS
@@ -23,6 +25,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
 
+
                   // COLUMNS
                   // On dom ready
                   $('[data-sek-level="location"]').each( function() {
@@ -35,7 +38,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                   });
 
-                  // MODULE
+
+                  // MODULES
                   // On dom ready
                   $('[data-sek-level="location"]').each( function() {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
@@ -51,7 +55,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
-
+                  // this case occurs when moving a section from a location to another for example
+                  $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                        $(this).find( '[data-sek-level="column"]' ).each( function() {
+                              self.makeModulesSortableInColumn( $(this).data('sek-id') );
+                        });
+                  });
 
                   // NESTED SEKTIONS
                   // $('.sek-column-inner', '[data-sek-level="section"]').children( '[data-sek-level="section"]' ).each( function() {
