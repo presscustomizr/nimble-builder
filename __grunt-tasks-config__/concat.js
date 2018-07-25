@@ -247,7 +247,12 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_0_sektions_initialize.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_2_sektions_setup_collection_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_4_sektions_react_to_preview.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_sektions_generate_UI.js',
+
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_0_sektions_generate_UI_base.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_1_sektions_generate_UI_content_pickers.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_2_sektions_generate_UI_front_modules.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_3_sektions_generate_UI_level_options_modules.js',
+
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_sektions_update_API_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_2_0_sektions_register_utils.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_2_1_sektions_various_utils.js',
