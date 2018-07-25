@@ -8,6 +8,9 @@ function sek_get_module_params_for_sek_level_height_module() {
         'dynamic_registration' => true,
         'module_type' => 'sek_level_height_module',
         'name' => __('Height options', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'custom-height'  => '50%',
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -23,7 +26,7 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'title'       => __('Custom height', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 100,
-                    'default' => '50%',
+                    'default' => '50',
                     'width-100'   => true
                 ),
                 'v_alignment' => array(
