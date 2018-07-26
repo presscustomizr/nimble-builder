@@ -686,9 +686,9 @@
 
 .sek-dragging .sek-dynamic-drop-zone {
   height: 5px;
-  -webkit-transition: all 0.25s ease;
-  -o-transition: all 0.25s ease;
-  transition: all 0.25s ease;
+  -webkit-transition: all 3s ease;
+  -o-transition: all 3s ease;
+  transition: all 3s ease;
   /*background: #eee;*/
   /*border:2px dotted #a2a2a2;*/
   border:2px dotted #72777c;
@@ -705,9 +705,15 @@
 }
 .sek-dragging .sek-drag-is-close.sek-dynamic-drop-zone {
   height: 55px;
+  -webkit-transition: all 1s ease;
+  -o-transition: all 1s ease;
+  transition: all 1s ease;
 }
 .sek-dragging .sek-drag-is-very-close.sek-dynamic-drop-zone {
   height: 75px;
+  -webkit-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  transition: all 0.4s ease;
 }
 
 

@@ -240,23 +240,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   this.$dropZones.find('.sek-drop-zone').each( function() {
                         var yPos = evt.clientY,
                             xPos = evt.clientX,
-                            isApproachingThreshold = 120,
-                            isCloseThreshold = 60,
-                            isVeryCloseThreshold = 40;
+                            APPROACHING_DIST = 120,
+                            CLOSE_DIST = 60,
+                            VERY_CLOSE_DIST = 40;
 
                         var dzoneRect = $(this)[0].getBoundingClientRect(),
-                            mouseToBottom = Math.abs( yPos - dzoneRect.bottom ),
+                            mouseToYCenter = Math.abs( yPos - ( dzoneRect.bottom - ( dzoneRect.bottom - dzoneRect.top )/2 ) ),
                             mouseToTop = Math.abs( dzoneRect.top - yPos ),
+                            mouseToXCenter = Math.abs( xPos - ( dzoneRect.right - ( dzoneRect.right - dzoneRect.left )/2 ) ),
                             mouseToRight = xPos - dzoneRect.right,
                             mouseToLeft = dzoneRect.left - xPos,
-                            isVeryCloseVertically = ( mouseToBottom < isVeryCloseThreshold ) || ( mouseToTop < isVeryCloseThreshold ),
-                            isVeryCloseHorizontally =  ( mouseToRight > 0 && mouseToRight < isVeryCloseThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isVeryCloseThreshold ),
-                            isCloseVertically = ( mouseToBottom < isCloseThreshold ) || ( mouseToTop < isCloseThreshold ),
-                            isCloseHorizontally =  ( mouseToRight > 0 && mouseToRight < isCloseThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isCloseThreshold ),
+                            isVeryCloseVertically = mouseToYCenter < VERY_CLOSE_DIST,
+                            isVeryCloseHorizontally =  mouseToXCenter < VERY_CLOSE_DIST,
+                            isCloseVertically = mouseToYCenter < CLOSE_DIST,
+                            isCloseHorizontally =  mouseToXCenter < CLOSE_DIST,
+                            isApproachingVertically = mouseToYCenter < APPROACHING_DIST,
+                            isApproachingHorizontally = mouseToXCenter < APPROACHING_DIST,
+
                             isInHorizontally = xPos <= dzoneRect.right && dzoneRect.left <= xPos,
-                            isInVertically = yPos >= dzoneRect.top && dzoneRect.bottom >= yPos,
-                            isApproachingVertically = ( mouseToBottom < isApproachingThreshold ) || ( mouseToTop < isApproachingThreshold ),
-                            isApproachingHorizontally = ( mouseToRight > 0 && mouseToRight < isApproachingThreshold ) || ( mouseToLeft > 0 && mouseToLeft < isApproachingThreshold );
+                            isInVertically = yPos >= dzoneRect.top && dzoneRect.bottom >= yPos;
 
                         // var html = "isApproachingHorizontally : " + isApproachingHorizontally + ' | isCloseHorizontally : ' + isCloseHorizontally + ' | isInHorizontally : ' + isInHorizontally;
                         // html += ' | xPos : ' + xPos + ' | zoneRect.right : ' + dzoneRect.right;
@@ -268,6 +270,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // html += ' | mouseToBottom : ' + mouseToBottom + ' | mouseToTop : ' + mouseToTop;
                         // html += "isApproachingVertically : " + isApproachingVertically + ' | isCloseVertically : ' + isCloseVertically + ' | isInVertically : ' + isInVertically;
                         // $(this).html( '<span style="font-size:12px">' + html + '</span>');
+
+                        // var html = ' | xPos : ' + xPos + ' | zoneRect.right : ' + dzoneRect.right + ' | zoneRect.left : ' + dzoneRect.left;
+                        // html += "mouseToYCenter : " + mouseToYCenter + ' | mouseToXCenter : ' + mouseToXCenter;
+                        // html += ' | yPos : ' + yPos + ' | zoneRect.top : ' + dzoneRect.top + ' | zoneRect.bottom : ' + dzoneRect.bottom;
+                        // $(this).html( '<span style="font-size:10px">' + html + '</span>');
 
                         if ( ( isVeryCloseVertically || isInVertically ) && ( isVeryCloseHorizontally || isInHorizontally ) ) {
                               $(this).addClass( 'sek-drag-is-very-close');
