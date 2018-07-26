@@ -211,6 +211,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_height.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_4_sek_register_spacing.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_5_sek_register_width.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/4_1_0_sek_register_local_skope_options.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php',
@@ -248,10 +249,12 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_2_sektions_setup_collection_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_4_sektions_react_to_preview.js',
 
+      // UI Generators
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_0_sektions_generate_UI_base.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_1_sektions_generate_UI_content_pickers.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_2_sektions_generate_UI_front_modules.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_3_sektions_generate_UI_level_options_modules.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_4_sektions_generate_UI_local_skope_options.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_sektions_update_API_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_2_0_sektions_register_utils.js',
@@ -280,6 +283,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_1_UI_spacing.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_2_UI_module_picker.js',
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_3_UI_section_picker.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_1_0_UI_local_skope_options.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_1_FRONT_tiny_mce_editor.js',
