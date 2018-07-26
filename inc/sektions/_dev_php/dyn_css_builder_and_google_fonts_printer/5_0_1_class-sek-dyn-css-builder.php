@@ -44,6 +44,9 @@ class Sek_Dyn_CSS_Builder {
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
 
         $this->sek_css_rules_sniffer_walker();
+
+        // add user local custom css
+        add_filter( 'nimble_get_dynamic_stylesheet', array( $this, 'sek_add_raw_local_custom_css'));
     }
 
 
@@ -223,23 +226,23 @@ class Sek_Dyn_CSS_Builder {
     //@returns a stringified stylesheet, ready to be printed on the page or in a file
     public function get_stylesheet() {
         $css = '';
-        if ( ! is_array( $this->collection ) || empty( $this->collection ) )
-          return $css;
-        // Sort the collection by media queries
-        uksort( $this->collection, array( $this, 'user_defined_array_key_sort_fn' ) );
+        if ( is_array( $this->collection ) && !empty( $this->collection ) ) {
+            // Sort the collection by media queries
+            uksort( $this->collection, array( $this, 'user_defined_array_key_sort_fn' ) );
 
-        // process
-        foreach ( $this->collection as $mq_device => $selectors ) {
-            $_css = '';
-            foreach ( $selectors as $selector => $css_rules ) {
-                $css_rules = is_array( $css_rules ) ? implode( ';', $css_rules ) : $css_rules;
-                $_css .=  $selector . '{' . $css_rules . '}';
-                $_css =  str_replace(';;', ';', $_css);//@fixes https://github.com/presscustomizr/nimble-builder/issues/137
+            // process
+            foreach ( $this->collection as $mq_device => $selectors ) {
+                $_css = '';
+                foreach ( $selectors as $selector => $css_rules ) {
+                    $css_rules = is_array( $css_rules ) ? implode( ';', $css_rules ) : $css_rules;
+                    $_css .=  $selector . '{' . $css_rules . '}';
+                    $_css =  str_replace(';;', ';', $_css);//@fixes https://github.com/presscustomizr/nimble-builder/issues/137
+                }
+                $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_device );
+                $css .= $_css;
             }
-            $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_device );
-            $css .= $_css;
         }
-        return $css;
+        return apply_filters( 'nimble_get_dynamic_stylesheet', $css );
     }
 
 
@@ -266,6 +269,17 @@ class Sek_Dyn_CSS_Builder {
         return $rules;
     }
 
+
+    //@filter 'nimble_get_dynamic_stylesheet'
+    public function sek_add_raw_local_custom_css( $css ) {
+        // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
+        // otherwise we fallback on the normal utility skp_build_skope_id()
+        $localSkopeNimble = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id()  );
+        if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['general'] ) && ! empty( $localSkopeNimble['options']['general']['local_custom_css'] ) ) {
+            $css .= $localSkopeNimble['options']['general']['local_custom_css'];
+        }
+        return $css;
+    }
 
 }//end class
 
