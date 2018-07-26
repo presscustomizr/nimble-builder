@@ -108,10 +108,11 @@ function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'lo
     if ( empty( $skope_id ) ) {
         $skope_id = skp_get_skope_id( $skope_level );
     }
-    // use the cached value when NOT in a customization scenario
-    if ( ! skp_is_customizing() && did_action('wp') && 'not_cached' != SEK_Front()->local_seks ) {
+    // use the cached value when available ( after did_action('wp') )
+    if ( did_action('wp') && 'not_cached' != SEK_Front()->local_seks ) {
         $seks_data = SEK_Front()->local_seks;
     } else {
+
         $seks_data = array();
         $post = sek_get_seks_post( $skope_id );
         // sek_error_log( 'sek_get_skoped_seks() => $post', $post);
