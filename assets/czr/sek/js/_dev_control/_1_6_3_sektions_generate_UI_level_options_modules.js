@@ -91,8 +91,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _setting_.bind( _.debounce( function( to, from, args ) {
                                                 try { self.updateAPISettingAndExecutePreviewActions({
                                                       defaultPreviewAction : 'refresh_stylesheet',
-                                                      uiParams : _.extend( params, { action : 'sek-set-level-options' } ),
-                                                      options_type : optionType,// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-set-level-options'
+                                                      uiParams : params,
+                                                      options_type : optionType,// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-generate-level-options-ui'
                                                       settingParams : {
                                                             to : to,
                                                             from : from,
@@ -102,7 +102,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
                                                 }
                                           }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
-                                    });//api( heightOptionsSetId, function( _setting_ ) {})
+                                    });//api( Id, function( _setting_ ) {})
 
                                     // Let's add the starting values if provided when registrating the module
                                     startingModuleValue = self.getModuleStartingValue( optionData.module_type );
