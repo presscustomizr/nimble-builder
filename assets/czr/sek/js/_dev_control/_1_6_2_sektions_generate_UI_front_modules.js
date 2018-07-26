@@ -26,10 +26,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return dfd;
                   }
 
-
-                  // Clean previously generated UI elements
-                  self.cleanRegistered();
-
                   // For modules, we need to generate a UI for the module value
                   var moduleValue = self.getLevelProperty({
                         property : 'value',

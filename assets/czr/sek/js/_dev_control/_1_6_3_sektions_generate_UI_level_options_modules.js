@@ -28,9 +28,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return dfd;
                   }
 
-                  // Clean previously generated UI elements
-                  self.cleanRegistered();
-
                   // Get this level options
                   var levelOptionValues = self.getLevelProperty({
                             property : 'options',
@@ -60,7 +57,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         },
                         spacing : {
                               settingControlId : params.id + '__spacing_options',
-                              module_type : 'sek_spacing_module',
+                              module_type : 'sek_level_spacing_module',
                               controlLabel : sektionsLocalizedData.i18n['Padding and margin settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
                         },
                         height : {

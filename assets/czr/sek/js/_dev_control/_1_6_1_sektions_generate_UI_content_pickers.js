@@ -35,8 +35,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
 
-                  // Clean previously generated UI elements
-                  self.cleanRegistered();
                   _do_register_ = function() {
                         if ( ! api.has( _id_ ) ) {
                               // synchronize the module setting with the main collection setting
