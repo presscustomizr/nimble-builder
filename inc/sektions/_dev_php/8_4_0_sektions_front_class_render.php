@@ -27,12 +27,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             // SCHEDULE THE ASSETS ENQUEUING
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
-            // add_filter( 'template_include', function( $template ) {
-            //       // error_log( 'TEMPLATE ? => ' . $template );
-            //       // error_log( 'DID_ACTION WP => ' . did_action('wp') );
-            //       return NIMBLE_BASE_PATH. "/tmpl/page-templates/full-width.php";// $template;
-            // });
+
+            // USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+            add_filter( 'template_include', array( $this, 'sek_maybe_set_custom_nimble_template') );
         }
+
 
         // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
         // @filter the_content::NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY
@@ -419,6 +418,25 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 }
             }//foreach
             return $enqueuing_candidates;
+        }
+
+
+        // @hook 'template_include'
+        // @return template path
+        function sek_maybe_set_custom_nimble_template( $template ) {
+              $localSkopeNimble = sek_get_skoped_seks( skp_build_skope_id() );
+              //sek_error_log('$localSkopeNimble', $localSkopeNimble );
+
+              if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['general'] ) && ! empty( $localSkopeNimble['options']['general']['local_template'] ) && 'default' !== $localSkopeNimble['options']['general']['local_template'] ) {
+                  $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['general']['local_template'] . '.php';
+                  if ( file_exists( $path ) ) {
+                      $template = $path;
+                  } else {
+                      sek_error_log( __CLASS__ .'::'.__FUNCTION__ .' the custom template does not exist', $path );
+                  }
+              }
+              // error_log( 'DID_ACTION WP => ' . did_action('wp') );
+              return $template;
         }
     }//class
 endif;
