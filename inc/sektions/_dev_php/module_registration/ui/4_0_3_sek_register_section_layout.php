@@ -1,7 +1,4 @@
 <?php
-/* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
-/* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_sek_level_section_layout_module() {
     return array(
