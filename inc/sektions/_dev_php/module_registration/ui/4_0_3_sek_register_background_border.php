@@ -1,7 +1,4 @@
 <?php
-/* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
-/* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_sek_level_bg_border_module() {
     return array(
@@ -388,8 +385,8 @@ function sek_add_css_rules_for_bg_border_boxshadow( $rules, $level ) {
       return $rules;
 
     if ( !empty( $bg_border_options[ 'shadow' ] ) &&  sek_is_checked( $bg_border_options[ 'shadow'] ) ) {
-        $css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
-
+        //$css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
+        $css_rules = '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;';
         $rules[]     = array(
                 'selector' => '[data-sek-id="'.$level['id'].'"]',
                 'css_rules' => $css_rules,
