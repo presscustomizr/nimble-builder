@@ -387,6 +387,11 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
 
+            // UI for the ocal skope options
+            'Local options for the sections of the current page'  => __( 'Local options for the sections of the current page', 'text_domain_to_be_replaced'),
+            'General options' => __( 'General options', 'text_domain_to_be_replaced'),
+
+
             // Levels
             'location' => __('location', 'text_domain_to_be_replaced'),
             'section' => __('section', 'text_domain_to_be_replaced'),

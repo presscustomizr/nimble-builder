@@ -8,8 +8,10 @@ function sek_register_modules() {
         'sek_level_bg_border_module',
         'sek_level_section_layout_module',
         'sek_level_height_module',
-        'sek_spacing_module',
+        'sek_level_spacing_module',
         'sek_level_width_module',
+
+        'sek_local_skope_options_module',
 
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
@@ -199,6 +201,14 @@ function sek_get_select_options_for_input_id( $input_id ) {
             );
         break;
 
+        // LOCAL SKOPE OPTIONS UI
+        case 'local_template' :
+            $options = array(
+                'default' => __('Default theme template','text_domain_to_be_replaced'),
+                'nimble_boxed' => __('Nimble boxed page template','text_domain_to_be_replaced'),
+                'nimble_full_width' => __('Nimble full width page template','text_domain_to_be_replaced')
+            );
+        break;
 
         default :
             sek_error_log( __FUNCTION__ . ' => no case set for input id : '. $input_id );

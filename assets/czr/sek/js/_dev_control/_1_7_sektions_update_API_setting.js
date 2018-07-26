@@ -640,7 +640,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //-------------------------------------------------------------------------------------------------
                               //-- LEVEL OPTIONS
                               //-------------------------------------------------------------------------------------------------
-                              case 'sek-set-level-options' :
+                              case 'sek-generate-level-options-ui' :
                                     var _candidate_ = self.getLevelModel( params.id, newSetValue.collection ),
                                         _valueCandidate = {};
                                     if ( 'no_match'=== _candidate_ ) {
@@ -679,7 +679,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 _candidate_.options.width = _valueCandidate;
                                           break;
                                           default :
-                                                api.errare( 'updateAPISetting => unknown options_type param ' + options_type );
+                                                api.errare( 'updateAPISetting => ' + params.action + 'unknown options_type param ' + options_type );
                                           break;
                                     }
                               break;
@@ -687,6 +687,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
+                              //-------------------------------------------------------------------------------------------------
+                              //-- LOCAL SKOPE OPTIONS
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-generate-local-skope-options-ui' :
+                                    _valueCandidate = {};
+
+                                    var _currentOptions = $.extend( true, {}, _.isObject( newSetValue.options ) ? newSetValue.options : {} );
+                                    // consider only the non empty settings for db
+                                    // booleans should bypass this check
+                                    _.each( params.value || {}, function( _val_, _key_ ) {
+                                          // Note : _.isEmpty( 5 ) returns true when checking an integer,
+                                          // that's why we need to cast the _val_ to a string when using _.isEmpty()
+                                          if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
+                                            return;
+                                          _valueCandidate[ _key_ ] = _val_;
+                                    });
+                                    if ( _.isEmpty( params.options_type ) ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
+                                    }
+                                    switch( params.options_type ) {
+                                          case 'general' :
+                                                newSetValue.options = $.extend( _currentOptions, { general : _valueCandidate } );
+                                          break;
+
+                                          default :
+                                                api.errare( 'updateAPISetting => ' + params.action + 'unknown options_type param ' + options_type );
+                                          break;
+                                    }
+                              break;
 
 
 

@@ -20,6 +20,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         dfd.reject( 'generateUI => missing action' );
                   }
 
+                  // Clean previously generated UI elements
+                  self.cleanRegistered();
+
                   // REGISTER SETTING AND CONTROL
                   switch ( params.action ) {
                         // Possible content types :
@@ -35,6 +38,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         case 'sek-generate-level-options-ui' :
                               dfd = self.generateUIforLevelOptions( params, dfd );
+                        break;
+
+                        case 'sek-generate-local-skope-options-ui' :
+                              dfd = self.generateUIforLocalSkopeOptions( params, dfd );
                         break;
                   }//switch
 
@@ -106,7 +113,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing parentModuleInstance', params );
                   }
 
-                  // The new module value can be an single item object if monoitem module, or an array of item objects if multi-item crud
+                  // The new module value can be a single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
                   if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
                         moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( rawModuleValue, parentModuleType );
@@ -128,7 +135,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Set the default value
                   var refresh_stylesheet = 'refresh_stylesheet' === params.defaultPreviewAction,//<= default action for level options
                       refresh_markup = 'refresh_markup' === params.defaultPreviewAction,//<= default action for module options
-                      refresh_fonts = 'refresh_fonts' === params.defaultPreviewAction;
+                      refresh_fonts = 'refresh_fonts' === params.defaultPreviewAction,
+                      refresh_preview = 'refresh_preview' === params.defaultPreviewAction;
 
                   // Maybe set the input based value
                   var input_id = params.settingParams.args.input_changed;
@@ -144,18 +152,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( ! _.isUndefined( inputRegistrationParams.refresh_fonts ) ) {
                               refresh_fonts = Boolean( inputRegistrationParams.refresh_fonts );
                         }
+                        if ( ! _.isUndefined( inputRegistrationParams.refresh_preview ) ) {
+                              refresh_preview = Boolean( inputRegistrationParams.refresh_preview );
+                        }
                   }
 
                   var _doUpdateWithRequestedAction = function() {
                         return self.updateAPISetting({
-                              action : params.uiParams.action,
+                              action : params.uiParams.action,// mandatory : 'sek-generate-level-options-ui', 'sek_local_skope_options_module',...
                               id : params.uiParams.id,
                               value : moduleValueCandidate,
-                              in_column : params.uiParams.in_column,
-                              in_sektion : params.uiParams.in_sektion,
+                              in_column : params.uiParams.in_column,//not mandatory
+                              in_sektion : params.uiParams.in_sektion,//not mandatory
 
-                              // specific for level options
-                              options_type : params.options_type,//'layout', 'spacing', 'bg_border', 'height'
+                              // specific for level options and local skope options
+                              options_type : params.options_type,// mandatory : 'layout', 'spacing', 'bg_border', 'height', ...
 
                               settingParams : params.settingParams
                         }).done( function( ) {
@@ -181,6 +192,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           },
                                           skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                     });
+                              }
+
+                              // REFRESH THE PREVIEW ?
+                              if ( true === refresh_preview ) {
+                                    api.previewer.refresh();
                               }
                         });//self.updateAPISetting()
                   };//_doUpdateWithRequestedAction

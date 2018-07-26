@@ -59,14 +59,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
 
+                        // POPULATE THE MAIN SETTING ID NOW
+                        // + GENERATE UI FOR THE LOCAL SKOPE OPTIONS
                         // populate the settingids now if skopes are set
                         if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
                               self.setContextualCollectionSettingIdWhenSkopeSet();
+                              // Generate UI for the local skope options
+                              self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
                         }
 
                         // Set the contextual setting prefix
                         api.czr_activeSkopes.callbacks.add( function( newSkopes, previousSkopes ) {
                               self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
+                              // Generate UI for the local skope options
+                              self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
                         });
 
                         // Communicate with the preview
@@ -201,7 +207,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _toggleActive : function(){ return true; }
                   });
 
-                  // Always display the module-picker when expanding the main panel
+                  // Prepend the Nimble logo in the main panel title
                   // the panel.expanded() Value is not the right candidate to be observed because it gets changed on too many events, when generating the various UI.
                   api.panel( sektionsLocalizedData.sektionsPanelId, function( _mainPanel_ ) {
                         _mainPanel_.deferred.embedded.done( function() {
@@ -209,14 +215,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   $topPanelTitleEl = _mainPanel_.container.find('.panel-meta .accordion-section-title'),
                                   logoHtml = [ '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="', sektionsLocalizedData.baseUrl, '/assets/img/nimble/nimble_horizontal.svg', '"/>' ].join('');
 
-
-
-
                               if ( 0 < $sidePanelTitleEl.length ) {
                                     // Attach click event
-                                    $sidePanelTitleEl.on( 'click', function( evt ) {
-                                          api.previewer.trigger('sek-pick-module');
-                                    });
+                                    // $sidePanelTitleEl.on( 'click', function( evt ) {
+                                    //       api.previewer.trigger('sek-pick-module');
+                                    // });
                                     // The default title looks like this : Nimble Builder <span class="screen-reader-text">Press return or enter to open this section</span>
                                     // we want to style "Nimble Builder" only.
                                     var $sidePanelTitleElSpan = $sidePanelTitleEl.find('span');
