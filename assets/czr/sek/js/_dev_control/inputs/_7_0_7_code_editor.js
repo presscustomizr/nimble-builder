@@ -51,7 +51,10 @@
                         // e.g. bad ui (bad inline CSS maths), not visible content until click.
                         setTimeout( function() {
                               if ( editorSettings ) {
-                                    initSyntaxHighlightingEditor( editorSettings );
+                                    try { initSyntaxHighlightingEditor( editorSettings ); } catch( er ) {
+                                          api.errare( 'error in sek_control => code_editor() input', er );
+                                          initPlainTextareaEditor();
+                                    }
                               } else {
                                     initPlainTextareaEditor();
                               }
@@ -102,7 +105,7 @@
                               suspendEditorUpdate = false;
                         });
 
-                        input.editor.codemirror.setValue( input.input_parent().html_content );
+                        input.editor.codemirror.setValue( input() );
 
                         // Update CodeMirror when the setting is changed by another plugin.
                         /* TODO: check this */
