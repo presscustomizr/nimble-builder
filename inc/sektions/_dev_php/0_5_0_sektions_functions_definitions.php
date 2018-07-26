@@ -12,10 +12,11 @@ if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFI
 // @return array
 function sek_get_locations() {
   return apply_filters( 'sek_locations', [
+      // Note : the order is important
       'loop_start',
-      'loop_end',
       'before_content',
-      'after_content'
+      'after_content',
+      'loop_end'
   ] );
 }
 
@@ -453,6 +454,30 @@ function sek_error_log( $title, $content = null ) {
         error_log( '<' . $title . '>' );
         error_log( print_r( $content, true ) );
         error_log( '</' . $title . '>' );
+    }
+}
+
+// @return mixed null || string
+function sek_get_locale_template(){
+    $path = null;
+    $localSkopeNimble = sek_get_skoped_seks( skp_build_skope_id() );
+    if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['general'] ) && ! empty( $localSkopeNimble['options']['general']['local_template'] ) && 'default' !== $localSkopeNimble['options']['general']['local_template'] ) {
+        $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['general']['local_template'] . '.php';
+        if ( file_exists( $path ) ) {
+            $template = $path;
+        } else {
+            sek_error_log( __FUNCTION__ .' the custom template does not exist', $path );
+        }
+    }
+    return $path;
+}
+
+//@return void()
+function render_content_sections() {
+    foreach( sek_get_locations() as $hook ) {
+        do_action( "sek_before_location_{$hook}" );
+        SEK_Front()->_render_seks_for_location( $hook );
+        do_action( "sek_after_location_{$hook}" );
     }
 }
 ?>

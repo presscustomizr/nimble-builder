@@ -7,6 +7,23 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
             if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
 
+            add_action( 'wp_head', array( $this, 'sek_schedule_rendering_hooks') );
+
+            // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
+            add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
+
+            // SCHEDULE THE ASSETS ENQUEUING
+            add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
+
+            // USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+            add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
+        }
+
+        function sek_schedule_rendering_hooks() {
+            $locale_template = sek_get_locale_template();
+            if ( !empty( $locale_template ) )
+              return;
+
             // SCHEDULE THE ACTIONS ON HOOKS AND CONTENT FILTERS
             foreach( sek_get_locations() as $hook ) {
                 switch ( $hook ) {
@@ -22,16 +39,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     break;
                 }
             }
-
-            add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
-
-            // SCHEDULE THE ASSETS ENQUEUING
-            add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
-
-            // USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
-            add_filter( 'template_include', array( $this, 'sek_maybe_set_custom_nimble_template') );
         }
-
 
         // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
         // @filter the_content::NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY
@@ -55,15 +63,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // hook : loop_start, loop_end
         function sek_schedule_sektions_rendering() {
+            $hook = current_filter();
             // A location can be rendered only once
             // for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
             // @see issue with Twenty Seventeen here : https://github.com/presscustomizr/nimble-builder/issues/14
             // That's why we check if did_action( ... )
-            if ( did_action( 'sek_before_location_' . current_filter() ) )
+            if ( did_action( "sek_before_location_{$hook}" ) )
               return;
-            do_action( 'sek_before_location_' . current_filter() );
-            $this->_render_seks_for_location( current_filter() );
-            do_action( 'sek_after_location_' . current_filter() );
+            do_action( "sek_before_location_{$hook}" );
+            $this->_render_seks_for_location( $hook );
+            do_action( "sek_after_location_{$hook}" );
         }
 
         // hook : 'the_content'::-9999
@@ -95,7 +104,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
 
-        private function _render_seks_for_location( $location = '' ) {
+        public function _render_seks_for_location( $location = '' ) {
             if ( ! in_array( $location, sek_get_locations() ) ) {
                 error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
@@ -423,20 +432,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // @hook 'template_include'
         // @return template path
-        function sek_maybe_set_custom_nimble_template( $template ) {
-              $localSkopeNimble = sek_get_skoped_seks( skp_build_skope_id() );
-              //sek_error_log('$localSkopeNimble', $localSkopeNimble );
-
-              if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['general'] ) && ! empty( $localSkopeNimble['options']['general']['local_template'] ) && 'default' !== $localSkopeNimble['options']['general']['local_template'] ) {
-                  $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['general']['local_template'] . '.php';
-                  if ( file_exists( $path ) ) {
-                      $template = $path;
-                  } else {
-                      sek_error_log( __CLASS__ .'::'.__FUNCTION__ .' the custom template does not exist', $path );
-                  }
-              }
-              // error_log( 'DID_ACTION WP => ' . did_action('wp') );
-              return $template;
+        function sek_maybe_set_local_nimble_template( $template ) {
+            $locale_template = sek_get_locale_template();
+            if ( !empty( $locale_template ) ) {
+                $template = $locale_template;
+            }
+            // error_log( 'DID_ACTION WP => ' . did_action('wp') );
+            return $template;
         }
     }//class
 endif;

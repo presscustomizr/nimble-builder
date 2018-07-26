@@ -5,10 +5,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 get_header();
-
-//  echo sections here.
-//  the_content should be a default section in singulars ?
-do_action('loop_start');
-echo apply_filters( 'the_content', '' );
-do_action('loop_end');
+render_content_sections();
 get_footer();
