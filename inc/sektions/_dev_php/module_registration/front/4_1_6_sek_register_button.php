@@ -202,6 +202,27 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_selectors' => $css_font_selectors,
                                 'width-100'         => true,
                             ),//24,//"20px",
+                            'color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $css_font_selectors
+                            ),//"#000000",
+                            'color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover',
+                                'css_selectors' => $css_font_selectors
+                            ),//"#000000",
                             'font_weight_css'     => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
@@ -255,27 +276,6 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_selectors' => $css_font_selectors,
                                 'width-100'   => true,
                             ),//0,
-                            'color_css'           => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => $css_font_selectors
-                            ),//"#000000",
-                            'color_hover_css'     => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'css_identifier' => 'color_hover',
-                                'css_selectors' => $css_font_selectors
-                            ),//"#000000",
                             // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                             'button___flag_important'       => array(
                                 'input_type'  => 'gutencheck',

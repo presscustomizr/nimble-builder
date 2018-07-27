@@ -17,7 +17,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
             'item-inputs' => array(
                 'tabs' => array(
                     array(
-                        'title' => __( 'Content', 'text_domain_to_be_replaced' ),
+                        'title' => __( 'General design', 'text_domain_to_be_replaced' ),
                         //'attributes' => 'data-sek-device="desktop"',
                         'inputs' => array(
                             'content' => array(
@@ -32,13 +32,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'h_alignment'
-                            )
-                        )
-                    ),
-                    array(
-                        'title' => __('Font style', 'text_domain_to_be_replaced'),
-                        'attributes' => 'data-sek-google-font-tab="true"',
-                        'inputs' => array(
+                            ),
                             'font_family_css' => array(
                                 'input_type'  => 'font_picker',
                                 'title'       => __('Font family', 'text_domain_to_be_replaced'),
@@ -71,6 +65,56 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'line_height'
                             ),//24,//"20px",
+                            'color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __('Text color', 'text_domain_to_be_replaced'),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color'
+                            ),//"#000000",
+                            'color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced'),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover'
+                            ),//"#000000",
+                            // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
+                            'tiny_mce___flag_important'  => array(
+                                'input_type'  => 'gutencheck',
+                                'title'       => __('Apply the style options in priority (uses !important).', 'text_domain_to_be_replaced'),
+                                'default'     => 0,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                // declare the list of input_id that will be flagged with !important when the option is checked
+                                // @see sek_add_css_rules_for_css_sniffed_input_id
+                                // @see Nsek_is_flagged_important
+                                'important_input_list' => array(
+                                    'font_family_css',
+                                    'font_size_css',
+                                    'line_height_css',
+                                    'font_weight_css',
+                                    'font_style_css',
+                                    'text_decoration_css',
+                                    'text_transform_css',
+                                    'letter_spacing_css',
+                                    'color_css',
+                                    'color_hover_css'
+                                )
+                            ),//false
+                        )
+                    ),
+                    array(
+                        'title' => __('Other font settings', 'text_domain_to_be_replaced'),
+                        'attributes' => 'data-sek-google-font-tab="true"',
+                        'inputs' => array(
                             'font_weight_css'     => array(
                                 'input_type'  => 'select',
                                 'title'       => __('Font weight', 'text_domain_to_be_replaced'),
@@ -118,49 +162,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'letter_spacing',
                                 'width-100'   => true,
-                            ),//0,
-                            'color_css'           => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Text color', 'text_domain_to_be_replaced'),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'css_identifier' => 'color'
-                            ),//"#000000",
-                            'color_hover_css'     => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced'),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'css_identifier' => 'color_hover'
-                            ),//"#000000",
-                            // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
-                            'tiny_mce___flag_important'  => array(
-                                'input_type'  => 'gutencheck',
-                                'title'       => __('Make those style options win if other rules are applied.', 'text_domain_to_be_replaced'),
-                                'default'     => 0,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                // declare the list of input_id that will be flagged with !important when the option is checked
-                                // @see sek_add_css_rules_for_css_sniffed_input_id
-                                // @see Nsek_is_flagged_important
-                                'important_input_list' => array(
-                                    'font_family_css',
-                                    'font_size_css',
-                                    'line_height_css',
-                                    'font_weight_css',
-                                    'font_style_css',
-                                    'text_decoration_css',
-                                    'text_transform_css',
-                                    'letter_spacing_css',
-                                    'color_css',
-                                    'color_hover_css'
-                                )
-                            ),//false
+                            )//0,
                         )
                     )
                 )
