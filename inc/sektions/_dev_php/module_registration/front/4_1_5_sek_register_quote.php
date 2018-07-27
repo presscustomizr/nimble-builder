@@ -38,6 +38,7 @@ function sek_get_module_params_for_czr_quote_module() {
         'starting_value' => array(
             'quote_text'  => __('Hey, careful, man, there\'s a beverage here!','text_domain_to_be_replaced'),
             'cite_text'   => sprintf( __('The Dude in %1s', 'text_domain_to_be_replaced'), '<a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>' ),
+            'cite_font_style_css' => 'italic',
             'quote_design' => 'border-before'
         ),
         'css_selectors' => array( '.sek-module-inner' ),
@@ -362,16 +363,6 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'css_identifier' => 'border_color',
                                 'css_selectors' => '.sek-quote.sek-quote-design.sek-border-before'
                             ),
-                            'icon_color_css' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Icon Color', 'text_domain_to_be_replaced' ),
-                                'width-100'   => true,
-                                'default'     => '#ccc',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => '.sek-quote.sek-quote-design.sek-quote-icon-before::before'
-                            ),
                             'icon_size_css' => array(
                                 'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Icon Size', 'text_domain_to_be_replaced' ),
@@ -384,6 +375,16 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'css_identifier' => 'font_size',
                                 'css_selectors' => array( '.sek-quote.sek-quote-design.sek-quote-icon-before::before', '.sek-quote.sek-quote-design.sek-quote-icon-before' )
                             ),
+                            'icon_color_css' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Icon Color', 'text_domain_to_be_replaced' ),
+                                'width-100'   => true,
+                                'default'     => '#ccc',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => '.sek-quote.sek-quote-design.sek-quote-icon-before::before'
+                            )
                         )
                     )
                 )
