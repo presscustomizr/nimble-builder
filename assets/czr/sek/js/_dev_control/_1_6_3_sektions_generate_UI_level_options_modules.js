@@ -69,7 +69,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   if ( 'module' === params.level ) {
                         $.extend( levelRegistrationParams, {
-                              layout : {
+                              width : {
                                     settingControlId : params.id + '__width_options',
                                     module_type : 'sek_level_width_module',
                                     controlLabel : sektionsLocalizedData.i18n['Width settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
