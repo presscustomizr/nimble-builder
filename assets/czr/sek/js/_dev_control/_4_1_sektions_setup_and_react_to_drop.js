@@ -241,8 +241,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var yPos = evt.clientY,
                             xPos = evt.clientX,
                             APPROACHING_DIST = 120,
-                            CLOSE_DIST = 60,
-                            VERY_CLOSE_DIST = 40;
+                            CLOSE_DIST = 80,
+                            VERY_CLOSE_DIST = 60;
 
                         var dzoneRect = $(this)[0].getBoundingClientRect(),
                             mouseToYCenter = Math.abs( yPos - ( dzoneRect.bottom - ( dzoneRect.bottom - dzoneRect.top )/2 ) ),
@@ -276,23 +276,41 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // html += ' | yPos : ' + yPos + ' | zoneRect.top : ' + dzoneRect.top + ' | zoneRect.bottom : ' + dzoneRect.bottom;
                         // $(this).html( '<span style="font-size:10px">' + html + '</span>');
 
-                        if ( ( isVeryCloseVertically || isInVertically ) && ( isVeryCloseHorizontally || isInHorizontally ) ) {
-                              $(this).addClass( 'sek-drag-is-very-close');
-                              $(this).removeClass( 'sek-drag-is-close');
-                              $(this).removeClass( 'sek-drag-is-approaching' );
-                        } else if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
-                              $(this).addClass( 'sek-drag-is-close');
+                        //var html = '';
+
+                        if ( isInVertically && isInHorizontally ) {
+                              $(this).removeClass( 'sek-drag-is-approaching');
+                              $(this).removeClass( 'sek-drag-is-close' );
                               $(this).removeClass( 'sek-drag-is-very-close');
-                              $(this).removeClass( 'sek-drag-is-approaching' );
+                              $(this).addClass( 'sek-drag-is-in');
+                              //html += 'is IN';
+                        } else if ( ( isVeryCloseVertically || isInVertically ) && ( isVeryCloseHorizontally || isInHorizontally ) ) {
+                              $(this).removeClass( 'sek-drag-is-approaching');
+                              $(this).removeClass( 'sek-drag-is-close' );
+                              $(this).addClass( 'sek-drag-is-very-close');
+                              $(this).removeClass( 'sek-drag-is-in');
+                              //html += 'is very close';
+                        } else if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
+                              $(this).removeClass( 'sek-drag-is-approaching');
+                              $(this).addClass( 'sek-drag-is-close' );
+                              $(this).removeClass( 'sek-drag-is-very-close');
+                              $(this).removeClass( 'sek-drag-is-in');
+                              //html += 'is close';
                         } else if ( ( isApproachingVertically || isInVertically ) && ( isApproachingHorizontally || isInHorizontally ) ) {
                               $(this).addClass( 'sek-drag-is-approaching');
-                              $(this).removeClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-close' );
+                              $(this).removeClass( 'sek-drag-is-very-close');
+                              $(this).removeClass( 'sek-drag-is-in');
+                              //html += 'is approaching';
                         } else {
-                              $(this).removeClass( 'sek-drag-is-very-close');
+                              $(this).removeClass( 'sek-drag-is-approaching');
                               $(this).removeClass( 'sek-drag-is-close' );
-                              $(this).removeClass( 'sek-drag-is-approaching' );
+                              $(this).removeClass( 'sek-drag-is-very-close');
+                              $(this).removeClass( 'sek-drag-is-in');
                         }
+
+
+                        //$(this).html( '<span style="font-size:10px">' + html + '</span>');
                   });//$('.sek-drop-zones').each()
 
                   // Reset the timer
@@ -380,6 +398,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $dropTarget.removeClass( 'sek-active-drop-zone' );
                   $dropTarget.find('.sek-drop-zone').removeClass('sek-drag-is-close');
                   $dropTarget.find('.sek-drop-zone').removeClass('sek-drag-is-approaching');
+
+                  $dropTarget.removeClass('sek-feed-me-seymore');
             },
 
 
@@ -422,6 +442,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Flag the preDrop element with class to apply a specific style if inserted in a new sektion of in a column
                         $dropTarget.find( '.' + sektionsLocalizedData.preDropElementClass ).toggleClass('in-new-sektion', inNewSection );
                         $dropTarget.data( 'preDrop-position', newPosition );
+
+                        $dropTarget.addClass('sek-feed-me-seymore');
 
                         self.isPrintingPreDrop = false;
                         self.$currentPreDropTarget = $dropTarget;

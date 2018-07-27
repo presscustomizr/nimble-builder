@@ -711,12 +711,21 @@
 }
 .sek-dragging .sek-drag-is-very-close.sek-dynamic-drop-zone {
   height: 75px;
-  -webkit-transition: all 0.4s ease;
-  -o-transition: all 0.4s ease;
-  transition: all 0.4s ease;
+  -webkit-transition: all 0.65s ease;
+  -o-transition: all 0.65s ease;
+  transition: all 0.65s ease;
 }
-
-
+.sek-dragging .sek-drag-is-in.sek-dynamic-drop-zone {
+  height: 100px;
+  -webkit-transition: all 0.45s ease;
+  -o-transition: all 0.45s ease;
+  transition: all 0.45s ease;
+}
+.sek-dragging .sek-feed-me-seymore {
+  -moz-box-shadow:    inset 0 0 30px #000000;
+  -webkit-box-shadow: inset 0 0 30px #000000;
+  box-shadow:         inset 0 0 30px #000000;
+}
 .sek-dragging [data-sek-location="between-modules-and-nested-sections"], .sek-dragging .sek-module-drop-zone-for-first-module {
   background: #dcefff;
   background: rgba(220, 239, 255, 0.84);
@@ -981,8 +990,6 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  height: calc(100% - 26px);/*26px is the padding-top of the .sek-column when previewing to let enough place for the ui icons */
-  top: 26px;/*26px is the padding-top of the .sek-column when previewing to let enough place for the ui icons */
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
