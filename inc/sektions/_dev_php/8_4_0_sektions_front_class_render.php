@@ -98,6 +98,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 ob_start();
                 $this->_render_seks_for_location( $where );
                 $html = 'before_content' == $where ? ob_get_clean() . $html : $html . ob_get_clean();
+                // Collapse line breaks before and after <div> elements so they don't get autop'd.
+                // @see function wpautop() in wp-includes\formatting.php
+                if ( strpos( $html, '<div' ) !== false ) {
+                  $html = preg_replace( '|\s*<div|', '<div', $html );
+                  $html = preg_replace( '|</div>\s*|', '</div>', $html );
+                }
             }
 
             return $html;
@@ -123,6 +129,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
 
                 add_filter('the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
+
 
             } else {
                 error_log( __CLASS__ . ' :: ' . __FUNCTION__ .' => sek_get_skoped_seks() should always return an array().');
