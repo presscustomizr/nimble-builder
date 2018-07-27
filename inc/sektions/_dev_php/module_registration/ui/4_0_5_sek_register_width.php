@@ -85,7 +85,7 @@ function sek_add_css_rules_for_level_width( $rules, $level ) {
                 $numeric = sek_extract_numeric_value( $width );
                 if ( !empty( $numeric ) ) {
                     $unit = sek_extract_unit( $width );
-                    $unit = '%' === $unit ? 'vw' : $unit;
+                    //$unit = '%' === $unit ? 'vw' : $unit;
                     $css_rules .= 'width:' . $numeric . $unit . ';';
                 }
             }
