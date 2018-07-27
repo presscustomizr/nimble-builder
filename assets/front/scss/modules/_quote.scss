@@ -32,9 +32,16 @@
         }
         .#{$project-prefix}quote-inner {
             color: inherit;
+            @if ( true == $is_rtl ) {
+              padding-right: calc( 10px + 1.3em );
+            }
+            @else {
+              padding-left: calc( 10px + 1.3em );
+            }
         }
         .#{$project-prefix}quote-content {
             font-weight: 400;
+            font-size: 16px;//as defined as default value on module registration
             color: inherit;
         }
         //border before
@@ -84,13 +91,13 @@
         &.#{$project-prefix}quote-icon-before {
             position: relative;
             display: flex;
+            font-size: 32px;
             .#{$project-prefix}quote-content *:last-child {
                 margin-bottom: .75em;
             }
             &::before {
                 content: '\f10d';
                 color: #ccc;
-                font-size: 32px;
                 font-weight: 900;
                 font-style: normal;
                 text-align: center;
@@ -103,12 +110,15 @@
                 position: static;
                 width: auto;
                 margin: 0;
+
                 @if ( true == $is_rtl ) {
-                  padding-left: 17px;
+                  right: 0;
                 }
                 @else {
-                  padding-right: 17px;
+                  left: 0;
                 }
+                position: absolute;
+                top: 0;
             }
         }
     }

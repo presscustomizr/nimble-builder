@@ -382,7 +382,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size',
-                                'css_selectors' => '.sek-quote.sek-quote-design.sek-quote-icon-before::before'
+                                'css_selectors' => array( '.sek-quote.sek-quote-design.sek-quote-icon-before::before', '.sek-quote.sek-quote-design.sek-quote-icon-before' )
                             ),
                         )
                     )
