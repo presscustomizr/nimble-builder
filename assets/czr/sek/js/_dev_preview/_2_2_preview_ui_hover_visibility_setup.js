@@ -315,8 +315,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.mouseMovedRecently( { x : evt.clientX, y : evt.clientY } );
                         clearTimeout( $(window).data('_scroll_move_timer_') );
                         $(window).data('_scroll_move_timer_', setTimeout(function() {
-                              self.mouseMovedRecently.set( {} );
-                        }, 2000 ) );
+                              //self.mouseMovedRecently.set( {} );
+                        }, 4000 ) );
                   }, 50 ) );
 
                   // Always reset the move timer and the mouseMove Value when
