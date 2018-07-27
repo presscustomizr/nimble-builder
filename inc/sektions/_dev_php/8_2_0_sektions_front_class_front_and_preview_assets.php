@@ -38,7 +38,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             wp_enqueue_script(
                 'sek-main-js',
                 NIMBLE_BASE_URL . '/assets/front/js/sek-main.js',
-                array( 'jquery'),
+                array( 'jquery', 'underscore'),
                 NIMBLE_ASSETS_VERSION,
                 true
             );
