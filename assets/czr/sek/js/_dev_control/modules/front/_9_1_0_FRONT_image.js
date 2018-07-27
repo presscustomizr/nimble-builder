@@ -83,10 +83,13 @@
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'link-custom-url' :
-                                                                  bool = 'url' == input() && '_custom_' == item.czr_Input('link-pick-url')().id;
+                                                                  bool = 'url' === input() && '_custom_' == item.czr_Input('link-pick-url')().id;
                                                             break;
-                                                            default :
-                                                                  bool = 'url' == input();
+                                                            case 'link-pick-url' :
+                                                                  bool = 'url' === input();
+                                                            break;
+                                                            case 'link-target' :
+                                                                  bool = 'no-link' !== input();
                                                             break;
                                                       }
                                                       return bool;
@@ -98,6 +101,26 @@
                                     case 'link-pick-url' :
                                           scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                 return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
+                                          });
+                                    break;
+                                    case 'border_width_css' :
+                                          _.each( [ 'border_color_css' ] , function( _inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var inputVal = input(),
+                                                          numericValue = _.isString( inputVal ) ? inputVal.replace(/px|em|%/g,'') : inputVal;
+                                                      return ! _.isEmpty( input() ) && (numericValue * 1) > 0;
+                                                }); } catch( er ) {
+                                                      api.errare( 'Button module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'use_custom_width' :
+                                          _.each( [ 'custom_width' ] , function( _inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                }); } catch( er ) {
+                                                      api.errare( 'Button module => error in setInputVisibilityDeps', er );
+                                                }
                                           });
                                     break;
                               }

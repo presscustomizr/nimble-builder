@@ -56,6 +56,19 @@ function sek_get_select_options_for_input_id( $input_id ) {
                 'img-page' =>__('Image page', 'text_domain_to_be_replaced' )
             );
         break;
+        case 'img_hover_effect' :
+            $options = array(
+                'none' => __('No effect', 'text_domain_to_be_replaced' ),
+                'opacity' => __('Opacity', 'text_domain_to_be_replaced' ),
+                'zoom-out' => __('Zoom out', 'text_domain_to_be_replaced' ),
+                'zoom-in' => __('Zoom in', 'text_domain_to_be_replaced' ),
+                'move-up' =>__('Move up', 'text_domain_to_be_replaced' ),
+                'move-down' =>__('Move down', 'text_domain_to_be_replaced' ),
+                'blur' =>__('Blur', 'text_domain_to_be_replaced' ),
+                'grayscale' =>__('Grayscale', 'text_domain_to_be_replaced' ),
+                'reverse-grayscale' =>__('Reverse grayscale', 'text_domain_to_be_replaced' )
+            );
+        break;
         case 'img-size' :
             $options = sek_get_img_sizes();
         break;
