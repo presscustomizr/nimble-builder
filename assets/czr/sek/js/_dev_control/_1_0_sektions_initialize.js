@@ -244,7 +244,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         what : 'panel',
                         id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
                         title: sektionsLocalizedData.i18n['Nimble Builder'],
-                        priority : 1000,
+                        priority : -1000,
                         constructWith : SektionPanelConstructor,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                   });
