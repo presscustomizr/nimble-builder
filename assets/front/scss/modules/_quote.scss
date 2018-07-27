@@ -3,7 +3,12 @@
         margin: 0 0 .5em;
         padding: 0;
     }
-    &.sek-quote-design {
+    .#{$project-prefix}cite {
+        font-size: 13px;
+        line-height: 1.5em;
+        font-style: inherit;
+    }
+    &.#{$project-prefix}quote-design {
         //reset
         background: none;
         font-style: inherit;
@@ -19,38 +24,21 @@
             display: none;
         }
         .#{$project-prefix}cite {
-            font-size: 13px;
-            clear: both;
-            display: block;
-            margin-top: 1.5em;
-            position: relative;
-            @if ( true == $is_rtl ) {
-              padding-right: 2.2em;
-              padding-left: 0.25em;
-            }
-            @else {
-              padding-left: 2.2em;
-              padding-right: 0.25em;
-            }
+            padding: 0;
             &::before {
-                content: '';
-                top: 1em;
-                position: absolute;
-                background: none;
-                width: 2em;
-                height: auto;
-                @if ( true == $is_rtl ) {
-                  right: 0;
-                }
-                @else {
-                  left: 0;
-                }
-                //border color inherited from the text color
-                border-top: 1px solid;
+                display: none;
             }
+            font-weight: normal;
+        }
+        .#{$project-prefix}quote-inner {
+            color: inherit;
+        }
+        .#{$project-prefix}quote-content {
+            font-weight: 400;
+            color: inherit;
         }
         //border before
-        &.sek-border-before {
+        &.#{$project-prefix}border-before {
             @if ( true == $is_rtl ) {
               padding-right: 15px;
               border-right: 5px solid;
@@ -58,6 +46,69 @@
             @else {
               padding-left: 15px;
               border-left: 5px solid;
+            }
+            .#{$project-prefix}cite {
+                clear: both;
+                display: block;
+                margin-top: 1.5em;
+                position: relative;
+                font-style: italic;
+                @if ( true == $is_rtl ) {
+                  padding-right: 2.2em;
+                  padding-left: 0.25em;
+                }
+                @else {
+                  padding-left: 2.2em;
+                  padding-right: 0.25em;
+                }
+                &::before {
+                    display: block;
+                    content: '';
+                    top: 1em;
+                    position: absolute;
+                    background: none;
+                    width: 2em;
+                    height: auto;
+                    @if ( true == $is_rtl ) {
+                      right: 0;
+                    }
+                    @else {
+                      left: 0;
+                    }
+                    //border color inherited from the text color
+                    border-top: 1px solid;
+                }
+            }
+        }
+        //icon before
+        &.#{$project-prefix}quote-icon-before {
+            position: relative;
+            display: flex;
+            .#{$project-prefix}quote-content *:last-child {
+                margin-bottom: .75em;
+            }
+            &::before {
+                content: '\f10d';
+                color: #ccc;
+                font-size: 32px;
+                font-weight: 900;
+                font-style: normal;
+                text-align: center;
+                font-family: 'Font Awesome 5 Free';
+                -moz-osx-font-smoothing: grayscale;
+                -webkit-font-smoothing: antialiased;
+                font-variant: normal;
+                text-rendering: auto;
+                display: flex;
+                position: static;
+                width: auto;
+                margin: 0;
+                @if ( true == $is_rtl ) {
+                  padding-left: 17px;
+                }
+                @else {
+                  padding-right: 17px;
+                }
             }
         }
     }
