@@ -18,18 +18,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Is the UI currently displayed the one that is being requested ?
                   // If so, visually remind the user that a module should be dragged
                   if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
-                        api.control( _id_ ).focus({
-                              completeCallback : function() {
-                                    var $container = api.control( _id_ ).container;
-                                    // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
-                                    if ( $container.hasClass( 'button-see-me') )
-                                      return;
-                                    $container.addClass('button-see-me');
-                                    _.delay( function() {
-                                         $container.removeClass('button-see-me');
-                                    }, 800 );
-                              }
-                        });
+                        // api.control( _id_ ).focus({
+                        //       completeCallback : function() {
+                        //             var $container = api.control( _id_ ).container;
+                        //             // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
+                        //             if ( $container.hasClass( 'button-see-me') )
+                        //               return;
+                        //             $container.addClass('button-see-me');
+                        //             _.delay( function() {
+                        //                  $container.removeClass('button-see-me');
+                        //             }, 800 );
+                        //       }
+                        // });
                         return dfd;
                   }
 
