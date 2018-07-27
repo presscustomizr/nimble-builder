@@ -92,7 +92,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         clearTimeout( $menu.data('_toggle_ui_menu_') );
                         $menu.data( '_toggle_ui_menu_', setTimeout(function() {
                               setClassesAndVisibilities.call( $menu );
-                        }, 5000 ) );
+                        }, 10000 ) );
                       },
                       setClassesAndVisibilities = function( expand ) {
                             var $menu = $(this),
@@ -289,11 +289,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               // sniff levels and print UI
                               _sniffLevelsAndPrintUI( position );
                         } else {
+                              // Mouse didn't move recently?
+                              // => remove all UIs
                               $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
                                     $(this).fadeOut( {
                                           duration : 200,
                                           complete : function() { $(this).remove(); }
                                     });
+                              });
+                              $('body').stop( true, true ).find('[data-sek-level]').each( function() {
+                                    // preserve if the ui menu is expanded, otherwise remove
+                                    if ( $(this).children('.sek-dyn-ui-wrapper').find('.sek-is-expanded').length < 1 ) {
+                                          removeLevelUI.call( $(this) );
+                                    }
                               });
                         }
                   });
@@ -308,7 +316,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         clearTimeout( $(window).data('_scroll_move_timer_') );
                         $(window).data('_scroll_move_timer_', setTimeout(function() {
                               self.mouseMovedRecently.set( {} );
-                        }, 4000 ) );
+                        }, 2000 ) );
                   }, 50 ) );
 
                   // Always reset the move timer and the mouseMove Value when
