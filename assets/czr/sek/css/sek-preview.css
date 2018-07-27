@@ -695,6 +695,11 @@
   background: #ddd;
   border-radius: 5px;
 }
+.sek-dragging .sek-drop-zone {
+  -webkit-transition: all 1s ease;
+  -o-transition: all 1s ease;
+  transition: all 1s ease;
+}
 .sek-dragging [data-sek-location="between-sections"], .sek-dragging [data-sek-location="in-empty-location"]{
   background: #ddd;
   border:2px dotted #72777c;
