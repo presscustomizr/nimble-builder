@@ -3,7 +3,8 @@
     align-items: center;
 }
 .#{$project-prefix}btn.box-shadow {
-    box-shadow: 0 3px 8px rgba(0,0,0,.2) !important;
+    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
     &.push-effect:active {
         transform: translateY(2px);
     }
