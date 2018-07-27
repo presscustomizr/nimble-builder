@@ -30,9 +30,9 @@ if ( ! function_exists( __NAMESPACE__ . '\sek_print_quote_content' ) ) {
 // print the module content if not empty
 if ( ! empty( $value['quote_text'] ) ) {
     sek_print_quote_content(
-        sprintf( '<blockquote class="sek-quote%3$s"><div class="sek-quote-content">%1$s</div>%2$s</blockquote>',
+        sprintf( '<blockquote class="sek-quote%3$s"><div class="sek-quote-inner"><div class="sek-quote-content">%1$s</div>%2$s</div></blockquote>',
             wpautop( $value['quote_text'] ),
-            ! empty( $value['cite_text'] ) ? sprintf( '<footer><cite class="sek-cite">%1$s</cite></footer>', $value['cite_text'] ) : '',
+            ! empty( $value['cite_text'] ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', $value['cite_text'] ) : '',
             empty( $value['quote_design'] ) || 'none' == $value['quote_design'] ? '' : " sek-quote-design sek-{$value['quote_design']}"
         ),
         'quote_text',

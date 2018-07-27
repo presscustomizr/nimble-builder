@@ -155,7 +155,8 @@ function sek_get_select_options_for_input_id( $input_id ) {
         case 'quote_design' :
             $options = array(
                 'none' => __( 'No design', 'text_domain_to_be_replaced' ),
-                'border-before' => __( 'Border on the left (right for RTL users)', 'text_domain_to_be_replaced' ),
+                'border-before' => __( 'Side Border', 'text_domain_to_be_replaced' ),
+                'quote-icon-before' => __( 'Quote Icon', 'text_domain_to_be_replaced' ),
             );
         break;
 
