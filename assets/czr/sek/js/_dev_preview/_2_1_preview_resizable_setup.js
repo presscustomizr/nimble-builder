@@ -8,12 +8,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   $('.sektion-wrapper').find( 'div[data-sek-level="section"]' ).each( function() {
                         self.maybeMakeColumnResizableInSektion.call( this );
                   });
-                  // Delegate instantiation when a module is added ( => column re-rendered )
+                  // Delegate instantiation when a level markup is refreshed
+                  // Let the event bubble up to the location, and then visit all children section to maybe re-instantiate resizable
+                  // @fixes https://github.com/presscustomizr/nimble-builder/issues/165
                   $('body').on(
-                        'sek-modules-refreshed sek-columns-refreshed',
-                        'div[data-sek-level="section"]',
-                        function(evt) {
-                              self.maybeMakeColumnResizableInSektion.call( this );
+                        'sek-level-refreshed',
+                        '[data-sek-level="location"]',
+                        function() {
+                              $(this).find('[data-sek-level="section"]').each( function() {
+                                    self.maybeMakeColumnResizableInSektion.call( this );
+                              });
                         }
                   );
                   return this;
