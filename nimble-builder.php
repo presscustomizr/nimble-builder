@@ -76,7 +76,7 @@ add_action( 'after_setup_theme', function() {
 
 require_once( plugin_dir_path( __FILE__ ) . 'inc/sektions/ccat-sektions.php' );
 
-if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
+if ( defined( 'NIMBLE_PRINT_TEST' ) && NIMBLE_PRINT_TEST && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
     require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
 }
 
