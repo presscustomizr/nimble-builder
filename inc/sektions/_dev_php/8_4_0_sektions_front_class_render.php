@@ -202,16 +202,23 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 break;
 
                 case 'section' :
-                    $is_nested            = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
+                    $is_nested = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
                     $has_at_least_one_module = sek_section_has_modules( $collection );
                     $column_container_class = 'sek-container-fluid';
                     //when boxed use proper container class
-                    if ( ! empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
+                    if ( !empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
                         $column_container_class = 'sek-container';
                     }
+                    $custom_anchor = null;
+                    if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'anchor' ] ) && !empty( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
+                        if ( is_string( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
+                            $custom_anchor = $model[ 'options' ][ 'anchor' ]['custom_anchor'];
+                        }
+                    }
+
                     ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s">', $id, $is_nested ? 'data-sek-is-nested="true"' : '', $has_at_least_one_module ? 'sek-has-modules' : '' ); ?>
-                          <div class="<?php echo $column_container_class ?>">
+                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s" %4$s>', $id, $is_nested ? 'data-sek-is-nested="true"' : '', $has_at_least_one_module ? 'sek-has-modules' : '', is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"' ); ?>
+                          <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
                                 <?php
                                   // Set the parent model now

@@ -63,4 +63,21 @@ jQuery( function($){
     //         doFitText();
     //     });
     // }
+
+    // animate menu item to Nimble anchors
+    $('body').on( 'click', '.menu .menu-item [href^="#"]', function( evt){
+          evt.preventDefault();
+          var anchorCandidate = $(this).attr('href');
+          anchorCandidate = _.isString( anchorCandidate ) ? anchorCandidate.replace('#','') : '';
+
+          if ( !_.isEmpty( anchorCandidate ) ) {
+          var $anchorCandidate = $('[data-sek-level="location"]' ).find( '[id="' + anchorCandidate + '"]');
+          if ( 1 === $anchorCandidate.length ) {
+                $('html, body').animate({
+                      scrollTop : $anchorCandidate.offset().top - 150
+                }, 'slow');
+          }
+    }
+    });
+
 });

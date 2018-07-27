@@ -14,20 +14,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return the state promise dfd
             generateUIforLevelOptions : function( params, dfd ) {
                   var self = this;
-                  // Generate the UI for level options
-                  var sectionLayoutOptionsSetId = params.id + '__sectionLayout_options',
-                      bgBorderOptionsSetId = params.id + '__bgBorder_options',
-                      heightOptionsSetId = params.id + '__height_options',
-                      spacingOptionsSetId = params.id + '__spacing_options',
-                      widthOptionsSetId = params.id + '__width_options';
-
-                  // Is the UI currently displayed the one that is being requested ?
-                  // If so, don't generate the ui again, simply focus on the section
-                  if ( self.isUIControlAlreadyRegistered( bgBorderOptionsSetId ) || self.isUIControlAlreadyRegistered( heightOptionsSetId ) || self.isUIControlAlreadyRegistered( spacingOptionsSetId ) ) {
-                        api.section( api.control( bgBorderOptionsSetId ).section() ).expanded( true );
-                        return dfd;
-                  }
-
                   // Get this level options
                   var levelOptionValues = self.getLevelProperty({
                             property : 'options',
@@ -64,7 +50,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : params.id + '__height_options',
                               module_type : 'sek_level_height_module',
                               controlLabel : sektionsLocalizedData.i18n['Height settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
-                        }
+                        },
+                        anchor : {
+                              settingControlId : params.id + '__anchor_options',
+                              module_type : 'sek_level_anchor_module',
+                              controlLabel : sektionsLocalizedData.i18n['Set a custom anchor for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
+                        },
                   });
 
                   if ( 'module' === params.level ) {
@@ -82,6 +73,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // @return void()
                   _do_register_ = function() {
                         _.each( levelRegistrationParams, function( optionData, optionType ){
+                               // Is the UI currently displayed the one that is being requested ?
+                              // If so, don't generate the ui again, simply focus on the section
+                              if ( self.isUIControlAlreadyRegistered( optionData.settingControlId ) ) {
+                                    api.section( api.control( optionData.settingControlId ).section() ).expanded( true );
+                                    return;
+                              }
                               if( ! api.has( optionData.settingControlId ) ) {
                                     // Schedule the binding to synchronize the options with the main collection setting
                                     // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.

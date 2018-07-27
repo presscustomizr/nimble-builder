@@ -211,6 +211,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_height.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_4_sek_register_spacing.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_5_sek_register_width.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_6_sek_register_anchor.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_1_0_sek_register_local_skope_options.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php',
@@ -276,6 +277,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_9_range_with_unit_picker.js',
 
       // Modules
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_anchor_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_bg_border_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_height_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_width_module.js',
