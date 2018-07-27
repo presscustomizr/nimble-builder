@@ -705,9 +705,9 @@
 }
 .sek-dragging .sek-drag-is-close.sek-dynamic-drop-zone {
   height: 55px;
-  -webkit-transition: all 1s ease;
-  -o-transition: all 1s ease;
-  transition: all 1s ease;
+  -webkit-transition: all 1.5s ease;
+  -o-transition: all 1.5s ease;
+  transition: all 1.5s ease;
 }
 .sek-dragging .sek-drag-is-very-close.sek-dynamic-drop-zone {
   height: 75px;
