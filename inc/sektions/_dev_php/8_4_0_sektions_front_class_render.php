@@ -37,6 +37,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     case 'after_content' :
                         add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
                     break;
+                    // Defaut is typically used when for custom locations
+                    default :
+                        add_action( $hook, array( $this, 'sek_schedule_sektions_rendering' ) );
+                    break;
                 }
             }
         }
@@ -100,6 +104,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 $html = 'before_content' == $where ? ob_get_clean() . $html : $html . ob_get_clean();
                 // Collapse line breaks before and after <div> elements so they don't get autop'd.
                 // @see function wpautop() in wp-includes\formatting.php
+                // @fixes https://github.com/presscustomizr/nimble-builder/issues/32
                 if ( strpos( $html, '<div' ) !== false ) {
                   $html = preg_replace( '|\s*<div|', '<div', $html );
                   $html = preg_replace( '|</div>\s*|', '</div>', $html );

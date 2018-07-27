@@ -4,36 +4,33 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-
 if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
 
 // @return array
 function sek_get_locations() {
-  return apply_filters( 'sek_locations', [
-      // Note : the order is important
-      'loop_start',
-      'before_content',
-      'after_content',
-      'loop_end'
-  ] );
+  return apply_filters( 'sek_locations', array_merge( SEK_Front()->default_locations, SEK_Front()->registered_locations ) );
+}
+
+function register_location( $location ) {
+    $registered_locations = SEK_Front()->registered_locations;
+    if ( is_array( $registered_locations ) ) {
+        $registered_locations[] = $location;
+    }
+    SEK_Front()->registered_locations = $registered_locations;
 }
 
 // @return array
-// @used when buiding the customizer localized params
+// @used when populating the customizer localized params
 function sek_get_default_sektions_value() {
     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
     foreach( sek_get_locations() as $location ) {
-        $defaut_sektions_value['collection'][] = [
-            'id' => $location,
-            'level' => 'location',
-            'collection' => [],
-            'options' => []
-        ];
+        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location ], SEK_Front()->default_location_model );
     }
     return $defaut_sektions_value;
 }
+
 
 //@return string
 function sek_get_seks_setting_id( $skope_id = '' ) {

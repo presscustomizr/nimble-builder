@@ -10,6 +10,19 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $default_models = array();// <= will be populated to cache the default models when invoking sek_get_default_module_model
         public $cached_input_lists = array(); // <= will be populated to cache the input_list of each registered module. Useful when we need to get info like css_selector for a particular input type or id.
         public $ajax_action_map = array();
+        public $default_locations = [
+            'loop_start',
+            'before_content',
+            'after_content',
+            'loop_end'
+        ];
+        public $registered_locations = [];
+        public $default_location_model = [
+            'id' => '',
+            'level' => 'location',
+            'collection' => [],
+            'options' => []
+        ];
 
         public static function get_instance( $params ) {
             if ( ! isset( self::$instance ) && ! ( self::$instance instanceof SEK_Front_Render ) )

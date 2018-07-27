@@ -104,7 +104,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
  * @param string $stylesheet Optional. A theme object stylesheet name. Defaults to the current theme.
  * @return array => the skope setting items
  */
-function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'local' ) {
+function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 'local' ) {
     if ( empty( $skope_id ) ) {
         $skope_id = skp_get_skope_id( $skope_level );
     }
@@ -120,31 +120,48 @@ function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'lo
             $seks_data = maybe_unserialize( $post->post_content );
         }
         $seks_data = is_array( $seks_data ) ? $seks_data : array();
+
+        // normalizes
+        // [ 'collection' => [], 'options' => [] ];
+        $default_collection = sek_get_default_sektions_value();
+        $seks_data = wp_parse_args( $seks_data, $default_collection );
+
+        // Maybe add missing registered locations
+        $maybe_incomplete_locations = [];
+        foreach( $seks_data['collection'] as $location_data ) {
+            if ( !empty( $location_data['id'] ) ) {
+                $maybe_incomplete_locations[] = $location_data['id'];
+            }
+        }
+
+        foreach( SEK_Front()->registered_locations as $loc_id ) {
+            if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
+                $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], SEK_Front()->default_location_model );
+            }
+        }
         // cache now
         SEK_Front()->local_seks = $seks_data;
-    }
+    }//end if
 
     // when customizing, let us filter the value with the 'customized' ones
     $seks_data = apply_filters(
         'sek_get_skoped_seks',
         $seks_data,
         $skope_id,
-        $location
+        $location_id
     );
-
-    // normalizes
-    $seks_data = wp_parse_args( $seks_data, sek_get_default_sektions_value() );
 
     // sek_error_log( '<sek_get_skoped_seks() location => ' . $location .  array_key_exists( 'collection', $seks_data ), $seks_data );
     // if a location is specified, return specifically the sections of this location
-    if ( array_key_exists( 'collection', $seks_data ) && ! empty( $location ) ) {
-        if ( ! in_array( $location, sek_get_locations() ) ) {
-            error_log('Error => location ' . $location . ' is not registered in the available locations' );
+    if ( array_key_exists( 'collection', $seks_data ) && ! empty( $location_id ) ) {
+        if ( ! in_array( $location_id, sek_get_locations() ) ) {
+            error_log('Error => location ' . $location_id . ' is not registered in the available locations' );
         } else {
-            $seks_data = sek_get_level_model( $location, $seks_data['collection'] );
+            $seks_data = sek_get_level_model( $location_id, $seks_data['collection'] );
         }
     }
-    return $seks_data;
+
+    return 'no_match' === $seks_data ? SEK_Front()->default_location_model : $seks_data;
 }
 
 

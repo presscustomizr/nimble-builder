@@ -89,3 +89,10 @@ function nimble_load_plugin_textdomain() {
   // Note to self, the third argument must not be hardcoded, to account for relocated folders.
   load_plugin_textdomain( 'nimble-builder' );
 }
+
+// @return void()
+function nimble_register_location( $location ) {
+    if ( empty( $location ) || ! is_string( $location ) )
+      return;
+    \Nimble\register_location( $location );
+}
