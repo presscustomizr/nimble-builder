@@ -27,18 +27,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'title' => __( 'Heading', 'text_domain_to_be_replaced' ),
                   'icon' => 'Nimble__heading_icon.svg'
                 ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_spacer_module',
-                  'title' => __( 'Spacer', 'text_domain_to_be_replaced' ),
-                  'icon' => 'Nimble__spacer_icon.svg'
-                ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_divider_module',
-                  'title' => __( 'Divider', 'text_domain_to_be_replaced' ),
-                  'icon' => 'Nimble__divider_icon.svg'
-                ),
+
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_icon_module',
@@ -47,15 +36,9 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 ),
                 array(
                   'content-type' => 'module',
-                  'content-id' => 'czr_featured_pages_module',
-                  'title' => __( 'Featured pages',  'text_domain_to_be_replaced' ),
-                  'icon' => 'Nimble__featured_icon.svg'
-                ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_simple_html_module',
-                  'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
-                  'icon' => 'Nimble_html_icon.svg'
+                  'content-id' => 'czr_button_module',
+                  'title' => __( 'Button', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_button_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
@@ -63,18 +46,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'title' => __( 'Map', 'text_domain_to_be_replaced' ),
                   'icon' => 'Nimble_map_icon.svg'
                 ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_quote_module',
-                  'title' => __( 'Quote', 'text_domain_to_be_replaced' ),
-                  'icon' => 'Nimble_quote_icon.svg'
-                ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_button_module',
-                  'title' => __( 'Button', 'text_domain_to_be_replaced' ),
-                  'icon' => 'Nimble_button_icon.svg'
-                ),
+
                 array(
                   'content-type' => 'preset_section',
                   'content-id' => 'two_columns',
@@ -93,6 +65,41 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'title' => __( 'Four Columns', 'text_domain_to_be_replaced' ),
                   'icon' => 'Nimble_4-columns_icon.svg'
                 ),
+
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_simple_html_module',
+                  'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_html_icon.svg'
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_quote_module',
+                  'title' => __( 'Quote', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble_quote_icon.svg'
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_spacer_module',
+                  'title' => __( 'Spacer', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble__spacer_icon.svg'
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_divider_module',
+                  'title' => __( 'Divider', 'text_domain_to_be_replaced' ),
+                  'icon' => 'Nimble__divider_icon.svg'
+                ),
+
+
+                // array(
+                //   'content-type' => 'module',
+                //   'content-id' => 'czr_featured_pages_module',
+                //   'title' => __( 'Featured pages',  'text_domain_to_be_replaced' ),
+                //   'icon' => 'Nimble__featured_icon.svg'
+                // ),
+
+
             );
             $i = 0;
             foreach( $content_collection as $_params) {
