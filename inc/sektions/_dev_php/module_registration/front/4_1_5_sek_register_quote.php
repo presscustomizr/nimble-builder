@@ -236,7 +236,7 @@ function sek_get_module_params_for_czr_quote_module() {
                             'cite_font_weight_css'     => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
-                                'default'     => 400,
+                                'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_weight',
@@ -361,6 +361,28 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'border_color',
                                 'css_selectors' => '.sek-quote.sek-quote-design.sek-border-before'
+                            ),
+                            'icon_color_css' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Icon Color', 'text_domain_to_be_replaced' ),
+                                'width-100'   => true,
+                                'default'     => '#ccc',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => '.sek-quote.sek-quote-design.sek-quote-icon-before::before'
+                            ),
+                            'icon_size_css' => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Icon Size', 'text_domain_to_be_replaced' ),
+                                'default'     => '32px',
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => '.sek-quote.sek-quote-design.sek-quote-icon-before::before'
                             ),
                         )
                     )
