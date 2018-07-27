@@ -427,7 +427,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         // <= the was_triggered param can be used to determine if we need to animate the picker control or not. @see ::generateUI() case 'sek-generate-draggable-candidates-picker-ui'
                                         // true by default, because this is the most common scenario ( when adding a section, a column ... )
                                         // but false when clicking on the + ui icon in the preview
-                                        was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true
+                                        was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true,
+                                        focus : _.isUndefined( params.focus ) ? true : params.focus
                                   };
                                   return self.generateUI( uiParams );
                             },

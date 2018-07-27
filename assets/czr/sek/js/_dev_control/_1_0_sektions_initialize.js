@@ -68,11 +68,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
                         }
 
-                        // Set the contextual setting prefix
+                        // ON SKOPE READY
+                        // - Set the contextual setting prefix
+                        // - Generate UI for Nimble local skope options
+                        // - Generate the content picker
                         api.czr_activeSkopes.callbacks.add( function( newSkopes, previousSkopes ) {
                               self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
                               // Generate UI for the local skope options
                               self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
+
+                              // Generate the content picker
+                              api.previewer.trigger( 'sek-pick-module', { focus : false });
                         });
 
                         // Communicate with the preview

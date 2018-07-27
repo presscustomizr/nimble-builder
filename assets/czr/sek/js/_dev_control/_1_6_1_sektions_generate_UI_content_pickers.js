@@ -20,7 +20,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
                         api.control( _id_ ).focus({
                               completeCallback : function() {
-                                    //console.log('params sek-generate-draggable-candidates-picker-ui' , params);
                                     var $container = api.control( _id_ ).container;
                                     // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
                                     if ( $container.hasClass( 'button-see-me') )
@@ -68,9 +67,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settings : { default : _id_ },
                               track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                         }).done( function() {
-                              api.control( _id_ ).focus({
-                                  completeCallback : function() {}
-                              });
+                              // we set the focus to false when firing api.previewer.trigger( 'sek-pick-module', { focus : false }); in ::initialize()
+                              if ( true === params.focus ) {
+                                    api.control( _id_ ).focus({
+                                        completeCallback : function() {}
+                                    });
+                              }
                         });
                   };
 
