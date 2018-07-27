@@ -66,7 +66,17 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
         // hook : loop_start, loop_end
-        function sek_schedule_sektions_rendering() {
+        function sek_schedule_sektions_rendering( $query = null ) {
+            // Check if the passed query is the main_query, bail if not
+            // fixes: https://github.com/presscustomizr/nimble-builder/issues/154 2.
+            // Note: a check using $query instanceof WP_Query would return false here, probably because the
+            // query object is passed by reference
+            // accidentally this would also fix the same point 1. of the same issue if the 'sek_schedule_rendering_hooks' method will be fired
+            // with an early hook (earlier than wp_head).
+            if ( is_object( $query ) && is_a( $query, 'WP_Query' ) && ! $query->is_main_query() ) {
+                return;
+            }
+
             $hook = current_filter();
             // A location can be rendered only once
             // for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
