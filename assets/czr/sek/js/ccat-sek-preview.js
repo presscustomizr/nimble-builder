@@ -105,6 +105,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         //handle: '.fa-arrows-alt',<= set by level
                         placeholder: "sortable-placeholder",
                         over: function( event, ui ) {},
+                        cursorAt: { top:0, left: 0 },//@fixes https://github.com/presscustomizr/nimble-builder/issues/114
+                        tolerance: "pointer",//@fixes https://github.com/presscustomizr/nimble-builder/issues/114
                   };
 
                   // SEKTIONS
@@ -118,6 +120,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
 
+
                   // COLUMNS
                   // On dom ready
                   $('[data-sek-level="location"]').each( function() {
@@ -129,8 +132,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   $('body').on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
                         self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                   });
+                  // this case occurs when moving a section from one location to another for example
+                  $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                        $(this).find( '[data-sek-level="section"]' ).each( function() {
+                              self.makeColumnsSortableInSektion( $(this).data('sek-id') );
+                        });
+                  });
 
-                  // MODULE
+
+                  // MODULES
                   // On dom ready
                   $('[data-sek-level="location"]').each( function() {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
@@ -146,7 +156,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
-
+                  // this case occurs when moving a section from one location to another for example
+                  $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                        $(this).find( '[data-sek-level="column"]' ).each( function() {
+                              self.makeModulesSortableInColumn( $(this).data('sek-id') );
+                        });
+                  });
 
                   // NESTED SEKTIONS
                   // $('.sek-column-inner', '[data-sek-level="section"]').children( '[data-sek-level="section"]' ).each( function() {
@@ -195,7 +210,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   $('[data-sek-id="' + locationId +'"]').each( function() {
                         defaults = $.extend( true, {}, self.sortableDefaultParams );
                         $(this).sortable( _.extend( defaults, {
-                              handle : '.sek-move-section',
+                              handle : '.sek-move-section, .sek-section-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
                               connectWith : '[data-sek-level="location"]',
                               placeholder: {
                                     element: function(currentItem) {
@@ -247,18 +262,102 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
 
+
+
+
+
             // Instantiate sortable for a given column Id
+            // Columns are a little more complex because we want to emulate the future layouts when moving a column from section to section
+            // for that, we need to compute the number of columns and play with css classes.
+            // During this process, we use two $.data to store informations :
+            //    'sek-is-sender' => tells us if this is the sektion from which we started to drag a column
+            //    '_sortable_columns_css_classes_' => stores the current and future css classes
             makeColumnsSortableInSektion : function( sektionId ) {
                   var self = this,
                       defaults = $.extend( true, {}, self.sortableDefaultParams ),
-                      $sortableCandidate = $( '[data-sek-id="' + sektionId + '"]').find('.sek-sektion-inner').first();
+                      $sortableCandidate = $( '[data-sek-id="' + sektionId + '"]').find('.sek-sektion-inner').first(),
+                      getCurrentAndNextColNumberClasses = function( args ) {
+                            args = $.extend( { forTarget : true }, args || {} );
+                            if ( ! _.isEmpty( $(this).data('_sortable_columns_css_classes_' ) ) )
+                              return $(this).data('_sortable_columns_css_classes_' );
+
+                            var $targetSektion          = $(this).closest('[data-sek-level="section"]'),
+                                $columnsInTargetSektion = $targetSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ),
+                                currentColnumber        = $columnsInTargetSektion.length,
+                                currentColCSSSuffix     = Math.floor( 100/currentColnumber );
+
+                            // the future columns number is different for the source and target sektions.
+                            var nextColNumber;
+                            if ( true === args.forTarget ) {
+                                  nextColNumber = 12 < ( currentColnumber + 1 ) ? 12 : currentColnumber + 1;
+                            } else {
+                                  nextColNumber = 1 > ( currentColnumber - 1 ) ? 1 : currentColnumber -1;
+                            }
+
+                            // this css suffix is consistent with the one written server side
+                            // @see SEK_Front_Render::render() case 'column'
+                            var nextColCSSSuffix        = Math.floor( 100/nextColNumber ),
+                                current_columns_css_class = 'sek-col-' + currentColCSSSuffix,
+                                next_columns_css_class = 'sek-col-' + nextColCSSSuffix,
+                                _classes_ = { current : current_columns_css_class , next : next_columns_css_class  };
+
+                            $(this).data('_sortable_columns_css_classes_', _classes_ );
+                            return _classes_;
+                      },
+                      cleanOnStop = function() {
+                            $( '[data-sek-level="section"]').find('.sek-sektion-inner').each( function() {
+                                    $(this).data( 'sek-is-sender', null ).data('_sortable_columns_css_classes_', null );
+                            });
+                      };
                   // if ( $sortableCandidate.children('[data-sek-level="column"]').length > 11 ) {
                   //       self.errare('12 COLUMNS');
                   //       return;
                   // }
+
                   $sortableCandidate.sortable( _.extend( defaults, {
-                        handle : '.sek-move-column',
+                        handle : '.sek-move-column, .sek-column-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
                         connectWith: ".sek-sektion-inner",
+                        over : function( event, ui ) {
+                              var $targetSektion          = $(this).closest('[data-sek-level="section"]'),
+                                  $columnsInTargetSektion = $targetSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ),
+                                  _classes_;
+
+                              if ( true !== $(this).data('sek-is-sender' ) ) {
+                                    _classes_ = getCurrentAndNextColNumberClasses.call( $(this) );
+                                    if ( ! _.isEmpty( _classes_ ) ) {
+                                          $columnsInTargetSektion.each( function() {
+                                                $(this).removeClass( _classes_.current ).addClass( _classes_.next );
+                                          });
+                                    }
+                              } else {
+                                    _classes_ = getCurrentAndNextColNumberClasses.call( $(this), { forTarget : false } );
+                                    if ( ! _.isEmpty( _classes_ ) ) {
+                                          $columnsInTargetSektion.each( function() {
+                                                $(this).addClass( _classes_.current ).removeClass( _classes_.next );
+                                          });
+                                    }
+                              }
+                        },
+                        out : function( event, ui ) {
+                              var $outedSektion = $(this).closest('[data-sek-level="section"]'),
+                                  $columnsInOutedSektion = $outedSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ),
+                                  _classes_;
+                              if ( true !== $(this).data('sek-is-sender' ) ) {
+                                    _classes_ = getCurrentAndNextColNumberClasses.call( $(this) );
+                                    if ( ! _.isEmpty( _classes_ ) ) {
+                                          $columnsInOutedSektion.each( function() {
+                                                $(this).addClass( _classes_.current ).removeClass( _classes_.next );
+                                          });
+                                    }
+                              } else {
+                                    _classes_ = getCurrentAndNextColNumberClasses.call( $(this), { forTarget : false } );
+                                    if ( ! _.isEmpty( _classes_ ) ) {
+                                          $columnsInOutedSektion.each( function() {
+                                                $(this).removeClass( _classes_.current ).addClass( _classes_.next );
+                                          });
+                                    }
+                              }
+                        },
                         remove : function( event, ui ) {
                               $targetSektionCandidate = ui.item.closest('[data-sek-level="section"]');
                               if ( $targetSektionCandidate.length > 0 && $targetSektionCandidate.find('.sek-sektion-inner').first().children('[data-sek-level="column"]').length > 12 ) {
@@ -282,27 +381,46 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               ui.item.closest('[data-sek-level="section"]').find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).each( function() {
                                     startOrder.push( $(this).data('sek-id') );
                               });
+
+                              $(this).data('sek-is-sender', true );
                               if ( _.isEmpty( startOrder ) ) {
                                     self.errare( 'column sortable => startOrder should not be empty' );
                                     return;
                               }
-                              //console.log('column moved from', from_sektion, ui );
                         },
 
                         stop : function( event, ui ) {
                               // set destination
                               $targetSektion = ui.item.closest('[data-sek-level="section"]');
                               to_sektion = $targetSektion.data( 'sek-id');
-                              //console.log('module moved to', to_column, from_column );
                               $targetSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).each( function() {
                                     newOrder.push( $(this).data('sek-id') );
                               });
+
+                              var $stopSektion = $(this).closest('[data-sek-level="section"]'),
+                                  $columnsInstopSektion = $stopSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ),
+                                  _classes_;
+                              if ( true !== $(this).data('sek-is-sender' ) ) {
+                                    _classes_ = getCurrentAndNextColNumberClasses.call( $(this) );
+                                    if ( ! _.isEmpty( _classes_ ) ) {
+                                          $columnsInstopSektion.each( function() {
+                                                $(this).removeClass( _classes_.current ).addClass( _classes_.next );
+                                          });
+                                    }
+                              } else {
+                                    _classes_ = getCurrentAndNextColNumberClasses.call( $(this), { forTarget : false } );
+                                    if ( ! _.isEmpty( _classes_ ) ) {
+                                          $columnsInstopSektion.each( function() {
+                                                $(this).addClass( _classes_.current ).removeClass( _classes_.next );
+                                          });
+                                    }
+                              }
+                              cleanOnStop();
+
                               if ( _.isEmpty( newOrder ) ) {
                                     self.errare( 'column sortable =>  newOrder should not be empty' );
                                     return;
                               }
-                              // console.log('ALORS SEKTIONS ?: ', to_sektion, from_sektion );
-                              // console.log('ALORS ORDER ?: ', newOrder, startOrder);
 
                               // don't send anything if the source and target columns are the same, and the order is unchanged
                               if ( _.isEqual( newOrder, startOrder ) && to_sektion === from_sektion ) {
@@ -325,6 +443,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
 
+
+
+
+
+
+
             // Instantiate sortable for a given column Id
             makeModulesSortableInColumn : function( columnId ) {
                   var from_sektion, to_sektion, from_column, to_column, startOrder = [], newOrder = [], $targetSektion, $targetColumn, defaults;
@@ -332,7 +456,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   defaults = $.extend( true, {}, self.sortableDefaultParams );
                   // Restrict to the .sek-column-inner for this very column id with first()
                   $( '[data-sek-id="' + columnId + '"]').find('.sek-column-inner').first().sortable( _.extend( defaults, {
-                        handle : '.sek-move-module',
+                        handle : '.sek-move-module, .sek-module-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
                         connectWith: ".sek-column-inner",
                         over : function( event, ui ) {
                               // Hide the module placeholder while overing, when the column is empty
@@ -359,14 +483,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     self.errare( 'makeModulesSortableInColumn => startOrder should not be empty' );
                                     return;
                               }
-                              //console.log('column moved from', from_sektion, ui );
                         },
 
                         stop : function( event, ui ) {
                               // set destination
                               $targetColumn = ui.item.closest('[data-sek-level="column"]');
                               to_column = $targetColumn.data( 'sek-id');
-                              //console.log('module moved to', to_column, from_column );
+
                               $targetColumn.find('.sek-column-inner').first().children( '[data-sek-id]' ).each( function() {
                                     newOrder.push( $(this).data('sek-id') );
                               });
@@ -374,8 +497,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     self.errare( 'makeModulesSortableInColumn => newOrder should not be empty' );
                                     return;
                               }
-                              // console.log('ALORS COLUMNS ?: ', to_column, from_column );
-                              // console.log('ALORS ORDER ?: ', newOrder, startOrder);
 
                               // don't send anything if the source and target columns are the same, and the order is unchanged
                               if ( _.isEqual( newOrder, startOrder ) && to_column === from_column ) {
@@ -564,7 +685,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               case 'section' :
                                     //$el = $('.sektion-wrapper').find('[data-sek-id="' + id + '"]');
                                     params = _.extend( params, {
-                                          is_last_possible_section : true === $(this).data('sek-is-nested'),
+                                          is_nested : true === $(this).data('sek-is-nested'),
                                           can_have_more_columns : $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12
                                     });
                               break;
@@ -595,7 +716,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     complete : function() {}
                               } );
                         });
-                  };
+                  };//printLevelUI()
 
                   var removeLevelUI = function() {
                         $levelEl = $(this);
@@ -611,54 +732,54 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     $levelEl.data( 'UIisFadingOut', false );
                               }
                         });
-                  };
+                  };//removeLevelUI
 
-                  // Level's UI icons with delegation
-                  // $('body').on( 'mouseenter', '[data-sek-level]', function( evt ) {
-                  //       // if ( $(this).children('.sek-dyn-ui-wrapper').length > 0 )
-                  //       //   return;
-
-
-                  // }).on( 'mouseleave', '[data-sek-level]', function( evt ) {
-                  //       console.log('MOUSE LEAVE');
-
-                  // });
 
 
 
                   // UI MENU
-                  // React to click
+                  // React to click and mouse actions. Uses delegation.
                   // + schedule auto collapse after n seconds of ui inactivity
-                  var autoCollapser = function( $menu, $dynUiWrapper ) {
+                  var autoCollapser = function() {
+                        var $menu = $(this);
                         clearTimeout( $menu.data('_toggle_ui_menu_') );
                         $menu.data( '_toggle_ui_menu_', setTimeout(function() {
-                              $menu.addClass('sek-collapsed');
-                              $dynUiWrapper.removeClass('sek-is-expanded');
+                              setClassesAndVisibilities.call( $menu );
                         }, 5000 ) );
-                  };
+                      },
+                      setClassesAndVisibilities = function( expand ) {
+                            var $menu = $(this),
+                                $levelTypeAndMenuWrapper = $(this).closest('.sek-dyn-ui-location-type'),
+                                $dynUiWrapper = $menu.closest( '.sek-dyn-ui-wrapper').find('.sek-dyn-ui-inner');
+                            if ( true === expand ) {
+                                  $menu.removeClass('sek-collapsed');
+                                  $dynUiWrapper.addClass('sek-is-expanded');
+                                  $levelTypeAndMenuWrapper.hide();
+                            } else {
+                                  $menu.addClass('sek-collapsed');
+                                  $dynUiWrapper.removeClass('sek-is-expanded');
+                                  $levelTypeAndMenuWrapper.show();
+                            }
+                      };
                   $('body').on( 'click', '.sek-dyn-ui-location-inner', function( evt )  {
                         var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper'),
-                            $dynUiWrapper = $menu.closest( '.sek-dyn-ui-wrapper').find('.sek-dyn-ui-inner'),
-                            $parentColumn = $(this).closest('[data-sek-level="column"]');
+                            $parentSection = $(this).closest('[data-sek-level="section"]');
                         // Close all other expanded ui menu of the column
-                        $parentColumn.find('.sek-dyn-ui-hamb-menu-wrapper').each( function() {
-                              $(this).toggleClass('sek-collapsed');
-                              $(this).closest( '.sek-dyn-ui-wrapper').find('.sek-dyn-ui-inner').removeClass('sek-is-expanded');
+                        $parentSection.find('.sek-dyn-ui-hamb-menu-wrapper').each( function() {
+                              setClassesAndVisibilities.call( $(this) );
                         });
-
                         // expand the ui menu of the clicked level
-                        $menu.removeClass('sek-collapsed');
-                        $dynUiWrapper.addClass('sek-is-expanded');
-                        autoCollapser( $menu, $dynUiWrapper );
+                        setClassesAndVisibilities.call( $menu, true );
+                        // schedule autocollapsing
+                        autoCollapser.call( $menu );
                   });
                   // maintain expanded as long as it's being hovered
                   $('body').on( 'mouseenter mouseover mouseleave', '.sek-dyn-ui-wrapper', _.throttle( function( evt )  {
-                        var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper'),
-                            $dynUiWrapper = $(this).find('.sek-dyn-ui-inner');
+                        var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper');
                         if ( _.isUndefined( $menu.data('_toggle_ui_menu_') ) || $menu.hasClass('sek-collapsed') )
                           return;
                         if ( $menu.length > 0 ) {
-                              autoCollapser( $menu, $dynUiWrapper );
+                              autoCollapser.call( $menu );
                         }
                   }, 50 ) );
 
@@ -704,6 +825,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
 
 
+
+                  // ADD SECTION BUTTONS
                   // Add content button between sections
                   // <script type="text/html" id="sek-tmpl-add-content-button">
                   //     <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
@@ -806,7 +929,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   };
 
 
-                  // Schedule the printing / removal of the add content button
+                  // SCHEDULE
+                  // - the printing / removal of the add content button
+                  // - the printing of the level's UI
                   self.mouseMovedRecently = new api.Value( {} );
                   self.mouseMovedRecently.bind( function( position ) {
                         if ( ! _.isEmpty( position) ) {
@@ -825,17 +950,29 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               });
                         }
                   });
+                  // @return void()
+                  var resetMouseMoveTrack = function() {
+                        clearTimeout( $(window).data('_scroll_move_timer_') );
+                        self.mouseMovedRecently.set( {} );
+                  };
+
                   $(window).on( 'mousemove scroll', _.throttle( function( evt ) {
                         self.mouseMovedRecently( { x : evt.clientX, y : evt.clientY } );
-                        clearTimeout( $.data( this, '_scroll_move_timer_') );
-                        $.data( this, '_scroll_move_timer_', setTimeout(function() {
+                        clearTimeout( $(window).data('_scroll_move_timer_') );
+                        $(window).data('_scroll_move_timer_', setTimeout(function() {
                               self.mouseMovedRecently.set( {} );
                         }, 4000 ) );
                   }, 50 ) );
 
-                  // Always remove when a dragging action is started
+                  // Always reset the move timer and the mouseMove Value when
+                  // - a dragging action is started
+                  // - a section is added <= fixes the addition of multiple "Add Section" button in the same location
                   api.preview.bind( 'sek-drag-start', function() {
-                        self.mouseMovedRecently.set( {} );
+                        resetMouseMoveTrack();
+                  });
+
+                  $( 'body').on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
+                        resetMouseMoveTrack();
                   });
 
                   return this;
@@ -1089,6 +1226,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             // DOM MODIFICATION CASES
                             'sek-add-section' : 'ajaxAddSektion',
                             'sek-add-content-in-new-sektion' : 'ajaxAddSektion',
+                            'sek-add-content-in-new-nested-sektion' : 'ajaxAddSektion',
                             'sek-add-column' : 'ajaxRefreshColumns',
                             'sek-add-module' : 'ajaxRefreshModulesAndNestedSections',
                             'sek-refresh-stylesheet' : 'ajaxRefreshStylesheet',
@@ -1208,7 +1346,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                                         $placeHolder.remove();
 
-                                        //=> 'sek-level-refreshed' is listened to clean the loader overalay in time
+                                        //=> 'sek-level-refreshed' is listened to clean the loader overlay in time
                                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
                                               .trigger( 'sek-level-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                                   });

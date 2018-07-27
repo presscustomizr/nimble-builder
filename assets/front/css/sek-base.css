@@ -686,6 +686,12 @@ button.sek-btn,
   padding: 0;
 }
 
+.sek-quote .sek-cite {
+  font-size: 13px;
+  line-height: 1.5em;
+  font-style: inherit;
+}
+
 .sek-quote.sek-quote-design {
   background: none;
   font-style: inherit;
@@ -705,16 +711,40 @@ button.sek-btn,
 }
 
 .sek-quote.sek-quote-design .sek-cite {
-  font-size: 13px;
+  padding: 0;
+  font-weight: normal;
+}
+
+.sek-quote.sek-quote-design .sek-cite::before {
+  display: none;
+}
+
+.sek-quote.sek-quote-design .sek-quote-inner {
+  color: inherit;
+}
+
+.sek-quote.sek-quote-design .sek-quote-content {
+  font-weight: 400;
+  color: inherit;
+}
+
+.sek-quote.sek-quote-design.sek-border-before {
+  padding-left: 15px;
+  border-left: 5px solid;
+}
+
+.sek-quote.sek-quote-design.sek-border-before .sek-cite {
   clear: both;
   display: block;
   margin-top: 1.5em;
   position: relative;
+  font-style: italic;
   padding-left: 2.2em;
   padding-right: 0.25em;
 }
 
-.sek-quote.sek-quote-design .sek-cite::before {
+.sek-quote.sek-quote-design.sek-border-before .sek-cite::before {
+  display: block;
   content: '';
   top: 1em;
   position: absolute;
@@ -725,9 +755,34 @@ button.sek-btn,
   border-top: 1px solid;
 }
 
-.sek-quote.sek-quote-design.sek-border-before {
-  padding-left: 15px;
-  border-left: 5px solid;
+.sek-quote.sek-quote-design.sek-quote-icon-before {
+  position: relative;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.sek-quote.sek-quote-design.sek-quote-icon-before .sek-quote-content *:last-child {
+  margin-bottom: .75em;
+}
+
+.sek-quote.sek-quote-design.sek-quote-icon-before::before {
+  content: '\f10d';
+  color: #ccc;
+  font-size: 32px;
+  font-weight: 900;
+  font-style: normal;
+  text-align: center;
+  font-family: 'Font Awesome 5 Free';
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-variant: normal;
+  text-rendering: auto;
+  display: -ms-flexbox;
+  display: flex;
+  position: static;
+  width: auto;
+  margin: 0;
+  padding-right: 17px;
 }
 
 .sek-btn-inner {

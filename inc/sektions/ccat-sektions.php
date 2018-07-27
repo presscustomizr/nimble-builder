@@ -4,35 +4,33 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-
 if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
 
 // @return array
 function sek_get_locations() {
-  return apply_filters( 'sek_locations', [
-      'loop_start',
-      'loop_end',
-      'before_content',
-      'after_content'
-  ] );
+  return apply_filters( 'sek_locations', array_merge( SEK_Front()->default_locations, SEK_Front()->registered_locations ) );
+}
+
+function register_location( $location ) {
+    $registered_locations = SEK_Front()->registered_locations;
+    if ( is_array( $registered_locations ) ) {
+        $registered_locations[] = $location;
+    }
+    SEK_Front()->registered_locations = $registered_locations;
 }
 
 // @return array
-// @used when buiding the customizer localized params
+// @used when populating the customizer localized params
 function sek_get_default_sektions_value() {
     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
     foreach( sek_get_locations() as $location ) {
-        $defaut_sektions_value['collection'][] = [
-            'id' => $location,
-            'level' => 'location',
-            'collection' => [],
-            'options' => []
-        ];
+        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location ], SEK_Front()->default_location_model );
     }
     return $defaut_sektions_value;
 }
+
 
 //@return string
 function sek_get_seks_setting_id( $skope_id = '' ) {
@@ -116,7 +114,7 @@ function sek_section_has_modules( $model, $has_module = null ) {
         // stop here and return if a match was recursively found
         if ( true === $has_module )
           break;
-        if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
+        if ( is_array( $level_data ) && array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
             foreach ( $level_data['collection'] as $child_level_data ) {
                 if ( 'module'== $child_level_data['level'] ) {
                     $has_module = true;
@@ -178,10 +176,12 @@ function sek_get_default_module_model( $module_type = '' ) {
         // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+            return $default;
         }
 
         if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+            return $default;
         }
         // Build
         $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
@@ -281,10 +281,12 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
         // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+            return $input_list;
         }
 
         if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+            return $input_list;
         }
         // Build
         $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
@@ -451,6 +453,30 @@ function sek_error_log( $title, $content = null ) {
         error_log( '</' . $title . '>' );
     }
 }
+
+// @return mixed null || string
+function sek_get_locale_template(){
+    $path = null;
+    $localSkopeNimble = sek_get_skoped_seks( skp_build_skope_id() );
+    if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['general'] ) && ! empty( $localSkopeNimble['options']['general']['local_template'] ) && 'default' !== $localSkopeNimble['options']['general']['local_template'] ) {
+        $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['general']['local_template'] . '.php';
+        if ( file_exists( $path ) ) {
+            $template = $path;
+        } else {
+            sek_error_log( __FUNCTION__ .' the custom template does not exist', $path );
+        }
+    }
+    return $path;
+}
+
+//@return void()
+function render_content_sections() {
+    foreach( sek_get_locations() as $hook ) {
+        do_action( "sek_before_location_{$hook}" );
+        SEK_Front()->_render_seks_for_location( $hook );
+        do_action( "sek_after_location_{$hook}" );
+    }
+}
 ?><?php
 // SEKTION POST
 register_post_type( NIMBLE_CPT , array(
@@ -557,14 +583,15 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
  * @param string $stylesheet Optional. A theme object stylesheet name. Defaults to the current theme.
  * @return array => the skope setting items
  */
-function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'local' ) {
+function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 'local' ) {
     if ( empty( $skope_id ) ) {
         $skope_id = skp_get_skope_id( $skope_level );
     }
-    // use the cached value when NOT in a customization scenario
-    if ( ! skp_is_customizing() && did_action('wp') && 'not_cached' != SEK_Front()->local_seks ) {
+    // use the cached value when available ( after did_action('wp') )
+    if ( did_action('wp') && 'not_cached' != SEK_Front()->local_seks ) {
         $seks_data = SEK_Front()->local_seks;
     } else {
+
         $seks_data = array();
         $post = sek_get_seks_post( $skope_id );
         // sek_error_log( 'sek_get_skoped_seks() => $post', $post);
@@ -572,31 +599,48 @@ function sek_get_skoped_seks( $skope_id = '', $location = '', $skope_level = 'lo
             $seks_data = maybe_unserialize( $post->post_content );
         }
         $seks_data = is_array( $seks_data ) ? $seks_data : array();
+
+        // normalizes
+        // [ 'collection' => [], 'options' => [] ];
+        $default_collection = sek_get_default_sektions_value();
+        $seks_data = wp_parse_args( $seks_data, $default_collection );
+
+        // Maybe add missing registered locations
+        $maybe_incomplete_locations = [];
+        foreach( $seks_data['collection'] as $location_data ) {
+            if ( !empty( $location_data['id'] ) ) {
+                $maybe_incomplete_locations[] = $location_data['id'];
+            }
+        }
+
+        foreach( SEK_Front()->registered_locations as $loc_id ) {
+            if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
+                $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], SEK_Front()->default_location_model );
+            }
+        }
         // cache now
         SEK_Front()->local_seks = $seks_data;
-    }
+    }//end if
 
     // when customizing, let us filter the value with the 'customized' ones
     $seks_data = apply_filters(
         'sek_get_skoped_seks',
         $seks_data,
         $skope_id,
-        $location
+        $location_id
     );
-
-    // normalizes
-    $seks_data = wp_parse_args( $seks_data, sek_get_default_sektions_value() );
 
     // sek_error_log( '<sek_get_skoped_seks() location => ' . $location .  array_key_exists( 'collection', $seks_data ), $seks_data );
     // if a location is specified, return specifically the sections of this location
-    if ( array_key_exists( 'collection', $seks_data ) && ! empty( $location ) ) {
-        if ( ! in_array( $location, sek_get_locations() ) ) {
-            error_log('Error => location ' . $location . ' is not registered in the available locations' );
+    if ( array_key_exists( 'collection', $seks_data ) && ! empty( $location_id ) ) {
+        if ( ! in_array( $location_id, sek_get_locations() ) ) {
+            error_log('Error => location ' . $location_id . ' is not registered in the available locations' );
         } else {
-            $seks_data = sek_get_level_model( $location, $seks_data['collection'] );
+            $seks_data = sek_get_level_model( $location_id, $seks_data['collection'] );
         }
     }
-    return $seks_data;
+
+    return 'no_match' === $seks_data ? SEK_Front()->default_location_model : $seks_data;
 }
 
 
@@ -1031,6 +1075,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Reset' => __('Reset', 'text_domain_to_be_replaced'),
             'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
 
+            // Header button title text
+            'Drag and drop content' => __('Drag and drop content', 'text_domain_to_be_replaced'),
+
             // Generated UI
             'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
             'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
@@ -1048,6 +1095,11 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Width settings for the' => __('Width settings for the', 'text_domain_to_be_replaced'),
 
             'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
+
+            // UI for the ocal skope options
+            'Local options for the sections of the current page'  => __( 'Local options for the sections of the current page', 'text_domain_to_be_replaced'),
+            'General options' => __( 'General options', 'text_domain_to_be_replaced'),
+
 
             // Levels
             'location' => __('location', 'text_domain_to_be_replaced'),
@@ -1145,11 +1197,11 @@ function add_sektion_values_to_skope_export( $skopes ) {
 
 function sek_get_preset_sektions() {
     return array(
-        'alternate_text_right' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}]}]}',
-        'alternate_text_left' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""}]}',
-        'two_columns' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
-        'three_columns' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
-        'four_columns' => '{"id":"","level":"section","collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}'
+        'alternate_text_right' => '{"collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}]}]}',
+        'alternate_text_left' => '{"collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""}]}',
+        'two_columns' => '{"collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
+        'three_columns' => '{"collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
+        'four_columns' => '{"collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}'
     );
 }
 
@@ -1166,7 +1218,7 @@ function sek_get_img_sizes() {
     foreach ( get_intermediate_image_sizes() as $_size ) {
 
         $first_to_upper_size = ucfirst(strtolower($_size));
-        $first_to_upper_size = preg_replace_callback('/[.!?].*?\w/', create_function('$matches', 'return strtoupper($matches[0]);'), $first_to_upper_size);
+        $first_to_upper_size = preg_replace_callback( '/[.!?].*?\w/', '\Nimble\sek_img_sizes_preg_replace_callback', $first_to_upper_size );
 
         if ( in_array( $_size, array('thumbnail', 'medium', 'medium_large', 'large') ) ) {
             $sizes[ $_size ]['width']  = get_option( "{$_size}_size_w" );
@@ -1187,6 +1239,10 @@ function sek_get_img_sizes() {
     }
 
     return $to_return;
+}
+
+function sek_img_sizes_preg_replace_callback( $matches ) {
+    return strtoupper( $matches[0] );
 }
 ?><?php
 /* ------------------------------------------------------------------------- *
@@ -2093,8 +2149,10 @@ function sek_register_modules() {
         'sek_level_bg_border_module',
         'sek_level_section_layout_module',
         'sek_level_height_module',
-        'sek_spacing_module',
+        'sek_level_spacing_module',
         'sek_level_width_module',
+
+        'sek_local_skope_options_module',
 
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
@@ -2154,16 +2212,16 @@ function sek_get_select_options_for_input_id( $input_id ) {
         // FEATURED PAGE MODULE
         case 'img-type' :
             $options = array(
-                'none' => __('No text', 'text_domain_to_be_replaced' ),
-                'page-excerpt' => __('Use the page excerpt', 'text_domain_to_be_replaced' ),
-                'custom' => __('Use a custom text', 'text_domain_to_be_replaced' ),
+                'none' => __( 'No image', 'text_domain_to_be_replaced' ),
+                'featured' => __( 'Use the page featured image', 'text_domain_to_be_replaced' ),
+                'custom' => __( 'Use a custom image', 'text_domain_to_be_replaced' ),
             );
         break;
         case 'content-type' :
             $options = array(
-                'none' => __('No image', 'text_domain_to_be_replaced' ),
-                'featured' => __('Use the page featured image', 'text_domain_to_be_replaced' ),
-                'custom' => __('Use a custom image', 'text_domain_to_be_replaced' ),
+                'none' => __( 'No text', 'text_domain_to_be_replaced' ),
+                'page-excerpt' => __( 'Use the page excerpt', 'text_domain_to_be_replaced' ),
+                'custom' => __( 'Use a custom text', 'text_domain_to_be_replaced' ),
             );
         break;
 
@@ -2238,7 +2296,8 @@ function sek_get_select_options_for_input_id( $input_id ) {
         case 'quote_design' :
             $options = array(
                 'none' => __( 'No design', 'text_domain_to_be_replaced' ),
-                'border-before' => __( 'Border on the left (right for RTL users)', 'text_domain_to_be_replaced' ),
+                'border-before' => __( 'Side Border', 'text_domain_to_be_replaced' ),
+                'quote-icon-before' => __( 'Quote Icon', 'text_domain_to_be_replaced' ),
             );
         break;
 
@@ -2284,6 +2343,14 @@ function sek_get_select_options_for_input_id( $input_id ) {
             );
         break;
 
+        // LOCAL SKOPE OPTIONS UI
+        case 'local_template' :
+            $options = array(
+                'default' => __('Default theme template','text_domain_to_be_replaced'),
+                'nimble_boxed' => __('Nimble boxed page template','text_domain_to_be_replaced'),
+                'nimble_full_width' => __('Nimble full width page template','text_domain_to_be_replaced')
+            );
+        break;
 
         default :
             sek_error_log( __FUNCTION__ . ' => no case set for input id : '. $input_id );
@@ -2320,9 +2387,6 @@ function sek_get_module_params_for_sek_module_picker_module() {
 
 
 ?><?php
-/* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
-/* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_sek_level_bg_border_module() {
     return array(
@@ -2331,7 +2395,7 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
         'name' => __('Background and borders', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'bg-color-overlay'  => '#000000',
-            'bg-opacity-overlay' => '50'
+            'bg-opacity-overlay' => '40'
         ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -2400,8 +2464,8 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                                 'orientation' => 'horizontal',
                                 'min' => 0,
                                 'max' => 100,
-                                'unit' => '%',
-                                'default'  => '50%',
+                                // 'unit' => '%',
+                                // 'default'  => '40%',
                                 'width-100'   => true,
                                 'title_width' => 'width-100'
                             )
@@ -2709,8 +2773,8 @@ function sek_add_css_rules_for_bg_border_boxshadow( $rules, $level ) {
       return $rules;
 
     if ( !empty( $bg_border_options[ 'shadow' ] ) &&  sek_is_checked( $bg_border_options[ 'shadow'] ) ) {
-        $css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
-
+        //$css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
+        $css_rules = '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;';
         $rules[]     = array(
                 'selector' => '[data-sek-id="'.$level['id'].'"]',
                 'css_rules' => $css_rules,
@@ -2720,9 +2784,6 @@ function sek_add_css_rules_for_bg_border_boxshadow( $rules, $level ) {
     return $rules;
 }
 ?><?php
-/* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
-/* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_sek_level_section_layout_module() {
     return array(
@@ -2756,15 +2817,15 @@ function sek_get_module_params_for_sek_level_section_layout_module() {
     );
 }
 ?><?php
-/* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
-/* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_sek_level_height_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_height_module',
         'name' => __('Height options', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'custom-height'  => '50%',
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -2780,7 +2841,7 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'title'       => __('Custom height', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 100,
-                    'default' => '50%',
+                    'default' => '50',
                     'width-100'   => true
                 ),
                 'v_alignment' => array(
@@ -2866,10 +2927,10 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
  *  SPACING MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_spacing_module() {
+function sek_get_module_params_for_sek_level_spacing_module() {
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'sek_spacing_module',
+        'module_type' => 'sek_level_spacing_module',
         'name' => __('Spacing options', 'text_domain_to_be_replaced'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -2994,9 +3055,6 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
 }
 
 ?><?php
-/* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER LEVEL LAYOUT BACKGROUND BORDER MODULE
-/* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_sek_level_width_module() {
     return array(
@@ -3100,6 +3158,39 @@ function sek_add_css_rules_for_level_width( $rules, $level ) {
     return $rules;
 }
 
+?><?php
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_local_skope_options_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_local_skope_options_module',
+        'name' => __('Options for the sections of the current page', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) ),
+        ),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'local_template' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Select a template', 'text_domain_to_be_replaced'),
+                    'default'     => 'default',
+                    'choices'     => sek_get_select_options_for_input_id( 'local_template' ),
+                    'refresh_preview' => true
+                ),
+                'local_custom_css' => array(
+                    'input_type'  => 'code_editor',
+                    'title'       => __( 'Custom css' , 'text_domain_to_be_replaced' ),
+                    'code_type' => 'text/css',// 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
+                    'notice_after' => __('This CSS code will be restricted to the currently previewed page only, and not applied site wide.', 'text_domain_to_be_replaced'),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                )
+            )
+        )//tmpl
+    );
+}
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER SIMPLE HTML MODULE
@@ -3919,7 +4010,7 @@ function sek_get_module_params_for_czr_icon_module() {
             'icon' =>  'far fa-star',
             'font_size_css' => '40px',
             'color_css' => '#707070',
-            'color_hover_css' => '#969696'
+            'color_hover' => '#969696'
         ),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -3976,20 +4067,28 @@ function sek_get_module_params_for_czr_icon_module() {
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __('Color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
-                    'default'    => '#5a5a5a',
+                    'default'    => '#707070',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'color'
                 ),
-                'color_hover_css' => array(
+                'use_custom_color_on_hover' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __( 'Set a custom icon color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'default'     => 0,
+                ),
+                'color_hover' => array(
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __('Hover color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
-                    'default'    => '#5a5a5a',
+                    'default'    => '#969696',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'color_hover'
-                ),
+                    //'css_identifier' => 'color_hover'
+                )
             )
         ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/icon_module_tmpl.php",
@@ -4002,6 +4101,41 @@ function sek_get_module_params_for_czr_icon_module() {
               )
         )
     );
+}
+
+/* ------------------------------------------------------------------------- *
+ *  SCHEDULE CSS RULES FILTERING
+/* ------------------------------------------------------------------------- */
+add_filter( 'sek_add_css_rules_for_module_type___czr_icon_module', '\Nimble\sek_add_css_rules_for_icon_front_module', 10, 2 );
+// filter documented in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker
+// Note : $complete_modul_model has been normalized
+// @return populated $rules
+function sek_add_css_rules_for_icon_front_module( $rules, $complete_modul_model ) {
+    if ( empty( $complete_modul_model['value'] ) )
+      return $rules;
+
+    $value = $complete_modul_model['value'];
+    $icon_color = $value['color_css'];
+    if ( sek_booleanize_checkbox_val( $value['use_custom_color_on_hover'] ) ) {
+        $color_hover = $value['color_hover'];
+    } else {
+        // Build the lighter rgb from the user picked bg color
+        if ( 0 === strpos( $icon_color, 'rgba' ) ) {
+            list( $rgb, $alpha ) = sek_rgba2rgb_a( $icon_color );
+            $color_hover_rgb  = sek_lighten_rgb( $rgb, $percent=15, $array = true );
+            $color_hover      = sek_rgb2rgba( $color_hover_rgb, $alpha, $array = false, $make_prop_value = true );
+        } else if ( 0 === strpos( $icon_color, 'rgb' ) ) {
+            $color_hover      = sek_lighten_rgb( $icon_color, $percent=15 );
+        } else {
+            $color_hover      = sek_lighten_hex( $icon_color, $percent=15 );
+        }
+    }
+    $rules[] = array(
+        'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-icon i:hover',
+        'css_rules' => 'color:' . $color_hover . ';',
+        'mq' =>null
+    );
+    return $rules;
 }
 ?><?php
 /* ------------------------------------------------------------------------- *
@@ -4116,8 +4250,8 @@ function sek_get_module_params_for_czr_quote_module() {
         'sanitize_callback' => __NAMESPACE__ . '\sanitize_callback__czr_quote_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'starting_value' => array(
-            'quote_text'  => 'Hey, careful, man, there\'s a beverage here!',
-            'cite_text'   => 'The Dude in <a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>',
+            'quote_text'  => __('Hey, careful, man, there\'s a beverage here!','text_domain_to_be_replaced'),
+            'cite_text'   => sprintf( __('The Dude in %1s', 'text_domain_to_be_replaced'), '<a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>' ),
             'quote_design' => 'border-before'
         ),
         'css_selectors' => array( '.sek-module-inner' ),
@@ -4316,7 +4450,7 @@ function sek_get_module_params_for_czr_quote_module() {
                             'cite_font_weight_css'     => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
-                                'default'     => 400,
+                                'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_weight',
@@ -4442,6 +4576,28 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'css_identifier' => 'border_color',
                                 'css_selectors' => '.sek-quote.sek-quote-design.sek-border-before'
                             ),
+                            'icon_color_css' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Icon Color', 'text_domain_to_be_replaced' ),
+                                'width-100'   => true,
+                                'default'     => '#ccc',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => '.sek-quote.sek-quote-design.sek-quote-icon-before::before'
+                            ),
+                            'icon_size_css' => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Icon Size', 'text_domain_to_be_replaced' ),
+                                'default'     => '32px',
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => '.sek-quote.sek-quote-design.sek-quote-icon-before::before'
+                            ),
                         )
                     )
                 )
@@ -4504,7 +4660,7 @@ function sek_get_module_params_for_czr_button_module() {
         'name' => __( 'Button', 'text_domain_to_be_replaced' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
         'starting_value' => array(
-            'button_text' => 'This is a button.',
+            'button_text' => __('Click me','text_domain_to_be_replaced'),
             'color_css'  => '#ffffff',
             'bg_color_css' => '#020202',
             'bg_color_hover' => '#151515', //lighten 15%,
@@ -4866,6 +5022,9 @@ class Sek_Dyn_CSS_Builder {
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
 
         $this->sek_css_rules_sniffer_walker();
+
+        // add user local custom css
+        add_filter( 'nimble_get_dynamic_stylesheet', array( $this, 'sek_add_raw_local_custom_css'));
     }
 
 
@@ -5045,22 +5204,23 @@ class Sek_Dyn_CSS_Builder {
     //@returns a stringified stylesheet, ready to be printed on the page or in a file
     public function get_stylesheet() {
         $css = '';
-        if ( ! is_array( $this->collection ) || empty( $this->collection ) )
-          return $css;
-        // Sort the collection by media queries
-        uksort( $this->collection, array( $this, 'user_defined_array_key_sort_fn' ) );
+        if ( is_array( $this->collection ) && !empty( $this->collection ) ) {
+            // Sort the collection by media queries
+            uksort( $this->collection, array( $this, 'user_defined_array_key_sort_fn' ) );
 
-        // process
-        foreach ( $this->collection as $mq_device => $selectors ) {
-            $_css = '';
-            foreach ( $selectors as $selector => $css_rules ) {
-                $css_rules = is_array( $css_rules ) ? implode( ';', $css_rules ) : $css_rules;
-                $_css .=  $selector . '{' . $css_rules . '}';
+            // process
+            foreach ( $this->collection as $mq_device => $selectors ) {
+                $_css = '';
+                foreach ( $selectors as $selector => $css_rules ) {
+                    $css_rules = is_array( $css_rules ) ? implode( ';', $css_rules ) : $css_rules;
+                    $_css .=  $selector . '{' . $css_rules . '}';
+                    $_css =  str_replace(';;', ';', $_css);//@fixes https://github.com/presscustomizr/nimble-builder/issues/137
+                }
+                $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_device );
+                $css .= $_css;
             }
-            $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_device );
-            $css .= $_css;
         }
-        return $css;
+        return apply_filters( 'nimble_get_dynamic_stylesheet', $css );
     }
 
 
@@ -5087,6 +5247,17 @@ class Sek_Dyn_CSS_Builder {
         return $rules;
     }
 
+
+    //@filter 'nimble_get_dynamic_stylesheet'
+    public function sek_add_raw_local_custom_css( $css ) {
+        // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
+        // otherwise we fallback on the normal utility skp_build_skope_id()
+        $localSkopeNimble = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id()  );
+        if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['general'] ) && ! empty( $localSkopeNimble['options']['general']['local_custom_css'] ) ) {
+            $css .= $localSkopeNimble['options']['general']['local_custom_css'];
+        }
+        return $css;
+    }
 
 }//end class
 
@@ -6514,6 +6685,19 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $default_models = array();// <= will be populated to cache the default models when invoking sek_get_default_module_model
         public $cached_input_lists = array(); // <= will be populated to cache the input_list of each registered module. Useful when we need to get info like css_selector for a particular input type or id.
         public $ajax_action_map = array();
+        public $default_locations = [
+            'loop_start',
+            'before_content',
+            'after_content',
+            'loop_end'
+        ];
+        public $registered_locations = [];
+        public $default_location_model = [
+            'id' => '',
+            'level' => 'location',
+            'collection' => [],
+            'options' => []
+        ];
 
         public static function get_instance( $params ) {
             if ( ! isset( self::$instance ) && ! ( self::$instance instanceof SEK_Front_Render ) )
@@ -6636,6 +6820,9 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                   'sek-add-section',
                   'sek-remove-section',
                   'sek-duplicate-section',
+
+                  // fired when dropping a module or a preset_section
+                  'sek-add-content-in-new-nested-sektion',
                   'sek-add-content-in-new-sektion',
 
                   // add, duplicate, remove column is a re-rendering of the parent sektion collection
@@ -6767,6 +6954,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 case 'sek-add-section' :
                 // when 'sek-add-content-in-new-sektion' is fired, the section has already been populated with a column and a module
                 case 'sek-add-content-in-new-sektion' :
+                case 'sek-add-content-in-new-nested-sektion' :
                     if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
                         $this -> parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
@@ -7060,7 +7248,10 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
                         'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
                         'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
-                        'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' )
+                        'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
+
+                        'section' => __('section', 'text_domain_to_be_replaced'),
+                        'nested section' => __('nested section', 'text_domain_to_be_replaced')
                     ),
                     'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -7112,13 +7303,12 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <# //console.log( 'data', data ); #>
                   <div class="sek-dyn-ui-wrapper sek-section-dyn-ui">
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
-                      <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>"><div class="sek-dyn-ui-level-type"><?php _e( 'section', 'text_domain' ); ?></div></div>
                       <div class="sek-dyn-ui-icons">
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
                         <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
-                        <# if ( ! data.is_last_possible_section ) { #>
+                        <# if ( ! data.is_nested ) { #>
                           <i class="fas fa-ellipsis-v sek-move-section" title="<?php _e( 'Move section', 'text_domain' ); ?>"></i>
                         <# } #>
                         <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>">settings</i>
@@ -7130,6 +7320,15 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'text_domain' ); ?>">delete_forever</i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
+                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>">
+                      <div class="sek-dyn-ui-location-inner">
+                        <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
+                          <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
+                        </div>
+                        <div class="sek-dyn-ui-level-type"><# if ( ! data.is_nested ) { #>{{ sekPreviewLocalized.i18n['section'] }}<# } else { #>{{ sekPreviewLocalized.i18n['nested section'] }}<# } #></div>
+                      </div><?php // .sek-dyn-ui-location-inner ?>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu', 'text-domain'); ?>"><i class="fa fa-times"></i></div>
+                    </div><?php // .sek-dyn-ui-location-type ?>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 
@@ -7155,14 +7354,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     </div><?php // .sek-dyn-ui-inner ?>
 
                     <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">
-                      <div class="sek-minimize-ui" title="<?php _e('Hide', 'text-domain'); ?>"><i class="fas fa-angle-down"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu', 'text-domain'); ?>"><i class="fa fa-times"></i></div>
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
                           <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
                         </div>
                         <div class="sek-dyn-ui-level-type"><?php _e( 'column', 'text_domain' ); ?></div>
-                      </div>
-                    </div>
+                      </div><?php // .sek-dyn-ui-location-inner ?>
+                    </div><?php // .sek-dyn-ui-location-type ?>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
 
@@ -7187,7 +7386,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         </div>
                         <div class="sek-dyn-ui-level-type">{{module_name}}</div>
                       </div>
-                      <div class="sek-minimize-ui" title="<?php _e('Hide', 'text-domain'); ?>"><i class="fas fa-angle-down"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu', 'text-domain'); ?>"><i class="fa fa-times"></i></div>
                     </div>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
@@ -7218,6 +7417,23 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
             if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
 
+            add_action( 'wp_head', array( $this, 'sek_schedule_rendering_hooks') );
+
+            // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
+            add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
+
+            // SCHEDULE THE ASSETS ENQUEUING
+            add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
+
+            // USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+            add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
+        }
+
+        function sek_schedule_rendering_hooks() {
+            $locale_template = sek_get_locale_template();
+            if ( !empty( $locale_template ) )
+              return;
+
             // SCHEDULE THE ACTIONS ON HOOKS AND CONTENT FILTERS
             foreach( sek_get_locations() as $hook ) {
                 switch ( $hook ) {
@@ -7231,18 +7447,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     case 'after_content' :
                         add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
                     break;
+                    // Defaut is typically used when for custom locations
+                    default :
+                        add_action( $hook, array( $this, 'sek_schedule_sektions_rendering' ) );
+                    break;
                 }
             }
-
-            add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
-
-            // SCHEDULE THE ASSETS ENQUEUING
-            add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
-            // add_filter( 'template_include', function( $template ) {
-            //       // error_log( 'TEMPLATE ? => ' . $template );
-            //       // error_log( 'DID_ACTION WP => ' . did_action('wp') );
-            //       return NIMBLE_BASE_PATH. "/tmpl/page-templates/full-width.php";// $template;
-            // });
         }
 
         // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
@@ -7266,16 +7476,27 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
         // hook : loop_start, loop_end
-        function sek_schedule_sektions_rendering() {
+        function sek_schedule_sektions_rendering( $query = null ) {
+            // Check if the passed query is the main_query, bail if not
+            // fixes: https://github.com/presscustomizr/nimble-builder/issues/154 2.
+            // Note: a check using $query instanceof WP_Query would return false here, probably because the
+            // query object is passed by reference
+            // accidentally this would also fix the same point 1. of the same issue if the 'sek_schedule_rendering_hooks' method will be fired
+            // with an early hook (earlier than wp_head).
+            if ( is_object( $query ) && is_a( $query, 'WP_Query' ) && ! $query->is_main_query() ) {
+                return;
+            }
+
+            $hook = current_filter();
             // A location can be rendered only once
             // for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
             // @see issue with Twenty Seventeen here : https://github.com/presscustomizr/nimble-builder/issues/14
             // That's why we check if did_action( ... )
-            if ( did_action( 'sek_before_location_' . current_filter() ) )
+            if ( did_action( "sek_before_location_{$hook}" ) )
               return;
-            do_action( 'sek_before_location_' . current_filter() );
-            $this->_render_seks_for_location( current_filter() );
-            do_action( 'sek_after_location_' . current_filter() );
+            do_action( "sek_before_location_{$hook}" );
+            $this->_render_seks_for_location( $hook );
+            do_action( "sek_after_location_{$hook}" );
         }
 
         // hook : 'the_content'::-9999
@@ -7301,13 +7522,20 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 ob_start();
                 $this->_render_seks_for_location( $where );
                 $html = 'before_content' == $where ? ob_get_clean() . $html : $html . ob_get_clean();
+                // Collapse line breaks before and after <div> elements so they don't get autop'd.
+                // @see function wpautop() in wp-includes\formatting.php
+                // @fixes https://github.com/presscustomizr/nimble-builder/issues/32
+                if ( strpos( $html, '<div' ) !== false ) {
+                  $html = preg_replace( '|\s*<div|', '<div', $html );
+                  $html = preg_replace( '|</div>\s*|', '</div>', $html );
+                }
             }
 
             return $html;
         }
 
 
-        private function _render_seks_for_location( $location = '' ) {
+        public function _render_seks_for_location( $location = '' ) {
             if ( ! in_array( $location, sek_get_locations() ) ) {
                 error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
@@ -7326,6 +7554,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
 
                 add_filter('the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
+
 
             } else {
                 error_log( __CLASS__ . ' :: ' . __FUNCTION__ .' => sek_get_skoped_seks() should always return an array().');
@@ -7415,6 +7644,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $col_number = 12 < $col_number ? 12 : $col_number;
                     $col_width_in_percent = 100/$col_number;
 
+                    //@note : we use the same logic in the customizer preview js to compute the column css classes when dragging them
+                    //@see sek_preview::makeColumnsSortableInSektion
                     //TODO, we might want to be sure the $col_suffix is related to an allowed size
                     $col_suffix = floor( $col_width_in_percent );
                     ?>
@@ -7628,6 +7859,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 }
             }//foreach
             return $enqueuing_candidates;
+        }
+
+
+        // @hook 'template_include'
+        // @return template path
+        function sek_maybe_set_local_nimble_template( $template ) {
+            $locale_template = sek_get_locale_template();
+            if ( !empty( $locale_template ) ) {
+                $template = $locale_template;
+            }
+            // error_log( 'DID_ACTION WP => ' . did_action('wp') );
+            return $template;
         }
     }//class
 endif;
