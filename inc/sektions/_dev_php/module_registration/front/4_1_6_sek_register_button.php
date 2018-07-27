@@ -114,12 +114,12 @@ function sek_get_module_params_for_czr_button_module() {
                                 'css_selectors'=> $css_selectors
                             ),
                             'border_radius_css'       => array(
-                                'input_type'  => 'range_simple',
-                                'title'       => __( 'Rounded corners in pixels', 'text_domain_to_be_replaced' ),
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
                                 'default'     => '2px',
                                 'width-100'   => true,
                                 'title_width' => 'width-100',
-                                'min'         => '0',
+                                'min'         => 0,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'border_radius',
