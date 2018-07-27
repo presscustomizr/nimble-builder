@@ -175,7 +175,9 @@
   width: 16px;
   padding: 3px;
 }
-
+.sek-dyn-ui-level-type {
+  cursor: -webkit-grab;
+}
 
 
 /* ADAPT THE UI ICONS SIZES WHEN COLUMNS ARE BECOMING NARROWS */
