@@ -2,6 +2,10 @@
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
+            /* This code is inpired from the plugin customize-posts, GPLv2 or later licensed
+                Credits : xwp, westonruter, valendesigns, sayedwp, utkarshpatel.
+                Date of original code modification : July 2018
+            */
             // fired from ::initialize()
             setupTinyMceEditor: function() {
                   var self = this;
@@ -248,26 +252,30 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // LISTEN TO USER DRAG ACTIONS => RESIZE EDITOR
-                  // self.$editorDragbar.on( 'mousedown mouseup', function( evt ) {
-                  //       if ( ! api.sekEditorExpanded() )
-                  //         return;
-                  //       switch( evt.type ) {
-                  //             case 'mousedown' :
-                  //                   $( document ).on( 'mousemove.czr-customize-content_editor', function( event ) {
-                  //                         event.preventDefault();
-                  //                         $( document.body ).addClass( 'czr-customize-content_editor-pane-resize' );
-                  //                         self.$editorFrame.css( 'pointer-events', 'none' );
-                  //                         self.czrResizeEditor( event.pageY );
-                  //                   });
-                  //             break;
+                  // Note : attaching event to the dragbar element was broken => the mouseup event could not be triggered for some reason, probably because adding the class "czr-customize-content_editor-pane-resize", makes us lose access to the dragbar element
+                  // => that's why we listen for the mouse events when they have bubbled up to the parent wrapper, and then check if the target is our candidate.
+                  $('#czr-customize-content_editor-pane').on( 'mousedown mouseup', function( evt ) {
+                        if ( 'mousedown' === evt.type && 'czr-customize-content_editor-dragbar' !== $(evt.target).attr('id') )
+                          return;
+                        if ( ! api.sekEditorExpanded() )
+                          return;
+                        switch( evt.type ) {
+                              case 'mousedown' :
+                                    $( document ).on( 'mousemove.czr-customize-content_editor', function( event ) {
+                                          event.preventDefault();
+                                          $( document.body ).addClass( 'czr-customize-content_editor-pane-resize' );
+                                          self.$editorFrame.css( 'pointer-events', 'none' );
+                                          self.czrResizeEditor( event.pageY );
+                                    });
+                              break;
 
-                  //             case 'mouseup' :
-                  //                   $( document ).off( 'mousemove.czr-customize-content_editor' );
-                  //                   $( document.body ).removeClass( 'czr-customize-content_editor-pane-resize' );
-                  //                   self.$editorFrame.css( 'pointer-events', '' );
-                  //             break;
-                  //       }
-                  // });
+                              case 'mouseup' :
+                                    $( document ).off( 'mousemove.czr-customize-content_editor' );
+                                    $( document.body ).removeClass( 'czr-customize-content_editor-pane-resize' );
+                                    self.$editorFrame.css( 'pointer-events', '' );
+                              break;
+                        }
+                  });
             },
 
 
