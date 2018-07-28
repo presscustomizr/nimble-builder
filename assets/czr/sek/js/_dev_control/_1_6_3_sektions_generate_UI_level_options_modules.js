@@ -114,7 +114,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });//api( Id, function( _setting_ ) {})
 
                                     // Let's add the starting values if provided when registrating the module
-                                    startingModuleValue = self.getModuleStartingValue( optionData.module_type );
+                                    startingModuleValue = $.extend( true, {}, self.getModuleStartingValue( optionData.module_type ) );
                                     initialModuleValues = levelOptionValues[ optionType ] || {};
                                     if ( 'no_starting_value' !== startingModuleValue ) {
                                           initialModuleValues = $.extend( startingModuleValue, initialModuleValues );
