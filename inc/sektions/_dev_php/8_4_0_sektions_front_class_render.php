@@ -159,6 +159,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
 
+
+
+
+
         // Walk a model tree recursively and render each level with a specific template
         function render( $model = array(), $location = 'loop_start' ) {
             //sek_error_log('LEVEL MODEL IN ::RENDER()', $model );
@@ -217,7 +221,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
 
                     ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s" %4$s>', $id, $is_nested ? 'data-sek-is-nested="true"' : '', $has_at_least_one_module ? 'sek-has-modules' : '', is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"' ); ?>
+                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s" %5$s>',
+                        $id,
+                        $is_nested ? 'data-sek-is-nested="true"' : '',
+                        $has_at_least_one_module ? 'sek-has-modules' : '',
+                        $this->get_level_visibility_css_class( $model ),
+                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"'
+                    ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
                                 <?php
@@ -247,9 +257,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $col_suffix = floor( $col_width_in_percent );
                     ?>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base sek-col-%2$s" %3$s>',
+                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base sek-col-%2$s %3s" %4$s>',
                               $id,
                               $col_suffix,
+                              $this->get_level_visibility_css_class( $model ),
                               empty( $collection ) ? 'data-sek-no-modules="true"' : ''
                           );
                       ?>
@@ -297,7 +308,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $title_attribute = 'title="'.$title_attribute.'"';
                     }
                     ?>
-                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module" %3$s>', $id, $module_type, $title_attribute ); ?>
+                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s>',
+                          $id,
+                          $module_type,
+                          $this->get_level_visibility_css_class( $model ),
+                          $title_attribute
+                        );?>
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>
                             </div>
@@ -308,6 +324,34 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             $this -> parent_model = $parent_model;
         }//render
+
+
+
+
+
+
+
+
+        /* HELPER TO PRINT THE VISIBILITY CSS CLASS IN THE LEVEL CONTAINER */
+        // @return string
+        private function get_level_visibility_css_class( $model ) {
+            if ( ! is_array( $model ) ) {
+                error_log( __FUNCTION__ . ' => $model param should be an array' );
+                return;
+            }
+            $visibility_class = '';
+            //when boxed use proper container class
+            if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'visibility' ] ) ) {
+                if ( is_array( $model[ 'options' ][ 'visibility' ] ) ) {
+                    foreach ( $model[ 'options' ][ 'visibility' ] as $device_type => $device_visibility_bool ) {
+                        if ( true !== sek_booleanize_checkbox_val( $device_visibility_bool  ) ) {
+                            $visibility_class .= " sek-hidden-on-{$device_type}";
+                        }
+                    }
+                }
+            }
+            return $visibility_class;
+        }
 
 
 

@@ -385,6 +385,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Height settings for the' => __('Height settings for the', 'text_domain_to_be_replaced'),
             'Width settings for the' => __('Width settings for the', 'text_domain_to_be_replaced'),
             'Set a custom anchor for the' => __('Set a custom anchor for the', 'text_domain_to_be_replaced'),
+            'Device visibility settings for the' => __('Device visibility settings for the', 'text_domain_to_be_replaced'),
 
             'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
 
