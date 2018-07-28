@@ -12,7 +12,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // Let the event bubble up to the location, and then visit all children section to maybe re-instantiate resizable
                   // @fixes https://github.com/presscustomizr/nimble-builder/issues/165
                   $('body').on(
-                        'sek-level-refreshed',
+                        'sek-level-refreshed sek-modules-refreshed sek-columns-refreshed',
                         '[data-sek-level="location"]',
                         function() {
                               $(this).find('[data-sek-level="section"]').each( function() {
