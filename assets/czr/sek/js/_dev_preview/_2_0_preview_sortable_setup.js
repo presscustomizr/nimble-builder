@@ -115,7 +115,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   $('[data-sek-id="' + locationId +'"]').each( function() {
                         defaults = $.extend( true, {}, self.sortableDefaultParams );
                         $(this).sortable( _.extend( defaults, {
-                              handle : '.sek-move-section, .sek-section-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                              //handle : '.sek-move-section, .sek-section-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                              handle : '.sek-move-section',
                               connectWith : '[data-sek-level="location"]',
                               placeholder: {
                                     element: function(currentItem) {
@@ -220,7 +221,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // }
 
                   $sortableCandidate.sortable( _.extend( defaults, {
-                        handle : '.sek-move-column, .sek-column-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                        //handle : '.sek-move-column, .sek-column-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                        handle : '.sek-move-column',
                         connectWith: ".sek-sektion-inner",
                         over : function( event, ui ) {
                               var $targetSektion          = $(this).closest('[data-sek-level="section"]'),
@@ -361,7 +363,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   defaults = $.extend( true, {}, self.sortableDefaultParams );
                   // Restrict to the .sek-column-inner for this very column id with first()
                   $( '[data-sek-id="' + columnId + '"]').find('.sek-column-inner').first().sortable( _.extend( defaults, {
-                        handle : '.sek-move-module, .sek-module-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                        //handle : '.sek-move-module, .sek-module-dyn-ui > .sek-dyn-ui-location-type .sek-dyn-ui-level-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                        handle : '.sek-move-module',
                         connectWith: ".sek-column-inner",
                         over : function( event, ui ) {
                               // Hide the module placeholder while overing, when the column is empty
