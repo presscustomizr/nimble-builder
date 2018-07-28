@@ -78,7 +78,9 @@ function sek_get_module_params_for_czr_button_module() {
                             'link-target' => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
-                                'default'     => false
+                                'default'     => false,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
                             ),
                             'icon' => array(
                                 'input_type'  => 'fa_icon_picker',
@@ -98,7 +100,8 @@ function sek_get_module_params_for_czr_button_module() {
                             'use_custom_bg_color_on_hover' => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __( 'Set a custom background color on mouse hover', 'text_domain_to_be_replaced' ),
-                                'title_width' => 'width-100',
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'default'     => 0,
@@ -154,11 +157,15 @@ function sek_get_module_params_for_czr_button_module() {
                                 'input_type'  => 'gutencheck',
                                 'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
                                 'default'     => 1,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
                             ),
                             'push_effect' => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __( 'Push visual effect', 'text_domain_to_be_replaced' ),
                                 'default'     => 1,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
                             ),
                         )
                     ),
@@ -280,7 +287,8 @@ function sek_get_module_params_for_czr_button_module() {
                             'button___flag_important'       => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
-                                'title_width' => 'width-100',
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
                                 'default'     => 0,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,

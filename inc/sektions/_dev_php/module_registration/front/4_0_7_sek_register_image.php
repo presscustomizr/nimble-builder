@@ -52,7 +52,9 @@ function sek_get_module_params_for_czr_image_module() {
                             'link-target' => array(
                                 'input_type'  => 'gutencheck',
                                 'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
-                                'default'     => false
+                                'default'     => false,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
                             ),
                             'h_alignment_css' => array(
                                 'input_type'  => 'h_alignment',

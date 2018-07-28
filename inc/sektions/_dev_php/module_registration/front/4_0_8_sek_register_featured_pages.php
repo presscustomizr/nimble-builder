@@ -75,7 +75,9 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 'btn-display' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Display a call to action button', 'text_domain_to_be_replaced'),
-                    'default'     => true
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
                 ),
                 'btn-custom-text' => array(
                     'input_type'  => 'tiny_mce_editor',

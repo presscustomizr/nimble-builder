@@ -125,8 +125,8 @@ function sek_get_module_params_for_czr_heading_module() {
                                 'default'     => 0,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
                                 // declare the list of input_id that will be flagged with !important when the option is checked
                                 // @see sek_add_css_rules_for_css_sniffed_input_id
                                 // @see Nsek_is_flagged_important

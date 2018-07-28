@@ -66,7 +66,9 @@ function sek_get_module_params_for_czr_icon_module() {
                 'link-target' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
-                    'default'     => false
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
                 ),
                 'font_size_css' => array(
                     'input_type'  => 'range_with_unit_picker',
@@ -100,7 +102,8 @@ function sek_get_module_params_for_czr_icon_module() {
                 'use_custom_color_on_hover' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __( 'Set a custom icon color on mouse hover', 'text_domain_to_be_replaced' ),
-                    'title_width' => 'width-100',
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'default'     => 0,
