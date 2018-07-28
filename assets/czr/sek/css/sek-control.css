@@ -701,10 +701,32 @@ credits : Gutenberg team @wordpress */
 
 
 
-/* VARIOUS */
+/* VARIOUS HELPER CLASSES */
 .sek-float-right {
   float: right;
 }
+.sek-flex-vertical-center {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* LEVEL UI CHEVRON ICON NEXT TO TITLE */
 .sek-animated-arrow {
@@ -737,4 +759,11 @@ credits : Gutenberg team @wordpress */
     -webkit-transform: rotate(180deg);
         -ms-transform: rotate(180deg);
             transform: rotate(180deg);
+}
+
+/* STYLE FOR THE LEVEL ICON NEXT TO THE CONTROL TITLE */
+.sek-level-option-icon {
+  padding-right: 5px;
+  min-width: 22px;
+  text-align: center;
 }

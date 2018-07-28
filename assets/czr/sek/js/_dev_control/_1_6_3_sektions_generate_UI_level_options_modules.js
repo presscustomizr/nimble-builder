@@ -30,22 +30,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : params.id + '__bgBorder_options',
                               module_type : 'sek_level_bg_border_module',
                               controlLabel : sektionsLocalizedData.i18n['Background and border settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
-                              expandAndFocusOnInit : true
+                              expandAndFocusOnInit : true,
+                              icon : '<i class="material-icons sek-level-option-icon">gradient</i>'//'<i class="material-icons sek-level-option-icon">brush</i>'
                         },
                         spacing : {
                               settingControlId : params.id + '__spacing_options',
                               module_type : 'sek_level_spacing_module',
-                              controlLabel : sektionsLocalizedData.i18n['Padding and margin settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
+                              controlLabel : sektionsLocalizedData.i18n['Padding and margin settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              icon : '<i class="material-icons sek-level-option-icon">center_focus_weak</i>'
                         },
                         height : {
                               settingControlId : params.id + '__height_options',
                               module_type : 'sek_level_height_module',
-                              controlLabel : sektionsLocalizedData.i18n['Height settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
+                              controlLabel : sektionsLocalizedData.i18n['Height settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              icon : '<i class="fas fa-ruler-vertical sek-level-option-icon"></i>'
                         },
                         anchor : {
                               settingControlId : params.id + '__anchor_options',
                               module_type : 'sek_level_anchor_module',
-                              controlLabel : sektionsLocalizedData.i18n['Set a custom anchor for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
+                              controlLabel : sektionsLocalizedData.i18n['Set a custom anchor for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              icon : '<i class="fas fa-anchor sek-level-option-icon"></i>'
+                        },
+                        visibility : {
+                              settingControlId : params.id + '__visibility_options',
+                              module_type : 'sek_level_visibility_module',
+                              controlLabel : sektionsLocalizedData.i18n['Device visibility settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                         },
                   });
 
@@ -54,7 +64,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               layout : {
                                     settingControlId : params.id + '__sectionLayout_options',
                                     module_type : 'sek_level_section_layout_module',
-                                    controlLabel : sektionsLocalizedData.i18n['Layout settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
+                                    controlLabel : sektionsLocalizedData.i18n['Layout settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                                    icon : '<i class="material-icons sek-level-option-icon">crop_din</i>'
                               }
                         });
                   }
@@ -63,7 +74,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               width : {
                                     settingControlId : params.id + '__width_options',
                                     module_type : 'sek_level_width_module',
-                                    controlLabel : sektionsLocalizedData.i18n['Width settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
+                                    controlLabel : sektionsLocalizedData.i18n['Width settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                                    icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
                               }
                         });
                   }
@@ -141,9 +153,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // Implement the animated arrow markup, and the initial state of the module visibility
                                     api.control( optionData.settingControlId, function( _control_ ) {
+                                          // Hide the item wrapper
                                           _control_.container.find('.czr-items-wrapper').hide();
                                           var $title = _control_.container.find('label > .customize-control-title');
+                                          // if this level has an icon, let's prepend it to the title
+                                          if ( ! _.isUndefined( optionData.icon ) ) {
+                                                $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
+                                          }
+                                          // prepend the animated arrow
                                           $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+                                          // setup the initial state + initial click
                                           _control_.container.attr('data-sek-expanded', "false" );
                                           if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
                                                 $title.trigger('click');
