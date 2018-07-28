@@ -203,7 +203,11 @@ class Sek_Dyn_CSS_Builder {
         if ( 'all_devices' === $mq_device ) {
             return $css;
         }
-        return sprintf( '@media(%1$s){%2$s}', $mq_device, $css);
+        if ( false === strpos($mq_device, '(') || false === strpos($mq_device, ')') ) {
+            sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => missing parenthesis in the media queries', $mq_device );
+            return $css;
+        }
+        return sprintf( '@media%1$s{%2$s}', $mq_device, $css);
     }
 
 
@@ -264,7 +268,7 @@ class Sek_Dyn_CSS_Builder {
         $rules[] = array(
             'selector'      => '.sek-column[data-sek-id="'.$level['id'].'"]',
             'css_rules'     => $css_rules,
-            'mq'            => 'min-width:' . self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] .'px'
+            'mq'            => '(min-width:' . self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] .'px)'
         );
         return $rules;
     }
