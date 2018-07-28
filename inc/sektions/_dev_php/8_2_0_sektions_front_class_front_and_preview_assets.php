@@ -177,7 +177,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         </div>
                         <div class="sek-dyn-ui-level-type"><# if ( ! data.is_nested ) { #>{{ sekPreviewLocalized.i18n['section'] }}<# } else { #>{{ sekPreviewLocalized.i18n['nested section'] }}<# } #></div>
                       </div><?php // .sek-dyn-ui-location-inner ?>
-                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu', 'text-domain'); ?>"><i class="fa fa-times"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
                     </div><?php // .sek-dyn-ui-location-type ?>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
@@ -204,7 +204,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     </div><?php // .sek-dyn-ui-inner ?>
 
                     <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">
-                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu', 'text-domain'); ?>"><i class="fa fa-times"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
                           <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
@@ -236,7 +236,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         </div>
                         <div class="sek-dyn-ui-level-type">{{module_name}}</div>
                       </div>
-                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu', 'text-domain'); ?>"><i class="fa fa-times"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
                     </div>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
