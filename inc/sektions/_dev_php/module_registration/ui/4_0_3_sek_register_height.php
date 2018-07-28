@@ -88,7 +88,9 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
                 if ( !empty( $numeric ) ) {
                     $unit = sek_extract_unit( $height );
                     $unit = '%' === $unit ? 'vh' : $unit;
-                    $css_rules .= 'height:' . $numeric . $unit . ';';
+                    // Note : Use of min-height. Because setting the level's height with the "height" css property can break the sections
+                    // @see https://github.com/presscustomizr/nimble-builder/issues/166
+                    $css_rules .= 'min-height:' . $numeric . $unit . ';';
                 }
             }
             if ( !empty( $css_rules ) ) {
