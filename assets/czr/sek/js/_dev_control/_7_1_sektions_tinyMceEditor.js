@@ -104,7 +104,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         mayBeAwakeTinyMceEditor();
                         //api.infoLog('in api.sekEditorExpanded', expanded );
                         if ( expanded ) {
-                            api.sekTinyMceEditor.focus();
+                              api.sekTinyMceEditor.focus();
                         }
                         $(document.body).toggleClass( 'czr-customize-content_editor-pane-open', expanded);
 
@@ -255,7 +255,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Note : attaching event to the dragbar element was broken => the mouseup event could not be triggered for some reason, probably because adding the class "czr-customize-content_editor-pane-resize", makes us lose access to the dragbar element
                   // => that's why we listen for the mouse events when they have bubbled up to the parent wrapper, and then check if the target is our candidate.
                   $('#czr-customize-content_editor-pane').on( 'mousedown mouseup', function( evt ) {
-                        if ( 'mousedown' === evt.type && 'czr-customize-content_editor-dragbar' !== $(evt.target).attr('id') )
+                        if ( 'mousedown' === evt.type && 'czr-customize-content_editor-dragbar' !== $(evt.target).attr('id') && ! $(evt.target).hasClass('czr-resize-handle') )
                           return;
                         if ( ! api.sekEditorExpanded() )
                           return;
