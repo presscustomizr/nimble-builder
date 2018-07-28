@@ -77,6 +77,11 @@
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
+                                    case 'img' :
+                                          scheduleVisibilityOfInputId.call( input, 'img-size', function() {
+                                                return ! _.isEmpty( input()+'' ) && _.isNumber( input() );
+                                          });
+                                    break;
                                     case 'link-to' :
                                           _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
                                                 try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
