@@ -55,7 +55,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : params.id + '__visibility_options',
                               module_type : 'sek_level_visibility_module',
                               controlLabel : sektionsLocalizedData.i18n['Device visibility settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
-                              icon : '<i class="material-icons sek-level-option-icon">devices</i>'
+                              icon : '<i class="far fa-eye sek-level-option-icon"></i>'
                         },
                   });
 
@@ -114,9 +114,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });//api( Id, function( _setting_ ) {})
 
                                     // Let's add the starting values if provided when registrating the module
-                                    startingModuleValue = $.extend( true, {}, self.getModuleStartingValue( optionData.module_type ) );
                                     initialModuleValues = levelOptionValues[ optionType ] || {};
+                                    startingModuleValue = self.getModuleStartingValue( optionData.module_type );
                                     if ( 'no_starting_value' !== startingModuleValue ) {
+                                          // make sure the starting values are deeped clone now, before being extended
+                                          startingModuleValue = $.extend( true, {}, self.getModuleStartingValue( optionData.module_type ) );
                                           initialModuleValues = $.extend( startingModuleValue, initialModuleValues );
                                     }
 
