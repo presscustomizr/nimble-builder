@@ -25,21 +25,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Prepare the module map to register
                   var levelRegistrationParams = {};
 
-                  if ( 'section' === params.level ) {
-                        $.extend( levelRegistrationParams, {
-                              layout : {
-                                    settingControlId : params.id + '__sectionLayout_options',
-                                    module_type : 'sek_level_section_layout_module',
-                                    controlLabel : sektionsLocalizedData.i18n['Layout settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
-                              }
-                        });
-                  }
-
                   $.extend( levelRegistrationParams, {
                         bg_border : {
                               settingControlId : params.id + '__bgBorder_options',
                               module_type : 'sek_level_bg_border_module',
-                              controlLabel : sektionsLocalizedData.i18n['Background and border settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
+                              controlLabel : sektionsLocalizedData.i18n['Background and border settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              expandAndFocusOnInit : true
                         },
                         spacing : {
                               settingControlId : params.id + '__spacing_options',
@@ -58,6 +49,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         },
                   });
 
+                  if ( 'section' === params.level ) {
+                        $.extend( levelRegistrationParams, {
+                              layout : {
+                                    settingControlId : params.id + '__sectionLayout_options',
+                                    module_type : 'sek_level_section_layout_module',
+                                    controlLabel : sektionsLocalizedData.i18n['Layout settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level]
+                              }
+                        });
+                  }
                   if ( 'module' === params.level ) {
                         $.extend( levelRegistrationParams, {
                               width : {
@@ -133,19 +133,45 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     priority : 0,
                                     settings : { default : optionData.settingControlId }
                               }).done( function() {
-                                    api.control( optionData.settingControlId ).focus({
-                                          completeCallback : function() {}
+                                    if ( true === optionData.expandAndFocusOnInit ) {
+                                          api.control( optionData.settingControlId ).focus({
+                                                completeCallback : function() {}
+                                          });
+                                    }
+
+                                    // Implement the animated arrow markup, and the initial state of the module visibility
+                                    api.control( optionData.settingControlId, function( _control_ ) {
+                                          _control_.container.find('.czr-items-wrapper').hide();
+                                          var $title = _control_.container.find('label > .customize-control-title');
+                                          $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+                                          _control_.container.attr('data-sek-expanded', "false" );
+                                          if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
+                                                $title.trigger('click');
+                                          }
                                     });
                               });
                         });//_.each()
                   };//_do_register_()
 
+                  // The section won't be tracked <= not removed on each ui update
+                  // Note : the check on api.section.has( params.id ) is also performd on api.CZR_Helpers.register(), but here we use it to avoid setting up the click listeners more than once.
+                  if ( ! api.section.has( params.id ) ) {
+                        api.section( params.id, function( _section_ ) {
+                              $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
+                                    var $control = $(this).closest( '.customize-control');
+                                    if ( "true" == $control.attr('data-sek-expanded' ) )
+                                      return;
+                                    _section_.container.find('.customize-control').each( function() {
+                                          $(this).attr('data-sek-expanded', "false" );
+                                          $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
+                                    });
 
 
-                  // Defer the registration when the parent section gets added to the api
-                  api.section.when( params.id, function() {
-                        _do_register_();
-                  });
+                                    $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
+                                    $control.find('.czr-items-wrapper').stop( true, true ).slideToggle( 'fast' );
+                              });
+                        });
+                  }
 
                   api.CZR_Helpers.register({
                         origin : 'nimble',
@@ -156,7 +182,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         priority : 10,
                         track : false//don't register in the self.registered()
                         //constructWith : MainSectionConstructor,
+                  }).done( function() {
+                        // - Defer the registration when the parent section gets added to the api
+                        // - Implement the module visibility
+                        api.section( params.id, function( _section_ ) {
+                              _do_register_();
+                        });
                   });
+
                   return dfd;
             }
       });//$.extend()
