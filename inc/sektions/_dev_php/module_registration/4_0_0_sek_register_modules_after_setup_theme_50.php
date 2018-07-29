@@ -12,6 +12,7 @@ function sek_register_modules() {
         'sek_level_width_module',
         'sek_level_anchor_module',
         'sek_level_visibility_module',
+        'sek_level_breakpoint_module',
 
         'sek_local_skope_options_module',
 

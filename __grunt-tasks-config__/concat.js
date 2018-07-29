@@ -213,6 +213,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_5_sek_register_width.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_6_sek_register_anchor.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_7_sek_register_visibility.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_8_sek_register_breakpoint.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_1_0_sek_register_local_skope_options.php',
 
@@ -281,6 +282,7 @@ module.exports = {
       // Modules
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_anchor_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_bg_border_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_breakpoint_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_height_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_visibility_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_width_module.js',

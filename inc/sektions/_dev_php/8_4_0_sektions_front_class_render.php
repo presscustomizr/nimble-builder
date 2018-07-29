@@ -247,6 +247,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     // }
                     // sek_error_log( 'PARENT MODEL WHEN RENDERING', $parent_model );
 
+                    // SETUP THE DEFAULT CSS CLASS
                     $col_number = ( array_key_exists( 'collection', $parent_model ) && is_array( $parent_model['collection'] ) ) ? count( $parent_model['collection'] ) : 1;
                     $col_number = 12 < $col_number ? 12 : $col_number;
                     $col_width_in_percent = 100/$col_number;
@@ -255,12 +256,20 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     //@see sek_preview::makeColumnsSortableInSektion
                     //TODO, we might want to be sure the $col_suffix is related to an allowed size
                     $col_suffix = floor( $col_width_in_percent );
+
+                    // SETUP THE CUSTOM BREAKPOINT CSS CLASS
+                    $has_custom_breakpoint = false;
+                    if ( !empty( $parent_model[ 'options' ] ) && !empty( $parent_model[ 'options' ][ 'breakpoint' ] ) && !empty( $parent_model[ 'options' ][ 'breakpoint' ]['custom-breakpoint'] ) ) {
+                        $has_custom_breakpoint = intval( $parent_model[ 'options' ][ 'breakpoint' ]['custom-breakpoint'] ) >= 0;
+                    }
+
                     ?>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base sek-col-%2$s %3s" %4$s>',
+                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base sek-col-%2$s %3s %4$s" %5$s>',
                               $id,
                               $col_suffix,
                               $this->get_level_visibility_css_class( $model ),
+                              $has_custom_breakpoint ? 'sek-custom-level-col-' . $col_suffix : '',
                               empty( $collection ) ? 'data-sek-no-modules="true"' : ''
                           );
                       ?>

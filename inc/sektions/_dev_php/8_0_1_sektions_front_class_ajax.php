@@ -224,6 +224,10 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                         wp_send_json_error(  __FUNCTION__ . ' ' . $sek_action .' => missing level id' );
                         break;
                     }
+                    if ( !empty( $_POST['level'] ) && 'column' === $_POST['level'] ) {
+                        // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
+                        $this -> parent_model = sek_get_parent_level_model( $_POST['id'], $sektion_collection );
+                    }
                     $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                 break;
             }//Switch sek_action
