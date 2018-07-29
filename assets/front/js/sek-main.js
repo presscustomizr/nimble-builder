@@ -57,7 +57,7 @@ jQuery( function($){
           );
 
     };
-    doFitText();
+    //doFitText();
     // if ( 'function' == typeof(_) && ! _.isUndefined( wp.customize ) ) {
     //     wp.customize.selectiveRefresh.bind('partial-content-rendered' , function() {
     //         doFitText();

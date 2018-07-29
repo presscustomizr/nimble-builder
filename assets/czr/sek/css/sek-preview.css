@@ -182,7 +182,7 @@
 .sek-dyn-ui-icons > i:last-child {
   padding-right: 2px;
 }*/
-.sek-dyn-ui-icons .fa-ellipsis-v {
+.sek-dyn-ui-icons .fa-arrows-alt {
   cursor: move;
 }
 
@@ -633,7 +633,8 @@
     text-align: center;
     border: 1px dotted #ccc;
     background: #eee;
-    background: rgba(238, 238, 238, 0.84);
+    /*background: rgba(238, 238, 238, 0.84);*/
+    background: rgba(0, 0, 0, 0.10);
     height: 100%;
     min-height: 40px;
     -webkit-box-align: center;
@@ -646,13 +647,22 @@
     display: -webkit-box;
     display: flex;
 }
+.sek-module-drop-zone-for-first-module:hover {
+    background: rgba(0, 0, 0, 0.50);
+}
+
+.sek-module-drop-zone-for-first-module:hover [data-sek-click-on="pick-module"]{
+    color: #fff;
+}
+
 
 .sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"] {
   cursor: pointer;
   width: 50px;
   height: 50px;
-  color: #0085ba;
-  color: rgba(0, 133, 186, 0.6);
+  /*color: #0085ba;
+  color: rgba(0, 133, 186, 0.6);*/
+  color: #535353;
   border-radius: 30px;
   -webkit-transition: all .20s ease;
   -o-transition: all .20s ease;
@@ -671,7 +681,8 @@
 .sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"]:hover {
   -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
   box-shadow: 0 2px 6px rgba(0,0,0,.2);
-  color: #0085ba;
+  /*color: #0085ba;*/
+  color: #fff;
 }
 
 /* Adapt the size when columns are too narrow */
@@ -705,9 +716,9 @@
 
 /* This is the selector for all eligible drop zones */
 .sek-drop-zone {
-  -webkit-transition: opacity, height 0.4s ease;
-  -o-transition: opacity, height 0.4s ease;
-  transition: opacity, height 0.4s ease;
+  -webkit-transition: opacity, height, background 0.4s ease;
+  -o-transition: opacity, height, background 0.4s ease;
+  transition: opacity, height, background 0.4s ease;
 }
 
 
@@ -1192,3 +1203,8 @@ html.no-js [id*=sek-slider-loader-wrapper] {
   z-index: 99;
   background: #ffffff;
 }*/
+
+
+
+/* PLACEHOLDER STYLE FOR TINYMCE MODULE */
+.sek-tiny-mce-module-placeholder-text { padding:10px;border: 1px dotted;background: rgba(0, 0, 0, 0.35); color: #fff;}

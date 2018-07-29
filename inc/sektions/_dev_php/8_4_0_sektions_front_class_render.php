@@ -396,7 +396,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             switch( $input_type ) {
                 case 'tiny_mce_editor' :
                 case 'text' :
-                  $ph = skp_is_customizing() ? '<div style="padding:10px;border: 1px dotted;background:#eee">' . __('Click to edit', 'here') .'</div>' : '<i class="material-icons">short_text</i>';
+                  $ph = skp_is_customizing() ? '<div class="sek-tiny-mce-module-placeholder-text">' . __('Click to edit', 'here') .'</div>' : '';
                 break;
                 case 'upload' :
                   $ph = '<i class="material-icons">image</i>';
