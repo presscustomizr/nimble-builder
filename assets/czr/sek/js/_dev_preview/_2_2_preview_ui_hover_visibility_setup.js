@@ -308,14 +308,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // @return void()
                   var resetMouseMoveTrack = function() {
                         clearTimeout( $(window).data('_scroll_move_timer_') );
-                        self.mouseMovedRecently.set( {} );
+                        self.mouseMovedRecently.set({});
                   };
 
                   $(window).on( 'mousemove scroll', _.throttle( function( evt ) {
                         self.mouseMovedRecently( { x : evt.clientX, y : evt.clientY } );
                         clearTimeout( $(window).data('_scroll_move_timer_') );
                         $(window).data('_scroll_move_timer_', setTimeout(function() {
-                              //self.mouseMovedRecently.set( {} );
+                              self.mouseMovedRecently.set({});
                         }, 4000 ) );
                   }, 50 ) );
 
