@@ -78,10 +78,15 @@ function sek_get_level_model( $id, $collection = array() ) {
 }
 
 // Recursive helper
+// Typically used when ajaxing
 function sek_get_parent_level_model( $child_level_id, $collection = array(), $skope_id = '' ) {
     if ( empty( $collection ) ) {
         if ( empty( $skope_id ) ) {
-            $skope_id = skp_get_skope_id( $skope_level );
+            if ( is_array( $_POST ) && ! empty( $_POST['skope_id'] ) ) {
+                $skope_id = $_POST['skope_id'];
+            } else {
+                $skope_id = skp_get_skope_id();
+            }
         }
         $collection = sek_get_skoped_seks( $skope_id );
     }
