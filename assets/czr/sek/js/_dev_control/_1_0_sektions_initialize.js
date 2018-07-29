@@ -341,14 +341,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-            /* TOP BAR */
-            //can be call directly, but is also a callback of self.topBarVisible, fired on skope base initialize
-            //noteParams is an object :
-            //{
-            // title : '',
-            // message : '',
-            // actions : fn()
-            //}
+            // TOP BAR
+            // fired in ::initialize()
             toggleTopBar : function( visible ) {
                   visible = _.isUndefined( visible ) ? true : visible;
                   var self = this,
@@ -359,22 +353,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   _.delay( function() {
                                       $('body').addClass('nimble-top-bar-open');
                                   }, 200 );
-                                  // api.CZR_Helpers.setupDOMListeners(
-                                  //       [ {
-                                  //             trigger   : 'click keydown',
-                                  //             selector  : '.czr-preview-note-close',
-                                  //             actions   : function() {
-                                  //                   _hide().done( function() {
-                                  //                         self.topBarVisible( false );
-                                  //                         if ( _.isFunction( noteParams.actions ) ) {
-                                  //                               noteParams.actions();
-                                  //                         }
-                                  //                   });
-                                  //             }
-                                  //       } ] ,
-                                  //       { dom_el : self.topBarContainer },
-                                  //       self
-                                  // );
                             });
                       },
                       _hide = function() {
@@ -399,13 +377,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.topBarVisible( false );//should be already false
                         });
                   }
-
-                  //Always auto-collapse the notification
-                  // _.delay( function() {
-                  //             self.topBarVisible( false );
-                  //       },
-                  //       2000
-                  // );
             },
 
 
