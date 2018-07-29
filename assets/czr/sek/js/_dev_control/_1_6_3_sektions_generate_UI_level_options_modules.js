@@ -39,12 +39,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel : sektionsLocalizedData.i18n['Padding and margin settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                               icon : '<i class="material-icons sek-level-option-icon">center_focus_weak</i>'
                         },
-                        height : {
-                              settingControlId : params.id + '__height_options',
-                              module_type : 'sek_level_height_module',
-                              controlLabel : sektionsLocalizedData.i18n['Height settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
-                              icon : '<i class="fas fa-ruler-vertical sek-level-option-icon"></i>'
-                        },
                         anchor : {
                               settingControlId : params.id + '__anchor_options',
                               module_type : 'sek_level_anchor_module',
@@ -56,6 +50,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_level_visibility_module',
                               controlLabel : sektionsLocalizedData.i18n['Device visibility settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                               icon : '<i class="far fa-eye sek-level-option-icon"></i>'
+                        },
+                        height : {
+                              settingControlId : params.id + '__height_options',
+                              module_type : 'sek_level_height_module',
+                              controlLabel : sektionsLocalizedData.i18n['Height settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              icon : '<i class="fas fa-ruler-vertical sek-level-option-icon"></i>'
                         },
                   });
 
