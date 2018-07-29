@@ -22,7 +22,7 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Custom height', 'text_domain_to_be_replaced'),
                     'min' => 0,
-                    'max' => 100,
+                    'max' => 500,
                     'default' => '50',
                     'width-100'   => true
                 ),
@@ -90,7 +90,7 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
                     $unit = '%' === $unit ? 'vh' : $unit;
                     // Note : Use of min-height. Because setting the level's height with the "height" css property can break the sections
                     // @see https://github.com/presscustomizr/nimble-builder/issues/166
-                    $css_rules .= 'min-height:' . $numeric . $unit . ';';
+                    $css_rules .= 'height:' . $numeric . $unit . ';';
                 }
             }
             if ( !empty( $css_rules ) ) {
