@@ -767,3 +767,109 @@ credits : Gutenberg team @wordpress */
   min-width: 22px;
   text-align: center;
 }
+
+
+
+
+
+/* TOP BAR */
+#nimble-top-bar {
+  position: absolute;
+  text-align: center;
+  right: 0;
+  left: 0;
+  z-index: 20;
+  color: #fff;
+  display: block;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all, 0.3s ease-in-out;
+  -ms-transition: all, 0.3s ease-in-out;
+  -o-transition: all, 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  /*visibility: hidden;*/
+  opacity: 0;
+  top : 0%;
+  background: rgba(0, 0, 0, 0.29);
+  padding: 2px;
+  z-index: 99999;
+}
+
+body.nimble-top-bar-open #nimble-top-bar {
+  /*visibility: inherit;*/
+  opacity: 1;
+}
+
+#nimble-top-bar:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+#nimble-top-bar .nimble-top-bar-content {
+  display: inline-block;
+  line-height: 20px;
+  width: 80%;
+}
+
+#nimble-top-bar .sek-do-undo .icon:before {
+  display: inline-block;
+  -webkit-font-smoothing: antialiased;
+  font: normal 20px/30px "dashicons";
+  vertical-align: top;
+/*  margin: 3px 0;
+  padding: 4px 8px;*/
+  color: #fff;
+}
+#nimble-top-bar .sek-do-undo {
+  float: right;
+}
+#nimble-top-bar .sek-do-undo button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+/*  opacity: 0.8;*/
+}
+#nimble-top-bar button[data-nimble-state="disabled"] {
+  cursor: inherit;
+  opacity: 0.4!important;
+}
+#nimble-top-bar .sek-do-undo button:hover {
+  opacity: 1;
+}
+#nimble-top-bar .sek-do-undo button:focus {
+  outline: none;
+}
+#nimble-top-bar .sek-do-undo .icon.undo:before {
+  content:"\f171";
+    -webkit-transform: rotate(-45deg);
+      -ms-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+}
+#nimble-top-bar .sek-do-undo .icon.do:before {
+  content:"\f172";
+    -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+
+/*.czr-preview-notification a, .czr-preview-notification h2 {color: #fff; margin: 1em 0;}
+
+.czr-preview-notification .czr-preview-note-close {
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  font-size: 31px;
+  cursor: pointer;
+}
+
+.czr-preview-notification  .fa-arrow-left {
+  position: absolute;
+  bottom: 10px;
+  left: 25px;
+  font-size: 40px;
+}
+
+.czr-preview-notification .czr-note-message {
+  font-size: 16px;
+  line-height: 1.5em;
+  margin: 0.5em 0;
+}*/

@@ -33,8 +33,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         if ( sektionsLocalizedData.isDevMode ) {
                               api( collectionSettingId, function( sektionSetInstance ) {
+                                    // self.historyLog is declared in ::initialize()
+                                    self.historyLog([{
+                                          status : 'current',
+                                          value : sektionSetInstance(),
+                                          action : 'initial'
+                                    }]);
                                     // Schedule reactions to a collection change
-                                    sektionSetInstance.bind( function( newSektionSettingValue, previousValue, params ) {
+                                    sektionSetInstance.bind( _.debounce( function( newSektionSettingValue, previousValue, params ) {
                                           api.infoLog( 'sektionSettingValue is updated',
                                                 {
                                                       newValue : newSektionSettingValue,
@@ -42,7 +48,37 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       params : params
                                                 }
                                           );
-                                    });
+
+                                          // Track changes, if not currently navigating the logs
+                                          // Always clean future values if the logs have been previously navigated back
+                                          if ( params && true !== params.navigatingHistoryLogs ) {
+                                                var newHistoryLog = [],
+                                                    historyLog = $.extend( true, [], self.historyLog() ),
+                                                    sektionToRefresh;
+
+                                                if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
+                                                      sektionToRefresh = params.in_sektion;
+                                                } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
+                                                      sektionToRefresh = params.to_sektion;
+                                                }
+
+                                                _.each( historyLog, function( log ) {
+                                                      var newStatus = 'previous';
+                                                      if ( 'future' == log.status )
+                                                        return;
+                                                      $.extend( log, { status : 'previous' } );
+                                                      newHistoryLog.push( log );
+                                                });
+                                                newHistoryLog.push({
+                                                      status : 'current',
+                                                      value : newSektionSettingValue,
+                                                      action : _.isObject( params ) ? ( params.action || '' ) : '',
+                                                      sektionToRefresh : sektionToRefresh
+                                                });
+                                                self.historyLog( newHistoryLog );
+                                          }
+
+                                    }, 1000 ) );
                               });//api( collectionSettingId, function( sektionSetInstance ){}
                         }
                   }

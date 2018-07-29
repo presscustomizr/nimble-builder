@@ -537,4 +537,22 @@ function sek_get_img_sizes() {
 function sek_img_sizes_preg_replace_callback( $matches ) {
     return strtoupper( $matches[0] );
 }
+
+add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_customizer_tmpl' );
+function sek_print_nimble_customizer_tmpl() {
+    ?>
+    <script type="text/html" id="tmpl-nimble-top-bar">
+      <div id="nimble-top-bar" class="czr-preview-notification">
+          <div class="sek-do-undo">
+            <button type="button" class="icon undo" title="<?php _e('Undo', 'text_domain'); ?>" data-nimble-history="undo" data-nimble-state="disabled">
+              <span class="screen-reader-text"><?php _e('Undo', 'text_domain'); ?></span>
+            </button>
+            <button type="button" class="icon do" title="<?php _e('Redo', 'text_domain'); ?>" data-nimble-history="redo" data-nimble-state="disabled">
+              <span class="screen-reader-text"><?php _e('Redo', 'text_domain'); ?></span>
+            </button>
+          </div>
+      </div>
+    </script>
+    <?php
+}
 ?>
