@@ -251,7 +251,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       inputDefaultValue = null,
                       inputType = null,
                       sanitizedVal,
-                      self = this;
+                      self = this,
+                      checkIfEqual = function( _val, _default ) {
+                            var equal;
+                            if ( _.isNumber( _val ) || _.isNumber( _default ) ) {
+                                  equal = Number( _val ) === Number( _default );
+                            } else {
+                                  equal = _val === _default;
+                            }
+                            return equal;
+                      };
 
                   // NORMALIZE
                   // title, id and module_type don't need to be saved in database
@@ -267,8 +276,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.infoLog( '::updateAPISettingAndExecutePreviewActions => missing default value for input ' + input_id + ' in module ' + parentModuleType );
                               }
                         }
-
-                        if ( _val === inputDefaultValue ) {
+                        if ( checkIfEqual( _val, inputDefaultValue ) ) {
                               return;
                         } else {
                               itemNormalized[ input_id ] = _val;
