@@ -19,7 +19,7 @@ function sek_get_module_params_for_sek_level_width_module() {
                     'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Custom width', 'text_domain_to_be_replaced'),
                     'min' => 0,
-                    'max' => 100,
+                    'max' => 500,
                     'default' => '100%',
                     'width-100'   => true,
                 ),
