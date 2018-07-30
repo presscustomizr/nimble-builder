@@ -57,7 +57,10 @@ function sek_enqueue_controls_js_css() {
                 'addNewModuleId' => 'sek_add_new_module',
 
                 'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
+                'optNameForGlobalOptions' => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS,//'nimble___'
                 'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__nimble__"
+
+                'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// '__nimble_options__'
 
                 'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 
@@ -390,8 +393,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
 
-            // UI for the ocal skope options
-            'Local options for the sections of the current page'  => __( 'Local options for the sections of the current page', 'text_domain_to_be_replaced'),
+            // UI global and local options
+            'Local options for the sections of the current page' => __( 'Local options for the sections of the current page', 'text_domain_to_be_replaced'),
+            'General options applied site wide' => __( 'General options applied site wide', 'text_domain_to_be_replaced'),
             'General options' => __( 'General options', 'text_domain_to_be_replaced'),
 
 

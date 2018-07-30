@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
+if ( ! defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
 
 // @return array
@@ -482,5 +483,18 @@ function render_content_sections() {
         SEK_Front()->_render_seks_for_location( $hook );
         do_action( "sek_after_location_{$hook}" );
     }
+}
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  GLOBAL OPTIONS HELPER
+/* ------------------------------------------------------------------------- */
+function sek_get_global_custom_breakpoint() {
+    $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+    if ( ! is_array( $global_options ) || empty( $global_options['general'] ) || empty( $global_options['general']['global-custom-breakpoint'] ) )
+      return;
+
+    return intval( $global_options['general']['global-custom-breakpoint'] );
 }
 ?>

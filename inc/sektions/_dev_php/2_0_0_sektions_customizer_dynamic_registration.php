@@ -28,8 +28,8 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         //@filter 'customize_dynamic_setting_args'
         function set_dyn_setting_args( $setting_args, $setting_id ) {
-            // shall start with "sek__"
-            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
+            // shall start with "nimble___" or "__nimble_options__"
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) ) {
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',

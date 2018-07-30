@@ -216,6 +216,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_8_sek_register_breakpoint.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_1_0_sek_register_local_skope_options.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/4_1_1_sek_register_global_options.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php',
@@ -259,6 +260,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_2_sektions_generate_UI_front_modules.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_3_sektions_generate_UI_level_options_modules.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_4_sektions_generate_UI_local_skope_options.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_5_sektions_generate_UI_global_options.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_sektions_update_API_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_2_0_sektions_register_utils.js',
@@ -291,6 +293,8 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_2_UI_module_picker.js',
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_3_UI_section_picker.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_1_0_UI_local_skope_options.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_1_1_UI_global_skope_options.js',
+
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_1_FRONT_tiny_mce_editor.js',

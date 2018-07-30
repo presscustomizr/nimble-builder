@@ -15,6 +15,7 @@ function sek_register_modules() {
         'sek_level_breakpoint_module',
 
         'sek_local_skope_options_module',
+        'sek_global_options_module',
 
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
