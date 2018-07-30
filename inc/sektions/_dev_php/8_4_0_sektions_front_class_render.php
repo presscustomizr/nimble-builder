@@ -258,19 +258,24 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     //TODO, we might want to be sure the $col_suffix is related to an allowed size
                     $col_suffix = floor( $col_width_in_percent );
 
-                    // SETUP THE CUSTOM BREAKPOINT CSS CLASS
-                    $has_custom_breakpoint = false;
+                    // SETUP THE GLOBAL CUSTOM BREAKPOINT CSS CLASS
+                    $has_global_custom_breakpoint = false;
+                    $has_global_custom_breakpoint = sek_get_global_custom_breakpoint() >= 0;
+
+                    // SETUP THE LEVEL CUSTOM BREAKPOINT CSS CLASS
+                    $has_level_custom_breakpoint = false;
                     if ( !empty( $parent_model[ 'options' ] ) && !empty( $parent_model[ 'options' ][ 'breakpoint' ] ) && !empty( $parent_model[ 'options' ][ 'breakpoint' ]['custom-breakpoint'] ) ) {
-                        $has_custom_breakpoint = intval( $parent_model[ 'options' ][ 'breakpoint' ]['custom-breakpoint'] ) >= 0;
+                        $has_level_custom_breakpoint = intval( $parent_model[ 'options' ][ 'breakpoint' ]['custom-breakpoint'] ) >= 0;
                     }
 
                     ?>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base sek-col-%2$s %3s %4$s" %5$s>',
+                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base sek-col-%2$s %3s %4$s %5$s" %6$s>',
                               $id,
                               $col_suffix,
                               $this->get_level_visibility_css_class( $model ),
-                              $has_custom_breakpoint ? 'sek-custom-level-col-' . $col_suffix : '',
+                              $has_level_custom_breakpoint ? 'sek-custom-level-col-' . $col_suffix : '',
+                              ( $has_global_custom_breakpoint && ! $has_level_custom_breakpoint ) ? 'sek-custom-global-col-' . $col_suffix : '',
                               empty( $collection ) ? 'data-sek-no-modules="true"' : ''
                           );
                       ?>
