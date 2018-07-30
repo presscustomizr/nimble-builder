@@ -31,4 +31,18 @@ function sek_get_module_params_for_sek_local_skope_options_module() {
         )//tmpl
     );
 }
+
+
+// add user local custom css
+add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_custom_css' );
+//@filter 'nimble_get_dynamic_stylesheet'
+function sek_add_raw_local_custom_css( $css ) {
+    // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
+    // otherwise we fallback on the normal utility skp_build_skope_id()
+    $localSkopeNimble = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id()  );
+    if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['general'] ) && ! empty( $localSkopeNimble['options']['general']['local_custom_css'] ) ) {
+        $css .= $localSkopeNimble['options']['general']['local_custom_css'];
+    }
+    return $css;
+}
 ?>
