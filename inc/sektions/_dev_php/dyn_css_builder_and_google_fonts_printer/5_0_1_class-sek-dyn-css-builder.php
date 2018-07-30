@@ -257,18 +257,34 @@ class Sek_Dyn_CSS_Builder {
 
 
     // hook : sek_add_css_rules_for_level_options
-    public function sek_add_rules_for_column_width( $rules, $level ) {
-        $width   = empty( $level[ 'width' ] ) || !is_numeric( $level[ 'width' ] ) ? '' : $level['width'];
+    public function sek_add_rules_for_column_width( $rules, $column ) {
+        if ( ! is_array( $column ) )
+          return $rules;
 
-        //width
+        if ( empty( $column['level'] ) || 'column' !== $column['level'] )
+          return $rules;
+
+        $width   = empty( $column[ 'width' ] ) || !is_numeric( $column[ 'width' ] ) ? '' : $column['width'];
+
+        // width
         if ( empty( $width ) )
           return $rules;
 
-        $css_rules = sprintf( '-ms-flex: 0 0 %1$s%%;flex: 0 0 %1$s%%;max-width: %1$s%%', $width );
+        $breakpoint = self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ];
+
+        // Does the parent section have a custom breakpoint set ?
+        $parent_section = sek_get_parent_level_model( $column['id'] );
+        if ( is_array( $parent_section ) && !empty( $parent_section[ 'options' ] ) && !empty( $parent_section[ 'options' ][ 'breakpoint' ] ) && !empty( $parent_section[ 'options' ][ 'breakpoint' ][ 'custom-breakpoint' ] ) ) {
+            $custom_parent_breakpoint = intval( $parent_section [ 'options' ][ 'breakpoint' ][ 'custom-breakpoint' ] );
+            $breakpoint = $custom_parent_breakpoint < 0 ? $breakpoint : $custom_parent_breakpoint;
+        }
+
+        // Note : the css selector must be specific enough to override the possible parent section ( or global ) custom breakpoint one.
+        // @see sek_add_css_rules_for_level_breakpoint()
         $rules[] = array(
-            'selector'      => '.sek-column[data-sek-id="'.$level['id'].'"]',
-            'css_rules'     => $css_rules,
-            'mq'            => '(min-width:' . self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ] .'px)'
+            'selector'      => sprintf( '[data-sek-id="%1$s"] .sek-sektion-inner > .sek-column[data-sek-id="%2$s"]', $parent_section['id'], $column['id'] ),
+            'css_rules'     => sprintf( '-ms-flex: 0 0 %1$s%%;flex: 0 0 %1$s%%;max-width: %1$s%%', $width ),
+            'mq'            => "(min-width:{$breakpoint}px)"
         );
         return $rules;
     }

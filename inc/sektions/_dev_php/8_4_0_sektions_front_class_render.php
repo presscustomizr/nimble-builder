@@ -248,6 +248,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     // sek_error_log( 'PARENT MODEL WHEN RENDERING', $parent_model );
 
                     // SETUP THE DEFAULT CSS CLASS
+                    // Note : the css rules for custom width are generated in Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
                     $col_number = ( array_key_exists( 'collection', $parent_model ) && is_array( $parent_model['collection'] ) ) ? count( $parent_model['collection'] ) : 1;
                     $col_number = 12 < $col_number ? 12 : $col_number;
                     $col_width_in_percent = 100/$col_number;

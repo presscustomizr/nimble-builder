@@ -338,7 +338,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
 
-
+                              // Note : the css rules are generated in Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
                               case 'sek-resize-columns' :
                                     if ( params.col_number < 2 )
                                       break;
