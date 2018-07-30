@@ -2,6 +2,14 @@
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
+            getLocalSkopeOptionId : function() {
+                  var skope_id = api.czr_skopeBase.getSkopeProperty( 'skope_id' );
+                  if ( _.isEmpty( skope_id ) ) {
+                        api.errare( 'czr_sektions::getLocalSkopeOptionId => empty skope_id ');
+                        return '';
+                  }
+                  return sektionsLocalizedData.optPrefixForSektionsNotSaved + skope_id + '__localSkopeOptions';
+            },
             // @params = {
             //    action : 'sek-generate-module-ui' / 'sek-generate-level-options-ui'
             //    level : params.level,
@@ -13,8 +21,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @dfd = $.Deferred()
             // @return the state promise dfd
             generateUIforLocalSkopeOptions : function( params, dfd ) {
-                  var self = this;
-                  var _id_ = sektionsLocalizedData.optPrefixForSektionsNotSaved + '__localSkopeOptions';
+                  var self = this,
+                      _id_ = self.getLocalSkopeOptionId();
                   // Is the UI currently displayed the one that is being requested ?
                   // If so, visually remind the user that a module should be dragged
                   if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
@@ -56,15 +64,29 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                               });//api( Id, function( _setting_ ) {})
 
+                              // // Let's add the starting values if provided when registrating the module
+                              // var startingModuleValue = self.getModuleStartingValue( 'sek_local_skope_options_module' ),
+                              //     currentSetValue = api( self.sekCollectionSettingId() )(),
+                              //     allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.options ) ? currentSetValue.options : {} ),
+                              //     generalOptions = _.isObject( allSkopeOptions.general ) ? allSkopeOptions.general : {},
+                              //     initialModuleValues;
+
+                              // // this options are saved under 'options.general'
+                              // if ( 'no_starting_value' !== startingModuleValue ) {
+                              //       initialModuleValues = $.extend( startingModuleValue, generalOptions );
+                              // }
+
                               // Let's add the starting values if provided when registrating the module
-                              var startingModuleValue = self.getModuleStartingValue( 'sek_local_skope_options_module' ),
+                              var initialModuleValues = {},
+                                  startingModuleValue = self.getModuleStartingValue( 'sek_local_skope_options_module' ),
                                   currentSetValue = api( self.sekCollectionSettingId() )(),
                                   allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.options ) ? currentSetValue.options : {} ),
                                   generalOptions = _.isObject( allSkopeOptions.general ) ? allSkopeOptions.general : {};
 
-                              // this options are saved under 'options.general'
-                              if ( 'no_starting_value' !== startingModuleValue ) {
-                                    initialModuleValues = $.extend( startingModuleValue, generalOptions );
+                              if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
+                                    // make sure the starting values are deeped clone now, before being extended
+                                    var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
+                                    initialModuleValues = $.extend( clonedStartingModuleValue, generalOptions );
                               }
 
                               api.CZR_Helpers.register( {
@@ -87,10 +109,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               label : sektionsLocalizedData.i18n['General options'],
                               type : 'czr_module',//sekData.controlType,
                               module_type : 'sek_local_skope_options_module',
-                              section : _id_,
+                              section : '__localSkopeOptions',
                               priority : 10,
                               settings : { default : _id_ },
-                              track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                              //track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                         }).done( function() {
                               // api.control( _id_ ).focus({
                               //     completeCallback : function() {}
@@ -99,9 +121,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   // Defer the registration when the parent section gets added to the api
-                  api.section( _id_, function() {
+                  api.section( '__localSkopeOptions', function( _section_ ) {
                         api( self.sekCollectionSettingId(), function() {
                               _do_register_();
+                              _section_.container.on('click', '.accordion-section-title',function() {
+                                    // Generate UI for the local skope options
+                                    self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
+                              });
                         });
                   });
 
@@ -109,7 +135,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
-                        id : _id_,
+                        id : '__localSkopeOptions',//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
                         title: sektionsLocalizedData.i18n['Local options for the sections of the current page'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 30,

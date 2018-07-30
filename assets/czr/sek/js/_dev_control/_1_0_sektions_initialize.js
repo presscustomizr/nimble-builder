@@ -402,7 +402,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   $(  '.sek-settings', '#nimble-top-bar' ).on( 'click', function(evt) {
-                        api.control( sektionsLocalizedData.optPrefixForSektionsNotSaved + '__localSkopeOptions').focus();
+                        // Generate UI for the local skope options
+                        self.generateUI({ action : 'sek-generate-local-skope-options-ui'}).done( function() {
+                              api.control( self.getLocalSkopeOptionId(), function( _control_ ) {
+                                    _control_.focus();
+                              });
+                        });
                   });
                   return $( '#nimble-top-bar' );
             },
