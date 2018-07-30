@@ -40,8 +40,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               dfd = self.generateUIforLevelOptions( params, dfd );
                         break;
 
+                        // Fired in ::initialize()
                         case 'sek-generate-local-skope-options-ui' :
                               dfd = self.generateUIforLocalSkopeOptions( params, dfd );
+                        break;
+
+                        // Fired in ::initialize()
+                        case 'sek-generate-global-options-ui' :
+                              dfd = self.generateUIforGlobalOptions( params, dfd );
                         break;
                   }//switch
 
@@ -158,47 +164,75 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   var _doUpdateWithRequestedAction = function() {
-                        return self.updateAPISetting({
-                              action : params.uiParams.action,// mandatory : 'sek-generate-level-options-ui', 'sek_local_skope_options_module',...
-                              id : params.uiParams.id,
-                              value : moduleValueCandidate,
-                              in_column : params.uiParams.in_column,//not mandatory
-                              in_sektion : params.uiParams.in_sektion,//not mandatory
-
-                              // specific for level options and local skope options
-                              options_type : params.options_type,// mandatory : 'layout', 'spacing', 'bg_border', 'height', ...
-
-                              settingParams : params.settingParams
-                        }).done( function( ) {
-                              // STYLESHEET => default action when modifying the level options
-                              if ( true === refresh_stylesheet ) {
-                                    api.previewer.send( 'sek-refresh-stylesheet', {
-                                          skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                          apiParams : {
-                                                action : 'sek-refresh-stylesheet',
-                                                id : params.uiParams.id,
-                                                level : params.uiParams.level
-                                          },
-                                    });
+                        // GLOBAL OPTIONS CASE => SITE WIDE => WRITING IN A SPECIFIC OPTION, SEPARATE FROM THE SEKTION
+                        if ( true === params.isGlobalOptions ) {
+                              if ( _.isEmpty( params.options_type ) ) {
+                                    api.errare( 'updateAPISettingAndExecutePreviewActions => error when updating the global options => missing options_type');
+                                    return;
                               }
+                              //api( sektionsLocalizedData.optNameForGlobalOptions )() is registered on ::initialize();
+                              var rawGlobalOptions = api( sektionsLocalizedData.optNameForGlobalOptions )(),
+                                  clonedGlobalOptions = $.extend( true, {}, _.isObject( rawGlobalOptions ) ? rawGlobalOptions : {} ),
+                                  _valueCandidate = {};
 
-                              // MARKUP
-                              if ( true === refresh_markup ) {
-                                    api.previewer.send( 'sek-refresh-level', {
-                                          apiParams : {
-                                                action : 'sek-refresh-level',
-                                                id : params.uiParams.id,
-                                                level : params.uiParams.level
-                                          },
-                                          skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                    });
-                              }
+                              // consider only the non empty settings for db
+                              // booleans should bypass this check
+                              _.each( moduleValueCandidate || {}, function( _val_, _key_ ) {
+                                    // Note : _.isEmpty( 5 ) returns true when checking an integer,
+                                    // that's why we need to cast the _val_ to a string when using _.isEmpty()
+                                    if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
+                                      return;
+                                    _valueCandidate[ _key_ ] = _val_;
+                              });
 
-                              // REFRESH THE PREVIEW ?
-                              if ( true === refresh_preview ) {
-                                    api.previewer.refresh();
-                              }
-                        });//self.updateAPISetting()
+                              clonedGlobalOptions[ params.options_type ] = _valueCandidate;
+
+                              // Set it
+                              api( sektionsLocalizedData.optNameForGlobalOptions )( clonedGlobalOptions );
+                        } else {
+                        // LEVEL OPTION CASE => LOCAL
+                              return self.updateAPISetting({
+                                    action : params.uiParams.action,// mandatory : 'sek-generate-level-options-ui', 'sek_local_skope_options_module',...
+                                    id : params.uiParams.id,
+                                    value : moduleValueCandidate,
+                                    in_column : params.uiParams.in_column,//not mandatory
+                                    in_sektion : params.uiParams.in_sektion,//not mandatory
+
+                                    // specific for level options and local skope options
+                                    options_type : params.options_type,// mandatory : 'layout', 'spacing', 'bg_border', 'height', ...
+
+                                    settingParams : params.settingParams
+                              }).done( function( ) {
+                                    // STYLESHEET => default action when modifying the level options
+                                    if ( true === refresh_stylesheet ) {
+                                          api.previewer.send( 'sek-refresh-stylesheet', {
+                                                skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                apiParams : {
+                                                      action : 'sek-refresh-stylesheet',
+                                                      id : params.uiParams.id,
+                                                      level : params.uiParams.level
+                                                },
+                                          });
+                                    }
+
+                                    // MARKUP
+                                    if ( true === refresh_markup ) {
+                                          api.previewer.send( 'sek-refresh-level', {
+                                                apiParams : {
+                                                      action : 'sek-refresh-level',
+                                                      id : params.uiParams.id,
+                                                      level : params.uiParams.level
+                                                },
+                                                skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                          });
+                                    }
+
+                                    // REFRESH THE PREVIEW ?
+                                    if ( true === refresh_preview ) {
+                                          api.previewer.refresh();
+                                    }
+                              });//self.updateAPISetting()
+                        }
                   };//_doUpdateWithRequestedAction
 
                   // if the changed input is a google font modifier ( <=> true === refresh_fonts )
