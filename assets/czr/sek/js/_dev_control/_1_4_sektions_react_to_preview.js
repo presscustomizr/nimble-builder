@@ -419,6 +419,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             // GENERATE UI ELEMENTS
                             'sek-pick-module' : function( params ) {
+                                  params = params || {};
                                   sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
@@ -428,7 +429,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         // true by default, because this is the most common scenario ( when adding a section, a column ... )
                                         // but false when clicking on the + ui icon in the preview
                                         was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true,
-                                        focus : _.isUndefined( params.focus ) ? true : params.focus
+                                        focus : _.has( params, 'focus' ) ? params.focus : true
                                   };
                                   return self.generateUI( uiParams );
                             },
