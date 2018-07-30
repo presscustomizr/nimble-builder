@@ -88,12 +88,13 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
                 $skope_id = skp_get_skope_id();
             }
         }
-        $collection = sek_get_skoped_seks( $skope_id );
+        $skoped_setting = sek_get_skoped_seks( $skope_id );
+        $collection = ( is_array( $skoped_setting ) && !empty( $skoped_setting['collection'] ) ) ? $skoped_setting['collection'] : array();
     }
     $_parent_level_data = 'no_match';
     foreach ( $collection as $level_data ) {
         // stop here and return if a match was recursively found
-        if ( 'no_match' != $_parent_level_data )
+        if ( 'no_match' !== $_parent_level_data )
           break;
         if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
             foreach ( $level_data['collection'] as $child_level_data ) {
@@ -102,7 +103,7 @@ function sek_get_parent_level_model( $child_level_id, $collection = array(), $sk
                     //match found, break this loop
                     break;
                 } else {
-                    $_parent_level_data = sek_get_parent_level_model( $child_level_id, $level_data['collection'] );
+                    $_parent_level_data = sek_get_parent_level_model( $child_level_id, $level_data['collection'], $skope_id );
                 }
             }
         }
