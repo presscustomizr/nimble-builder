@@ -45,6 +45,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   api.bind( 'ready', function() {
                         // the main sektion panel
+                        // the local and global options section
                         self.registerAndSetupDefaultPanelSectionOptions();
 
                         // Setup the collection setting => register the main setting and bind it
@@ -59,27 +60,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
 
+
                         // POPULATE THE MAIN SETTING ID NOW
                         // + GENERATE UI FOR THE LOCAL SKOPE OPTIONS
-                        // populate the settingids now if skopes are set
-                        if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
-                              self.setContextualCollectionSettingIdWhenSkopeSet();
-                              // Generate UI for the local skope options
+                        // + GENERATE UI FOR THE GLOBAL OPTIONS
+                        var doSkopeDependantActions = function( newSkopes, previousSkopes ) {
+                              self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
+                              // Generate UI for the local skope options and the global options
                               self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
+                              self.generateUI({ action : 'sek-generate-global-options-ui'});
+                        };
+                        // populate the setting ids now if skopes are set
+                        if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
+                              doSkopeDependantActions();
                         }
-
                         // ON SKOPE READY
                         // - Set the contextual setting prefix
                         // - Generate UI for Nimble local skope options
                         // - Generate the content picker
                         api.czr_activeSkopes.callbacks.add( function( newSkopes, previousSkopes ) {
-                              self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
-                              // Generate UI for the local skope options
-                              self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
-
-                              // Generate the content picker
-                              api.previewer.trigger( 'sek-pick-module', { focus : false });
-
+                              doSkopeDependantActions( newSkopes, previousSkopes );
                         });
 
 
@@ -241,9 +241,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-
-
-            // MAYBE REGISTER THE ADD NEW PANEL
             // Fired in initialize()
             registerAndSetupDefaultPanelSectionOptions : function() {
                   var self = this;
@@ -300,6 +297,39 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                   });
 
+
+                  // LOCAL AND GLOBAL OPTIONS SECTION
+                  api.CZR_Helpers.register({
+                        origin : 'nimble',
+                        what : 'section',
+                        id : '__globalAndLocalOptionsSection',//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
+                        title: sektionsLocalizedData.i18n['General options'],
+                        panel : sektionsLocalizedData.sektionsPanelId,
+                        priority : 30,
+                        track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                        constructWith : api.Section.extend({
+                              //attachEvents : function () {},
+                              // Always make the section active, event if we have no control in it
+                              isContextuallyActive : function () {
+                                return this.active();
+                              },
+                              _toggleActive : function(){ return true; }
+                        })
+                  });
+
+                  // GLOBAL OPTIONS SETTING
+                  // Will Be updated in ::generateUIforGlobalOptions()
+                  // has no control.
+                  api.CZR_Helpers.register( {
+                        origin : 'nimble',
+                        //level : params.level,
+                        what : 'setting',
+                        id : sektionsLocalizedData.optNameForGlobalOptions,
+                        dirty : false,
+                        value : sektionsLocalizedData.globalOptionDBValues,
+                        transport : 'refresh',//'refresh',//// ,
+                        type : 'option'
+                  });
             },//mayBeRegisterAndSetupAddNewSektionSection()
 
 
@@ -313,7 +343,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // )
             setContextualCollectionSettingIdWhenSkopeSet : function( newSkopes, previousSkopes ) {
                   var self = this;
-
+                  previousSkopes = previousSkopes || {};
                   // Clear all previous sektions if the main panel is expanded and we're coming from a previousSkopes
                   if ( ! _.isEmpty( previousSkopes.local ) && api.panel( sektionsLocalizedData.sektionsPanelId ).expanded() ) {
                         //api.previewer.trigger('sek-pick-section');

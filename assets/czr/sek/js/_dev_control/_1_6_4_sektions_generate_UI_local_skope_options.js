@@ -26,18 +26,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Is the UI currently displayed the one that is being requested ?
                   // If so, visually remind the user that a module should be dragged
                   if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
-                        // api.control( _id_ ).focus({
-                        //       completeCallback : function() {
-                        //             var $container = api.control( _id_ ).container;
-                        //             // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
-                        //             if ( $container.hasClass( 'button-see-me') )
-                        //               return;
-                        //             $container.addClass('button-see-me');
-                        //             _.delay( function() {
-                        //                  $container.removeClass('button-see-me');
-                        //             }, 800 );
-                        //       }
-                        // });
                         return dfd;
                   }
 
@@ -63,18 +51,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }
                                     }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                               });//api( Id, function( _setting_ ) {})
-
-                              // // Let's add the starting values if provided when registrating the module
-                              // var startingModuleValue = self.getModuleStartingValue( 'sek_local_skope_options_module' ),
-                              //     currentSetValue = api( self.sekCollectionSettingId() )(),
-                              //     allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.options ) ? currentSetValue.options : {} ),
-                              //     generalOptions = _.isObject( allSkopeOptions.general ) ? allSkopeOptions.general : {},
-                              //     initialModuleValues;
-
-                              // // this options are saved under 'options.general'
-                              // if ( 'no_starting_value' !== startingModuleValue ) {
-                              //       initialModuleValues = $.extend( startingModuleValue, generalOptions );
-                              // }
 
                               // Let's add the starting values if provided when registrating the module
                               var initialModuleValues = {},
@@ -106,10 +82,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               level : params.level,
                               what : 'control',
                               id : _id_,
-                              label : sektionsLocalizedData.i18n['General options'],
+                              label : sektionsLocalizedData.i18n['Local options for the sections of the current page'],
                               type : 'czr_module',//sekData.controlType,
                               module_type : 'sek_local_skope_options_module',
-                              section : '__localSkopeOptions',
+                              section : '__globalAndLocalOptionsSection',
                               priority : 10,
                               settings : { default : _id_ },
                               //track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
@@ -121,7 +97,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   // Defer the registration when the parent section gets added to the api
-                  api.section( '__localSkopeOptions', function( _section_ ) {
+                  // the section '__globalAndLocalOptionsSection' is registered in ::initialize()
+                  api.section( '__globalAndLocalOptionsSection', function( _section_ ) {
                         api( self.sekCollectionSettingId(), function() {
                               _do_register_();
                               _section_.container.on('click', '.accordion-section-title',function() {
@@ -129,25 +106,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
                               });
                         });
-                  });
-
-                  // MODULE / SECTION PICKER SECTION
-                  api.CZR_Helpers.register({
-                        origin : 'nimble',
-                        what : 'section',
-                        id : '__localSkopeOptions',//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
-                        title: sektionsLocalizedData.i18n['Local options for the sections of the current page'],
-                        panel : sektionsLocalizedData.sektionsPanelId,
-                        priority : 30,
-                        track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
-                        constructWith : api.Section.extend({
-                              //attachEvents : function () {},
-                              // Always make the section active, event if we have no control in it
-                              isContextuallyActive : function () {
-                                return this.active();
-                              },
-                              _toggleActive : function(){ return true; }
-                        })
                   });
                   return dfd;
             }
