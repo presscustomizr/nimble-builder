@@ -122,12 +122,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });//api( Id, function( _setting_ ) {})
 
                                     // Let's add the starting values if provided when registrating the module
-                                    initialModuleValues = levelOptionValues[ optionType ] || {};
-                                    startingModuleValue = self.getModuleStartingValue( optionData.module_type );
-                                    if ( 'no_starting_value' !== startingModuleValue ) {
+                                    var initialModuleValues = levelOptionValues[ optionType ] || {};
+                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type );
+                                    if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
                                           // make sure the starting values are deeped clone now, before being extended
-                                          startingModuleValue = $.extend( true, {}, self.getModuleStartingValue( optionData.module_type ) );
-                                          initialModuleValues = $.extend( startingModuleValue, initialModuleValues );
+                                          var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
+                                          initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
                                     }
 
                                     api.CZR_Helpers.register( {
