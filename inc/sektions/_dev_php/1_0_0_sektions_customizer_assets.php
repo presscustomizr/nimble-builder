@@ -552,6 +552,11 @@ function sek_print_nimble_customizer_tmpl() {
               <span class="screen-reader-text"><?php _e('Redo', 'text_domain'); ?></span>
             </button>
           </div>
+          <div class="sek-settings">
+            <button type="button" class="fas fa-sliders-h" title="<?php _e('Global settings', 'text_domain'); ?>" data-nimble-state="enabled">
+              <span class="screen-reader-text"><?php _e('Global settings', 'text_domain'); ?></span>
+            </button>
+          </div>
       </div>
     </script>
     <?php

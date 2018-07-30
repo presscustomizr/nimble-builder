@@ -351,13 +351,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   self.topBarContainer = $_el;
                                   //display
                                   _.delay( function() {
-                                      $('body').addClass('nimble-top-bar-open');
+                                      $('body').addClass('nimble-top-bar-visible');
                                   }, 200 );
                             });
                       },
                       _hide = function() {
                             var dfd = $.Deferred();
-                            $('body').removeClass('nimble-top-bar-open');
+                            $('body').removeClass('nimble-top-bar-visible');
                             if ( self.topBarContainer && self.topBarContainer.length ) {
                                   //remove Dom element after slide up
                                   _.delay( function() {
@@ -400,6 +400,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         try { self.navigateHistory( $(this).data( 'nimble-history') ); } catch( er ) {
                               api.errare( 'Error when firing self.navigateHistory', er );
                         }
+                  });
+                  $(  '.sek-settings', '#nimble-top-bar' ).on( 'click', function(evt) {
+                        api.control( sektionsLocalizedData.optPrefixForSektionsNotSaved + '__localSkopeOptions').focus();
                   });
                   return $( '#nimble-top-bar' );
             },

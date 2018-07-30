@@ -773,7 +773,12 @@ credits : Gutenberg team @wordpress */
 
 
 /* TOP BAR */
+
+/* space for the Nimble topbar */
+#customize-preview iframe {top: 36px;}
+
 #nimble-top-bar {
+  max-height: 36px;
   position: absolute;
   text-align: center;
   right: 0;
@@ -787,14 +792,23 @@ credits : Gutenberg team @wordpress */
   -o-transition: all, 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
   /*visibility: hidden;*/
-  opacity: 0;
+  opacity: 0.3;
   top : 0%;
   background: rgba(0, 0, 0, 0.29);
   padding: 2px;
   z-index: 99999;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+    -ms-flex-align: center;
+        align-items: center;
+  /* flex-direction: column; */
+  flex: 0 0 100%;
+  max-width: 100%;
 }
 
-body.nimble-top-bar-open #nimble-top-bar {
+body.nimble-top-bar-visible #nimble-top-bar {
   /*visibility: inherit;*/
   opacity: 1;
 }
@@ -818,10 +832,12 @@ body.nimble-top-bar-open #nimble-top-bar {
   padding: 4px 8px;*/
   color: #fff;
 }
-#nimble-top-bar .sek-do-undo {
-  float: right;
+#nimble-top-bar .sek-settings {
+  font-size: 18px;
+  padding: 0 10px;
 }
-#nimble-top-bar .sek-do-undo button {
+
+#nimble-top-bar button {
   background: none;
   border: none;
   color: white;
@@ -850,6 +866,7 @@ body.nimble-top-bar-open #nimble-top-bar {
       -ms-transform: rotate(45deg);
           transform: rotate(45deg);
 }
+
 
 /*.czr-preview-notification a, .czr-preview-notification h2 {color: #fff; margin: 1em 0;}
 
