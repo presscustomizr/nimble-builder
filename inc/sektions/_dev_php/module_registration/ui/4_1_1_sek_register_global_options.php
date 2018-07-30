@@ -48,17 +48,35 @@ function sek_get_module_params_for_sek_global_options_module() {
 }
 
 
-add_action('wp_head', '\Nimble\sek_write_global_custom_breakpoint_rules', 1000 );
-function sek_write_global_custom_breakpoint_rules() {
+add_action('wp_head', '\Nimble\sek_write_global_custom_', 1000 );
+function sek_write_global_custom_() {
+    $css = '';
     // delete_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
     $custom_breakpoint = sek_get_global_custom_breakpoint();
-    if ( $custom_breakpoint < 0 )
-      return;
-      ?>
-      <style type="text/css">
-          @media (min-width:<?php echo $custom_breakpoint; ?>px) {.sek-custom-global-col-8 {-ms-flex: 0 0 8.333%;flex: 0 0 8.333%;max-width: 8.333%;}.sek-custom-global-col-9 {-ms-flex: 0 0 9.090909%;flex: 0 0 9.090909%;max-width: 9.090909%;}.sek-custom-global-col-10 {-ms-flex: 0 0 10%;flex: 0 0 10%;max-width: 10%;}.sek-custom-global-col-11 {-ms-flex: 0 0 11.111%;flex: 0 0 11.111%;max-width: 11.111%;}.sek-custom-global-col-12 {-ms-flex: 0 0 12.5%;flex: 0 0 12.5%;max-width: 12.5%;}.sek-custom-global-col-14 {-ms-flex: 0 0 14.285%;flex: 0 0 14.285%;max-width: 14.285%;}.sek-custom-global-col-16 {-ms-flex: 0 0 16.666%;flex: 0 0 16.666%;max-width: 16.666%;}.sek-custom-global-col-20 {-ms-flex: 0 0 20%;flex: 0 0 20%;max-width: 20%;}.sek-custom-global-col-25 {-ms-flex: 0 0 25%;flex: 0 0 25%;max-width: 25%;}.sek-custom-global-col-30 {-ms-flex: 0 0 30%;flex: 0 0 30%;max-width: 30%;}.sek-custom-global-col-33 {-ms-flex: 0 0 33.333%;flex: 0 0 33.333%;max-width: 33.333%;}.sek-custom-global-col-40 {-ms-flex: 0 0 40%;flex: 0 0 40%;max-width: 40%;}.sek-custom-global-col-50 {-ms-flex: 0 0 50%;flex: 0 0 50%;max-width: 50%;}.sek-custom-global-col-60 {-ms-flex: 0 0 60%;flex: 0 0 60%;max-width: 60%;}.sek-custom-global-col-66 {-ms-flex: 0 0 66.666%;flex: 0 0 66.666%;max-width: 66.666%;}.sek-custom-global-col-70 {-ms-flex: 0 0 70%;flex: 0 0 70%;max-width: 70%;}.sek-custom-global-col-75 {-ms-flex: 0 0 75%;flex: 0 0 75%;max-width: 75%;}.sek-custom-global-col-80 {-ms-flex: 0 0 80%;flex: 0 0 80%;max-width: 80%;}.sek-custom-global-col-83 {-ms-flex: 0 0 83.333%;flex: 0 0 83.333%;max-width: 83.333%;}.sek-custom-global-col-90 {-ms-flex: 0 0 90%;flex: 0 0 90%;max-width: 90%;}.sek-custom-global-col-100 {-ms-flex: 0 0 100%;flex: 0 0 100%;max-width: 100%;}}
-      </style>
-      <?php
+    if ( $custom_breakpoint >= 0 ) {
+        $css .= '@media (min-width:' . $custom_breakpoint . 'px) {.sek-custom-global-col-8 {-ms-flex: 0 0 8.333%;flex: 0 0 8.333%;max-width: 8.333%;}.sek-custom-global-col-9 {-ms-flex: 0 0 9.090909%;flex: 0 0 9.090909%;max-width: 9.090909%;}.sek-custom-global-col-10 {-ms-flex: 0 0 10%;flex: 0 0 10%;max-width: 10%;}.sek-custom-global-col-11 {-ms-flex: 0 0 11.111%;flex: 0 0 11.111%;max-width: 11.111%;}.sek-custom-global-col-12 {-ms-flex: 0 0 12.5%;flex: 0 0 12.5%;max-width: 12.5%;}.sek-custom-global-col-14 {-ms-flex: 0 0 14.285%;flex: 0 0 14.285%;max-width: 14.285%;}.sek-custom-global-col-16 {-ms-flex: 0 0 16.666%;flex: 0 0 16.666%;max-width: 16.666%;}.sek-custom-global-col-20 {-ms-flex: 0 0 20%;flex: 0 0 20%;max-width: 20%;}.sek-custom-global-col-25 {-ms-flex: 0 0 25%;flex: 0 0 25%;max-width: 25%;}.sek-custom-global-col-30 {-ms-flex: 0 0 30%;flex: 0 0 30%;max-width: 30%;}.sek-custom-global-col-33 {-ms-flex: 0 0 33.333%;flex: 0 0 33.333%;max-width: 33.333%;}.sek-custom-global-col-40 {-ms-flex: 0 0 40%;flex: 0 0 40%;max-width: 40%;}.sek-custom-global-col-50 {-ms-flex: 0 0 50%;flex: 0 0 50%;max-width: 50%;}.sek-custom-global-col-60 {-ms-flex: 0 0 60%;flex: 0 0 60%;max-width: 60%;}.sek-custom-global-col-66 {-ms-flex: 0 0 66.666%;flex: 0 0 66.666%;max-width: 66.666%;}.sek-custom-global-col-70 {-ms-flex: 0 0 70%;flex: 0 0 70%;max-width: 70%;}.sek-custom-global-col-75 {-ms-flex: 0 0 75%;flex: 0 0 75%;max-width: 75%;}.sek-custom-global-col-80 {-ms-flex: 0 0 80%;flex: 0 0 80%;max-width: 80%;}.sek-custom-global-col-83 {-ms-flex: 0 0 83.333%;flex: 0 0 83.333%;max-width: 83.333%;}.sek-custom-global-col-90 {-ms-flex: 0 0 90%;flex: 0 0 90%;max-width: 90%;}.sek-custom-global-col-100 {-ms-flex: 0 0 100%;flex: 0 0 100%;max-width: 100%;}}';
+    }
+
+    $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+    if ( is_array( $global_options ) && ! empty( $global_options['general'] ) ) {
+          if ( ! empty( $global_options['general'][ 'outer-section-width'] ) ) {
+                $numeric = sek_extract_numeric_value( $global_options['general'][ 'outer-section-width'] );
+                if ( ! empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $global_options['general'][ 'outer-section-width'] );
+                    $css .= sprintf( '[data-sek-level="section"]{max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
+                }
+          }
+          if ( ! empty( $global_options['general'][ 'inner-section-width'] ) ) {
+                $numeric = sek_extract_numeric_value( $global_options['general'][ 'inner-section-width'] );
+                if ( ! empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $global_options['general'][ 'inner-section-width'] );
+                    $css .= sprintf( '[data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner {max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
+                }
+          }
+    }
+
+
+    printf('<style type="text/css" id="nimble-global-options">%1$s</style>', $css );
 }
 
 /* ------------------------------------------------------------------------- *
