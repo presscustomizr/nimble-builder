@@ -268,13 +268,22 @@ class Sek_Dyn_CSS_Builder {
         if ( empty( $width ) )
           return $rules;
 
+        // define a default breakpoint : 768
         $breakpoint = self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ];
+
+        // Is there a global custom breakpoint set ?
+        $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+        $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
 
         // Does the parent section have a custom breakpoint set ?
         $parent_section = sek_get_parent_level_model( $column['id'] );
-        if ( is_array( $parent_section ) && !empty( $parent_section[ 'options' ] ) && !empty( $parent_section[ 'options' ][ 'breakpoint' ] ) && !empty( $parent_section[ 'options' ][ 'breakpoint' ][ 'custom-breakpoint' ] ) ) {
-            $custom_parent_breakpoint = intval( $parent_section [ 'options' ][ 'breakpoint' ][ 'custom-breakpoint' ] );
-            $breakpoint = $custom_parent_breakpoint < 0 ? $breakpoint : $custom_parent_breakpoint;
+        $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_section ) );
+        $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
+
+        if ( $has_section_custom_breakpoint ) {
+            $breakpoint = $section_custom_breakpoint;
+        } else if ( $has_global_custom_breakpoint ) {
+            $breakpoint = $global_custom_breakpoint;
         }
 
         // Note : the css selector must be specific enough to override the possible parent section ( or global ) custom breakpoint one.

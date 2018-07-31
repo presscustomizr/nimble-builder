@@ -10,11 +10,20 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
+                  'use-custom-breakpoint' => array(
+                      'input_type'  => 'gutencheck',
+                      'title'       => __('Use a custom breakpoint for the vertical reorganization of columns', 'text_domain_to_be_replaced'),
+                      'default'     => 0,
+                      'title_width' => 'width-80',
+                      'input_width' => 'width-20',
+                      'refresh_markup' => true,
+                      'refresh_stylesheet' => true
+                  ),
                   'custom-breakpoint'  => array(
                       'input_type'  => 'range_simple',
                       'title'       => __( 'Define a custom breakpoint in pixels', 'text_domain_to_be_replaced' ),
                       'default'     => $global_custom_breakpoint > 0 ? $global_custom_breakpoint : 768,
-                      'min'         => 0,
+                      'min'         => 1,
                       'max'         => 2000,
                       'step'        => 1,
                       'refresh_markup' => true,
@@ -39,19 +48,9 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
     if ( empty( $section['level'] ) || 'section' !== $section['level'] )
       return $rules;
 
-    $options = empty( $section[ 'options' ] ) ? array() : $section['options'];
-    if ( empty( $options[ 'breakpoint' ] ) )
-      return $rules;
+    $custom_breakpoint = intval( sek_get_section_custom_breakpoint( $section ) );
 
-    if ( empty( $options[ 'breakpoint' ][ 'custom-breakpoint' ] ) )
-      return $rules;
-
-    if ( empty($section['id']) )
-      return $rules;
-
-
-    $custom_breakpoint = intval( $options[ 'breakpoint' ][ 'custom-breakpoint' ] );
-    if ( $custom_breakpoint < 0 )
+    if ( $custom_breakpoint < 1 )
       return $rules;
 
     $col_number = ( array_key_exists( 'collection', $section ) && is_array( $section['collection'] ) ) ? count( $section['collection'] ) : 1;
@@ -59,16 +58,9 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
     $col_width_in_percent = 100/$col_number;
     $col_suffix = floor( $col_width_in_percent );
 
-    $css_rules = 'flex: 0 0 100%;max-width: 100%;';
-    $rules[] = array(
-        'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner > .sek-custom-level-col-'.$col_suffix,
-        'css_rules' => $css_rules,
-        'mq' =>null
-    );
-
     $responsive_css_rules = "flex: 0 0 {$col_suffix}%;max-width: {$col_suffix}%;";
     $rules[] = array(
-        'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner > .sek-custom-level-col-'.$col_suffix,
+        'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-'.$col_suffix,
         'css_rules' => $responsive_css_rules,
         'mq' => "(min-width: {$custom_breakpoint}px)"
     );

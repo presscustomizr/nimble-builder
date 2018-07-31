@@ -259,23 +259,25 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $col_suffix = floor( $col_width_in_percent );
 
                     // SETUP THE GLOBAL CUSTOM BREAKPOINT CSS CLASS
-                    $has_global_custom_breakpoint = false;
-                    $has_global_custom_breakpoint = sek_get_global_custom_breakpoint() >= 0;
+                    $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+                    $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
 
                     // SETUP THE LEVEL CUSTOM BREAKPOINT CSS CLASS
-                    $has_level_custom_breakpoint = false;
-                    if ( !empty( $parent_model[ 'options' ] ) && !empty( $parent_model[ 'options' ][ 'breakpoint' ] ) && !empty( $parent_model[ 'options' ][ 'breakpoint' ]['custom-breakpoint'] ) ) {
-                        $has_level_custom_breakpoint = intval( $parent_model[ 'options' ][ 'breakpoint' ]['custom-breakpoint'] ) >= 0;
-                    }
+                    $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_model ) );
+                    $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
 
+                    $grid_column_class = "sek-col-{$col_suffix}";
+                    if ( $has_section_custom_breakpoint ) {
+                        $grid_column_class = "sek-section-custom-breakpoint-col-{$col_suffix}";
+                    } else if ( $has_global_custom_breakpoint ) {
+                        $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";
+                    }
                     ?>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base sek-col-%2$s %3s %4$s %5$s" %6$s>',
+                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s" %4$s>',
                               $id,
-                              $col_suffix,
+                              $grid_column_class,
                               $this->get_level_visibility_css_class( $model ),
-                              $has_level_custom_breakpoint ? 'sek-custom-level-col-' . $col_suffix : '',
-                              ( $has_global_custom_breakpoint && ! $has_level_custom_breakpoint ) ? 'sek-custom-global-col-' . $col_suffix : '',
                               empty( $collection ) ? 'data-sek-no-modules="true"' : ''
                           );
                       ?>
