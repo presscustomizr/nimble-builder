@@ -33,7 +33,16 @@ function sek_get_module_params_for_sek_global_options_module() {
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 ),//0,
-                'global-outer-section-width' => array(
+                'use-custom-width' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Define custom outer and inner widths for the sections of this page', 'text_domain_to_be_replaced'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                ),
+                'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Outer sections width', 'text_domain_to_be_replaced'),
                     'min' => 0,
@@ -41,7 +50,7 @@ function sek_get_module_params_for_sek_global_options_module() {
                     'default' => '100%',
                     'width-100'   => true
                 ),
-                'global-inner-section-width' => array(
+                'inner-section-width' => array(
                     'input_type'  => 'range_with_unit_picker',
                     'title'       => __('Inner sections width', 'text_domain_to_be_replaced'),
                     'min' => 0,
@@ -66,20 +75,22 @@ function sek_write_global_custom_options() {
 
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
     if ( is_array( $global_options ) && ! empty( $global_options['general'] ) ) {
-          if ( ! empty( $global_options['general'][ 'global-outer-section-width'] ) ) {
-                $numeric = sek_extract_numeric_value( $global_options['general'][ 'global-outer-section-width'] );
-                if ( ! empty( $numeric ) ) {
-                    $unit = sek_extract_unit( $global_options['general'][ 'global-outer-section-width'] );
-                    $css .= sprintf( '[data-sek-level="section"]{max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
-                }
-          }
-          if ( ! empty( $global_options['general'][ 'global-inner-section-width'] ) ) {
-                $numeric = sek_extract_numeric_value( $global_options['general'][ 'global-inner-section-width'] );
-                if ( ! empty( $numeric ) ) {
-                    $unit = sek_extract_unit( $global_options['general'][ 'global-inner-section-width'] );
-                    $css .= sprintf( '[data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner {max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
-                }
-          }
+        if ( ! empty( $global_options['general'][ 'use-custom-width' ] ) && true === sek_booleanize_checkbox_val( $global_options['general'][ 'use-custom-width' ] ) ) {
+            if ( ! empty( $global_options['general'][ 'outer-section-width'] ) ) {
+                  $numeric = sek_extract_numeric_value( $global_options['general'][ 'outer-section-width'] );
+                  if ( ! empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $global_options['general'][ 'outer-section-width'] );
+                      $css .= sprintf( '[data-sek-level="section"]{max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
+                  }
+            }
+            if ( ! empty( $global_options['general'][ 'inner-section-width'] ) ) {
+                  $numeric = sek_extract_numeric_value( $global_options['general'][ 'inner-section-width'] );
+                  if ( ! empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $global_options['general'][ 'inner-section-width'] );
+                      $css .= sprintf( '[data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner {max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
+                  }
+            }
+        }
     }
 
 

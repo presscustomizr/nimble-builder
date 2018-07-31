@@ -19,6 +19,35 @@ function sek_get_module_params_for_sek_local_skope_options_module() {
                     'choices'     => sek_get_select_options_for_input_id( 'local_template' ),
                     'refresh_preview' => true
                 ),
+                'use-custom-width' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Define custom outer and inner widths for the sections of this page', 'text_domain_to_be_replaced'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                ),
+                'outer-section-width' => array(
+                    'input_type'  => 'range_with_unit_picker',
+                    'title'       => __('Outer sections width', 'text_domain_to_be_replaced'),
+                    'min' => 0,
+                    'max' => 500,
+                    'default' => '100%',
+                    'width-100'   => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                ),
+                'inner-section-width' => array(
+                    'input_type'  => 'range_with_unit_picker',
+                    'title'       => __('Inner sections width', 'text_domain_to_be_replaced'),
+                    'min' => 0,
+                    'max' => 500,
+                    'default' => '100%',
+                    'width-100'   => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                ),
                 'local_custom_css' => array(
                     'input_type'  => 'code_editor',
                     'title'       => __( 'Custom css' , 'text_domain_to_be_replaced' ),
@@ -39,9 +68,29 @@ add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_custom_c
 function sek_add_raw_local_custom_css( $css ) {
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
     // otherwise we fallback on the normal utility skp_build_skope_id()
-    $localSkopeNimble = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id()  );
-    if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['general'] ) && ! empty( $localSkopeNimble['options']['general']['local_custom_css'] ) ) {
-        $css .= $localSkopeNimble['options']['general']['local_custom_css'];
+    $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
+    if ( is_array( $local_options ) && !empty( $local_options['options']) && ! empty( $local_options['options']['general'] ) ) {
+        $general_options = $local_options['options']['general'];
+        if ( ! empty( $general_options['local_custom_css'] ) ) {
+            $css .= $general_options['local_custom_css'];
+        }
+
+        if ( ! empty( $general_options[ 'use-custom-width' ] ) && true === sek_booleanize_checkbox_val( $general_options[ 'use-custom-width' ] ) ) {
+            if ( ! empty( $general_options['outer-section-width'] ) ) {
+                  $numeric = sek_extract_numeric_value( $general_options['outer-section-width'] );
+                  if ( ! empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $general_options['outer-section-width'] );
+                      $css .= sprintf( '.sektion-wrapper [data-sek-level="section"]{max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
+                  }
+            }
+            if ( ! empty( $general_options[ 'inner-section-width'] ) ) {
+                  $numeric = sek_extract_numeric_value( $general_options[ 'inner-section-width'] );
+                  if ( ! empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $general_options[ 'inner-section-width'] );
+                      $css .= sprintf( '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner {max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
+                  }
+            }
+        }
     }
     return $css;
 }

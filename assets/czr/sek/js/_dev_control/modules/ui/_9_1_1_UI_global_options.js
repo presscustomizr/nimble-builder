@@ -58,6 +58,14 @@
                                                 return input();
                                           });
                                     break;
+                                    case 'use-custom-width' :
+                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
+                                                return input();
+                                          });
+                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
+                                                return input();
+                                          });
+                                    break;
                               }
                         });
                   }
