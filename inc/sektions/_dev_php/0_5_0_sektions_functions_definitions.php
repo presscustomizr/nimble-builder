@@ -488,13 +488,41 @@ function render_content_sections() {
 
 
 /* ------------------------------------------------------------------------- *
- *  GLOBAL OPTIONS HELPER
+ *  BREAKPOINTS HELPER
 /* ------------------------------------------------------------------------- */
 function sek_get_global_custom_breakpoint() {
-    $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    if ( ! is_array( $global_options ) || empty( $global_options['general'] ) || empty( $global_options['general']['global-custom-breakpoint'] ) )
+    $options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+    if ( ! is_array( $options ) || empty( $options['general'] ) || empty( $options['general']['global-custom-breakpoint'] ) )
       return;
 
-    return intval( $global_options['general']['global-custom-breakpoint'] );
+    if ( empty( $options['general'][ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $options['general'][ 'use-custom-breakpoint'] ) )
+      return;
+
+    return intval( $options['general']['global-custom-breakpoint'] );
+}
+
+
+function sek_get_section_custom_breakpoint( $section ) {
+    if ( ! is_array( $section ) )
+      return;
+
+    $options = empty( $section[ 'options' ] ) ? array() : $section['options'];
+    if ( empty( $options[ 'breakpoint' ] ) )
+      return;
+
+    if ( empty( $options[ 'breakpoint' ][ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $options[ 'breakpoint' ][ 'use-custom-breakpoint'] ) )
+      return;
+
+    if ( empty( $options[ 'breakpoint' ][ 'custom-breakpoint' ] ) )
+      return;
+
+    if ( empty($section['id']) )
+      return;
+
+    $custom_breakpoint = intval( $options[ 'breakpoint' ][ 'custom-breakpoint' ] );
+    if ( $custom_breakpoint < 0 )
+      return;
+
+    return $custom_breakpoint;
 }
 ?>
