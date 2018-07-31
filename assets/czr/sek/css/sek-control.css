@@ -847,6 +847,7 @@ body.nimble-top-bar-visible #nimble-top-bar {
 #nimble-top-bar button[data-nimble-state="disabled"] {
   cursor: inherit;
   opacity: 0.4!important;
+  cursor: not-allowed;
 }
 #nimble-top-bar .sek-do-undo button:hover {
   opacity: 1;

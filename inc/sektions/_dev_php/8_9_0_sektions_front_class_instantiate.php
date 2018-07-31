@@ -1,5 +1,5 @@
 <?php
-// invoked ( and instanciated ) when skp_is_customizing()
+// invoked ( and instantiated ) when skp_is_customizing()
 function SEK_CZR_Dyn_Register( $params = array() ) {
     return SEK_CZR_Dyn_Register::get_instance( $params );
 }

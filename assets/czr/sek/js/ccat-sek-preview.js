@@ -210,7 +210,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   $('[data-sek-id="' + locationId +'"]').each( function() {
                         defaults = $.extend( true, {}, self.sortableDefaultParams );
                         $(this).sortable( _.extend( defaults, {
-                              handle : '.sek-move-section, .sek-section-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                              //handle : '.sek-move-section, .sek-section-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                              handle : '.sek-move-section',
                               connectWith : '[data-sek-level="location"]',
                               placeholder: {
                                     element: function(currentItem) {
@@ -315,7 +316,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // }
 
                   $sortableCandidate.sortable( _.extend( defaults, {
-                        handle : '.sek-move-column, .sek-column-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                        //handle : '.sek-move-column, .sek-column-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                        handle : '.sek-move-column',
                         connectWith: ".sek-sektion-inner",
                         over : function( event, ui ) {
                               var $targetSektion          = $(this).closest('[data-sek-level="section"]'),
@@ -456,7 +458,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   defaults = $.extend( true, {}, self.sortableDefaultParams );
                   // Restrict to the .sek-column-inner for this very column id with first()
                   $( '[data-sek-id="' + columnId + '"]').find('.sek-column-inner').first().sortable( _.extend( defaults, {
-                        handle : '.sek-move-module, .sek-module-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                        //handle : '.sek-move-module, .sek-module-dyn-ui > .sek-dyn-ui-location-type .sek-dyn-ui-level-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                        handle : '.sek-move-module',
                         connectWith: ".sek-column-inner",
                         over : function( event, ui ) {
                               // Hide the module placeholder while overing, when the column is empty
@@ -529,12 +532,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   $('.sektion-wrapper').find( 'div[data-sek-level="section"]' ).each( function() {
                         self.maybeMakeColumnResizableInSektion.call( this );
                   });
-                  // Delegate instantiation when a module is added ( => column re-rendered )
+                  // Delegate instantiation when a level markup is refreshed
+                  // Let the event bubble up to the location, and then visit all children section to maybe re-instantiate resizable
+                  // @fixes https://github.com/presscustomizr/nimble-builder/issues/165
                   $('body').on(
-                        'sek-modules-refreshed sek-columns-refreshed',
-                        'div[data-sek-level="section"]',
-                        function(evt) {
-                              self.maybeMakeColumnResizableInSektion.call( this );
+                        'sek-level-refreshed sek-modules-refreshed sek-columns-refreshed',
+                        '[data-sek-level="location"]',
+                        function() {
+                              $(this).find('[data-sek-level="section"]').each( function() {
+                                    self.maybeMakeColumnResizableInSektion.call( this );
+                              });
                         }
                   );
                   return this;
@@ -745,7 +752,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         clearTimeout( $menu.data('_toggle_ui_menu_') );
                         $menu.data( '_toggle_ui_menu_', setTimeout(function() {
                               setClassesAndVisibilities.call( $menu );
-                        }, 5000 ) );
+                        }, 10000 ) );
                       },
                       setClassesAndVisibilities = function( expand ) {
                             var $menu = $(this),
@@ -942,25 +949,33 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               // sniff levels and print UI
                               _sniffLevelsAndPrintUI( position );
                         } else {
+                              // Mouse didn't move recently?
+                              // => remove all UIs
                               $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
                                     $(this).fadeOut( {
                                           duration : 200,
                                           complete : function() { $(this).remove(); }
                                     });
                               });
+                              $('body').stop( true, true ).find('[data-sek-level]').each( function() {
+                                    // preserve if the ui menu is expanded, otherwise remove
+                                    if ( $(this).children('.sek-dyn-ui-wrapper').find('.sek-is-expanded').length < 1 ) {
+                                          removeLevelUI.call( $(this) );
+                                    }
+                              });
                         }
                   });
                   // @return void()
                   var resetMouseMoveTrack = function() {
                         clearTimeout( $(window).data('_scroll_move_timer_') );
-                        self.mouseMovedRecently.set( {} );
+                        self.mouseMovedRecently.set({});
                   };
 
                   $(window).on( 'mousemove scroll', _.throttle( function( evt ) {
                         self.mouseMovedRecently( { x : evt.clientX, y : evt.clientY } );
                         clearTimeout( $(window).data('_scroll_move_timer_') );
                         $(window).data('_scroll_move_timer_', setTimeout(function() {
-                              self.mouseMovedRecently.set( {} );
+                              self.mouseMovedRecently.set({});
                         }, 4000 ) );
                   }, 50 ) );
 

@@ -641,6 +641,71 @@ button.sek-btn,
   text-align: center;
 }
 
+[data-sek-module-type="czr_image_module"] img {
+  border: 0 solid #f2f2f2;
+}
+
+[data-sek-module-type="czr_image_module"] .box-shadow img {
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0;
+}
+
+[data-sek-module-type="czr_image_module"] figure img {
+  transition: all 0.2s ease-out;
+}
+
+.sek-hover-effect-opacity img:hover {
+  opacity: .7;
+}
+
+.sek-hover-effect-zoom-out img:hover {
+  -webkit-transform: scale(1.05);
+  transform: scale(1.05);
+}
+
+.sek-hover-effect-zoom-in img:hover {
+  -webkit-transform: scale(0.95);
+  transform: scale(0.95);
+}
+
+.sek-hover-effect-move-up img:hover {
+  -webkit-transform: translateY(-6px);
+  transform: translateY(-6px);
+}
+
+.sek-hover-effect-move-down img:hover {
+  -webkit-transform: translateY(6px);
+  transform: translateY(6px);
+}
+
+.sek-hover-effect-blur img:hover {
+  -webkit-filter: blur(2px);
+  filter: blur(2px);
+}
+
+.sek-hover-effect-grayscale img:hover {
+  -webkit-filter: grayscale(0%);
+  filter: grayscale(0%);
+}
+
+.sek-hover-effect-grayscale img:hover {
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+  -webkit-filter: gray;
+  filter: gray;
+}
+
+.sek-hover-effect-reverse-grayscale img {
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+  -webkit-filter: gray;
+  filter: gray;
+}
+
+.sek-hover-effect-reverse-grayscale img:hover {
+  -webkit-filter: grayscale(0%);
+  filter: grayscale(0%);
+}
+
 [data-sek-module-type="czr_divider_module"] {
   text-align: center;
 }
@@ -721,10 +786,12 @@ button.sek-btn,
 
 .sek-quote.sek-quote-design .sek-quote-inner {
   color: inherit;
+  padding-left: calc(10px + 1.3em);
 }
 
 .sek-quote.sek-quote-design .sek-quote-content {
   font-weight: 400;
+  font-size: 16px;
   color: inherit;
 }
 
@@ -738,7 +805,6 @@ button.sek-btn,
   display: block;
   margin-top: 1.5em;
   position: relative;
-  font-style: italic;
   padding-left: 2.2em;
   padding-right: 0.25em;
 }
@@ -759,6 +825,7 @@ button.sek-btn,
   position: relative;
   display: -ms-flexbox;
   display: flex;
+  font-size: 32px;
 }
 
 .sek-quote.sek-quote-design.sek-quote-icon-before .sek-quote-content *:last-child {
@@ -768,7 +835,6 @@ button.sek-btn,
 .sek-quote.sek-quote-design.sek-quote-icon-before::before {
   content: '\f10d';
   color: #ccc;
-  font-size: 32px;
   font-weight: 900;
   font-style: normal;
   text-align: center;
@@ -782,7 +848,9 @@ button.sek-btn,
   position: static;
   width: auto;
   margin: 0;
-  padding-right: 17px;
+  left: 0;
+  position: absolute;
+  top: 0;
 }
 
 .sek-btn-inner {
@@ -837,6 +905,7 @@ button.sek-btn,
   -ms-flex-item-align: center;
   align-self: center;
   width: 100%;
+  max-width: 100%;
 }
 
 /* a nested sektion should reset its parent column padding
@@ -895,5 +964,24 @@ button.sek-btn,
 .sek-module-placeholder .material-icons {
   font-size: inherit;
   color: #cfcfcf;
+}
+
+/* LEVEL VISIBILITY BY DEVICE */
+@media (min-width: 767px) {
+  [data-sek-level="location"] .sek-hidden-on-desktops {
+    display: none;
+  }
+}
+
+@media (min-width: 575px) and (max-width: 768px) {
+  [data-sek-level="location"] .sek-hidden-on-tablets {
+    display: none;
+  }
+}
+
+@media (max-width: 575px) {
+  [data-sek-level="location"] .sek-hidden-on-mobiles {
+    display: none;
+  }
 }
 /*# sourceMappingURL=sek-base.css.map */
