@@ -42,8 +42,14 @@ function sek_get_module_params_for_sek_level_width_module() {
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
 add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_level_width', 10, 3 );
-function sek_add_css_rules_for_level_width( $rules, $level ) {
-    $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
+function sek_add_css_rules_for_level_width( $rules, $module ) {
+    if ( ! is_array( $module ) )
+      return $rules;
+    // this filter is fired for all level types. Make sure we filter only the modules.
+    if ( empty( $module['level'] ) || 'section' !== $module['level'] )
+      return $rules;
+
+    $options = empty( $module[ 'options' ] ) ? array() : $module['options'];
     if ( empty( $options[ 'width' ] ) )
       return $rules;
 
@@ -70,7 +76,7 @@ function sek_add_css_rules_for_level_width( $rules, $level ) {
 
         if ( !empty( $css_rules ) ) {
             $rules[]     = array(
-                    'selector' => '[data-sek-id="'.$level['id'].'"]',
+                    'selector' => '[data-sek-id="'.$module['id'].'"]',
                     'css_rules' => $css_rules,
                     'mq' =>null
             );
@@ -91,7 +97,7 @@ function sek_add_css_rules_for_level_width( $rules, $level ) {
             }
             if ( !empty( $css_rules ) ) {
                 $rules[]     = array(
-                        'selector' => '[data-sek-id="'.$level['id'].'"]',
+                        'selector' => '[data-sek-id="'.$module['id'].'"]',
                         'css_rules' => $css_rules,
                         'mq' =>null
                 );
