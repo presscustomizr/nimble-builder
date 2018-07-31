@@ -1,23 +1,21 @@
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-            var Constructor = {
+      var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  // module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
+                  module.inputConstructor = api.CZRInput.extend({
+                        setupSelect : function() {
+                              api.czr_sektions.setupSelectInput.call( this );
+                        }
+                  });
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
-
-            // CZRInputMths : {
-            //       setupSelect : function() {
-            //             api.czr_sektions.setupSelectInput.call( this );
-            //       }
-            // },//CZRInputMths
 
             CZRItemConstructor : {
                   //overrides the parent ready
@@ -56,7 +54,7 @@
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-breakpoint' :
-                                          scheduleVisibilityOfInputId.call( input, 'custom-breakpoint', function() {
+                                          scheduleVisibilityOfInputId.call( input, 'global-custom-breakpoint', function() {
                                                 return input();
                                           });
                                     break;
@@ -65,6 +63,7 @@
                   }
             }//CZRItemConstructor
       };
+
 
       //provides a description of each module
       //=> will determine :
@@ -76,15 +75,15 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            sek_level_breakpoint_module : {
+            sek_global_options_module : {
                   mthds : Constructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_breakpoint_module', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_options_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_breakpoint_module' )
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_options_module' )
                   )
             },
       });

@@ -293,7 +293,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_2_UI_module_picker.js',
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_3_UI_section_picker.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_1_0_UI_local_skope_options.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_1_1_UI_global_skope_options.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_1_1_UI_global_options.js',
 
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',

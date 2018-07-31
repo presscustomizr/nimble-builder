@@ -315,6 +315,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               },
                               _toggleActive : function(){ return true; }
                         })
+                  }).done( function() {
+                        api.section( '__globalAndLocalOptionsSection', function( _section_ ) {
+                              $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
+                                    var $control = $(this).closest( '.customize-control');
+                                    if ( "true" == $control.attr('data-sek-expanded' ) )
+                                      return;
+                                    _section_.container.find('.customize-control').each( function() {
+                                          $(this).attr('data-sek-expanded', "false" );
+                                          $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
+                                    });
+
+
+                                    $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
+                                    $control.find('.czr-items-wrapper').stop( true, true ).slideToggle( 'fast' );
+                              });
+                        });
                   });
 
                   // GLOBAL OPTIONS SETTING

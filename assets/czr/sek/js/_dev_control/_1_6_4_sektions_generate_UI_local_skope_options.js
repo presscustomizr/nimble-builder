@@ -90,9 +90,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settings : { default : _id_ },
                               //track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                         }).done( function() {
-                              // api.control( _id_ ).focus({
-                              //     completeCallback : function() {}
-                              // });
+                              // Implement the animated arrow markup, and the initial state of the module visibility
+                              api.control( _id_, function( _control_ ) {
+                                    // Hide the item wrapper
+                                    _control_.container.find('.czr-items-wrapper').hide();
+                                    var $title = _control_.container.find('label > .customize-control-title');
+                                    // if this level has an icon, let's prepend it to the title
+                                     $title.addClass('sek-flex-vertical-center').prepend( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
+                                    // prepend the animated arrow
+                                    $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+                                    // setup the initial state + initial click
+                                    _control_.container.attr('data-sek-expanded', "false" );
+                                    // if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
+                                    //       $title.trigger('click');
+                                    // }
+                              });
                         });
                   };
 
