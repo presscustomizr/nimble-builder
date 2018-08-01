@@ -40,14 +40,8 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_sections_breakpoint', 10, 3 );
+add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_sections_breakpoint', 10, 3 );
 function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
-    if ( ! is_array( $section ) )
-      return $rules;
-    // this filter is fired for all level types. Make sure we filter only the sections.
-    if ( empty( $section['level'] ) || 'section' !== $section['level'] )
-      return $rules;
-
     $custom_breakpoint = intval( sek_get_section_custom_breakpoint( $section ) );
 
     if ( $custom_breakpoint < 1 )

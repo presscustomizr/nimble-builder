@@ -71,28 +71,14 @@ class Sek_Dyn_CSS_Builder {
         }
 
         foreach ( $level as $key => $entry ) {
-             $rules = array();
-            // Populate rules for sections / columns / modules
-            if ( !empty( $entry[ 'level' ] ) && ( !empty( $entry[ 'options' ] ) || !empty( $entry[ 'width' ] ) ) ) {
-                // build rules for level options => section / column / module
-                $rules = apply_filters( 'sek_add_css_rules_for_level_options', $rules, $entry );
-            }
+            $rules = array();
 
-            // populate rules for modules values
-            if ( !empty( $entry[ 'level' ] ) && 'module' === $entry['level'] ) {
-                if ( ! empty( $entry['module_type'] ) ) {
-                    $module_type = $entry['module_type'];
-                    // build rules for modules
-                    // applying sek_normalize_module_value_with_defaults() allows us to access all the value properties of the module without needing to check their existence
-                    $rules = apply_filters( "sek_add_css_rules_for_module_type___{$module_type}", $rules, sek_normalize_module_value_with_defaults( $entry ) );
-                }
-            }
-
+            // INPUT CSS RULES
             // When we are inside the associative arrays of the module 'value' or the level 'options' entries
             // the keys are not integer.
             // We want to filter each input
             // which makes it possible to target for example the font-family. Either in module values or in level options
-            if ( empty( $entry[ 'level' ] ) && is_string( $key ) && 1 < strlen( $key ) ) {
+            if ( ! is_array( $entry ) && is_string( $key ) && 1 < strlen( $key ) ) {
                 // we need to have a level model set
                 if ( !empty( $parent_level ) && is_array( $parent_level ) && ! empty( $parent_level['module_type'] ) ) {
                     // the input_id candidate to filter is the $key
@@ -118,10 +104,32 @@ class Sek_Dyn_CSS_Builder {
                 }//if
             }//if
 
-            // populates the rules collection
-            if ( !empty( $rules ) ) {
 
-                //TODO: MAKE SURE RULE ARE NORMALIZED
+            // LEVEL CSS RULES
+            if ( is_array( $entry ) ) {
+                // Populate rules for sections / columns / modules
+                if ( !empty( $entry[ 'level' ] ) ) {
+                    $level_type = $entry[ 'level' ];
+                    $rules = apply_filters( "sek_add_css_rules_for__{$level_type}__options", $rules, $entry );
+                    // build rules for level options => section / column / module
+                    $rules = apply_filters( 'sek_add_css_rules_for_level_options', $rules, $entry );
+                }
+
+                // populate rules for modules values
+                if ( !empty( $entry[ 'level' ] ) && 'module' === $entry['level'] ) {
+                    if ( ! empty( $entry['module_type'] ) ) {
+                        $module_type = $entry['module_type'];
+                        // build rules for modules
+                        // applying sek_normalize_module_value_with_defaults() allows us to access all the value properties of the module without needing to check their existence
+                        $rules = apply_filters( "sek_add_css_rules_for_module_type___{$module_type}", $rules, sek_normalize_module_value_with_defaults( $entry ) );
+                    }
+                }
+            } // if ( is_array( $entry ) ) {
+
+
+            // POPULATE THE CSS RULES COLLECTION
+            if ( !empty( $rules ) ) {
+                //@TODO: MAKE SURE RULE ARE NORMALIZED
                 foreach( $rules as $rule ) {
                     if ( ! is_array( $rule ) ) {
                         sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a css rule should be represented by an array', $rule );
@@ -148,13 +156,13 @@ class Sek_Dyn_CSS_Builder {
                 }
                 // Let's go recursive
                 $this->sek_css_rules_sniffer_walker( $entry, $parent_level );
-
-
             }
+
             // Reset the parent level model because it might have been modified after walking the sublevels
             if ( ! empty( $parent_level ) ) {
                 $this -> parent_level_model = $parent_level;
             }
+
         }//foreach
     }//sek_css_rules_sniffer_walker()
 

@@ -44,14 +44,8 @@ function sek_get_module_params_for_sek_level_width_section() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_section_width', 10, 3 );
+add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_section_width', 10, 3 );
 function sek_add_css_rules_for_section_width( $rules, $section ) {
-    if ( ! is_array( $section ) )
-      return $rules;
-    // this filter is fired for all level types. Make sure we filter only the sections.
-    if ( empty( $section['level'] ) || 'section' !== $section['level'] )
-      return $rules;
-
     $options = empty( $section[ 'options' ] ) ? array() : $section['options'];
     if ( empty( $options[ 'width' ] ) )
       return $rules;
