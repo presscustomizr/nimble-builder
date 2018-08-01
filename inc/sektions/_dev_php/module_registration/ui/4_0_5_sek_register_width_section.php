@@ -7,6 +7,10 @@ function sek_get_module_params_for_sek_level_width_section() {
         'name' => __('Width options', 'text_domain_to_be_replaced'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'starting_value' => array(
+            'outer-section-width' => '100%',
+            'inner-section-width' => '100%'
+        ),
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-width' => array(
@@ -23,7 +27,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'title'       => __('Outer section width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '100%',
+                    'default' => '',
                     'width-100'   => true
                 ),
                 'inner-section-width' => array(
@@ -31,7 +35,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'title'       => __('Inner section width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '100%',
+                    'default' => '',
                     'width-100'   => true
                 )
             )
@@ -57,7 +61,7 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
           if ( ! empty( $numeric ) ) {
               $unit = sek_extract_unit( $options[ 'width' ][ 'outer-section-width'] );
               $rules[]     = array(
-                      'selector' => '[data-sek-id="'.$section['id'].'"]',
+                      'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]',// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
                       'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
                       'mq' =>null
               );
@@ -68,14 +72,12 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
           if ( ! empty( $numeric ) ) {
               $unit = sek_extract_unit( $options[ 'width' ][ 'inner-section-width'] );
               $rules[]     = array(
-                      'selector' => '[data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner',
+                      'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner',// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
                       'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
                       'mq' =>null
               );
           }
     }
-
-    //error_log( print_r($rules, true) );
     return $rules;
 }
 

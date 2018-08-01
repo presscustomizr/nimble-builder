@@ -7,6 +7,8 @@ function sek_get_module_params_for_sek_local_skope_options_module() {
         'name' => __('Options for the sections of the current page', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) ),
+            'outer-section-width' => '100%',
+            'inner-section-width' => '100%'
         ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -33,7 +35,7 @@ function sek_get_module_params_for_sek_local_skope_options_module() {
                     'title'       => __('Outer sections width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '100%',
+                    'default' => '',
                     'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -43,7 +45,7 @@ function sek_get_module_params_for_sek_local_skope_options_module() {
                     'title'       => __('Inner sections width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '100%',
+                    'default' => '',
                     'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,

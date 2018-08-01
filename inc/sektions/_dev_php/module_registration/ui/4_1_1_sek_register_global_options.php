@@ -92,8 +92,6 @@ function sek_write_global_custom_options() {
             }
         }
     }
-
-
     printf('<style type="text/css" id="nimble-global-options">%1$s</style>', $css );
 }
 ?>

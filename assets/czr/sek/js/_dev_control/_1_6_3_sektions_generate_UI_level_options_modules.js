@@ -68,14 +68,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
                               }
                         });
-                        $.extend( levelRegistrationParams, {
-                              layout : {
-                                    settingControlId : params.id + '__sectionLayout_options',
-                                    module_type : 'sek_level_section_layout_module',
-                                    controlLabel : sektionsLocalizedData.i18n['Layout settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
-                                    icon : '<i class="material-icons sek-level-option-icon">crop_din</i>'
-                              }
-                        });
+                        // Deactivated
+                        // => replaced by sek_level_width_section
+                        // $.extend( levelRegistrationParams, {
+                        //       layout : {
+                        //             settingControlId : params.id + '__sectionLayout_options',
+                        //             module_type : 'sek_level_section_layout_module',
+                        //             controlLabel : sektionsLocalizedData.i18n['Layout settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                        //             icon : '<i class="material-icons sek-level-option-icon">crop_din</i>'
+                        //       }
+                        // });
                         $.extend( levelRegistrationParams, {
                               breakpoint : {
                                     settingControlId : params.id + '__breakpoint_options',

@@ -2232,7 +2232,7 @@ function sek_register_modules() {
         'sek_module_picker_module',
         //'sek_section_picker_module',
         'sek_level_bg_border_module',
-        'sek_level_section_layout_module',
+        //'sek_level_section_layout_module',<// deactivated for now. Replaced by sek_level_width_section
         'sek_level_height_module',
         'sek_level_spacing_module',
         'sek_level_width_module',
@@ -3227,14 +3227,8 @@ function sek_get_module_params_for_sek_level_width_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_level_width', 10, 3 );
-function sek_add_css_rules_for_level_width( $rules, $module ) {
-    if ( ! is_array( $module ) )
-      return $rules;
-    // this filter is fired for all level types. Make sure we filter only the modules.
-    if ( empty( $module['level'] ) || 'section' !== $module['level'] )
-      return $rules;
-
+add_filter( 'sek_add_css_rules_for__module__options', '\Nimble\sek_add_css_rules_for_module_width', 10, 3 );
+function sek_add_css_rules_for_module_width( $rules, $module ) {
     $options = empty( $module[ 'options' ] ) ? array() : $module['options'];
     if ( empty( $options[ 'width' ] ) )
       return $rules;
@@ -3303,6 +3297,10 @@ function sek_get_module_params_for_sek_level_width_section() {
         'name' => __('Width options', 'text_domain_to_be_replaced'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'starting_value' => array(
+            'outer-section-width' => '100%',
+            'inner-section-width' => '100%'
+        ),
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-width' => array(
@@ -3319,7 +3317,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'title'       => __('Outer section width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '100%',
+                    'default' => '',
                     'width-100'   => true
                 ),
                 'inner-section-width' => array(
@@ -3327,7 +3325,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'title'       => __('Inner section width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '100%',
+                    'default' => '',
                     'width-100'   => true
                 )
             )
@@ -3340,14 +3338,8 @@ function sek_get_module_params_for_sek_level_width_section() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_section_width', 10, 3 );
+add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_section_width', 10, 3 );
 function sek_add_css_rules_for_section_width( $rules, $section ) {
-    if ( ! is_array( $section ) )
-      return $rules;
-    // this filter is fired for all level types. Make sure we filter only the sections.
-    if ( empty( $section['level'] ) || 'section' !== $section['level'] )
-      return $rules;
-
     $options = empty( $section[ 'options' ] ) ? array() : $section['options'];
     if ( empty( $options[ 'width' ] ) )
       return $rules;
@@ -3359,7 +3351,7 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
           if ( ! empty( $numeric ) ) {
               $unit = sek_extract_unit( $options[ 'width' ][ 'outer-section-width'] );
               $rules[]     = array(
-                      'selector' => '[data-sek-id="'.$section['id'].'"]',
+                      'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]',// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
                       'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
                       'mq' =>null
               );
@@ -3370,14 +3362,12 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
           if ( ! empty( $numeric ) ) {
               $unit = sek_extract_unit( $options[ 'width' ][ 'inner-section-width'] );
               $rules[]     = array(
-                      'selector' => '[data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner',
+                      'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner',// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
                       'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
                       'mq' =>null
               );
           }
     }
-
-    //error_log( print_r($rules, true) );
     return $rules;
 }
 
@@ -3488,14 +3478,8 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_sections_breakpoint', 10, 3 );
+add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_sections_breakpoint', 10, 3 );
 function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
-    if ( ! is_array( $section ) )
-      return $rules;
-    // this filter is fired for all level types. Make sure we filter only the sections.
-    if ( empty( $section['level'] ) || 'section' !== $section['level'] )
-      return $rules;
-
     $custom_breakpoint = intval( sek_get_section_custom_breakpoint( $section ) );
 
     if ( $custom_breakpoint < 1 )
@@ -3524,6 +3508,8 @@ function sek_get_module_params_for_sek_local_skope_options_module() {
         'name' => __('Options for the sections of the current page', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) ),
+            'outer-section-width' => '100%',
+            'inner-section-width' => '100%'
         ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -3550,7 +3536,7 @@ function sek_get_module_params_for_sek_local_skope_options_module() {
                     'title'       => __('Outer sections width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '100%',
+                    'default' => '',
                     'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -3560,7 +3546,7 @@ function sek_get_module_params_for_sek_local_skope_options_module() {
                     'title'       => __('Inner sections width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '100%',
+                    'default' => '',
                     'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -3705,8 +3691,6 @@ function sek_write_global_custom_options() {
             }
         }
     }
-
-
     printf('<style type="text/css" id="nimble-global-options">%1$s</style>', $css );
 }
 ?><?php
@@ -5708,28 +5692,14 @@ class Sek_Dyn_CSS_Builder {
         }
 
         foreach ( $level as $key => $entry ) {
-             $rules = array();
-            // Populate rules for sections / columns / modules
-            if ( !empty( $entry[ 'level' ] ) && ( !empty( $entry[ 'options' ] ) || !empty( $entry[ 'width' ] ) ) ) {
-                // build rules for level options => section / column / module
-                $rules = apply_filters( 'sek_add_css_rules_for_level_options', $rules, $entry );
-            }
+            $rules = array();
 
-            // populate rules for modules values
-            if ( !empty( $entry[ 'level' ] ) && 'module' === $entry['level'] ) {
-                if ( ! empty( $entry['module_type'] ) ) {
-                    $module_type = $entry['module_type'];
-                    // build rules for modules
-                    // applying sek_normalize_module_value_with_defaults() allows us to access all the value properties of the module without needing to check their existence
-                    $rules = apply_filters( "sek_add_css_rules_for_module_type___{$module_type}", $rules, sek_normalize_module_value_with_defaults( $entry ) );
-                }
-            }
-
+            // INPUT CSS RULES
             // When we are inside the associative arrays of the module 'value' or the level 'options' entries
             // the keys are not integer.
             // We want to filter each input
             // which makes it possible to target for example the font-family. Either in module values or in level options
-            if ( empty( $entry[ 'level' ] ) && is_string( $key ) && 1 < strlen( $key ) ) {
+            if ( ! is_array( $entry ) && is_string( $key ) && 1 < strlen( $key ) ) {
                 // we need to have a level model set
                 if ( !empty( $parent_level ) && is_array( $parent_level ) && ! empty( $parent_level['module_type'] ) ) {
                     // the input_id candidate to filter is the $key
@@ -5755,10 +5725,32 @@ class Sek_Dyn_CSS_Builder {
                 }//if
             }//if
 
-            // populates the rules collection
-            if ( !empty( $rules ) ) {
 
-                //TODO: MAKE SURE RULE ARE NORMALIZED
+            // LEVEL CSS RULES
+            if ( is_array( $entry ) ) {
+                // Populate rules for sections / columns / modules
+                if ( !empty( $entry[ 'level' ] ) ) {
+                    $level_type = $entry[ 'level' ];
+                    $rules = apply_filters( "sek_add_css_rules_for__{$level_type}__options", $rules, $entry );
+                    // build rules for level options => section / column / module
+                    $rules = apply_filters( 'sek_add_css_rules_for_level_options', $rules, $entry );
+                }
+
+                // populate rules for modules values
+                if ( !empty( $entry[ 'level' ] ) && 'module' === $entry['level'] ) {
+                    if ( ! empty( $entry['module_type'] ) ) {
+                        $module_type = $entry['module_type'];
+                        // build rules for modules
+                        // applying sek_normalize_module_value_with_defaults() allows us to access all the value properties of the module without needing to check their existence
+                        $rules = apply_filters( "sek_add_css_rules_for_module_type___{$module_type}", $rules, sek_normalize_module_value_with_defaults( $entry ) );
+                    }
+                }
+            } // if ( is_array( $entry ) ) {
+
+
+            // POPULATE THE CSS RULES COLLECTION
+            if ( !empty( $rules ) ) {
+                //@TODO: MAKE SURE RULE ARE NORMALIZED
                 foreach( $rules as $rule ) {
                     if ( ! is_array( $rule ) ) {
                         sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a css rule should be represented by an array', $rule );
@@ -5785,13 +5777,13 @@ class Sek_Dyn_CSS_Builder {
                 }
                 // Let's go recursive
                 $this->sek_css_rules_sniffer_walker( $entry, $parent_level );
-
-
             }
+
             // Reset the parent level model because it might have been modified after walking the sublevels
             if ( ! empty( $parent_level ) ) {
                 $this -> parent_level_model = $parent_level;
             }
+
         }//foreach
     }//sek_css_rules_sniffer_walker()
 
