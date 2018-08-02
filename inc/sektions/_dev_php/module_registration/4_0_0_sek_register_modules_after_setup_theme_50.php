@@ -3,6 +3,7 @@
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     foreach( [
+        // ui modules
         'sek_module_picker_module',
         //'sek_section_picker_module',
         'sek_level_bg_border_module',
@@ -15,13 +16,17 @@ function sek_register_modules() {
         'sek_level_visibility_module',
         'sek_level_breakpoint_module',
 
+        // local skope options modules
         'sek_local_skope_options_module',
+
+        // global options modules
         'sek_global_options_module',
 
+        // front modules
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
         'czr_image_module',
-        'czr_featured_pages_module',
+        //'czr_featured_pages_module',
         'czr_heading_module',
         'czr_spacer_module',
         'czr_divider_module',
