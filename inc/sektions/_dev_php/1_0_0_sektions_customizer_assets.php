@@ -395,6 +395,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             // UI global and local options
             'Local options for the sections of the current page' => __( 'Local options for the sections of the current page', 'text_domain_to_be_replaced'),
+            'Currently previewed page options' => __( 'Current previewed page options', 'text_domain_to_be_replaced'),
             'General options applied site wide' => __( 'General options applied site wide', 'text_domain_to_be_replaced'),
             'General options' => __( 'General options', 'text_domain_to_be_replaced'),
 

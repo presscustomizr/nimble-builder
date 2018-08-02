@@ -302,7 +302,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
-                        id : '__globalAndLocalOptionsSection',//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
+                        id : '__globalAndLocalOptionsSection',
                         title: sektionsLocalizedData.i18n['General options'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 30,
@@ -332,6 +332,59 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });
                   });
+
+
+                  api.CZR_Helpers.register({
+                        origin : 'nimble',
+                        what : 'section',
+                        id : '__localOptionsSection',//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
+                        title: sektionsLocalizedData.i18n['Currently previewed page options'],
+                        panel : sektionsLocalizedData.sektionsPanelId,
+                        priority : 30,
+                        track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                        constructWith : api.Section.extend({
+                              //attachEvents : function () {},
+                              // Always make the section active, event if we have no control in it
+                              isContextuallyActive : function () {
+                                return this.active();
+                              },
+                              _toggleActive : function(){ return true; }
+                        })
+                  }).done( function() {
+                        api.section( '__localOptionsSection', function( _section_ ) {
+                              // Style the section title
+                              var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
+                                  $panelTitleEl = _section_.container.find('.customize-section-title h3');
+
+                              // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
+                              if ( 0 < $sectionTitleEl.length ) {
+                                    $sectionTitleEl.prepend( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
+                              }
+
+                              // The default title looks like this : <span class="customize-action">Customizing</span> Title
+                              if ( 0 < $panelTitleEl.length ) {
+                                    $panelTitleEl.find('.customize-action').after( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
+                              }
+
+
+
+                              // Schedule the accordion behavious
+                              $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
+                                    var $control = $(this).closest( '.customize-control');
+                                    if ( "true" == $control.attr('data-sek-expanded' ) )
+                                      return;
+                                    _section_.container.find('.customize-control').each( function() {
+                                          $(this).attr('data-sek-expanded', "false" );
+                                          $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
+                                    });
+
+
+                                    $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
+                                    $control.find('.czr-items-wrapper').stop( true, true ).slideToggle( 'fast' );
+                              });
+                        });
+                  });
+
 
                   // GLOBAL OPTIONS SETTING
                   // Will Be updated in ::generateUIforGlobalOptions()

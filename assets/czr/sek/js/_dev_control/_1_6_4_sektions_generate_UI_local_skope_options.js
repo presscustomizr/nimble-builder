@@ -85,7 +85,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               label : sektionsLocalizedData.i18n['Local options for the sections of the current page'],
                               type : 'czr_module',//sekData.controlType,
                               module_type : 'sek_local_skope_options_module',
-                              section : '__globalAndLocalOptionsSection',
+                              section : '__localOptionsSection',
                               priority : 10,
                               settings : { default : _id_ },
                               //track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
@@ -109,8 +109,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   // Defer the registration when the parent section gets added to the api
-                  // the section '__globalAndLocalOptionsSection' is registered in ::initialize()
-                  api.section( '__globalAndLocalOptionsSection', function( _section_ ) {
+                  // the section '__localOptionsSection' is registered in ::initialize()
+                  api.section( '__localOptionsSection', function( _section_ ) {
                         api( self.sekCollectionSettingId(), function() {
                               _do_register_();
                               _section_.container.on('click', '.accordion-section-title',function() {
