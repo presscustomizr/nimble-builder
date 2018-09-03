@@ -260,7 +260,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
 
-                  // LOCAL AND GLOBAL OPTIONS SECTION
+                  //GLOBAL OPTIONS SECTION
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
@@ -279,6 +279,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         })
                   }).done( function() {
                         api.section( '__globalAndLocalOptionsSection', function( _section_ ) {
+                              // Style the section title
+                              var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
+                                  $panelTitleEl = _section_.container.find('.customize-section-title h3');
+
+                              // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
+                              if ( 0 < $sectionTitleEl.length ) {
+                                    $sectionTitleEl.prepend( '<i class="fas fa-globe sek-level-option-icon"></i>' );
+                              }
+
+                              // The default title looks like this : <span class="customize-action">Customizing</span> Title
+                              if ( 0 < $panelTitleEl.length ) {
+                                    $panelTitleEl.find('.customize-action').after( '<i class="fas fa-globe sek-level-option-icon"></i>' );
+                              }
+
+                              // Schedule the accordion behaviour
                               $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
                                     var $control = $(this).closest( '.customize-control');
                                     if ( "true" == $control.attr('data-sek-expanded' ) )
@@ -295,12 +310,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });
 
-
+                  //LOCAL OPTIONS SECTION
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
                         id : '__localOptionsSection',//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
-                        title: sektionsLocalizedData.i18n['Currently previewed page options'],
+                        title: sektionsLocalizedData.i18n['Current page options'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 30,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
@@ -330,7 +345,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-                              // Schedule the accordion behavious
+                              // Schedule the accordion behaviour
                               $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
                                     var $control = $(this).closest( '.customize-control');
                                     if ( "true" == $control.attr('data-sek-expanded' ) )
