@@ -549,6 +549,11 @@ function sek_print_nimble_customizer_tmpl() {
     ?>
     <script type="text/html" id="tmpl-nimble-top-bar">
       <div id="nimble-top-bar" class="czr-preview-notification">
+          <div class="sek-add-content">
+            <button type="button" class="material-icons" title="<?php _e('Add content', 'text_domain'); ?>" data-nimble-state="enabled">
+              add_circle_outline<span class="screen-reader-text"><?php _e('Add content', 'text_domain'); ?></span>
+            </button>
+          </div>
           <div class="sek-do-undo">
             <button type="button" class="icon undo" title="<?php _e('Undo', 'text_domain'); ?>" data-nimble-history="undo" data-nimble-state="disabled">
               <span class="screen-reader-text"><?php _e('Undo', 'text_domain'); ?></span>

@@ -867,6 +867,9 @@ body.nimble-top-bar-visible #nimble-top-bar {
       -ms-transform: rotate(45deg);
           transform: rotate(45deg);
 }
+#nimble-top-bar .sek-add-content button {
+  padding-top: 3px;
+}
 
 
 /*.czr-preview-notification a, .czr-preview-notification h2 {color: #fff; margin: 1em 0;}

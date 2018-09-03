@@ -193,45 +193,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // TOP BAR
                         // Setup the topbar including do/undo action buttons
-                        self.topBarVisible = new api.Value( false );
-                        self.topBarVisible.bind( function( visible ){
-                              self.toggleTopBar( visible );
-                        });
-
-
-                        self.mouseMovedRecently = new api.Value( {} );
-                        self.mouseMovedRecently.bind( function( position ) {
-                              self.topBarVisible( ! _.isEmpty( position ) );
-                        });
-
-                        var trackMouseMovements = function( evt ) {
-                              self.mouseMovedRecently( { x : evt.clientX, y : evt.clientY } );
-                              clearTimeout( $(window).data('_scroll_move_timer_') );
-                              $(window).data('_scroll_move_timer_', setTimeout(function() {
-                                    self.mouseMovedRecently.set( {} );
-                              }, 4000 ) );
-                        };
-                        $(window).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
-                        api.previewer.bind('ready', function() {
-                              $(api.previewer.targetWindow().document ).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
-                        });
-                        self.historyLog = new api.Value([]);
-                        // LISTEN TO HISTORY LOG CHANGES TO UPDATE THE BUTTON STATE
-                        self.historyLog.bind( function( newLog ) {
-                              if ( _.isEmpty( newLog ) )
-                                return;
-
-                              var newCurrentKey = _.findKey( newLog, { status : 'current'} );
-                              newCurrentKey = Number( newCurrentKey );
-                              $( '#nimble-top-bar' ).find('[data-nimble-history]').each( function() {
-                                    if ( 'undo' === $(this).data('nimble-history') ) {
-                                          $(this).attr('data-nimble-state', 0 >= newCurrentKey ? 'disabled' : 'enabled');
-                                    } else {
-                                          $(this).attr('data-nimble-state', newLog.length <= ( newCurrentKey + 1 ) ? 'disabled' : 'enabled');
-                                    }
-                              });
-                        });
-
+                        self.setupTopBar();//@see specific dev file
                   });//api.bind( 'ready' )
 
             },// initialize()
