@@ -110,12 +110,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   $('.sek-settings', '#nimble-top-bar').on( 'click', function(evt) {
-                        // Generate UI for the local skope options
-                        self.generateUI({ action : 'sek-generate-local-skope-options-ui'}).done( function() {
-                              api.control( self.getLocalSkopeOptionId(), function( _control_ ) {
-                                    _control_.focus();
-                              });
+                        // Focus on the Nimble panel
+                        api.panel( sektionsLocalizedData.sektionsPanelId, function( _panel_ ) {
+                              self.rootPanelFocus();
+                              _panel_.focus();
                         });
+                        // // Generate UI for the local skope options
+                        // self.generateUI({ action : 'sek-generate-local-skope-options-ui'}).done( function() {
+                        //       api.control( self.getLocalSkopeOptionId(), function( _control_ ) {
+                        //             _control_.focus();
+                        //       });
+                        // });
                   });
                   $('.sek-add-content', '#nimble-top-bar').on( 'click', function(evt) {
                         evt.preventDefault();
