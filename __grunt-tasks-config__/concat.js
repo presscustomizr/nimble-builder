@@ -206,18 +206,21 @@ module.exports = {
 
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_1_sek_register_module_picker.php',
       //'<%= paths.sektions %>_dev_php/module_registration/ui/4_0_2_sek_register_section_picker.php',
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_background_border.php',
-      //'<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_section_layout.php',
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_height.php',
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_4_sek_register_spacing.php',
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_5_sek_register_width_module.php',
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_5_sek_register_width_section.php',
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_6_sek_register_anchor.php',
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_7_sek_register_visibility.php',
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_8_sek_register_breakpoint.php',
 
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_1_0_sek_register_local_skope_options.php',
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_1_1_sek_register_global_options.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_background_border.php',
+      //'<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_section_layout.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_height.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_4_sek_register_spacing.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_module.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_section.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_6_sek_register_anchor.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_7_sek_register_visibility.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_8_sek_register_breakpoint.php',
+
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_2_local/4_1_0_sek_register_local_skope_options.php',
+
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php',
@@ -284,20 +287,23 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_9_range_with_unit_picker.js',
 
       // Modules
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_anchor_module.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_bg_border_module.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_breakpoint_module.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_height_module.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_visibility_module.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_width_module.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_level_width_section.js',
-      //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_0_UI_sek_section_layout_module.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_1_UI_spacing.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_2_UI_module_picker.js',
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_3_UI_section_picker.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_1_0_UI_local_skope_options.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_1_1_UI_global_options.js',
 
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_anchor_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_bg_border_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_breakpoint_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_height_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_visibility_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_width_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_width_section.js',
+      //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_section_layout_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_1_UI_spacing.js',
+
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_0_UI_local_skope_options.js',
+
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_1_UI_global_breakpoint.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_2_UI_global_widths.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_1_FRONT_tiny_mce_editor.js',

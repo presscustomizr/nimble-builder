@@ -58,14 +58,6 @@
                                                 return input();
                                           });
                                     break;
-                                    case 'use-custom-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
-                                                return input();
-                                          });
-                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
-                                                return input();
-                                          });
-                                    break;
                               }
                         });
                   }
@@ -83,15 +75,15 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            sek_global_options_module : {
+            sek_global_breakpoint : {
                   mthds : Constructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_options_module', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_breakpoint', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_options_module' )
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_breakpoint' )
                   )
             },
       });
