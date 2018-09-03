@@ -492,13 +492,13 @@ function render_content_sections() {
 /* ------------------------------------------------------------------------- */
 function sek_get_global_custom_breakpoint() {
     $options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    if ( ! is_array( $options ) || empty( $options['general'] ) || empty( $options['general']['global-custom-breakpoint'] ) )
+    if ( ! is_array( $options ) || empty( $options['breakpoint'] ) || empty( $options['breakpoint']['global-custom-breakpoint'] ) )
       return;
 
-    if ( empty( $options['general'][ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $options['general'][ 'use-custom-breakpoint'] ) )
+    if ( empty( $options['breakpoint'][ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $options['breakpoint'][ 'use-custom-breakpoint'] ) )
       return;
 
-    return intval( $options['general']['global-custom-breakpoint'] );
+    return intval( $options['breakpoint']['global-custom-breakpoint'] );
 }
 
 

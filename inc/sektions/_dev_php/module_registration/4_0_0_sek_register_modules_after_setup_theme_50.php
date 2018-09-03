@@ -20,7 +20,8 @@ function sek_register_modules() {
         'sek_local_skope_options_module',
 
         // global options modules
-        'sek_global_options_module',
+        'sek_global_breakpoint',
+        'sek_global_widths',
 
         // front modules
         'czr_simple_html_module',
