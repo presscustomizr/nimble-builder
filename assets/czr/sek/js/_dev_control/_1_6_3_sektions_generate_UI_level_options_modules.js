@@ -205,7 +205,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
                                     });
 
-
                                     $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
                                     $control.find('.czr-items-wrapper').stop( true, true ).slideToggle( 'fast' );
                               });
@@ -226,6 +225,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // - Implement the module visibility
                         api.section( params.id, function( _section_ ) {
                               _do_register_();
+                              // don't display the clickable section title in the nimble root panel
+                              _section_.container.find('.accordion-section-title').first().hide();
+
+                              // Style the section title
+                              var $panelTitleEl = _section_.container.find('.customize-section-title h3');
+
+                              // The default title looks like this : <span class="customize-action">Customizing</span> Title
+                              if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
+                                    $panelTitleEl.find('.customize-action').after( '<i class="fas fa-sliders-h sek-level-option-icon"></i>' );
+                              }
                         });
                   });
 
