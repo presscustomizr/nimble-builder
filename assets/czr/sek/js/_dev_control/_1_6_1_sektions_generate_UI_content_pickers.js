@@ -59,7 +59,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               level : params.level,
                               what : 'control',
                               id : _id_,
-                              label : 'module' === params.content_type ? sektionsLocalizedData.i18n['Module Picker'] : sektionsLocalizedData.i18n['Section Picker'],
+                              label : 'module' === params.content_type ? sektionsLocalizedData.i18n['Content Picker'] : sektionsLocalizedData.i18n['Section Picker'],
                               type : 'czr_module',//sekData.controlType,
                               module_type : 'module' === params.content_type ? 'sek_module_picker_module' : 'sek_section_picker_module',
                               section : _id_,
@@ -67,12 +67,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settings : { default : _id_ },
                               track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                         }).done( function() {
-                              // we set the focus to false when firing api.previewer.trigger( 'sek-pick-module', { focus : false }); in ::initialize()
-                              if ( true === params.focus ) {
-                                    api.control( _id_ ).focus({
-                                        completeCallback : function() {}
-                                    });
-                              }
+                              api.control( _id_, function( _control_ ) {
+                                    // we set the focus to false when firing api.previewer.trigger( 'sek-pick-module', { focus : false }); in ::initialize()
+                                    if ( true === params.focus ) {
+                                          _control_.focus({
+                                              completeCallback : function() {}
+                                          });
+                                    }
+                                    var $title = _control_.container.find('label > .customize-control-title');
+                                    // if this level has an icon, let's prepend it to the title
+                                    $title.addClass('sek-flex-vertical-center').prepend( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
+                              });
                         });
                   };
 
@@ -86,7 +91,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         origin : 'nimble',
                         what : 'section',
                         id : _id_,
-                        title: 'module' === params.content_type ? sektionsLocalizedData.i18n['Module Picker'] : sektionsLocalizedData.i18n['Section Picker'],
+                        title: 'module' === params.content_type ? sektionsLocalizedData.i18n['Content Picker'] : sektionsLocalizedData.i18n['Section Picker'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 30,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
@@ -98,6 +103,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               },
                               _toggleActive : function(){ return true; }
                         })
+                  }).done( function() {
+                        api.section( _id_, function( _section_ ) {
+                              // Style the section title
+                              var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
+                                  $panelTitleEl = _section_.container.find('.customize-section-title h3');
+
+                              // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
+                              if ( 0 < $sectionTitleEl.length ) {
+                                    $sectionTitleEl.prepend( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
+                              }
+
+                              // The default title looks like this : <span class="customize-action">Customizing</span> Title
+                              if ( 0 < $panelTitleEl.length ) {
+                                    $panelTitleEl.find('.customize-action').after( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
+                              }
+                        });
                   });
                   return dfd;
             }
