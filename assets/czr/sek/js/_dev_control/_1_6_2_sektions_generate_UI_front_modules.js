@@ -102,6 +102,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _do_register_();
                   });
 
+
                   // MAIN CONTENT SECTION
                   api.CZR_Helpers.register({
                         origin : 'nimble',
@@ -109,9 +110,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         id : params.id,
                         title: sektionsLocalizedData.i18n['Content for'] + ' ' + api.czrModuleMap[ moduleType ].name,
                         panel : sektionsLocalizedData.sektionsPanelId,
-                        priority : 20,
+                        priority : 1000,
                         //track : false//don't register in the self.registered()
                         //constructWith : MainSectionConstructor,
+                  }).done( function() {
+                        api.section( params.id, function( _section_ ) {
+                              // don't display the clickable section title in the nimble root panel
+                              _section_.container.find('.accordion-section-title').first().hide();
+
+                              // Style the section title
+                              var $panelTitleEl = _section_.container.find('.customize-section-title h3');
+
+                              // The default title looks like this : <span class="customize-action">Customizing</span> Title
+                              if ( 0 < $panelTitleEl.length ) {
+                                    $panelTitleEl.find('.customize-action').after( '<i class="fas fa-pencil-alt sek-level-option-icon"></i>' );
+                              }
+                        });
                   });
                   return dfd;
             }
