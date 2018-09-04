@@ -17,7 +17,9 @@ function sek_register_modules() {
         'sek_level_breakpoint_module',
 
         // local skope options modules
-        'sek_local_skope_options_module',
+        'sek_local_template',
+        'sek_local_widths',
+        'sek_local_custom_css',
 
         // global options modules
         'sek_global_breakpoint',

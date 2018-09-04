@@ -465,8 +465,8 @@ function sek_error_log( $title, $content = null ) {
 function sek_get_locale_template(){
     $path = null;
     $localSkopeNimble = sek_get_skoped_seks( skp_build_skope_id() );
-    if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['general'] ) && ! empty( $localSkopeNimble['options']['general']['local_template'] ) && 'default' !== $localSkopeNimble['options']['general']['local_template'] ) {
-        $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['general']['local_template'] . '.php';
+    if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['template'] ) && ! empty( $localSkopeNimble['options']['template']['local_template'] ) && 'default' !== $localSkopeNimble['options']['template']['local_template'] ) {
+        $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['template']['local_template'] . '.php';
         if ( file_exists( $path ) ) {
             $template = $path;
         } else {

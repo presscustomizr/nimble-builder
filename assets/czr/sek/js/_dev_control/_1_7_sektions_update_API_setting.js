@@ -685,17 +685,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             return;
                                           _valueCandidate[ _key_ ] = _val_;
                                     });
-                                    if ( _.isEmpty( params.options_type ) ) {
+                                    if ( _.isEmpty( params.options_type ) || ! _.isString( params.options_type ) ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
-                                    }
-                                    switch( params.options_type ) {
-                                          case 'general' :
-                                                newSetValue.options = $.extend( _currentOptions, { general : _valueCandidate } );
-                                          break;
-
-                                          default :
-                                                api.errare( 'updateAPISetting => ' + params.action + 'unknown options_type param ' + options_type );
-                                          break;
+                                    } else {
+                                          var newOptionsValues = {};
+                                          newOptionsValues[ params.options_type ] = _valueCandidate;
+                                          newSetValue.options = $.extend( _currentOptions, newOptionsValues );
                                     }
                               break;
 

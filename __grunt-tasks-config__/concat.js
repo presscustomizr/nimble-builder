@@ -217,7 +217,9 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_7_sek_register_visibility.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_8_sek_register_breakpoint.php',
 
-      '<%= paths.sektions %>_dev_php/module_registration/ui/_2_local/4_1_0_sek_register_local_skope_options.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_2_local/4_1_0_sek_register_local_template.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_2_local/4_1_1_sek_register_local_widths.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_2_local/4_1_2_sek_register_local_custom_css.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php',
@@ -300,7 +302,9 @@ module.exports = {
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_section_layout_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_1_UI_spacing.js',
 
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_0_UI_local_skope_options.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_0_UI_local_template.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_1_UI_local_widths.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_2_UI_local_custom_css.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_1_UI_global_breakpoint.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_2_UI_global_widths.js',
