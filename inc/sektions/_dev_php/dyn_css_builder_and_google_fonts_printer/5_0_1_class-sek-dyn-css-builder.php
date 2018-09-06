@@ -78,7 +78,7 @@ class Sek_Dyn_CSS_Builder {
             // the keys are not integer.
             // We want to filter each input
             // which makes it possible to target for example the font-family. Either in module values or in level options
-            if ( ! is_array( $entry ) && is_string( $key ) && 1 < strlen( $key ) ) {
+            if ( is_string( $key ) && 1 < strlen( $key ) ) {
                 // we need to have a level model set
                 if ( !empty( $parent_level ) && is_array( $parent_level ) && ! empty( $parent_level['module_type'] ) ) {
                     // the input_id candidate to filter is the $key
