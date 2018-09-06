@@ -4,7 +4,7 @@ namespace Nimble;
 /* ------------------------------------------------------------------------- *
  * FOR TEST
 /* ------------------------------------------------------------------------- */
-add_action('loop_end', function() {
+function render_test_logs() {
     if ( ! skp_is_customizing() )
       return;
     $skope_id = skp_build_skope_id();
@@ -28,4 +28,6 @@ add_action('loop_end', function() {
         </pre>
       </div>
     <?php
-}, 50 );
+}
+add_action('loop_end', '\Nimble\render_test_logs', 50 );
+add_action('nimble_after_content_sections', '\Nimble\render_test_logs', 50 );//@see tmpl/page-templates/nimble_template.php

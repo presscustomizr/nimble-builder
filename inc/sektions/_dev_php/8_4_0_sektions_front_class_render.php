@@ -19,6 +19,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
         }
 
+        // When using the default theme template, let's schedule the default hooks rendering
+        // When using the Nimble template, this is done with render_content_sections_for_nimble_template();
         function sek_schedule_rendering_hooks() {
             $locale_template = sek_get_locale_template();
             if ( !empty( $locale_template ) )
@@ -124,13 +126,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return $html;
         }
 
-
-        public function _render_seks_for_location( $location = '' ) {
+        // the $location_data can be provided. Typically when using the function render_content_sections_for_nimble_template in the Nimble page template.
+        public function _render_seks_for_location( $location = '', $location_data = array() ) {
             if ( ! in_array( $location, sek_get_locations() ) ) {
                 error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
             }
-            $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
+            $locationSettingValue = array();
+            if ( empty( $location_data ) ) {
+                $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
+            } else {
+                $locationSettingValue = $location_data;
+            }
             if ( is_array( $locationSettingValue ) ) {
 
                 remove_filter('the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );

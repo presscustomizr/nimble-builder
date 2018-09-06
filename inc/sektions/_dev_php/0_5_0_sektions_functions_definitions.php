@@ -471,17 +471,24 @@ function sek_get_locale_template(){
             $template = $path;
         } else {
             sek_error_log( __FUNCTION__ .' the custom template does not exist', $path );
+            $path = null;
         }
     }
     return $path;
 }
 
 //@return void()
-function render_content_sections() {
-    foreach( sek_get_locations() as $hook ) {
-        do_action( "sek_before_location_{$hook}" );
-        SEK_Front()->_render_seks_for_location( $hook );
-        do_action( "sek_after_location_{$hook}" );
+function render_content_sections_for_nimble_template() {
+    foreach( sek_get_locations() as $location ) {
+        $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
+        // We don't need to render the locations with no sections
+        // But we need at least one location : let's always render loop_start.
+        // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
+        if ( 'loop_start' === $location || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
+            do_action( "sek_before_location_{$location}" );
+            SEK_Front()->_render_seks_for_location( $location, $locationSettingValue );
+            do_action( "sek_after_location_{$location}" );
+        }
     }
 }
 

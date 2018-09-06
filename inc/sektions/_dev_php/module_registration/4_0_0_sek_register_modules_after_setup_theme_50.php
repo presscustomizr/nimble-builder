@@ -232,8 +232,7 @@ function sek_get_select_options_for_input_id( $input_id ) {
         case 'local_template' :
             $options = array(
                 'default' => __('Default theme template','text_domain_to_be_replaced'),
-                'nimble_boxed' => __('Nimble boxed page template','text_domain_to_be_replaced'),
-                'nimble_full_width' => __('Nimble full width page template','text_domain_to_be_replaced')
+                'nimble_template' => __('Nimble template','text_domain_to_be_replaced')
             );
         break;
 
