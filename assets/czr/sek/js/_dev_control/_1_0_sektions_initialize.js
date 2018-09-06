@@ -267,7 +267,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         id : '__globalAndLocalOptionsSection',
                         title: sektionsLocalizedData.i18n['General options'],
                         panel : sektionsLocalizedData.sektionsPanelId,
-                        priority : 30,
+                        priority : 20,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                         constructWith : api.Section.extend({
                               //attachEvents : function () {},
@@ -317,7 +317,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         id : '__localOptionsSection',//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
                         title: sektionsLocalizedData.i18n['Current page options'],
                         panel : sektionsLocalizedData.sektionsPanelId,
-                        priority : 30,
+                        priority : 10,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                         constructWith : api.Section.extend({
                               //attachEvents : function () {},
