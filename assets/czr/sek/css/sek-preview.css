@@ -34,6 +34,12 @@
 }/* <= Needed for the placement of the ui icons container revealed on hover */
 .sek-module-inner {
   position: relative;
+  /* Smoothify the changes done when customizing this selector */
+  -webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all, 0.25s ease-in-out;
+  -ms-transition: all, 0.25s ease-in-out;
+  -o-transition: all, 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out;
 }
 
 
