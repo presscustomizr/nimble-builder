@@ -512,6 +512,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             //-------------------------------------------------------------------------------------------------
             // GENERIC WAY TO SETUP FONT SIZE AND LINE HEIGHT INPUTS
+            // DEPRECATED
             //-------------------------------------------------------------------------------------------------
             // "this" is the input
             setupFontSizeAndLineHeightInputs : function( obj ) {
@@ -575,7 +576,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   input.container.find('.customize-control-title').prepend( deviceSwitcherHtml );
                   input.previewedDevice = new api.Value( api.previewedDevice() );
 
-                  input.container.on( 'click', '[data-sek-device]', function() {
+
+                  syncWithPreviewedDevice = function() {
                         input.container.find( '[data-sek-device]' ).removeClass('active');
                         $(this).addClass('active');
                         var device = 'desktop';
@@ -586,8 +588,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare( 'maybeSetupDeviceSwitcherForInput => error when setting the previewed device', er );
                         }
                         input.previewedDevice( device );
-                  });
+                  };
+                  // react on device click
+                  input.container.on( 'click', '[data-sek-device]', syncWithPreviewedDevice );
 
+                  // initialize with the currently previewed device
+                  var $currentDeviceIcon = input.container.find('[data-sek-device="' + api.previewedDevice() + '"]');
+                  if ( $currentDeviceIcon.length > 0 ) {
+                        $currentDeviceIcon.trigger('click');
+                  }
             }
       });//$.extend()
 })( wp.customize, jQuery );
