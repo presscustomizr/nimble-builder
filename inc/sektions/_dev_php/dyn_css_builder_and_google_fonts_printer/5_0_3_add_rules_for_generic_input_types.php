@@ -1,6 +1,8 @@
 <?php
 // filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
+// the rules are filtered if ( false !== strpos( $input_id_candidate, '_css') )
+// Example of input id candidate filtered : 'h_alignment_css'
 add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_css_sniffed_input_id', 10, 6 );
 function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, $registered_input_list, $parent_level, $module_level_css_selectors ) {
 
@@ -81,10 +83,19 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
     $properties_to_render = array();
 
     switch ( $css_identifier ) {
+        // 2 cases for the font_size
+        // 1) we save it as a string : '16px'
+        // 2) we save it as an array of strings by devices : [ 'desktop' => '55px', 'tablet' => '40px', 'mobile' => '36px']
         case 'font_size' :
-            $numeric = sek_extract_numeric_value( $value);
-            if ( ! empty( $numeric ) ) {
-                $properties_to_render['font-size'] = $value;
+            sek_error_log('in font_size', $value );
+            if ( is_string( $value ) ) {
+                  $numeric = sek_extract_numeric_value($value);
+                  if ( ! empty( $numeric ) ) {
+                      $properties_to_render['font-size'] = $value;
+                  }
+            } else {
+                  $important = sek_is_flagged_important( $input_id, $parent_level, $registered_input_list );
+                  $rules = sek_set_mq_font_size_rules( $value, $selector, $important, $rules );
             }
         break;
         case 'line_height' :
@@ -694,8 +705,71 @@ function sek_extract_unit( $value ) {
 // 1.5em => 1.5
 // note : using preg_replace('/[^0-9]/', '', $data); would remove the dots or comma.
 function sek_extract_numeric_value( $value ) {
+    if ( ! is_scalar( $value ) )
+      return null;
     $numeric = preg_replace('/px|em|%/', '', $value);
     return ( !empty( $numeric ) && is_int( (int)$numeric ) && $numeric > 0 )? $numeric : null;
+}
+
+
+
+
+// This function is invoked when sniffing the font_size_css input rules.
+// @param $value = Array
+// (
+//     [desktop] => 5em
+//     [mobile] => 25px
+// )
+// @param $rules = array() of css rules to populate
+// @return an array of css rules looking like
+// $rules[] = array(
+//     'selector'    => $selector,
+//     'css_rules'   => $css_rules,
+//     'mq'          => $mq
+// );
+function sek_set_mq_font_size_rules( $value, $selector, $important, $rules = array() ) {
+    $default_unit = 'px';
+    $value = wp_parse_args( $value, array(
+        'desktop' => '16px',
+        'tablet' => '',
+        'mobile' => ''
+    ));
+
+
+    /*
+    * TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
+    */
+    // Sek_Dyn_CSS_Builder::$breakpoints = [
+    //     'xs' => 0,
+    //     'sm' => 576,
+    //     'md' => 768,
+    //     'lg' => 992,
+    //     'xl' => 1200
+    // ];
+    if ( ! empty( $value[ 'desktop' ] ) ) {
+        $_font_size_mq[ 'desktop' ] = null;
+    }
+
+    if ( ! empty( $value[ 'tablet' ] ) ) {
+        $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+    }
+
+    if ( ! empty( $value[ 'mobile' ] ) ) {
+        $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+    }
+
+
+    foreach ( $value as $device => $val ) {
+        if ( ! empty(  $val ) ) {
+            $rules[] = array(
+                'selector' => $selector,
+                'css_rules' => sprintf( '%1$s:%2$s%3$s;', 'font-size', $val, $important ? '!important' : '' ),
+                'mq' => $_font_size_mq[ $device ]
+            );
+        }
+    }
+
+    return $rules;
 }
 
 ?>
