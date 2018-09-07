@@ -149,7 +149,7 @@
                   var input = this,
                       $wrapper = $('.sek-spacing-wrapper', input.container ),
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
-                      defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : [];
+                      defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {};
 
                   api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
 
@@ -179,7 +179,7 @@
 
                   // Synchronizes on init + refresh on previewed device changes
                   var syncWithPreviewedDevice = function( currentDevice ) {
-                        var inputValues = $.extend( true, {}, input() || {} ),
+                        var inputValues = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
                             clonedDefault = $.extend( true, {}, defaultVal );
                         inputValues = _.isObject( inputValues ) ? $.extend( clonedDefault, inputValues ) : clonedDefault;
 
