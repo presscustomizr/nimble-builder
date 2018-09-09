@@ -465,23 +465,30 @@ function sek_error_log( $title, $content = null ) {
 function sek_get_locale_template(){
     $path = null;
     $localSkopeNimble = sek_get_skoped_seks( skp_build_skope_id() );
-    if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['general'] ) && ! empty( $localSkopeNimble['options']['general']['local_template'] ) && 'default' !== $localSkopeNimble['options']['general']['local_template'] ) {
-        $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['general']['local_template'] . '.php';
+    if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['template'] ) && ! empty( $localSkopeNimble['options']['template']['local_template'] ) && 'default' !== $localSkopeNimble['options']['template']['local_template'] ) {
+        $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['template']['local_template'] . '.php';
         if ( file_exists( $path ) ) {
             $template = $path;
         } else {
             sek_error_log( __FUNCTION__ .' the custom template does not exist', $path );
+            $path = null;
         }
     }
     return $path;
 }
 
 //@return void()
-function render_content_sections() {
-    foreach( sek_get_locations() as $hook ) {
-        do_action( "sek_before_location_{$hook}" );
-        SEK_Front()->_render_seks_for_location( $hook );
-        do_action( "sek_after_location_{$hook}" );
+function render_content_sections_for_nimble_template() {
+    foreach( sek_get_locations() as $location ) {
+        $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
+        // We don't need to render the locations with no sections
+        // But we need at least one location : let's always render loop_start.
+        // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
+        if ( 'loop_start' === $location || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
+            do_action( "sek_before_location_{$location}" );
+            SEK_Front()->_render_seks_for_location( $location, $locationSettingValue );
+            do_action( "sek_after_location_{$location}" );
+        }
     }
 }
 
@@ -492,13 +499,13 @@ function render_content_sections() {
 /* ------------------------------------------------------------------------- */
 function sek_get_global_custom_breakpoint() {
     $options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    if ( ! is_array( $options ) || empty( $options['general'] ) || empty( $options['general']['global-custom-breakpoint'] ) )
+    if ( ! is_array( $options ) || empty( $options['breakpoint'] ) || empty( $options['breakpoint']['global-custom-breakpoint'] ) )
       return;
 
-    if ( empty( $options['general'][ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $options['general'][ 'use-custom-breakpoint'] ) )
+    if ( empty( $options['breakpoint'][ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $options['breakpoint'][ 'use-custom-breakpoint'] ) )
       return;
 
-    return intval( $options['general']['global-custom-breakpoint'] );
+    return intval( $options['breakpoint']['global-custom-breakpoint'] );
 }
 
 
@@ -1130,7 +1137,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Drag and drop content' => __('Drag and drop content', 'text_domain_to_be_replaced'),
 
             // Generated UI
-            'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
+            'Content Picker' => __('Content Picker', 'text_domain_to_be_replaced'),
             'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
 
             'Section Picker' => __('Section Picker', 'text_domain_to_be_replaced'),
@@ -1151,8 +1158,13 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
 
             // UI global and local options
-            'Local options for the sections of the current page' => __( 'Local options for the sections of the current page', 'text_domain_to_be_replaced'),
-            'General options applied site wide' => __( 'General options applied site wide', 'text_domain_to_be_replaced'),
+            'Current page options' => __( 'Current page options', 'text_domain_to_be_replaced'),
+
+            // DEPRECATED
+            'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_domain_to_be_replaced'),
+            'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_domain_to_be_replaced'),
+            //
+
             'General options' => __( 'General options', 'text_domain_to_be_replaced'),
 
 
@@ -1305,6 +1317,11 @@ function sek_print_nimble_customizer_tmpl() {
     ?>
     <script type="text/html" id="tmpl-nimble-top-bar">
       <div id="nimble-top-bar" class="czr-preview-notification">
+          <div class="sek-add-content">
+            <button type="button" class="material-icons" title="<?php _e('Add content', 'text_domain'); ?>" data-nimble-state="enabled">
+              add_circle_outline<span class="screen-reader-text"><?php _e('Add content', 'text_domain'); ?></span>
+            </button>
+          </div>
           <div class="sek-do-undo">
             <button type="button" class="icon undo" title="<?php _e('Undo', 'text_domain'); ?>" data-nimble-history="undo" data-nimble-state="disabled">
               <span class="screen-reader-text"><?php _e('Undo', 'text_domain'); ?></span>
@@ -1492,6 +1509,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         break;
         case 'range_with_unit_picker' :
             sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data );
+        break;
+        case 'range_with_unit_picker_device_switcher' :
+            sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id, $input_data );
         break;
         case 'range_simple' :
             sek_set_input_tmpl___range_simple( $input_id, $input_data );
@@ -2225,10 +2245,54 @@ function sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data ) {
 }
 ?>
 <?php
+/* ------------------------------------------------------------------------- *
+ *  CODE EDITOR INPUT TEMPLATE
+/* ------------------------------------------------------------------------- */
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
+function sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id, $input_data ) {
+    ?>
+    <?php
+      // we save the int value + unit
+      // we want to keep only the numbers when printing the tmpl
+      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
+    ?>
+    <#
+      var value = data['<?php echo $input_id; ?>'],
+          unit = data['<?php echo $input_id; ?>'];
+      value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
+      unit = _.isString( unit ) ? unit.replace(/[0-9]|\.|,/g, '') : 'px';
+      unit = _.isEmpty( unit ) ? 'px' : unit;
+    #>
+    <div class="sek-range-with-unit-picker-wrapper">
+        <# //console.log( 'IN php::sek_set_input_tmpl___range_with_unit_picker_device_switcher() => data range_slide => ', data ); #>
+        <div class="sek-range-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
+          <?php
+          printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
+            ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
+            ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
+            ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
+            ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
+          );
+          ?>
+        </div>
+        <div class="sek-number-wrapper">
+            <input class="sek-pm-input" value="{{ value }}" type="number"  >
+        </div>
+        <div class="sek-unit-wrapper">
+          <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_domain');?>" data-sek-unit="%"><?php _e('%', 'text_domain');?></button></div>
+        </div>
+    </div><?php // sek-spacing-wrapper ?>
+  <?php
+}
+?>
+<?php
 // The base fmk is loaded @after_setup_theme:10
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     foreach( [
+        // ui modules
         'sek_module_picker_module',
         //'sek_section_picker_module',
         'sek_level_bg_border_module',
@@ -2241,13 +2305,20 @@ function sek_register_modules() {
         'sek_level_visibility_module',
         'sek_level_breakpoint_module',
 
-        'sek_local_skope_options_module',
-        'sek_global_options_module',
+        // local skope options modules
+        'sek_local_template',
+        'sek_local_widths',
+        'sek_local_custom_css',
 
+        // global options modules
+        'sek_global_breakpoint',
+        'sek_global_widths',
+
+        // front modules
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
         'czr_image_module',
-        'czr_featured_pages_module',
+        //'czr_featured_pages_module',
         'czr_heading_module',
         'czr_spacer_module',
         'czr_divider_module',
@@ -2450,8 +2521,7 @@ function sek_get_select_options_for_input_id( $input_id ) {
         case 'local_template' :
             $options = array(
                 'default' => __('Default theme template','text_domain_to_be_replaced'),
-                'nimble_boxed' => __('Nimble boxed page template','text_domain_to_be_replaced'),
-                'nimble_full_width' => __('Nimble full width page template','text_domain_to_be_replaced')
+                'nimble_template' => __('Nimble template','text_domain_to_be_replaced')
             );
         break;
 
@@ -2472,7 +2542,7 @@ function sek_get_module_params_for_sek_module_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_module_picker_module',
-        'name' => __('Module Picker', 'text_domain_to_be_replaced'),
+        'name' => __('Content Picker', 'text_domain_to_be_replaced'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -2910,39 +2980,6 @@ function sek_add_css_rules_for_bg_border_boxshadow( $rules, $level ) {
         );
     }
     return $rules;
-}
-?><?php
-//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_level_section_layout_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'sek_level_section_layout_module',
-        'name' => __('Section Layout', 'text_domain_to_be_replaced'),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
-        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'tmpl' => array(
-            'item-inputs' => array(
-                'boxed-wide' => array(
-                    'input_type'  => 'select',
-                    'title'       => __('Boxed or full width', 'text_domain_to_be_replaced'),
-                    'refresh_markup' => true,
-                    'refresh_stylesheet' => false,
-                    'default'     => 'fullwidth',
-                    'choices'     => sek_get_select_options_for_input_id( 'boxed-wide' )
-                ),
-
-                /* suspended, needs more thoughts
-                'boxed-width' => array(
-                    'input_type'  => 'range_slider',
-                    'title'       => __('Custom boxed width', 'text_domain_to_be_replaced'),
-                    'orientation' => 'horizontal',
-                    'min' => 500,
-                    'max' => 1600,
-                    'unit' => 'px'
-                ),*/
-            )
-        )//tmpl
-    );
 }
 ?><?php
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
@@ -3501,16 +3538,12 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
 
 ?><?php
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_local_skope_options_module() {
+function sek_get_module_params_for_sek_local_template() {
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'sek_local_skope_options_module',
+        'module_type' => 'sek_local_template',
         'name' => __('Options for the sections of the current page', 'text_domain_to_be_replaced'),
-        'starting_value' => array(
-            'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) ),
-            'outer-section-width' => '100%',
-            'inner-section-width' => '100%'
-        ),
+        'starting_value' => array(),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -3521,7 +3554,26 @@ function sek_get_module_params_for_sek_local_skope_options_module() {
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'local_template' ),
                     'refresh_preview' => true
-                ),
+                )
+            )
+        )//tmpl
+    );
+}
+?><?php
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_local_widths() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_local_widths',
+        'name' => __('Options for the sections of the current page', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'outer-section-width' => '100%',
+            'inner-section-width' => '100%'
+        ),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
                 'use-custom-width' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Define custom outer and inner widths for the sections of this page', 'text_domain_to_be_replaced'),
@@ -3550,7 +3602,56 @@ function sek_get_module_params_for_sek_local_skope_options_module() {
                     'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                ),
+                )
+            )
+        )//tmpl
+    );
+}
+
+
+// add user local custom css
+add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_widths_css' );
+//@filter 'nimble_get_dynamic_stylesheet'
+function sek_add_raw_local_widths_css( $css ) {
+    // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
+    // otherwise we fallback on the normal utility skp_build_skope_id()
+    $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
+    if ( is_array( $local_options ) && !empty( $local_options['options']) && ! empty( $local_options['options']['widths'] ) ) {
+        $options = $local_options['options']['widths'];
+
+        if ( ! empty( $options[ 'use-custom-width' ] ) && true === sek_booleanize_checkbox_val( $options[ 'use-custom-width' ] ) ) {
+            if ( ! empty( $options['outer-section-width'] ) ) {
+                  $numeric = sek_extract_numeric_value( $options['outer-section-width'] );
+                  if ( ! empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $options['outer-section-width'] );
+                      $css .= sprintf( '.sektion-wrapper [data-sek-level="section"]{max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
+                  }
+            }
+            if ( ! empty( $options[ 'inner-section-width'] ) ) {
+                  $numeric = sek_extract_numeric_value( $options[ 'inner-section-width'] );
+                  if ( ! empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $options[ 'inner-section-width'] );
+                      $css .= sprintf( '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner {max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
+                  }
+            }
+        }
+    }
+    return $css;
+}
+?><?php
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_local_custom_css() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_local_custom_css',
+        'name' => __('Options for the sections of the current page', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) )
+        ),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
                 'local_custom_css' => array(
                     'input_type'  => 'code_editor',
                     'title'       => __( 'Custom css' , 'text_domain_to_be_replaced' ),
@@ -3572,37 +3673,20 @@ function sek_add_raw_local_custom_css( $css ) {
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
     // otherwise we fallback on the normal utility skp_build_skope_id()
     $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
-    if ( is_array( $local_options ) && !empty( $local_options['options']) && ! empty( $local_options['options']['general'] ) ) {
-        $general_options = $local_options['options']['general'];
-        if ( ! empty( $general_options['local_custom_css'] ) ) {
-            $css .= $general_options['local_custom_css'];
-        }
-
-        if ( ! empty( $general_options[ 'use-custom-width' ] ) && true === sek_booleanize_checkbox_val( $general_options[ 'use-custom-width' ] ) ) {
-            if ( ! empty( $general_options['outer-section-width'] ) ) {
-                  $numeric = sek_extract_numeric_value( $general_options['outer-section-width'] );
-                  if ( ! empty( $numeric ) ) {
-                      $unit = sek_extract_unit( $general_options['outer-section-width'] );
-                      $css .= sprintf( '.sektion-wrapper [data-sek-level="section"]{max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
-                  }
-            }
-            if ( ! empty( $general_options[ 'inner-section-width'] ) ) {
-                  $numeric = sek_extract_numeric_value( $general_options[ 'inner-section-width'] );
-                  if ( ! empty( $numeric ) ) {
-                      $unit = sek_extract_unit( $general_options[ 'inner-section-width'] );
-                      $css .= sprintf( '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner {max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
-                  }
-            }
+    if ( is_array( $local_options ) && !empty( $local_options['options']) && ! empty( $local_options['options']['custom_css'] ) ) {
+        $options = $local_options['options']['custom_css'];
+        if ( ! empty( $options['local_custom_css'] ) ) {
+            $css .= $options['local_custom_css'];
         }
     }
     return $css;
 }
 ?><?php
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_global_options_module() {
+function sek_get_module_params_for_sek_global_breakpoint() {
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'sek_global_options_module',
+        'module_type' => 'sek_global_breakpoint',
         'name' => __('Site wide options', 'text_domain_to_be_replaced'),
         // 'starting_value' => array(
 
@@ -3631,10 +3715,41 @@ function sek_get_module_params_for_sek_global_options_module() {
                     //'css_identifier' => 'letter_spacing',
                     'width-100'   => true,
                     'title_width' => 'width-100'
-                ),//0,
+                )//0,
+            )
+        )//tmpl
+    );
+}
+
+
+add_action('wp_head', '\Nimble\sek_write_global_custom_breakpoint', 1000 );
+function sek_write_global_custom_breakpoint() {
+    $css = '';
+    // delete_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+    $custom_breakpoint = sek_get_global_custom_breakpoint();
+    if ( $custom_breakpoint >= 1 ) {
+        $css .= '@media (min-width:' . $custom_breakpoint . 'px) {.sek-global-custom-breakpoint-col-8 {-ms-flex: 0 0 8.333%;flex: 0 0 8.333%;max-width: 8.333%;}.sek-global-custom-breakpoint-col-9 {-ms-flex: 0 0 9.090909%;flex: 0 0 9.090909%;max-width: 9.090909%;}.sek-global-custom-breakpoint-col-10 {-ms-flex: 0 0 10%;flex: 0 0 10%;max-width: 10%;}.sek-global-custom-breakpoint-col-11 {-ms-flex: 0 0 11.111%;flex: 0 0 11.111%;max-width: 11.111%;}.sek-global-custom-breakpoint-col-12 {-ms-flex: 0 0 12.5%;flex: 0 0 12.5%;max-width: 12.5%;}.sek-global-custom-breakpoint-col-14 {-ms-flex: 0 0 14.285%;flex: 0 0 14.285%;max-width: 14.285%;}.sek-global-custom-breakpoint-col-16 {-ms-flex: 0 0 16.666%;flex: 0 0 16.666%;max-width: 16.666%;}.sek-global-custom-breakpoint-col-20 {-ms-flex: 0 0 20%;flex: 0 0 20%;max-width: 20%;}.sek-global-custom-breakpoint-col-25 {-ms-flex: 0 0 25%;flex: 0 0 25%;max-width: 25%;}.sek-global-custom-breakpoint-col-30 {-ms-flex: 0 0 30%;flex: 0 0 30%;max-width: 30%;}.sek-global-custom-breakpoint-col-33 {-ms-flex: 0 0 33.333%;flex: 0 0 33.333%;max-width: 33.333%;}.sek-global-custom-breakpoint-col-40 {-ms-flex: 0 0 40%;flex: 0 0 40%;max-width: 40%;}.sek-global-custom-breakpoint-col-50 {-ms-flex: 0 0 50%;flex: 0 0 50%;max-width: 50%;}.sek-global-custom-breakpoint-col-60 {-ms-flex: 0 0 60%;flex: 0 0 60%;max-width: 60%;}.sek-global-custom-breakpoint-col-66 {-ms-flex: 0 0 66.666%;flex: 0 0 66.666%;max-width: 66.666%;}.sek-global-custom-breakpoint-col-70 {-ms-flex: 0 0 70%;flex: 0 0 70%;max-width: 70%;}.sek-global-custom-breakpoint-col-75 {-ms-flex: 0 0 75%;flex: 0 0 75%;max-width: 75%;}.sek-global-custom-breakpoint-col-80 {-ms-flex: 0 0 80%;flex: 0 0 80%;max-width: 80%;}.sek-global-custom-breakpoint-col-83 {-ms-flex: 0 0 83.333%;flex: 0 0 83.333%;max-width: 83.333%;}.sek-global-custom-breakpoint-col-90 {-ms-flex: 0 0 90%;flex: 0 0 90%;max-width: 90%;}.sek-global-custom-breakpoint-col-100 {-ms-flex: 0 0 100%;flex: 0 0 100%;max-width: 100%;}}';
+    }
+
+    printf('<style type="text/css" id="nimble-global-options">%1$s</style>', $css );
+}
+?><?php
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_global_widths() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_global_widths',
+        'name' => __('Site wide width options', 'text_domain_to_be_replaced'),
+        // 'starting_value' => array(
+
+        // ),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
                 'use-custom-width' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Define custom outer and inner widths for the sections of this page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Define custom outer and inner widths for the sections site wide', 'text_domain_to_be_replaced'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3663,29 +3778,24 @@ function sek_get_module_params_for_sek_global_options_module() {
 }
 
 
-add_action('wp_head', '\Nimble\sek_write_global_custom_options', 1000 );
-function sek_write_global_custom_options() {
+add_action('wp_head', '\Nimble\sek_write_global_custom_section_widths', 1000 );
+function sek_write_global_custom_section_widths() {
     $css = '';
-    // delete_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    $custom_breakpoint = sek_get_global_custom_breakpoint();
-    if ( $custom_breakpoint >= 1 ) {
-        $css .= '@media (min-width:' . $custom_breakpoint . 'px) {.sek-global-custom-breakpoint-col-8 {-ms-flex: 0 0 8.333%;flex: 0 0 8.333%;max-width: 8.333%;}.sek-global-custom-breakpoint-col-9 {-ms-flex: 0 0 9.090909%;flex: 0 0 9.090909%;max-width: 9.090909%;}.sek-global-custom-breakpoint-col-10 {-ms-flex: 0 0 10%;flex: 0 0 10%;max-width: 10%;}.sek-global-custom-breakpoint-col-11 {-ms-flex: 0 0 11.111%;flex: 0 0 11.111%;max-width: 11.111%;}.sek-global-custom-breakpoint-col-12 {-ms-flex: 0 0 12.5%;flex: 0 0 12.5%;max-width: 12.5%;}.sek-global-custom-breakpoint-col-14 {-ms-flex: 0 0 14.285%;flex: 0 0 14.285%;max-width: 14.285%;}.sek-global-custom-breakpoint-col-16 {-ms-flex: 0 0 16.666%;flex: 0 0 16.666%;max-width: 16.666%;}.sek-global-custom-breakpoint-col-20 {-ms-flex: 0 0 20%;flex: 0 0 20%;max-width: 20%;}.sek-global-custom-breakpoint-col-25 {-ms-flex: 0 0 25%;flex: 0 0 25%;max-width: 25%;}.sek-global-custom-breakpoint-col-30 {-ms-flex: 0 0 30%;flex: 0 0 30%;max-width: 30%;}.sek-global-custom-breakpoint-col-33 {-ms-flex: 0 0 33.333%;flex: 0 0 33.333%;max-width: 33.333%;}.sek-global-custom-breakpoint-col-40 {-ms-flex: 0 0 40%;flex: 0 0 40%;max-width: 40%;}.sek-global-custom-breakpoint-col-50 {-ms-flex: 0 0 50%;flex: 0 0 50%;max-width: 50%;}.sek-global-custom-breakpoint-col-60 {-ms-flex: 0 0 60%;flex: 0 0 60%;max-width: 60%;}.sek-global-custom-breakpoint-col-66 {-ms-flex: 0 0 66.666%;flex: 0 0 66.666%;max-width: 66.666%;}.sek-global-custom-breakpoint-col-70 {-ms-flex: 0 0 70%;flex: 0 0 70%;max-width: 70%;}.sek-global-custom-breakpoint-col-75 {-ms-flex: 0 0 75%;flex: 0 0 75%;max-width: 75%;}.sek-global-custom-breakpoint-col-80 {-ms-flex: 0 0 80%;flex: 0 0 80%;max-width: 80%;}.sek-global-custom-breakpoint-col-83 {-ms-flex: 0 0 83.333%;flex: 0 0 83.333%;max-width: 83.333%;}.sek-global-custom-breakpoint-col-90 {-ms-flex: 0 0 90%;flex: 0 0 90%;max-width: 90%;}.sek-global-custom-breakpoint-col-100 {-ms-flex: 0 0 100%;flex: 0 0 100%;max-width: 100%;}}';
-    }
 
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    if ( is_array( $global_options ) && ! empty( $global_options['general'] ) ) {
-        if ( ! empty( $global_options['general'][ 'use-custom-width' ] ) && true === sek_booleanize_checkbox_val( $global_options['general'][ 'use-custom-width' ] ) ) {
-            if ( ! empty( $global_options['general'][ 'outer-section-width'] ) ) {
-                  $numeric = sek_extract_numeric_value( $global_options['general'][ 'outer-section-width'] );
+    if ( is_array( $global_options ) && ! empty( $global_options['widths'] ) ) {
+        if ( ! empty( $global_options['widths'][ 'use-custom-width' ] ) && true === sek_booleanize_checkbox_val( $global_options['widths'][ 'use-custom-width' ] ) ) {
+            if ( ! empty( $global_options['widths'][ 'outer-section-width'] ) ) {
+                  $numeric = sek_extract_numeric_value( $global_options['widths'][ 'outer-section-width'] );
                   if ( ! empty( $numeric ) ) {
-                      $unit = sek_extract_unit( $global_options['general'][ 'outer-section-width'] );
+                      $unit = sek_extract_unit( $global_options['widths'][ 'outer-section-width'] );
                       $css .= sprintf( '[data-sek-level="section"]{max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
                   }
             }
-            if ( ! empty( $global_options['general'][ 'inner-section-width'] ) ) {
-                  $numeric = sek_extract_numeric_value( $global_options['general'][ 'inner-section-width'] );
+            if ( ! empty( $global_options['widths'][ 'inner-section-width'] ) ) {
+                  $numeric = sek_extract_numeric_value( $global_options['widths'][ 'inner-section-width'] );
                   if ( ! empty( $numeric ) ) {
-                      $unit = sek_extract_unit( $global_options['general'][ 'inner-section-width'] );
+                      $unit = sek_extract_unit( $global_options['widths'][ 'inner-section-width'] );
                       $css .= sprintf( '[data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner {max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
                   }
             }
@@ -3800,11 +3910,12 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                                 'css_identifier' => 'font_family'
                             ),
                             'font_size_css'       => array(
-                                'input_type'  => 'range_with_unit_picker',
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
-                                'default'     => '16px',
+                                'default'     => array( 'desktop' => array() ),
                                 'min' => 0,
                                 'max' => 100,
+                                'title_width' => 'width-100',
                                 'width-100'         => true,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -5699,7 +5810,7 @@ class Sek_Dyn_CSS_Builder {
             // the keys are not integer.
             // We want to filter each input
             // which makes it possible to target for example the font-family. Either in module values or in level options
-            if ( ! is_array( $entry ) && is_string( $key ) && 1 < strlen( $key ) ) {
+            if ( is_string( $key ) && 1 < strlen( $key ) ) {
                 // we need to have a level model set
                 if ( !empty( $parent_level ) && is_array( $parent_level ) && ! empty( $parent_level['module_type'] ) ) {
                     // the input_id candidate to filter is the $key
@@ -6645,6 +6756,8 @@ class Sek_Dyn_CSS_Handler {
 ?><?php
 // filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
+// the rules are filtered if ( false !== strpos( $input_id_candidate, '_css') )
+// Example of input id candidate filtered : 'h_alignment_css'
 add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_css_sniffed_input_id', 10, 6 );
 function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, $registered_input_list, $parent_level, $module_level_css_selectors ) {
 
@@ -6725,10 +6838,19 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
     $properties_to_render = array();
 
     switch ( $css_identifier ) {
+        // 2 cases for the font_size
+        // 1) we save it as a string : '16px'
+        // 2) we save it as an array of strings by devices : [ 'desktop' => '55px', 'tablet' => '40px', 'mobile' => '36px']
         case 'font_size' :
-            $numeric = sek_extract_numeric_value( $value);
-            if ( ! empty( $numeric ) ) {
-                $properties_to_render['font-size'] = $value;
+            sek_error_log('in font_size', $value );
+            if ( is_string( $value ) ) {
+                  $numeric = sek_extract_numeric_value($value);
+                  if ( ! empty( $numeric ) ) {
+                      $properties_to_render['font-size'] = $value;
+                  }
+            } else {
+                  $important = sek_is_flagged_important( $input_id, $parent_level, $registered_input_list );
+                  $rules = sek_set_mq_font_size_rules( $value, $selector, $important, $rules );
             }
         break;
         case 'line_height' :
@@ -7338,8 +7460,71 @@ function sek_extract_unit( $value ) {
 // 1.5em => 1.5
 // note : using preg_replace('/[^0-9]/', '', $data); would remove the dots or comma.
 function sek_extract_numeric_value( $value ) {
+    if ( ! is_scalar( $value ) )
+      return null;
     $numeric = preg_replace('/px|em|%/', '', $value);
     return ( !empty( $numeric ) && is_int( (int)$numeric ) && $numeric > 0 )? $numeric : null;
+}
+
+
+
+
+// This function is invoked when sniffing the font_size_css input rules.
+// @param $value = Array
+// (
+//     [desktop] => 5em
+//     [mobile] => 25px
+// )
+// @param $rules = array() of css rules to populate
+// @return an array of css rules looking like
+// $rules[] = array(
+//     'selector'    => $selector,
+//     'css_rules'   => $css_rules,
+//     'mq'          => $mq
+// );
+function sek_set_mq_font_size_rules( $value, $selector, $important, $rules = array() ) {
+    $default_unit = 'px';
+    $value = wp_parse_args( $value, array(
+        'desktop' => '16px',
+        'tablet' => '',
+        'mobile' => ''
+    ));
+
+
+    /*
+    * TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
+    */
+    // Sek_Dyn_CSS_Builder::$breakpoints = [
+    //     'xs' => 0,
+    //     'sm' => 576,
+    //     'md' => 768,
+    //     'lg' => 992,
+    //     'xl' => 1200
+    // ];
+    if ( ! empty( $value[ 'desktop' ] ) ) {
+        $_font_size_mq[ 'desktop' ] = null;
+    }
+
+    if ( ! empty( $value[ 'tablet' ] ) ) {
+        $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+    }
+
+    if ( ! empty( $value[ 'mobile' ] ) ) {
+        $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+    }
+
+
+    foreach ( $value as $device => $val ) {
+        if ( ! empty(  $val ) ) {
+            $rules[] = array(
+                'selector' => $selector,
+                'css_rules' => sprintf( '%1$s:%2$s%3$s;', 'font-size', $val, $important ? '!important' : '' ),
+                'mq' => $_font_size_mq[ $device ]
+            );
+        }
+    }
+
+    return $rules;
 }
 
 ?><?php
@@ -8102,6 +8287,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
         }
 
+        // When using the default theme template, let's schedule the default hooks rendering
+        // When using the Nimble template, this is done with render_content_sections_for_nimble_template();
         function sek_schedule_rendering_hooks() {
             $locale_template = sek_get_locale_template();
             if ( !empty( $locale_template ) )
@@ -8207,13 +8394,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return $html;
         }
 
-
-        public function _render_seks_for_location( $location = '' ) {
+        // the $location_data can be provided. Typically when using the function render_content_sections_for_nimble_template in the Nimble page template.
+        public function _render_seks_for_location( $location = '', $location_data = array() ) {
             if ( ! in_array( $location, sek_get_locations() ) ) {
                 error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
             }
-            $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
+            $locationSettingValue = array();
+            if ( empty( $location_data ) ) {
+                $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
+            } else {
+                $locationSettingValue = $location_data;
+            }
             if ( is_array( $locationSettingValue ) ) {
 
                 remove_filter('the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
