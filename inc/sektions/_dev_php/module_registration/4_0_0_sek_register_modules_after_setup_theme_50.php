@@ -36,7 +36,8 @@ function sek_register_modules() {
         'czr_icon_module',
         'czr_map_module',
         'czr_quote_module',
-        'czr_button_module'
+        'czr_button_module',
+        'czr_simple_form_module'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
