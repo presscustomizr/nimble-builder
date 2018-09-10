@@ -25,8 +25,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         ];
 
         public static function get_instance( $params ) {
-            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof SEK_Front_Render ) )
-              self::$instance = new SEK_Front_Render_Css( $params );
+            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Sek_Simple_Form ) )
+              self::$instance = new Sek_Simple_Form( $params );
             return self::$instance;
         }
 
@@ -41,6 +41,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             $this -> _schedule_front_rendering();
             // RENDERING
             $this -> _setup_hook_for_front_css_printing_or_enqueuing();
+            //  LOADS SIMPLE FORM
+            $this -> _setup_simple_forms();
 
             // TEST
             //add_action( 'wp_ajax_sek_import_attachment', array( $this, '__import__' ) );
