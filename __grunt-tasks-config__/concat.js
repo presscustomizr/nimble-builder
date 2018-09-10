@@ -235,6 +235,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/front/4_1_4_sek_register_map.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_1_5_sek_register_quote.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_1_6_sek_register_button.php',
+      '<%= paths.sektions %>_dev_php/module_registration/front/4_1_7_sek_register_simple_form.php',
 
       // DYN CSS
       '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_1_class-sek-dyn-css-builder.php',
@@ -247,6 +248,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/8_2_0_sektions_front_class_front_and_preview_assets.php',
       '<%= paths.sektions %>_dev_php/8_4_0_sektions_front_class_render.php',
       '<%= paths.sektions %>_dev_php/8_4_1_sektions_front_class_render_css.php',
+      '<%= paths.sektions %>_dev_php/8_5_0_sektions_front_class_simple_forms.php',
       '<%= paths.sektions %>_dev_php/8_9_0_sektions_front_class_instantiate.php'
     ],
     dest: '<%= paths.sektions %>ccat-sektions.php',
@@ -321,6 +323,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_8_FRONT_map.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_9_FRONT_quote.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_2_0_FRONT_button.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_2_1_FRONT_simple_form.js'
     ],
     dest: '<%= paths.czr_assets %>sek/js/ccat-sek-control.js',
   },

@@ -87,7 +87,6 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         // 1) we save it as a string : '16px'
         // 2) we save it as an array of strings by devices : [ 'desktop' => '55px', 'tablet' => '40px', 'mobile' => '36px']
         case 'font_size' :
-            sek_error_log('in font_size', $value );
             if ( is_string( $value ) ) {
                   $numeric = sek_extract_numeric_value($value);
                   if ( ! empty( $numeric ) ) {
