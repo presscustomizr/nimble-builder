@@ -62,45 +62,85 @@ class Sek_Dyn_CSS_Builder {
             $this -> parent_level_model = $parent_level;
         }
 
-        // If the current level is a module, check if the module has more specific css selectors specified on registration
-        $module_level_css_selectors = null;
-        $registered_input_list = null;
-        if ( ! empty( $parent_level['module_type'] ) ) {
-            $module_level_css_selectors = sek_get_registered_module_type_property( $parent_level['module_type'], 'css_selectors' );
-            $registered_input_list = sek_get_registered_module_input_list( $parent_level['module_type'] );
-        }
-
         foreach ( $level as $key => $entry ) {
             $rules = array();
 
-            // INPUT CSS RULES
-            // When we are inside the associative arrays of the module 'value' or the level 'options' entries
+            // INPUT CSS RULES <= used in front modules only
+            // When we are inside the associative arrays of
+            // - the module 'value'
+            // - or the level 'options' entries <= NOT ANYMORE
             // the keys are not integer.
             // We want to filter each input
             // which makes it possible to target for example the font-family. Either in module values or in level options
             if ( is_string( $key ) && 1 < strlen( $key ) ) {
                 // we need to have a level model set
-                if ( !empty( $parent_level ) && is_array( $parent_level ) && ! empty( $parent_level['module_type'] ) ) {
-                    // the input_id candidate to filter is the $key
-                    $input_id_candidate = $key;
-                    // let's skip the $key that are reserved for the structure of the sektion tree
-                    // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
-                    // The generic rules must be suffixed with '_css'
-                    if ( false !== strpos( $input_id_candidate, '_css') ) {
-                        if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id_candidate ] ) && ! empty( $registered_input_list[ $input_id_candidate ]['css_identifier'] ) ) {
-                            $rules = apply_filters(
-                                "sek_add_css_rules_for_input_id",
-                                $rules,// <= the in-progress array of css rules to be populated
-                                $entry,// <= the css property value
-                                $input_id_candidate, // <= the unique input_id as it as been declared on module registration
-                                $registered_input_list,// <= the full list of input for the module
-                                $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
-                                $module_level_css_selectors // <= if the parent is a module, a default set of css_selectors might have been specified on module registration
-                            );
-                        } else {
-                            sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $parent_level['module_type'] . ' for a css input candidate : ' . $key, $parent_level );
-                        }
-                    }
+                if ( !empty( $parent_level ) && is_array( $parent_level ) && !empty( $parent_level['module_type'] ) ) {
+                     // If the current level is a module, check if the module has generic css ( *_css suffixed ) selectors specified on registration
+                    // $module_level_css_selectors = null;
+                    // $registered_input_list = null;
+                    $module_level_css_selectors = sek_get_registered_module_type_property( $parent_level['module_type'], 'css_selectors' );
+                    $registered_input_list = sek_get_registered_module_input_list( $parent_level['module_type'] );
+                    if ( 'value' === $key && is_array( $entry ) ) {
+                          $is_father = sek_get_registered_module_type_property( $parent_level['module_type'], 'is_father' );
+                          $father_mod_type = $parent_level['module_type'];
+                          // If the module has children ( the module is_father ), let's loop on each option group
+                          if ( $is_father ) {
+                              $children = sek_get_registered_module_type_property( $father_mod_type, 'children' );
+                              foreach ( $entry as $opt_group_type => $input_candidates ) {
+                                  if ( ! is_array( $children ) ) {
+                                      sek_error_log( 'Father module ' . $father_mod_type . ' has invalid children');
+                                      continue;
+                                  }
+                                  if ( empty( $children[$opt_group_type] ) ) {
+                                      sek_error_log( 'Father module ' . $father_mod_type . ' has a invalid child for option group : '. $opt_group_type);
+                                      continue;
+                                  }
+                                  $children_mod_type = $children[$opt_group_type];
+                                  foreach ( $input_candidates as $input_id_candidate => $_input_val ) {
+                                      // let's skip the $key that are reserved for the structure of the sektion tree
+                                      // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
+                                      // The generic rules must be suffixed with '_css'
+                                      if ( false !== strpos( $input_id_candidate, '_css') ) {
+                                          if ( is_array( $registered_input_list ) && is_array( $registered_input_list[ $opt_group_type ] )&& ! empty( $registered_input_list[ $opt_group_type ][ $input_id_candidate ] ) && ! empty( $registered_input_list[ $opt_group_type ][ $input_id_candidate ]['css_identifier'] ) ) {
+                                              $rules = apply_filters(
+                                                  "sek_add_css_rules_for_input_id",
+                                                  $rules,// <= the in-progress array of css rules to be populated
+                                                  $_input_val,// <= the css property value
+                                                  $input_id_candidate, // <= the unique input_id as it as been declared on module registration
+                                                  $registered_input_list[ $opt_group_type ],// <= the full list of input for the module
+                                                  $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                                  sek_get_registered_module_type_property( $children_mod_type, 'css_selectors' )// <= if the parent is a module, a default set of css_selectors might have been specified on module registration
+                                                  //$module_level_css_selectors
+                                              );
+                                          } else {
+                                              sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $father_mod_type . ' for a css input candidate : ' . $key, $parent_level );
+                                          }
+                                      }
+                                  }//foreach
+                              }//foreach
+                          } else {
+                              foreach ( $entry as $input_id_candidate => $_input_val ) {
+                                  // let's skip the $key that are reserved for the structure of the sektion tree
+                                  // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
+                                  // The generic rules must be suffixed with '_css'
+                                  if ( false !== strpos( $input_id_candidate, '_css') ) {
+                                      if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id_candidate ] ) && ! empty( $registered_input_list[ $input_id_candidate ]['css_identifier'] ) ) {
+                                          $rules = apply_filters(
+                                              "sek_add_css_rules_for_input_id",
+                                              $rules,// <= the in-progress array of css rules to be populated
+                                              $_input_val,// <= the css property value
+                                              $input_id_candidate, // <= the unique input_id as it as been declared on module registration
+                                              $registered_input_list,// <= the full list of input for the module
+                                              $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                              $module_level_css_selectors // <= if the parent is a module, a default set of css_selectors might have been specified on module registration
+                                          );
+                                      } else {
+                                          sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $parent_level['module_type'] . ' for a css input candidate : ' . $key, $parent_level );
+                                      }
+                                  }
+                              }//foreach
+                          }//if is_father
+                    }//if
                 }//if
             }//if
 
