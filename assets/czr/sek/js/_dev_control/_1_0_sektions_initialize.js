@@ -294,19 +294,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
 
                               // Schedule the accordion behaviour
-                              $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
-                                    var $control = $(this).closest( '.customize-control');
-                                    if ( "true" == $control.attr('data-sek-expanded' ) )
-                                      return;
-                                    _section_.container.find('.customize-control').each( function() {
-                                          $(this).attr('data-sek-expanded', "false" );
-                                          $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
-                                    });
-
-
-                                    $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
-                                    $control.find('.czr-items-wrapper').stop( true, true ).slideToggle( 'fast' );
-                              });
+                              self.scheduleModuleAccordion.call( _section_ );
                         });
                   });
 
@@ -343,22 +331,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     $panelTitleEl.find('.customize-action').after( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
                               }
 
-
-
                               // Schedule the accordion behaviour
-                              $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
-                                    var $control = $(this).closest( '.customize-control');
-                                    if ( "true" == $control.attr('data-sek-expanded' ) )
-                                      return;
-                                    _section_.container.find('.customize-control').each( function() {
-                                          $(this).attr('data-sek-expanded', "false" );
-                                          $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
-                                    });
-
-
-                                    $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
-                                    $control.find('.czr-items-wrapper').stop( true, true ).slideToggle( 'fast' );
-                              });
+                              self.scheduleModuleAccordion.call( _section_ );
                         });
                   });
 

@@ -160,14 +160,15 @@ function sek_get_registered_module_type_property( $module_type, $property = '' )
 
 
 
+
 /* ------------------------------------------------------------------------- *
  *  REGISTERED MODULES => DEFAULT MODULE MODEL
 /* ------------------------------------------------------------------------- */
 // @param (string) module_type
 // Walk the registered modules tree and generates the module default if not already cached
 // used :
-// - when preprocessing the module model before printing the module template. @seeSEL_Front::render()
-// - when setting the level option css. @see sek_add_css_rules_for_bg_border_background()
+// - in sek_normalize_module_value_with_defaults(), when preprocessing the module model before printing the module template. @see SEK_Front::render()
+// - when setting the css of a level option. @see for example : sek_add_css_rules_for_bg_border_background()
 // @return array()
 function sek_get_default_module_model( $module_type = '' ) {
     $default = array();
@@ -180,23 +181,41 @@ function sek_get_default_module_model( $module_type = '' ) {
         $default = $default_models[ $module_type ];
     } else {
         $registered_modules = CZR_Fmk_Base() -> registered_modules;
-        // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $default;
         }
 
-        if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
-            return $default;
+        // Is this module a father ?
+        if ( !empty( $registered_modules[ $module_type ]['is_father'] ) && true === $registered_modules[ $module_type ]['is_father'] ) {
+            if ( empty( $registered_modules[ $module_type ][ 'children' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+                return $default;
+            }
+            if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+                return $default;
+            }
+            foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $mod_type ) {
+                if ( empty( $registered_modules[ $mod_type ][ 'tmpl' ] ) ) {
+                    error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the father default model.' );
+                    continue;
+                }
+                $default[$opt_group] = _sek_build_default_model( $registered_modules[ $mod_type ][ 'tmpl' ] );
+            }
+        } else {
+            if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+                return $default;
+            }
+            // Build
+            $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
         }
-        // Build
-        $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
 
         // Cache
         $default_models[ $module_type ] = $default;
         SEK_Front()->default_models = $default_models;
-        // sek_error_log( __FUNCTION__ . ' => $default_models', $default_models );
+        //sek_error_log( __FUNCTION__ . ' => $default_models', $default_models );
     }
     return $default;
 }
@@ -266,6 +285,8 @@ function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
 
 
 
+
+
 /* ------------------------------------------------------------------------- *
  *  REGISTERED MODULES => INPUT LIST
 /* ------------------------------------------------------------------------- */
@@ -291,12 +312,47 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
             return $input_list;
         }
 
-        if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
-            return $input_list;
+
+        // Is this module a father ?
+        if ( !empty( $registered_modules[ $module_type ]['is_father'] ) && true === $registered_modules[ $module_type ]['is_father'] ) {
+            if ( empty( $registered_modules[ $module_type ][ 'children' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+                return $input_list;
+            }
+            if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+                return $input_list;
+            }
+            $temp = array();
+            foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $mod_type ) {
+                if ( empty( $registered_modules[ $mod_type ][ 'tmpl' ] ) ) {
+                    error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the master input_list.' );
+                    continue;
+                }
+                // $temp[$opt_group] = _sek_build_input_list( $registered_modules[ $mod_type ][ 'tmpl' ] );
+                // $input_list = array_merge( $input_list, $temp[$opt_group] );
+
+                $input_list[$opt_group] = _sek_build_input_list( $registered_modules[ $mod_type ][ 'tmpl' ] );
+            }
+        } else {
+            if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the input_list.' );
+                return $input_list;
+            }
+            // Build
+            $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
         }
-        // Build
-        $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
+
+
+
+
+        // if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
+        //     error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the input_list.' );
+        //     return $input_list;
+        // }
+
+        // // Build
+        // $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
 
         // Cache
         $cached_input_lists[ $module_type ] = $input_list;
@@ -372,28 +428,65 @@ function _sek_build_input_list( $module_tmpl_data, $input_list = null ) {
 
 
 
+
+
+
 /* ------------------------------------------------------------------------- *
  *  NORMALIZE MODULE VALUE WITH DEFAULT
+ *  preprocessing the module model before printing the module template.
  *  used before rendering or generating css
 /* ------------------------------------------------------------------------- */
+// @return array() $normalized_model
 function sek_normalize_module_value_with_defaults( $raw_module_model ) {
     $normalized_model = $raw_module_model;
     $module_type = $normalized_model['module_type'];
-    $default_value_model  = sek_get_default_module_model( $module_type );//<= walk the registered modules tree and generates the module default if not already cached
+    $is_father = sek_get_registered_module_type_property( $module_type, 'is_father' );
+
     $raw_module_value = ( ! empty( $raw_module_model['value'] ) && is_array( $raw_module_model['value'] ) ) ? $raw_module_model['value'] : array();
 
     // reset the model value and rewrite it normalized with the defaults
     $normalized_model['value'] = array();
-    if ( czr_is_multi_item_module( $module_type ) ) {
-        foreach ( $raw_module_value as $item ) {
-            $normalized_model['value'][] = wp_parse_args( $item, $default_value_model );
+    if ( $is_father ) {
+        $children = sek_get_registered_module_type_property( $module_type, 'children' );
+        if ( empty( $children ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+            return $default;
+        }
+        if ( ! is_array( $children ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+            return $default;
+        }
+        foreach ( $children as $opt_group => $mod_type ) {
+            $children_value = ( ! empty( $raw_module_value[$opt_group] ) && is_array( $raw_module_value[$opt_group] ) ) ? $raw_module_value[$opt_group] : array();
+            $normalized_model['value'][ $opt_group ] = _sek_normalize_single_module_values( $children_value, $mod_type );
         }
     } else {
-        $normalized_model['value'] = wp_parse_args( $raw_module_value, $default_value_model );
+        $normalized_model['value'] = _sek_normalize_single_module_values( $raw_module_value, $module_type );
     }
-
+    //sek_error_log('sek_normalize_single_module_values for module type ' . $module_type , $normalized_model );
     return $normalized_model;
 }
+
+// @return array()
+function _sek_normalize_single_module_values( $raw_module_value, $module_type ) {
+    $default_value_model  = sek_get_default_module_model( $module_type );//<= walk the registered modules tree and generates the module default if not already cached
+
+    // reset the model value and rewrite it normalized with the defaults
+    $module_values = array();
+    if ( czr_is_multi_item_module( $module_type ) ) {
+        foreach ( $raw_module_value as $item ) {
+            $module_values[] = wp_parse_args( $item, $default_value_model );
+        }
+    } else {
+        $module_values = wp_parse_args( $raw_module_value, $default_value_model );
+    }
+
+    return $module_values;
+}
+
+
+
+
 
 
 

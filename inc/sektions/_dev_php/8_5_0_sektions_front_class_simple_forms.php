@@ -133,8 +133,12 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     }
 
     //set the fields to render
-    private function _set_form_composition( $form_composition, $module_options ) {
+    private function _set_form_composition( $form_composition, $module_options = array() ) {
         $user_form_composition = array();
+        if ( ! is_array( $module_options ) ) {
+              sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => ERROR : invalid module options array');
+              return $user_form_composition;
+        }
         foreach ($form_composition as $field_id => $field_data ) {
             switch ( $field_id ) {
               case 'name':

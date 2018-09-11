@@ -196,18 +196,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Note : the check on api.section.has( params.id ) is also performd on api.CZR_Helpers.register(), but here we use it to avoid setting up the click listeners more than once.
                   if ( ! api.section.has( params.id ) ) {
                         api.section( params.id, function( _section_ ) {
-                              $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
-                                    var $control = $(this).closest( '.customize-control');
-                                    if ( "true" == $control.attr('data-sek-expanded' ) )
-                                      return;
-                                    _section_.container.find('.customize-control').each( function() {
-                                          $(this).attr('data-sek-expanded', "false" );
-                                          $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
-                                    });
-
-                                    $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
-                                    $control.find('.czr-items-wrapper').stop( true, true ).slideToggle( 'fast' );
-                              });
+                              // Schedule the accordion behaviour
+                              self.scheduleModuleAccordion.call( _section_ );
                         });
                   }
 

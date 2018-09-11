@@ -17,14 +17,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
-            //@return a 24 digits global unique identifier
+            //@return a global unique identifier
             guid : function() {
                   function s4() {
                         return Math.floor((1 + Math.random()) * 0x10000)
                           .toString(16)
                           .substring(1);
                   }
-                  return s4() + s4() + s4() + s4() + s4() + s4();
+                  return s4() + s4() + s4();//s4() + s4() + s4() + s4() + s4() + s4();
             },
 
             // @params = { id : '', level : '' }
@@ -134,7 +134,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
             // Extract the default model values from the server localized registered module
-            // Invoked when registrating a module.
+            // Invoked when registrating a module in api.czrModuleMap
             // For example :
             // czr_image_module : {
             //       mthds : ImageModuleConstructor,
@@ -151,6 +151,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             getDefaultItemModelFromRegisteredModuleData : function( moduleType ) {
                   if ( ! this.isModuleRegistered( moduleType ) ) {
                         return {};
+                  }
+                  // This method should normally not be invoked for a father module type
+                  if ( sektionsLocalizedData.registeredModules[moduleType]['is_father'] ) {
+                        api.errare( 'getDefaultItemModelFromRegisteredModuleData => Father modules should be treated specifically' );
+                        return;
                   }
                   var data = sektionsLocalizedData.registeredModules[ moduleType ]['tmpl']['item-inputs'],
                       // title, id are always included in the defaultItemModel but those properties don't need to be saved in database
@@ -242,6 +247,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //-------------------------------------------------------------------------------------------------
             // <RECURSIVE UTILITIES USING THE sektionsLocalizedData.registeredModules>
             //-------------------------------------------------------------------------------------------------
+            // Invoked when updating a setting value => in normalizeAndSanitizeSingleItemInputValues(), when doing updateAPISettingAndExecutePreviewActions()
             // @return a mixed type default value
             // @param input_id string
             // @param module_type string
@@ -257,6 +263,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
                         api.errare( 'getInputDefaultValue => missing sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules[module_type] ) ) {
+                        api.errare( 'getInputDefaultValue => missing ' + module_type + ' in sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  // This method should normally not be invoked for a father module type
+                  if ( sektionsLocalizedData.registeredModules[module_type]['is_father'] ) {
+                        api.errare( 'getInputDefaultValue => Father modules should be treated specifically' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
@@ -301,6 +316,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getInputType => missing sektionsLocalizedData.registeredModules' );
                         return;
                   }
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules[module_type] ) ) {
+                        api.errare( 'getInputType => missing ' + module_type + ' in sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( sektionsLocalizedData.registeredModules[module_type]['is_father'] ) {
+                        api.errare( 'getInputType => Father modules should be treated specifically' );
+                        return;
+                  }
                   if ( _.isUndefined( level ) ) {
                         level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
                   }
@@ -325,6 +348,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
+            // Invoked when :
+            // 1) updating a setting value, in ::updateAPISettingAndExecutePreviewActions()
+            // 2) we need to get a registration param like the default value for example, @see spacing input
             // @return object of registration params
             // @param input_id string
             // @param module_type string
@@ -340,6 +366,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
                         api.errare( 'getInputRegistrationParams => missing sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  if ( _.isUndefined( sektionsLocalizedData.registeredModules[module_type] ) ) {
+                        api.errare( 'getInputRegistrationParams => missing ' + module_type + ' in sektionsLocalizedData.registeredModules' );
+                        return;
+                  }
+                  // This method should normally not be invoked for a father module type
+                  if ( sektionsLocalizedData.registeredModules[module_type]['is_father'] ) {
+                        api.errare( 'getInputRegistrationParams => Father modules should be treated specifically' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
@@ -379,7 +414,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return self.cachedFontFamilyModifier[ input_id ];
                   }
                   if ( _.isUndefined( sektionsLocalizedData.registeredModules ) ) {
-                        api.errare( 'getInputType => missing sektionsLocalizedData.registeredModules' );
+                        api.errare( 'inputIsAFontFamilyModifier => missing sektionsLocalizedData.registeredModules' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
@@ -597,6 +632,35 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( $currentDeviceIcon.length > 0 ) {
                         $currentDeviceIcon.trigger('click');
                   }
+            },
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            // GENERIC WAY TO SETUP ACCORDION BEHAVIOUR OF MODULES IN SECTIONS
+            //-------------------------------------------------------------------------------------------------
+            // "this" is the section
+            scheduleModuleAccordion : function() {
+                  var _section_ = this;
+                  // Attach event on click
+                  $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
+                        var $control = $(this).closest( '.customize-control');
+                        // if ( "true" == $control.attr('data-sek-expanded' ) )
+                        //   return;
+                        _section_.container.find('.customize-control').not( $control ).each( function() {
+                              $(this).attr('data-sek-expanded', "false" );
+                              $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
+                        });
+                        $control.find('.czr-items-wrapper').stop( true, true ).slideToggle({
+                              duration : 'fast',
+                              start : function() {
+                                    $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
+                              }
+                        });
+                  });
+
+                  // Always expand the first module
+                  _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
             }
       });//$.extend()
 })( wp.customize, jQuery );

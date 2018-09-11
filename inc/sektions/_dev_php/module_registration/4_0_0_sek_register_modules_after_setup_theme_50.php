@@ -3,7 +3,7 @@
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     foreach( [
-        // ui modules
+        // UI MODULES
         'sek_module_picker_module',
         //'sek_section_picker_module',
         'sek_level_bg_border_module',
@@ -25,7 +25,7 @@ function sek_register_modules() {
         'sek_global_breakpoint',
         'sek_global_widths',
 
-        // front modules
+        // FRONT MODULES
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
         'czr_image_module',
@@ -37,7 +37,11 @@ function sek_register_modules() {
         'czr_map_module',
         'czr_quote_module',
         'czr_button_module',
-        'czr_simple_form_module'
+
+        // simple form father + children
+        'czr_simple_form_module',
+        'czr_simple_form_fields_module',
+        'czr_simple_form_design_module'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {

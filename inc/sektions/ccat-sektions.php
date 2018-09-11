@@ -160,14 +160,15 @@ function sek_get_registered_module_type_property( $module_type, $property = '' )
 
 
 
+
 /* ------------------------------------------------------------------------- *
  *  REGISTERED MODULES => DEFAULT MODULE MODEL
 /* ------------------------------------------------------------------------- */
 // @param (string) module_type
 // Walk the registered modules tree and generates the module default if not already cached
 // used :
-// - when preprocessing the module model before printing the module template. @seeSEL_Front::render()
-// - when setting the level option css. @see sek_add_css_rules_for_bg_border_background()
+// - in sek_normalize_module_value_with_defaults(), when preprocessing the module model before printing the module template. @see SEK_Front::render()
+// - when setting the css of a level option. @see for example : sek_add_css_rules_for_bg_border_background()
 // @return array()
 function sek_get_default_module_model( $module_type = '' ) {
     $default = array();
@@ -180,23 +181,41 @@ function sek_get_default_module_model( $module_type = '' ) {
         $default = $default_models[ $module_type ];
     } else {
         $registered_modules = CZR_Fmk_Base() -> registered_modules;
-        // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
             error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $default;
         }
 
-        if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
-            return $default;
+        // Is this module a father ?
+        if ( !empty( $registered_modules[ $module_type ]['is_father'] ) && true === $registered_modules[ $module_type ]['is_father'] ) {
+            if ( empty( $registered_modules[ $module_type ][ 'children' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+                return $default;
+            }
+            if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+                return $default;
+            }
+            foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $mod_type ) {
+                if ( empty( $registered_modules[ $mod_type ][ 'tmpl' ] ) ) {
+                    error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the father default model.' );
+                    continue;
+                }
+                $default[$opt_group] = _sek_build_default_model( $registered_modules[ $mod_type ][ 'tmpl' ] );
+            }
+        } else {
+            if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+                return $default;
+            }
+            // Build
+            $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
         }
-        // Build
-        $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
 
         // Cache
         $default_models[ $module_type ] = $default;
         SEK_Front()->default_models = $default_models;
-        // sek_error_log( __FUNCTION__ . ' => $default_models', $default_models );
+        //sek_error_log( __FUNCTION__ . ' => $default_models', $default_models );
     }
     return $default;
 }
@@ -266,6 +285,8 @@ function _sek_build_default_model( $module_tmpl_data, $default_model = null ) {
 
 
 
+
+
 /* ------------------------------------------------------------------------- *
  *  REGISTERED MODULES => INPUT LIST
 /* ------------------------------------------------------------------------- */
@@ -291,12 +312,47 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
             return $input_list;
         }
 
-        if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
-            return $input_list;
+
+        // Is this module a father ?
+        if ( !empty( $registered_modules[ $module_type ]['is_father'] ) && true === $registered_modules[ $module_type ]['is_father'] ) {
+            if ( empty( $registered_modules[ $module_type ][ 'children' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+                return $input_list;
+            }
+            if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+                return $input_list;
+            }
+            $temp = array();
+            foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $mod_type ) {
+                if ( empty( $registered_modules[ $mod_type ][ 'tmpl' ] ) ) {
+                    error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the master input_list.' );
+                    continue;
+                }
+                // $temp[$opt_group] = _sek_build_input_list( $registered_modules[ $mod_type ][ 'tmpl' ] );
+                // $input_list = array_merge( $input_list, $temp[$opt_group] );
+
+                $input_list[$opt_group] = _sek_build_input_list( $registered_modules[ $mod_type ][ 'tmpl' ] );
+            }
+        } else {
+            if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
+                error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the input_list.' );
+                return $input_list;
+            }
+            // Build
+            $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
         }
-        // Build
-        $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
+
+
+
+
+        // if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
+        //     error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the input_list.' );
+        //     return $input_list;
+        // }
+
+        // // Build
+        // $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
 
         // Cache
         $cached_input_lists[ $module_type ] = $input_list;
@@ -372,28 +428,65 @@ function _sek_build_input_list( $module_tmpl_data, $input_list = null ) {
 
 
 
+
+
+
 /* ------------------------------------------------------------------------- *
  *  NORMALIZE MODULE VALUE WITH DEFAULT
+ *  preprocessing the module model before printing the module template.
  *  used before rendering or generating css
 /* ------------------------------------------------------------------------- */
+// @return array() $normalized_model
 function sek_normalize_module_value_with_defaults( $raw_module_model ) {
     $normalized_model = $raw_module_model;
     $module_type = $normalized_model['module_type'];
-    $default_value_model  = sek_get_default_module_model( $module_type );//<= walk the registered modules tree and generates the module default if not already cached
+    $is_father = sek_get_registered_module_type_property( $module_type, 'is_father' );
+
     $raw_module_value = ( ! empty( $raw_module_model['value'] ) && is_array( $raw_module_model['value'] ) ) ? $raw_module_model['value'] : array();
 
     // reset the model value and rewrite it normalized with the defaults
     $normalized_model['value'] = array();
-    if ( czr_is_multi_item_module( $module_type ) ) {
-        foreach ( $raw_module_value as $item ) {
-            $normalized_model['value'][] = wp_parse_args( $item, $default_value_model );
+    if ( $is_father ) {
+        $children = sek_get_registered_module_type_property( $module_type, 'children' );
+        if ( empty( $children ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+            return $default;
+        }
+        if ( ! is_array( $children ) ) {
+            error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+            return $default;
+        }
+        foreach ( $children as $opt_group => $mod_type ) {
+            $children_value = ( ! empty( $raw_module_value[$opt_group] ) && is_array( $raw_module_value[$opt_group] ) ) ? $raw_module_value[$opt_group] : array();
+            $normalized_model['value'][ $opt_group ] = _sek_normalize_single_module_values( $children_value, $mod_type );
         }
     } else {
-        $normalized_model['value'] = wp_parse_args( $raw_module_value, $default_value_model );
+        $normalized_model['value'] = _sek_normalize_single_module_values( $raw_module_value, $module_type );
     }
-
+    //sek_error_log('sek_normalize_single_module_values for module type ' . $module_type , $normalized_model );
     return $normalized_model;
 }
+
+// @return array()
+function _sek_normalize_single_module_values( $raw_module_value, $module_type ) {
+    $default_value_model  = sek_get_default_module_model( $module_type );//<= walk the registered modules tree and generates the module default if not already cached
+
+    // reset the model value and rewrite it normalized with the defaults
+    $module_values = array();
+    if ( czr_is_multi_item_module( $module_type ) ) {
+        foreach ( $raw_module_value as $item ) {
+            $module_values[] = wp_parse_args( $item, $default_value_model );
+        }
+    } else {
+        $module_values = wp_parse_args( $raw_module_value, $default_value_model );
+    }
+
+    return $module_values;
+}
+
+
+
+
 
 
 
@@ -2297,7 +2390,7 @@ function sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id,
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     foreach( [
-        // ui modules
+        // UI MODULES
         'sek_module_picker_module',
         //'sek_section_picker_module',
         'sek_level_bg_border_module',
@@ -2319,7 +2412,7 @@ function sek_register_modules() {
         'sek_global_breakpoint',
         'sek_global_widths',
 
-        // front modules
+        // FRONT MODULES
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
         'czr_image_module',
@@ -2331,7 +2424,11 @@ function sek_register_modules() {
         'czr_map_module',
         'czr_quote_module',
         'czr_button_module',
-        'czr_simple_form_module'
+
+        // simple form father + children
+        'czr_simple_form_module',
+        'czr_simple_form_fields_module',
+        'czr_simple_form_design_module'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
@@ -5770,7 +5867,66 @@ function sek_get_module_params_for_czr_simple_form_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_module',
+        'is_father' => true,
+        'children' => array(
+            'form_fields' => 'czr_simple_form_fields_module',
+            'design' => 'czr_simple_form_design_module'
+        ),
         'name' => __( 'Simple Form', 'text_domain_to_be_replaced' ),
+        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        'starting_value' => array(
+            'design' => array(
+                'border_width_css' => '4px',
+                'border_color_css' => '#ff0000'
+            )
+        ),
+        'css_selectors' => array( '.sek-module-inner' ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/simple_form_module_tmpl.php",
+    );
+}
+
+
+// function sanitize_callback__czr_simple_form_module( $value ) {
+//     $value[ 'button_text' ] = sanitize_text_field( $value[ 'button_text' ] );
+//     return $value;
+// }
+
+?>
+<?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER BUTTON MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+//Availabe input types
+// $.extend( api.czrInputMap, {
+//       text      : '',
+//       textarea  : '',
+//       check     : 'setupIcheck',
+//       gutencheck : 'setupGutenCheck',
+//       select    : 'setupSelect',
+//       radio     : 'setupRadio',
+//       number    : 'setupStepper',
+//       upload    : 'setupImageUploaderSaveAsId',
+//       upload_url : 'setupImageUploaderSaveAsUrl',
+//       color     : 'setupColorPicker',
+//       wp_color_alpha : 'setupColorPickerAlpha',
+//       wp_color  : 'setupWPColorPicker',//not used for the moment
+//       content_picker : 'setupContentPicker',
+//       tiny_mce_editor : 'setupTinyMceEditor',
+//       password : '',
+//       range : 'setupSimpleRange',
+//       range_slider : 'setupRangeSlider',
+//       hidden : '',
+//       h_alignment : 'setupHAlignement',
+//       h_text_alignment : 'setupHAlignement'
+// });
+function sek_get_module_params_for_czr_simple_form_fields_module() {
+    $css_selectors = '.sek-btn';
+    $css_font_selectors = '.sek-btn';
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_simple_form_fields_module',
+        'name' => __( 'Simple Form Fields', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_domain_to_be_replaced'),
@@ -5783,7 +5939,7 @@ function sek_get_module_params_for_czr_simple_form_module() {
         //     'use_box_shadow' => 1,
         //     'push_effect' => 1
         // ),
-        'css_selectors' => array( '.sek-module-inner > .sek-button' ),
+        'css_selectors' => array( '.sek-module-inner' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'show_name_field' => array(
@@ -5809,7 +5965,92 @@ function sek_get_module_params_for_czr_simple_form_module() {
                 ),
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/simple_form_module_tmpl.php",
+        'render_tmpl_path' => '',
+    );
+}
+
+
+// function sanitize_callback__czr_simple_form_module( $value ) {
+//     $value[ 'button_text' ] = sanitize_text_field( $value[ 'button_text' ] );
+//     return $value;
+// }
+
+?>
+<?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER BUTTON MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+//Availabe input types
+// $.extend( api.czrInputMap, {
+//       text      : '',
+//       textarea  : '',
+//       check     : 'setupIcheck',
+//       gutencheck : 'setupGutenCheck',
+//       select    : 'setupSelect',
+//       radio     : 'setupRadio',
+//       number    : 'setupStepper',
+//       upload    : 'setupImageUploaderSaveAsId',
+//       upload_url : 'setupImageUploaderSaveAsUrl',
+//       color     : 'setupColorPicker',
+//       wp_color_alpha : 'setupColorPickerAlpha',
+//       wp_color  : 'setupWPColorPicker',//not used for the moment
+//       content_picker : 'setupContentPicker',
+//       tiny_mce_editor : 'setupTinyMceEditor',
+//       password : '',
+//       range : 'setupSimpleRange',
+//       range_slider : 'setupRangeSlider',
+//       hidden : '',
+//       h_alignment : 'setupHAlignement',
+//       h_text_alignment : 'setupHAlignement'
+// });
+function sek_get_module_params_for_czr_simple_form_design_module() {
+    $css_selectors = '.sek-btn';
+    $css_font_selectors = '.sek-btn';
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_simple_form_design_module',
+        'name' => __( 'Simple Form Design', 'text_domain_to_be_replaced' ),
+        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        // 'starting_value' => array(
+        //     'button_text' => __('Click me','text_domain_to_be_replaced'),
+        //     'color_css'  => '#ffffff',
+        //     'bg_color_css' => '#020202',
+        //     'bg_color_hover' => '#151515', //lighten 15%,
+        //     'use_custom_bg_color_on_hover' => 0,
+        //     'border_radius_css' => '2',
+        //     'h_alignment_css' => 'center',
+        //     'use_box_shadow' => 1,
+        //     'push_effect' => 1
+        // ),
+        'css_selectors' => array( '.sek-module-inner .simple-form-wrapper' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'border_width_css' => array(
+                    'input_type'  => 'range_with_unit_picker',
+                    'title'       => __( 'Border weight', 'text_domain_to_be_replaced' ),
+                    'min' => 1,
+                    'max' => 80,
+                    'default' => '5px',
+                    'width-100'   => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'border_width',
+                    'css_selectors' => 'input[type="text"]'
+                ),
+                'border_color_css' => array(
+                    'input_type'  => 'wp_color_alpha',
+                    'title'       => __( 'Border Color', 'text_domain_to_be_replaced' ),
+                    'width-100'   => true,
+                    'default'     => '',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'border_color',
+                    'css_selectors' => 'input[type="text"]'
+                ),
+            )
+        ),
+        'render_tmpl_path' => '',
     );
 }
 
@@ -5884,45 +6125,85 @@ class Sek_Dyn_CSS_Builder {
             $this -> parent_level_model = $parent_level;
         }
 
-        // If the current level is a module, check if the module has more specific css selectors specified on registration
-        $module_level_css_selectors = null;
-        $registered_input_list = null;
-        if ( ! empty( $parent_level['module_type'] ) ) {
-            $module_level_css_selectors = sek_get_registered_module_type_property( $parent_level['module_type'], 'css_selectors' );
-            $registered_input_list = sek_get_registered_module_input_list( $parent_level['module_type'] );
-        }
-
         foreach ( $level as $key => $entry ) {
             $rules = array();
 
-            // INPUT CSS RULES
-            // When we are inside the associative arrays of the module 'value' or the level 'options' entries
+            // INPUT CSS RULES <= used in front modules only
+            // When we are inside the associative arrays of
+            // - the module 'value'
+            // - or the level 'options' entries <= NOT ANYMORE
             // the keys are not integer.
             // We want to filter each input
             // which makes it possible to target for example the font-family. Either in module values or in level options
             if ( is_string( $key ) && 1 < strlen( $key ) ) {
                 // we need to have a level model set
-                if ( !empty( $parent_level ) && is_array( $parent_level ) && ! empty( $parent_level['module_type'] ) ) {
-                    // the input_id candidate to filter is the $key
-                    $input_id_candidate = $key;
-                    // let's skip the $key that are reserved for the structure of the sektion tree
-                    // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
-                    // The generic rules must be suffixed with '_css'
-                    if ( false !== strpos( $input_id_candidate, '_css') ) {
-                        if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id_candidate ] ) && ! empty( $registered_input_list[ $input_id_candidate ]['css_identifier'] ) ) {
-                            $rules = apply_filters(
-                                "sek_add_css_rules_for_input_id",
-                                $rules,// <= the in-progress array of css rules to be populated
-                                $entry,// <= the css property value
-                                $input_id_candidate, // <= the unique input_id as it as been declared on module registration
-                                $registered_input_list,// <= the full list of input for the module
-                                $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
-                                $module_level_css_selectors // <= if the parent is a module, a default set of css_selectors might have been specified on module registration
-                            );
-                        } else {
-                            sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $parent_level['module_type'] . ' for a css input candidate : ' . $key, $parent_level );
-                        }
-                    }
+                if ( !empty( $parent_level ) && is_array( $parent_level ) && !empty( $parent_level['module_type'] ) ) {
+                     // If the current level is a module, check if the module has generic css ( *_css suffixed ) selectors specified on registration
+                    // $module_level_css_selectors = null;
+                    // $registered_input_list = null;
+                    $module_level_css_selectors = sek_get_registered_module_type_property( $parent_level['module_type'], 'css_selectors' );
+                    $registered_input_list = sek_get_registered_module_input_list( $parent_level['module_type'] );
+                    if ( 'value' === $key && is_array( $entry ) ) {
+                          $is_father = sek_get_registered_module_type_property( $parent_level['module_type'], 'is_father' );
+                          $father_mod_type = $parent_level['module_type'];
+                          // If the module has children ( the module is_father ), let's loop on each option group
+                          if ( $is_father ) {
+                              $children = sek_get_registered_module_type_property( $father_mod_type, 'children' );
+                              foreach ( $entry as $opt_group_type => $input_candidates ) {
+                                  if ( ! is_array( $children ) ) {
+                                      sek_error_log( 'Father module ' . $father_mod_type . ' has invalid children');
+                                      continue;
+                                  }
+                                  if ( empty( $children[$opt_group_type] ) ) {
+                                      sek_error_log( 'Father module ' . $father_mod_type . ' has a invalid child for option group : '. $opt_group_type);
+                                      continue;
+                                  }
+                                  $children_mod_type = $children[$opt_group_type];
+                                  foreach ( $input_candidates as $input_id_candidate => $_input_val ) {
+                                      // let's skip the $key that are reserved for the structure of the sektion tree
+                                      // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
+                                      // The generic rules must be suffixed with '_css'
+                                      if ( false !== strpos( $input_id_candidate, '_css') ) {
+                                          if ( is_array( $registered_input_list ) && is_array( $registered_input_list[ $opt_group_type ] )&& ! empty( $registered_input_list[ $opt_group_type ][ $input_id_candidate ] ) && ! empty( $registered_input_list[ $opt_group_type ][ $input_id_candidate ]['css_identifier'] ) ) {
+                                              $rules = apply_filters(
+                                                  "sek_add_css_rules_for_input_id",
+                                                  $rules,// <= the in-progress array of css rules to be populated
+                                                  $_input_val,// <= the css property value
+                                                  $input_id_candidate, // <= the unique input_id as it as been declared on module registration
+                                                  $registered_input_list[ $opt_group_type ],// <= the full list of input for the module
+                                                  $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                                  sek_get_registered_module_type_property( $children_mod_type, 'css_selectors' )// <= if the parent is a module, a default set of css_selectors might have been specified on module registration
+                                                  //$module_level_css_selectors
+                                              );
+                                          } else {
+                                              sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $father_mod_type . ' for a css input candidate : ' . $key, $parent_level );
+                                          }
+                                      }
+                                  }//foreach
+                              }//foreach
+                          } else {
+                              foreach ( $entry as $input_id_candidate => $_input_val ) {
+                                  // let's skip the $key that are reserved for the structure of the sektion tree
+                                  // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
+                                  // The generic rules must be suffixed with '_css'
+                                  if ( false !== strpos( $input_id_candidate, '_css') ) {
+                                      if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id_candidate ] ) && ! empty( $registered_input_list[ $input_id_candidate ]['css_identifier'] ) ) {
+                                          $rules = apply_filters(
+                                              "sek_add_css_rules_for_input_id",
+                                              $rules,// <= the in-progress array of css rules to be populated
+                                              $_input_val,// <= the css property value
+                                              $input_id_candidate, // <= the unique input_id as it as been declared on module registration
+                                              $registered_input_list,// <= the full list of input for the module
+                                              $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                              $module_level_css_selectors // <= if the parent is a module, a default set of css_selectors might have been specified on module registration
+                                          );
+                                      } else {
+                                          sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $parent_level['module_type'] . ' for a css input candidate : ' . $key, $parent_level );
+                                      }
+                                  }
+                              }//foreach
+                          }//if is_father
+                    }//if
                 }//if
             }//if
 
@@ -9080,8 +9361,12 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     }
 
     //set the fields to render
-    private function _set_form_composition( $form_composition, $module_options ) {
+    private function _set_form_composition( $form_composition, $module_options = array() ) {
         $user_form_composition = array();
+        if ( ! is_array( $module_options ) ) {
+              sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => ERROR : invalid module options array');
+              return $user_form_composition;
+        }
         foreach ($form_composition as $field_id => $field_data ) {
             switch ( $field_id ) {
               case 'name':

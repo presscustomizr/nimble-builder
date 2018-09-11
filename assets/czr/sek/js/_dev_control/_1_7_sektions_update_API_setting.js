@@ -629,7 +629,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           dfd.reject( 'updateAPISetting => ' + params.action + ' => error no module matched');
                                           break;
                                     }
-                                    moduleCandidate.value = _value_;
+                                    if ( _.isEmpty( params.options_type ) ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
+                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => missing options_type');
+                                          break;
+                                    }
+
+                                    // Is this a father module ?
+                                    // If yes, the module value is structured by option group, each option group being updated by a child module
+                                    if ( '__no_option_group_to_be_updated_by_children_modules__' === params.options_type ) {
+                                          moduleCandidate.value = _value_;
+                                    } else {
+                                          moduleCandidate.value = _.isEmpty( moduleCandidate.value ) ? {} : moduleCandidate.value;
+                                          moduleCandidate.value[ params.options_type ] = _value_;
+                                    }
+
                               break;
 
 
