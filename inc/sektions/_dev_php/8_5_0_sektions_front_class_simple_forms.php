@@ -25,39 +25,38 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     function _setup_simple_forms() {
         //Hooks
         add_action( 'parse_request', array( $this, 'simple_form_parse_request' ), 20 );
-        //add_action( 'wp_head'      , array( $this, 'simple_form_setup_front' ) );
-
-
+        // Note : form input need to be prefixed to avoid a collision with reserved WordPress input
+        // @see : https://stackoverflow.com/questions/15685020/wordpress-form-submission-and-the-404-error-page#16636051
         $this->form_composition = array(
             'nimble_simple_cf'              => array(
                 'type'            => 'hidden',
                 'value'           => 'nimble_simple_cf'
             ),
-            'name' => array(
+            'nimble_name' => array(
                 'label'            => __( 'Name', 'text_domain_to_be_replaced' ),
                 'required'         => 'required',
                 'type'             => 'text',
                 'wrapper_tag'      => 'p'
             ),
-            'email' => array(
+            'nimble_email' => array(
                 'label'            => __( 'Email', 'text_domain_to_be_replaced' ),
                 'required'         => 'required',
                 'type'             => 'email',
                 'wrapper_tag'      => 'p'
             ),
-            'subject' => array(
+            'nimble_subject' => array(
                 'label'            => __( 'Subject', 'text_domain_to_be_replaced' ),
                 'type'             => 'url',
                 'wrapper_tag'      => 'p'
             ),
-            'message' => array(
+            'nimble_message' => array(
                 'label'            => __( 'Message', 'text_domain_to_be_replaced' ),
                 'required'         => 'required',
                 'additional_attrs' => array( 'rows' => "10", 'cols' => "50" ),
                 'type'             => 'textarea',
                 'wrapper_tag'      => 'p'
             ),
-            'submit' => array(
+            'nimble_submit' => array(
                 'type'             => 'submit',
                 'value'            => __( 'Contact', 'text_domain_to_be_replaced' ),
                 'wrapper_tag'      => 'p'
@@ -88,14 +87,6 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             $this->mailer->maybe_send();
         }
     }
-
-
-    //@hook: wp_head
-    // function simple_form_setup_front() {
-    //     if ( is_page( 'contact-us' ) ) {
-    //         add_filter( 'the_content', array( $this, 'get_form_html' ) );
-    //     }
-    // }
 
 
 
@@ -141,17 +132,17 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         }
         foreach ($form_composition as $field_id => $field_data ) {
             switch ( $field_id ) {
-              case 'name':
+              case 'nimble_name':
                   if ( ! empty( $module_options['show_name_field'] ) && sek_is_checked( $module_options['show_name_field'] ) ) {
                       $user_form_composition[$field_id] = $field_data;
                   }
               break;
-              case 'subject':
+              case 'nimble_subject':
                   if ( ! empty( $module_options['show_subject_field'] ) && sek_is_checked( $module_options['show_subject_field'] ) ) {
                       $user_form_composition[$field_id] = $field_data;
                   }
               break;
-              case 'message':
+              case 'nimble_message':
                   if ( ! empty( $module_options['show_message_field'] ) && sek_is_checked( $module_options['show_message_field'] ) ) {
                       $user_form_composition[$field_id] = $field_data;
                   }
@@ -709,8 +700,8 @@ class Sek_Mailer {
         //<-allow html? -> TODO: turn into option
         $allow_html     = true;
 
-        $sender_email   = $this->form->get_field('email')->get_input()->get_value();
-        $sender_name    = sprintf( '%1$s', $this->form->get_field('name')->get_input()->get_value() );
+        $sender_email   = $this->form->get_field('nimble_email')->get_input()->get_value();
+        $sender_name    = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
 
         $recipient      = get_option( 'admin_email' ); //<- maybe this can be an option as well
 
@@ -728,7 +719,7 @@ class Sek_Mailer {
                             $before_message,
                             sprintf( __( 'Message:%1$s%2$s', 'text_domain_to_be_replaced' ),
                                  $allow_html ? '<br><br>': "\r\n\r\n",
-                                 $this->form->get_field('message')->get_input()->get_value()
+                                 $this->form->get_field('nimble_message')->get_input()->get_value()
                             ),
                             $after_message,
                             $allow_html ? '<br><br>--<br>': "\r\n\r\n--\r\n",
