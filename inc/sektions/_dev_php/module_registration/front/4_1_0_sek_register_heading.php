@@ -211,7 +211,9 @@ function sek_get_module_params_for_czr_heading_module() {
 function sanitize_callback__czr_heading_module( $value ) {
     if (  !current_user_can( 'unfiltered_html' ) && array_key_exists('heading_text', $value ) ) {
         //sanitize heading_text
-        $value[ 'heading_text' ] = czr_heading_module_kses_text( $value[ 'heading_text' ] );
+        if ( function_exists( 'czr_heading_module_kses_text' ) ) {
+            $value[ 'heading_text' ] = czr_heading_module_kses_text( $value[ 'heading_text' ] );
+        }
     }
     return $value;
     //return new \WP_Error('required' ,'heading did not pass sanitization');
