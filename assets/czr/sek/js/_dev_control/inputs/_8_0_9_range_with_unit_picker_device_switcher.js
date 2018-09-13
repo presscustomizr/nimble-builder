@@ -39,14 +39,14 @@
                   // falls back on the module default
                   var getCurrentDeviceActualOrInheritedValue = function( inputValues, currentDevice ) {
                         var deviceHierarchy = [ 'mobile' , 'tablet', 'desktop' ];
-                        if ( ! _.isEmpty( inputValues[ currentDevice ] ) ) {
+                        if ( _.has( inputValues, currentDevice ) ) {
                               return inputValues[ currentDevice ];
                         } else {
                               var deviceIndex = _.findIndex( deviceHierarchy, function( _d_ ) { return currentDevice === _d_; });
                               if ( deviceIndex < deviceHierarchy.length ) {
                                     return getCurrentDeviceActualOrInheritedValue( inputValues, deviceHierarchy[ deviceIndex + 1 ] );
                               } else {
-                                    return { desktop : '16px' };
+                                    return '16px';
                               }
                         }
                   };
@@ -99,6 +99,7 @@
                   // SCHEDULE REACTIONS
                   // React to a unit change => trigger a number input change
                   // Don't move when switching the device
+                  // @param params can be { previewed_device_switched : true }
                   input.css_unit.bind( function( to, from, params ) {
                         if ( _.isObject( params ) && true === params.previewed_device_switched )
                           return;
