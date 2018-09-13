@@ -223,7 +223,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'css_identifier' => 'font_size',
                                 'css_selectors' => $cite_font_selectors,
                             ),//16,//"14px",
-                            'line_height_css'     => array(
+                            'cite_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
                                 'default'     => '1.5em',
