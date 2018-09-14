@@ -205,7 +205,7 @@ function sek_get_module_params_for_czr_simple_form_design_module() {
         //     'use_box_shadow' => 1,
         //     'push_effect' => 1
         // ),
-        'css_selectors' => array( '.sek-module-inner .simple-form-wrapper' ),
+        'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'bg_color_css' => array(
@@ -271,7 +271,7 @@ function sek_get_module_params_for_czr_simple_form_button_module() {
         //     'use_box_shadow' => 1,
         //     'push_effect' => 1
         // ),
-        'css_selectors' => array( '.sek-module-inner .simple-form-wrapper' ),
+        'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'bg_color_css' => array(
@@ -385,7 +385,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_module() {
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         // ),
-        'css_selectors' => array( '.sek-module-inner .simple-form-wrapper' ),
+        'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'tabs' => array(
@@ -838,7 +838,7 @@ function sek_get_module_params_for_czr_simple_form_submission_module() {
         //     'use_box_shadow' => 1,
         //     'push_effect' => 1
         // ),
-        'css_selectors' => array( '.sek-module-inner .simple-form-wrapper' ),
+        'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'recipients' => array(
