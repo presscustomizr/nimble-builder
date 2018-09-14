@@ -527,7 +527,25 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
 
     public function get_value() {
         $data = (array)$this->data;
-        return $this->data['escape_cb']( $data['value'] );
+        $value = $this->data['escape_cb']( $data['value'] );
+        if ( skp_is_customizing() ) {
+            $field_name = $this->get_data('name' );
+            switch( $field_name ) {
+                case 'nimble_name' :
+                    $value = __('John Doe', 'text-domain');
+                break;
+                case 'nimble_email' :
+                    $value = __('john@doe.com', 'text-domain');
+                break;
+                case 'nimble_subject' :
+                    $value = __('An email subject', 'text-domain');
+                break;
+                case 'nimble_message' :
+                    $value = __('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.', 'text-domain');
+                break;
+            }
+        }
+        return $value;
     }
 
 
@@ -547,7 +565,9 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
             ),
             $this->data[ 'additional_attrs' ]
         );
-
+        if ( skp_is_customizing() ) {
+            $attributes['value'] = array_key_exists('value', $attributes ) ? $attributes['value'] : '';
+        }
         $attributes = array_map(
             function ($k, $v) {
                 $v     =  'value' == $k ? $this->get_value() : esc_attr( $v );
