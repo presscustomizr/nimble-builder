@@ -44,32 +44,32 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 'label'            => __( 'Name', 'text_domain_to_be_replaced' ),
                 'required'         => true,
                 'type'             => 'text',
-                'wrapper_tag'      => 'p'
+                'wrapper_tag'      => 'div'
             ),
             'nimble_email' => array(
                 'label'            => __( 'Email', 'text_domain_to_be_replaced' ),
                 'required'         => true,
                 'type'             => 'email',
-                'wrapper_tag'      => 'p'
+                'wrapper_tag'      => 'div'
             ),
             'nimble_subject' => array(
                 'label'            => __( 'Subject', 'text_domain_to_be_replaced' ),
                 'type'             => 'text',
-                'wrapper_tag'      => 'p'
+                'wrapper_tag'      => 'div'
             ),
             'nimble_message' => array(
                 'label'            => __( 'Message', 'text_domain_to_be_replaced' ),
                 'required'         => true,
                 'additional_attrs' => array( 'rows' => "10", 'cols' => "50" ),
                 'type'             => 'textarea',
-                'wrapper_tag'      => 'p'
+                'wrapper_tag'      => 'div'
             ),
             'nimble_submit' => array(
                 'type'             => 'submit',
                 'value'            => __( 'Submit', 'text_domain_to_be_replaced' ),
                 'additional_attrs' => array( 'class' => 'sek-btn' ),
                 'wrapper_tag'      => 'div',
-                'wrapper_class'    => array( 'sek-form-btn-wrapper' )
+                'wrapper_class'    => array( 'sek-form-field', 'sek-form-btn-wrapper' )
             )
         );
     }//_setup_simple_forms
@@ -382,7 +382,7 @@ class Sek_Field {
 
         $this->data  = wp_parse_args( $args, [
             'wrapper_tag'         => '',
-            'wrapper_class'       => '',
+            'wrapper_class'       => array( 'sek-form-field' ),
             'label'               => '',
             //TODO: allow callbacks
             'before_label'        => '',
@@ -529,7 +529,7 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
         $data = (array)$this->data;
         $value = $this->data['escape_cb']( $data['value'] );
         if ( skp_is_customizing() ) {
-            $field_name = $this->get_data('name' );
+            $field_name = $this->get_data('name');
             switch( $field_name ) {
                 case 'nimble_name' :
                     $value = __('John Doe', 'text-domain');
@@ -540,9 +540,9 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
                 case 'nimble_subject' :
                     $value = __('An email subject', 'text-domain');
                 break;
-                case 'nimble_message' :
-                    $value = __('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.', 'text-domain');
-                break;
+                // case 'nimble_message' :
+                //     $value = __('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.', 'text-domain');
+                // break;
             }
         }
         return $value;
