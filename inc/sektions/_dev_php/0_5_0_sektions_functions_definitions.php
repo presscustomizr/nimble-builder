@@ -405,7 +405,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 // Build the input list from item-inputs and modop-inputs
 function _sek_build_input_list( $module_tmpl_data, $input_list = null ) {
     $input_list = is_array( $input_list ) ? $input_list : array();
-    //error_log( print_r(  $module_tmpl_data , true ) );
+    //sek_error_log( '_sek_build_input_list', print_r(  $module_tmpl_data , true ) );
     foreach( $module_tmpl_data as $key => $data ) {
         if ( 'pre-item' === $key )
           continue;
