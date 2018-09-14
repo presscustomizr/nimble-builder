@@ -43,18 +43,21 @@ function sek_get_module_params_for_czr_simple_form_module() {
         'name' => __( 'Simple Form', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         'starting_value' => array(
-            'fields_design' => array(
-                'border_width_css' => '1px',
-                'border_color_css' => '#000000'
-            ),
+            // 'fields_design' => array(
+            //     'border_width_css' => '1px',
+            //     'border_color_css' => '#000000'
+            // ),
             'form_button' => array(
                 'bg_color_css' => '#020202',
                 'bg_color_hover' => '#151515', //lighten 15%,
                 'use_custom_bg_color_on_hover' => 0,
                 'border_radius_css' => '2',
-                'h_alignment_css' => 'center',
+                'h_alignment_css' => is_rtl() ? 'right' : 'left',
                 'use_box_shadow' => 1,
                 'push_effect' => 1
+            ),
+            'form_fonts' => array(
+                'fl_font_family_css' => '[cfont]Lucida Console,Monaco,monospace'
             ),
             'form_submission' => array(
                 'email_footer' => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_domain_to_be_replaced' ),
@@ -188,7 +191,7 @@ function sek_get_module_params_for_czr_simple_form_fields_module() {
  *  FIELDS DESIGN
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_simple_form_design_module() {
-    $css_selectors = 'form input[type="text"], input[type="text"]:focus, form textarea, form textarea:focus';
+    $css_selectors = array( 'form input[type="text"]', 'input[type="text"]:focus', 'form textarea', 'form textarea:focus' );
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_design_module',
@@ -224,7 +227,7 @@ function sek_get_module_params_for_czr_simple_form_design_module() {
                     'title'       => __( 'Fields border weight', 'text_domain_to_be_replaced' ),
                     'min' => 1,
                     'max' => 80,
-                    'default' => '5px',
+                    'default' => '1px',
                     'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -235,7 +238,7 @@ function sek_get_module_params_for_czr_simple_form_design_module() {
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __( 'Fields border Color', 'text_domain_to_be_replaced' ),
                     'width-100'   => true,
-                    'default'     => '',
+                    'default'     => '#cccccc',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'border_color',
@@ -328,6 +331,7 @@ function sek_get_module_params_for_czr_simple_form_button_module() {
                     'input_type'         => 'spacing',
                     'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
                     'default'            => array(
+                        'margin-top'     => .5,
                         'padding-top'    => .5,
                         'padding-bottom' => .5,
                         'padding-right'  => 1,
@@ -375,9 +379,9 @@ function sek_get_module_params_for_czr_simple_form_button_module() {
  *  FONTS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_simple_form_fonts_module() {
-    $fl_font_selectors = 'form label, .sek-form-message'; //<= .sek-form-message is the wrapper of the form status message : Thanks, etc...
-    $ft_font_selectors = 'form input[type="text"], form input[type="text"]:focus, form textarea, form textarea:focus';
-    $btn_font_selectors = 'form input[type="submit"]';
+    $fl_font_selectors = array( 'form label', '.sek-form-message' ); //<= .sek-form-message is the wrapper of the form status message : Thanks, etc...
+    $ft_font_selectors = array( 'form input[type="text"]', 'form input[type="text"]:focus', 'form textarea', 'form textarea:focus' );
+    $btn_font_selectors = array( 'form input[type="submit"]' );
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_fonts_module',
@@ -821,7 +825,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_module() {
  *  FIELDS DESIGN
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_simple_form_submission_module() {
-    $css_selectors = 'form input[type="text"], input[type="text"]:focus, form textarea, form textarea:focus';
+    $css_selectors = array( 'form input[type="text"]', 'input[type="text"]:focus', 'form textarea', 'form textarea:focus' );
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_submission_module',
