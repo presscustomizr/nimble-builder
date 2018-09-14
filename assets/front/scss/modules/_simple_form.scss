@@ -1,0 +1,34 @@
+.#{$project-prefix}simple-form-wrapper {
+    input[type=text], textarea {
+        width: 100% !important;
+        padding: 0.4em 0.5em;
+        border-radius: 3px;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+        box-sizing: border-box;
+        outline: none;
+        font-weight: normal;
+        max-width: 100%;
+        border-color: #cccccc;
+        border-width: 1px;
+        border-style: solid;
+        color: #555555;
+        background-color: #ffffff;
+    }
+    textarea {
+        height: auto;
+    }
+    .sek-form-field {
+        margin-bottom: 15px;
+        clear: both;
+    }
+    label {
+        font-family: "Lucida Grande","Lucida Sans Unicode",Tahoma,sans-serif;
+        color: #444444;
+        font-weight: bold;
+        text-align: left;
+        margin: 0;
+        padding: 0 0 3px 0;
+        width: auto;
+        display: block;
+    }
+}
