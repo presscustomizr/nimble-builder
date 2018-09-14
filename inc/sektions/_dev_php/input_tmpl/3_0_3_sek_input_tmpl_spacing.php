@@ -10,14 +10,14 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
     <div class="sek-spacing-wrapper">
         <div class="sek-pad-marg-inner">
           <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
-            <div class="sek-flex-center-stretch" data-sek-spacing="margin-top">
+            <div class="sek-flex-center-stretch" data-sek-spacing="margin-top" title="<?php _e('Margin top', 'text-domain'); ?>">
               <div class="sek-pm-input-parent">
                 <input class="sek-pm-input" value="" type="number"  >
               </div>
             </div>
           </div>
           <div class="sek-pm-middle-wrap sek-flex-justify-center">
-            <div class="sek-flex-center-stretch sek-pm-margin-left" data-sek-spacing="margin-left">
+            <div class="sek-flex-center-stretch sek-pm-margin-left" data-sek-spacing="margin-left" title="<?php _e('Margin left', 'text-domain'); ?>">
               <div class="sek-pm-input-parent">
                 <input class="sek-pm-input" value="" type="number"  >
               </div>
@@ -25,26 +25,26 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
 
             <div class="sek-pm-padding-wrapper">
               <div class="sek-flex-justify-center">
-                <div class="sek-flex-center-stretch" data-sek-spacing="padding-top">
+                <div class="sek-flex-center-stretch" data-sek-spacing="padding-top" title="<?php _e('Padding top', 'text-domain'); ?>">
                   <div class="sek-pm-input-parent">
                     <input class="sek-pm-input" value="" type="number"  >
                   </div>
                 </div>
               </div>
                 <div class="sek-flex-justify-center sek-flex-space-between">
-                  <div class="sek-flex-center-stretch" data-sek-spacing="padding-left">
+                  <div class="sek-flex-center-stretch" data-sek-spacing="padding-left" title="<?php _e('Padding left', 'text-domain'); ?>">
                     <div class="sek-pm-input-parent">
                       <input class="sek-pm-input" value="" type="number"  >
                     </div>
                   </div>
-                  <div class="sek-flex-center-stretch" data-sek-spacing="padding-right">
+                  <div class="sek-flex-center-stretch" data-sek-spacing="padding-right" title="<?php _e('Padding right', 'text-domain'); ?>">
                     <div class="sek-pm-input-parent">
                       <input class="sek-pm-input" value="" type="number"  >
                     </div>
                   </div>
                 </div>
               <div class="sek-flex-justify-center">
-                <div class="sek-flex-center-stretch" data-sek-spacing="padding-bottom">
+                <div class="sek-flex-center-stretch" data-sek-spacing="padding-bottom" title="<?php _e('Padding bottom', 'text-domain'); ?>">
                   <div class="sek-pm-input-parent">
                     <input class="sek-pm-input" value="" type="number"  >
                   </div>
@@ -52,7 +52,7 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
               </div>
             </div>
 
-            <div class="sek-flex-center-stretch sek-pm-margin-right" data-sek-spacing="margin-right">
+            <div class="sek-flex-center-stretch sek-pm-margin-right" data-sek-spacing="margin-right" title="<?php _e('Margin right', 'text-domain'); ?>">
               <div class="sek-pm-input-parent">
                 <input class="sek-pm-input" value="" type="number"  >
               </div>
@@ -60,7 +60,7 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
           </div>
 
           <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
-            <div class="sek-flex-center-stretch" data-sek-spacing="margin-bottom">
+            <div class="sek-flex-center-stretch" data-sek-spacing="margin-bottom" title="<?php _e('Margin bottom', 'text-domain'); ?>">
               <div class="sek-pm-input-parent">
                 <input class="sek-pm-input" value="" type="number"  >
               </div>
