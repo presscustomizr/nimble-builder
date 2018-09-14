@@ -41,7 +41,10 @@ function sek_register_modules() {
         // simple form father + children
         'czr_simple_form_module',
         'czr_simple_form_fields_module',
-        'czr_simple_form_design_module'
+        'czr_simple_form_button_module',
+        'czr_simple_form_design_module',
+        'czr_simple_form_fonts_module',
+        'czr_simple_form_submission_module'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {

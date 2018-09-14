@@ -61,8 +61,8 @@
                           //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
-                                      case 'show_name_field' :
-                                            _.each( [ 'name_field_label', 'name_field_required' ] , function( _inputId_ ) {
+                                      case 'use_custom_bg_color_on_hover' :
+                                            _.each( [ 'bg_color_hover' ] , function( _inputId_ ) {
                                                   try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
@@ -70,30 +70,14 @@
                                                   }
                                             });
                                       break;
-                                      case 'show_subject_field' :
-                                            _.each( [ 'subject_field_label', 'subject_field_required' ] , function( _inputId_ ) {
+                                      case 'use_box_shadow' :
+                                            _.each( [ 'push_effect' ] , function( _inputId_ ) {
                                                   try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
                                                   }
                                             });
-                                      break;
-                                      case 'show_message_field' :
-                                            _.each( [ 'message_field_label', 'message_field_required' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        return input();
-                                                  }); } catch( er ) {
-                                                        api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
-                                            });
-                                      break;
-                                      case 'link-pick-url' :
-                                            try { scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
-                                                  return input();
-                                            }); } catch( er ) {
-                                                  api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
-                                            }
                                       break;
                                 }
                           });
@@ -110,13 +94,13 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            czr_simple_form_fields_module: {
+            czr_simple_form_button_module: {
                   mthds : Constructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_fields_module', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_button_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_form_fields_module' )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_form_button_module' )
             }
       });
 })( wp.customize , jQuery, _ );
