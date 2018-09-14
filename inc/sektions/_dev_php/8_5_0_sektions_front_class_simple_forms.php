@@ -32,34 +32,44 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 'type'            => 'hidden',
                 'value'           => 'nimble_simple_cf'
             ),
+            'nimble_skope_id'     => array(
+                'type'            => 'hidden',
+                'value'           => ''
+            ),
+            'nimble_level_id'     => array(
+                'type'            => 'hidden',
+                'value'           => ''
+            ),
             'nimble_name' => array(
                 'label'            => __( 'Name', 'text_domain_to_be_replaced' ),
-                'required'         => 'required',
+                'required'         => true,
                 'type'             => 'text',
                 'wrapper_tag'      => 'p'
             ),
             'nimble_email' => array(
                 'label'            => __( 'Email', 'text_domain_to_be_replaced' ),
-                'required'         => 'required',
+                'required'         => true,
                 'type'             => 'email',
                 'wrapper_tag'      => 'p'
             ),
             'nimble_subject' => array(
                 'label'            => __( 'Subject', 'text_domain_to_be_replaced' ),
-                'type'             => 'url',
+                'type'             => 'text',
                 'wrapper_tag'      => 'p'
             ),
             'nimble_message' => array(
                 'label'            => __( 'Message', 'text_domain_to_be_replaced' ),
-                'required'         => 'required',
+                'required'         => true,
                 'additional_attrs' => array( 'rows' => "10", 'cols' => "50" ),
                 'type'             => 'textarea',
                 'wrapper_tag'      => 'p'
             ),
             'nimble_submit' => array(
                 'type'             => 'submit',
-                'value'            => __( 'Contact', 'text_domain_to_be_replaced' ),
-                'wrapper_tag'      => 'p'
+                'value'            => __( 'Submit', 'text_domain_to_be_replaced' ),
+                'additional_attrs' => array( 'class' => 'sek-btn' ),
+                'wrapper_tag'      => 'div',
+                'wrapper_class'    => array( 'sek-form-btn-wrapper' )
             )
         );
     }//_setup_simple_forms
@@ -68,14 +78,37 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     //@hook: parse_request
     function simple_form_parse_request() {
         if ( isset( $_POST['nimble_simple_cf'] ) ) {
+            // get the module options
+            // we are before 'wp', so let's use the posted skope_id and level_id to get our $module_user_values
+            $module_model = array();
+            if ( isset( $_POST['nimble_skope_id'] ) && '_skope_not_set_' !== $_POST['nimble_skope_id'] ) {
+                $local_sektions = sek_get_skoped_seks( $_POST['nimble_skope_id'] );
+                if ( is_array( $local_sektions ) && !empty( $local_sektions ) ) {
+                $sektion_collection = array_key_exists('collection', $local_sektions) ? $local_sektions['collection'] : array();
+                }
+                if ( is_array($sektion_collection) && ! empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
+                    $module_model = sek_get_level_model($_POST['nimble_level_id'], $sektion_collection );
+                    $module_model = sek_normalize_module_value_with_defaults( $module_model );
+                }
+            } else {
+                sek_error_log( __FUNCTION__ . ' => skope_id problem');
+                return;
+            }
 
-            $form_composition = array();
+            if ( empty( $module_model ) ) {
+                sek_error_log( __FUNCTION__ . ' => invalid module model');
+                return;
+            }
+
+            //update the form with the posted values
             foreach ( $this->form_composition as $name => $field ) {
                 $form_composition[ $name ]                = $field;
                 if ( isset( $_POST[ $name ] ) ) {
                     $form_composition[ $name ][ 'value' ] = $_POST[ $name ];
                 }
             }
+            //set the form composition according to the user's options
+            $form_composition = $this->_set_form_composition( $form_composition, $module_model );
             //generate fields
             $this->fields = $this->simple_form_generate_fields( $form_composition );
             //generate form
@@ -84,7 +117,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             //mailer
             $this->mailer = new Sek_Mailer( $this-> form );
 
-            $this->mailer->maybe_send();
+            $this->mailer->maybe_send( $form_composition, $module_model );
         }
     }
 
@@ -92,26 +125,25 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
 
     //Rendering
     //@return string
-    function get_simple_form_html( $module_options ) {
+    //@param module_options is the module level "value" property. @see tmpl/modules/simple_form_module_tmpl.php
+    function get_simple_form_html( $module_model ) {
         $html         = '';
-
-        //set the fields to render
-        $form_composition = $this->_set_form_composition( $this->form_composition, $module_options );
+        //set the form composition according to the user's options
+        $form_composition = $this->_set_form_composition( $this->form_composition, $module_model );
         //generate fields
         $fields       = isset( $this->fields ) ? $this->fields : $this->simple_form_generate_fields( $form_composition );
         //generate form
         $form         = isset( $this->form ) ? $this->form : $this->simple_form_generate_form( $fields );
-
         ob_start();
         ?>
-        <div id="respond">
+        <div id="sek-form-respond">
           <?php
             $echo_form = true;
             if ( ! is_null( $this->mailer ) ) {
                 if ( 'sent' == $status_code = $this->mailer->get_status() ) {
                     $echo_form = false;
                 }
-                echo $this->mailer->get_message( $status_code );
+                printf( '<span class="sek-form-message">%1$s</span>', $this->mailer->get_message( $status_code, $module_model ) );
             }
 
             if ( $echo_form ) {
@@ -124,32 +156,71 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     }
 
     //set the fields to render
-    private function _set_form_composition( $form_composition, $module_options = array() ) {
+    private function _set_form_composition( $form_composition, $module_model = array() ) {
+
         $user_form_composition = array();
-        if ( ! is_array( $module_options ) ) {
+        if ( ! is_array( $module_model ) ) {
               sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => ERROR : invalid module options array');
               return $user_form_composition;
         }
-        foreach ($form_composition as $field_id => $field_data ) {
+        $module_user_values = array_key_exists( 'value', $module_model ) ? $module_model['value'] : array();
+        //sek_error_log( '$module_model', $module_model );
+        $form_fields_options = empty( $module_user_values['form_fields'] ) ? array() : $module_user_values['form_fields'];
+        $form_button_options = empty( $module_user_values['form_button'] ) ? array() : $module_user_values['form_button'];
+        foreach ( $form_composition as $field_id => $field_data ) {
+            //sek_error_log( '$field_data', $field_data );
             switch ( $field_id ) {
-              case 'nimble_name':
-                  if ( ! empty( $module_options['show_name_field'] ) && sek_is_checked( $module_options['show_name_field'] ) ) {
-                      $user_form_composition[$field_id] = $field_data;
-                  }
-              break;
-              case 'nimble_subject':
-                  if ( ! empty( $module_options['show_subject_field'] ) && sek_is_checked( $module_options['show_subject_field'] ) ) {
-                      $user_form_composition[$field_id] = $field_data;
-                  }
-              break;
-              case 'nimble_message':
-                  if ( ! empty( $module_options['show_message_field'] ) && sek_is_checked( $module_options['show_message_field'] ) ) {
-                      $user_form_composition[$field_id] = $field_data;
-                  }
-              break;
-              default:
-                  $user_form_composition[$field_id] = $field_data;
-              break;
+                case 'nimble_name':
+                    if ( ! empty( $form_fields_options['show_name_field'] ) && sek_is_checked( $form_fields_options['show_name_field'] ) ) {
+                        $user_form_composition[$field_id] = $field_data;
+                        $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['name_field_required'] );
+                        $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['name_field_label'] );
+                    }
+                break;
+                case 'nimble_subject':
+                    if ( ! empty( $form_fields_options['show_subject_field'] ) && sek_is_checked( $form_fields_options['show_subject_field'] ) ) {
+                        $user_form_composition[$field_id] = $field_data;
+                        $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['subject_field_required'] );
+                        $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['subject_field_label'] );
+                    }
+                break;
+                case 'nimble_message':
+                    if ( ! empty( $form_fields_options['show_message_field'] ) && sek_is_checked( $form_fields_options['show_message_field'] ) ) {
+                        $user_form_composition[$field_id] = $field_data;
+                        $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['message_field_required'] );
+                        $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['message_field_label'] );
+                    }
+                break;
+                case 'nimble_email':
+                    $user_form_composition[$field_id] = $field_data;
+                    $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['email_field_label'] );
+                break;
+                //'additional_attrs' => array( 'class' => 'sek-btn' ),
+                case 'nimble_submit':
+                    $user_form_composition[$field_id] = $field_data;
+                    $visual_effect_class = '';
+                    //visual effect classes
+                    if ( array_key_exists( 'use_box_shadow', $form_button_options ) && true === sek_booleanize_checkbox_val( $form_button_options['use_box_shadow'] ) ) {
+                        $visual_effect_class = ' box-shadow';
+                        if ( array_key_exists( 'push_effect', $form_button_options ) && true === sek_booleanize_checkbox_val( $form_button_options['push_effect'] ) ) {
+                            $visual_effect_class .= ' push-effect';
+                        }
+                    }
+                    $user_form_composition[$field_id]['additional_attrs']['class'] = 'sek-btn' . $visual_effect_class;
+                break;
+                case 'nimble_skope_id':
+                    $user_form_composition[$field_id] = $field_data;
+                    // always use the posted skope_id
+                    // => in a scenario in which we post the form several times, the skp_get_skope_id() won't be available after the first submit action
+                    $user_form_composition[$field_id]['value'] = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : skp_get_skope_id();
+                break;
+                case 'nimble_level_id':
+                    $user_form_composition[$field_id] = $field_data;
+                    $user_form_composition[$field_id]['value'] = $module_model['id'];
+                break;
+                default:
+                    $user_form_composition[$field_id] = $field_data;
+                break;
             }
 
         }
@@ -235,26 +306,27 @@ class Sek_Form {
     }
 
     //make sure fields are well formed
-    public function is_well_formed() {
-        $is_well_formed = true;
+    public function has_invalid_field() {
+        $has_invalid_field = false;
 
         foreach ( $this->fields as $form_field ) {
+            if ( false !== $has_invalid_field )
+              continue;
             $input        = $form_field->get_input();
-
             $value        = $input->get_value();
             $filter       = $input->get_data( 'filter' );
-            $can_be_empty = 'required' != $input->get_data( 'required' );
+            $can_be_empty = true !== $input->get_data( 'required' );
 
             if ( $can_be_empty && ! $value ) {
                 continue;
             }
             if ( $filter && ! filter_var( $value, $filter ) ) {
-                $is_well_formed = false;
+                $has_invalid_field = $input->get_data('label');
                 break;
             }
         }
 
-        return $is_well_formed;
+        return $has_invalid_field;
     }
 
     public function get_attributes_html() {
@@ -333,9 +405,9 @@ class Sek_Field {
 
         //label stuff
         if ( $label ) {
-            if ( 'required' == $this->input->get_data( 'required' ) ) {
-
-                $label .= ' ' . esc_html__( '(required)', 'text_domain_to_be_replaced' );
+            if ( true == $this->input->get_data( 'required' ) ) {
+                $label .= ' *';
+                //$label .= ' ' . esc_html__( '(required)', 'text_domain_to_be_replaced' );
             }
             $label = sprintf( '%1$s<label for="%2$s">%3$s</label>%4$s',
                 $this->data[ 'before_label' ],
@@ -674,6 +746,7 @@ class Sek_Mailer {
     private $form;
     private $status;
     private $messages;
+    private $invalid_field = false;
 
     public function __construct( Sek_Form $form ) {
         $this-> form = $form;
@@ -690,12 +763,19 @@ class Sek_Mailer {
 
 
 
-    public function maybe_send() {
-
-        if ( ! $this->form->is_well_formed() ) {
+    public function maybe_send( $form_composition, $module_model ) {
+        //sek_error_log('$form_composition', $form_composition );
+        //sek_error_log('$module_model', $module_model );
+        $invalid_field = $this->form->has_invalid_field();
+        if ( false !== $invalid_field ) {
             $this->status = 'aborted';
+            $this->invalid_field = $invalid_field;
             return;
         }
+
+        $module_user_values = array_key_exists( 'value', $module_model ) ? $module_model['value'] : array();
+        //sek_error_log( '$module_model', $module_model );
+        $submission_options = empty( $module_user_values['form_submission'] ) ? array() : $module_user_values['form_submission'];
 
         //<-allow html? -> TODO: turn into option
         $allow_html     = true;
@@ -703,9 +783,19 @@ class Sek_Mailer {
         $sender_email   = $this->form->get_field('nimble_email')->get_input()->get_value();
         $sender_name    = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
 
-        $recipient      = get_option( 'admin_email' ); //<- maybe this can be an option as well
+        if ( array_key_exists( 'recipients', $submission_options ) ) {
+            $recipient      = $submission_options['recipients'];
+        } else {
+            $recipient      = get_option( 'admin_email' );
+        }
 
-        $subject        = sprintf( __( 'Someone sent a message from %1$s', 'text_domain_to_be_replaced' ), get_bloginfo( 'name' ) );
+        if ( array_key_exists( 'nimble_subject' , $form_composition ) ) {
+            $subject = $this->form->get_field('nimble_subject')->get_input()->get_value();
+        } else {
+            $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_domain_to_be_replaced' ), get_bloginfo( 'name' ) );
+        }
+
+
 
         // $sender_website = sprintf( __( 'Website: %1$s %2$s', 'text_domain_to_be_replaced' ),
         //     $this->form->get_field('website')->get_input()->get_value(),
@@ -715,18 +805,24 @@ class Sek_Mailer {
         $before_message = '';//$sender_website;
         $after_message  = '';
 
+        if ( array_key_exists( 'email_footer', $submission_options ) ) {
+            $email_footer = $submission_options['email_footer'];
+        } else {
+            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_domain_to_be_replaced' ),
+                get_bloginfo( 'name' ),
+                get_site_url( 'url' )
+            );
+        }
+
         $body           = sprintf( '%1$s%2$s%3$s%4$s%5$s',
                             $before_message,
-                            sprintf( __( 'Message:%1$s%2$s', 'text_domain_to_be_replaced' ),
-                                 $allow_html ? '<br><br>': "\r\n\r\n",
+                            sprintf( '%1$s',
+                                 //$allow_html ? '<br><br>': "\r\n\r\n",
                                  $this->form->get_field('nimble_message')->get_input()->get_value()
                             ),
                             $after_message,
                             $allow_html ? '<br><br>--<br>': "\r\n\r\n--\r\n",
-                            sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_domain_to_be_replaced' ),
-                                get_bloginfo( 'name' ),
-                                get_site_url( 'url' )
-                            )
+                            $email_footer
         );
 
         $headers        = array();
@@ -746,8 +842,33 @@ class Sek_Mailer {
     }
 
 
-    public function get_message( $status ) {
-        return isset( $this->messages[ $status ] ) ? $this->messages[ $status ] : '';
+    public function get_message( $status, $module_model ) {
+        $module_user_values = array_key_exists( 'value', $module_model ) ? $module_model['value'] : array();
+        //sek_error_log( '$module_model', $module_model );
+        $submission_options = empty( $module_user_values['form_submission'] ) ? array() : $module_user_values['form_submission'];
+
+        $submission_message = isset( $this->messages[ $status ] ) ? $this->messages[ $status ] : '';
+        switch( $status ) {
+            case 'not_sent' :
+                if ( array_key_exists( 'failure_message', $submission_options ) && !empty( $submission_options['failure_message'] ) ) {
+                    $submission_message = $submission_options['failure_message'];
+                }
+            break;
+            case 'sent' :
+                if ( array_key_exists( 'success_message', $submission_options ) && !empty( $submission_options['success_message'] ) ) {
+                    $submission_message = $submission_options['success_message'];
+                }
+            break;
+            case 'aborted' :
+                if ( array_key_exists( 'error_message', $submission_options ) && !empty( $submission_options['error_message'] ) ) {
+                    $submission_message = $submission_options['error_message'];
+                }
+                if ( false !== $this->invalid_field ) {
+                    $submission_message = sprintf( __( '%1$s The following field is not well formed : <strong>%2$s</strong>.', 'text-domain' ), $submission_message, $this->invalid_field );
+                }
+            break;
+        }
+        return $submission_message;
     }
 
 
