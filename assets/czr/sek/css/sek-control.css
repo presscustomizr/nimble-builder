@@ -577,14 +577,35 @@ div[data-sek-align].selected {
 
 
 /* RANGE WITH UNIT PICKER */
-.sek-range-with-unit-picker-wrapper {
+.sek-range-with-unit-picker-wrapper{
   width: 100%;
   float: left;
   margin-bottom: 8px;
 }
-.sek-range-with-unit-picker-wrapper > div {
+.sek-range-with-unit-picker-wrapper .sek-unit-wrapper{ float: right; }
+.sek-range-with-unit-picker-wrapper > div { float: left; }
+
+
+/* BORDERS */
+.sek-borders {
+  width: 100%;
   float: left;
+  margin-bottom: 8px;
 }
+.sek-borders > div {float: left;width: 100%}
+.sek-borders .sek-range-unit-wrapper > div {float: left;}
+.sek-borders .sek-border-type-wrapper {margin-bottom: 5px;}
+.sek-borders .sek-range-unit-wrapper {margin-bottom: 5px;}
+.sek-borders .sek-range-unit-wrapper .sek-unit-wrapper { float: right;}
+.sek-borders .sek-color-wrapper { width:100%;}
+.sek-borders .sek-color-wrapper .sek-color-picker{ width: 50%;float: left;}
+.sek-borders .sek-color-wrapper .sek-reset-button { width: 50%;float: right;}
+
+
+
+/* RANGE INPUT */
+/* This range slider is inspired from the one used in the Gutenberg plugin ( https://github.com/WordPress/gutenberg ), released under GNU General Public License
+credits : Gutenberg team @wordpress */
 .sek-range-wrapper {
   width: 44%;
   margin-right: 4px;
@@ -596,10 +617,8 @@ div[data-sek-align].selected {
   width: 50px;
   margin-right: 5px;
 }
-.sek-range-with-unit-picker-wrapper .sek-unit-wrapper { float: right; }
 
-/* This range slider is inspired from the one used in the Gutenberg plugin ( https://github.com/WordPress/gutenberg ), released under GNU General Public License
-credits : Gutenberg team @wordpress */
+
 .sek-range-input{
     flex:1;
     width:100%;

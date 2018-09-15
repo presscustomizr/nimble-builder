@@ -52,6 +52,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'range_simple' :
             sek_set_input_tmpl___range_simple( $input_id, $input_data );
         break;
+        case 'borders' :
+            sek_set_input_tmpl___borders( $input_id, $input_data );
+        break;
     }
 }
 ?>
