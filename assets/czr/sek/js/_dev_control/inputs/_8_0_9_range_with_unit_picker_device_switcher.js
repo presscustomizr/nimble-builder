@@ -13,7 +13,6 @@
                       $wrapper = $('.sek-range-with-unit-picker-wrapper', input.container ),
                       $numberInput = $wrapper.find( 'input[type="number"]'),
                       $rangeInput = $wrapper.find( 'input[type="range"]'),
-                      initial_unit = $wrapper.find('input[data-czrtype]').data('sek-unit'),
                       validateUnit = function( unit ) {
                             if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
                                   api.errare( 'range_with_unit_picker_device_switcher => error : invalid unit for input ' + input.id, unit );
@@ -30,6 +29,10 @@
                       },
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                       defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {};
+
+                  var getInitialUnit = function() {
+                        return $wrapper.find('input[data-czrtype]').data('sek-unit') || 'px';
+                  };
 
                   // Recursive helper
                   // return the value set for the currently previewed device if exists
@@ -85,7 +88,7 @@
                   api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
 
                   // initialize the unit with the value provided in the dom
-                  input.css_unit = new api.Value( _.isEmpty( initial_unit ) ? 'px' : validateUnit( initial_unit ) );
+                  input.css_unit = new api.Value( _.isEmpty( getInitialUnit() ) ? 'px' : validateUnit( getInitialUnit() ) );
 
                   // Append a reset button
                   var resetButton = '<button type="button" class="button sek-reset-button sek-float-right">@missi18n Reset</button>';
@@ -103,7 +106,6 @@
                   input.css_unit.bind( function( to, from, params ) {
                         if ( _.isObject( params ) && true === params.previewed_device_switched )
                           return;
-                        to = _.isEmpty( to ) ? 'px' : to;
                         $numberInput.trigger('input');
                   });
 
