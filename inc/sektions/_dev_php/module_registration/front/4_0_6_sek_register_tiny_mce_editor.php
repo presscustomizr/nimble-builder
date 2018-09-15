@@ -45,7 +45,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                             'font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
-                                'default'     => array( 'desktop' => array() ),
+                                'default'     => array( 'desktop' => '16px' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'title_width' => 'width-100',
