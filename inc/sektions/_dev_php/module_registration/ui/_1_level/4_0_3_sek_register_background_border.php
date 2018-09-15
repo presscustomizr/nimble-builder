@@ -7,7 +7,10 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
         'name' => __('Background and borders', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'bg-color-overlay'  => '#000000',
-            'bg-opacity-overlay' => '40'
+            'bg-opacity-overlay' => '40',
+            'borders' => array(
+                  '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+              )
         ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -92,19 +95,30 @@ function sek_get_module_params_for_sek_level_bg_border_module() {
                                 'default' => 'none',
                                 'choices'     => sek_get_select_options_for_input_id( 'border-type' )
                             ),
-                            'border-width' => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __('Border width', 'text_domain_to_be_replaced'),
+                            // 'border-width' => array(
+                            //     'input_type'  => 'range_with_unit_picker',
+                            //     'title'       => __('Border width', 'text_domain_to_be_replaced'),
+                            //     'min' => 0,
+                            //     'max' => 100,
+                            //     'default' => '1px',
+                            //     'width-100'   => true,
+                            // ),
+                            // 'border-color' => array(
+                            //     'input_type'  => 'wp_color_alpha',
+                            //     'title'       => __('Border color', 'text_domain_to_be_replaced'),
+                            //     'width-100'   => true,
+                            //     'default' => ''
+                            // ),
+                            'borders' => array(
+                                'input_type'  => 'borders',
+                                'title'       => __('Borders', 'text_domain_to_be_replaced'),
                                 'min' => 0,
                                 'max' => 100,
-                                'default' => '1px',
+                                'default' => array(
+                                    '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+                                ),
                                 'width-100'   => true,
-                            ),
-                            'border-color' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Border color', 'text_domain_to_be_replaced'),
-                                'width-100'   => true,
-                                'default' => ''
+                                'title_width' => 'width-100'
                             ),
                             'border-radius'       => array(
                                 'input_type'  => 'range_with_unit_picker',
@@ -313,49 +327,86 @@ function sek_add_css_rules_for_bg_border_border( $rules, $level ) {
     //     [bg-apply-overlay] => 0
     //     [bg-color-overlay] =>
     //     [bg-opacity-overlay] => 50
-    //     [border-width] => 1
-    //     [border-type] => none
-    //     [border-color] =>
+    //     [border-type] => 'solid'
+    //     [borders] => Array
+    //         (
+    //             [_all_] => Array
+    //                 (
+    //                     [wght] => 55px
+    //                     [col] => #359615
+    //                 )
+
+    //             [top] => Array
+    //                 (
+    //                     [wght] => 6em
+    //                     [col] => #dd3333
+    //                 )
+
+    //             [bottom] => Array
+    //                 (
+    //                     [wght] => 76%
+    //                     [col] => #eeee22
+    //                 )
     //     [shadow] => 0
     // )
     $default_value_model  = sek_get_default_module_model( 'sek_level_bg_border_module' );
     $bg_border_options = ( ! empty( $options[ 'bg_border' ] ) && is_array( $options[ 'bg_border' ] ) ) ? $options[ 'bg_border' ] : array();
     $bg_border_options = wp_parse_args( $bg_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
-    //TODO: we actually should allow multidimensional border widths plus different units
     if ( empty( $bg_border_options ) )
       return $rules;
 
-    $border_width = ! empty( $bg_border_options[ 'border-width' ] ) ? $bg_border_options[ 'border-width' ] : FALSE;
-    $border_type  = FALSE !== $border_width && ! empty( $bg_border_options[ 'border-type' ] ) && 'none' != $bg_border_options[ 'border-type' ] ? $bg_border_options[ 'border-type' ] : FALSE;
+    $border_settings = ! empty( $bg_border_options[ 'borders' ] ) ? $bg_border_options[ 'borders' ] : FALSE;
+    $border_type = $bg_border_options[ 'border-type' ];
+    $has_border_settings  = FALSE !== $border_settings && is_array( $border_settings ) && ! empty( $border_type ) && 'none' != $border_type;
 
-    //border width
-    if ( $border_type ) {
-        $border_properties = array();
-        // border width
-        $numeric = sek_extract_numeric_value( $border_width );
-        if ( !empty( $numeric ) ) {
-            $unit = sek_extract_unit( $border_width );
-            // $unit = '%' === $unit ? 'vw' : $unit;
-            $border_properties[] = $numeric . $unit;
+    //border width + type + color
+    if ( $has_border_settings ) {
+        $default_data = array( 'wght' => '1px', 'col' => '#000000' );
+        if ( array_key_exists('_all_', $border_settings) ) {
+            $default_data = wp_parse_args( $border_settings['_all_'] , $default_data );
         }
 
-        //border type
-        $border_properties[] = $border_type;
+        $css_rules = array();
+        foreach ( $border_settings as $border_dimension => $data ) {
+            if ( ! is_array( $data ) ) {
+                sek_error_log( __FUNCTION__ . " => ERROR, the border setting should be an array formed like : array( 'wght' => '1px', 'col' => '#000000' )");
+            }
+            $data = wp_parse_args( $data, $default_data );
 
-        //border color
-        //(needs validation: we need a sanitize hex or rgba color)
-        if ( ! empty( $bg_border_options[ 'border-color' ] ) ) {
-            $border_properties[] = $bg_border_options[ 'border-color' ];
-        }
+            $border_properties = array();
+            // border width
+            $numeric = sek_extract_numeric_value( $data['wght'] );
+            if ( !empty( $numeric ) ) {
+                $unit = sek_extract_unit( $data['wght'] );
+                // $unit = '%' === $unit ? 'vw' : $unit;
+                $border_properties[] = $numeric . $unit;
+                //border type
+                $border_properties[] = $border_type;
+                //border color
+                //(needs validation: we need a sanitize hex or rgba color)
+                if ( ! empty( $data[ 'col' ] ) ) {
+                    $border_properties[] = $data[ 'col' ];
+                }
+
+                $css_property = 'border';
+                if ( '_all_' !== $border_dimension ) {
+                    $css_property = 'border-' . $border_dimension;
+                }
+
+                $css_rules[] = "{$css_property}:" . implode( ' ', array_filter( $border_properties ) );
+                //sek_error_log('CSS RULES FOR BORDERS', implode( ';', array_filter( $css_rules ) ));
+            }//if ( !empty( $numeric ) )
+        }//foreach
 
         //append border rules
         $rules[]     = array(
                 'selector' => '[data-sek-id="'.$level['id'].'"]',
-                'css_rules' => "border:" . implode( ' ', array_filter( $border_properties ) ),
+                'css_rules' => implode( ';', array_filter( $css_rules ) ),//"border:" . implode( ' ', array_filter( $border_properties ) ),
                 'mq' =>null
         );
     }
+
     if ( ! empty( $bg_border_options['border-radius'] ) ) {
         $numeric = sek_extract_numeric_value( $bg_border_options['border-radius'] );
         if ( !empty( $numeric ) ) {
@@ -412,6 +463,10 @@ function sek_add_css_rules_for_bg_border_boxshadow( $rules, $level ) {
     if ( !empty( $bg_border_options[ 'shadow' ] ) &&  sek_is_checked( $bg_border_options[ 'shadow'] ) ) {
         //$css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
         $css_rules = '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;';
+        // Set to !important when customizing, to override the sek-highlight-active-ui effect
+        if ( skp_is_customizing() ) {
+            $css_rules = '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;';
+        }
         $rules[]     = array(
                 'selector' => '[data-sek-id="'.$level['id'].'"]',
                 'css_rules' => $css_rules,
