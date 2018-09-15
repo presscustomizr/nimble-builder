@@ -576,10 +576,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // Schedule unit changes on button click
-                  $wrapper.on( 'click', '.sek-ui-button', function(evt) {
+                  $wrapper.on( 'click', '[data-sek-unit]', function(evt) {
                         evt.preventDefault();
                         // handle the is-selected css class toggling
-                        $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
+                        $wrapper.find('[data-sek-unit]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
                         // update the initial unit ( not mandatory)
                         $wrapper.find('input[data-czrtype]').data('sek-unit', $(this).data('sek-unit') );
