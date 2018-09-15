@@ -1,69 +1,7 @@
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
-      var Constructor = {
-              initialize: function( id, options ) {
-                      var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                      api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-              },//initialize
-
-              //////////////////////////////////////////////////////////
-              /// ITEM CONSTRUCTOR
-              //////////////////////////////////////////
-              // CZRItemConstructor : {
-              //       //overrides the parent ready
-              //       ready : function() {
-              //             var item = this;
-              //             //wait for the input collection to be populated,
-              //             //and then set the input visibility dependencies
-              //             item.inputCollection.bind( function( col ) {
-              //                   if( _.isEmpty( col ) )
-              //                     return;
-              //                   try { item.setInputVisibilityDeps(); } catch( er ) {
-              //                         api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
-              //                   }
-              //             });//item.inputCollection.bind()
-
-              //             //fire the parent
-              //             api.CZRItem.prototype.ready.call( item );
-              //       },
-
-              //       //Fired when the input collection is populated
-              //       //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
-              //       setInputVisibilityDeps : function() {
-              //             var item = this,
-              //                 module = item.module;
-              //             // input controller instance == this
-              //             var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-              //                   //Fire on init
-              //                   item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-              //                   //React on change
-              //                   this.bind( function( to ) {
-              //                         item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-              //                   });
-              //             };
-              //             //Internal item dependencies
-              //             item.czr_Input.each( function( input ) {
-              //             });
-              //       }
-              // }
-      };
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -75,7 +13,7 @@
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_simple_form_submission_module: {
-                  mthds : Constructor,
+                  // mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_submission_module', 'name' ),
                   has_mod_opt : false,
