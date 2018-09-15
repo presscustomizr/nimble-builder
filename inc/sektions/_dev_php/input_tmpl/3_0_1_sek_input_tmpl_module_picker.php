@@ -94,7 +94,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-type' => 'module',
                   'content-id' => 'czr_simple_form_module',
                   'title' => __( 'Simple Contact Form', 'text_domain_to_be_replaced' ),
-                  //'icon' => 'Nimble__divider_icon.svg'
+                  'icon' => 'Nimble_contact-form_icon.svg'
                 ),
 
                 // array(
