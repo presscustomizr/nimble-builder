@@ -94,13 +94,13 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            czr_simple_form_button_module: {
+            czr_simple_form_button_child: {
                   mthds : Constructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_button_module', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_button_child', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_form_button_module' )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_form_button_child' )
             }
       });
 })( wp.customize , jQuery, _ );

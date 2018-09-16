@@ -34,11 +34,11 @@ function sek_get_module_params_for_czr_simple_form_module() {
         'module_type' => 'czr_simple_form_module',
         'is_father' => true,
         'children' => array(
-            'form_fields'   => 'czr_simple_form_fields_module',
-            'fields_design' => 'czr_simple_form_design_module',
-            'form_button'   => 'czr_simple_form_button_module',
-            'form_fonts'    => 'czr_simple_form_fonts_module',
-            'form_submission'    => 'czr_simple_form_submission_module'
+            'form_fields'   => 'czr_simple_form_fields_child',
+            'fields_design' => 'czr_simple_form_design_child',
+            'form_button'   => 'czr_simple_form_button_child',
+            'form_fonts'    => 'czr_simple_form_fonts_child',
+            'form_submission'    => 'czr_simple_form_submission_child'
         ),
         'name' => __( 'Simple Form', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
@@ -84,12 +84,12 @@ function sek_get_module_params_for_czr_simple_form_module() {
 /* ------------------------------------------------------------------------- *
  *  FIELDS VISIBILITY AND REQUIRED
 /* ------------------------------------------------------------------------- */
-function sek_get_module_params_for_czr_simple_form_fields_module() {
+function sek_get_module_params_for_czr_simple_form_fields_child() {
     $css_selectors = '.sek-btn';
     $css_font_selectors = '.sek-btn';
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'czr_simple_form_fields_module',
+        'module_type' => 'czr_simple_form_fields_child',
         'name' => __( 'Form Fields', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
@@ -190,11 +190,11 @@ function sek_get_module_params_for_czr_simple_form_fields_module() {
 /* ------------------------------------------------------------------------- *
  *  FIELDS DESIGN
 /* ------------------------------------------------------------------------- */
-function sek_get_module_params_for_czr_simple_form_design_module() {
+function sek_get_module_params_for_czr_simple_form_design_child() {
     $css_selectors = array( 'form input[type="text"]', 'input[type="text"]:focus', 'form textarea', 'form textarea:focus' );
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'czr_simple_form_design_module',
+        'module_type' => 'czr_simple_form_design_child',
         'name' => __( 'Form Design', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
@@ -256,11 +256,11 @@ function sek_get_module_params_for_czr_simple_form_design_module() {
 /* ------------------------------------------------------------------------- *
  *  SUBMIT BUTTON DESIGN
 /* ------------------------------------------------------------------------- */
-function sek_get_module_params_for_czr_simple_form_button_module() {
+function sek_get_module_params_for_czr_simple_form_button_child() {
     $css_selectors = 'form input[type="submit"]';
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'czr_simple_form_button_module',
+        'module_type' => 'czr_simple_form_button_child',
         'name' => __( 'Form Button', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
@@ -378,13 +378,13 @@ function sek_get_module_params_for_czr_simple_form_button_module() {
 /* ------------------------------------------------------------------------- *
  *  FONTS
 /* ------------------------------------------------------------------------- */
-function sek_get_module_params_for_czr_simple_form_fonts_module() {
+function sek_get_module_params_for_czr_simple_form_fonts_child() {
     $fl_font_selectors = array( 'form label', '.sek-form-message' ); //<= .sek-form-message is the wrapper of the form status message : Thanks, etc...
     $ft_font_selectors = array( 'form input[type="text"]', 'form input[type="text"]:focus', 'form textarea', 'form textarea:focus' );
     $btn_font_selectors = array( 'form input[type="submit"]' );
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'czr_simple_form_fonts_module',
+        'module_type' => 'czr_simple_form_fonts_child',
         'name' => __( 'Form texts options : fonts, colors, ...', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
@@ -827,11 +827,11 @@ function sek_get_module_params_for_czr_simple_form_fonts_module() {
 /* ------------------------------------------------------------------------- *
  *  FIELDS DESIGN
 /* ------------------------------------------------------------------------- */
-function sek_get_module_params_for_czr_simple_form_submission_module() {
+function sek_get_module_params_for_czr_simple_form_submission_child() {
     $css_selectors = array( 'form input[type="text"]', 'input[type="text"]:focus', 'form textarea', 'form textarea:focus' );
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'czr_simple_form_submission_module',
+        'module_type' => 'czr_simple_form_submission_child',
         'name' => __( 'Form Submission', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
@@ -905,10 +905,10 @@ function sek_get_module_params_for_czr_simple_form_submission_module() {
 /* ------------------------------------------------------------------------- */
 // FORM MODULE CHILDREN
 // 'children' => array(
-//       'form_fields'   => 'czr_simple_form_fields_module',
-//       'fields_design' => 'czr_simple_form_design_module',
-//       'form_button'   => 'czr_simple_form_button_module',
-//       'form_fonts'    => 'czr_simple_form_fonts_module'
+//       'form_fields'   => 'czr_simple_form_fields_child',
+//       'fields_design' => 'czr_simple_form_design_child',
+//       'form_button'   => 'czr_simple_form_button_child',
+//       'form_fonts'    => 'czr_simple_form_fonts_child'
 //   ),
 add_filter( 'sek_add_css_rules_for_module_type___czr_simple_form_module', '\Nimble\sek_add_css_rules_for_czr_simple_form_module', 10, 2 );
 // filter documented in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker
