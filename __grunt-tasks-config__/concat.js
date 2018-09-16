@@ -203,6 +203,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/input_tmpl/3_1_4_sek_input_tmpl_borders.php',
 
       // MODULE REGISTRATION
+      '<%= paths.sektions %>_dev_php/module_registration/10_0_0_sek_module_helpers_for_css_rules_generation.php',
       '<%= paths.sektions %>_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_1_sek_register_module_picker.php',
