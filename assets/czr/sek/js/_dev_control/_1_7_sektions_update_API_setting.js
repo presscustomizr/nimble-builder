@@ -914,7 +914,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // if we did not already rejected the request, let's check if the setting object has actually been modified
                         // at this point it should have been.
                         if ( 'pending' == dfd.state() ) {
-                              //console.log('ALORS ?', currentSetValue, newSetValue );
                               if ( _.isEqual( currentSetValue, newSetValue ) ) {
                                     dfd.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                               } else {
