@@ -33,18 +33,22 @@ function sek_register_modules() {
         'czr_heading_module',
         'czr_spacer_module',
         'czr_divider_module',
+
         'czr_icon_module',
+        'czr_icon_settings_child',
+        'czr_icon_spacing_border_child',
+
         'czr_map_module',
         'czr_quote_module',
         'czr_button_module',
 
         // simple form father + children
         'czr_simple_form_module',
-        'czr_simple_form_fields_module',
-        'czr_simple_form_button_module',
-        'czr_simple_form_design_module',
-        'czr_simple_form_fonts_module',
-        'czr_simple_form_submission_module'
+        'czr_simple_form_fields_child',
+        'czr_simple_form_button_child',
+        'czr_simple_form_design_child',
+        'czr_simple_form_fonts_child',
+        'czr_simple_form_submission_child'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {

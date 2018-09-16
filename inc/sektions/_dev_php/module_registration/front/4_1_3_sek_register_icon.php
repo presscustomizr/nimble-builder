@@ -30,15 +30,59 @@ function sek_get_module_params_for_czr_icon_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_module',
+        'is_father' => true,
+        'children' => array(
+            'icon_settings' => 'czr_icon_settings_child',
+            'spacing_border' => 'czr_icon_spacing_border_child'
+        ),
         'name' => __('Icon', 'text_domain_to_be_replaced'),
         'starting_value' => array(
-            'icon' =>  'far fa-star',
-            'font_size_css' => '40px',
-            'color_css' => '#707070',
-            'color_hover' => '#969696'
+            'icon_settings' => array(
+                'icon' =>  'far fa-star',
+                'font_size_css' => '40px',
+                'color_css' => '#707070',
+                'color_hover' => '#969696'
+            )
         ),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'css_selectors' => array( '.sek-icon i' ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/icon_module_tmpl.php",
+        'front_assets' => array(
+              'czr-font-awesome' => array(
+                  'type' => 'css',
+                  //'handle' => 'czr-font-awesome',
+                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
+                  //'deps' => array()
+              )
+        )
+    );
+}
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  MAIN ICON SETTINGS : ICON, SIZE, COLOR, LINK
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_icon_settings_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_icon_settings_child',
+        'name' => __( 'Icon settings', 'text_domain_to_be_replaced' ),
+        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        // 'starting_value' => array(
+        //     'button_text' => __('Click me','text_domain_to_be_replaced'),
+        //     'color_css'  => '#ffffff',
+        //     'bg_color_css' => '#020202',
+        //     'bg_color_hover' => '#151515', //lighten 15%,
+        //     'use_custom_bg_color_on_hover' => 0,
+        //     'border_radius_css' => '2',
+        //     'h_alignment_css' => 'center',
+        //     'use_box_shadow' => 1,
+        //     'push_effect' => 1
+        // ),
         'css_selectors' => array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
@@ -119,17 +163,115 @@ function sek_get_module_params_for_czr_icon_module() {
                 )
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/icon_module_tmpl.php",
-        'front_assets' => array(
-              'czr-font-awesome' => array(
-                  'type' => 'css',
-                  //'handle' => 'czr-font-awesome',
-                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
-                  //'deps' => array()
-              )
-        )
+        'render_tmpl_path' => '',
     );
 }
+
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  ICON SPACING BORDER SHADOW
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_icon_spacing_border_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_icon_spacing_border_child',
+        'name' => __( 'Icon options for background, spacing, border, shadow', 'text_domain_to_be_replaced' ),
+        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        // 'starting_value' => array(
+        //     'button_text' => __('Click me','text_domain_to_be_replaced'),
+        //     'color_css'  => '#ffffff',
+        //     'bg_color_css' => '#020202',
+        //     'bg_color_hover' => '#151515', //lighten 15%,
+        //     'use_custom_bg_color_on_hover' => 0,
+        //     'border_radius_css' => '2',
+        //     'h_alignment_css' => 'center',
+        //     'use_box_shadow' => 1,
+        //     'push_effect' => 1
+        // ),
+        'css_selectors' => array( '.sek-icon i' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'spacing_css'        => array(
+                    'input_type'         => 'spacing',
+                    'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
+                    'default'            => array(),
+                    'width-100'   => true,
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'padding_margin_spacing',
+                    'css_selectors'=> '.sek-icon i'
+                ),
+                'bg_color_css' => array(
+                    'input_type'  => 'wp_color_alpha',
+                    'title'       => __( 'Background color', 'text_domain_to_be_replaced' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'default'    => '',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'background_color',
+                    'css_selectors'=> '.sek-icon i'
+                ),
+                'border-type' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Border', 'text_domain_to_be_replaced'),
+                    'default' => 'none',
+                    'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
+                    'refresh_stylesheet' => true
+                ),
+                'borders' => array(
+                    'input_type'  => 'borders',
+                    'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                    'min' => 0,
+                    'max' => 100,
+                    'default' => array(
+                        '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+                    ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'css_selectors'=> '.sek-icon i'
+                ),
+                'border_radius_css'       => array(
+                    'input_type'  => 'range_with_unit_picker',
+                    'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
+                    'default'     => '',
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'min'         => 0,
+                    'max'         => 500,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'border_radius',
+                    'css_selectors'=> '.sek-icon i'
+                ),
+                'use_box_shadow' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
+                    'default'     => 0,
+                ),
+            )
+        ),
+        'render_tmpl_path' => '',
+    );
+}
+
+
+
+
+
+
+
+
+
+
 
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
@@ -143,9 +285,13 @@ function sek_add_css_rules_for_icon_front_module( $rules, $complete_modul_model 
       return $rules;
 
     $value = $complete_modul_model['value'];
-    $icon_color = $value['color_css'];
-    if ( sek_booleanize_checkbox_val( $value['use_custom_color_on_hover'] ) ) {
-        $color_hover = $value['color_hover'];
+
+    $icon_settings = $value['icon_settings'];
+
+    // COLOR ON HOVER
+    $icon_color = $icon_settings['color_css'];
+    if ( sek_booleanize_checkbox_val( $icon_settings['use_custom_color_on_hover'] ) ) {
+        $color_hover = $icon_settings['color_hover'];
     } else {
         // Build the lighter rgb from the user picked bg color
         if ( 0 === strpos( $icon_color, 'rgba' ) ) {
@@ -163,6 +309,22 @@ function sek_add_css_rules_for_icon_front_module( $rules, $complete_modul_model 
         'css_rules' => 'color:' . $color_hover . ';',
         'mq' =>null
     );
+
+    // BORDERS
+    $border_settings = $value[ 'spacing_border' ][ 'borders' ];
+    $border_type = $value[ 'spacing_border' ][ 'border-type' ];
+    $has_border_settings  = 'none' != $border_type && !empty( $border_type );
+
+    //border width + type + color
+    if ( $has_border_settings ) {
+        $rules = sek_generate_css_rules_for_multidimensional_border_options(
+            $rules,
+            $border_settings,
+            $border_type,
+            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-icon i'
+        );
+    }
+
     return $rules;
 }
 ?>

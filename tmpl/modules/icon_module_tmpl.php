@@ -31,8 +31,11 @@ Array
 if ( ! function_exists( '\Nimble\sek_get_icon_module_icon_html') ) {
     function sek_get_icon_module_icon_html( $value ) {
         $html = '';
-        if ( ! empty( $value['icon'] ) ) {
-            $html = sprintf( '<i class="%1$s"></i>', $value[ 'icon' ] );
+        $icon_settings = $value['icon_settings'];
+        $spacing_border = $value['spacing_border'];
+
+        if ( ! empty( $icon_settings['icon'] ) ) {
+            $html = sprintf( '<i class="%1$s"></i>', $icon_settings[ 'icon' ] );
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
@@ -45,32 +48,44 @@ if ( ! function_exists( '\Nimble\sek_get_icon_module_icon_html') ) {
 
 
 if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_link' ) ) {
-    function sek_get_icon_module_icon_link( $value ) {
+    function sek_get_icon_module_icon_link( $icon_settings ) {
         $link = 'javascript:void(0);';
         if ( skp_is_customizing() ) {
             return $link;
         }
-        if ( 'url' == $value['link-to'] ) {
-            if ( ! empty( $value['link-pick-url'] ) && ! empty( $value['link-pick-url']['id'] ) ) {
-                if ( '_custom_' == $value['link-pick-url']['id']  && ! empty( $value['link-custom-url'] ) ) {
-                    $link = esc_url( $value['link-custom-url'] );
-                } else if ( ! empty( $value['link-pick-url']['url'] ) ) {
-                    $link = esc_url( $value['link-pick-url']['url'] );
+        if ( 'url' == $icon_settings['link-to'] ) {
+            if ( ! empty( $icon_settings['link-pick-url'] ) && ! empty( $icon_settings['link-pick-url']['id'] ) ) {
+                if ( '_custom_' == $icon_settings['link-pick-url']['id']  && ! empty( $icon_settings['link-custom-url'] ) ) {
+                    $link = esc_url( $icon_settings['link-custom-url'] );
+                } else if ( ! empty( $icon_settings['link-pick-url']['url'] ) ) {
+                    $link = esc_url( $icon_settings['link-pick-url']['url'] );
                 }
             }
         }
         return $link;
     }
 }
+
+$icon_settings = $value['icon_settings'];
+$spacing_border = $value['spacing_border'];
+
+$visual_effect_class = '';
+//visual effect classes
+if ( isset( $spacing_border['use_box_shadow'] ) && true === sek_booleanize_checkbox_val( $spacing_border['use_box_shadow'] ) ) {
+    $visual_effect_class = 'box-shadow';
+}
+
 // Print
-if ( 'no-link' === $value['link-to'] ) :
-    printf('<div class="sek-icon">%1$s</div>',
-        sek_get_icon_module_icon_html( $value )
+if ( 'no-link' === $icon_settings['link-to'] ) :
+    printf('<div class="sek-icon %2$s">%1$s</div>',
+        sek_get_icon_module_icon_html( $value ),
+        $visual_effect_class
     );
 else :
-    printf('<a class="sek-icon" href="%1$s" %2$s>%3$s</a>',
-        sek_get_icon_module_icon_link( $value ),
-        true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-        sek_get_icon_module_icon_html( $value )
+    printf('<a class="sek-icon %4$s" href="%1$s" %2$s>%3$s</a>',
+        sek_get_icon_module_icon_link( $icon_settings ),
+        true === sek_booleanize_checkbox_val( $icon_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
+        sek_get_icon_module_icon_html( $value ),
+        $visual_effect_class
     );
 endif;
