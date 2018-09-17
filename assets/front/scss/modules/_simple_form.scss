@@ -4,7 +4,7 @@
         width: 100% !important;
         padding: 0.4em 0.5em;
         border-radius: 3px;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+        -webkit-box-sizing: border-box;
         box-sizing: border-box;
         outline: none;
         font-weight: normal;
@@ -31,5 +31,13 @@
         padding: 0 0 3px 0;
         width: auto;
         display: block;
+    }
+    &.use-outset-shadow .sek-form-field input[type="text"], &.use-outset-shadow .sek-form-field  textarea  {
+        -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+    &.use-inset-shadow .sek-form-field input[type="text"], &.use-inset-shadow .sek-form-field  textarea  {
+        -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
     }
 }
