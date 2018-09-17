@@ -36,7 +36,7 @@ function sek_set_input_tmpl___borders( $input_id, $input_data ) {
             </div>
         </div>
         <div class="sek-color-wrapper">
-            <div class="sek-color-picker"><input class="sek-alpha-color-input" type="text" value=""/></div>
+            <div class="sek-color-picker"><input class="sek-alpha-color-input" data-alpha="true" type="text" value=""/></div>
             <div class="sek-reset-button"><button type="button" class="button sek-reset-button sek-float-right"><?php _e( 'Reset', 'text_domain'); ?></button></div>
         </div>
     </div><?php // sek-borders ?>
