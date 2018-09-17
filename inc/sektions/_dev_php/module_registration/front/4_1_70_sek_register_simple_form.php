@@ -222,28 +222,50 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                     'css_identifier' => 'background_color',
                     'css_selectors'=> $css_selectors
                 ),
-                'border_width_css' => array(
+                'border-type' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Fields border shape', 'text_domain_to_be_replaced'),
+                    'default' => 'none',
+                    'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
+                    'refresh_stylesheet' => true
+                ),
+                'borders' => array(
+                    'input_type'  => 'borders',
+                    'title'       => __('Borders options', 'text_domain_to_be_replaced'),
+                    'min' => 0,
+                    'max' => 100,
+                    'default' => array(
+                        '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+                    ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'css_selectors'=> $css_selectors
+                ),
+                'border_radius_css'       => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Fields border weight', 'text_domain_to_be_replaced' ),
-                    'min' => 1,
-                    'max' => 80,
-                    'default' => '1px',
+                    'title'       => __( 'Fields rounded corners', 'text_domain_to_be_replaced' ),
+                    'default'     => '3px',
                     'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'min'         => 0,
+                    'max'         => 500,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'border_width',
-                    'css_selectors' => $css_selectors
+                    'css_identifier' => 'border_radius',
+                    'css_selectors'=> $css_selectors
                 ),
-                'border_color_css' => array(
-                    'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Fields border Color', 'text_domain_to_be_replaced' ),
-                    'width-100'   => true,
-                    'default'     => '#cccccc',
-                    'refresh_markup' => false,
-                    'refresh_stylesheet' => true,
-                    'css_identifier' => 'border_color',
-                    'css_selectors' => $css_selectors
+                'use_inset_shadow' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __( 'Apply an inset shadow', 'text_domain_to_be_replaced' ),
+                    'default'     => 1,
                 ),
+                'use_outset_shadow' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __( 'Apply an outset shadow', 'text_domain_to_be_replaced' ),
+                    'default'     => 0,
+                )
             )
         ),
         'render_tmpl_path' => '',
@@ -943,11 +965,29 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
             'mq' =>null
         );
     }
+
+
+    // BORDERS
+    $border_settings = $value[ 'fields_design' ][ 'borders' ];
+    $border_type = $value[ 'fields_design' ][ 'border-type' ];
+    $has_border_settings  = 'none' != $border_type && !empty( $border_type );
+
+    //border width + type + color
+    if ( $has_border_settings ) {
+        $selector_list = array( 'form input[type="text"]', 'input[type="text"]:focus', 'form textarea', 'form textarea:focus' );
+        $css_selectors = array();
+        foreach( $selector_list as $selector ) {
+            $css_selectors[] = '[data-sek-id="'.$complete_modul_model['id'].'"]' . ' ' . $selector;
+        }
+        $rules = sek_generate_css_rules_for_multidimensional_border_options(
+            $rules,
+            $border_settings,
+            $border_type,
+            implode( ', ', $css_selectors )
+        );
+    }
     return $rules;
 }
-
-
-
 
 
 
