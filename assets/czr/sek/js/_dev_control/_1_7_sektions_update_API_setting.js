@@ -116,7 +116,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                               case 'sek-duplicate-section' :
-                                    //console.log('PARAMS IN sek-duplicate-section', params );
+                                    //api.infoLog('PARAMS IN sek-duplicate-section', params );
                                     // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
@@ -163,7 +163,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // in the case of a nested sektion, we have to remove it from a column
                               // otherwise from the root sektion collection
                               case 'sek-remove-section' :
-                                    //console.log('PARAMS IN sek-remove-sektion', params );
+                                    //api.infoLog('PARAMS IN sek-remove-sektion', params );
                                     if ( true === params.is_nested ) {
                                           columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                           if ( 'no_match' != columnCandidate ) {
@@ -188,7 +188,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
                               case 'sek-move-section' :
-                                    //console.log('PARAMS in sek-move-section', params );
+                                    //api.infoLog('PARAMS in sek-move-section', params );
                                     var toLocationCandidate = self.getLevelModel( params.to_location, newSetValue.collection ),
                                         movedSektionCandidate,
                                         copyOfMovedSektionCandidate;
@@ -346,7 +346,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var resizedColumn = self.getLevelModel( params.resized_column, newSetValue.collection ),
                                         sistercolumn = self.getLevelModel( params.sister_column, newSetValue.collection );
 
-                                    //console.log( 'updateAPISetting => ' + params.action + ' => ', params );
+                                    //api.infoLog( 'updateAPISetting => ' + params.action + ' => ', params );
 
                                     // SET RESIZED COLUMN WIDTH
                                     if ( 'no_match' == resizedColumn ) {
@@ -380,16 +380,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // SET SISTER COLUMN WIDTH
 
                                     // sum up all other column's width, excluding the resized and sister one.
-                                    // console.log( "resizedColumn.width", resizedColumn.width  );
-                                    // console.log( "otherColumns", otherColumns );
+                                    // api.infoLog( "resizedColumn.width", resizedColumn.width  );
+                                    // api.infoLog( "otherColumns", otherColumns );
 
                                     // then calculate the sistercolumn so we are sure that we feel the entire space of the sektion
                                     sistercolumn.width = parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) );
 
-                                    // console.log('otherColumnsWidth', otherColumnsWidth );
-                                    // console.log("sistercolumn.width", sistercolumn.width );
-                                    // console.log( "sistercolumn.width + otherColumnsWidth" , Number( sistercolumn.width ) + Number( otherColumnsWidth ) );
-                                    //console.log('COLLECTION AFTER UPDATE ', parentSektion.collection );
+                                    // api.infoLog('otherColumnsWidth', otherColumnsWidth );
+                                    // api.infoLog("sistercolumn.width", sistercolumn.width );
+                                    // api.infoLog( "sistercolumn.width + otherColumnsWidth" , Number( sistercolumn.width ) + Number( otherColumnsWidth ) );
+                                    //api.infoLog('COLLECTION AFTER UPDATE ', parentSektion.collection );
                               break;
 
 
@@ -728,7 +728,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
                               // }
                               case 'sek-add-content-in-new-sektion' :
-                                    // console.log('update API Setting => sek-add-content-in-new-sektion => PARAMS', params );
+                                    // api.infoLog('update API Setting => sek-add-content-in-new-sektion => PARAMS', params );
                                     // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
@@ -797,11 +797,51 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       dfd.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                                       break;
                                                 }
-                                                locationCandidate.collection.splice( position, 0, {
-                                                      id : params.id,
-                                                      level : 'section',
-                                                      collection : presetColumnCollection.collection
-                                                });
+
+                                                // If the preset_section is inserted in a an empty nested section, add it at the right place in the parent column of the nested section.
+                                                // Otherwise, add the preset section at the right position in the parent location of the section.
+                                                var insertedInANestedSektion = false;
+                                                if ( ! _.isEmpty( params.sektion_to_replace ) ) {
+                                                      var sektionToReplace = self.getLevelModel( params.sektion_to_replace, newSetValue.collection );
+                                                      if ( 'no_match' === sektionToReplace ) {
+                                                            api.errare( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched' );
+                                                            dfd.reject( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched');
+                                                            break;
+                                                      }
+                                                      insertedInANestedSektion = true === sektionToReplace.is_nested;
+                                                }
+
+                                                if ( ! insertedInANestedSektion ) {
+                                                      locationCandidate.collection.splice( position, 0, {
+                                                            id : params.id,
+                                                            level : 'section',
+                                                            collection : presetColumnCollection.collection
+                                                      });
+                                                } else {
+                                                      columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
+                                                      if ( 'no_match' === columnCandidate ) {
+                                                            api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                                            dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                                            break;
+                                                      }
+
+                                                      columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                                                      // get the position of the before or after module
+                                                      _.each( columnCandidate.collection, function( moduleOrSectionModel, index ) {
+                                                            if ( params.before_section === moduleOrSectionModel.id ) {
+                                                                  position = index;
+                                                            }
+                                                            if ( params.after_section === moduleOrSectionModel.id ) {
+                                                                  position = index + 1;
+                                                            }
+                                                      });
+                                                      columnCandidate.collection.splice( position, 0, {
+                                                            id : params.id,
+                                                            is_nested : true,
+                                                            level : 'section',
+                                                            collection : presetColumnCollection.collection
+                                                      });
+                                                }
                                           break;
                                     }//switch( params.content_type)
                               break;
@@ -888,7 +928,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //       font_family : newFontFamily,
                               // }
                               case 'sek-update-fonts' :
-                                    //console.log('PARAMS in sek-add-fonts', params );
+                                    //api.infoLog('PARAMS in sek-add-fonts', params );
                                     // Get the gfonts from the level options and modules values
                                     var currentGfonts = self.sniffGFonts();
                                     if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
@@ -924,7 +964,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           dfd.reject( 'updateAPISetting => the new setting value did not pass the validation checks for action ' + params.action );
                                     }
 
-                                    //console.log('COLLECTION SETTING UPDATED => ', self.sekCollectionSettingId(), api( self.sekCollectionSettingId() )() );
+                                    //api.infoLog('COLLECTION SETTING UPDATED => ', self.sekCollectionSettingId(), api( self.sekCollectionSettingId() )() );
 
                               }
                         }

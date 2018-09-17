@@ -113,13 +113,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         uiParams = {};
                                         switch( params.level ) {
                                               case 'section' :
+                                                  var sektionToRemove = self.getLevelModel( params.id );
+                                                  if ( 'no_match' === sektionToRemove ) {
+                                                        api.errare( 'reactToPreviewMsg => sek-remove-section => no sektionToRemove matched' );
+                                                        break;
+                                                  }
                                                   apiParams = {
                                                         action : 'sek-remove-section',
                                                         id : params.id,
                                                         location : params.location,
                                                         in_sektion : params.in_sektion,
                                                         in_column : params.in_column,
-                                                        is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column )
+                                                        is_nested : sektionToRemove.is_nested
                                                   };
                                               break;
                                               case 'column' :
@@ -378,6 +383,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               api.previewer.trigger( 'sek-remove', {
                                                     id : params.apiParams.sektion_to_replace,
                                                     location : params.apiParams.location,
+                                                    in_column : params.apiParams.in_column,//needed when removing a nested column
                                                     level : 'section'
                                               });
                                         }

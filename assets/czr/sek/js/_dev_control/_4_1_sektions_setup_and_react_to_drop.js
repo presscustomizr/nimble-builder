@@ -89,7 +89,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 'sek-refresh-nimbleDragDropZones' is emitted by the section and the module picker modules with param { type : 'section_picker' || 'module_picker'}
             setupNimbleDragZones : function( $draggableWrapper ) {
                   var self = this;
-                  //console.log('instantiate', type );
+                  //api.infoLog('instantiate', type );
                   // $(this) is the dragged element
                   var _onStart = function( evt ) {
                         evt.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
@@ -172,7 +172,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $zone
                               //.on( 'dragenter dragover', sektionsLocalizedData.dropSelectors,  )
                               .on( 'dragenter dragover', sektionsLocalizedData.dropSelectors, function( evt ) {
-                                    //console.log( self.enterOverTimer, self.dnd_canDrop( $(this) ) );
+                                    //api.infoLog( self.enterOverTimer, self.dnd_canDrop( $(this) ) );
                                     if ( _.isNull( self.enterOverTimer ) ) {
                                           self.enterOverTimer = true;
                                           _.delay(function() {
@@ -354,7 +354,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return boolean
             // Note : the class "sek-content-preset_section-drop-zone" is dynamically generated in preview::schedulePanelMsgReactions() sek-drag-start case
             dnd_canDrop : function( $dropTarget ) {
-                  //console.log("$dropTarget.hasClass('sek-drop-zone') ?", $dropTarget, $dropTarget.hasClass('sek-drop-zone') );
+                  //api.infoLog("$dropTarget.hasClass('sek-drop-zone') ?", $dropTarget, $dropTarget.hasClass('sek-drop-zone') );
                   var isSectionDropZone = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' ),
                       sectionHasNoModule = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' );
                   return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === this.dnd_draggedType && isSectionDropZone ) || ( 'module' === this.dnd_draggedType && ! isSectionDropZone ) || ( 'preset_section' === this.dnd_draggedType && sectionHasNoModule ) );
@@ -468,8 +468,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             dnd_onDrop: function( $dropTarget, evt ) {
                   evt.stopPropagation();
                   var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
-                  // console.log('onDropping params', position, evt );
-                  // console.log('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
+                  // api.infoLog('onDropping params', position, evt );
+                  // api.infoLog('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
                   api.czr_sektions.trigger( 'sek-content-dropped', {
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
@@ -552,6 +552,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else {
                                           params.sektion_to_replace = $parentSektion.data('sek-id');
                                           params.after_section = params.sektion_to_replace;
+                                          // if the sektion to replace is nested, we will append the new sektion to the parent column of the nested section
+                                          params.in_column = $parentSektion.closest('[data-sek-level="column"]').data('sek-id');
                                           dropCase = 'content-in-a-section-to-replace';
                                     }
                               } else {
@@ -625,7 +627,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
                   // });
                   this.bind( 'sek-content-dropped', function( params ) {
-                        //console.log('sek-content-dropped', params );
+                        //api.infoLog('sek-content-dropped', params );
                         try { _do_( params ); } catch( er ) {
                               api.errare( 'error when reactToDrop', er );
                         }
