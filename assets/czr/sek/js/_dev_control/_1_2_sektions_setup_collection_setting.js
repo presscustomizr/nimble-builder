@@ -217,7 +217,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             switch ( level.level ) {
                                   case 'location' :
-                                        //console.log('parentLevel ? ', level, parentLevel);
                                         if ( ! _.isEmpty( parentLevel.level ) ) {
                                               _errorDetected_('validation error => the parent of location ' + level.id +' should have no level set' );
                                               return;
