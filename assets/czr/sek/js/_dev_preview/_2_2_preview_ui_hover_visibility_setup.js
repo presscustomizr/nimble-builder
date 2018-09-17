@@ -69,7 +69,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $levelEl = $(this);
                         if ( $levelEl.children('.sek-dyn-ui-wrapper').length < 1 )
                           return;
-                        //stores ths status of 200 ms fading out. => will let us know if we can print again when moving the mouse fast back and forth between two levels.
+                        //stores the status of 200 ms fading out. => will let us know if we can print again when moving the mouse fast back and forth between two levels.
                         $levelEl.data( 'UIisFadingOut', true );//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
 
                         $levelEl.children('.sek-dyn-ui-wrapper').stop( true, true ).fadeOut( {
@@ -261,16 +261,53 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   };
 
-                  var _sniffLevelsAndPrintUI = function( position ) {
-                        $('body').find('[data-sek-level]').each( function() {
+                  // Print / remove ui according to the mouse position
+                  // The mouse position is provided by self.mouseMovedRecently()
+                  // If the ui is expanded, remove after a delay to let user access all ui buttons, even those outside the $level.
+                  // => the ui can be "outside" ( <=> out vertically and horizontally ) when columns are narrow.
+                  var _sniffLevelsAndPrintUI = function( position, $candidateForRemoval ) {
+                        var $levelsToWalk, sniffCase;
+                        if ( _.isUndefined( $candidateForRemoval ) || $candidateForRemoval.length < 1 ) {
+                              $levelsToWalk = $('body').find('[data-sek-level]');
+                              sniffCase = 'printOrScheduleRemoval';
+                        } else {
+                              $levelsToWalk = $candidateForRemoval;
+                              sniffCase = 'mayBeRemove';
+                        }
+
+                        $levelsToWalk.each( function() {
                               var levelWrapperRect = $(this)[0].getBoundingClientRect(),
                                 isInHorizontally = position.x <= levelWrapperRect.right && levelWrapperRect.left <= position.x,
-                                isInVertically = position.y >= levelWrapperRect.top && levelWrapperRect.bottom >= position.y;
+                                isInVertically = position.y >= levelWrapperRect.top && levelWrapperRect.bottom >= position.y,
+                                $levelEl = $(this);
 
-                              if ( isInHorizontally && isInVertically ) {
-                                    printLevelUI.call( $(this) );
-                              } else {
-                                    removeLevelUI.call( $(this) );
+                              switch( sniffCase ) {
+                                    case 'mayBeRemove' :
+                                          $levelEl.data('sek-ui-removal-scheduled', false );
+                                          if ( ! isInHorizontally || ! isInVertically ) {
+                                                removeLevelUI.call( $levelEl );
+                                          }
+                                    break;
+                                    case 'printOrScheduleRemoval' :
+                                          if ( isInHorizontally && isInVertically ) {
+                                                $levelEl.data('sek-ui-removal-scheduled', false );
+                                                printLevelUI.call( $levelEl );
+                                          } else {
+                                                if ( true !== $levelEl.data('sek-ui-removal-scheduled') ) {
+                                                      $levelEl.data('sek-ui-removal-scheduled', true );
+                                                      if ( $levelEl.children('.sek-dyn-ui-wrapper').find('.sek-is-expanded').length < 1 ) {
+                                                            _sniffLevelsAndPrintUI( position, $levelEl );
+                                                      } else {
+                                                            _.delay( function() {
+                                                                  if ( true === $levelEl.data('sek-ui-removal-scheduled') ) {
+                                                                        // using the latest self.mouseMovedRecently(), instead of the initial "position" param, makes sure we don't miss the latest mouse movements
+                                                                        _sniffLevelsAndPrintUI( self.mouseMovedRecently(), $levelEl );
+                                                                  }
+                                                            }, 3500 );
+                                                      }
+                                                }
+                                          }
+                                    break;
                               }
                         });
                   };
