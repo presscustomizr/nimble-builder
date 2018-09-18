@@ -374,9 +374,10 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             // Generated UI
             'Content Picker' => __('Content Picker', 'text_domain_to_be_replaced'),
-            'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
-
+            'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
             'Section Picker' => __('Section Picker', 'text_domain_to_be_replaced'),
+
+            'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
 
             'Module' => __('Module', 'text_domain_to_be_replaced'),
             'Content for' => __('Content for', 'text_domain_to_be_replaced'),

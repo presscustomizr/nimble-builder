@@ -206,8 +206,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/10_0_0_sek_module_helpers_for_css_rules_generation.php',
       '<%= paths.sektions %>_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php',
 
-      '<%= paths.sektions %>_dev_php/module_registration/ui/4_0_1_sek_register_module_picker.php',
-      //'<%= paths.sektions %>_dev_php/module_registration/ui/4_0_2_sek_register_section_picker.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_background_border.php',
       //'<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_section_layout.php',
@@ -295,9 +294,8 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_0_9_range_with_unit_picker_device_switcher.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_0_borders.js',
 
-      // Modules
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_2_UI_module_picker.js',
-      //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_9_0_3_UI_section_picker.js',
+      // Content pickers
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_anchor_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_bg_border_module.js',

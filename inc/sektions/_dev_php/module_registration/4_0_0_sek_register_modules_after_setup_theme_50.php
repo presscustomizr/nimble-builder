@@ -3,9 +3,11 @@
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     foreach( [
-        // UI MODULES
+        // UI CONTENT PICKER
         'sek_module_picker_module',
-        //'sek_section_picker_module',
+        'sek_section_picker_module',
+
+        // UI LEVEL MODULES
         'sek_level_bg_border_module',
         //'sek_level_section_layout_module',<// deactivated for now. Replaced by sek_level_width_section
         'sek_level_height_module',
