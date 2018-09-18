@@ -640,7 +640,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // GENERIC WAY TO SETUP ACCORDION BEHAVIOUR OF MODULES IN SECTIONS
             //-------------------------------------------------------------------------------------------------
             // "this" is the section
-            scheduleModuleAccordion : function() {
+            scheduleModuleAccordion : function( params ) {
+                  params = params || { expand_first_module : true };
                   var _section_ = this;
                   // Attach event on click
                   $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
@@ -660,7 +661,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   // Always expand the first module
-                  _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
+                  if ( params.expand_first_module ) {
+                        _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
+                  }
             }
       });//$.extend()
 })( wp.customize, jQuery );
