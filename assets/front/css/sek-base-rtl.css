@@ -14,7 +14,7 @@
   overflow: hidden;
 }
 
-.sek-service-font, .sek-btn {
+.sek-service-font, .sek-module-inner .sek-btn {
   font-family: sans-serif;
   letter-spacing: 1px;
 }
@@ -358,7 +358,7 @@
   margin-bottom: 0;
 }
 
-.sek-btn {
+.sek-module-inner .sek-btn {
   display: inline-block;
   font-weight: normal;
   line-height: 1.25em;
@@ -383,27 +383,27 @@
   transition: all 0.2s ease-in-out;
 }
 
-.sek-btn:focus, .sek-btn:hover {
+.sek-module-inner .sek-btn:focus, .sek-module-inner .sek-btn:hover {
   text-decoration: none;
 }
 
-.sek-btn:focus, .focus.sek-btn {
+.sek-module-inner .sek-btn:focus, .sek-module-inner .focus.sek-btn {
   outline: 0;
   box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.25);
 }
 
-.disabled.sek-btn, .sek-btn:disabled {
+.sek-module-inner .disabled.sek-btn, .sek-module-inner .sek-btn:disabled {
   cursor: not-allowed;
   opacity: .65;
   box-shadow: none;
 }
 
-.sek-btn:active, .active.sek-btn {
+.sek-module-inner .sek-btn:active, .sek-module-inner .active.sek-btn {
   background-image: none;
   box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.25);
 }
 
-.sek-btn i {
+.sek-module-inner .sek-btn i {
   margin-left: 10px;
 }
 
@@ -742,6 +742,10 @@ button.sek-btn,
   color: inherit;
 }
 
+[data-sek-module-type="czr_icon_module"] .box-shadow i {
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0;
+}
+
 [data-sek-module-type="czr_icon_module"] .sek-icon i {
   transition: all 0.15s ease-in-out;
 }
@@ -867,6 +871,50 @@ button.sek-btn,
 .sek-btn.box-shadow.push-effect:active {
   -webkit-transform: translateY(2px);
   transform: translateY(2px);
+}
+
+.sek-simple-form-wrapper input[type=text], .sek-simple-form-wrapper textarea {
+  font-size: 16px;
+  width: 100% !important;
+  padding: 0.4em 0.5em;
+  border-radius: 3px;
+  box-sizing: border-box;
+  outline: none;
+  font-weight: normal;
+  max-width: 100%;
+  border-color: #cccccc;
+  border-width: 1px;
+  border-style: solid;
+  color: #555555;
+  background-color: #ffffff;
+}
+
+.sek-simple-form-wrapper textarea {
+  height: auto;
+}
+
+.sek-simple-form-wrapper .sek-form-field {
+  margin-bottom: 15px;
+  clear: both;
+}
+
+.sek-simple-form-wrapper label {
+  font-family: "Lucida Grande","Lucida Sans Unicode",Tahoma,sans-serif;
+  color: #444444;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+  padding: 0 0 3px 0;
+  width: auto;
+  display: block;
+}
+
+.sek-simple-form-wrapper.use-outset-shadow .sek-form-field input[type="text"], .sek-simple-form-wrapper.use-outset-shadow .sek-form-field textarea {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.sek-simple-form-wrapper.use-inset-shadow .sek-form-field input[type="text"], .sek-simple-form-wrapper.use-inset-shadow .sek-form-field textarea {
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
 }
 
 /* make sure that the location level occupies 100% of the width */
