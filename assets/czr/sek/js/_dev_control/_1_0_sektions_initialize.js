@@ -152,15 +152,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
 
-                        // TEST
-                        // @see php wp_ajax_sek_import_attachment
-                        // wp.ajax.post( 'sek_import_attachment', {
-                        //       rel_path : '/assets/img/41883.jpg'
-                        // }).done( function( data) {
-                        //       console.log('DATA', data );
-                        // }).fail( function( _er_ ) {
-                        //       api.errare( 'sek_import_attachment ajax action failed', _er_ );
-                        // });
 
                         // POPULATE THE REGISTERED COLLECTION
                         // 'czr-new-registered' is fired in api.CZR_Helpers.register()
