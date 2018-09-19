@@ -41,13 +41,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }]);
                                     // Schedule reactions to a collection change
                                     sektionSetInstance.bind( _.debounce( function( newSektionSettingValue, previousValue, params ) {
-                                          api.infoLog( 'sektionSettingValue is updated',
-                                                {
-                                                      newValue : newSektionSettingValue,
-                                                      previousValue : previousValue,
-                                                      params : params
-                                                }
-                                          );
+                                          // api.infoLog( 'sektionSettingValue is updated',
+                                          //       {
+                                          //             newValue : newSektionSettingValue,
+                                          //             previousValue : previousValue,
+                                          //             params : params
+                                          //       }
+                                          // );
 
                                           // Track changes, if not currently navigating the logs
                                           // Always clean future values if the logs have been previously navigated back
