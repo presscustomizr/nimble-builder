@@ -664,6 +664,89 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( params.expand_first_module ) {
                         _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
                   }
+            },
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            // HELPERS USED WHEN UPLOADING IMAGES FROM PRESET SECTIONS
+            //-------------------------------------------------------------------------------------------------
+            isPromise : function (fn) {
+                  return fn && typeof fn.then === 'function' && String( $.Deferred().then ) === String( fn.then );
+            },
+
+            // @param deferreds = { '::img-path::/assets/img/tests/1.jpg' : 'dfd1', '::img-path::/assets/img/tests/2.jpg' : dfd2, ..., '::img-path::/assets/img/tests/n.jpg' : dfdn }
+            whenAllPromisesInParallel : function ( deferreds ) {
+                var self = this,
+                    mainDfd = $.Deferred(),
+                    args = [],
+                    _keys_ = _.keys( deferreds );
+
+                _.each( deferreds, function( mayBeDfd, _k_ ) {
+                      args.push( $.Deferred( function( _dfd_ ) {
+                            var dfdCandidate = self.isPromise( mayBeDfd ) ? mayBeDfd : $.Deferred();
+                            dfdCandidate
+                                  .done( _dfd_.resolve )
+                                  .fail( function (err) { _dfd_.reject( err ); } );
+                      }) );
+                });
+                $.when.apply( this, args )
+                      .done( function () {
+                          var resObj = {},
+                              resArgs = Array.prototype.slice.call( arguments );
+
+                          _.each( resArgs, function( v, i ) {
+                                resObj[ _keys_[i] ] = v;
+                          });
+                          mainDfd.resolve( resObj );
+                      })
+                      .fail( mainDfd.reject );
+
+                return mainDfd;
+            },
+
+            // Run the deferred in sequence, only one asynchronous method at a time
+            // Was an experiment when implementing the img assets upload for preset sections
+            // Abandonned for whenAllPromisesInParallel
+            whenAllPromisesInSerie : function ( deferreds, ind, promiseMessages, mainDfd ) {
+                ind = ind || 0;
+                promiseMessages = promiseMessages || {};
+                mainDfd = mainDfd || $.Deferred();
+                var self = this;
+                if ( _.isArray( deferreds ) ) {
+                      var mayBeDfd = deferreds[ind],
+                          dfdCandidate = self.isPromise( mayBeDfd ) ? mayBeDfd : $.Deferred( function( _d_ ) { _d_.resolve(); } );
+
+                      dfdCandidate.always( function( msg ) {
+                            promiseMessages[ ind ] = msg;
+                            if ( ( ind + 1 ) == deferreds.length ) {
+                                  mainDfd.resolve( promiseMessages );
+                            } else {
+                                  if ( ind + 1 < deferreds.length ) {
+                                      self.whenAllPromisesInSerie( deferreds, ind + 1, promiseMessages, mainDfd );
+                                  }
+                            }
+                      });
+                }//if
+                return mainDfd;
+            },
+
+
+            // @param relpath = string : '/assets/img/41883.jpg'
+            // @return a promise
+            importAttachment : function( relpath ) {
+                  // @see php wp_ajax_sek_import_attachment
+                  return wp.ajax.post( 'sek_import_attachment', {
+                        rel_path : relpath,
+                        nonce: api.settings.nonce.save//<= do we need to set a specific nonce to fetch the attachment
+                  })
+                  .fail( function( _er_ ) {
+                        api.errare( 'sek_import_attachment ajax action failed for image ' +  relpath, _er_ );
+                  });
+                  // .done( function( data) {
+                  //       api.infoLog('relpath and DATA ' + relpath , data );
+                  // });
             }
+
       });//$.extend()
 })( wp.customize, jQuery );

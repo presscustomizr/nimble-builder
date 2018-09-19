@@ -10,7 +10,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // }
             updateAPISetting : function( params ) {
                   var self = this,
-                      dfd = $.Deferred();
+                      __updateAPISettingDeferred__ = $.Deferred();
 
                   // Update the sektion collection
                   api( self.sekCollectionSettingId(), function( sektionSetInstance ) {
@@ -34,7 +34,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             reorderedCollection,
                             //duplication variable
                             cloneId, //will be passed in resolve()
-                            startingModuleValue;// will be populated by the optional starting value specificied on module registration
+                            startingModuleValue,// will be populated by the optional starting value specificied on module registration
+                            __presetSectionInjected__ = false;
 
                         // make sure we have a collection array to populate
                         newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.defaultSektionSettingValue.collection;
@@ -59,16 +60,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // if the parent sektion of the column has is_nested = true, then we can't
                                           var parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                           if ( 'no_match' == parentSektionCandidate ) {
-                                                dfd.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
                                                 break;
                                           }
                                           if ( true === parentSektionCandidate.is_nested ) {
-                                                dfd.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
+                                                __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
                                                 break;
                                           }
                                           if ( 'no_match' == columnCandidate ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                                dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
                                                 break;
                                           }
                                           columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
@@ -86,7 +87,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                           if ( 'no_match' == locationCandidate ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
-                                                dfd.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
                                                 break;
                                           }
                                           locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
@@ -137,7 +138,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                           if ( 'no_match' == columnCandidate ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                                dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
                                                 break;
                                           }
 
@@ -149,7 +150,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                           if ( 'no_match' == locationCandidate ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
-                                                dfd.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
                                                 break;
                                           }
                                           locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
@@ -178,7 +179,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                           if ( 'no_match' == locationCandidate ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
-                                                dfd.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
                                                 break;
                                           }
                                           locationCandidate.collection = _.filter( locationCandidate.collection, function( sek ) {
@@ -258,14 +259,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     sektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' == sektionCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
 
                                     sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
                                     // can we add another column ?
                                     if ( ( self.MAX_NUMBER_OF_COLUMNS - 1 ) < _.size( sektionCandidate.collection ) ) {
-                                          dfd.reject( sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]);
+                                          __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]);
                                           break;
                                     }
 
@@ -286,7 +287,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( 'no_match' != sektionCandidate ) {
                                           // can we remove the column ?
                                           if ( 1 === _.size( sektionCandidate.collection ) ) {
-                                                dfd.reject( sektionsLocalizedData.i18n["A section must have at least one column."]);
+                                                __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n["A section must have at least one column."]);
                                                 break;
                                           }
                                           sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
@@ -312,14 +313,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     sektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' == sektionCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
 
                                     sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
                                     // can we add another column ?
                                     if ( ( self.MAX_NUMBER_OF_COLUMNS - 1 ) < _.size( sektionCandidate.collection ) ) {
-                                          dfd.reject( sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]);
+                                          __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]);
                                           break;
                                     }
 
@@ -351,7 +352,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // SET RESIZED COLUMN WIDTH
                                     if ( 'no_match' == resizedColumn ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no resized column matched' );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no resized column matched');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no resized column matched');
                                           break;
                                     }
 
@@ -476,7 +477,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                     if ( 'no_match' === columnCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
                                           break;
                                     }
 
@@ -514,7 +515,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                     if ( 'no_match' == columnCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
                                           break;
                                     }
 
@@ -523,7 +524,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var deepClonedModule;
                                     try { deepClonedModule = self.cloneLevel( params.id ); } catch( er ) {
                                           api.errare( 'updateAPISetting => ' + params.action, er );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => error when cloning the level');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => error when cloning the level');
                                           break;
                                     }
                                     var insertInposition = self.getLevelPositionInCollection( params.id, newSetValue.collection );
@@ -626,12 +627,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                                     if ( 'no_match' == moduleCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no module matched', params );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => error no module matched');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => error no module matched');
                                           break;
                                     }
                                     if ( _.isEmpty( params.options_type ) ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => missing options_type');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => missing options_type');
                                           break;
                                     }
 
@@ -659,7 +660,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _valueCandidate = {};
                                     if ( 'no_match'=== _candidate_ ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
                                     _candidate_.options = _candidate_.options || {};
@@ -738,7 +739,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                     if ( 'no_match' == locationCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
                                           break;
                                     }
                                     locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
@@ -782,6 +783,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // When a preset section is dropped
                                           case 'preset_section' :
                                                 // insert the section in the collection at the right place
+                                                __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
                                                 var presetColumnCollection;
                                                 try { presetColumnCollection = self.getPresetSectionCollection({
                                                             presetSectionType : params.content_id,
@@ -789,59 +791,75 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       });
                                                 } catch( _er_ ) {
                                                       api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
-                                                      dfd.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                                                      __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
                                                       break;
                                                 }
                                                 if ( ! _.isObject( presetColumnCollection ) || _.isEmpty( presetColumnCollection ) ) {
                                                       api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnCollection );
-                                                      dfd.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
+                                                      __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                                       break;
                                                 }
 
-                                                // If the preset_section is inserted in a an empty nested section, add it at the right place in the parent column of the nested section.
-                                                // Otherwise, add the preset section at the right position in the parent location of the section.
-                                                var insertedInANestedSektion = false;
-                                                if ( ! _.isEmpty( params.sektion_to_replace ) ) {
-                                                      var sektionToReplace = self.getLevelModel( params.sektion_to_replace, newSetValue.collection );
-                                                      if ( 'no_match' === sektionToReplace ) {
-                                                            api.errare( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched' );
-                                                            dfd.reject( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched');
-                                                            break;
-                                                      }
-                                                      insertedInANestedSektion = true === sektionToReplace.is_nested;
-                                                }
+                                                self.preparePresetSectionForInjection( presetColumnCollection )
+                                                      .fail( function( _er_ ){
+                                                            __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
+                                                            // Used when updating the setting
+                                                            // @see end of this method
+                                                            __presetSectionInjected__.reject( _er_ );
+                                                      })
+                                                      .done( function( sectionReadyToInject ) {
+                                                            api.infoLog( 'sectionReadyToInject', sectionReadyToInject );
 
-                                                if ( ! insertedInANestedSektion ) {
-                                                      locationCandidate.collection.splice( position, 0, {
-                                                            id : params.id,
-                                                            level : 'section',
-                                                            collection : presetColumnCollection.collection
-                                                      });
-                                                } else {
-                                                      columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                                      if ( 'no_match' === columnCandidate ) {
-                                                            api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                                            dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
-                                                            break;
-                                                      }
+                                                            // If the preset_section is inserted in a an empty nested section, add it at the right place in the parent column of the nested section.
+                                                            // Otherwise, add the preset section at the right position in the parent location of the section.
+                                                            var insertedInANestedSektion = false;
+                                                            if ( ! _.isEmpty( params.sektion_to_replace ) ) {
+                                                                  var sektionToReplace = self.getLevelModel( params.sektion_to_replace, newSetValue.collection );
+                                                                  if ( 'no_match' === sektionToReplace ) {
+                                                                        api.errare( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched' );
+                                                                        __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched');
+                                                                  }
+                                                                  insertedInANestedSektion = true === sektionToReplace.is_nested;
+                                                            }
 
-                                                      columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                                      // get the position of the before or after module
-                                                      _.each( columnCandidate.collection, function( moduleOrSectionModel, index ) {
-                                                            if ( params.before_section === moduleOrSectionModel.id ) {
-                                                                  position = index;
+                                                            if ( ! insertedInANestedSektion ) {
+                                                                  locationCandidate.collection.splice( position, 0, {
+                                                                        id : params.id,
+                                                                        level : 'section',
+                                                                        collection : sectionReadyToInject.collection
+                                                                  });
+                                                            } else {
+                                                                  columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
+                                                                  if ( 'no_match' === columnCandidate ) {
+                                                                        api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                                                        __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                                                  }
+
+                                                                  columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                                                                  // get the position of the before or after module
+                                                                  _.each( columnCandidate.collection, function( moduleOrSectionModel, index ) {
+                                                                        if ( params.before_section === moduleOrSectionModel.id ) {
+                                                                              position = index;
+                                                                        }
+                                                                        if ( params.after_section === moduleOrSectionModel.id ) {
+                                                                              position = index + 1;
+                                                                        }
+                                                                  });
+                                                                  columnCandidate.collection.splice( position, 0, {
+                                                                        id : params.id,
+                                                                        is_nested : true,
+                                                                        level : 'section',
+                                                                        collection : sectionReadyToInject.collection
+                                                                  });
                                                             }
-                                                            if ( params.after_section === moduleOrSectionModel.id ) {
-                                                                  position = index + 1;
-                                                            }
-                                                      });
-                                                      columnCandidate.collection.splice( position, 0, {
-                                                            id : params.id,
-                                                            is_nested : true,
-                                                            level : 'section',
-                                                            collection : presetColumnCollection.collection
-                                                      });
-                                                }
+
+                                                            // Used when updating the setting
+                                                            // @see end of this method
+                                                            __presetSectionInjected__.resolve();
+                                                      });// self.preparePresetSectionForInjection.done()
+
+
+
                                           break;
                                     }//switch( params.content_type)
                               break;
@@ -871,16 +889,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // if the parent sektion of the column has is_nested = true, then we can't
                                     var parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' == parentSektionCandidate ) {
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
                                           break;
                                     }
                                     if ( true === parentSektionCandidate.is_nested ) {
-                                          dfd.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
+                                          __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
                                           break;
                                     }
                                     if ( 'no_match' == columnCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
                                           break;
                                     }
                                     columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
@@ -893,12 +911,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     } catch( _er_ ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
                                           break;
                                     }
                                     if ( ! _.isObject( presetColumnCollection ) || _.isEmpty( presetColumnCollection ) ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnCollection );
-                                          dfd.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                           break;
                                     }
                                     columnCandidate.collection.push({
@@ -928,13 +946,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //       font_family : newFontFamily,
                               // }
                               case 'sek-update-fonts' :
-                                    //api.infoLog('PARAMS in sek-add-fonts', params );
+                                    // api.infoLog('PARAMS in sek-add-fonts', params );
                                     // Get the gfonts from the level options and modules values
                                     var currentGfonts = self.sniffGFonts();
                                     if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
                                           if ( params.font_family.indexOf('gfont') < 0 ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
-                                                dfd.reject( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont');
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont');
                                                 break;
                                           }
                                           currentGfonts.push( params.font_family );
@@ -947,30 +965,52 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-
-
-
-
                         // if we did not already rejected the request, let's check if the setting object has actually been modified
                         // at this point it should have been.
-                        if ( 'pending' == dfd.state() ) {
-                              if ( _.isEqual( currentSetValue, newSetValue ) ) {
-                                    dfd.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
-                              } else {
-                                    if ( null !== self.validateSettingValue( newSetValue ) ) {
-                                          sektionSetInstance( newSetValue, params );
-                                          dfd.resolve( cloneId );// the cloneId is only needed in the duplication scenarii
+                        if ( 'pending' == __updateAPISettingDeferred__.state() ) {
+                              var mayBeUpdateSektionsSetting = function() {
+                                    if ( _.isEqual( currentSetValue, newSetValue ) ) {
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
-                                          dfd.reject( 'updateAPISetting => the new setting value did not pass the validation checks for action ' + params.action );
+                                          if ( null !== self.validateSettingValue( newSetValue ) ) {
+                                                sektionSetInstance( newSetValue, params );
+                                                __updateAPISettingDeferred__.resolve( cloneId );// the cloneId is only needed in the duplication scenarii
+                                          } else {
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value did not pass the validation checks for action ' + params.action );
+                                          }
+                                          //api.infoLog('COLLECTION SETTING UPDATED => ', self.sekCollectionSettingId(), api( self.sekCollectionSettingId() )() );
                                     }
+                              };//mayBeUpdateSektionsSetting()
 
-                                    //api.infoLog('COLLECTION SETTING UPDATED => ', self.sekCollectionSettingId(), api( self.sekCollectionSettingId() )() );
-
+                              if ( false === __presetSectionInjected__ ) {
+                                    mayBeUpdateSektionsSetting();
+                              } else {
+                                    __presetSectionInjected__
+                                          .done( function() {
+                                               mayBeUpdateSektionsSetting();
+                                          })
+                                          .fail( function( _er_ ) {
+                                                api.errare( 'updateAPISetting => __presetSectionInjected__ failed', _er_ );
+                                          });
                               }
                         }
                   });//api( self.sekCollectionSettingId(), function( sektionSetInstance ) {}
-                  return dfd.promise();
+                  return __updateAPISettingDeferred__.promise();
             },//updateAPISetting
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
             // @return a JSON parsed string,
@@ -1016,6 +1056,60 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // the other level's id have to be generated
                   presetCandidate.collection = setIds( presetCandidate.collection );
                   return presetCandidate;
+            },
+
+
+            // Walk the column collection of a preset section, and replace '::img-path::*' pattern by image ids that we get from ajax calls
+            // Is designed to handle multiple ajax calls in parallel if the preset_section includes several images
+            // @return a promise()
+            preparePresetSectionForInjection : function( columnCollection ) {
+                var self = this,
+                    deferreds = {},
+                    preparedSection = {},
+                    _dfd_ = $.Deferred();
+
+                // walk the column collection and populates the deferreds object recursively
+                var _sniffImg = function( data ) {
+                      _.each( data, function( val, key ) {
+                            if ( _.isObject( val ) || _.isArray( val ) ) {
+                                  _sniffImg( val );
+                            } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) ) {
+                                  // scenario when a section uses an image more than once.
+                                  // => we don't need to fire a new ajax request for an image already sniffed
+                                  if ( ! _.has( deferreds, val ) ) {
+                                        deferreds[ val ] = self.importAttachment( val.replace( '::img-path::', '' ) );
+                                  }
+                            }
+                      });
+                      return deferreds;
+                };
+
+                // walk the column collection and populates the deferreds object recursively
+                // imdList is formed this way :
+                // ::img-path::/assets/img/1.jpg : {id: 2547, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_1.jpg"}
+                // ::img-path::/assets/img/2.jpg : {id: 2548, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_2.jpg"}
+                // ::img-path::/assets/img/3.jpg : {id: 2549, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_3.jpg"}
+                var _replaceImgPlaceholderById = function( data, imgList) {
+                      _.each( data, function( val, key ) {
+                            if ( _.isObject( val ) || _.isArray( val ) ) {
+                                  _replaceImgPlaceholderById( val, imgList );
+                            } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) && _.has( imgList, val ) ) {
+                                  data[ key ] = imgList[ val ][ 'id'];
+                            }
+                      });
+                      return columnCollection;
+                };
+
+                self.whenAllPromisesInParallel( _sniffImg( columnCollection ) )
+                    .done( function( imgList ) {
+                          var imgReadySection = _replaceImgPlaceholderById( columnCollection, imgList );
+                          _dfd_.resolve( imgReadySection );
+                    })
+                    .fail( function( _er_ ){
+                          _dfd_.reject( _er_ );
+                    });
+
+                return _dfd_.promise();
             }
       });//$.extend()
 })( wp.customize, jQuery );
