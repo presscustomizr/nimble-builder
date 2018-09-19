@@ -155,9 +155,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
         case 'font_family' :
             $family = $value;
+            //sek_error_log( __FUNCTION__ . ' font-family', $value );
             // Preprocess the selected font family
-            //font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
-            //special treatment for font-family
+            // font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
+            // special treatment for font-family
             if ( false != strstr( $value, '[gfont]') ) {
                 $split = explode(":", $family);
                 $family = $split[0];
