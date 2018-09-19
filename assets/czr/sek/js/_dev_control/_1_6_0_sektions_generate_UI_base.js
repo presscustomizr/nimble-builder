@@ -55,6 +55,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//generateUI()
 
 
+
+
+
+
+
             // @params = {
             //     uiParams : params,
             //     options_type : 'spacing',
@@ -249,7 +254,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.updateAPISetting({
                                     action : 'sek-update-fonts',
                                     font_family : newFontFamily
-                              }).done( function( ) {
+                              })
+                              // we use always() instead of done here, because the api section setting might not be changed ( and therefore return a reject() promise ).
+                              // => this can occur when a user is setting a google font already picked elsewhere
+                              // @see case 'sek-update-fonts'
+                              .always( function() {
                                     _doUpdateWithRequestedAction().then( function() {
                                           // always refresh again after
                                           // Why ?
