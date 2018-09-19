@@ -390,7 +390,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Width settings for the' => __('Width settings for the', 'text_domain_to_be_replaced'),
             'Set a custom anchor for the' => __('Set a custom anchor for the', 'text_domain_to_be_replaced'),
             'Device visibility settings for the' => __('Device visibility settings for the', 'text_domain_to_be_replaced'),
-            'Breakpoint for responsive columns' => __('Breakpoint for responsive columns', 'text_domain_to_be_replaced'),
+            'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_domain_to_be_replaced'),
 
             'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
 
@@ -500,18 +500,19 @@ function add_sektion_values_to_skope_export( $skopes ) {
 
 
 function sek_get_preset_sektions() {
-    return array(
-        // in section picker
-        // 'alternate_text_right' => '{"collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}]}]}',
-        // 'alternate_text_left' => '{"collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""}]}',
+    if ( false == get_transient( 'nimble_preset_sections_1_1_0' ) || ( defined( 'NIMBLE_DEV') && true === NIMBLE_DEV ) ) {
+        $preset_raw      = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
+        if ( $preset_raw === false ) {
+          $preset_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
+        }
 
-        'img_text_one' => '{"collection":[{"id":"","level":"column","collection":[],"width":"","options":{"bg_border":{"bg-image":"::img-path::/assets/img/girl-with-leaf.jpg","bg-color-overlay":"#000000","bg-opacity-overlay":"40","borders":{"_all_":{"wght":"1px","col":"#000000"}}},"visibility":[],"spacing":{"pad_marg":{"desktop":{"padding-top":"100","padding-bottom":"100"}}}}},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_heading_module","value":{"heading_text":"Add a heading","font_family_css":"[gfont]Lato:700"}},{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.","font_family_css":"[gfont]Courgette:regular","font_size_css":{"desktop":"16px","mobile":"12px"}}},{"id":"","level":"module","module_type":"czr_button_module","value":{"button_text":"Click me","font_family_css":"[gfont]Courgette:regular","bg_color_css":"#020202","bg_color_hover":"#151515","border_radius_css":"2","spacing_css":{"padding-top":0.5,"padding-bottom":0.5,"padding-right":1,"padding-left":1,"unit":"em","margin-top":"1"},"color_css":"#ffffff"}}],"options":{"spacing":{"pad_marg":{"desktop":{"margin-top":"100","padding-top":"45","padding-left":"45","padding-right":"45","padding-bottom":"45","margin-bottom":"100","margin-left":"-45"},"tablet":{"margin-left":"0","margin-right":"0","margin-top":"0","margin-bottom":"0","padding-top":"20","padding-right":"20","padding-bottom":"20","padding-left":"20"},"mobile":{"padding-top":"20","padding-bottom":"20","padding-right":"20","padding-left":"20"}}},"bg_border":{"bg-color":"#ffffff","bg-color-overlay":"#000000","bg-opacity-overlay":"40","borders":{"_all_":{"wght":"1px","col":"#000000"}},"shadow":true}}}]}',
-
-        // in module picker
-        'two_columns' => '{"collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
-        'three_columns' => '{"collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
-        'four_columns' => '{"collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}'
-    );
+        $presets_decoded   = json_decode( $preset_raw, true );
+        set_transient( 'nimble_preset_sections_1_1_0' , $presets_decoded , 60*60*24*30 );
+    }
+    else {
+        $presets_decoded = get_transient( 'nimble_preset_sections_1_1_0' );
+    }
+    return $presets_decoded;
 }
 
 
