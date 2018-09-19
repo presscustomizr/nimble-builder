@@ -75,11 +75,15 @@ ul[id*="sub-accordion-section-__nimble__"] {
   width: 29%;
   height: 130px;
 }
-[data-sek-content-type="preset_section"] {
+/* When sections are displayed in the module picker. Typically the columns sections */
+li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   width: 29%;
-  height: 130px;
 }
 
+[data-sek-content-type="preset_section"] {
+  width: 95%;
+  height: 130px;
+}
 
 [data-sek-content-type]:hover {
   -webkit-box-shadow: 0 12px 20px rgba(0,0,0,.2);
