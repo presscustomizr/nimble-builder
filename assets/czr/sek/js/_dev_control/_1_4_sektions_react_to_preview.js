@@ -360,16 +360,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           level : 'module',
                                                           id : params.apiParams.droppedModuleId
                                                     });
-                                                    // always update the root fonts property after a module addition
-                                                    // because there might be a google font specified in the starting value
-                                                    self.updateAPISetting({ action : 'sek-update-fonts' } );
-
-                                                    // Refresh the stylesheet to generate the css rules of the module
-                                                    api.previewer.send( 'sek-refresh-stylesheet', {
-                                                          skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                                    });
                                               break;
                                         }
+
+                                        // Refresh the stylesheet to generate the css rules of the module
+                                        api.previewer.send( 'sek-refresh-stylesheet', {
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        });
+
+                                        // Always update the root fonts property after a module addition
+                                        // => because there might be a google font specified in the starting value or in a preset section
+                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+
                                         // Refresh when a section is created ( not duplicated )
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
