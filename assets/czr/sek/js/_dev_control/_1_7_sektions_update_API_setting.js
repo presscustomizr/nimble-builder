@@ -1035,11 +1035,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionType + ' has not been found in sektionsLocalizedData.presetSections');
                   }
                   var presetCandidate = allPresets[ sectionParams.presetSectionType ];
+
                   // Ensure we have a string that's JSON.parse-able
-                  if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
-                        throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionType + ' is not JSON.parse-able');
-                  }
-                  presetCandidate = JSON.parse( presetCandidate );
+                  // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
+                  //       throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionType + ' is not JSON.parse-able');
+                  // }
+                  // presetCandidate = JSON.parse( presetCandidate );
+
                   var setIds = function( collection ) {
                         _.each( collection, function( levelData ) {
                               levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
