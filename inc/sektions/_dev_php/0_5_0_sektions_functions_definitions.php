@@ -601,7 +601,7 @@ function sek_get_global_custom_breakpoint() {
     return intval( $options['breakpoint']['global-custom-breakpoint'] );
 }
 
-
+// invoked when filtering 'sek_add_css_rules_for__section__options'
 function sek_get_section_custom_breakpoint( $section ) {
     if ( ! is_array( $section ) )
       return;

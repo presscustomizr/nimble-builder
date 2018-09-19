@@ -82,7 +82,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               breakpoint : {
                                     settingControlId : params.id + '__breakpoint_options',
                                     module_type : 'sek_level_breakpoint_module',
-                                    controlLabel : sektionsLocalizedData.i18n['Breakpoint for responsive columns'],
+                                    controlLabel : sektionsLocalizedData.i18n['Responsive settings : breakpoint, column direction'],
                                     icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                               }
                         });
