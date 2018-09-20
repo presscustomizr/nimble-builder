@@ -401,17 +401,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             //       content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
                             //       content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
                             // }
-                            'sek-add-content-in-new-nested-sektion' : {
+                            'sek-add-preset-section-in-new-nested-sektion' : {
                                   callback : function( params ) {
                                         sendToPreview = false;//<= when the level is refreshed when complete, we don't need to send to preview.
                                         uiParams = {};
                                         apiParams = params;
-                                        apiParams.action = 'sek-add-content-in-new-nested-sektion';
+                                        apiParams.action = 'sek-add-preset-section-in-new-nested-sektion';
                                         apiParams.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
 
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
+                                        // Refresh the stylesheet to generate the css rules of the module
+                                        api.previewer.send( 'sek-refresh-stylesheet', {
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        });
+
+                                        // Always update the root fonts property after a module addition
+                                        // => because there might be a google font specified in the starting value or in a preset section
+                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+
                                         api.previewer.trigger( 'sek-refresh-level', {
                                               level : 'section',
                                               id :  params.apiParams.in_sektion

@@ -544,7 +544,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var colNumber = $parentSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).length;
                                     // if the parent section has more than 1 column, we will need to inject the preset_section inside a nested_section
                                     if ( colNumber > 1 ) {
-                                          dropCase = 'content-in-a-nested-section-to-create';
+                                          dropCase = 'preset-section-in-a-nested-section-to-create';
                                           params.is_nested = true;
                                           params.in_column = $dropTarget.closest('[data-sek-level="column"]').data('sek-id');
                                           params.in_sektion = $parentSektion.data('sek-id');
@@ -601,8 +601,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'content-in-a-section-to-replace' :
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
-                              case 'content-in-a-nested-section-to-create' :
-                                    api.previewer.trigger( 'sek-add-content-in-new-nested-sektion', params );
+                              case 'preset-section-in-a-nested-section-to-create' :
+                                    api.previewer.trigger( 'sek-add-preset-section-in-new-nested-sektion', params );
                               break;
                               case 'content-in-empty-location' :
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );

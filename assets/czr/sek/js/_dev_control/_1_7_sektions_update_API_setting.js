@@ -877,7 +877,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //   content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ), //<= module or preset_section
                               //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
                               // }
-                              case 'sek-add-content-in-new-nested-sektion' :
+                              case 'sek-add-preset-section-in-new-nested-sektion' :
                                     // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
@@ -905,6 +905,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // insert the section in the collection at the right place
                                     var presetColumnCollection;
+                                    __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
+
                                     try { presetColumnCollection = self.getPresetSectionCollection({
                                                 presetSectionType : params.content_id,
                                                 section_id : params.id//<= we need to use the section id already generated, and passed for ajax action @see ::reactToPreviewMsg, case "sek-add-section"
@@ -919,12 +921,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                           break;
                                     }
-                                    columnCandidate.collection.push({
-                                          id : params.id,
-                                          level : 'section',
-                                          collection : presetColumnCollection.collection,
-                                          is_nested : true
-                                    });
+                                    self.preparePresetSectionForInjection( presetColumnCollection )
+                                          .fail( function( _er_ ){
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
+                                                // Used when updating the setting
+                                                // @see end of this method
+                                                __presetSectionInjected__.reject( _er_ );
+                                          })
+                                          .done( function( sectionReadyToInject ) {
+                                                columnCandidate.collection.push({
+                                                      id : params.id,
+                                                      level : 'section',
+                                                      collection : sectionReadyToInject.collection,
+                                                      is_nested : true
+                                                });
+
+                                                // Used when updating the setting
+                                                // @see end of this method
+                                                __presetSectionInjected__.resolve();
+                                          });//self.preparePresetSectionForInjection.done()
+
                               break;
 
 
