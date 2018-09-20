@@ -145,7 +145,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         clicked_input_type : $el.closest('div[data-sek-input-type]').length > 0 ? $el.closest('div[data-sek-input-type]').data('sek-input-type') : '',
                         clicked_input_id : $el.closest('div[data-sek-input-id]').length > 0 ? $el.closest('div[data-sek-input-id]').data('sek-input-id') : '',
                         was_triggered : params.was_triggered
-                  }, params ) );
+                  }, clonedParams ) );
             }
       });//$.extend()
 })( wp.customize, jQuery, _ );
