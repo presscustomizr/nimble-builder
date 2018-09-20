@@ -14,58 +14,78 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return the state promise dfd
             generateUIforDraggableContent : function( params, dfd ) {
                   var self = this;
-                  // var _id_ = sektionsLocalizedData.optPrefixForSektionsNotSaved + ( 'module' === params.content_type ? '_sek_draggable_modules_ui' : '_sek_draggable_sections_ui' );
-
                   // Prepare the module map to register
-                  var levelRegistrationParams = {};
+                  var modulesRegistrationParams = {};
 
-                  $.extend( levelRegistrationParams, {
+                  $.extend( modulesRegistrationParams, {
+                        content_type_switcher : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_content_type_switcher_ui',
+                              module_type : 'sek_content_type_switcher_module',
+                              controlLabel :  sektionsLocalizedData.i18n['Select a content type'],
+                              expandAndFocusOnInit : true,
+                              priority : 0,
+                              settingValue : { content_type : params.content_type }
+                              //icon : '<i class="material-icons sek-level-option-icon">center_focus_weak</i>'
+                        },
                         section_picker : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_draggable_sections_ui',
                               module_type : 'sek_section_picker_module',
-                              controlLabel :  sektionsLocalizedData.i18n['Section Picker'],
-                              expandAndFocusOnInit : true,
-                              priority : 10
-                              //icon : '<i class="material-icons sek-level-option-icon">center_focus_weak</i>'
+                              controlLabel :  sektionsLocalizedData.i18n['Pick a pre-designed section'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : 'section' === params.content_type,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
                         module_picker : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_draggable_modules_ui',
                               module_type : 'sek_module_picker_module',
-                              controlLabel : sektionsLocalizedData.i18n['Module Picker'],
-                              priority : 20
-                              //icon : '<i class="material-icons sek-level-option-icon">gradient</i>'//'<i class="material-icons sek-level-option-icon">brush</i>'
+                              controlLabel : sektionsLocalizedData.i18n['Pick a module'],
+                              content_type : 'module',
+                              expandAndFocusOnInit : 'module' === params.content_type,
+                              priority : 20,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         }
                   });
 
 
+                  // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
+                  // Is the UI currently displayed the one that is being requested ?
+                  // If so :
+                  // 1) visually remind the user that a module should be dragged
+                  // 2) pass the content_type param to display the requested content_type
+                  var firstKey = _.keys( modulesRegistrationParams )[0],
+                      firstControlId = modulesRegistrationParams[firstKey].settingControlId;
+
+                  if ( self.isUIControlAlreadyRegistered( firstControlId ) ) {
+                        api.control( firstControlId, function( _control_ ) {
+                              _control_.focus({
+                                    completeCallback : function() {
+                                          var $container = _control_.container;
+                                          // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
+                                          if ( $container.hasClass( 'button-see-me') )
+                                            return;
+                                          $container.addClass('button-see-me');
+                                          _.delay( function() {
+                                               $container.removeClass('button-see-me');
+                                          }, 800 );
+                                    }
+                              });
+                              // this event will be listened to from the "content_type_switcher" input()
+                              // @see content_type_switcher method in api.czrInputMap
+                              api.section( _control_.section() ).container.first().trigger('sek-content-type-refreshed', { content_type : params.content_type } );
+                        });
+                        return dfd;
+                  }//if
 
 
+                  // @return void()
                   _do_register_ = function() {
-                        _.each( levelRegistrationParams, function( optionData, optionType ){
-                              // Is the UI currently displayed the one that is being requested ?
-                              // If so, visually remind the user that a module should be dragged
-                              if ( self.isUIControlAlreadyRegistered( optionData.settingControlId ) ) {
-                                    api.control( optionData.settingControlId ).focus({
-                                          completeCallback : function() {
-                                                var $container = api.control( optionData.settingControlId ).container;
-                                                // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
-                                                if ( $container.hasClass( 'button-see-me') )
-                                                  return;
-                                                $container.addClass('button-see-me');
-                                                _.delay( function() {
-                                                     $container.removeClass('button-see-me');
-                                                }, 800 );
-                                          }
-                                    });
-                                    return;
-                              }//if
-
-
+                        _.each( modulesRegistrationParams, function( optionData, optionType ){
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     // synchronize the module setting with the main collection setting
                                     api( optionData.settingControlId, function( _setting_ ) {
                                           _setting_.bind( function( to, from ) {
-                                                api.errare('MODULE / SECTION PICKER SETTING CHANGED');
+                                                api.errare('generateUIforDraggableContent => the setting() should not changed');
                                           });
                                     });
                                     api.CZR_Helpers.register( {
@@ -74,7 +94,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           what : 'setting',
                                           id : optionData.settingControlId,
                                           dirty : false,
-                                          value : {},
+                                          value : optionData.settingValue || {},
                                           transport : 'postMessage',// 'refresh',
                                           type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
                                     });
@@ -94,26 +114,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                               }).done( function() {
                                     api.control( optionData.settingControlId, function( _control_ ) {
-                                          // we set the focus to false when firing api.previewer.trigger( 'sek-pick-module', { focus : false }); in ::initialize()
+                                          // set the control type property
+                                          _control_.content_type = optionData.content_type;//<= used to handle visibility when switching content type with the "content_type_switcher" control
+
+                                          // we set the focus to false when firing api.previewer.trigger( 'sek-pick-content', { focus : false }); in ::initialize()
                                           if ( true === params.focus ) {
                                                 _control_.focus({
                                                     completeCallback : function() {}
                                                 });
                                           }
-                                          // Hide the item wrapper
-                                          _control_.container.find('.czr-items-wrapper').hide();
+
                                           var $title = _control_.container.find('label > .customize-control-title');
-                                          // if this level has a no icon, let's prepend it to the title
-                                          if ( $title.find('.sek-level-option-icon').length < 1 ) {
-                                                $title.addClass('sek-flex-vertical-center').prepend( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
+                                          // if this level has an icon, let's prepend it to the title
+                                          if ( ! _.isUndefined( optionData.icon ) ) {
+                                                $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                           }
-                                          // prepend the animated arrow
-                                          $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                          // setup the initial state + initial click
-                                          _control_.container.attr('data-sek-expanded', "false" );
-                                          if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                                $title.trigger('click');
-                                          }
+
+                                          // // ACCORDION
+                                          // // Hide the item wrapper
+                                          // _control_.container.find('.czr-items-wrapper').hide();
+                                          // // prepend the animated arrow
+                                          // $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+                                          // // setup the initial state + initial click
+                                          // _control_.container.attr('data-sek-expanded', "false" );
+                                          // if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
+                                          //       $title.trigger('click');
+                                          // }
                                     });
                               });
                         });//_.each
@@ -121,14 +147,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-                  // Defer the registration when the parent section gets added to the api
-                  // Note : the check on api.section.has( params.id ) is also performd on api.CZR_Helpers.register(), but here we use it to avoid setting up the click listeners more than once.
-                  if ( ! api.section.has( '__content_picker__' ) ) {
-                        api.section( '__content_picker__', function( _section_ ) {
-                              // Schedule the accordion behaviour
-                              self.scheduleModuleAccordion.call( _section_, { expand_first_module : false } );
-                        });
-                  }
+                  // // Defer the accordion setup when the parent section gets added to the api
+                  // // Note : the check on api.section.has( params.id ) is also performd on api.CZR_Helpers.register(), but here we use it to avoid setting up the click listeners more than once.
+                  // if ( ! api.section.has( '__content_picker__' ) ) {
+                  //       api.section( '__content_picker__', function( _section_ ) {
+                  //             // Schedule the accordion behaviour
+                  //             self.scheduleModuleAccordion.call( _section_, { expand_first_module : false } );
+                  //       });
+                  // }
 
                   // CONTENT PICKER SECTION
                   api.CZR_Helpers.register({

@@ -296,7 +296,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
-                                      <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e('Drag and drop a module here', 'text_domain_to_be_replaced' ); ?>">add_circle_outline</i>
+                                      <i data-sek-click-on="pick-content" data-sek-content-type="module" class="material-icons sek-click-on" title="<?php _e('Drag and drop a module here', 'text_domain_to_be_replaced' ); ?>">add_circle_outline</i>
                                     </div>
                                   </div>
                                   <?php

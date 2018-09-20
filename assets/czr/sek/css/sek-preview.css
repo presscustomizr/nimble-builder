@@ -200,7 +200,7 @@
     width: 1.6em!important;
     border-left: 1px dotted white;
 }
-.sek-dyn-ui-icons [data-sek-click-on="pick-module"] {
+.sek-dyn-ui-icons [data-sek-click-on="pick-content"] {
     /*padding-left: 9px;*/
     padding-left: 0.42em;
     margin-left: 0px;
@@ -657,12 +657,12 @@
     background: rgba(0, 0, 0, 0.50);
 }
 
-.sek-module-drop-zone-for-first-module:hover [data-sek-click-on="pick-module"]{
+.sek-module-drop-zone-for-first-module:hover [data-sek-click-on="pick-content"]{
     color: #fff;
 }
 
 
-.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"] {
+.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-content"] {
   cursor: pointer;
   width: 50px;
   height: 50px;
@@ -684,7 +684,7 @@
           justify-content: center;
 }
 
-.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"]:hover {
+.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-content"]:hover {
   -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
   box-shadow: 0 2px 6px rgba(0,0,0,.2);
   /*color: #0085ba;*/
@@ -692,15 +692,15 @@
 }
 
 /* Adapt the size when columns are too narrow */
-.sek-col-8 [data-sek-click-on="pick-module"],
-.sek-col-9 [data-sek-click-on="pick-module"],
-.sek-col-10 [data-sek-click-on="pick-module"],
-.sek-col-11 [data-sek-click-on="pick-module"],
-.sek-col-12 [data-sek-click-on="pick-module"],
-.sek-col-14 [data-sek-click-on="pick-module"],
-.sek-col-16 [data-sek-click-on="pick-module"],
-.sek-col-20 [data-sek-click-on="pick-module"],
-.sek-col-25 [data-sek-click-on="pick-module"] {
+.sek-col-8 [data-sek-click-on="pick-content"],
+.sek-col-9 [data-sek-click-on="pick-content"],
+.sek-col-10 [data-sek-click-on="pick-content"],
+.sek-col-11 [data-sek-click-on="pick-content"],
+.sek-col-12 [data-sek-click-on="pick-content"],
+.sek-col-14 [data-sek-click-on="pick-content"],
+.sek-col-16 [data-sek-click-on="pick-content"],
+.sek-col-20 [data-sek-click-on="pick-content"],
+.sek-col-25 [data-sek-click-on="pick-content"] {
   font-size: 0.9rem;
 /*  width: 35px;
   height: 35px;
@@ -709,10 +709,10 @@
 
 
 /* Hide the + during a drag phase */
-.sek-dragging .sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"] {
+.sek-dragging .sek-module-drop-zone-for-first-module [data-sek-click-on="pick-content"] {
   display: none;
 }
-/*.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"]:hover {
+/*.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-content"]:hover {
   font-size: 27px;
 }*/
 
@@ -736,7 +736,7 @@
  the class .sek-active-drop-zone is added when entering / overing the drop target
  and removed when leaving the drop element
  */
-.sek-active-drop-zone.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-module"] {
+.sek-active-drop-zone.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-content"] {
   display: none;
 }
 .sek-dynamic-drop-zone {

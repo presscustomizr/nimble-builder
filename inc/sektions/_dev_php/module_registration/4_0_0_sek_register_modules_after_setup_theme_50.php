@@ -4,6 +4,7 @@ add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     foreach( [
         // UI CONTENT PICKER
+        'sek_content_type_switcher_module',
         'sek_module_picker_module',
         'sek_section_picker_module',
 

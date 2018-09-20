@@ -437,7 +437,7 @@ div[data-sek-align].selected {
 
 
 
-/* UNIT PICKER */
+/* DEFAULT UI BUTTONS STYLE, for unit picker, etc*/
 .sek-unit-wrapper {
   text-align: center;
 }
@@ -514,6 +514,20 @@ div[data-sek-align].selected {
     /*box-shadow: inset 0 -1px 0 #00435d, 0 0 0 2px #bfe7f3;*/
     outline: none;
 }
+
+/* Button style for the content type switcher */
+.sek-content-type-wrapper .sek-ui-button-group {
+  display: block;
+}
+.sek-content-type-wrapper .sek-ui-button {
+    width: 49%;
+    text-align: center;
+    display: inline-block;
+    padding: 3px 0;
+    height: auto;
+    text-transform: uppercase;
+}
+
 
 
 

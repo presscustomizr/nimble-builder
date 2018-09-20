@@ -8,12 +8,17 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
          wp_send_json_error( 'sek_set_input_tmpl_content => missing input type for input id : ' . $input_id );
     }
     switch( $input_type ) {
+        // Content picker group
+        case 'content_type_switcher' :
+            sek_set_input_tmpl___content_type_switcher( $input_id, $input_data );
+        break;
         case 'module_picker' :
             sek_set_input_tmpl___module_picker( $input_id, $input_data );
         break;
         case 'section_picker' :
             sek_set_input_tmpl___section_picker( $input_id, $input_data );
         break;
+
         case 'spacing' :
         case 'spacingWithDeviceSwitcher' :
             sek_set_input_tmpl___spacing( $input_id, $input_data );

@@ -47,7 +47,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     id :  params.apiParams.location
                                               });
                                         }
-                                        api.previewer.trigger( 'sek-pick-module', {});
+                                        api.previewer.trigger( 'sek-pick-content', {});
                                         api.previewer.send('sek-focus-on', { id : params.apiParams.id });
                                   }
                             },
@@ -70,7 +70,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         // We want to focus on the module picker in this case, that's why the autofocus is set to false
                                         // @see 'sek-add-section' action description
                                         if ( false !== params.apiParams.autofocus ) {
-                                              api.previewer.trigger( 'sek-pick-module', {});
+                                              api.previewer.trigger( 'sek-pick-content', {});
                                         }
                                   }
                             },
@@ -149,7 +149,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        api.previewer.trigger( 'sek-pick-module', {});
+                                        api.previewer.trigger( 'sek-pick-content', {});
                                         // always update the root fonts property after a removal
                                         // because the removed level(s) might had registered fonts
                                         self.updateAPISetting({ action : 'sek-update-fonts' } );
@@ -426,14 +426,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                             // GENERATE UI ELEMENTS
-                            'sek-pick-module' : function( params ) {
+                            'sek-pick-content' : function( params ) {
                                   params = params || {};
                                   sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
-                                        content_type : 'module',
-                                        // <= the was_triggered param can be used to determine if we need to animate the picker control or not. @see ::generateUI() case 'sek-generate-draggable-candidates-picker-ui'
+                                        content_type : params.content_type || 'section',
+                                        // <= the "was_triggered" param can be used to determine if we need to animate the picker control or not. @see ::generateUI() case 'sek-generate-draggable-candidates-picker-ui'
                                         // true by default, because this is the most common scenario ( when adding a section, a column ... )
                                         // but false when clicking on the + ui icon in the preview
                                         was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true,
@@ -441,19 +441,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   };
                                   return self.generateUI( uiParams );
                             },
-                            'sek-pick-section' : function( params ) {
-                                  sendToPreview = true;
-                                  apiParams = {};
-                                  uiParams = {
-                                        action : 'sek-generate-draggable-candidates-picker-ui',
-                                        content_type : 'section',
-                                        // <= the was_triggered param can be used to determine if we need to animate the picker control or not. @see ::generateUI() case 'sek-generate-draggable-candidates-picker-ui'
-                                        // true by default, because this is the most common scenario ( when adding a section, a column ... )
-                                        // but false when clicking on the + ui icon in the preview
-                                        was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true
-                                  };
-                                  return self.generateUI( uiParams );
-                            },
+
                             'sek-edit-options' : function( params ) {
                                   sendToPreview = true;
                                   apiParams = {};

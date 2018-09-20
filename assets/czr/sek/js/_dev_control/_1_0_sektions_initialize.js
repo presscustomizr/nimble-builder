@@ -219,10 +219,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   logoHtml = [ '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="', sektionsLocalizedData.baseUrl, '/assets/img/nimble/nimble_horizontal.svg', '"/>' ].join('');
 
                               if ( 0 < $sidePanelTitleEl.length ) {
-                                    // Attach click event
-                                    // $sidePanelTitleEl.on( 'click', function( evt ) {
-                                    //       api.previewer.trigger('sek-pick-module');
-                                    // });
                                     // The default title looks like this : Nimble Builder <span class="screen-reader-text">Press return or enter to open this section</span>
                                     // we want to style "Nimble Builder" only.
                                     var $sidePanelTitleElSpan = $sidePanelTitleEl.find('span');
@@ -362,8 +358,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   previousSkopes = previousSkopes || {};
                   // Clear all previous sektions if the main panel is expanded and we're coming from a previousSkopes
                   if ( ! _.isEmpty( previousSkopes.local ) && api.panel( sektionsLocalizedData.sektionsPanelId ).expanded() ) {
-                        //api.previewer.trigger('sek-pick-section');
-                        api.previewer.trigger('sek-pick-module');
+                        api.previewer.trigger('sek-pick-content');
                   }
 
                   // set the sekCollectionSettingId now, and update it on skope change

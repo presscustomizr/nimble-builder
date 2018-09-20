@@ -182,7 +182,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         'sek-duplicate',
                         'sek-resize-columns',
                         'sek-add-content-in-new-sektion',
-                        'sek-pick-module',
+                        'sek-pick-content',
                         'sek-edit-options',
                         'sek-edit-module',
                         'sek-notify'

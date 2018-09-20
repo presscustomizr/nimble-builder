@@ -124,7 +124,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   $('.sek-add-content', '#nimble-top-bar').on( 'click', function(evt) {
                         evt.preventDefault();
-                        api.previewer.trigger( 'sek-pick-module', {});
+                        api.previewer.trigger( 'sek-pick-content', {});
                   });
                   return $( '#nimble-top-bar' );
             },
@@ -217,7 +217,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.previewer.refresh();
 
                         // Always make sure that the ui gets refreshed
-                        api.previewer.trigger( 'sek-pick-module', {});
+                        api.previewer.trigger( 'sek-pick-content', {});
                   }
 
                   // UPDATE THE HISTORY LOG

@@ -187,8 +187,7 @@ module.exports = {
 
       // INPUT TEMPLATES
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_1_sek_input_tmpl_base_filter.php',
-      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_1_sek_input_tmpl_module_picker.php',
-      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_2_sek_input_tmpl_sektion_picker.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_0_2_sek_input_tmpl_module_sektion_picker.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_3_sek_input_tmpl_spacing.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_4_sek_input_tmpl_bg_position.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_0_5_sek_input_tmpl_horizontal_alignment.php',

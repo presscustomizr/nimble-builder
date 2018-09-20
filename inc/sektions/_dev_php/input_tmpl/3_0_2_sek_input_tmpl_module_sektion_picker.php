@@ -1,4 +1,22 @@
 <?php
+
+/* ------------------------------------------------------------------------- *
+ *  CONTENT TYPE SWITCHER INPUT
+/* ------------------------------------------------------------------------- */
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
+function sek_set_input_tmpl___content_type_switcher( $input_id, $input_data ) {
+    ?>
+        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+        <div class="sek-content-type-wrapper">
+            <div aria-label="<?php _e( 'Content type', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a section', 'text_domain');?>" data-sek-content-type="section"><?php _e('Pick a section', 'text_domain');?></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a module', 'text_domain');?>" data-sek-content-type="module"><?php _e('Pick a module', 'text_domain');?></button>
+            </div>
+        </div>
+  <?php
+}
+
+
 /* ------------------------------------------------------------------------- *
  *  MODULE PICKER INPUT
 /* ------------------------------------------------------------------------- */
@@ -127,6 +145,54 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
           ?>
         </div>
     <?php
+}
+
+
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SECTION PICKER INPUT
+/* ------------------------------------------------------------------------- */
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
+function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
+    ?>
+        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+        <div class="sek-content-type-wrapper">
+          <?php
+            $content_collection = array(
+                array(
+                    'content-type' => 'preset_section',
+                    'content-id' => 'img_text_one',
+                    'title' => __('2 columns with image and text', 'text-domain' ),
+                    'thumb' => 'img_text_one.jpg'
+                ),
+                array(
+                    'content-type' => 'preset_section',
+                    'content-id' => 'img_text_two',
+                    'title' => __('2 columns with image and text', 'text-domain' ),
+                    'thumb' => 'img_text_two.jpg',
+                    'height' => '188px'
+                )
+            );
+            foreach( $content_collection as $_params) {
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"></div>',
+                    $_params['content-type'],
+                    $_params['content-id'],
+                    sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
+                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'],
+                        isset( $_params['height'] ) ? 'height:'.$_params['height'] : ''
+                    ),
+                    $_params['title']
+                );
+            }
+          ?>
+        </div>
+  <?php
 }
 
 ?>
