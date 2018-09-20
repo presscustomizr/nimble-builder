@@ -17,14 +17,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isEmpty( params.id ) ) {
                         dfd.reject( 'generateUI => missing id' );
                   }
-                  // Is the UI currently displayed the one that is being requested ?
-                  // If so, don't generate the ui again, simply focus on it
-                  if ( self.isUIControlAlreadyRegistered( params.id ) ) {
-                        api.control( params.id ).focus({
-                              completeCallback : function() {}
-                        });
-                        return dfd;
-                  }
 
                   // For modules, we need to generate a UI for the module value
                   var moduleValue = self.getLevelProperty({
@@ -44,7 +36,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   // Prepare the module map to register
-                  var registrationParams = {};
+                  var modulesRegistrationParams = {};
 
                   if ( true === self.getRegisteredModuleProperty( moduleType, 'is_father' ) ) {
                         var _childModules_ = self.getRegisteredModuleProperty( moduleType, 'children' );
@@ -52,7 +44,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               throw new Error('::generateUIforFrontModules => a father module ' + moduleType + ' is missing children modules ');
                         } else {
                               _.each( _childModules_, function( mod_type, optionType ){
-                                    registrationParams[ optionType ] = {
+                                    modulesRegistrationParams[ optionType ] = {
                                           settingControlId : params.id + '__' + optionType,
                                           module_type : mod_type,
                                           controlLabel : self.getRegisteredModuleProperty( mod_type, 'name' )
@@ -61,7 +53,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         }
                   } else {
-                        registrationParams[ '__no_option_group_to_be_updated_by_children_modules__' ] = {
+                        modulesRegistrationParams[ '__no_option_group_to_be_updated_by_children_modules__' ] = {
                               settingControlId : params.id,
                               module_type : moduleType,
                               controlLabel : moduleName
@@ -69,12 +61,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         };
                   }
 
-                  _do_register_ = function() {
-                        _.each( registrationParams, function( optionData, optionType ){
+                  // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
+                  // Is the UI currently displayed the one that is being requested ?
+                  // Check if the first control of the list is already registered
+                  // If so, visually remind the user and break;
+                  var firstKey = _.keys( modulesRegistrationParams )[0],
+                      firstControlId = modulesRegistrationParams[firstKey].settingControlId;
 
+                  if ( self.isUIControlAlreadyRegistered( firstControlId ) ) {
+                        api.control( firstControlId ).focus({
+                              completeCallback : function() {
+                                    var $container = api.control( firstControlId ).container;
+                                    // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
+                                    if ( $container.hasClass( 'button-see-me') )
+                                      return;
+                                    $container.addClass('button-see-me');
+                                    _.delay( function() {
+                                         $container.removeClass('button-see-me');
+                                    }, 800 );
+                              }
+                        });
+                        return dfd;
+                  }//if
+
+                  // Clean previously generated UI elements
+                  self.cleanRegistered();
+
+                  _do_register_ = function() {
+                        _.each( modulesRegistrationParams, function( optionData, optionType ){
                               // Make sure this setting is bound only once !
                               if ( ! api.has( optionData.settingControlId ) ) {
-
                                     // Schedule the binding to synchronize the module setting with the main collection setting
                                     // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
                                     // They need to be kept in order to keep track of the changes in the customizer.

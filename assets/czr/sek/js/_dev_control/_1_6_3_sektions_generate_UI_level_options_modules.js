@@ -23,9 +23,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // Prepare the module map to register
-                  var levelRegistrationParams = {};
+                  var modulesRegistrationParams = {};
 
-                  $.extend( levelRegistrationParams, {
+                  $.extend( modulesRegistrationParams, {
                         bg_border : {
                               settingControlId : params.id + '__bgBorder_options',
                               module_type : 'sek_level_bg_border_module',
@@ -60,7 +60,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   if ( 'section' === params.level ) {
-                        $.extend( levelRegistrationParams, {
+                        $.extend( modulesRegistrationParams, {
                               width : {
                                     settingControlId : params.id + '__width_options',
                                     module_type : 'sek_level_width_section',
@@ -70,7 +70,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                         // Deactivated
                         // => replaced by sek_level_width_section
-                        // $.extend( levelRegistrationParams, {
+                        // $.extend( modulesRegistrationParams, {
                         //       layout : {
                         //             settingControlId : params.id + '__sectionLayout_options',
                         //             module_type : 'sek_level_section_layout_module',
@@ -78,7 +78,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //             icon : '<i class="material-icons sek-level-option-icon">crop_din</i>'
                         //       }
                         // });
-                        $.extend( levelRegistrationParams, {
+                        $.extend( modulesRegistrationParams, {
                               breakpoint : {
                                     settingControlId : params.id + '__breakpoint_options',
                                     module_type : 'sek_level_breakpoint_module',
@@ -88,7 +88,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   }
                   if ( 'module' === params.level ) {
-                        $.extend( levelRegistrationParams, {
+                        $.extend( modulesRegistrationParams, {
                               width : {
                                     settingControlId : params.id + '__width_options',
                                     module_type : 'sek_level_width_module',
@@ -99,10 +99,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
 
+                  // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
+                  // Is the UI currently displayed the one that is being requested ?
+                  // Check if the first control of the list is already registered
+                  // If so, visually remind the user and break;
+                  var firstKey = _.keys( modulesRegistrationParams )[0],
+                      firstControlId = modulesRegistrationParams[firstKey].settingControlId;
+
+                  if ( self.isUIControlAlreadyRegistered( firstControlId ) ) {
+                        api.control( firstControlId ).focus({
+                              completeCallback : function() {
+                                    var $container = api.control( firstControlId ).container;
+                                    // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
+                                    if ( $container.hasClass( 'button-see-me') )
+                                      return;
+                                    $container.addClass('button-see-me');
+                                    _.delay( function() {
+                                         $container.removeClass('button-see-me');
+                                    }, 800 );
+                              }
+                        });
+                        return dfd;
+                  }//if
+
+                  // Clean previously generated UI elements
+                  self.cleanRegistered();
+
 
                   // @return void()
                   _do_register_ = function() {
-                        _.each( levelRegistrationParams, function( optionData, optionType ){
+                        _.each( modulesRegistrationParams, function( optionData, optionType ){
                                // Is the UI currently displayed the one that is being requested ?
                               // If so, don't generate the ui again, simply focus on the section
                               if ( self.isUIControlAlreadyRegistered( optionData.settingControlId ) ) {
@@ -208,7 +234,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         title: sektionsLocalizedData.i18n['Settings for the'] + ' ' + params.level,
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 10,
-                        track : false//don't register in the self.registered()
+                        //track : false//don't register in the self.registered()
                         //constructWith : MainSectionConstructor,
                   }).done( function() {
                         // - Defer the registration when the parent section gets added to the api

@@ -20,18 +20,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         dfd.reject( 'generateUI => missing action' );
                   }
 
-                  // Clean previously generated UI elements
-                  self.cleanRegistered();
-
                   // REGISTER SETTING AND CONTROL
                   switch ( params.action ) {
-                        // Possible content types :
-                        // 1) module
-                        // 2) preset_section
-                        case 'sek-generate-draggable-candidates-picker-ui' :
-                              dfd = self.generateUIforDraggableContent( params, dfd );
-                        break;
-
+                        // FRONT AND LEVEL MODULES UI
+                        // The registered elements are cleaned (self.cleanRegistered()) in the callbacks,
+                        // because we want to check if the requested UI is not the one already rendered, and fire a button-see-me animation if yes.
                         case 'sek-generate-module-ui' :
                               dfd = self.generateUIforFrontModules( params, dfd );
                         break;
@@ -40,13 +33,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               dfd = self.generateUIforLevelOptions( params, dfd );
                         break;
 
+                        // Possible content types :
+                        // 1) module
+                        // 2) preset_section
+                        case 'sek-generate-draggable-candidates-picker-ui' :
+                              // Clean previously generated UI elements
+                              self.cleanRegistered();
+                              dfd = self.generateUIforDraggableContent( params, dfd );
+                        break;
+
                         // Fired in ::initialize()
                         case 'sek-generate-local-skope-options-ui' :
+                              // Clean previously generated UI elements
+                              self.cleanRegistered();
                               dfd = self.generateUIforLocalSkopeOptions( params, dfd );
                         break;
 
                         // Fired in ::initialize()
                         case 'sek-generate-global-options-ui' :
+                              // Clean previously generated UI elements
+                              self.cleanRegistered();
                               dfd = self.generateUIforGlobalOptions( params, dfd );
                         break;
                   }//switch
