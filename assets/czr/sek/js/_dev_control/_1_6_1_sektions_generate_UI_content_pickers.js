@@ -27,15 +27,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingValue : { content_type : params.content_type }
                               //icon : '<i class="material-icons sek-level-option-icon">center_focus_weak</i>'
                         },
-                        section_picker : {
-                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_draggable_sections_ui',
-                              module_type : 'sek_section_picker_module',
-                              controlLabel :  sektionsLocalizedData.i18n['Pick a pre-designed section'],
-                              content_type : 'section',
-                              expandAndFocusOnInit : 'section' === params.content_type,
-                              priority : 10,
-                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                        },
                         module_picker : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_draggable_modules_ui',
                               module_type : 'sek_module_picker_module',
@@ -44,7 +35,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               expandAndFocusOnInit : 'module' === params.content_type,
                               priority : 20,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                        }
+                        },
+
+                        sek_intro_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_intro_sec_picker_module',
+                              controlLabel :  sektionsLocalizedData.i18n['Intro Sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : 'section' === params.content_type,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
+                        sek_features_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_features_sec_picker_module',
+                              controlLabel :  sektionsLocalizedData.i18n['Features Sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : 'section' === params.content_type,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
                   });
 
 

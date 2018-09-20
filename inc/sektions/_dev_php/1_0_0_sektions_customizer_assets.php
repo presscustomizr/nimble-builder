@@ -378,6 +378,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_domain_to_be_replaced'),
             'Select a content type' => __('Select a content type', 'text_domain_to_be_replaced'),
 
+            'Intro Sections' => __('Intro Sections', 'text_domain_to_be_replaced'),
+            'Features Sections' => __('Features Sections', 'text_domain_to_be_replaced'),
+
             'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
 
             'Module' => __('Module', 'text_domain_to_be_replaced'),

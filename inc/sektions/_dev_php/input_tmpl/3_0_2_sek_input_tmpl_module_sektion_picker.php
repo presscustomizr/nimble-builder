@@ -164,21 +164,29 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
         <div class="sek-content-type-wrapper">
           <?php
-            $content_collection = array(
-                array(
-                    'content-type' => 'preset_section',
-                    'content-id' => 'img_text_one',
-                    'title' => __('2 columns with image and text', 'text-domain' ),
-                    'thumb' => 'img_text_one.jpg'
-                ),
-                array(
-                    'content-type' => 'preset_section',
-                    'content-id' => 'img_text_two',
-                    'title' => __('2 columns with image and text', 'text-domain' ),
-                    'thumb' => 'img_text_two.jpg',
-                    'height' => '188px'
-                )
-            );
+            switch( $input_id ) {
+                case 'intro_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'img_text_one',
+                            'title' => __('2 columns with image and text', 'text-domain' ),
+                            'thumb' => 'img_text_one.jpg'
+                        )
+                    );
+                break;
+                case 'features_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'img_text_two',
+                            'title' => __('2 columns with image and text', 'text-domain' ),
+                            'thumb' => 'img_text_two.jpg',
+                            'height' => '188px'
+                        )
+                    );
+                break;
+            }
             foreach( $content_collection as $_params) {
                 printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"></div>',
                     $_params['content-type'],

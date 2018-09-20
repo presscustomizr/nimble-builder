@@ -6,7 +6,9 @@ function sek_register_modules() {
         // UI CONTENT PICKER
         'sek_content_type_switcher_module',
         'sek_module_picker_module',
-        'sek_section_picker_module',
+
+        'sek_intro_sec_picker_module',
+        'sek_features_sec_picker_module',
 
         // UI LEVEL MODULES
         'sek_level_bg_border_module',
