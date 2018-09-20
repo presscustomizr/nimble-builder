@@ -498,7 +498,8 @@ function add_sektion_values_to_skope_export( $skopes ) {
 }
 
 
-
+// @return array() of json decoded sections
+// used when js localizing the preset_sections for the customizer
 function sek_get_preset_sektions() {
     if ( false == get_transient( 'nimble_preset_sections_1_1_0' ) || ( defined( 'NIMBLE_DEV') && true === NIMBLE_DEV ) ) {
         $preset_raw      = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
