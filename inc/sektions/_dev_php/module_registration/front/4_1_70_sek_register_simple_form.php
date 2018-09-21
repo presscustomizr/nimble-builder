@@ -43,10 +43,11 @@ function sek_get_module_params_for_czr_simple_form_module() {
         'name' => __( 'Simple Form', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         'starting_value' => array(
-            // 'fields_design' => array(
-            //     'border_width_css' => '1px',
-            //     'border_color_css' => '#000000'
-            // ),
+            'fields_design' => array(
+                'border' => array(
+                    '_all_' => array( 'wght' => '1px', 'col' => '#cccccc' )
+                )
+            ),
             'form_button' => array(
                 'bg_color_css' => '#020202',
                 'bg_color_hover' => '#151515', //lighten 15%,
@@ -225,7 +226,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                 'border-type' => array(
                     'input_type'  => 'select',
                     'title'       => __('Fields border shape', 'text_domain_to_be_replaced'),
-                    'default' => 'none',
+                    'default' => 'solid',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_stylesheet' => true
                 ),
@@ -235,7 +236,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
-                        '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+                        '_all_' => array( 'wght' => '1px', 'col' => '#cccccc' )
                     ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
