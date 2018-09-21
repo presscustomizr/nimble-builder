@@ -22,7 +22,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_content_type_switcher_ui',
                               module_type : 'sek_content_type_switcher_module',
                               controlLabel :  sektionsLocalizedData.i18n['Select a content type'],
-                              expandAndFocusOnInit : true,
                               priority : 0,
                               settingValue : { content_type : params.content_type }
                               //icon : '<i class="material-icons sek-level-option-icon">center_focus_weak</i>'
@@ -32,7 +31,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_module_picker_module',
                               controlLabel : sektionsLocalizedData.i18n['Pick a module'],
                               content_type : 'module',
-                              expandAndFocusOnInit : 'module' === params.content_type,
                               priority : 20,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
@@ -42,7 +40,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_intro_sec_picker_module',
                               controlLabel :  sektionsLocalizedData.i18n['Intro Sections'],
                               content_type : 'section',
-                              expandAndFocusOnInit : 'section' === params.content_type,
+                              expandAndFocusOnInit : true,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
@@ -51,7 +49,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_features_sec_picker_module',
                               controlLabel :  sektionsLocalizedData.i18n['Features Sections'],
                               content_type : 'section',
-                              expandAndFocusOnInit : 'section' === params.content_type,
+                              expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
@@ -140,31 +138,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                           }
 
-                                          // // ACCORDION
-                                          // // Hide the item wrapper
-                                          // _control_.container.find('.czr-items-wrapper').hide();
-                                          // // prepend the animated arrow
-                                          // $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                          // // setup the initial state + initial click
-                                          // _control_.container.attr('data-sek-expanded', "false" );
-                                          // if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                          //       $title.trigger('click');
-                                          // }
+                                          // ACCORDION
+                                          // Setup the accordion only for section content type
+                                          if ( 'section' === _control_.content_type ) {
+                                                // Hide the item wrapper
+                                                _control_.container.find('.czr-items-wrapper').hide();
+                                                // prepend the animated arrow
+                                                $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+                                                // setup the initial state + initial click
+                                                _control_.container.attr('data-sek-expanded', "false" );
+                                                if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
+                                                      $title.trigger('click');
+                                                }
+                                          } else {
+                                                _control_.container.attr('data-sek-accordion', 'no');
+                                          }
+
                                     });
                               });
                         });//_.each
                   };//_do_register_
-
-
-
-                  // // Defer the accordion setup when the parent section gets added to the api
-                  // // Note : the check on api.section.has( params.id ) is also performd on api.CZR_Helpers.register(), but here we use it to avoid setting up the click listeners more than once.
-                  // if ( ! api.section.has( '__content_picker__' ) ) {
-                  //       api.section( '__content_picker__', function( _section_ ) {
-                  //             // Schedule the accordion behaviour
-                  //             self.scheduleModuleAccordion.call( _section_, { expand_first_module : false } );
-                  //       });
-                  // }
 
                   // CONTENT PICKER SECTION
                   api.CZR_Helpers.register({
@@ -200,6 +193,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
                                     $panelTitleEl.find('.customize-action').after( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
                               }
+
+                              // Schedule the accordion behaviour
+                              self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
                         });
                   });
                   return dfd;

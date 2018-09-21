@@ -640,15 +640,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // GENERIC WAY TO SETUP ACCORDION BEHAVIOUR OF MODULES IN SECTIONS
             //-------------------------------------------------------------------------------------------------
             // "this" is the section
+            // in the content picker section, control's container have the attribute "data-sek-accordion" to selectively enable the accordion
+            // @see ::generateUIforDraggableContent()
+            // @params { expand_first_module : boolean }
             scheduleModuleAccordion : function( params ) {
                   params = params || { expand_first_module : true };
                   var _section_ = this;
                   // Attach event on click
                   $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
+                        evt.preventDefault();
                         var $control = $(this).closest( '.customize-control');
-                        // if ( "true" == $control.attr('data-sek-expanded' ) )
-                        //   return;
+
+                        if ( "no" === $control.attr( 'data-sek-accordion' ))
+                          return;
+
                         _section_.container.find('.customize-control').not( $control ).each( function() {
+                              if ( $(this).attr( 'data-sek-accordion' ) )
+                                return;
                               $(this).attr('data-sek-expanded', "false" );
                               $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
                         });
@@ -660,7 +668,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });
 
-                  // Always expand the first module
+                  // Expand the first module if requested
                   if ( params.expand_first_module ) {
                         _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
                   }
