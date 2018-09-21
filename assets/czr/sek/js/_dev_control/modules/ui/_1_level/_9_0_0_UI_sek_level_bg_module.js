@@ -86,15 +86,6 @@
                                                 }
                                           });
                                     break;
-                                    case 'border-type' :
-                                          _.each( [ 'borders' ] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return 'none' !== input();
-                                                }); } catch( er ) {
-                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
                               }
                         });
                   }
@@ -112,15 +103,15 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            sek_level_bg_border_module : {
+            sek_level_bg_module : {
                   mthds : Constructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_bg_border_module', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_bg_module', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_bg_border_module' )
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_bg_module' )
                   )
             },
       });

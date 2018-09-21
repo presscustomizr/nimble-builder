@@ -26,12 +26,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var modulesRegistrationParams = {};
 
                   $.extend( modulesRegistrationParams, {
-                        bg_border : {
-                              settingControlId : params.id + '__bgBorder_options',
-                              module_type : 'sek_level_bg_border_module',
-                              controlLabel : sektionsLocalizedData.i18n['Background and border settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                        bg : {
+                              settingControlId : params.id + '__bg_options',
+                              module_type : 'sek_level_bg_module',
+                              controlLabel : sektionsLocalizedData.i18n['Background settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                               expandAndFocusOnInit : true,
                               icon : '<i class="material-icons sek-level-option-icon">gradient</i>'//'<i class="material-icons sek-level-option-icon">brush</i>'
+                        },
+                        border : {
+                              settingControlId : params.id + '__border_options',
+                              module_type : 'sek_level_border_module',
+                              controlLabel : sektionsLocalizedData.i18n['Borders settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              //expandAndFocusOnInit : true,
+                              icon : '<i class="material-icons sek-level-option-icon">rounded_corner</i>'//'<i class="material-icons sek-level-option-icon">brush</i>'
                         },
                         spacing : {
                               settingControlId : params.id + '__spacing_options',
@@ -223,7 +230,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( ! api.section.has( params.id ) ) {
                         api.section( params.id, function( _section_ ) {
                               // Schedule the accordion behaviour
-                              self.scheduleModuleAccordion.call( _section_ );
+                              self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
                         });
                   }
 

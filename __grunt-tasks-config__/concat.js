@@ -207,7 +207,8 @@ module.exports = {
 
       '<%= paths.sektions %>_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php',
 
-      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_background_border.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_background.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_border.php',
       //'<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_section_layout.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_height.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_4_sek_register_spacing.php',
@@ -297,7 +298,8 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_anchor_module.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_bg_border_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_bg_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_border_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_breakpoint_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_height_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_visibility_module.js',

@@ -11,7 +11,8 @@ function sek_register_modules() {
         'sek_features_sec_picker_module',
 
         // UI LEVEL MODULES
-        'sek_level_bg_border_module',
+        'sek_level_bg_module',
+        'sek_level_border_module',
         //'sek_level_section_layout_module',<// deactivated for now. Replaced by sek_level_width_section
         'sek_level_height_module',
         'sek_level_spacing_module',
