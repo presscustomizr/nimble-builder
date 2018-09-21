@@ -1075,12 +1075,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               clickedOn = 'inactiveZone';
                         }
 
-                        //console.log('CLICKED', clickedOn, _action );
-
                         switch( clickedOn ) {
                               case 'addContentButton' :
-                                    //self._send_( $el, { action : 'pick-section' } );
-                                    //self._send_( $el, { action : 'pick-module', level : _level , id : _id } );
                                     var is_first_section = true === $el.closest('[data-sek-is-first-section]').data('sek-is-first-section');
 
                                     api.preview.send( 'sek-add-section', {
@@ -1124,7 +1120,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
                                       return;
 
-                                    self._send_( $el, { action : 'pick-module', level : _level , id : _id } );
+                                    self._send_( $el, { action : 'pick-content', content_type : 'module', level : _level , id : _id } );
                               break;
                               case 'columnOutsideModules' :
                               case 'sectionOutsideColumns' :
@@ -1161,7 +1157,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               break;
                               case 'inactiveZone' :
                                     api.preview.send( 'sek-click-on-inactive-zone');//<= for example, collapses the tinyMce editor if expanded
-                                    //self._send_( $el, { action : 'pick-module' } );
+                                    //self._send_( $el, { action : 'pick-content' } );
                               break;
                         }
                   });//$('body').on('click', function( evt ) {}
@@ -1171,17 +1167,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
             _send_ : function( $el, params ) {
                   //console.log('IN _send_', $el, params );
-                  api.preview.send( 'sek-' + params.action, {
+                  var clonedParams = $.extend( true, {}, params );
+                  api.preview.send( 'sek-' + params.action, _.extend( {
                         location : params.location,
                         level : params.level,
-                        module_type : 'module' == params.level ? $el.closest('div[data-sek-level="module"]').data( 'sek-module-type') : '',
                         id : params.id,
+                        content_type : $el.data( 'sek-content-type'),
+                        module_type : 'module' == params.level ? $el.closest('div[data-sek-level="module"]').data( 'sek-module-type') : '',
                         in_column : $el.closest('div[data-sek-level="column"]').length > 0 ? $el.closest('div[data-sek-level="column"]').data( 'sek-id') : '',
                         in_sektion : $el.closest('div[data-sek-level="section"]').length > 0 ? $el.closest('div[data-sek-level="section"]').data( 'sek-id') : '',
                         clicked_input_type : $el.closest('div[data-sek-input-type]').length > 0 ? $el.closest('div[data-sek-input-type]').data('sek-input-type') : '',
                         clicked_input_id : $el.closest('div[data-sek-input-id]').length > 0 ? $el.closest('div[data-sek-input-id]').data('sek-input-id') : '',
                         was_triggered : params.was_triggered
-                  });
+                  }, clonedParams ) );
             }
       });//$.extend()
 })( wp.customize, jQuery, _ );

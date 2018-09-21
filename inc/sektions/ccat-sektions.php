@@ -601,7 +601,7 @@ function sek_get_global_custom_breakpoint() {
     return intval( $options['breakpoint']['global-custom-breakpoint'] );
 }
 
-
+// invoked when filtering 'sek_add_css_rules_for__section__options'
 function sek_get_section_custom_breakpoint( $section ) {
     if ( ! is_array( $section ) )
       return;
@@ -1231,8 +1231,12 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             // Generated UI
             'Content Picker' => __('Content Picker', 'text_domain_to_be_replaced'),
-            'Module Picker' => __('Module Picker', 'text_domain_to_be_replaced'),
-            'Section Picker' => __('Section Picker', 'text_domain_to_be_replaced'),
+            'Pick a module' => __('Pick a module', 'text_domain_to_be_replaced'),
+            'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_domain_to_be_replaced'),
+            'Select a content type' => __('Select a content type', 'text_domain_to_be_replaced'),
+
+            'Intro Sections' => __('Intro Sections', 'text_domain_to_be_replaced'),
+            'Features Sections' => __('Features Sections', 'text_domain_to_be_replaced'),
 
             'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
 
@@ -1247,7 +1251,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Width settings for the' => __('Width settings for the', 'text_domain_to_be_replaced'),
             'Set a custom anchor for the' => __('Set a custom anchor for the', 'text_domain_to_be_replaced'),
             'Device visibility settings for the' => __('Device visibility settings for the', 'text_domain_to_be_replaced'),
-            'Breakpoint for responsive columns' => __('Breakpoint for responsive columns', 'text_domain_to_be_replaced'),
+            'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_domain_to_be_replaced'),
 
             'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
 
@@ -1355,20 +1359,22 @@ function add_sektion_values_to_skope_export( $skopes ) {
 }
 
 
-
+// @return array() of json decoded sections
+// used when js localizing the preset_sections for the customizer
 function sek_get_preset_sektions() {
-    return array(
-        // in section picker
-        // 'alternate_text_right' => '{"collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}]}]}',
-        // 'alternate_text_left' => '{"collection":[{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."}}],"width":""},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_image_module"}],"width":""}]}',
+    if ( false == get_transient( 'nimble_preset_sections_1_1_0' ) || ( defined( 'NIMBLE_DEV') && true === NIMBLE_DEV ) ) {
+        $preset_raw      = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
+        if ( $preset_raw === false ) {
+          $preset_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
+        }
 
-        'img_text_one' => '{"collection":[{"id":"","level":"column","collection":[],"width":"","options":{"bg_border":{"bg-image":"::img-path::/assets/img/girl-with-leaf.jpg","bg-color-overlay":"#000000","bg-opacity-overlay":"40","borders":{"_all_":{"wght":"1px","col":"#000000"}}},"visibility":[],"spacing":{"pad_marg":{"desktop":{"padding-top":"100","padding-bottom":"100"}}}}},{"id":"","level":"column","collection":[{"id":"","level":"module","module_type":"czr_heading_module","value":{"heading_text":"Add a heading","font_family_css":"[gfont]Lato:700"}},{"id":"","level":"module","module_type":"czr_tiny_mce_editor_module","value":{"content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.","font_family_css":"[gfont]Courgette:regular","font_size_css":{"desktop":"16px","mobile":"12px"}}},{"id":"","level":"module","module_type":"czr_button_module","value":{"button_text":"Click me","font_family_css":"[gfont]Courgette:regular","bg_color_css":"#020202","bg_color_hover":"#151515","border_radius_css":"2","spacing_css":{"padding-top":0.5,"padding-bottom":0.5,"padding-right":1,"padding-left":1,"unit":"em","margin-top":"1"},"color_css":"#ffffff"}}],"options":{"spacing":{"pad_marg":{"desktop":{"margin-top":"100","padding-top":"45","padding-left":"45","padding-right":"45","padding-bottom":"45","margin-bottom":"100","margin-left":"-45"},"tablet":{"margin-left":"0","margin-right":"0","margin-top":"0","margin-bottom":"0","padding-top":"20","padding-right":"20","padding-bottom":"20","padding-left":"20"},"mobile":{"padding-top":"20","padding-bottom":"20","padding-right":"20","padding-left":"20"}}},"bg_border":{"bg-color":"#ffffff","bg-color-overlay":"#000000","bg-opacity-overlay":"40","borders":{"_all_":{"wght":"1px","col":"#000000"}},"shadow":true}}}]}',
-
-        // in module picker
-        'two_columns' => '{"collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
-        'three_columns' => '{"collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}',
-        'four_columns' => '{"collection":[{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[],"width":""},{"id":"","level":"column","collection":[]}]}'
-    );
+        $presets_decoded   = json_decode( $preset_raw, true );
+        set_transient( 'nimble_preset_sections_1_1_0' , $presets_decoded , 60*60*24*30 );
+    }
+    else {
+        $presets_decoded = get_transient( 'nimble_preset_sections_1_1_0' );
+    }
+    return $presets_decoded;
 }
 
 
@@ -1571,12 +1577,17 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
          wp_send_json_error( 'sek_set_input_tmpl_content => missing input type for input id : ' . $input_id );
     }
     switch( $input_type ) {
+        // Content picker group
+        case 'content_type_switcher' :
+            sek_set_input_tmpl___content_type_switcher( $input_id, $input_data );
+        break;
         case 'module_picker' :
             sek_set_input_tmpl___module_picker( $input_id, $input_data );
         break;
         case 'section_picker' :
             sek_set_input_tmpl___section_picker( $input_id, $input_data );
         break;
+
         case 'spacing' :
         case 'spacingWithDeviceSwitcher' :
             sek_set_input_tmpl___spacing( $input_id, $input_data );
@@ -1621,6 +1632,24 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
     }
 }
 ?><?php
+
+/* ------------------------------------------------------------------------- *
+ *  CONTENT TYPE SWITCHER INPUT
+/* ------------------------------------------------------------------------- */
+// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
+function sek_set_input_tmpl___content_type_switcher( $input_id, $input_data ) {
+    ?>
+        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+        <div class="sek-content-type-wrapper">
+            <div aria-label="<?php _e( 'Content type', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a section', 'text_domain');?>" data-sek-content-type="section"><?php _e('Pick a section', 'text_domain');?></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a module', 'text_domain');?>" data-sek-content-type="module"><?php _e('Pick a module', 'text_domain');?></button>
+            </div>
+        </div>
+  <?php
+}
+
+
 /* ------------------------------------------------------------------------- *
  *  MODULE PICKER INPUT
 /* ------------------------------------------------------------------------- */
@@ -1751,7 +1780,13 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
     <?php
 }
 
-?><?php
+
+
+
+
+
+
+
 
 /* ------------------------------------------------------------------------- *
  *  SECTION PICKER INPUT
@@ -1762,20 +1797,36 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
         <div class="sek-content-type-wrapper">
           <?php
-            $content_collection = array(
-                array(
-                  'content-type' => 'preset_section',
-                  'content-id' => 'img_text_one',
-                  'title' => __('2 columns with image and text', 'text-domain' ),
-                  'thumb' => 'img_text_one.jpg'
-                )
-            );
+            switch( $input_id ) {
+                case 'intro_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'img_text_one',
+                            'title' => __('2 columns with image and text', 'text-domain' ),
+                            'thumb' => 'img_text_one.jpg'
+                        )
+                    );
+                break;
+                case 'features_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'img_text_two',
+                            'title' => __('2 columns with image and text', 'text-domain' ),
+                            'thumb' => 'img_text_two.jpg',
+                            'height' => '188px'
+                        )
+                    );
+                break;
+            }
             foreach( $content_collection as $_params) {
                 printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"></div>',
                     $_params['content-type'],
                     $_params['content-id'],
-                    sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;',
-                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb']
+                    sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
+                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'],
+                        isset( $_params['height'] ) ? 'height:'.$_params['height'] : ''
                     ),
                     $_params['title']
                 );
@@ -2901,8 +2952,11 @@ add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
     foreach( [
         // UI CONTENT PICKER
+        'sek_content_type_switcher_module',
         'sek_module_picker_module',
-        'sek_section_picker_module',
+
+        'sek_intro_sec_picker_module',
+        'sek_features_sec_picker_module',
 
         // UI LEVEL MODULES
         'sek_level_bg_border_module',
@@ -3156,6 +3210,31 @@ function sek_get_select_options_for_input_id( $input_id ) {
 
 ?><?php
 /* ------------------------------------------------------------------------- *
+ *  CONTENT TYPE SWITCHER
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_content_type_switcher_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_content_type_switcher_module',
+        'name' => __('Content type', 'text_domain_to_be_replaced'),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'content_type' => array(
+                    'input_type'  => 'content_type_switcher',
+                    'title'       => __('Which type of content would you like to insert in your page ?', 'text_domain_to_be_replaced'),
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                )
+            )
+        )
+    );
+}
+
+
+/* ------------------------------------------------------------------------- *
  *  MODULE PICKER MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
@@ -3179,24 +3258,42 @@ function sek_get_module_params_for_sek_module_picker_module() {
     );
 }
 
+
 /* ------------------------------------------------------------------------- *
- *  SEKTION PICKER MODULE
+ *  SEKTION PICKER MODULES
 /* ------------------------------------------------------------------------- */
+function sek_get_default_section_input_params() {
+    return array(
+        'input_type'  => 'section_picker',
+        'title'       => __('Drag and drop sections in the previewed page', 'text_domain_to_be_replaced'),
+        'width-100'   => true,
+        'title_width' => 'width-100'
+    );
+
+}
+
+
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-function sek_get_module_params_for_sek_section_picker_module() {
+function sek_get_module_params_for_sek_intro_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
-        'module_type' => 'sek_section_picker_module',
-        'name' => __('Section Picker', 'text_domain_to_be_replaced'),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
-        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'module_type' => 'sek_intro_sec_picker_module',
+        'name' => __('Intro Sections', 'text_domain_to_be_replaced'),
         'tmpl' => array(
             'item-inputs' => array(
-                'section_id' => array(
-                    'input_type'  => 'section_picker',
-                    'title'       => __('Pick a section', 'text_domain_to_be_replaced'),
-                    'width-100'   => true
-                )
+                'intro_sections' => sek_get_default_section_input_params()
+            )
+        )
+    );
+}
+function sek_get_module_params_for_sek_features_sec_picker_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_features_sec_picker_module',
+        'name' => __('Features Sections', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'features_sections' => sek_get_default_section_input_params()
             )
         )
     );
@@ -4148,7 +4245,16 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                       'width-100'   => true,
                       'title_width' => 'width-100',
                       'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default breakpoint is 768px.', 'text_domain_to_be_replaced')
-                  )//0,
+                  ),//0,
+                  'reverse-col-at-breakpoint' => array(
+                      'input_type'  => 'gutencheck',
+                      'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'text_domain_to_be_replaced'),
+                      'default'     => 0,
+                      'title_width' => 'width-80',
+                      'input_width' => 'width-20',
+                      'refresh_markup' => true,
+                      'refresh_stylesheet' => true
+                  ),
             )
         )//tmpl
     );
@@ -4159,21 +4265,36 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
 add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_sections_breakpoint', 10, 3 );
 function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
     $custom_breakpoint = intval( sek_get_section_custom_breakpoint( $section ) );
+    if ( $custom_breakpoint > 0 ) {
+        $col_number = ( array_key_exists( 'collection', $section ) && is_array( $section['collection'] ) ) ? count( $section['collection'] ) : 1;
+        $col_number = 12 < $col_number ? 12 : $col_number;
+        $col_width_in_percent = 100/$col_number;
+        $col_suffix = floor( $col_width_in_percent );
 
-    if ( $custom_breakpoint < 1 )
-      return $rules;
+        $responsive_css_rules = "flex: 0 0 {$col_suffix}%;max-width: {$col_suffix}%;";
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-'.$col_suffix,
+            'css_rules' => $responsive_css_rules,
+            'mq' => "(min-width: {$custom_breakpoint}px)"
+        );
+    }
 
-    $col_number = ( array_key_exists( 'collection', $section ) && is_array( $section['collection'] ) ) ? count( $section['collection'] ) : 1;
-    $col_number = 12 < $col_number ? 12 : $col_number;
-    $col_width_in_percent = 100/$col_number;
-    $col_suffix = floor( $col_width_in_percent );
+    // maybe set the reverse column order on mobile devices ( smaller than the breakpoint )
+    if ( isset( $section[ 'options' ] ) && isset( $section[ 'options' ]['breakpoint'] ) && array_key_exists( 'reverse-col-at-breakpoint', $section[ 'options' ]['breakpoint'] ) ) {
+        $default_md_breakpoint = '768';
+        if ( class_exists('\Nimble\Sek_Dyn_CSS_Builder') ) {
+            $default_md_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];
+        }
+        $breakpoint = $custom_breakpoint > 0 ? $custom_breakpoint : $default_md_breakpoint;
+        $responsive_css_rules = "-ms-flex-direction: column-reverse;flex-direction: column-reverse;";
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner',
+            'css_rules' => $responsive_css_rules,
+            'mq' => "(max-width: {$breakpoint}px)"
+        );
+    }
 
-    $responsive_css_rules = "flex: 0 0 {$col_suffix}%;max-width: {$col_suffix}%;";
-    $rules[] = array(
-        'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-'.$col_suffix,
-        'css_rules' => $responsive_css_rules,
-        'mq' => "(min-width: {$custom_breakpoint}px)"
-    );
+
     return $rules;
 }
 
@@ -9653,7 +9774,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                           <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'text_domain' ); ?>">view_column</i>
                         <# } #>
                         <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'text_domain' ); ?>">filter_none</i>
-                        <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'text_domain' ); ?>">add_circle_outline</i>
+                        <i data-sek-click-on="pick-content" data-sek-content-type="module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'text_domain' ); ?>">add_circle_outline</i>
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'text_domain' ); ?>">delete_forever</i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
@@ -9683,7 +9804,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                           <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate column', 'text_domain' ); ?>">filter_none</i>
                         <# } #>
 
-                        <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'text_domain' ); ?>">add_circle_outline</i>
+                        <i data-sek-click-on="pick-content" data-sek-content-type="module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'text_domain' ); ?>">add_circle_outline</i>
                         <# if ( ! data.parent_is_single_column ) { #>
                           <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'text_domain' ); ?>">delete_forever</i>
                         <# } #>
@@ -10040,10 +10161,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
                             <?php
                               if ( skp_is_customizing() && empty( $collection ) ) {
+                                  $content_type = 1 === $col_number ? 'section' : 'module';
+                                  $title = 'section' === $content_type ? __('Drag and drop a section here', 'text_domain_to_be_replaced' ) : __('Drag and drop a module here', 'text_domain_to_be_replaced' );
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
-                                      <i data-sek-click-on="pick-module" class="material-icons sek-click-on" title="<?php _e('Drag and drop a module here', 'text_domain_to_be_replaced' ); ?>">add_circle_outline</i>
+                                      <i data-sek-click-on="pick-content" data-sek-content-type="<?php echo $content_type; ?>" class="material-icons sek-click-on" title="<?php echo $title; ?>">add_circle_outline</i>
                                     </div>
                                   </div>
                                   <?php
