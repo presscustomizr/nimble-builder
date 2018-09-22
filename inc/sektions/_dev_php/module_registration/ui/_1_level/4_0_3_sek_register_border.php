@@ -32,15 +32,17 @@ function sek_get_module_params_for_sek_level_border_module() {
                     'title_width' => 'width-100'
                 ),
                 'border-radius'       => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'border_radius',
                     'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
-                    'default'     => '',
+                    'default' => array(
+                        '_all_' => '0px'
+                    ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'min'         => 0,
                     'max'         => 500,
-                    'refresh_markup' => false,
-                    'refresh_stylesheet' => true,
+                    //'refresh_markup' => false,
+                    //'refresh_stylesheet' => true,
                     //'css_identifier' => 'border_radius',
                     //'css_selectors'=> $css_selectors
                 ),
@@ -115,17 +117,8 @@ function sek_add_css_rules_for_border( $rules, $level ) {
         $rules = sek_generate_css_rules_for_multidimensional_border_options( $rules, $border_settings, $border_type, '[data-sek-id="'.$level['id'].'"]'  );
     }
 
-    if ( ! empty( $border_options['border-radius'] ) ) {
-        $numeric = sek_extract_numeric_value( $border_options['border-radius'] );
-        if ( !empty( $numeric ) ) {
-            $unit = sek_extract_unit( $border_options['border-radius'] );
-            // $unit = '%' === $unit ? 'vw' : $unit;
-            $rules[]     = array(
-                'selector' => '[data-sek-id="'.$level['id'].'"]',
-                'css_rules' => 'border-radius:'.$numeric . $unit.';',
-                'mq' =>null
-            );
-        }
+    if ( ! empty( $border_options['border-radius'] ) && is_array( $border_options['border-radius'] ) ) {
+        $rules = sek_generate_css_rules_for_border_radius_options( $rules, $border_options['border-radius'], '[data-sek-id="'.$level['id'].'"]' );
     }
 
     return $rules;
