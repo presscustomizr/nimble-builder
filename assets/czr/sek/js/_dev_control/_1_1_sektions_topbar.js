@@ -190,7 +190,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // set the new setting Value
                   if( ! _.isUndefined( newSettingValue ) ) {
                         api( self.sekCollectionSettingId() )( self.validateSettingValue( newSettingValue ), { navigatingHistoryLogs : true } );
-
                         // If the information is available, refresh only the relevant sections
                         // otherwise fallback on a full refresh
                         var previewHasBeenRefreshed = false;
@@ -218,6 +217,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // Always make sure that the ui gets refreshed
                         api.previewer.trigger( 'sek-pick-content', {});
+                        // Clean registered setting and control, even the level settings
+                        // => otherwise the level settings won't be synchronized when regenerating their ui.
+                        self.cleanRegistered();//<= normal cleaning
+                        self.cleanRegisteredLevelSettingsAfterHistoryNavigation();// setting cleaning
                   }
 
                   // UPDATE THE HISTORY LOG
