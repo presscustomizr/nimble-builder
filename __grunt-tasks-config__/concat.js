@@ -200,6 +200,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/input_tmpl/3_1_2_sek_input_tmpl_range_with_unit_picker.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_1_3_sek_input_tmpl_range_with_unit_picker_device_switcher.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_1_4_sek_input_tmpl_borders.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_1_5_sek_input_tmpl_border_radius.php',
 
       // MODULE REGISTRATION
       '<%= paths.sektions %>_dev_php/module_registration/10_0_0_sek_module_helpers_for_css_rules_generation.php',
@@ -293,6 +294,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_9_range_with_unit_picker.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_0_9_range_with_unit_picker_device_switcher.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_0_borders.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_1_border_radius.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
