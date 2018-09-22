@@ -148,7 +148,8 @@ class Sek_Dyn_CSS_Builder {
             // LEVEL CSS RULES
             if ( is_array( $entry ) ) {
                 // Populate rules for sections / columns / modules
-                if ( !empty( $entry[ 'level' ] ) ) {
+                // Location level are excluded
+                if ( !empty( $entry[ 'level' ] ) && 'location' != $entry[ 'level' ] ) {
                     $level_type = $entry[ 'level' ];
                     $rules = apply_filters( "sek_add_css_rules_for__{$level_type}__options", $rules, $entry );
                     // build rules for level options => section / column / module
