@@ -113,11 +113,11 @@
                         // update the numeric val
                         $numberInput.val( _numberVal ).trigger('input', { border_type_switched : true });// We don't want to update the input()
                         // update the color
-                        // trigger the change between "silent-update" data flags, so we know the api setting don't have to be refreshed
+                        // trigger the change between "border_type_switched" data flags, so we know the api setting don't have to be refreshed
                         // ( there's no easy other way to pass a param when triggering )
-                        $colorInput.data('silent-update', true );
+                        $colorInput.data('border_type_switched', true );
                         $colorInput.val( _rawVal.col ).trigger( 'change' );
-                        $colorInput.data('silent-update', false );
+                        $colorInput.data('border_type_switched', false );
                   };
 
 
@@ -148,9 +148,7 @@
                               //synchronizes with the original input
                               //OLD => $(this).val( $(this).wpColorPicker('color') ).trigger('colorpickerchange').trigger('change');
                               $(this).val( o.color.toString() ).trigger('colorpickerchange');
-                              if ( true !== $(this).data('silent-update') ) {
-                                    input.borderColor( o.color.toString() );
-                              }
+                              input.borderColor( o.color.toString(), { border_type_switched : true === $(this).data('border_type_switched') } );
                               //input.borderColor( o.color.toString() );
                               // if ( evt.originalEvent && evt.originalEvent.type && 'external' === evt.originalEvent.type ) {
                               //       input.borderColor( o.color.toString(), { border_type_switched : true } );
