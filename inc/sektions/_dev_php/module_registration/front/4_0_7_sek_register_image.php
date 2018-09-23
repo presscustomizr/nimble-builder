@@ -79,27 +79,26 @@ function sek_get_module_params_for_czr_image_module() {
                         'title' => __( 'Style', 'text_domain_to_be_replaced' ),
                         //'attributes' => 'data-sek-device="desktop"',
                         'inputs' => array(
-                            'border_width_css' => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Border weight', 'text_domain_to_be_replaced' ),
-                                'min' => 0,
-                                'max' => 80,
-                                'default' => '',
-                                'width-100'   => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'border_width',
-                                'css_selectors' => $css_selectors
+                            'border-type' => array(
+                                'input_type'  => 'select',
+                                'title'       => __('Border', 'text_domain_to_be_replaced'),
+                                'default' => 'none',
+                                'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
+                                'refresh_stylesheet' => true
                             ),
-                            'border_color_css' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Border Color', 'text_domain_to_be_replaced' ),
-                                'width-100'   => true,
-                                'default'     => '#f2f2f2',
+                            'borders' => array(
+                                'input_type'  => 'borders',
+                                'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                                'min' => 0,
+                                'max' => 100,
+                                'default' => array(
+                                    '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+                                ),
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'border_color',
-                                'css_selectors' => $css_selectors
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_selectors'=> $css_selectors
                             ),
                             'border_radius_css'       => array(
                                 'input_type'  => 'border_radius',
@@ -182,6 +181,21 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
                 'mq' =>null
             );
         }
+    }
+
+    // BORDERS
+    $border_settings = $value[ 'borders' ];
+    $border_type = $value[ 'border-type' ];
+    $has_border_settings  = 'none' != $border_type && !empty( $border_type );
+
+    //border width + type + color
+    if ( $has_border_settings ) {
+        $rules = sek_generate_css_rules_for_multidimensional_border_options(
+            $rules,
+            $border_settings,
+            $border_type,
+            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner img'
+        );
     }
 
     return $rules;

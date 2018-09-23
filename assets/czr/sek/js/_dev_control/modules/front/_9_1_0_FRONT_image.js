@@ -108,14 +108,12 @@
                                                 return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
                                           });
                                     break;
-                                    case 'border_width_css' :
-                                          _.each( [ 'border_color_css' ] , function( _inputId_ ) {
+                                    case 'border-type' :
+                                          _.each( [ 'borders' ] , function(_inputId_ ) {
                                                 try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      var inputVal = input(),
-                                                          numericValue = _.isString( inputVal ) ? inputVal.replace(/px|em|%/g,'') : inputVal;
-                                                      return ! _.isEmpty( input() ) && (numericValue * 1) > 0;
+                                                      return 'none' !== input();
                                                 }); } catch( er ) {
-                                                      api.errare( 'Button module => error in setInputVisibilityDeps', er );
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
                                                 }
                                           });
                                     break;
