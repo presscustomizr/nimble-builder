@@ -34,9 +34,7 @@ function sek_get_module_params_for_sek_level_border_module() {
                 'border-radius'       => array(
                     'input_type'  => 'border_radius',
                     'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
-                    'default' => array(
-                        '_all_' => '0px'
-                    ),
+                    'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'min'         => 0,
