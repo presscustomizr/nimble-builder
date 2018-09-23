@@ -210,10 +210,14 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             $properties_to_render['border-top-color'] = $value ? $value : '#5a5a5a';
         break;
         case 'border_radius' :
-            $numeric = sek_extract_numeric_value( $value );
-            if ( ! empty( $numeric ) ) {
-                $unit = sek_extract_unit( $value );
-                $properties_to_render['border-radius'] = $numeric . $unit;
+            if ( is_string( $value ) ) {
+                $numeric = sek_extract_numeric_value( $value );
+                if ( ! empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $value );
+                    $properties_to_render['border-radius'] = $numeric . $unit;
+                }
+            } else if ( is_array( $value ) ) {
+                $rules = sek_generate_css_rules_for_border_radius_options( $rules, $value, $selector );
             }
         break;
         case 'width' :
