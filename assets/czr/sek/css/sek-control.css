@@ -604,7 +604,7 @@ div[data-sek-align].selected {
 .sek-range-with-unit-picker-wrapper > div { float: left; }
 
 
-/* BORDERS */
+/* BORDERS AND BORDER RADIUS*/
 .sek-borders {
   width: 100%;
   float: left;
@@ -619,7 +619,21 @@ div[data-sek-align].selected {
 .sek-borders .sek-color-wrapper .sek-color-picker{ width: 50%;float: left;}
 .sek-borders .sek-color-wrapper .sek-reset-button { width: 50%;float: right;}
 
-
+[data-sek-radius-type="top_right"] > i.material-icons {
+  -webkit-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+      transform: rotate(90deg);
+}
+[data-sek-radius-type="bottom_right"] > i.material-icons {
+  -webkit-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+      transform: rotate(180deg);
+}
+[data-sek-radius-type="bottom_left"] > i.material-icons {
+  -webkit-transform: rotate(270deg);
+  -ms-transform: rotate(270deg);
+      transform: rotate(270deg);
+}
 
 /* RANGE INPUT */
 /* This range slider is inspired from the one used in the Gutenberg plugin ( https://github.com/WordPress/gutenberg ), released under GNU General Public License
@@ -921,9 +935,8 @@ body.nimble-top-bar-visible #nimble-top-bar {
 
 
 /* VARIOUS HELPER CLASSES */
-.sek-float-right {
-  float: right;
-}
+.sek-float-right {float: right;}
+.sek-float-left { float: left;}
 .sek-flex-vertical-center {
   display: -webkit-box;
   display: -ms-flexbox;
