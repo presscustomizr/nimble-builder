@@ -1,6 +1,6 @@
 <?php
 /* ------------------------------------------------------------------------- *
- *  BORDERS INPUT TEMPLATE
+ *  BORDER RADIUS INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
 // @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___border_radius( $input_id, $input_data ) {
