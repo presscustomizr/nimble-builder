@@ -34,7 +34,11 @@ function sek_register_modules() {
         // FRONT MODULES
         'czr_simple_html_module',
         'czr_tiny_mce_editor_module',
+
         'czr_image_module',
+        'czr_image_main_settings_child',
+        'czr_image_borders_corners_child',
+
         //'czr_featured_pages_module',
         'czr_heading_module',
         'czr_spacer_module',
