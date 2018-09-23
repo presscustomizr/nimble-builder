@@ -102,9 +102,9 @@ function sek_get_module_params_for_czr_image_module() {
                                 'css_selectors' => $css_selectors
                             ),
                             'border_radius_css'       => array(
-                                'input_type'  => 'range_with_unit_picker',
+                                'input_type'  => 'border_radius',
                                 'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
-                                'default'     => '',
+                                'default' => array( '_all_' => '0px' ),
                                 'width-100'   => true,
                                 'title_width' => 'width-100',
                                 'min'         => 0,
