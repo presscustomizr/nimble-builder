@@ -2,7 +2,7 @@
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
       //BUTTON MODULE
-      var ButtonModuleConstructor = {
+      var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
 
@@ -132,7 +132,7 @@
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_button_module : {
-                  mthds : ButtonModuleConstructor,
+                  mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_button_module', 'name' ),
                   has_mod_opt : false,
