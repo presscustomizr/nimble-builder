@@ -612,7 +612,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   input.previewedDevice = new api.Value( api.previewedDevice() );
 
 
-                  syncWithPreviewedDevice = function() {
+                  syncWithPreviewedDevice = function( evt ) {
+                        evt.stopPropagation();
                         input.container.find( '[data-sek-device]' ).removeClass('active');
                         $(this).addClass('active');
                         var device = 'desktop';
@@ -648,7 +649,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var _section_ = this;
                   // Attach event on click
                   $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
-                        evt.preventDefault();
+                        //evt.preventDefault();
+                        evt.stopPropagation();
                         var $control = $(this).closest( '.customize-control');
 
                         if ( "no" === $control.attr( 'data-sek-accordion' ))

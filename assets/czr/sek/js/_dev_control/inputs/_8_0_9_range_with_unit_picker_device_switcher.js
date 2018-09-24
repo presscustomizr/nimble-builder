@@ -137,7 +137,8 @@
 
                   // Schedule unit changes on button click
                   $wrapper.on( 'click', '.sek-ui-button', function( evt, params ) {
-                        evt.preventDefault();
+                        //evt.preventDefault();
+                        evt.stopPropagation();
                         // handle the is-selected css class toggling
                         $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
