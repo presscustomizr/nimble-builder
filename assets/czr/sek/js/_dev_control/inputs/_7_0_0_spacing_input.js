@@ -165,7 +165,7 @@
                               return inputValues[ currentDevice ];
                         } else {
                               var deviceIndex = _.findIndex( deviceHierarchy, function( _d_ ) { return currentDevice === _d_; });
-                              if ( deviceIndex < deviceHierarchy.length ) {
+                              if ( ! _.isEmpty( currentDevice ) && deviceIndex < deviceHierarchy.length ) {
                                     return getCurrentDeviceActualOrInheritedValue( inputValues, deviceHierarchy[ deviceIndex + 1 ] );
                               } else {
                                     return {};

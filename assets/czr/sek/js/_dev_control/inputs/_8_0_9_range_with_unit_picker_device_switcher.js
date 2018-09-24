@@ -46,7 +46,7 @@
                               return inputValues[ currentDevice ];
                         } else {
                               var deviceIndex = _.findIndex( deviceHierarchy, function( _d_ ) { return currentDevice === _d_; });
-                              if ( deviceIndex < deviceHierarchy.length ) {
+                              if ( ! _.isEmpty( currentDevice ) && deviceIndex < deviceHierarchy.length ) {
                                     return getCurrentDeviceActualOrInheritedValue( inputValues, deviceHierarchy[ deviceIndex + 1 ] );
                               } else {
                                     return '16px';
@@ -91,7 +91,7 @@
                   input.css_unit = new api.Value( _.isEmpty( getInitialUnit() ) ? 'px' : validateUnit( getInitialUnit() ) );
 
                   // Append a reset button
-                  var resetButton = '<button type="button" class="button sek-reset-button sek-float-right">@missi18n Reset</button>';
+                  var resetButton = '<button type="button" class="button sek-reset-button sek-float-right">' + sektionsLocalizedData.i18n['Reset'] + '</button>';
                   input.container.find('.customize-control-title').append( resetButton );
 
 
