@@ -79,6 +79,7 @@ class Sek_Dyn_CSS_Builder {
                     // $module_level_css_selectors = null;
                     // $registered_input_list = null;
                     $module_level_css_selectors = sek_get_registered_module_type_property( $parent_level['module_type'], 'css_selectors' );
+
                     $registered_input_list = sek_get_registered_module_input_list( $parent_level['module_type'] );
                     if ( 'value' === $key && is_array( $entry ) ) {
                           $is_father = sek_get_registered_module_type_property( $parent_level['module_type'], 'is_father' );
@@ -86,6 +87,7 @@ class Sek_Dyn_CSS_Builder {
                           // If the module has children ( the module is_father ), let's loop on each option group
                           if ( $is_father ) {
                               $children = sek_get_registered_module_type_property( $father_mod_type, 'children' );
+                              // Loop on the children
                               foreach ( $entry as $opt_group_type => $input_candidates ) {
                                   if ( ! is_array( $children ) ) {
                                       sek_error_log( 'Father module ' . $father_mod_type . ' has invalid children');
@@ -95,7 +97,12 @@ class Sek_Dyn_CSS_Builder {
                                       sek_error_log( 'Father module ' . $father_mod_type . ' has a invalid child for option group : '. $opt_group_type);
                                       continue;
                                   }
-                                  $children_mod_type = $children[$opt_group_type];
+                                  $child_mod_type = $children[ $opt_group_type ];
+
+                                  // If the child module has no css_selectors set, we fallback on the father css_selector
+                                  $child_css_selector = sek_get_registered_module_type_property( $child_mod_type, 'css_selectors' );
+                                  $child_css_selector = empty( $child_css_selector ) ? $module_level_css_selectors : $child_css_selector;
+
                                   foreach ( $input_candidates as $input_id_candidate => $_input_val ) {
                                       // let's skip the $key that are reserved for the structure of the sektion tree
                                       // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
@@ -109,8 +116,7 @@ class Sek_Dyn_CSS_Builder {
                                                   $input_id_candidate, // <= the unique input_id as it as been declared on module registration
                                                   $registered_input_list[ $opt_group_type ],// <= the full list of input for the module
                                                   $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
-                                                  sek_get_registered_module_type_property( $children_mod_type, 'css_selectors' )// <= if the parent is a module, a default set of css_selectors might have been specified on module registration
-                                                  //$module_level_css_selectors
+                                                  $child_css_selector
                                               );
                                           } else {
                                               sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $father_mod_type . ' for a css input candidate : ' . $key, $parent_level );
