@@ -157,6 +157,119 @@ function sek_generate_css_rules_for_border_radius_options( $rules, $border_radiu
 
 
 
+// @return array() for css rules
+// $rules[]     = array(
+//     'selector' => '[data-sek-id="'.$level['id'].'"]',
+//     'css_rules' => '',
+//     'mq' =>null
+// );
+//
+// @param bspacing_settings is an array looking like :
+// Array
+// (
+//     [desktop] => Array
+//         (
+//             [padding-top] => 2
+//         )
+
+// )
+function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spacing_settings, $css_selectors = '' ) {
+    //spacing
+    if ( empty( $spacing_settings ) || ! is_array( $spacing_settings ) )
+      return $rules;
+
+
+    $default_unit = 'px';
+
+    //not mobile first
+    $_desktop_rules = $_mobile_rules = $_tablet_rules = null;
+
+    if ( !empty( $spacing_settings['desktop'] ) ) {
+         $_desktop_rules = array( 'rules' => $spacing_settings['desktop'] );
+    }
+
+    // POPULATES AN ARRAY FROM THE RAW SAVED OPTIONS
+    $_pad_marg = array(
+        'desktop' => array(),
+        'tablet' => array(),
+        'mobile' => array()
+    );
+
+    foreach( array_keys( $_pad_marg ) as $device  ) {
+        if ( !empty( $spacing_settings[ $device ] ) ) {
+            $rules_candidates = $spacing_settings[ $device ];
+            //add unit and sanitize padding (cannot have negative padding)
+            $unit                 = !empty( $rules_candidates['unit'] ) ? $rules_candidates['unit'] : $default_unit;
+            $unit                 = 'percent' == $unit ? '%' : $unit;
+
+            $filtered_rules_candidates = array_filter( $rules_candidates, function( $k ) {
+                return 'unit' !== $k;
+            }, ARRAY_FILTER_USE_KEY );
+
+            $_pad_marg[ $device ] = array( 'rules' => $filtered_rules_candidates );
+
+            array_walk( $_pad_marg[ $device ][ 'rules' ],
+                function( &$val, $key, $unit ) {
+                    //make sure paddings are positive values
+                    if ( FALSE !== strpos( 'padding', $key ) ) {
+                        $val = abs( $val );
+                    }
+
+                    $val .= $unit;
+            }, $unit );
+        }
+    }
+
+
+    /*
+    * TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
+    */
+    // Sek_Dyn_CSS_Builder::$breakpoints = [
+    //     'xs' => 0,
+    //     'sm' => 576,
+    //     'md' => 768,
+    //     'lg' => 992,
+    //     'xl' => 1200
+    // ];
+    if ( ! empty( $_pad_marg[ 'desktop' ] ) ) {
+        $_pad_marg[ 'desktop' ][ 'mq' ] = null;
+    }
+
+    if ( ! empty( $_pad_marg[ 'tablet' ] ) ) {
+        $_pad_marg[ 'tablet' ][ 'mq' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+    }
+
+    if ( ! empty( $_pad_marg[ 'mobile' ] ) ) {
+        $_pad_marg[ 'mobile' ][ 'mq' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+    }
+
+
+
+    foreach( array_filter( $_pad_marg ) as $_spacing_rules ) {
+        $css_rules = implode(';',
+            array_map( function( $key, $value ) {
+                return "$key:{$value};";
+            }, array_keys( $_spacing_rules[ 'rules' ] ), array_values( $_spacing_rules[ 'rules' ] )
+        ) );
+
+        $rules[] = array(
+            'selector' => $css_selectors,//'[data-sek-id="'.$level['id'].'"]',
+            'css_rules' => $css_rules,
+            'mq' =>$_spacing_rules[ 'mq' ]
+        );
+    }
+    return $rules;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
