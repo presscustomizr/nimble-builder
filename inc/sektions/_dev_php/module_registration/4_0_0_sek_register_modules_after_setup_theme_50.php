@@ -43,6 +43,8 @@ function sek_register_modules() {
 
         //'czr_featured_pages_module',
         'czr_heading_module',
+        'czr_heading_child',
+
         'czr_spacer_module',
         'czr_divider_module',
 

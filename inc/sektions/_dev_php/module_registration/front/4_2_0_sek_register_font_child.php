@@ -19,7 +19,7 @@ function sek_get_module_params_for_czr_font_child() {
         //     'use_box_shadow' => 1,
         //     'push_effect' => 1
         // ),
-        //'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
+        //'css_selectors' => '',
         'tmpl' => array(
             'item-inputs' => array(
                 'font_family_css' => array(
