@@ -223,6 +223,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'title'       => __('Border', 'text_domain_to_be_replaced'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
+                    'refresh_markup' => false,
                     'refresh_stylesheet' => true
                 ),
                 'borders' => array(

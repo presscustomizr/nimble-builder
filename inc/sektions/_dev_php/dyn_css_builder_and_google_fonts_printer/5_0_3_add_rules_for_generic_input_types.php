@@ -93,7 +93,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
                       $properties_to_render['font-size'] = $value;
                   }
             } else {
-                  $important = sek_is_flagged_important( $input_id, $parent_level, $registered_input_list );
+                  $important = false;
+                  if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+                      $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
+                  }
                   $rules = sek_set_mq_font_size_rules( $value, $selector, $important, $rules );
             }
         break;
@@ -210,10 +213,14 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             $properties_to_render['border-top-color'] = $value ? $value : '#5a5a5a';
         break;
         case 'border_radius' :
-            $numeric = sek_extract_numeric_value( $value );
-            if ( ! empty( $numeric ) ) {
-                $unit = sek_extract_unit( $value );
-                $properties_to_render['border-radius'] = $numeric . $unit;
+            if ( is_string( $value ) ) {
+                $numeric = sek_extract_numeric_value( $value );
+                if ( ! empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $value );
+                    $properties_to_render['border-radius'] = $numeric . $unit;
+                }
+            } else if ( is_array( $value ) ) {
+                $rules = sek_generate_css_rules_for_border_radius_options( $rules, $value, $selector );
             }
         break;
         case 'width' :
@@ -294,7 +301,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
     // => check if the input_id belongs to the list of "important_input_list"
     // => and maybe flag the css rules with !important
     if ( ! empty( $properties_to_render ) ) {
-        $important = sek_is_flagged_important( $input_id, $parent_level, $registered_input_list );
+        $important = false;
+        if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+            $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
+        }
         $css_rules = '';
         foreach ( $properties_to_render as $prop => $prop_val ) {
             $css_rules .= sprintf( '%1$s:%2$s%3$s;', $prop, $prop_val, $important ? '!important' : '' );
@@ -311,25 +321,27 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
 
 
 // @return boolean
-function sek_is_flagged_important( $input_id, $parent_level, $registered_input_list ) {
+// Recursive
+function sek_is_flagged_important( $input_id, $value, $registered_input_list ) {
     // is the important flag on ?
     $important = false;
-    if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
-        // loop on the module input values, and find _flag_important.
-        // then check if the current input_id, is in the list of important_input_list
-        foreach( $parent_level['value'] as $id => $input_value ) {
-            if ( false !== strpos( $id, '_flag_important' ) ) {
-                if ( is_array( $registered_input_list ) && array_key_exists( $id, $registered_input_list ) ) {
-                    if ( empty( $registered_input_list[ $id ][ 'important_input_list' ] ) ) {
-                        sek_error_log( __FUNCTION__ . ' => missing important_input_list for input id ' . $id );
-                    } else {
-                        $important_list_candidate = $registered_input_list[ $id ][ 'important_input_list' ];
-                        if ( in_array( $input_id, $important_list_candidate ) ) {
-                            $important = (bool)sek_is_checked( $input_value );
-                        }
+
+    // loop on the module input values, and find _flag_important.
+    // then check if the current input_id, is in the list of important_input_list
+    foreach( $value as $id => $input_value ) {
+        if ( is_string( $id ) && false !== strpos( $id, '_flag_important' ) ) {
+            if ( is_array( $registered_input_list ) && array_key_exists( $id, $registered_input_list ) ) {
+                if ( empty( $registered_input_list[ $id ][ 'important_input_list' ] ) ) {
+                    sek_error_log( __FUNCTION__ . ' => missing important_input_list for input id ' . $id );
+                } else {
+                    $important_list_candidate = $registered_input_list[ $id ][ 'important_input_list' ];
+                    if ( in_array( $input_id, $important_list_candidate ) ) {
+                        $important = (bool)sek_is_checked( $input_value );
                     }
                 }
             }
+        } else if ( is_array( $input_value ) ) {
+              $important = sek_is_flagged_important( $input_id, $input_value, $registered_input_list );
         }
     }
     return $important;

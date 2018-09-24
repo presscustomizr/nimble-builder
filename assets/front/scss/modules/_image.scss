@@ -9,11 +9,12 @@
   -moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;
   box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0;
 }
-[data-sek-module-type="czr_image_module"] figure img {
-  -webkit-transition: all 0.2s ease-out;
-  -o-transition: all 0.2s ease-out;
-  transition: all 0.2s ease-out;
-}
+// Commented because now applied only when previewing, in sek-preview.css
+// [data-sek-module-type="czr_image_module"] figure img {
+//   -webkit-transition: all 0.2s ease-out;
+//   -o-transition: all 0.2s ease-out;
+//   transition: all 0.2s ease-out;
+// }
 
 .sek-hover-effect-opacity img:hover {
   opacity: .7;

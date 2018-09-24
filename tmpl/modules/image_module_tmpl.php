@@ -15,6 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 // };
 $model = SEK_Front() -> model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
+$main_settings = $value['main_settings'];
+//$borders_corners_settings = $value['borders_corners'];
 
 if ( ! function_exists( '\Nimble\sek_get_img_module_img_html') ) {
     function sek_get_img_module_img_html( $value ) {
@@ -96,12 +98,12 @@ if ( ! function_exists( '\Nimble\sek_get_img_module_img_link' ) ) {
 }
 
 // Print
-if ( 'no-link' === $value['link-to'] ) {
-    echo sek_get_img_module_img_html( $value );
+if ( 'no-link' === $main_settings['link-to'] ) {
+    echo sek_get_img_module_img_html( $main_settings );
 } else {
     printf('<a href="%1$s" %2$s>%3$s</a>',
-        sek_get_img_module_img_link( $value ),
-        true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-        sek_get_img_module_img_html( $value )
+        sek_get_img_module_img_link( $main_settings ),
+        true === sek_booleanize_checkbox_val( $main_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
+        sek_get_img_module_img_html( $main_settings )
     );
 }

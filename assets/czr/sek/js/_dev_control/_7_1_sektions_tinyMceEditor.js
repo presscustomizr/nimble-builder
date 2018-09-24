@@ -39,9 +39,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 'tiny_mce_editor' != params.clicked_input_type )
                           return;
 
+                        var controlId = params.id;
+                        // When the module is a father, we need to assign the right child module id
+                        if ( true === self.getRegisteredModuleProperty( params.module_type, 'is_father' ) ) {
+                              var _childModules_ = self.getRegisteredModuleProperty( params.module_type, 'children' );
+                              if ( _.isEmpty( _childModules_ ) ) {
+                                    throw new Error('::generateUIforFrontModules => a father module ' + params.module_type + ' is missing children modules ');
+                              } else {
+                                    _.each( _childModules_, function( mod_type, optionType ){
+                                          if ( 'czr_tinymce_child' === mod_type ) {
+                                                controlId = controlId + '__' + optionType;//<= as defined when generating the ui in ::generateUIforFrontModules
+                                          }
+                                    });
+                              }
+                        }
+
                         // Set a new sync input
                         api.sekEditorSynchronizedInput({
-                              control_id : params.id,
+                              control_id : controlId,
                               input_id : params.clicked_input_id
                         });
 
@@ -82,14 +97,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         mayBeAwakeTinyMceEditor();
                         //api.sekEditorExpanded( true );
                         //console.log('MODULE VALUE ?', self.getLevelProperty( { property : 'value', id : to.control_id } ) );
-                        // When initializing the module, its customized value might not be set yet
-                        var _currentModuleValue_ = self.getLevelProperty( { property : 'value', id : to.control_id } ),
-                            _currentInputContent_ = ( _.isObject( _currentModuleValue_ ) && ! _.isEmpty( _currentModuleValue_[ to.input_id ] ) ) ? _currentModuleValue_[ to.input_id ] : '';
 
-                        try { api.sekTinyMceEditor.setContent( _currentInputContent_ ); } catch( er ) {
-                              api.errare( 'Error when setting the tiny mce editor content in setupTinyMceEditor', er );
-                        }
-                        api.sekTinyMceEditor.focus();
+                        // When initializing the module, its customized value might not be set yet
+                        // => defer the setContent action when the api setting is instantiated
+                        api( to.control_id, function( _setting_ ) {
+                              var _currentModuleValue_ = _setting_(),
+                                  _currentInputContent_ = ( _.isObject( _currentModuleValue_ ) && ! _.isEmpty( _currentModuleValue_[ to.input_id ] ) ) ? _currentModuleValue_[ to.input_id ] : '';
+
+                              try { api.sekTinyMceEditor.setContent( _currentInputContent_ ); } catch( er ) {
+                                    api.errare( 'Error when setting the tiny mce editor content in setupTinyMceEditor', er );
+                              }
+                              api.sekTinyMceEditor.focus();
+                        });
+
                   });//api.sekEditorSynchronizedInput.bind( function( to, from )
 
 
@@ -100,7 +120,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // REACT TO EDITOR VISIBILITY
-                  api.sekEditorExpanded.bind( function ( expanded ) {
+                  api.sekEditorExpanded.bind( function ( expanded, from, params ) {
                         mayBeAwakeTinyMceEditor();
                         //api.infoLog('in api.sekEditorExpanded', expanded );
                         if ( expanded ) {
@@ -151,8 +171,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $('#customize-controls' ).on('click', function( evt ) {
                         if ( 'open-tinymce-editor' == $( evt.target ).data( 'czr-action') )
                           return;
-
-                        api.sekEditorExpanded( false );
+                        api.sekEditorExpanded( false, { context : "clicked anywhere"} );
                   });
 
                   // Pressing the escape key collapses the editor

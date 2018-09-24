@@ -11,7 +11,8 @@ function sek_register_modules() {
         'sek_features_sec_picker_module',
 
         // UI LEVEL MODULES
-        'sek_level_bg_border_module',
+        'sek_level_bg_module',
+        'sek_level_border_module',
         //'sek_level_section_layout_module',<// deactivated for now. Replaced by sek_level_width_section
         'sek_level_height_module',
         'sek_level_spacing_module',
@@ -32,10 +33,18 @@ function sek_register_modules() {
 
         // FRONT MODULES
         'czr_simple_html_module',
+
         'czr_tiny_mce_editor_module',
+        'czr_tinymce_child',
+
         'czr_image_module',
+        'czr_image_main_settings_child',
+        'czr_image_borders_corners_child',
+
         //'czr_featured_pages_module',
         'czr_heading_module',
+        'czr_heading_child',
+
         'czr_spacer_module',
         'czr_divider_module',
 
@@ -53,7 +62,10 @@ function sek_register_modules() {
         'czr_simple_form_button_child',
         'czr_simple_form_design_child',
         'czr_simple_form_fonts_child',
-        'czr_simple_form_submission_child'
+        'czr_simple_form_submission_child',
+
+        // GENERIC FRONT CHILD MODULES
+        'czr_font_child'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {

@@ -16,20 +16,6 @@
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
 
-                      //SET THE CONTENT PICKER DEFAULT OPTIONS
-                      //@see ::setupContentPicker()
-                      module.bind( 'set_default_content_picker_options', function( params ) {
-                            params.defaultContentPickerOption.defaultOption = {
-                                  'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
-                                  'type'       : '',
-                                  'type_label' : '',
-                                  'object'     : '',
-                                  'id'         : '_custom_',
-                                  'url'        : ''
-                            };
-                            return params;
-                      });
-
                       // run the parent initialize
                       // Note : must be always invoked always after the input / item class extension
                       // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
@@ -131,13 +117,13 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            czr_button_module : {
+            czr_font_child : {
                   mthds : Constructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_button_module', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_font_child', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_button_module' )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_font_child' )
             }
       });
 })( wp.customize , jQuery, _ );

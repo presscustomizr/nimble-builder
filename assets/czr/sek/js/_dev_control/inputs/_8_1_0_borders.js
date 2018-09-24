@@ -31,6 +31,7 @@
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                       defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {};
 
+                  input.cssBorderTypes = [ 'top', 'left', 'right', 'bottom' ];
 
                   // Return the unit of the _all_ border type
                   var getInitialUnit = function() {
@@ -79,9 +80,9 @@
                         }
                   };
 
-                  // Synchronizes on init + refresh on previewed device changes
+                  // Synchronizes on init + refresh on border type change
                   var syncWithBorderType = function( borderType ) {
-                        if ( ! _.contains( [ '_all_', 'top', 'left', 'right', 'bottom' ], borderType ) ) {
+                        if ( ! _.contains( _.union( input.cssBorderTypes, [ '_all_' ] ) , borderType ) ) {
                               throw new Error( "Error in syncWithBorderType : the border type must be one of those values '_all_', 'top', 'left', 'right', 'bottom'" );
                         }
 
@@ -112,10 +113,12 @@
                         // update the numeric val
                         $numberInput.val( _numberVal ).trigger('input', { border_type_switched : true });// We don't want to update the input()
                         // update the color
-                        $colorInput.val( _rawVal.col ).trigger('change');
+                        // trigger the change between "border_type_switched" data flags, so we know the api setting don't have to be refreshed
+                        // ( there's no easy other way to pass a param when triggering )
+                        $colorInput.data('border_type_switched', true );
+                        $colorInput.val( _rawVal.col ).trigger( 'change' );
+                        $colorInput.data('border_type_switched', false );
                   };
-
-
 
 
 
@@ -135,7 +138,7 @@
                         palettes: true,
                         //hide:false,
                         width: window.innerWidth >= 1440 ? 271 : 251,
-                        change : function( e, o ) {
+                        change : function( evt, o ) {
                               //if the input val is not updated here, it's not detected right away.
                               //weird
                               //is there a "change complete" kind of event for iris ?
@@ -145,19 +148,19 @@
                               //synchronizes with the original input
                               //OLD => $(this).val( $(this).wpColorPicker('color') ).trigger('colorpickerchange').trigger('change');
                               $(this).val( o.color.toString() ).trigger('colorpickerchange');
-                              input.borderColor( o.color.toString() );
+                              input.borderColor( o.color.toString(), { border_type_switched : true === $(this).data('border_type_switched') } );
+                              //input.borderColor( o.color.toString() );
+                              // if ( evt.originalEvent && evt.originalEvent.type && 'external' === evt.originalEvent.type ) {
+                              //       input.borderColor( o.color.toString(), { border_type_switched : true } );
+                              // } else {
+                              //       input.borderColor( o.color.toString() );
+                              // }
                         },
                         clear : function( e, o ) {
                               $(this).val('').trigger('colorpickerchange');
                               input.borderColor('');
                         }
                   });
-
-
-
-
-
-
 
 
 
@@ -217,7 +220,13 @@
                         _newInputVal[ currentBorderType ][ 'col' ] = currentColor;
 
                         // update input if not border_type_switched
+                        // if _all_ is changed, removed all other types
                         if ( _.isEmpty( params ) || ( _.isObject( params ) && true !== params.border_type_switched ) ) {
+                              if ( '_all_' === currentBorderType ) {
+                                    _.each( input.cssBorderTypes, function( _type ) {
+                                          _newInputVal = _.omit( _newInputVal, _type );
+                                    });
+                              }
                               input( _newInputVal );
                         }
                         // refresh the range slider

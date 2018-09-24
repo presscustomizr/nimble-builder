@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $model = SEK_Front() -> model;
 $module_type = $model['module_type'];
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
+$value = $value['main_settings'];
 
 // Utility to print the text content generated with tinyMce
 // should be wrapped in a specific selector when customizing,

@@ -33,6 +33,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return _reg_.what === 'setting';
                   });
                   self.registered( registered );
+            },
+
+            // Keep only the settings for global option, local options, content picker
+            // Remove all the other
+            cleanRegisteredLevelSettingsAfterHistoryNavigation : function() {
+                  var self = this,
+                      registered = $.extend( true, [], self.registered() || [] );
+
+                  registered = _.filter( registered, function( _reg_ ) {
+                        // We check if the level property is set, so we preserve the permanent options like global options, local options, content picker
+                        if ( ! _.isEmpty( _reg_.level ) && 'setting' === _reg_.what ) {
+                              if ( api.has( _reg_.id ) ) {
+                                    // remove setting from the api
+                                    api.remove( _reg_.id );
+                              }
+                        }
+                        return _.isEmpty( _reg_.level ) && 'setting' !== _reg_.what ;
+                  });
+                  self.registered( registered );
             }
 
       });//$.extend()

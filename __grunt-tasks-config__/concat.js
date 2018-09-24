@@ -200,6 +200,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/input_tmpl/3_1_2_sek_input_tmpl_range_with_unit_picker.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_1_3_sek_input_tmpl_range_with_unit_picker_device_switcher.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_1_4_sek_input_tmpl_borders.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_1_5_sek_input_tmpl_border_radius.php',
 
       // MODULE REGISTRATION
       '<%= paths.sektions %>_dev_php/module_registration/10_0_0_sek_module_helpers_for_css_rules_generation.php',
@@ -207,7 +208,8 @@ module.exports = {
 
       '<%= paths.sektions %>_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php',
 
-      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_background_border.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_background.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_border.php',
       //'<%= paths.sektions %>_dev_php/module_registration/ui/4_0_3_sek_register_section_layout.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_height.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/_1_level/4_0_4_sek_register_spacing.php',
@@ -237,6 +239,8 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/front/4_1_6_sek_register_button.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php',
+
+      '<%= paths.sektions %>_dev_php/module_registration/front/4_2_0_sek_register_font_child.php',
 
       // DYN CSS
       '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_1_class-sek-dyn-css-builder.php',
@@ -292,12 +296,14 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_9_range_with_unit_picker.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_0_9_range_with_unit_picker_device_switcher.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_0_borders.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_1_border_radius.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_anchor_module.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_bg_border_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_bg_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_border_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_breakpoint_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_height_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_visibility_module.js',
@@ -329,7 +335,10 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_12_FRONT_simple_form_design.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_13_FRONT_simple_form_button.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_14_FRONT_simple_form_fonts.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_15_FRONT_simple_form_submission.js'
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_15_FRONT_simple_form_submission.js',
+
+      // CHILD MODULES
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_0_FRONT_font_child.js',
     ],
     dest: '<%= paths.czr_assets %>sek/js/ccat-sek-control.js',
   },

@@ -43,6 +43,34 @@
 }
 
 
+
+
+/* LEVELS WRAPPER ANIMATION WHEN CUSTOMIZING
+  For example when setting border radius
+*/
+[data-sek-level] {
+  -webkit-transition: all 0.2s ease-out;
+  -o-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+
+/* MODULES SPECIFICS WHEN CUSTOMIZING */
+/* image module transitions when customizing */
+[data-sek-module-type="czr_image_module"] figure img {
+  -webkit-transition: all 0.2s ease-out;
+  -o-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+
+/* TinyMce block outline */
+.sek-module [data-sek-input-type="tiny_mce_editor"]:hover {
+  outline: 1px solid #1d85bb;
+}
+
+
+
+
+
 /* MAKE SURE WE CAN SEE THE LEVELS, EVEN IF SETUP TO BE HIDDEN WITH THE CURRENT PREVIEWED DEVICE */
 @media (min-width:767px){
   [data-sek-level="location"] .sek-hidden-on-desktops {
@@ -1076,17 +1104,6 @@
 
 
 
-
-
-
-
-
-
-
-/* TINYMCE BLOCK OUTLINE */
-.sek-module [data-sek-input-type="tiny_mce_editor"]:hover {
-  outline: 1px solid #1d85bb;
-}
 
 
 

@@ -78,6 +78,88 @@ function sek_generate_css_rules_for_multidimensional_border_options( $rules, $bo
 }
 
 
+
+// @return array() for css rules
+// $rules[]     = array(
+//     'selector' => '[data-sek-id="'.$level['id'].'"]',
+//     'css_rules' => 'border-radius:'.$numeric . $unit.';',
+//     'mq' =>null
+// );
+//
+// @param border_radius_settings is an array looking like :
+// border-radius] => Array
+// (
+//     [_all_] => 207px
+//     [bottom_right] => 360px
+//     [top_left] => 448px
+//     [bottom_left] => 413px
+// )
+function sek_generate_css_rules_for_border_radius_options( $rules, $border_radius_settings, $css_selectors = '' ) {
+    if ( ! is_array( $rules ) )
+      return array();
+
+    if ( empty( $border_radius_settings ) )
+      return $rules;
+
+    $default_radius = '0px';
+    if ( array_key_exists('_all_', $border_radius_settings ) ) {
+        $default_val = sek_extract_numeric_value( $border_radius_settings['_all_'] );
+        if ( is_numeric( $default_val ) ) {
+            $unit = sek_extract_unit( $border_radius_settings['_all_'] );
+            $default_radius = $default_val . $unit;
+        }
+    }
+
+    // Make sure that the $border_radius_setting is normalize so we can generate a proper border-radius value
+    // For example a user value of  ( '_all_' => '3px', 'top_right' => '6px', 'bottom_left' => '3px' )
+    // should be normalized to      ( '_all_' => '3px', 'top_left' => '3px', 'top_right' => '6px', 'bottom_right' => '3px', 'bottom_left' => '3px' )
+    $radius_dimensions_default = array(
+        'top_left' => $default_radius,
+        'top_right' => $default_radius,
+        'bottom_right' => $default_radius,
+        'bottom_left' => $default_radius
+    );
+
+    $css_rules = '';
+    if ( array_key_exists( '_all_', $border_radius_settings ) && 1 === count( $border_radius_settings ) ) {
+        $css_rules = "border-radius:" . $default_radius.';';
+    } else {
+        // Build the normalized array for multidimensional css properties
+        $normalized_border_radius_values = array();
+        foreach ( $radius_dimensions_default as $dim => $default_radius) {
+            if ( array_key_exists( $dim, $border_radius_settings ) ) {
+                $numeric = sek_extract_numeric_value( $border_radius_settings[$dim] );
+                if ( is_numeric( $numeric ) ) {
+                    $unit = sek_extract_unit( $border_radius_settings[$dim] );
+                    $normalized_border_radius_values[] = $numeric . $unit;
+                } else {
+                    $normalized_border_radius_values[] = $default_radius;
+                }
+            } else {
+                $normalized_border_radius_values[] = $default_radius;
+            }
+        }
+        $css_rules = "border-radius:" . implode( ' ', array_filter( $normalized_border_radius_values ) ).';';
+    }
+
+    if ( ! empty( $css_rules ) ) {
+        //append border radius rules
+        $rules[]     = array(
+            'selector' => $css_selectors,
+            'css_rules' => $css_rules,
+            'mq' => null
+        );
+    }
+
+    return $rules;
+}
+
+
+
+
+
+
+
 //HELPERS
 /**
 * SASS COLOR DARKEN/LIGHTEN UTILS
