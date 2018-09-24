@@ -291,6 +291,12 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
                     $val .= $unit;
             }, $unit );
         break;
+        case 'spacing_with_device_switcher' :
+            if ( ! empty( $value ) && is_array( $value ) ) {
+                $rules = sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $value, $selector );
+            }
+        break;
+
         // The default is simply there to let us know if a css_identifier is missing
         default :
             sek_error_log( __FUNCTION__ . ' => the css_identifier : ' . $css_identifier . ' has no css rules defined for input id ' . $input_id );
