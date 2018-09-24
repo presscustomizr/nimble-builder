@@ -1,7 +1,7 @@
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var TinyMceEditorModuleConstructor = {
+      var Constructor = {
             initialize: function( id, options ) {
                     //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
@@ -34,7 +34,7 @@
             },//CZRTextEditorInputMths
 
             // CZRSocialsItem : { },//CZRSocialsItem
-      };//TinyMceEditorModuleConstructor
+      };//Constructor
 
 
       //provides a description of each module
@@ -47,13 +47,13 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            czr_tiny_mce_editor_module : {
-                  mthds : TinyMceEditorModuleConstructor,
+            czr_tinymce_child : {
+                  mthds : Constructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_tiny_mce_editor_module', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_tinymce_child', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_tiny_mce_editor_module' )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_tinymce_child' )
             },
       });
 })( wp.customize , jQuery, _ );

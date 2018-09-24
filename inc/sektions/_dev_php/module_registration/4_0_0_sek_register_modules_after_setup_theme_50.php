@@ -33,7 +33,9 @@ function sek_register_modules() {
 
         // FRONT MODULES
         'czr_simple_html_module',
+
         'czr_tiny_mce_editor_module',
+        'czr_tinymce_child',
 
         'czr_image_module',
         'czr_image_main_settings_child',
@@ -58,7 +60,10 @@ function sek_register_modules() {
         'czr_simple_form_button_child',
         'czr_simple_form_design_child',
         'czr_simple_form_fonts_child',
-        'czr_simple_form_submission_child'
+        'czr_simple_form_submission_child',
+
+        // GENERIC FRONT CHILD MODULES
+        'czr_font_child'
     ] as $module_name ) {
         $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {

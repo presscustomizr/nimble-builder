@@ -240,6 +240,8 @@ module.exports = {
 
       '<%= paths.sektions %>_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php',
 
+      '<%= paths.sektions %>_dev_php/module_registration/front/4_2_0_sek_register_font_child.php',
+
       // DYN CSS
       '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_1_class-sek-dyn-css-builder.php',
       '<%= paths.sektions %>_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_2_class-sek-dyn-css-handler.php',
@@ -333,7 +335,10 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_12_FRONT_simple_form_design.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_13_FRONT_simple_form_button.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_14_FRONT_simple_form_fonts.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_15_FRONT_simple_form_submission.js'
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_15_FRONT_simple_form_submission.js',
+
+      // CHILD MODULES
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_0_FRONT_font_child.js',
     ],
     dest: '<%= paths.czr_assets %>sek/js/ccat-sek-control.js',
   },
