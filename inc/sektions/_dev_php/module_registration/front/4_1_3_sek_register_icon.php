@@ -115,11 +115,12 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                     'input_width' => 'width-20',
                 ),
                 'font_size_css' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Size', 'text_domain_to_be_replaced'),
-                    'default'     => '16px',
+                    'default'     => array( 'desktop' => '16px' ),
                     'min' => 0,
                     'max' => 100,
+                    'title_width' => 'width-100',
                     'width-100'       => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -197,14 +198,14 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
         'css_selectors' => array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
-                'spacing_css'        => array(
-                    'input_type'         => 'spacing',
-                    'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
-                    'default'            => array(),
+                'spacing_css'     => array(
+                    'input_type'  => 'spacingWithDeviceSwitcher',
+                    'title'       => __( 'Spacing', 'text_domain_to_be_replaced' ),
+                    'default'     => array( 'desktop' => array() ),
                     'width-100'   => true,
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'padding_margin_spacing',
+                    'css_identifier' => 'spacing_with_device_switcher',
                     'css_selectors'=> '.sek-icon i'
                 ),
                 'bg_color_css' => array(
