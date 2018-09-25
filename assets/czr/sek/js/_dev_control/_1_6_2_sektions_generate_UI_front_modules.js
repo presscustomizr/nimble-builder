@@ -112,8 +112,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });
 
+                                    var settingValueOnRegistration = $.extend( true, {}, moduleValue );
                                     if ( '__no_option_group_to_be_updated_by_children_modules__' !== optionType ) {
-                                          moduleValue = ( !_.isEmpty( moduleValue ) && _.isObject( moduleValue ) && _.isObject( moduleValue[optionType] ) ) ? moduleValue[optionType] : {};
+                                          settingValueOnRegistration = ( !_.isEmpty( settingValueOnRegistration ) && _.isObject( settingValueOnRegistration ) && _.isObject( settingValueOnRegistration[optionType] ) ) ? settingValueOnRegistration[optionType] : {};
                                     }
                                     api.CZR_Helpers.register({
                                           origin : 'nimble',
@@ -121,7 +122,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           what : 'setting',
                                           id : optionData.settingControlId,
                                           dirty : false,
-                                          value : moduleValue,
+                                          value : settingValueOnRegistration,
                                           transport : 'postMessage',// 'refresh',
                                           type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
                                     });
