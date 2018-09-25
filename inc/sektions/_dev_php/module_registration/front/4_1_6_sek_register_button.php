@@ -32,294 +32,233 @@ function sek_get_module_params_for_czr_button_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_button_module',
+        'is_father' => true,
+        'children' => array(
+            'content' => 'czr_btn_content_child',
+            'design' => 'czr_btn_design_child',
+            'font' => 'czr_font_child'
+        ),
         'name' => __( 'Button', 'text_domain_to_be_replaced' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
         'starting_value' => array(
-            'button_text' => __('Click me','text_domain_to_be_replaced'),
-            'color_css'  => '#ffffff',
-            'bg_color_css' => '#020202',
-            'bg_color_hover' => '#151515', //lighten 15%,
-            'use_custom_bg_color_on_hover' => 0,
-            'border_radius_css' => '2',
-            'h_alignment_css' => 'center',
-            'use_box_shadow' => 1,
-            'push_effect' => 1
-        ),
-        'css_selectors' => array( '.sek-module-inner > .sek-button' ),
-        'tmpl' => array(
-            'item-inputs' => array(
-                'tabs' => array(
-                    array(
-                        'title' => __( 'Button', 'text_domain_to_be_replaced' ),
-                        //'attributes' => 'data-sek-device="desktop"',
-                        'inputs' => array(
-                            'button_text' => array(
-                                'input_type'         => 'text',
-                                'title'              => __( 'Button text', 'text_domain_to_be_replaced' ),
-                                'default'            => '',
-                                'width-100'         => true,
-                            ),
-                            'link-to' => array(
-                                'input_type'  => 'select',
-                                'title'       => __('Link to', 'text_domain_to_be_replaced'),
-                                'default'     => 'no-link',
-                                'choices'     => sek_get_select_options_for_input_id( 'link-to' )
-                            ),
-                            'link-pick-url' => array(
-                                'input_type'  => 'content_picker',
-                                'title'       => __('Link url', 'text_domain_to_be_replaced'),
-                                'default'     => array()
-                            ),
-                            'link-custom-url' => array(
-                                'input_type'  => 'text',
-                                'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
-                                'default'     => ''
-                            ),
-                            'link-target' => array(
-                                'input_type'  => 'gutencheck',
-                                'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
-                                'default'     => false,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                            ),
-                            'icon' => array(
-                                'input_type'  => 'fa_icon_picker',
-                                'title'       => __( 'Icon next to the button text', 'text_domain_to_be_replaced' ),
-                                //'default'     => 'no-link'
-                            ),
-                            'bg_color_css' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Background color', 'text_domain_to_be_replaced' ),
-                                'width-100'   => true,
-                                'default'    => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'background_color',
-                                'css_selectors'=> $css_selectors
-                            ),
-                            'use_custom_bg_color_on_hover' => array(
-                                'input_type'  => 'gutencheck',
-                                'title'       => __( 'Set a custom background color on mouse hover', 'text_domain_to_be_replaced' ),
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'default'     => 0,
-                            ),
-                            'bg_color_hover' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Background color on mouse hover', 'text_domain_to_be_replaced' ),
-                                'width-100'   => true,
-                                'default'    => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                //'css_identifier' => 'background_color_hover',
-                                'css_selectors'=> $css_selectors
-                            ),
-                            'border_radius_css'       => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
-                                'default'     => '2px',
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'min'         => 0,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'border_radius',
-                                'css_selectors'=> $css_selectors
-                            ),
-                            'h_alignment_css'        => array(
-                                'input_type'         => 'h_alignment',
-                                'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
-                                'default'            => is_rtl() ? 'right' : 'left',
-                                'refresh_markup'     => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'h_alignment',
-                                'css_selectors'=> '.sek-module-inner'
-                            ),
-                            'spacing_css'        => array(
-                                'input_type'         => 'spacing',
-                                'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
-                                'default'            => array(
-                                    'padding-top'    => .5,
-                                    'padding-bottom' => .5,
-                                    'padding-right'  => 1,
-                                    'padding-left'   => 1,
-                                    'unit' => 'em'
-                                ),
-                                'width-100'   => true,
-                                'refresh_markup'     => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'padding_margin_spacing',
-                                'css_selectors'=> '.sek-module-inner .sek-btn'
-                            ),
-                            'use_box_shadow' => array(
-                                'input_type'  => 'gutencheck',
-                                'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
-                                'default'     => 1,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                            ),
-                            'push_effect' => array(
-                                'input_type'  => 'gutencheck',
-                                'title'       => __( 'Push visual effect', 'text_domain_to_be_replaced' ),
-                                'default'     => 1,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                            ),
-                        )
-                    ),
-                    array(
-                        'title' => __( 'Font style', 'text_domain_to_be_replaced' ),
-                        'attributes' => 'data-sek-google-font-tab="true"',
-                        'inputs' => array(
-                            'font_family_css' => array(
-                                'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'refresh_fonts' => true,
-                                'css_identifier' => 'font_family',
-                                'css_selectors' => $css_font_selectors
-                            ),
-                            'font_size_css'       => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
-                                'default'     => '1em',
-                                'min' => 0,
-                                'max' => 10,
-                                'step' => 0.1,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_size',
-                                'css_selectors' => $css_font_selectors,
-                                'width-100'         => true,
-                            ),//16,//"14px",
-                            'line_height_css'     => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
-                                'default'     => '1.25em',
-                                'min' => 0,
-                                'max' => 10,
-                                'step' => 0.1,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'line_height',
-                                'css_selectors' => $css_font_selectors,
-                                'width-100'         => true,
-                            ),//24,//"20px",
-                            'color_css'           => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => $css_font_selectors
-                            ),//"#000000",
-                            'color_hover_css'     => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'css_identifier' => 'color_hover',
-                                'css_selectors' => $css_font_selectors
-                            ),//"#000000",
-                            'font_weight_css'     => array(
-                                'input_type'  => 'select',
-                                'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
-                                'default'     => 'normal',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_weight',
-                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' ),
-                                'css_selectors' => $css_font_selectors
-                            ),//null,
-                            'font_style_css'      => array(
-                                'input_type'  => 'select',
-                                'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
-                                'default'     => 'inherit',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_style',
-                                'choices'            => sek_get_select_options_for_input_id( 'font_style_css' ),
-                                'css_selectors' => $css_font_selectors
-                            ),//null,
-                            'text_decoration_css' => array(
-                                'input_type'  => 'select',
-                                'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
-                                'default'     => 'none',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_decoration',
-                                'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' ),
-                                'css_selectors' => $css_font_selectors . ' .sek-btn-text'
-                            ),//null,
-                            'text_transform_css'  => array(
-                                'input_type'  => 'select',
-                                'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
-                                'default'     => 'none',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_transform',
-                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' ),
-                                'css_selectors' => $css_font_selectors . ' .sek-btn-text'
-                            ),//null,
-
-                            'letter_spacing_css'  => array(
-                                'input_type'  => 'range_simple',
-                                'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
-                                'default'     => 0,
-                                'min'         => 0,
-                                'step'        => 1,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'letter_spacing',
-                                'css_selectors' => $css_font_selectors,
-                                'width-100'   => true,
-                            ),//0,
-                            // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
-                            'button___flag_important'       => array(
-                                'input_type'  => 'gutencheck',
-                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                                'default'     => 0,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                // declare the list of input_id that will be flagged with !important when the option is checked
-                                // @see sek_add_css_rules_for_css_sniffed_input_id
-                                // @see Nsek_is_flagged_important
-                                'important_input_list' => array(
-                                    'font_family_css',
-                                    'font_size_css',
-                                    'line_height_css',
-                                    'font_weight_css',
-                                    'font_style_css',
-                                    'text_decoration_css',
-                                    'text_transform_css',
-                                    'letter_spacing_css',
-                                    'color_css',
-                                    'color_hover_css'
-                                )
-                            ),
-                        )
-                    )
-                )
+            'content' => array(
+                'button_text' => __('Click me','text_domain_to_be_replaced'),
+            ),
+            'design' => array(
+                'bg_color_css' => '#020202',
+                'bg_color_hover' => '#151515', //lighten 15%,
+                'use_custom_bg_color_on_hover' => 0,
+                'border_radius_css' => '2',
+                'h_alignment_css' => 'center',
+                'use_box_shadow' => 1,
+                'push_effect' => 1,
+            ),
+            'font' => array(
+                'color_css'  => '#ffffff',
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/button_module_tmpl.php",
+        'css_selectors' => array( '.sek-btn' ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/button_module_tmpl.php"
     );
 }
 
 
+
+/* ------------------------------------------------------------------------- *
+ *  BUTTON CONTENT
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_btn_content_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_btn_content_child',
+        'name' => __( 'Button content', 'text_domain_to_be_replaced' ),
+        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        //'css_selectors' =>'',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'button_text' => array(
+                    'input_type'         => 'text',
+                    'title'              => __( 'Button text', 'text_domain_to_be_replaced' ),
+                    'default'            => '',
+                    'width-100'         => true,
+                ),
+                'link-to' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'default'     => 'no-link',
+                    'choices'     => sek_get_select_options_for_input_id( 'link-to' )
+                ),
+                'link-pick-url' => array(
+                    'input_type'  => 'content_picker',
+                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'default'     => array()
+                ),
+                'link-custom-url' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'default'     => ''
+                ),
+                'link-target' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'icon' => array(
+                    'input_type'  => 'fa_icon_picker',
+                    'title'       => __( 'Icon next to the button text', 'text_domain_to_be_replaced' ),
+                    //'default'     => 'no-link'
+                ),
+            )
+        ),
+        'render_tmpl_path' => '',
+    );
+}
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  BUTTON DESIGN
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_btn_design_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_btn_design_child',
+        'name' => __( 'Button design', 'text_domain_to_be_replaced' ),
+        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        //'css_selectors' =>'',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'bg_color_css' => array(
+                    'input_type'  => 'wp_color_alpha',
+                    'title'       => __( 'Background color', 'text_domain_to_be_replaced' ),
+                    'width-100'   => true,
+                    'default'    => '#020202',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'background_color',
+                    //'css_selectors'=> $css_selectors
+                ),
+                'use_custom_bg_color_on_hover' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __( 'Set a custom background color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'default'     => 0,
+                ),
+                'bg_color_hover' => array(
+                    'input_type'  => 'wp_color_alpha',
+                    'title'       => __( 'Background color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'width-100'   => true,
+                    'default'    => '',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    //'css_identifier' => 'background_color_hover',
+                    //'css_selectors'=> $css_selectors
+                ),
+                'border-type' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Border', 'text_domain_to_be_replaced'),
+                    'default' => 'none',
+                    'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),
+                'borders' => array(
+                    'input_type'  => 'borders',
+                    'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                    'min' => 0,
+                    'max' => 100,
+                    'default' => array(
+                        '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+                    ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'css_selectors'=> '.sek-icon i'
+                ),
+                'border_radius_css'       => array(
+                    'input_type'  => 'border_radius',
+                    'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
+                    'default' => array( '_all_' => '0px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'min'         => 0,
+                    'max'         => 500,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'border_radius',
+                    //'css_selectors'=> $css_selectors
+                ),
+                'h_alignment_css'        => array(
+                    'input_type'         => 'h_alignment',
+                    'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
+                    'default'            => 'center',
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier'     => 'h_alignment',
+                    'css_selectors'      => '.sek-module-inner'
+                ),
+                'spacing_css'        => array(
+                    'input_type'         => 'spacing',
+                    'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
+                    'default'            => array(
+                        'padding-top'    => .5,
+                        'padding-bottom' => .5,
+                        'padding-right'  => 1,
+                        'padding-left'   => 1,
+                        'unit' => 'em'
+                    ),
+                    'width-100'   => true,
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'padding_margin_spacing',
+                    'css_selectors'=> '.sek-module-inner .sek-btn'
+                ),
+                'use_box_shadow' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'push_effect' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __( 'Push visual effect', 'text_domain_to_be_replaced' ),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                )
+            )
+        ),
+        'render_tmpl_path' => '',
+    );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function sanitize_callback__czr_button_module( $value ) {
-    $value[ 'button_text' ] = sanitize_text_field( $value[ 'button_text' ] );
+    if ( is_array( $value ) && is_array( $value['content'] ) && array_key_exists( 'button_text', $value['content'] ) ) {
+        $value['content'][ 'button_text' ] = sanitize_text_field( $value['content'][ 'button_text' ] );
+    }
     return $value;
 }
 
@@ -334,10 +273,12 @@ function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_mode
     if ( empty( $complete_modul_model['value'] ) )
       return $rules;
 
+    // BACKGROUND
     $value = $complete_modul_model['value'];
-    $bg_color = $value['bg_color_css'];
-    if ( sek_booleanize_checkbox_val( $value['use_custom_bg_color_on_hover'] ) ) {
-        $bg_color_hover = $value['bg_color_hover'];
+    $design_settings = $value['design'];
+    $bg_color = $design_settings['bg_color_css'];
+    if ( sek_booleanize_checkbox_val( $design_settings['use_custom_bg_color_on_hover'] ) ) {
+        $bg_color_hover = $design_settings['bg_color_hover'];
     } else {
         // Build the lighter rgb from the user picked bg color
         if ( 0 === strpos( $bg_color, 'rgba' ) ) {
@@ -355,6 +296,21 @@ function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_mode
         'css_rules' => 'background-color:' . $bg_color_hover . ';',
         'mq' =>null
     );
+
+    // BORDERS
+    $border_settings = $design_settings[ 'borders' ];
+    $border_type = $design_settings[ 'border-type' ];
+    $has_border_settings  = 'none' != $border_type && !empty( $border_type );
+
+    //border width + type + color
+    if ( $has_border_settings ) {
+        $rules = sek_generate_css_rules_for_multidimensional_border_options(
+            $rules,
+            $border_settings,
+            $border_type,
+            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-btn'
+        );
+    }
     return $rules;
 }
 

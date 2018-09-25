@@ -54,7 +54,10 @@ function sek_register_modules() {
 
         'czr_map_module',
         'czr_quote_module',
+
         'czr_button_module',
+        'czr_btn_content_child',
+        'czr_btn_design_child',
 
         // simple form father + children
         'czr_simple_form_module',
