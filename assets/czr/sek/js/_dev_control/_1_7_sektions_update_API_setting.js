@@ -615,6 +615,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               case 'sek-set-module-value' :
                                     moduleCandidate = self.getLevelModel( params.id, newSetValue.collection );
+
                                     var _value_ = {};
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
@@ -638,6 +639,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // Is this a father module ?
                                     // If yes, the module value is structured by option group, each option group being updated by a child module
+                                    // If no, the default option type is : '__no_option_group_to_be_updated_by_children_modules__'
                                     if ( '__no_option_group_to_be_updated_by_children_modules__' === params.options_type ) {
                                           moduleCandidate.value = _value_;
                                     } else {
