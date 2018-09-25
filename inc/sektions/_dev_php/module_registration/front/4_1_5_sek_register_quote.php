@@ -377,7 +377,7 @@ function sek_get_module_params_for_czr_quote_module() {
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_size',
-                                'css_selectors' => array( '.sek-quote.sek-quote-design.sek-quote-icon-before::before', '.sek-quote.sek-quote-design.sek-quote-icon-before' )
+                                'css_selectors' => '.sek-quote.sek-quote-design.sek-quote-icon-before::before'
                             ),
                             'icon_color_css' => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -395,6 +395,12 @@ function sek_get_module_params_for_czr_quote_module() {
             )
         ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/quote_module_tmpl.php",
+        'front_assets' => array(
+              'czr-font-awesome' => array(
+                  'type' => 'css',
+                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
+              )
+        )
     );
 }
 
