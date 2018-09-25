@@ -119,7 +119,8 @@ class Sek_Dyn_CSS_Builder {
                                                   $child_css_selector
                                               );
                                           } else {
-                                              sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $father_mod_type . ' for a css input candidate : ' . $key, $parent_level );
+                                              sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering father module ' . $father_mod_type . ' for a css input candidate : ' . $input_id_candidate . ' in option group : ' . $opt_group_type, $parent_level );
+                                              sek_error_log('$registered_input_list', $registered_input_list );
                                           }
                                       }
                                   }//foreach
@@ -141,7 +142,8 @@ class Sek_Dyn_CSS_Builder {
                                               $module_level_css_selectors // <= if the parent is a module, a default set of css_selectors might have been specified on module registration
                                           );
                                       } else {
-                                          sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $parent_level['module_type'] . ' for a css input candidate : ' . $key, $parent_level );
+                                          sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $parent_level['module_type'] . ' for a css input candidate : ' . $input_id_candidate, $parent_level );
+                                          sek_error_log('$registered_input_list', $registered_input_list );
                                       }
                                   }
                               }//foreach
