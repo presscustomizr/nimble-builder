@@ -130,6 +130,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing parentModuleInstance', params );
                   }
 
+
+
                   // The new module value can be a single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
                   if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
@@ -201,7 +203,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // Set it
                               api( sektionsLocalizedData.optNameForGlobalOptions )( clonedGlobalOptions );
                         } else {
-                        // LEVEL OPTION CASE => LOCAL
+                              // LEVEL OPTION CASE => LOCAL
                               return self.updateAPISetting({
                                     action : params.uiParams.action,// mandatory : 'sek-generate-level-options-ui', 'sek_local_skope_options_module',...
                                     id : params.uiParams.id,
@@ -294,6 +296,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             // @return a normalized and sanitized item value
+            // What does this helper do ?
+            // 1) remove title and id properties, we don't need them in db
+            // 2) don't write if is equal to default
             normalizeAndSanitizeSingleItemInputValues : function( _item_, parentModuleType ) {
                   var itemNormalized = {},
                       itemNormalizedAndSanitized = {},
@@ -301,10 +306,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       inputType = null,
                       sanitizedVal,
                       self = this,
-                      checkIfEqual = function( _val, _default ) {
-                            var equal;
-                            if ( _.isNumber( _val ) || _.isNumber( _default ) ) {
+                      isEqualToDefault = function( _val, _default ) {
+                            var equal = false;
+                            if ( _.isBoolean( _val ) || _.isBoolean( _default ) ) {
+                                  equal = Boolean(_val) === Boolean(_default);
+                            } else if ( _.isNumber( _val ) || _.isNumber( _default ) ) {
                                   equal = Number( _val ) === Number( _default );
+                            } else if ( _.isString( _val ) || _.isString( _default ) ) {
+                                  equal = _val+'' === _default+'';
+                            } else if ( _.isObject( _val ) && _.isObject( _default ) ) {
+                                  equal = _.isEqual( _val,_default );
+                            } else if ( _.isArray( _val ) && _.isArray( _default ) ) {
+                                  //@see https://stackoverflow.com/questions/39517316/check-for-equality-between-two-array
+                                  equal = JSON.stringify(_val.sort()) === JSON.stringify(_default.sort());
                             } else {
                                   equal = _val === _default;
                             }
@@ -325,7 +339,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.infoLog( '::updateAPISettingAndExecutePreviewActions => missing default value for input ' + input_id + ' in module ' + parentModuleType );
                               }
                         }
-                        if ( checkIfEqual( _val, inputDefaultValue ) ) {
+                        if ( isEqualToDefault( _val, inputDefaultValue ) ) {
                               return;
                         } else {
                               itemNormalized[ input_id ] = _val;
