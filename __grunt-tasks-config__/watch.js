@@ -143,6 +143,7 @@ module.exports = {
     ],
     tasks : [
       'concat:czr_sektions_php',
+      'comments:php'
     ],
   },
 
@@ -182,6 +183,7 @@ module.exports = {
     tasks : [
       'jshint:those',
       'concat:czr_sektions_customizer_control_js',
+      'comments:czr_base_control_js'
     ],
   },
 
@@ -209,6 +211,7 @@ module.exports = {
     tasks : [
       'jshint:those',
       'concat:czr_sektions_customizer_preview_js',
+      'comments:czr_base_preview_js'
     ],
   },
 
