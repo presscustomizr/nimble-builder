@@ -288,8 +288,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               empty( $collection ) ? 'data-sek-no-modules="true"' : ''
                           );
                       ?>
-                        <?php // Drop zone : if no modules, the drop zone is wrapped in sek-no-modules-columns
-                        // if at least one module, the sek-drop-zone is the .sek-column-inner wrapper ?>
+                        <?php
+                        // Drop zone : if no modules, the drop zone is wrapped in sek-no-modules-columns
+                        // if at least one module, the sek-drop-zone is the .sek-column-inner wrapper
+                        ?>
                         <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
                             <?php
                               if ( skp_is_customizing() && empty( $collection ) ) {
