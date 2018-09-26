@@ -63,6 +63,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'border_radius' :
             sek_set_input_tmpl___border_radius( $input_id, $input_data );
         break;
+        case 'buttons_choice' :
+            sek_set_input_tmpl___buttons_choice( $input_id, $input_data );
+        break;
     }
 }
 ?>
