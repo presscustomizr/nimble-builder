@@ -110,6 +110,12 @@ function sek_get_module_params_for_czr_btn_content_child() {
                     'title'       => __( 'Icon next to the button text', 'text_domain_to_be_replaced' ),
                     //'default'     => 'no-link'
                 ),
+                'icon-side' => array(
+                    'input_type'  => 'buttons_choice',
+                    'title'       => __("Icon's position", 'text_domain_to_be_replaced'),
+                    'default'     => 'left',
+                    'choices'     => array( 'left' => __('Left', 'text-domain'), 'right' => __('Right', 'text-domain') )
+                ),
             )
         ),
         'render_tmpl_path' => '',

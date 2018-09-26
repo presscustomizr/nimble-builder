@@ -101,6 +101,11 @@
                                                   return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
                                             });
                                       break;
+                                      case 'icon' :
+                                            scheduleVisibilityOfInputId.call( input, 'icon-side', function() {
+                                                  return !_.isEmpty( input() );
+                                            });
+                                      break;
                                 }
                           });
                     }

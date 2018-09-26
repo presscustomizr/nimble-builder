@@ -46,14 +46,6 @@
     background-image: none;
     box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.25);
   }
-  i {
-    @if ( true == $is_rtl ) {
-      margin-left: 10px;
-    }
-    @else {
-      margin-right: 10px;
-    }
-  }
 }
 
 

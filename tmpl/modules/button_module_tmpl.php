@@ -45,18 +45,24 @@ if ( isset( $design_settings['use_box_shadow'] ) && true === sek_booleanize_chec
 }
 
 // Print
-if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to'] ) && 'no-link' === $content_settings['link-to'] ) :
-    printf('<button class="sek-btn%3$s"><span class="sek-btn-inner">%1$s<span class="sek-btn-text">%2$s</span></span></button>',
-        sek_get_button_module_icon( $content_settings ),
+if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to'] ) && 'no-link' === $content_settings['link-to'] )  {
+    $icon_html = sek_get_button_module_icon( $content_settings );
+    $icon_side = empty($content_settings['icon-side']) ? 'left' : $content_settings['icon-side'];
+    printf('<button class="sek-btn%3$s"><span class="sek-btn-inner">%1$s<span class="sek-btn-text">%2$s</span>%4$s</span></button>',
+        'left' === $icon_side ? $icon_html : '',
         strip_tags( $content_settings[ 'button_text' ] ),
-        $visual_effect_class
+        $visual_effect_class,
+        'right' === $icon_side ? $icon_html : ''
     );
-else :
-    printf('<a class="sek-btn%5$s" href="%1$s" %2$s><span class="sek-btn-inner">%3$s<span class="sek-btn-text">%4$s</span></span></a>',
+} else {
+    $icon_html = sek_get_button_module_icon( $content_settings );
+    $icon_side = empty($content_settings['icon-side']) ? 'left' : $content_settings['icon-side'];
+    printf('<a class="sek-btn%5$s" href="%1$s" %2$s><span class="sek-btn-inner">%3$s<span class="sek-btn-text">%4$s</span>%6$s</span></a>',
         sek_get_button_module_link( $content_settings ),
         true === sek_booleanize_checkbox_val( $content_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-        sek_get_button_module_icon( $content_settings ),
+        'left' === $icon_side ? $icon_html : '',
         strip_tags( $content_settings['button_text'] ),
-        $visual_effect_class
+        $visual_effect_class,
+        'right' === $icon_side ? $icon_html : ''
     );
-endif;
+}
