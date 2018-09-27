@@ -16,7 +16,9 @@ if ( ! function_exists( '\Nimble\sek_print_tiny_mce_text_content') ) {
         if ( empty( $tiny_mce_content ) ) {
             echo SEK_Front()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
         } else {
+            //remove_filter( 'the_content', 'wpautop');
             $content = apply_filters( 'the_content', $tiny_mce_content );
+            //add_filter( 'the_content', 'wpautop');
             if ( skp_is_customizing() ) {
                 printf('<div title="%3$s" data-sek-input-type="tiny_mce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
             } else {
