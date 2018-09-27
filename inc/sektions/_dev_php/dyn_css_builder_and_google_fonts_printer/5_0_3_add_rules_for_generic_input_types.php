@@ -92,12 +92,22 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
                   if ( ! empty( $numeric ) ) {
                       $properties_to_render['font-size'] = $value;
                   }
-            } else {
+            } else if ( is_array( $value ) ) {
                   $important = false;
                   if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
                       $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
                   }
-                  $rules = sek_set_mq_font_size_rules( $value, $selector, $important, $rules );
+                  $value = wp_parse_args( $value, array(
+                      'desktop' => '16px',
+                      'tablet' => '',
+                      'mobile' => ''
+                  ));
+                  $rules = sek_set_mq_css_rules( array(
+                      'value' => $value,
+                      'css_property' => 'font-size',
+                      'selector' => $selector,
+                      'is_important' => $important,
+                  ), $rules );
             }
         break;
         case 'line_height' :
@@ -178,11 +188,40 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         /* Spacer */
         // The unit should be included in the $value
         case 'height' :
-            $numeric = sek_extract_numeric_value( $value );
-            if ( ! empty( $numeric ) ) {
-                $unit = sek_extract_unit( $value );
-                $unit = '%' === $unit ? 'vh' : $unit;
-                $properties_to_render['height'] = $numeric . $unit;
+            if ( is_string( $value ) ) {
+                  $numeric = sek_extract_numeric_value($value);
+                  if ( ! empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $value );
+                      $unit = '%' === $unit ? 'vh' : $unit;
+                      $properties_to_render['height'] = $numeric . $unit;
+                  }
+            } else if ( is_array( $value ) ) {
+                  $important = false;
+                  if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+                      $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
+                  }
+                  $value = wp_parse_args( $value, array(
+                      'desktop' => '20px',
+                      'tablet' => '',
+                      'mobile' => ''
+                  ));
+                  // replace % by vh when needed
+                  $ready_value = $value;
+                  foreach ($value as $device => $num_unit ) {
+                      $numeric = sek_extract_numeric_value( $num_unit );
+                      if ( ! empty( $numeric ) ) {
+                          $unit = sek_extract_unit( $num_unit );
+                          $unit = '%' === $unit ? 'vh' : $unit;
+                          $ready_value[$device] = $numeric . $unit;
+                      }
+                  }
+
+                  $rules = sek_set_mq_css_rules(array(
+                      'value' => $ready_value,
+                      'css_property' => 'height',
+                      'selector' => $selector,
+                      'is_important' => $important,
+                  ), $rules );
             }
         break;
         /* Quote border */
@@ -228,11 +267,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             if ( ! empty( $numeric ) ) {
                 $unit = sek_extract_unit( $value );
                 //$unit = '%' === $unit ? 'vw' : $unit;
-
                 $properties_to_render['width'] = $numeric . $unit;
-                // sek_error_log(' WIDTH ? for '. $input_id, $properties_to_render );
-                // sek_error_log('$parent_level', $parent_level );
-                //$properties_to_render['width'] = in_array( $value, range( 1, 100 ) ) ? $value . '%' : 100 . '%';
             }
         break;
         case 'v_spacing' :
@@ -384,30 +419,29 @@ function sek_is_flagged_important( $input_id, $module_value, $registered_input_l
 
 
 // This function is invoked when sniffing the font_size_css input rules.
-// @param $value = Array
-// (
-//     [desktop] => 5em
-//     [mobile] => 25px
-// )
-// @param $rules = array() of css rules to populate
+
+
 // @return an array of css rules looking like
 // $rules[] = array(
 //     'selector'    => $selector,
 //     'css_rules'   => $css_rules,
 //     'mq'          => $mq
 // );
-function sek_set_mq_font_size_rules( $value, $selector, $important, $rules = array() ) {
-    $default_unit = 'px';
-    $value = wp_parse_args( $value, array(
-        'desktop' => '16px',
-        'tablet' => '',
-        'mobile' => ''
-    ));
-
-
-    /*
-    * TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
-    */
+// @params params(array). Example
+// array(
+//     'value' => $ready_value,(array)
+//     'css_property' => 'height',(string)
+//     'selector' => $selector,(string)
+//     'is_important' => $important,(bool)
+// )
+// params['value'] = Array
+// (
+//     [desktop] => 5em
+//     [tablet] => 4em
+//     [mobile] => 25px
+// )
+function sek_set_mq_css_rules( $params, $rules ) {
+    // TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
     // Sek_Dyn_CSS_Builder::$breakpoints = [
     //     'xs' => 0,
     //     'sm' => 576,
@@ -415,29 +449,32 @@ function sek_set_mq_font_size_rules( $value, $selector, $important, $rules = arr
     //     'lg' => 992,
     //     'xl' => 1200
     // ];
-    if ( ! empty( $value[ 'desktop' ] ) ) {
+    $params = wp_parse_args( $params, array(
+        'value' => array(),
+        'css_property' => '',
+        'selector' => '',
+        'is_important' => false
+    ));
+    if ( ! empty( $params['value'][ 'desktop' ] ) ) {
         $_font_size_mq[ 'desktop' ] = null;
     }
 
-    if ( ! empty( $value[ 'tablet' ] ) ) {
+    if ( ! empty( $params['value'][ 'tablet' ] ) ) {
         $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
     }
 
-    if ( ! empty( $value[ 'mobile' ] ) ) {
+    if ( ! empty( $params['value'][ 'mobile' ] ) ) {
         $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
     }
-
-
-    foreach ( $value as $device => $val ) {
+    foreach ( $params['value'] as $device => $val ) {
         if ( ! empty(  $val ) ) {
             $rules[] = array(
-                'selector' => $selector,
-                'css_rules' => sprintf( '%1$s:%2$s%3$s;', 'font-size', $val, $important ? '!important' : '' ),
+                'selector' => $params['selector'],
+                'css_rules' => sprintf( '%1$s:%2$s%3$s;', $params['css_property'], $val, $params['is_important'] ? '!important' : '' ),
                 'mq' => $_font_size_mq[ $device ]
             );
         }
     }
-
     return $rules;
 }
 
