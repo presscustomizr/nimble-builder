@@ -5,9 +5,9 @@ function sek_get_module_params_for_sek_local_custom_css() {
         'dynamic_registration' => true,
         'module_type' => 'sek_local_custom_css',
         'name' => __('Custom CSS for the sections of the current page', 'text_domain_to_be_replaced'),
-        'starting_value' => array(
-            'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) )
-        ),
+        // 'starting_value' => array(
+        //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) )
+        // ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -15,6 +15,7 @@ function sek_get_module_params_for_sek_local_custom_css() {
                 'local_custom_css' => array(
                     'input_type'  => 'code_editor',
                     'title'       => __( 'Custom css' , 'text_domain_to_be_replaced' ),
+                    'default'     => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) ),
                     'code_type' => 'text/css',// 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
                     'notice_after' => __('This CSS code will be restricted to the currently previewed page only, and not applied site wide.', 'text_domain_to_be_replaced'),
                     'refresh_markup' => false,
