@@ -35,21 +35,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         template : {
                               settingControlId : _id_ + '__template',
                               module_type : 'sek_local_template',
-                              controlLabel : '@missi18n local template',
+                              controlLabel : sektionsLocalizedData.i18n['Page template'],
                               expandAndFocusOnInit : true,
                               //icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                         },
                         widths : {
                               settingControlId : _id_ + '__widths',
                               module_type : 'sek_local_widths',
-                              controlLabel : '@missi18n inner and outer widths',
+                              controlLabel : sektionsLocalizedData.i18n['Inner and outer widths'],
                               icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
                         },
                         custom_css : {
                               settingControlId : _id_ + '__custom_css',
                               module_type : 'sek_local_custom_css',
-                              controlLabel : '@missi18n custom css',
+                              controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
                               icon : '<i class="material-icons sek-level-option-icon">code</i>'
+                        },
+                        local_reset : {
+                              settingControlId : _id_ + '__local_reset',
+                              module_type : 'sek_local_reset',
+                              controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
+                              icon : '<i class="material-icons sek-level-option-icon">cached</i>'
                         }
                   });
 

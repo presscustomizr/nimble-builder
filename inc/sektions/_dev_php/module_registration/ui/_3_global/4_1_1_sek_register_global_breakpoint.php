@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_breakpoint() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_breakpoint',
-        'name' => __('Site wide options', 'text_domain_to_be_replaced'),
+        'name' => __('Site wide breakpoint options', 'text_domain_to_be_replaced'),
         // 'starting_value' => array(
 
         // ),

@@ -401,6 +401,13 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             // UI global and local options
             'Current page options' => __( 'Current page options', 'text_domain_to_be_replaced'),
+            'Page template' => __( 'Page template', 'text_domain_to_be_replaced'),
+            'Inner and outer widths' => __( 'Inner and outer widths', 'text_domain_to_be_replaced'),
+            'Custom CSS' => __( 'Custom CSS', 'text_domain_to_be_replaced'),
+            'Remove the sections in this page' => __( 'Remove the sections in this page', 'text_domain_to_be_replaced'),
+
+            'Site wide breakpoint for Nimble sections' => __( 'Site wide breakpoint for Nimble sections', 'text_domain_to_be_replaced'),
+            'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'text_domain_to_be_replaced'),
 
             // DEPRECATED
             'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_domain_to_be_replaced'),

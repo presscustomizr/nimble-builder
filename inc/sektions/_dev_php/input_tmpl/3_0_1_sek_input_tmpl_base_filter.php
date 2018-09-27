@@ -66,6 +66,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'buttons_choice' :
             sek_set_input_tmpl___buttons_choice( $input_id, $input_data );
         break;
+        case 'reset_button' :
+            sek_set_input_tmpl___reset_button( $input_id, $input_data );
+        break;
     }
 }
 ?>

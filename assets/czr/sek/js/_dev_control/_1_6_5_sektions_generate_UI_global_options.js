@@ -29,14 +29,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         breakpoint : {
                               settingControlId : _id_ + '__breakpoint',
                               module_type : 'sek_global_breakpoint',
-                              controlLabel : '@missi18n breakpoint global options',
+                              controlLabel : sektionsLocalizedData.i18n['Site wide breakpoint for Nimble sections'],
                               expandAndFocusOnInit : true,
                               icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                         },
                         widths : {
                               settingControlId : _id_ + '__widths',
                               module_type : 'sek_global_widths',
-                              controlLabel : '@missi18n inner and outer widths',
+                              controlLabel : sektionsLocalizedData.i18n['Site wide inner and outer sections widths'],
                               icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
                         }
                   });

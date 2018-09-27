@@ -202,6 +202,7 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/input_tmpl/3_1_4_sek_input_tmpl_borders.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_1_5_sek_input_tmpl_border_radius.php',
       '<%= paths.sektions %>_dev_php/input_tmpl/3_1_6_sek_input_tmpl_buttons_choice.php',
+      '<%= paths.sektions %>_dev_php/input_tmpl/3_1_7_sek_input_tmpl_reset_button.php',
 
       // MODULE REGISTRATION
       '<%= paths.sektions %>_dev_php/module_registration/10_0_0_sek_module_helpers_for_css_rules_generation.php',
@@ -223,9 +224,11 @@ module.exports = {
       '<%= paths.sektions %>_dev_php/module_registration/ui/_2_local/4_1_0_sek_register_local_template.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/_2_local/4_1_1_sek_register_local_widths.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/_2_local/4_1_2_sek_register_local_custom_css.php',
+      '<%= paths.sektions %>_dev_php/module_registration/ui/_2_local/4_1_3_sek_register_local_reset.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php',
       '<%= paths.sektions %>_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php',
+      //'<%= paths.sektions %>_dev_php/module_registration/ui/_3_global/4_1_3_sek_register_global_reset.php',
 
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php',
       '<%= paths.sektions %>_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php',
@@ -299,6 +302,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_0_borders.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_1_border_radius.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_2_buttons_choice.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_3_reset_button.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
@@ -317,6 +321,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_0_UI_local_template.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_1_UI_local_widths.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_2_UI_local_custom_css.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_3_UI_local_reset.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_1_UI_global_breakpoint.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_2_UI_global_widths.js',

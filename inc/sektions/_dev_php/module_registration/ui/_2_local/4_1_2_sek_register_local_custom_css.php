@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_local_custom_css() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_custom_css',
-        'name' => __('Options for the sections of the current page', 'text_domain_to_be_replaced'),
+        'name' => __('Custom CSS for the sections of the current page', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) )
         ),
