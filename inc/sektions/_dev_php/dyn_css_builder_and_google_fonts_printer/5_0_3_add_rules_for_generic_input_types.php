@@ -262,14 +262,43 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
                 $rules = sek_generate_css_rules_for_border_radius_options( $rules, $value, $selector );
             }
         break;
+
         case 'width' :
-            $numeric = sek_extract_numeric_value( $value );
-            if ( ! empty( $numeric ) ) {
-                $unit = sek_extract_unit( $value );
-                //$unit = '%' === $unit ? 'vw' : $unit;
-                $properties_to_render['width'] = $numeric . $unit;
+            if ( is_string( $value ) ) {
+                  $numeric = sek_extract_numeric_value($value);
+                  if ( ! empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $value );
+                      $properties_to_render['width'] = $numeric . $unit;
+                  }
+            } else if ( is_array( $value ) ) {
+                  $important = false;
+                  if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+                      $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
+                  }
+                  $value = wp_parse_args( $value, array(
+                      'desktop' => '100%',
+                      'tablet' => '',
+                      'mobile' => ''
+                  ));
+                  // replace % by vh when needed
+                  $ready_value = $value;
+                  foreach ($value as $device => $num_unit ) {
+                      $numeric = sek_extract_numeric_value( $num_unit );
+                      if ( ! empty( $numeric ) ) {
+                          $unit = sek_extract_unit( $num_unit );
+                          $ready_value[$device] = $numeric . $unit;
+                      }
+                  }
+
+                  $rules = sek_set_mq_css_rules(array(
+                      'value' => $ready_value,
+                      'css_property' => 'width',
+                      'selector' => $selector,
+                      'is_important' => $important,
+                  ), $rules );
             }
         break;
+
         case 'v_spacing' :
             //$value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
             $numeric = sek_extract_numeric_value( $value );
