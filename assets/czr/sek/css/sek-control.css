@@ -380,7 +380,7 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
 }
 
 
-.sek-bg-pos-wrapper .cls-5 {
+.sek-bg-pos-wrapper .sek-svg-bg-pos {
     fill: #fff;
 }
 
