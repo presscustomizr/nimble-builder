@@ -6,6 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 $model = SEK_Front() -> model;
 $module_type = $model['module_type'];
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
+$quote_content_settings = $value['quote_content'];
+$cite_content_settings = $value['cite_content'];
+$design_settings = $value['design'];
 
 // Utility to print the text content generated with tinyMce
 // should be wrapped in a specific selector when customizing,
@@ -28,12 +31,12 @@ if ( ! function_exists( __NAMESPACE__ . '\sek_print_quote_content' ) ) {
 }
 
 // print the module content if not empty
-if ( ! empty( $value['quote_text'] ) ) {
+if ( ! empty( $quote_content_settings['quote_text'] ) ) {
     sek_print_quote_content(
         sprintf( '<blockquote class="sek-quote%3$s"><div class="sek-quote-inner"><div class="sek-quote-content">%1$s</div>%2$s</div></blockquote>',
-            wpautop( $value['quote_text'] ),
-            ! empty( $value['cite_text'] ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', $value['cite_text'] ) : '',
-            empty( $value['quote_design'] ) || 'none' == $value['quote_design'] ? '' : " sek-quote-design sek-{$value['quote_design']}"
+            wpautop( $quote_content_settings['quote_text'] ),
+            ! empty( $cite_content_settings['cite_text'] ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', $cite_content_settings['cite_text'] ) : '',
+            empty( $design_settings['quote_design'] ) || 'none' == $design_settings['quote_design'] ? '' : " sek-quote-design sek-{$design_settings['quote_design']}"
         ),
         'quote_text',
         $model,

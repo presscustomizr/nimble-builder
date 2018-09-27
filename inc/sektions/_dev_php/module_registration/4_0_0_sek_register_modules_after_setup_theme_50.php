@@ -26,10 +26,12 @@ function sek_register_modules() {
         'sek_local_template',
         'sek_local_widths',
         'sek_local_custom_css',
+        'sek_local_reset',
 
         // global options modules
         'sek_global_breakpoint',
         'sek_global_widths',
+        //'sek_global_reset',
 
         // FRONT MODULES
         'czr_simple_html_module',
@@ -53,7 +55,11 @@ function sek_register_modules() {
         'czr_icon_spacing_border_child',
 
         'czr_map_module',
+
         'czr_quote_module',
+        'czr_quote_quote_child',
+        'czr_quote_cite_child',
+        'czr_quote_design_child',
 
         'czr_button_module',
         'czr_btn_content_child',
@@ -212,7 +218,7 @@ function sek_get_select_options_for_input_id( $input_id ) {
         //QUOTE MODULE
         case 'quote_design' :
             $options = array(
-                'none' => __( 'No design', 'text_domain_to_be_replaced' ),
+                'none' => __( 'Text only', 'text_domain_to_be_replaced' ),
                 'border-before' => __( 'Side Border', 'text_domain_to_be_replaced' ),
                 'quote-icon-before' => __( 'Quote Icon', 'text_domain_to_be_replaced' ),
             );
