@@ -64,7 +64,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'default'     => 'large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
-                                            'link-to' => array(
+                'link-to' => array(
                     'input_type'  => 'select',
                     'title'       => __('Link to', 'text_domain_to_be_replaced'),
                     'default'     => 'no-link',
@@ -102,14 +102,15 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'refresh_stylesheet' => true
                 ),
                 'custom_width' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Width', 'text_domain_to_be_replaced'),
                     'min' => 1,
                     'max' => 100,
                     //'unit' => '%',
-                    'default' => '',
+                    'default'     => array( 'desktop' => '100%' ),
                     'max'     => 500,
                     'width-100'   => true,
+                    'title_width' => 'width-100',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true
                 ),
@@ -232,7 +233,39 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
                 $unit = sek_extract_unit( $width );
                 $css_rules .= 'width:' . $numeric . $unit . ';';
             }
-        }
+            // same treatment as in sek_add_css_rules_for_css_sniffed_input_id() => 'width'
+            if ( is_string( $width ) ) {
+                  $numeric = sek_extract_numeric_value($width);
+                  if ( ! empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $width );
+                      $css_rules .= 'width:' . $numeric . $unit . ';';
+                  }
+            } else if ( is_array( $width ) ) {
+                  $width = wp_parse_args( $width, array(
+                      'desktop' => '100%',
+                      'tablet' => '',
+                      'mobile' => ''
+                  ));
+                  // replace % by vh when needed
+                  $ready_value = $width;
+                  foreach ($width as $device => $num_unit ) {
+                      $numeric = sek_extract_numeric_value( $num_unit );
+                      if ( ! empty( $numeric ) ) {
+                          $unit = sek_extract_unit( $num_unit );
+                          $ready_value[$device] = $numeric . $unit;
+                      }
+                  }
+
+                  $rules = sek_set_mq_css_rules(array(
+                      'value' => $ready_value,
+                      'css_property' => 'width',
+                      'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner img',
+                      'is_important' => false
+                  ), $rules );
+            }
+        }//if
+
+
         if ( !empty( $css_rules ) ) {
             $rules[] = array(
                 'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner img',
