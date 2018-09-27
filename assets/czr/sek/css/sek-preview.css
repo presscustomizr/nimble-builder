@@ -85,7 +85,6 @@
     filter: blur(1px);*/
     opacity: 0.8;
   }
-  [data-sek-level="location"] .sek-hidden-on-desktops .
 }
 @media (min-width:575px) and (max-width:768px){
   [data-sek-level="location"] .sek-hidden-on-tablets {
