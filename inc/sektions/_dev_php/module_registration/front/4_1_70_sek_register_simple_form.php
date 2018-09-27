@@ -905,6 +905,7 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                 'email_footer' => array(
                     'input_type'  => 'code_editor',
                     'title'       => __( 'Email footer' , 'text_domain_to_be_replaced' ),
+                    'notice_before' => __('Html code is allowed', 'text-domain'),
                     'default'     => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_domain_to_be_replaced' ),
                         get_bloginfo( 'name' ),
                         get_site_url( 'url' )
