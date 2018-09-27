@@ -16,7 +16,7 @@ function sek_get_module_params_for_sek_local_reset() {
                     'input_type'  => 'reset_button',
                     'title'       => __( 'Remove the Nimble sections in the current page' , 'text_domain_to_be_replaced' ),
                     'scope'       => 'local',
-                    'notice_after' => __('This will reset the sections created for the currently previewed page only. All other sections in other contexts will be preserved', 'text_domain_to_be_replaced'),
+                    'notice_after' => __('This will reset the sections created for the currently previewed page only. All other sections in other contexts will be preserved.', 'text_domain_to_be_replaced'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                 )
