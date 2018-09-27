@@ -49,7 +49,8 @@
                               if ( ! _.isEmpty( currentDevice ) && deviceIndex < deviceHierarchy.length ) {
                                     return getCurrentDeviceActualOrInheritedValue( inputValues, deviceHierarchy[ deviceIndex + 1 ] );
                               } else {
-                                    return '16px';
+                                    var clonedDefault = $.extend( true, { desktop : '' }, defaultVal );
+                                    return clonedDefault[ 'desktop' ];
                               }
                         }
                   };
@@ -60,13 +61,13 @@
                         // for retro-compatibility, we must handle the case when the initial input val is a string instead of an array
                         // in this case, the string value is assigned to the desktop device.
                         var inputVal = input(), inputValues = {}, clonedDefault = $.extend( true, {}, defaultVal );
+                        inputValues = clonedDefault;
                         if ( _.isObject( inputVal ) ) {
                               inputValues = $.extend( true, {}, inputVal );
-                        } else if ( _.isString( inputVal ) ) {
+                        } else if ( _.isString( inputVal ) && ! _.isEmpty( inputVal ) ) {
                               inputValues = { desktop : inputVal };
                         }
-                        inputValues = $.extend( clonedDefault, inputValues );
-
+                        //inputValues = _.extend( inputValues, clonedDefault );
                         // do we have a val for the current device ?
                         var _rawVal = getCurrentDeviceActualOrInheritedValue( inputValues, currentDevice ),
                             _unit = _extractUnit( _rawVal ),
