@@ -47,20 +47,38 @@
                   }
 
                   input.isReady.done( function() {
-                        // the input should be visible otherwise the code mirror initializes wrongly:
-                        // e.g. bad ui (bad inline CSS maths), not visible content until click.
-                        setTimeout( function() {
-                              if ( editorSettings ) {
-                                    try { initSyntaxHighlightingEditor( editorSettings ); } catch( er ) {
-                                          api.errare( 'error in sek_control => code_editor() input', er );
+                        var _doInstantiate = function( evt ) {
+                              var input = this;
+                              // Bail if we have an instance
+                              if ( ! _.isEmpty( input.editor ) )
+                                return;
+                              // Bail if the control is not expanded yet
+                              if ( _.isEmpty( input.module.control.container.attr('data-sek-expanded') ) || "false" == input.module.control.container.attr('data-sek-expanded') )
+                                return;
+
+                              setTimeout( function() {
+                                    if ( editorSettings ) {
+                                          try { initSyntaxHighlightingEditor( editorSettings ); } catch( er ) {
+                                                api.errare( 'error in sek_control => code_editor() input', er );
+                                                initPlainTextareaEditor();
+                                          }
+                                    } else {
                                           initPlainTextareaEditor();
                                     }
-                              } else {
-                                    initPlainTextareaEditor();
-                              }
-                              //focus the editor
-                             $input_title.click();
-                        }, 10 );
+                                    //focus the editor
+                                   $input_title.click();
+                              }, 10 );
+                        };
+                        // Try to instantiate now
+                        _doInstantiate.call(input);
+
+                        // the input should be visible otherwise the code mirror initializes wrongly:
+                        // e.g. bad ui (bad inline CSS maths), not visible content until click.
+                        // When the code_editor input is rendered in an accordion control ( @see CZRSeksPrototype.scheduleModuleAccordion ), we need to defer the instantiation when the control has been expanded.
+                        // fixes @see https://github.com/presscustomizr/nimble-builder/issues/176
+                        input.module.control.container.on('sek-accordion-expanded', function() {
+                              _doInstantiate.call( input );
+                        });
                   });
 
 
@@ -72,8 +90,8 @@
                             settings;
 
                         settings = _.extend( {}, codeEditorSettings, {
-                              onTabNext: onTabNext,
-                              onTabPrevious: onTabPrevious,
+                              onTabNext: CZRSeksPrototype.selectNextTabbableOrFocusable( ':tabbable' ),
+                              onTabPrevious: CZRSeksPrototype.selectPrevTabbableOrFocusable( ':tabbable' ),
                               onUpdateErrorNotice: onUpdateErrorNotice
                         });
 
@@ -90,7 +108,8 @@
                               });
 
                         // Focus the editor when clicking on its title.
-                        $input_title.on( 'click', function() {
+                        $input_title.on( 'click', function( evt ) {
+                              evt.stopPropagation();
                               input.editor.codemirror.focus();
                         });
 
@@ -131,7 +150,7 @@
                    */
                   var initPlainTextareaEditor = function() {
                         var textarea  = $textarea[0];
-
+                        input.editor = textarea;//assign the editor property
                         $textarea.on( 'blur', function onBlur() {
                               $textarea.data( 'next-tab-blurs', false );
                         } );
@@ -191,24 +210,6 @@
                                     type: 'warning'
                               } ) );
                         }
-                  },
-
-
-
-                  /**
-                   * Handle tabbing to the tabbable element before the editor.
-                   */
-                  onTabNext = function() {
-                        CZRSeksPrototype.selectNextTabbableOrFocusable( ':tabbable' );
-                  },
-
-
-
-                  /**
-                   * Handle tabbing to the tabbable element after the editor.
-                   */
-                  onTabPrevious = function() {
-                        CZRSeksPrototype.selectPrevTabbableOrFocusable( ':tabbable' );
                   }
             }
       });//$.extend( api.czrInputMap, {})

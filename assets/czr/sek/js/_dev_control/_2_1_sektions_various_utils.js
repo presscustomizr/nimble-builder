@@ -666,6 +666,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               duration : 'fast',
                               start : function() {
                                     $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
+                                    // this event 'sek-accordion-expanded', is used to defer the instantiation of the code editor
+                                    // @see api.czrInputMap['code_editor']
+                                    // @see https://github.com/presscustomizr/nimble-builder/issues/176
+                                    if ( "true" == $control.attr('data-sek-expanded') ) {
+                                          $control.trigger( 'sek-accordion-expanded' );
+                                    } else {
+                                          $control.trigger( 'sek-accordion-collapsed' );
+                                    }
                               }
                         });
                   });
