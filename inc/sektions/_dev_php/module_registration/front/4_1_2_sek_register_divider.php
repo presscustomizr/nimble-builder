@@ -76,6 +76,19 @@ function sek_get_module_params_for_czr_divider_module() {
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'width'
                 ),
+                'border_radius_css'       => array(
+                    'input_type'  => 'border_radius',
+                    'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
+                    'default' => array( '_all_' => '0px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'min'         => 0,
+                    'max'         => 500,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'border_radius'
+                    //'css_selectors'=> ''
+                ),
                 'h_alignment_css' => array(
                     'input_type'  => 'h_alignment',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
