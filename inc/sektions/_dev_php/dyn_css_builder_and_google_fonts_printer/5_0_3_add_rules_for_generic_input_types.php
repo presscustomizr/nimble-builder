@@ -300,16 +300,49 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
 
         case 'v_spacing' :
-            //$value = in_array( $value, range( 1, 100 ) ) ? $value . 'px' : '15px' ;
-            $numeric = sek_extract_numeric_value( $value );
-            if ( ! empty( $numeric ) ) {
-                $unit = sek_extract_unit( $value );
-                $unit = '%' === $unit ? 'vh' : $unit;
+            if ( is_string( $value ) ) {
+                  $numeric = sek_extract_numeric_value($value);
+                  if ( ! empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $value );
+                      $unit = '%' === $unit ? 'vh' : $unit;
+                      $properties_to_render = array(
+                          'margin-top'  => $numeric . $unit,
+                          'margin-bottom' => $numeric . $unit
+                      );
+                  }
+            } else if ( is_array( $value ) ) {
+                  $important = false;
+                  if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+                      $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
+                  }
+                  $value = wp_parse_args( $value, array(
+                      'desktop' => '15px',
+                      'tablet' => '',
+                      'mobile' => ''
+                  ));
+                  // replace % by vh when needed
+                  $ready_value = $value;
+                  foreach ($value as $device => $num_unit ) {
+                      $numeric = sek_extract_numeric_value( $num_unit );
+                      if ( ! empty( $numeric ) ) {
+                          $unit = sek_extract_unit( $num_unit );
+                          $unit = '%' === $unit ? 'vh' : $unit;
+                          $ready_value[$device] = $numeric . $unit;
+                      }
+                  }
 
-                $properties_to_render = array(
-                    'margin-top'  => $numeric . $unit,
-                    'margin-bottom' => $numeric . $unit
-                );
+                  $rules = sek_set_mq_css_rules(array(
+                      'value' => $ready_value,
+                      'css_property' => 'margin-top',
+                      'selector' => $selector,
+                      'is_important' => $important,
+                  ), $rules );
+                  $rules = sek_set_mq_css_rules(array(
+                      'value' => $ready_value,
+                      'css_property' => 'margin-bottom',
+                      'selector' => $selector,
+                      'is_important' => $important,
+                  ), $rules );
             }
         break;
         //not used at the moment, but it might if we want to display the divider as block (e.g. a div instead of a span)
