@@ -328,26 +328,52 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
 
 // @return boolean
 // Recursive
-function sek_is_flagged_important( $input_id, $value, $registered_input_list ) {
-    // is the important flag on ?
+// Check if a *_flag_important input id is part of the registered input list of the module
+// then verify is the provided input_id is part of the list of input that should be set to important => 'important_input_list'
+// Example of a *_flag_important input:
+// 'quote___flag_important'       => array(
+//     'input_type'  => 'gutencheck',
+//     'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+//     'default'     => 0,
+//     'refresh_markup' => false,
+//     'refresh_stylesheet' => true,
+//     'title_width' => 'width-80',
+//     'input_width' => 'width-20',
+//     // declare the list of input_id that will be flagged with !important when the option is checked
+//     // @see sek_add_css_rules_for_css_sniffed_input_id
+//     // @see sek_is_flagged_important
+//     'important_input_list' => array(
+//         'quote_font_family_css',
+//         'quote_font_size_css',
+//         'quote_line_height_css',
+//         'quote_font_weight_css',
+//         'quote_font_style_css',
+//         'quote_text_decoration_css',
+//         'quote_text_transform_css',
+//         'quote_letter_spacing_css',
+//         'quote_color_css',
+//         'quote_color_hover_css'
+//     )
+// )
+function sek_is_flagged_important( $input_id, $module_value, $registered_input_list ) {
     $important = false;
 
-    // loop on the module input values, and find _flag_important.
-    // then check if the current input_id, is in the list of important_input_list
-    foreach( $value as $id => $input_value ) {
-        if ( is_string( $id ) && false !== strpos( $id, '_flag_important' ) ) {
-            if ( is_array( $registered_input_list ) && array_key_exists( $id, $registered_input_list ) ) {
-                if ( empty( $registered_input_list[ $id ][ 'important_input_list' ] ) ) {
-                    sek_error_log( __FUNCTION__ . ' => missing important_input_list for input id ' . $id );
-                } else {
-                    $important_list_candidate = $registered_input_list[ $id ][ 'important_input_list' ];
-                    if ( in_array( $input_id, $important_list_candidate ) ) {
-                        $important = (bool)sek_is_checked( $input_value );
-                    }
+    if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => the $registered_input_list param should be an array not empty');
+        return $important;
+    }
+
+    // loop on the registered input list and try to find a *_flag_important input id
+    foreach ( $registered_input_list as $_id => $input_data ) {
+        if ( is_string( $_id ) && false !== strpos( $_id, '_flag_important' ) ) {
+            if ( empty( $input_data[ 'important_input_list' ] ) ) {
+                sek_error_log( __FUNCTION__ . ' => error => missing important_input_list for input id ' . $_id );
+            } else {
+                $important_list_candidate = $input_data[ 'important_input_list' ];
+                if ( in_array( $input_id, $important_list_candidate ) ) {
+                    $important = sek_booleanize_checkbox_val( sek_get_input_value_in_module_model( $_id, $module_value ) );
                 }
             }
-        } else if ( is_array( $input_value ) ) {
-              $important = sek_is_flagged_important( $input_id, $input_value, $registered_input_list );
         }
     }
     return $important;

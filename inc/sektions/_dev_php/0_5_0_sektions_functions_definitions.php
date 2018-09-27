@@ -158,6 +158,66 @@ function sek_get_registered_module_type_property( $module_type, $property = '' )
 
 
 
+/* ------------------------------------------------------------------------- *
+ *  GET THE INPUT VALUE OF A GIVEN MODULE MODEL
+/* ------------------------------------------------------------------------- */
+// Recursive helper
+// Handles simple model and multidimensional module model ( father - children ), like
+// Array
+// (
+//     [quote_content] => Array
+//         (
+//             [quote_text] => Hey, careful, man, there's a beverage here!
+//             [quote_font_size_css] => Array
+//                 (
+//                     [desktop] => 29px
+//                     [mobile] => 12px
+//                 )
+
+//             [quote_letter_spacing_css] => 7
+//             [quote___flag_important] => 1
+//         )
+
+//     [cite_content] => Array
+//         (
+//             [cite_text] => The Dude in <a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>
+//             [cite_font_style_css] => italic
+//         )
+
+//     [design] => Array
+//         (
+//             [quote_design] => border-before
+//         )
+// )
+// Helper
+// @param $input_id ( string )
+// @param $module_model ( array )
+function sek_get_input_value_in_module_model( $input_id, $module_model ) {
+    if ( ! is_string( $input_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => the $input_id param should be a string', $module_model);
+        return;
+    }
+    if ( ! is_array( $module_model ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => the $module_model param should be an array', $module_model );
+        return;
+    }
+    $input_value = '_not_set_';
+    foreach ( $module_model as $key => $data ) {
+        if ( $input_value !== '_not_set_' )
+          break;
+        if ( $input_id === $key ) {
+            $input_value = $data;
+            break;
+        } else {
+            if ( is_array( $data ) ) {
+                $input_value = sek_get_input_value_in_module_model( $input_id, $data );
+            }
+        }
+    }
+    return $input_value;
+}
+
+
 
 
 
@@ -584,6 +644,10 @@ function render_content_sections_for_nimble_template() {
         }
     }
 }
+
+
+
+
 
 
 
