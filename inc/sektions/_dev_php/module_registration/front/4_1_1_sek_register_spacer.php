@@ -38,13 +38,14 @@ function sek_get_module_params_for_czr_spacer_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'height_css' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'min'         => 0,
                     'max'         => 100,
                     'step'        => 1,
                     'title'       => __('Space', 'text_domain_to_be_replaced'),
-                    'default'     => '20px',
+                    'default'     => array( 'desktop' => '20px' ),
                     'width-100'   => true,
+                    'title_width' => 'width-100',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_selectors' => array( '.sek-spacer' ),
