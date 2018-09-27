@@ -99,12 +99,13 @@ function sek_get_module_params_for_czr_divider_module() {
                     'css_identifier' => 'h_alignment'
                 ),
                 'v_spacing_css' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Space before and after', 'text_domain_to_be_replaced'),
                     'min'         => 1,
                     'max'         => 100,
-                    'default'     => '15px',
+                    'default'     => array( 'desktop' => '15px' ),
                     'width-100'   => true,
+                    'title_width' => 'width-100',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'v_spacing'
