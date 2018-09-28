@@ -2,6 +2,7 @@
 /* ------------------------------------------------------------------------- *
  *  SETUP DYNAMIC SERVER REGISTRATION FOR SETTING
 /* ------------------------------------------------------------------------- */
+// Fired @'after_setup_theme:20'
 if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
     class SEK_CZR_Dyn_Register {
         static $instance;
