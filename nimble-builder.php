@@ -96,3 +96,7 @@ function nimble_register_location( $location ) {
       return;
     \Nimble\register_location( $location );
 }
+
+// Retro compat for image and tinymce module, turned multidimensional ( father - child logic ) since 1.1+
+// Fired once (transient flag), for logged in user with "edit_theme_options" cap
+/*add_action( 'wp_loaded', '\Nimble\sek_do_compat_1_0_to_1_1' );*/
