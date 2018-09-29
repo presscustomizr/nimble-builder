@@ -282,4 +282,14 @@ module.exports = {
       'postcss:sek_main_rtl',
     ]
   },
+
+  nimble_main_php_file : {
+    options: {
+      spawn : false,
+      // Start a live reload server on the default port 35729
+      livereload : true
+    },
+    files : [ 'nimble-builder.php' ],
+    tasks : []
+  },
 };
