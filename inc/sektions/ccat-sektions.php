@@ -9,20 +9,20 @@ if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE
 if ( ! defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
 function sek_get_locations() {
-  return apply_filters( 'sek_locations', array_merge( SEK_Front()->default_locations, SEK_Front()->registered_locations ) );
+  return apply_filters( 'sek_locations', array_merge( SEK_Fire()->default_locations, SEK_Fire()->registered_locations ) );
 }
 
 function register_location( $location ) {
-    $registered_locations = SEK_Front()->registered_locations;
+    $registered_locations = SEK_Fire()->registered_locations;
     if ( is_array( $registered_locations ) ) {
         $registered_locations[] = $location;
     }
-    SEK_Front()->registered_locations = $registered_locations;
+    SEK_Fire()->registered_locations = $registered_locations;
 }
 function sek_get_default_sektions_value() {
     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
     foreach( sek_get_locations() as $location ) {
-        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location ], SEK_Front()->default_location_model );
+        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location ], SEK_Fire()->default_location_model );
     }
     return $defaut_sektions_value;
 }
@@ -162,7 +162,7 @@ function sek_get_default_module_model( $module_type = '' ) {
     $default = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
       return $default;
-    $default_models = SEK_Front()->default_models;
+    $default_models = SEK_Fire()->default_models;
     if ( ! empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
@@ -195,7 +195,7 @@ function sek_get_default_module_model( $module_type = '' ) {
             $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
         }
         $default_models[ $module_type ] = $default;
-        SEK_Front()->default_models = $default_models;
+        SEK_Fire()->default_models = $default_models;
     }
     return $default;
 }
@@ -232,7 +232,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
     $input_list = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
       return $input_list;
-    $cached_input_lists = SEK_Front()->cached_input_lists;
+    $cached_input_lists = SEK_Fire()->cached_input_lists;
     if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
         $input_list = $cached_input_lists[ $module_type ];
     } else {
@@ -267,7 +267,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
             $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
         }
         $cached_input_lists[ $module_type ] = $input_list;
-        SEK_Front()->cached_input_lists = $cached_input_lists;
+        SEK_Fire()->cached_input_lists = $cached_input_lists;
     }
     return $input_list;
 }
@@ -429,7 +429,7 @@ function render_content_sections_for_nimble_template() {
         $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
         if ( 'loop_start' === $location || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
             do_action( "sek_before_location_{$location}" );
-            SEK_Front()->_render_seks_for_location( $location, $locationSettingValue );
+            SEK_Fire()->_render_seks_for_location( $location, $locationSettingValue );
             do_action( "sek_after_location_{$location}" );
         }
     }
@@ -580,8 +580,8 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
     if ( empty( $skope_id ) ) {
         $skope_id = skp_get_skope_id( $skope_level );
     }
-    if ( did_action('wp') && 'not_cached' != SEK_Front()->local_seks ) {
-        $seks_data = SEK_Front()->local_seks;
+    if ( did_action('wp') && 'not_cached' != SEK_Fire()->local_seks ) {
+        $seks_data = SEK_Fire()->local_seks;
     } else {
 
         $seks_data = array();
@@ -599,12 +599,12 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             }
         }
 
-        foreach( SEK_Front()->registered_locations as $loc_id ) {
+        foreach( SEK_Fire()->registered_locations as $loc_id ) {
             if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
-                $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], SEK_Front()->default_location_model );
+                $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], SEK_Fire()->default_location_model );
             }
         }
-        SEK_Front()->local_seks = $seks_data;
+        SEK_Fire()->local_seks = $seks_data;
     }//end if
     $seks_data = apply_filters(
         'sek_get_skoped_seks',
@@ -620,7 +620,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         }
     }
 
-    return 'no_match' === $seks_data ? SEK_Front()->default_location_model : $seks_data;
+    return 'no_match' === $seks_data ? SEK_Fire()->default_location_model : $seks_data;
 }
 
 
@@ -682,7 +682,131 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
     }
     return get_post( $r );
 }
+function sek_do_compat_1_0_to_1_1() {
+    if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
+      return;
+    if ( 'done' === get_transient( 'sek_do_compat_1_0_to_1_1' ) )
+      return;
+    $sek_post_query_vars = array(
+        'post_type'              => NIMBLE_CPT,
+        'post_status'            => get_post_stati(),
+        'posts_per_page'         => -1,
+        'no_found_rows'          => true,
+        'cache_results'          => true,
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
+        'lazy_load_term_meta'    => false,
+    );
+    $query = new \WP_Query( $sek_post_query_vars );
+    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+      return;
 
+    foreach ($query->posts as $post_object ) {
+        if ( $post_object ) {
+            $seks_data = maybe_unserialize( $post_object->post_content );
+        }
+
+        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        if ( empty( $seks_data ) )
+          continue;
+        $seks_data = sek_walk_sections_and_do_map_compat( $seks_data );
+        $new_post_data = array(
+            'ID'          => $post_object->ID,
+            'post_title'  => $post_object->post_title,
+            'post_name'   => sanitize_title( $post_object->post_title ),
+            'post_type'   => NIMBLE_CPT,
+            'post_status' => 'publish',
+            'post_content' => maybe_serialize( $seks_data )
+        );
+        $r = wp_update_post( wp_slash( $new_post_data ), true );
+        if ( is_wp_error( $r ) ) {
+            sek_error_log( __FUNCTION__ . ' => error', $r );
+        }
+    }
+    set_transient( 'sek_do_compat_1_0_to_1_1', 'done', 60*60*24*3650 );
+}
+function sek_walk_sections_and_do_map_compat( $seks_data ) {
+    $new_seks_data = array();
+    foreach ( $seks_data as $key => $value ) {
+        $new_seks_data[$key] = $value;
+        if ( ! empty( $value ) && is_array( $value ) && 'options' === $key ) {
+            if ( array_key_exists( 'bg', $value ) )
+              continue;
+            $new_seks_data[$key] = array();
+            foreach( $value as $_opt_group => $_opt_group_data ) {
+                if ( 'spacing' === $_opt_group || 'layout' === $_opt_group )
+                  continue;
+                if ( 'bg_border' === $_opt_group ) {
+                    foreach ( $_opt_group_data as $input_id => $val ) {
+                        if ( false !== strpos( $input_id , 'bg-' ) ) {
+                            $new_seks_data[$key]['bg'][$input_id] = $val;
+                        }
+                    }
+                }
+            }
+        } // module mapping
+        else if ( is_array( $value ) && array_key_exists('module_type', $value ) ) {
+            $new_seks_data[$key] = $value;
+            $new_value = $value['value'];
+
+            switch ( $value['module_type'] ) {
+                case 'czr_image_module':
+                    if ( is_array( $value['value'] ) ) {
+                        if ( array_key_exists( 'main_settings', $value['value'] ) || array_key_exists( 'borders_corners', $value['value'] ) )
+                          break;
+                        $new_value = array( 'main_settings' => array(), 'borders_corners' => array() );
+                        foreach ( $value['value'] as $input_id => $input_data ) {
+                            if ( in_array( $input_id, array( 'main_settings', 'borders_corners' ) ) )
+                              break;
+                            switch ($input_id) {
+                                case 'border-type':
+                                case 'borders':
+                                case 'border_radius_css':
+                                    $new_value['borders_corners'][$input_id] = $input_data;
+                                break;
+
+                                default:
+                                    $new_value['main_settings'][$input_id] = $input_data;
+                                break;
+                            }
+                        }
+                    }
+                break;
+
+                case 'czr_tiny_mce_editor_module':
+                    if ( is_array( $value['value'] ) ) {
+                        if ( array_key_exists( 'main_settings', $value['value'] ) || array_key_exists( 'font_settings', $value['value'] ) )
+                          break;
+                        $new_value = array( 'main_settings' => array(), 'font_settings' => array() );
+                        foreach ( $value['value'] as $input_id => $input_data ) {
+                            if ( in_array( $input_id, array( 'main_settings', 'font_settings' ) ) )
+                              break;
+                            switch ($input_id) {
+                                case 'content':
+                                case 'h_alignment_css':
+                                    $new_value['main_settings'][$input_id] = $input_data;
+                                break;
+
+                                default:
+                                    $new_value['font_settings'][$input_id] = $input_data;
+                                break;
+                            }
+                        }
+                    }
+                break;
+                default :
+                    $new_value = $value['value'];
+                break;
+            }
+
+            $new_seks_data[$key]['value'] = $new_value;
+
+        } else if ( is_array( $value ) ) {
+            $new_seks_data[$key] = sek_walk_sections_and_do_map_compat( $value );
+        }
+    }
+    return $new_seks_data;
+}
 ?><?php
 require_once(  dirname( __FILE__ ) . '/customizer/seks_tiny_mce_editor_actions.php' );
 add_action ( 'customize_controls_enqueue_scripts', '\Nimble\sek_enqueue_controls_js_css', 20 );
@@ -10034,13 +10158,15 @@ function simple_form_mail_template() {
 
 ?><?php
 function SEK_CZR_Dyn_Register( $params = array() ) {
-    return SEK_CZR_Dyn_Register::get_instance( $params );
+    if (  skp_is_customizing() ) {
+        return SEK_CZR_Dyn_Register::get_instance( $params );
+    }
 }
-function SEK_Front( $params = array() ) {
-    return SEK_Front_Render_Css::get_instance( $params );
+add_action('after_setup_theme', '\Nimble\SEK_CZR_Dyn_Register', 20 );
+
+function SEK_Fire( $params = array() ) {
+    return Sek_Simple_Form::get_instance( $params );
 }
-if (  skp_is_customizing() ) {
-  SEK_CZR_Dyn_Register();
-}
-SEK_Front();
+
+SEK_Fire();
 ?>

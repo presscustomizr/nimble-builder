@@ -299,7 +299,6 @@ function sek_walk_sections_and_do_map_compat( $seks_data ) {
         //    bg_border => array()
         // )
         if ( ! empty( $value ) && is_array( $value ) && 'options' === $key ) {
-            sek_error_log(' SOOO N', $value );
             // bail if the mapping has already been done
             if ( array_key_exists( 'bg', $value ) )
               continue;
