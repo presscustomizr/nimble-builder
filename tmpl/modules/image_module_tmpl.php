@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 //     'link-target' : '',
 //     'lightbox' : true
 // };
-$model = SEK_Front() -> model;
+$model = SEK_Fire() -> model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $main_settings = $value['main_settings'];
 //$borders_corners_settings = $value['borders_corners'];
@@ -37,7 +37,7 @@ if ( ! function_exists( '\Nimble\sek_get_img_module_img_html') ) {
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
-                $html = SEK_Front() -> sek_get_input_placeholder_content( 'upload' );
+                $html = SEK_Fire() -> sek_get_input_placeholder_content( 'upload' );
             }
         }
 
@@ -49,20 +49,23 @@ if ( ! function_exists( '\Nimble\sek_get_img_module_img_html') ) {
         //   'src' => $attachment->guid,
         //   'title' => $attachment->post_title
         $img_post = get_post( $value['img'] );
-        if ( !is_wp_error( $img_post ) && is_object( $img_post ) ) {
-            $caption = $img_post->post_excerpt;
-            $description = $img_post->post_content;
-            $img_title = $img_post->post_title;
+        if ( is_int( $value['img'] ) ) {
+            $img_post = get_post( $value['img'] );
+            if ( !is_wp_error( $img_post ) && is_object( $img_post ) && 'attachment' === $img_post->post_type ) {
+                $caption = $img_post->post_excerpt;
+                $description = $img_post->post_content;
+                $img_title = $img_post->post_title;
 
-            if ( !empty( $caption ) ) {
-                $title = $caption;
-            } else if ( !empty( $description ) ) {
-                $title = $description;
-            } else if ( !empty( $img_title ) ) {
-                $title = $img_title;
+                if ( !empty( $caption ) ) {
+                    $title = $caption;
+                } else if ( !empty( $description ) ) {
+                    $title = $description;
+                } else if ( !empty( $img_title ) ) {
+                    $title = $img_title;
+                }
             }
         }
-        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, $title );
+        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) );
     }
 }
 

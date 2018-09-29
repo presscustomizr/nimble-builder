@@ -3,7 +3,7 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-$model = SEK_Front() -> model;
+$model = SEK_Fire() -> model;
 $module_type = $model['module_type'];
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $value = $value['main_settings'];
@@ -14,7 +14,7 @@ $value = $value['main_settings'];
 if ( ! function_exists( __NAMESPACE__ . '\sek_print_text_heading_content' ) ) {
     function sek_print_text_heading_content( $heading_content, $input_id, $module_model, $echo = false ) {
         if ( empty( $heading_content ) ) {
-            $to_print = SEK_Front()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
+            $to_print = SEK_Fire()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
         } else {
             if ( skp_is_customizing() ) {
                 $to_print = sprintf('<div title="%3$s" data-sek-input-type="textarea" data-sek-input-id="%1$s">%2$s</div>', $input_id, $heading_content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );

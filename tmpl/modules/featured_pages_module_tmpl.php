@@ -73,7 +73,7 @@ The model looks like this
 TO ASK: We're missing the title input
 */
 
-$model          = SEK_Front() -> model;
+$model          = SEK_Fire() -> model;
 $module_type    = $model['module_type'];
 
 $value          = array_key_exists( 'value', $model ) ? $model['value'] : array();
@@ -163,7 +163,7 @@ endif;
             }
             if ( empty( $is_custom_url ) && empty( $is_wp_post_type ) ):
                 echo '<h2>Feature Page temporary placeholder</h2>';
-                echo SEK_Front() -> sek_get_input_placeholder_content( 'upload' );
+                echo SEK_Fire() -> sek_get_input_placeholder_content( 'upload' );
             else :
                 //DEFINITION
 

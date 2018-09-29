@@ -3,7 +3,7 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-$model = SEK_Front() -> model;
+$model = SEK_Fire() -> model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 
 

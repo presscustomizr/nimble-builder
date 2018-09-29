@@ -11,15 +11,15 @@ if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFI
 
 // @return array
 function sek_get_locations() {
-  return apply_filters( 'sek_locations', array_merge( SEK_Front()->default_locations, SEK_Front()->registered_locations ) );
+  return apply_filters( 'sek_locations', array_merge( SEK_Fire()->default_locations, SEK_Fire()->registered_locations ) );
 }
 
 function register_location( $location ) {
-    $registered_locations = SEK_Front()->registered_locations;
+    $registered_locations = SEK_Fire()->registered_locations;
     if ( is_array( $registered_locations ) ) {
         $registered_locations[] = $location;
     }
-    SEK_Front()->registered_locations = $registered_locations;
+    SEK_Fire()->registered_locations = $registered_locations;
 }
 
 // @return array
@@ -27,7 +27,7 @@ function register_location( $location ) {
 function sek_get_default_sektions_value() {
     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
     foreach( sek_get_locations() as $location ) {
-        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location ], SEK_Front()->default_location_model );
+        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location ], SEK_Fire()->default_location_model );
     }
     return $defaut_sektions_value;
 }
@@ -236,7 +236,7 @@ function sek_get_default_module_model( $module_type = '' ) {
       return $default;
 
     // Did we already cache it ?
-    $default_models = SEK_Front()->default_models;
+    $default_models = SEK_Fire()->default_models;
     if ( ! empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
@@ -274,7 +274,7 @@ function sek_get_default_module_model( $module_type = '' ) {
 
         // Cache
         $default_models[ $module_type ] = $default;
-        SEK_Front()->default_models = $default_models;
+        SEK_Fire()->default_models = $default_models;
         //sek_error_log( __FUNCTION__ . ' => $default_models', $default_models );
     }
     return $default;
@@ -361,7 +361,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
       return $input_list;
 
     // Did we already cache it ?
-    $cached_input_lists = SEK_Front()->cached_input_lists;
+    $cached_input_lists = SEK_Fire()->cached_input_lists;
     if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
         $input_list = $cached_input_lists[ $module_type ];
     } else {
@@ -416,7 +416,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 
         // Cache
         $cached_input_lists[ $module_type ] = $input_list;
-        SEK_Front()->cached_input_lists = $cached_input_lists;
+        SEK_Fire()->cached_input_lists = $cached_input_lists;
         // sek_error_log( __FUNCTION__ . ' => $cached_input_lists', $cached_input_lists );
     }
     return $input_list;
@@ -639,7 +639,7 @@ function render_content_sections_for_nimble_template() {
         // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
         if ( 'loop_start' === $location || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
             do_action( "sek_before_location_{$location}" );
-            SEK_Front()->_render_seks_for_location( $location, $locationSettingValue );
+            SEK_Fire()->_render_seks_for_location( $location, $locationSettingValue );
             do_action( "sek_after_location_{$location}" );
         }
     }
