@@ -7,8 +7,8 @@ function sek_get_module_params_for_sek_level_border_module() {
         'name' => __('Borders', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'borders' => array(
-                  '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
-              )
+                '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+            )
         ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -100,14 +100,14 @@ function sek_add_css_rules_for_border( $rules, $level ) {
     //     [shadow] => 0
     // )
     $default_value_model  = sek_get_default_module_model( 'sek_level_border_module' );
-    $border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
-    $border_options = wp_parse_args( $border_options , is_array( $default_value_model ) ? $default_value_model : array() );
+    $normalized_border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
+    $normalized_border_options = wp_parse_args( $normalized_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
-    if ( empty( $border_options ) )
+    if ( empty( $normalized_border_options ) )
       return $rules;
 
-    $border_settings = ! empty( $border_options[ 'borders' ] ) ? $border_options[ 'borders' ] : FALSE;
-    $border_type = $border_options[ 'border-type' ];
+    $border_settings = ! empty( $normalized_border_options[ 'borders' ] ) ? $normalized_border_options[ 'borders' ] : FALSE;
+    $border_type = $normalized_border_options[ 'border-type' ];
     $has_border_settings  = FALSE !== $border_settings && is_array( $border_settings ) && ! empty( $border_type ) && 'none' != $border_type;
 
     //border width + type + color
@@ -115,8 +115,10 @@ function sek_add_css_rules_for_border( $rules, $level ) {
         $rules = sek_generate_css_rules_for_multidimensional_border_options( $rules, $border_settings, $border_type, '[data-sek-id="'.$level['id'].'"]'  );
     }
 
-    if ( ! empty( $border_options['border-radius'] ) && is_array( $border_options['border-radius'] ) ) {
-        $rules = sek_generate_css_rules_for_border_radius_options( $rules, $border_options['border-radius'], '[data-sek-id="'.$level['id'].'"]' );
+    $has_border_radius = ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) && !empty( $options[ 'border' ]['border-radius'] );
+    if ( $has_border_radius ) {
+        $radius_settings = $normalized_border_options['border-radius'];
+        $rules = sek_generate_css_rules_for_border_radius_options( $rules, $normalized_border_options['border-radius'], '[data-sek-id="'.$level['id'].'"]' );
     }
 
     return $rules;
@@ -142,13 +144,13 @@ function sek_add_css_rules_for_boxshadow( $rules, $level ) {
     //     [shadow] => 0
     // )
     $default_value_model  = sek_get_default_module_model( 'sek_level_border_module' );
-    $border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
-    $border_options = wp_parse_args( $border_options , is_array( $default_value_model ) ? $default_value_model : array() );
+    $normalized_border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
+    $normalized_border_options = wp_parse_args( $normalized_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
-    if ( empty( $border_options) )
+    if ( empty( $normalized_border_options) )
       return $rules;
 
-    if ( !empty( $border_options[ 'shadow' ] ) &&  sek_is_checked( $border_options[ 'shadow'] ) ) {
+    if ( !empty( $normalized_border_options[ 'shadow' ] ) &&  sek_is_checked( $normalized_border_options[ 'shadow'] ) ) {
         //$css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
         $css_rules = '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;';
         // Set to !important when customizing, to override the sek-highlight-active-ui effect
