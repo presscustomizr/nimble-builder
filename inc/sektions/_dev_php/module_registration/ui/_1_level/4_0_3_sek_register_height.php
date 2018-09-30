@@ -19,12 +19,13 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'choices'     => sek_get_select_options_for_input_id( 'height-type' )
                 ),
                 'custom-height' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Custom height', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '50',
-                    'width-100'   => true
+                    'default'     => array( 'desktop' => '50%' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
                 ),
                 'v_alignment' => array(
                     'input_type'  => 'v_alignment',
@@ -79,26 +80,51 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             );
         }
     }
+
     if ( ! empty( $options[ 'height' ][ 'height-type' ] ) ) {
         if ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) ) {
-            $height = $options[ 'height' ][ 'custom-height' ];
-            $css_rules = '';
-            if ( isset( $height ) && FALSE !== $height ) {
-                $numeric = sek_extract_numeric_value( $height );
-                if ( !empty( $numeric ) ) {
-                    $unit = sek_extract_unit( $height );
-                    $unit = '%' === $unit ? 'vh' : $unit;
-                    // Note : Use of min-height. Because setting the level's height with the "height" css property can break the sections
-                    // @see https://github.com/presscustomizr/nimble-builder/issues/166
-                    $css_rules .= 'height:' . $numeric . $unit . ';';
+            $custom_user_height = $options[ 'height' ][ 'custom-height' ];
+            $selector = '[data-sek-id="'.$level['id'].'"]';
+            if ( is_string( $custom_user_height ) ) {
+                $css_rules = '';
+                if ( isset( $custom_user_height ) && FALSE !== $custom_user_height ) {
+                    $numeric = sek_extract_numeric_value( $custom_user_height );
+                    if ( !empty( $numeric ) ) {
+                        $unit = sek_extract_unit( $custom_user_height );
+                        $unit = '%' === $unit ? 'vh' : $unit;
+                        // Note : Use of min-height ? Because setting the level's height with the "height" css property can break the sections
+                        // @see https://github.com/presscustomizr/nimble-builder/issues/166
+                        $css_rules .= 'height:' . $numeric . $unit . ';';
+                    }
                 }
-            }
-            if ( !empty( $css_rules ) ) {
-                $rules[]     = array(
-                        'selector' => '[data-sek-id="'.$level['id'].'"]',
+                if ( !empty( $css_rules ) ) {
+                    $rules[]     = array(
+                        'selector' => $selector,
                         'css_rules' => $css_rules,
-                        'mq' =>null
-                );
+                        'mq' => null
+                    );
+                }
+            } else if ( is_array( $custom_user_height ) ) {
+                $custom_user_height = wp_parse_args( $custom_user_height, array(
+                    'desktop' => '50%',
+                    'tablet' => '',
+                    'mobile' => ''
+                ));
+                $height_value = $custom_user_height;
+                foreach ( $custom_user_height as $device => $num_unit ) {
+                    $numeric = sek_extract_numeric_value( $num_unit );
+                    if ( ! empty( $numeric ) ) {
+                        $unit = sek_extract_unit( $num_unit );
+                        $unit = '%' === $unit ? 'vh' : $unit;
+                        $height_value[$device] = $numeric . $unit;
+                    }
+                }
+
+                $rules = sek_set_mq_css_rules(array(
+                    'value' => $height_value,
+                    'css_property' => 'height',
+                    'selector' => $selector
+                ), $rules );
             }
         }
     }
