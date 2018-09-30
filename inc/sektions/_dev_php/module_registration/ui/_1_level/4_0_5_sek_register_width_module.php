@@ -16,12 +16,13 @@ function sek_get_module_params_for_sek_level_width_module() {
                     'choices'     => sek_get_select_options_for_input_id( 'width-type' )
                 ),
                 'custom-width' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Custom width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '100%',
+                    'default'     => array( 'desktop' => '100%' ),
                     'width-100'   => true,
+                    'title_width' => 'width-100',
                 ),
                 'h_alignment' => array(
                     'input_type'  => 'h_alignment',
@@ -79,22 +80,39 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
 
     if ( ! empty( $options[ 'width' ][ 'width-type' ] ) ) {
         if ( 'custom' == $options[ 'width' ][ 'width-type' ] && array_key_exists( 'custom-width', $options[ 'width' ] ) ) {
-            $width = $options[ 'width' ][ 'custom-width' ];
-            $css_rules = '';
-            if ( isset( $width ) && FALSE !== $width ) {
-                $numeric = sek_extract_numeric_value( $width );
-                if ( !empty( $numeric ) ) {
-                    $unit = sek_extract_unit( $width );
-                    //$unit = '%' === $unit ? 'vw' : $unit;
-                    $css_rules .= 'width:' . $numeric . $unit . ';';
+            $user_custom_width_value = $options[ 'width' ][ 'custom-width' ];
+            $selector = '[data-sek-id="'.$module['id'].'"]';
+
+            if ( is_string( $user_custom_width_value ) ) {
+                $numeric = sek_extract_numeric_value( $user_custom_width_value );
+                if ( ! empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $user_custom_width_value );
+                    $rules[]     = array(
+                            'selector' => $selector,// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
+                            'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
+                            'mq' =>null
+                    );
                 }
-            }
-            if ( !empty( $css_rules ) ) {
-                $rules[]     = array(
-                        'selector' => '[data-sek-id="'.$module['id'].'"]',
-                        'css_rules' => $css_rules,
-                        'mq' =>null
-                );
+            } else if ( is_array( $user_custom_width_value ) ) {
+                $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
+                    'desktop' => '100%',
+                    'tablet' => '',
+                    'mobile' => ''
+                ));
+                $width_value = $user_custom_width_value;
+                foreach ( $user_custom_width_value as $device => $num_unit ) {
+                    $numeric = sek_extract_numeric_value( $num_unit );
+                    if ( ! empty( $numeric ) ) {
+                        $unit = sek_extract_unit( $num_unit );
+                        $width_value[$device] = $numeric . $unit;
+                    }
+                }
+
+                $rules = sek_set_mq_css_rules(array(
+                    'value' => $width_value,
+                    'css_property' => 'width',
+                    'selector' => $selector
+                ), $rules );
             }
         }
     }

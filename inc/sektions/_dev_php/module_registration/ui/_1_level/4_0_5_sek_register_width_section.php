@@ -23,20 +23,22 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'refresh_stylesheet' => true
                 ),
                 'outer-section-width' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Outer section width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '',
-                    'width-100'   => true
+                    'default'     => array( 'desktop' => '100%' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
                 ),
                 'inner-section-width' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Inner section width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '',
-                    'width-100'   => true
+                    'default'     => array( 'desktop' => '100%' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
                 )
             )
         )//tmpl
@@ -51,33 +53,64 @@ function sek_get_module_params_for_sek_level_width_section() {
 add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_section_width', 10, 3 );
 function sek_add_css_rules_for_section_width( $rules, $section ) {
     $options = empty( $section[ 'options' ] ) ? array() : $section['options'];
-    if ( empty( $options[ 'width' ] ) )
+    if ( empty( $options[ 'width' ] ) || ! is_array( $options[ 'width' ] ) )
       return $rules;
 
     if ( empty( $options[ 'width' ][ 'use-custom-width' ] ) || false === sek_booleanize_checkbox_val( $options[ 'width' ][ 'use-custom-width' ] ) )
       return $rules;
-    if ( ! empty( $options[ 'width' ][ 'outer-section-width'] ) ) {
-          $numeric = sek_extract_numeric_value( $options[ 'width' ][ 'outer-section-width'] );
-          if ( ! empty( $numeric ) ) {
-              $unit = sek_extract_unit( $options[ 'width' ][ 'outer-section-width'] );
-              $rules[]     = array(
-                      'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]',// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
-                      'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
-                      'mq' =>null
-              );
-          }
-    }
-    if ( ! empty( $options[ 'width' ][ 'inner-section-width'] ) ) {
-          $numeric = sek_extract_numeric_value( $options[ 'width' ][ 'inner-section-width'] );
-          if ( ! empty( $numeric ) ) {
-              $unit = sek_extract_unit( $options[ 'width' ][ 'inner-section-width'] );
-              $rules[]     = array(
-                      'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner',// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
-                      'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
-                      'mq' =>null
-              );
-          }
-    }
+
+    $user_widths = array(
+        'outer-section-width' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]',
+        'inner-section-width' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner'
+    );
+
+    foreach ( $user_widths as $width_opt_name => $selector ) {
+        if ( empty( $options[ 'width' ][ $width_opt_name ] ) )
+          continue;
+        $user_custom_width_value = $options[ 'width' ][ $width_opt_name ];
+        if ( is_string( $user_custom_width_value ) ) {
+            $numeric = sek_extract_numeric_value( $user_custom_width_value );
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $user_custom_width_value );
+                $rules[]     = array(
+                        'selector' => $selector,// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
+                        'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
+                        'mq' =>null
+                );
+            }
+        } else if ( is_array( $user_custom_width_value ) ) {
+            $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
+                'desktop' => '100%',
+                'tablet' => '',
+                'mobile' => ''
+            ));
+            $max_width_value = $user_custom_width_value;
+            $margin_value = array();
+            foreach ($user_custom_width_value as $device => $num_unit ) {
+                $numeric = sek_extract_numeric_value( $num_unit );
+                if ( ! empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $num_unit );
+                    $max_width_value[$device] = $numeric . $unit;
+                    $margin_value[$device] = '0 auto';
+                }
+            }
+
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $max_width_value,
+                'css_property' => 'max-width',
+                'selector' => $selector
+            ), $rules );
+
+            if ( ! empty( $margin_value ) ) {
+                $rules = sek_set_mq_css_rules(array(
+                    'value' => $margin_value,
+                    'css_property' => 'margin',
+                    'selector' => $selector
+                ), $rules );
+            }
+        }
+    }//foreach
+
     return $rules;
 }
 
