@@ -214,6 +214,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   }
                             }
 
+                            // a level should always have a version "ver_ini" property
+                            if ( _.isUndefined( level.ver_ini ) ) {
+                                  _errorDetected_('validation error => a ' + level.level + ' should have a version property : "ver_ini"' );
+                                  return;
+                            }
+
+                            // Specific checks by level type
                             switch ( level.level ) {
                                   case 'location' :
                                         if ( ! _.isEmpty( parentLevel.level ) ) {

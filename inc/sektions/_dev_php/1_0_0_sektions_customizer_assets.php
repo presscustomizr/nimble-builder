@@ -49,6 +49,7 @@ function sek_enqueue_controls_js_css() {
         'sektionsLocalizedData',
         apply_filters( 'nimble-sek-localized-customizer-control-params',
             array(
+                'nimbleVersion' => NIMBLE_VERSION,
                 'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
                 'baseUrl' => NIMBLE_BASE_URL,
                 'sektionsPanelId' => '__sektions__',

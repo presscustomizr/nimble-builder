@@ -110,7 +110,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
                                                       level : 'column',
                                                       collection : []
-                                                }]
+                                                }],
+                                                ver_ini : sektionsLocalizedData.nimbleVersion
                                           });
                                     }
                               break;
@@ -277,7 +278,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     sektionCandidate.collection.push({
                                           id :  params.id,
                                           level : 'column',
-                                          collection : []
+                                          collection : [],
+                                          ver_ini : sektionsLocalizedData.nimbleVersion
                                     });
                               break;
 
@@ -496,7 +498,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var _moduleParams = {
                                           id : params.id,
                                           level : 'module',
-                                          module_type : params.module_type
+                                          module_type : params.module_type,
+                                          ver_ini : sektionsLocalizedData.nimbleVersion
                                     };
                                     // Let's add the starting value if provided when registrating the module
                                     startingModuleValue = self.getModuleStartingValue( params.module_type );
@@ -778,7 +781,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         }
                                                                   ]
                                                             }
-                                                      ]
+                                                      ],
+                                                      ver_ini : sektionsLocalizedData.nimbleVersion
                                                 });
                                           break;
 
@@ -829,7 +833,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         id : params.id,
                                                                         level : 'section',
                                                                         collection : sectionReadyToInject.collection,
-                                                                        options : sectionReadyToInject.options || {}
+                                                                        options : sectionReadyToInject.options || {},
+                                                                        ver_ini : sektionsLocalizedData.nimbleVersion
                                                                   });
                                                             } else {
                                                                   columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
@@ -853,7 +858,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         is_nested : true,
                                                                         level : 'section',
                                                                         collection : sectionReadyToInject.collection,
-                                                                        options : sectionReadyToInject.options || {}
+                                                                        options : sectionReadyToInject.options || {},
+                                                                        ver_ini : sektionsLocalizedData.nimbleVersion
                                                                   });
                                                             }
 
@@ -938,7 +944,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       level : 'section',
                                                       collection : sectionReadyToInject.collection,
                                                       options : sectionReadyToInject.options || {},
-                                                      is_nested : true
+                                                      is_nested : true,
+                                                      ver_ini : sektionsLocalizedData.nimbleVersion
                                                 });
 
                                                 // Used when updating the setting
@@ -1073,11 +1080,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return collection;
                   };
 
+                  var setVersion = function( collection ) {
+                        _.each( collection, function( levelData ) {
+                              levelData.ver_ini = sektionsLocalizedData.nimbleVersion;
+                              if ( _.isArray( levelData.collection ) ) {
+                                    setVersion( levelData.collection );
+                              }
+                        });
+                        return collection;
+                  };
+
+                  // ID's
                   // set the section id provided.
                   presetCandidate.id = sectionParams.section_id;
-
                   // the other level's id have to be generated
                   presetCandidate.collection = setIds( presetCandidate.collection );
+
+                  // NIMBLE VERSION
+                  // set the section version
+                  presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
+                  // the other level's version have to be added
+                  presetCandidate.collection = setVersion( presetCandidate.collection );
                   return presetCandidate;
             },
 
