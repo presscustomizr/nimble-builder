@@ -233,6 +233,7 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
 
 ////////////////////////////////////////////////////////////////
 // RETRO COMPAT
+// Introduced when upgrading from version 1.0.4 to version 1.1 +. October 2018.
 // fired @wp_loaded
 // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
 function sek_do_compat_1_0_to_1_1() {
@@ -263,7 +264,7 @@ function sek_do_compat_1_0_to_1_1() {
         $seks_data = is_array( $seks_data ) ? $seks_data : array();
         if ( empty( $seks_data ) )
           continue;
-        $seks_data = sek_walk_sections_and_do_map_compat( $seks_data );
+        $seks_data = sek_walk_levels_and_do_map_compat( $seks_data );
         $new_post_data = array(
             'ID'          => $post_object->ID,
             'post_title'  => $post_object->post_title,
@@ -272,7 +273,7 @@ function sek_do_compat_1_0_to_1_1() {
             'post_status' => 'publish',
             'post_content' => maybe_serialize( $seks_data )
         );
-        //sek_error_log('$new_post_data ??', $new_post_data );
+        //sek_error_log('$new_post_data ??', $seks_data );
         $r = wp_update_post( wp_slash( $new_post_data ), true );
         if ( is_wp_error( $r ) ) {
             sek_error_log( __FUNCTION__ . ' => error', $r );
@@ -281,13 +282,20 @@ function sek_do_compat_1_0_to_1_1() {
     set_transient( 'sek_do_compat_1_0_to_1_1', 'done', 60*60*24*3650 );
 }
 
+
+
 // Recursive helper
 // Sniff the modules that need a compatibility mapping
 // do the mapping
 // @return an updated sektions collection
-function sek_walk_sections_and_do_map_compat( $seks_data ) {
+function sek_walk_levels_and_do_map_compat( $seks_data ) {
     $new_seks_data = array();
     foreach ( $seks_data as $key => $value ) {
+        // Set level ver_ini
+        // If the ver_ini property is not set, it means the level has been created with the previous version of Nimble ( v1.4.0 )
+        if ( is_array($value) && array_key_exists('level', $value) && ! array_key_exists('ver_ini', $value) ) {
+            $value['ver_ini'] = '1.0.4';
+        }
         $new_seks_data[$key] = $value;
         // Level options mapping
         // remove spacing
@@ -375,10 +383,9 @@ function sek_walk_sections_and_do_map_compat( $seks_data ) {
             }
 
             $new_seks_data[$key]['value'] = $new_value;
-
-        } else if ( is_array( $value ) ) {
+        } else if ( is_array($value) ) {
             // go recursive
-            $new_seks_data[$key] = sek_walk_sections_and_do_map_compat( $value );
+            $new_seks_data[$key] = sek_walk_levels_and_do_map_compat( $value );
         }
     }
     return $new_seks_data;
