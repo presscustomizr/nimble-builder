@@ -83,11 +83,6 @@
                   });
 
                   // INITIALIZES
-
-                  // // Synchronize on init
-                  // if ( ! _.isEmpty( input() ) ) {
-                  //       input.container.find('input[value="'+ input() +'"]').attr('checked', true).trigger('click');
-                  // }
                   try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
                         api.errare('Error when firing syncWithPreviewedDevice for input type bgPositionWithDeviceSwitcher for input id ' + input.id , er );
                   }
