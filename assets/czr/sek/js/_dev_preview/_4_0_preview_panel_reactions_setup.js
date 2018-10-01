@@ -18,6 +18,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             'sek-resize-columns' : 'ajaxResizeColumns',
 
+                            'sek-maybe-print-loader' : 'mayBePrintLoader',
+
                             'sek-remove' : function( params ) {
                                   var removeCandidateId = params.apiParams.id,
                                       $candidateEl = $('div[data-sek-id="' + removeCandidateId + '"]' ),
@@ -244,7 +246,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             // GENERATE UI ELEMENTS
                             // when the options ui has been generated in the panel for a level, we receive back this msg
                             // 'sek-generate-level-options-ui' : function( params ) {
-                            //       console.log('PANEL REACT? ', 'sek-generate-level-options-ui', params );
+                            //       api.infoLog('PANEL REACT? ', 'sek-generate-level-options-ui', params );
                             // },
 
                             'sek-edit-options' : function( params ) {
