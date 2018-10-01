@@ -24,6 +24,7 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___spacing( $input_id, $input_data );
         break;
         case 'bg_position' :
+        case 'bgPositionWithDeviceSwitcher' :
             sek_set_input_tmpl___bg_position( $input_id, $input_data );
         break;
         case 'h_alignment' :

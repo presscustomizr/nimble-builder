@@ -25,9 +25,10 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'default'     => '',
                 ),
                 'bg-position' => array(
-                    'input_type'  => 'bg_position',
+                    'input_type'  => 'bgPositionWithDeviceSwitcher',
                     'title'       => __('Image position', 'text_domain_to_be_replaced'),
-                    'default'     => 'center'
+                    'default'     => array( 'desktop' => 'center' ),
+                    'title_width' => 'width-100',
                 ),
                 // 'bg-parallax' => array(
                 //     'input_type'  => 'gutencheck',
@@ -115,6 +116,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
       return $rules;
 
     $background_properties = array();
+    $bg_property_selector = '[data-sek-id="'.$level['id'].'"]';
 
     /* The general syntax of the background property is:
     * https://www.webpagefx.com/blog/web-design/background-css-shorthand/
@@ -123,7 +125,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     // Img background
     if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
         //no repeat by default?
-        $background_properties[] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
+        $background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
 
         // Img Bg Position
         if ( ! empty( $bg_options[ 'bg-position'] ) ) {
@@ -138,48 +140,59 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
                 'bottom'      => '50% 100%',
                 'bottom_right'=> '100% 100%'
             );
+            // Retro-compat for old bg-position option without device switcher
+            if ( is_string( $bg_options[ 'bg-position'] ) ) {
+                $raw_pos                    = $bg_options[ 'bg-position'];
+                $background_properties[ 'background-position' ] = array_key_exists($raw_pos, $pos_map) ? $pos_map[ $raw_pos ] : $pos_map[ 'center' ];
+            } else if ( is_array( $bg_options[ 'bg-position'] ) ) {
+                $mapped_bg_options = array();
+                // map option with css value
+                foreach ($bg_options[ 'bg-position'] as $device => $user_val ) {
+                    if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
+                        sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
+                        continue;
+                    }
+                    $mapped_bg_options[$device] = array_key_exists($user_val, $pos_map) ? $pos_map[ $user_val ] : $pos_map[ 'center' ];
+                }
 
-            $raw_pos                    = $bg_options[ 'bg-position'];
-            $background_properties[]         = array_key_exists($raw_pos, $pos_map) ? $pos_map[ $raw_pos ] : $pos_map[ 'center' ];
+                $rules = sek_set_mq_css_rules(array(
+                    'value' => $mapped_bg_options,
+                    'css_property' => 'background-position',
+                    'selector' => $bg_property_selector
+                ), $rules );
+            }
         }
-
 
         //background size
         if ( ! empty( $bg_options[ 'bg-scale'] ) && 'default' != $bg_options[ 'bg-scale'] ) {
             //When specifying a background-size value, it must immediately follow the background-position value.
-            if ( ! empty( $bg_options[ 'bg-position'] ) ) {
-                $background_properties[] = '/ ' . $bg_options[ 'bg-scale'];
-            } else {
-                $background_size    = $bg_options[ 'bg-scale'];
-            }
+            $background_properties[ 'background-size' ] = $bg_options[ 'bg-scale'];
         }
 
         //add no-repeat by default?
-        $background_properties[] = 'no-repeat';
+        $background_properties[ 'background-repeat' ] = 'no-repeat';
 
         // write the bg-attachment rule only if true <=> set to "fixed"
         if ( ! empty( $bg_options[ 'bg-attachment'] ) && sek_is_checked( $bg_options[ 'bg-attachment'] ) ) {
-            $background_properties[] = 'fixed';
+            $background_properties[ 'background-attachment' ] = 'fixed';
         }
 
     }
 
-
     //background color (needs validation: we need a sanitize hex or rgba color)
     if ( ! empty( $bg_options[ 'bg-color' ] ) ) {
-        $background_properties[] = $bg_options[ 'bg-color' ];
+        $background_properties[ 'background-color' ] = $bg_options[ 'bg-color' ];
     }
 
 
     //build background rule
     if ( ! empty( $background_properties ) ) {
-        $background_css_rules      = "background:" . implode( ' ', array_filter( $background_properties ) );
-
-        //do we need to add the background-size property separately?
-        $background_css_rules      = isset( $background_size ) ? $css_rules . ';background-size:' . $background_size : $background_css_rules;
-
+        $background_css_rules = '';
+        foreach ($background_properties as $bg_prop => $bg_css_val ) {
+            $background_css_rules .= sprintf('%1$s:%2$s;', $bg_prop, $bg_css_val );
+        }
         $rules[] = array(
-            'selector' => '[data-sek-id="'.$level['id'].'"]',
+            'selector' => $bg_property_selector,
             'css_rules' => $background_css_rules,
             'mq' =>null
         );
