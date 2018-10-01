@@ -202,13 +202,15 @@ function sek_get_module_params_for_czr_btn_design_child() {
                     //'css_selectors'=> $css_selectors
                 ),
                 'h_alignment_css'        => array(
-                    'input_type'         => 'h_alignment',
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
-                    'default'            => 'center',
+                    'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
                     'css_identifier'     => 'h_alignment',
-                    'css_selectors'      => '.sek-module-inner'
+                    'css_selectors'      => '.sek-module-inner',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 ),
                 'spacing_css'        => array(
                     'input_type'         => 'spacing',

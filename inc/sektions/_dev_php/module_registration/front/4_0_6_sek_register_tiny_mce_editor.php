@@ -46,12 +46,14 @@ function sek_get_module_params_for_czr_tinymce_child() {
                     'default'     => ''
                 ),
                 'h_alignment_css' => array(
-                    'input_type'  => 'h_text_alignment',
+                    'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
-                    'default'     => is_rtl() ? 'right' : 'left',
+                    'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'h_alignment'
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 ),
                 'autop' => array(
                     'input_type'  => 'gutencheck',

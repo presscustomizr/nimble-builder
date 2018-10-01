@@ -342,13 +342,15 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                     'css_selectors'=> $css_selectors
                 ),
                 'h_alignment_css'        => array(
-                    'input_type'         => 'h_alignment',
-                    'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
-                    'default'            => is_rtl() ? 'right' : 'left',
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
+                    'title'       => __( 'Button alignment', 'text_domain_to_be_replaced' ),
+                    'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'h_alignment',
-                    'css_selectors'=> '.sek-form-btn-wrapper'
+                    'css_selectors'=> '.sek-form-btn-wrapper',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 ),
                 'spacing_css'        => array(
                     'input_type'         => 'spacing',

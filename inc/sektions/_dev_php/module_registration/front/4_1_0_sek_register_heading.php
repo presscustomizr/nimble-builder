@@ -17,7 +17,7 @@ function sek_get_module_params_for_czr_heading_module() {
         'starting_value' => array(
             'main_settings' => array(
                 'heading_text' => 'This is a heading.',
-                'h_alignment_css' => 'center'
+                'h_alignment_css' => array( 'desktop' => 'center')
             )
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-heading' ),
@@ -57,14 +57,16 @@ function sek_get_module_params_for_czr_heading_child() {
                     'default'            => 'h1',
                     'choices'            => sek_get_select_options_for_input_id( 'heading_tag' )
                 ),
-                'h_alignment_css'        => array(
-                    'input_type'         => 'h_text_alignment',
-                    'title'              => __( 'Alignment', 'text_domain_to_be_replaced' ),
-                    'default'            => is_rtl() ? 'right' : 'left',
-                    'refresh_markup'     => false,
+                'h_alignment_css' => array(
+                    'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
+                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
+                    'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'h_alignment'
-                )
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                ),
             )
         ),
         'render_tmpl_path' =>'',

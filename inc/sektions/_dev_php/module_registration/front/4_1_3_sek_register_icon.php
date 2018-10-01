@@ -127,13 +127,15 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                     'css_identifier' => 'font_size'
                 ),
                 'h_alignment_css' => array(
-                    'input_type'  => 'h_alignment',
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
-                    'default'     => 'center',
+                    'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'h_alignment',
-                    'css_selectors' => '.sek-icon'
+                    'css_selectors' => '.sek-icon',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 ),
                 'color_css' => array(
                     'input_type'  => 'wp_color_alpha',

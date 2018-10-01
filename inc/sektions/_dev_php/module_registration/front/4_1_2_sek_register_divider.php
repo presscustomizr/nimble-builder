@@ -90,13 +90,15 @@ function sek_get_module_params_for_czr_divider_module() {
                     //'css_selectors'=> ''
                 ),
                 'h_alignment_css' => array(
-                    'input_type'  => 'h_alignment',
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
-                    'default'     => 'center',
+                    'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_selectors' => '.sek-module-inner',
-                    'css_identifier' => 'h_alignment'
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 ),
                 'v_spacing_css' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
