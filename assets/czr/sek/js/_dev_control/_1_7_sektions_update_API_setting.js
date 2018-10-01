@@ -810,7 +810,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             __presetSectionInjected__.reject( _er_ );
                                                       })
                                                       .done( function( sectionReadyToInject ) {
-                                                            api.infoLog( 'sectionReadyToInject', sectionReadyToInject );
+                                                            //api.infoLog( 'sectionReadyToInject', sectionReadyToInject );
 
                                                             // If the preset_section is inserted in a an empty nested section, add it at the right place in the parent column of the nested section.
                                                             // Otherwise, add the preset section at the right position in the parent location of the section.
@@ -828,7 +828,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   locationCandidate.collection.splice( position, 0, {
                                                                         id : params.id,
                                                                         level : 'section',
-                                                                        collection : sectionReadyToInject.collection
+                                                                        collection : sectionReadyToInject.collection,
+                                                                        options : sectionReadyToInject.options || {}
                                                                   });
                                                             } else {
                                                                   columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
@@ -851,7 +852,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         id : params.id,
                                                                         is_nested : true,
                                                                         level : 'section',
-                                                                        collection : sectionReadyToInject.collection
+                                                                        collection : sectionReadyToInject.collection,
+                                                                        options : sectionReadyToInject.options || {}
                                                                   });
                                                             }
 
@@ -935,6 +937,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       id : params.id,
                                                       level : 'section',
                                                       collection : sectionReadyToInject.collection,
+                                                      options : sectionReadyToInject.options || {},
                                                       is_nested : true
                                                 });
 
