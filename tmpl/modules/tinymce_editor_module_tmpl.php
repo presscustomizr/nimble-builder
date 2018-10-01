@@ -12,13 +12,17 @@ $value = $value['main_settings'];
 // should be wrapped in a specific selector when customizing,
 //  => so we can listen to user click actions and open the editor on for each separate tiny_mce_editor input
 if ( ! function_exists( '\Nimble\sek_print_tiny_mce_text_content') ) {
-    function sek_print_tiny_mce_text_content( $tiny_mce_content, $input_id, $module_model ) {
+    function sek_print_tiny_mce_text_content( $tiny_mce_content, $input_id, $value ) {
         if ( empty( $tiny_mce_content ) ) {
             echo SEK_Fire()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
         } else {
-            //remove_filter( 'the_content', 'wpautop');
+            if ( false === sek_booleanize_checkbox_val( $value['autop'] ) ) {
+                remove_filter( 'the_content', 'wpautop');
+            }
             $content = apply_filters( 'the_content', $tiny_mce_content );
-            //add_filter( 'the_content', 'wpautop');
+            if ( false === sek_booleanize_checkbox_val( $value['autop'] ) ) {
+                add_filter( 'the_content', 'wpautop');
+            }
             if ( skp_is_customizing() ) {
                 printf('<div title="%3$s" data-sek-input-type="tiny_mce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
             } else {
@@ -29,5 +33,5 @@ if ( ! function_exists( '\Nimble\sek_print_tiny_mce_text_content') ) {
 }
 // print the module content if not empty
 if ( array_key_exists('content', $value ) ) {
-    sek_print_tiny_mce_text_content( $value['content'], 'content', $model );
+    sek_print_tiny_mce_text_content( $value['content'], 'content', $value );
 }

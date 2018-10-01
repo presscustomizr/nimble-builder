@@ -52,7 +52,15 @@ function sek_get_module_params_for_czr_tinymce_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'h_alignment'
-                )
+                ),
+                'autop' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Automatically convert text into paragraph', 'text_domain_to_be_replaced'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('WordPress wraps the editor text inside "p" tags by default. You can disable this behaviour by unchecking this option.', 'text-domain')
+                ),
             )
         ),
         'render_tmpl_path' =>'',
