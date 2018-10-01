@@ -348,7 +348,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                               // When a preset section is dropped
                                               case 'preset_section' :
-
+                                                    api.previewer.send( 'sek-maybe-print-loader', { loader_located_in_level_id : params.location });
                                               break;
                                         }
                                         return self.updateAPISetting( apiParams );
@@ -363,14 +363,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               break;
                                         }
 
+                                        // Always update the root fonts property after a module addition
+                                        // => because there might be a google font specified in the starting value or in a preset section
+                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+
                                         // Refresh the stylesheet to generate the css rules of the module
                                         api.previewer.send( 'sek-refresh-stylesheet', {
                                               skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         });
 
-                                        // Always update the root fonts property after a module addition
-                                        // => because there might be a google font specified in the starting value or in a preset section
-                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
 
                                         // Refresh when a section is created ( not duplicated )
                                         if ( params.apiParams.is_first_section ) {
@@ -389,6 +390,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     level : 'section'
                                               });
                                         }
+
+                                        // Refresh the stylesheet again after a delay
+                                        // For the moment, some styling, like fonts are not
+                                        // @todo fix => see why we need to do it.
+                                        // _.delay( function() {
+                                        //       // Refresh the stylesheet to generate the css rules of the module
+                                        //       api.previewer.send( 'sek-refresh-stylesheet', {
+                                        //             skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        //       });
+                                        // }, 1000 );
                                   }
                             },
 
@@ -408,7 +419,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         apiParams = params;
                                         apiParams.action = 'sek-add-preset-section-in-new-nested-sektion';
                                         apiParams.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
-
+                                        api.previewer.send( 'sek-maybe-print-loader', { loader_located_in_level_id : params.location });
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
