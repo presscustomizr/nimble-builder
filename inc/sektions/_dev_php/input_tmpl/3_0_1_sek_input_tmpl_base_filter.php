@@ -28,9 +28,11 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___bg_position( $input_id, $input_data );
         break;
         case 'h_alignment' :
+        case 'horizAlignmentWithDeviceSwitcher' :
             sek_set_input_tmpl___h_alignment( $input_id, $input_data );
         break;
-         case 'h_text_alignment' :
+        case 'h_text_alignment' :
+        case 'horizTextAlignmentWithDeviceSwitcher' :
             sek_set_input_tmpl___h_text_alignment( $input_id, $input_data );
         break;
         case 'v_alignment' :

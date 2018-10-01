@@ -87,12 +87,12 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         // 1) we save it as a string : '16px'
         // 2) we save it as an array of strings by devices : [ 'desktop' => '55px', 'tablet' => '40px', 'mobile' => '36px']
         case 'font_size' :
-            if ( is_string( $value ) ) {
+            if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
                   if ( ! empty( $numeric ) ) {
                       $properties_to_render['font-size'] = $value;
                   }
-            } else if ( is_array( $value ) ) {
+            } else if ( is_array( $value ) ) { // <= by device
                   $important = false;
                   if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
                       $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
@@ -146,8 +146,27 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         case 'background_color' :
             $properties_to_render['background-color'] = $value;
         break;
+        // handles simple or by device option
         case 'h_alignment' :
-            $properties_to_render['text-align'] = $value;
+            if ( is_string( $value ) ) {// <= simple
+                $properties_to_render['text-align'] = $value;
+            } else if ( is_array( $value ) ) {// <= by device
+                  $important = false;
+                  if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+                      $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
+                  }
+                  $value = wp_parse_args( $value, array(
+                      'desktop' => '',
+                      'tablet' => '',
+                      'mobile' => ''
+                  ));
+                  $rules = sek_set_mq_css_rules( array(
+                      'value' => $value,
+                      'css_property' => 'text-align',
+                      'selector' => $selector,
+                      'is_important' => $important,
+                  ), $rules );
+            }
         break;
         case 'v_alignment' :
             switch ( $value ) {
@@ -188,14 +207,14 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         /* Spacer */
         // The unit should be included in the $value
         case 'height' :
-            if ( is_string( $value ) ) {
+            if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
                   if ( ! empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
                       $unit = '%' === $unit ? 'vh' : $unit;
                       $properties_to_render['height'] = $numeric . $unit;
                   }
-            } else if ( is_array( $value ) ) {
+            } else if ( is_array( $value ) ) { // <= by device
                   $important = false;
                   if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
                       $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
@@ -264,13 +283,13 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
 
         case 'width' :
-            if ( is_string( $value ) ) {
+            if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
                   if ( ! empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
                       $properties_to_render['width'] = $numeric . $unit;
                   }
-            } else if ( is_array( $value ) ) {
+            } else if ( is_array( $value ) ) { // <= by device
                   $important = false;
                   if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
                       $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
@@ -300,7 +319,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
 
         case 'v_spacing' :
-            if ( is_string( $value ) ) {
+            if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
                   if ( ! empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
@@ -310,7 +329,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
                           'margin-bottom' => $numeric . $unit
                       );
                   }
-            } else if ( is_array( $value ) ) {
+            } else if ( is_array( $value ) ) { // <= by device
                   $important = false;
                   if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
                       $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
