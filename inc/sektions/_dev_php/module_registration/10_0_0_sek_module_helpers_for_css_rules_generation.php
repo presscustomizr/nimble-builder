@@ -164,7 +164,7 @@ function sek_generate_css_rules_for_border_radius_options( $rules, $border_radiu
 //     'mq' =>null
 // );
 //
-// @param bspacing_settings is an array looking like :
+// @param $spacing_settings is an array looking like :
 // Array
 // (
 //     [desktop] => Array
@@ -243,8 +243,6 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
         $_pad_marg[ 'mobile' ][ 'mq' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
     }
 
-
-
     foreach( array_filter( $_pad_marg ) as $_spacing_rules ) {
         $css_rules = implode(';',
             array_map( function( $key, $value ) {
@@ -263,8 +261,68 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
 
 
 
+// This function is invoked when sniffing the input rules.
+// It's a generic helper to generate media query css rule
+// @return an array of css rules looking like
+// $rules[] = array(
+//     'selector'    => $selector,
+//     'css_rules'   => $css_rules,
+//     'mq'          => $mq
+// );
+// @params params(array). Example
+// array(
+//     'value' => $ready_value,(array)
+//     'css_property' => 'height',(string)
+//     'selector' => $selector,(string)
+//     'is_important' => $important,(bool)
+// )
+// params['value'] = Array
+// (
+//     [desktop] => 5em
+//     [tablet] => 4em
+//     [mobile] => 25px
+// )
+function sek_set_mq_css_rules( $params, $rules ) {
+    // TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
+    // Sek_Dyn_CSS_Builder::$breakpoints = [
+    //     'xs' => 0,
+    //     'sm' => 576,
+    //     'md' => 768,
+    //     'lg' => 992,
+    //     'xl' => 1200
+    // ];
+    $params = wp_parse_args( $params, array(
+        'value' => array(),
+        'css_property' => '',
+        'selector' => '',
+        'is_important' => false
+    ));
+    if ( ! empty( $params['value'][ 'desktop' ] ) ) {
+        $_font_size_mq[ 'desktop' ] = null;
+    }
 
+    if ( ! empty( $params['value'][ 'tablet' ] ) ) {
+        $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+    }
 
+    if ( ! empty( $params['value'][ 'mobile' ] ) ) {
+        $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+    }
+    foreach ( $params['value'] as $device => $val ) {
+        if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
+            sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
+            continue;
+        }
+        if ( ! empty(  $val ) ) {
+            $rules[] = array(
+                'selector' => $params['selector'],
+                'css_rules' => sprintf( '%1$s:%2$s%3$s;', $params['css_property'], $val, $params['is_important'] ? '!important' : '' ),
+                'mq' => $_font_size_mq[ $device ]
+            );
+        }
+    }
+    return $rules;
+}
 
 
 
