@@ -10,9 +10,10 @@ function sek_get_module_params_for_czr_heading_module() {
         'is_father' => true,
         'children' => array(
             'main_settings'   => 'czr_heading_child',
-            'font_settings' => 'czr_font_child'
+            'font_settings' => 'czr_font_child',
+            'spacing' => 'czr_heading_spacing_child'
         ),
-        'name' => __('Text Editor', 'text_domain_to_be_replaced'),
+        'name' => __('Heading', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'main_settings' => array(
                 'heading_text' => 'This is a heading.',
@@ -69,6 +70,38 @@ function sek_get_module_params_for_czr_heading_child() {
         'render_tmpl_path' =>'',
     );
 }
+
+
+/* ------------------------------------------------------------------------- *
+ *  HEADING SPACING CHILD
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_czr_heading_spacing_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_heading_spacing_child',
+        'name' => __('Spacing', 'text_domain_to_be_replaced'),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'spacing_css'     => array(
+                    'input_type'  => 'spacingWithDeviceSwitcher',
+                    'title'       => __( 'Margin and padding', 'text_domain_to_be_replaced' ),
+                    'default'     => array( 'desktop' => array() ),
+                    'width-100'   => true,
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'spacing_with_device_switcher',
+                    //'css_selectors'=> ''
+                )
+            )
+        ),
+        'render_tmpl_path' =>'',
+    );
+}
+
+
 
 
 function sanitize_callback__czr_heading_module( $value ) {
