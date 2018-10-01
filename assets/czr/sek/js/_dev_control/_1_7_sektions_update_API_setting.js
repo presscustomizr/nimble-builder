@@ -79,9 +79,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 collection : [{
                                                       id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
                                                       level : 'column',
-                                                      collection : []
+                                                      collection : [],
+                                                      ver_ini : sektionsLocalizedData.nimbleVersion
                                                 }],
-                                                is_nested : true
+                                                is_nested : true,
+                                                ver_ini : sektionsLocalizedData.nimbleVersion
                                           });
                                     } else {
                                           locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
@@ -109,7 +111,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 collection : [{
                                                       id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
                                                       level : 'column',
-                                                      collection : []
+                                                      collection : [],
+                                                      ver_ini : sektionsLocalizedData.nimbleVersion
                                                 }],
                                                 ver_ini : sektionsLocalizedData.nimbleVersion
                                           });
