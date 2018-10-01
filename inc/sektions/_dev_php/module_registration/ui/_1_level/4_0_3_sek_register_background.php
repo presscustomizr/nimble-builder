@@ -5,10 +5,10 @@ function sek_get_module_params_for_sek_level_bg_module() {
         'dynamic_registration' => true,
         'module_type' => 'sek_level_bg_module',
         'name' => __('Background', 'text_domain_to_be_replaced'),
-        'starting_value' => array(
-            'bg-color-overlay'  => '#000000',
-            'bg-opacity-overlay' => '40'
-        ),
+        // 'starting_value' => array(
+        //     'bg-color-overlay'  => '#000000',
+        //     'bg-opacity-overlay' => '40'
+        // ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -64,7 +64,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __('Overlay Color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
-                    'default'     => ''
+                    'default'     => '#000000'
                 ),
                 'bg-opacity-overlay' => array(
                     'input_type'  => 'range_simple',
@@ -73,7 +73,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'min' => 0,
                     'max' => 100,
                     // 'unit' => '%',
-                    // 'default'  => '40%',
+                    'default'  => '40',
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 )
@@ -188,6 +188,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     //Background overlay?
     // 1) a background image should be set
     // 2) the option should be checked
+    sek_error_log('MERDE => ' . empty( $bg_options['bg-image']), $bg_options );
     if ( !empty( $bg_options['bg-image']) && ! empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
         $bg_color_overlay = isset( $bg_options[ 'bg-color-overlay' ] ) ? $bg_options[ 'bg-color-overlay' ] : null;
