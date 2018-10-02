@@ -181,6 +181,7 @@ module.exports = {
   czr_sektions_php : {
     src: [
       '<%= paths.sektions %>_dev_php/0_5_0_sektions_functions_definitions.php',
+      '<%= paths.sektions %>_dev_php/0_7_0_sektions_retro_compatibilities.php',
       '<%= paths.sektions %>_dev_php/0_9_0_sektions_functions_seks_post_set_get.php',
       '<%= paths.sektions %>_dev_php/1_0_0_sektions_customizer_assets.php',
       '<%= paths.sektions %>_dev_php/2_0_0_sektions_customizer_dynamic_registration.php',

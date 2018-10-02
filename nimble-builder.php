@@ -86,8 +86,8 @@ add_action('plugins_loaded', 'nimble_load_plugin_textdomain');
 * @action plugins_loaded
 */
 function nimble_load_plugin_textdomain() {
-  // Note to self, the third argument must not be hardcoded, to account for relocated folders.
-  load_plugin_textdomain( 'nimble-builder' );
+    // Note to self, the third argument must not be hardcoded, to account for relocated folders.
+    load_plugin_textdomain( 'nimble-builder' );
 }
 
 // @return void()
@@ -97,6 +97,5 @@ function nimble_register_location( $location ) {
     \Nimble\register_location( $location );
 }
 
-// Retro compat for image and tinymce module, turned multidimensional ( father - child logic ) since 1.1+
-// Fired once (transient flag), for logged in user with "edit_theme_options" cap
-add_action( 'wp_loaded', '\Nimble\sek_do_compat_1_0_to_1_1' );
+// Fire the retro compatibility functions
+add_action( 'wp_loaded', '\Nimble\sek_maybe_do_version_mapping' );
