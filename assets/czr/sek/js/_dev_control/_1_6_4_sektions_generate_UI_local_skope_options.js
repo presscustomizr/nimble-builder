@@ -84,18 +84,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });//api( Id, function( _setting_ ) {})
 
                                     // Let's add the starting values if provided when registrating the module
-                                    var initialModuleValues = {},
-                                        startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
+                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
                                         currentSetValue = api( self.sekCollectionSettingId() )(),
                                         allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.options ) ? currentSetValue.options : {} ),
-                                        optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {};
+                                        optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {},
+                                        initialModuleValues = optionTypeValue;
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
                                           // make sure the starting values are deeped clone now, before being extended
                                           var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
-                                          initialModuleValues = $.extend( clonedStartingModuleValue, optionTypeValue );
+                                          initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
                                     }
-
                                     api.CZR_Helpers.register( {
                                           origin : 'nimble',
                                           level : params.level,
