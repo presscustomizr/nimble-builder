@@ -42,6 +42,18 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 NIMBLE_ASSETS_VERSION,
                 true
             );
+
+            // Font awesome is always loaded when customizing
+            // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
+            if ( ! skp_is_customizing() && sek_front_needs_font_awesome() ) {
+                wp_enqueue_style(
+                    'czr-font-awesome',
+                    NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    $media = 'all'
+                );
+            }
             // wp_localize_script(
             //     'sek-main-js',
             //     'sekFrontLocalized',

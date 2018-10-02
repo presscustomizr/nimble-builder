@@ -617,7 +617,7 @@ function sek_error_log( $title, $content = null ) {
 // @return mixed null || string
 function sek_get_locale_template(){
     $path = null;
-    $localSkopeNimble = sek_get_skoped_seks( skp_build_skope_id() );
+    $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
     if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['template'] ) && ! empty( $localSkopeNimble['options']['template']['local_template'] ) && 'default' !== $localSkopeNimble['options']['template']['local_template'] ) {
         $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['template']['local_template'] . '.php';
         if ( file_exists( $path ) ) {
@@ -633,7 +633,7 @@ function sek_get_locale_template(){
 //@return void()
 function render_content_sections_for_nimble_template() {
     foreach( sek_get_locations() as $location ) {
-        $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
+        $locationSettingValue = sek_get_skoped_seks( skp_get_skope_id(), $location );
         // We don't need to render the locations with no sections
         // But we need at least one location : let's always render loop_start.
         // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
@@ -688,5 +688,31 @@ function sek_get_section_custom_breakpoint( $section ) {
       return;
 
     return $custom_breakpoint;
+}
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  FONT AWESOME HELPER
+/* ------------------------------------------------------------------------- */
+// @return bool
+// 2 modules use font awesome :
+// czr_button_module and czr_icon_module
+function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
+    if ( !$bool ) {
+        if ( is_null( $recursive_data ) ) {
+            $recursive_data = sek_get_skoped_seks( skp_get_skope_id() );
+        }
+        foreach ($recursive_data as $key => $value) {
+            if ( is_array( $value ) && array_key_exists('module_type', $value) && in_array($value['module_type'], array( 'czr_button_module', 'czr_icon_module' ) ) ) {
+                $bool = true;
+                break;
+            } else if ( is_array( $value ) ) {
+                $bool = sek_front_needs_font_awesome( $bool, $value );
+            }
+        }
+    }
+    return $bool;
 }
 ?>
