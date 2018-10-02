@@ -349,6 +349,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               // When a preset section is dropped
                                               case 'preset_section' :
                                                     api.previewer.send( 'sek-maybe-print-loader', { loader_located_in_level_id : params.location });
+                                                    api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true });
                                               break;
                                         }
                                         return self.updateAPISetting( apiParams );
@@ -360,6 +361,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           level : 'module',
                                                           id : params.apiParams.droppedModuleId
                                                     });
+                                              break;
+                                              // Clean the full page loader if not autocleaned yet
+                                              case 'preset_section' :
+                                                    api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
                                               break;
                                         }
 
@@ -572,19 +577,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     })
                                     .fail( function( er ) {
                                           api.errare( 'reactToPreviewMsg => error when firing ' + msgId, er );
-                                          api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
-                                                api.notifications.add( new api.Notification( 'sek-react-to-preview', {
-                                                      type: 'info',
-                                                      message:  er,
-                                                      dismissible: true
-                                                } ) );
+                                          // api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
+                                          //       api.notifications.add( new api.Notification( 'sek-react-to-preview', {
+                                          //             type: 'info',
+                                          //             message:  er,
+                                          //             dismissible: true
+                                          //       } ) );
 
-                                                // Removed if not dismissed after 5 seconds
-                                                _.delay( function() {
-                                                      api.notifications.remove( 'sek-react-to-preview' );
-                                                }, 5000 );
+                                          //       // Removed if not dismissed after 5 seconds
+                                          //       _.delay( function() {
+                                          //             api.notifications.remove( 'sek-react-to-preview' );
+                                          //       }, 5000 );
+                                          // });
+                                          api.previewer.trigger('sek-notify', {
+                                                type : 'error',
+                                                duration : 30000,
+                                                message : [
+                                                      '<span style="font-size:0.95em">',
+                                                        '<strong>' + er + '</strong>',
+                                                        '<br>',
+                                                        sektionsLocalizedData.i18n['If this problem locks the Nimble builder, you might try to reset the sections for this page.'],
+                                                        '<br>',
+                                                        '<span style="text-align:center;display:block">',
+                                                          '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n['Reset'] + '" data-sek-reset="true">' + sektionsLocalizedData.i18n['Reset'] + '</button>',
+                                                        '</span>',
+                                                      '</span>'
+                                                ].join('')
+
                                           });
-
                                     }); } catch( _er_ ) {
                                           api.errare( 'reactToPreviewMsg => error when receiving ' + msgId, _er_ );
                                     }
@@ -656,7 +676,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   api.previewer.bind( 'sek-to-json', function( params ) {
                         var sectionModel = $.extend( true, {}, self.getLevelModel( params.id ) );
-                        popupCenter( JSON.stringify( cleanIds( sectionModel ) ) );
+                        console.log( JSON.stringify( cleanIds( sectionModel ) ) );
+                        //popupCenter( JSON.stringify( cleanIds( sectionModel ) ) );
                   });
             }//schedulePrintSectionJson
       });//$.extend()

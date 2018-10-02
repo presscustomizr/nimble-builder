@@ -18,8 +18,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             'sek-resize-columns' : 'ajaxResizeColumns',
 
-                            'sek-maybe-print-loader' : 'mayBePrintLoader',
-
+                            'sek-maybe-print-loader' : function( params ) {
+                                  try { self.mayBePrintLoader( params ); } catch( er ) {
+                                        api.errare( 'sek-clean-loader => error', er );
+                                  }
+                            },
+                            'sek-clean-loader' : function( params ) {
+                                  try { self.cleanLoader( params ); } catch( er ) {
+                                        api.errare( 'sek-clean-loader => error', er );
+                                  }
+                            },
                             'sek-remove' : function( params ) {
                                   var removeCandidateId = params.apiParams.id,
                                       $candidateEl = $('div[data-sek-id="' + removeCandidateId + '"]' ),

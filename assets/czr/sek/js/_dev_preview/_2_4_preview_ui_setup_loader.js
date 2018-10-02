@@ -31,6 +31,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // - a module / section is dropped in the preview
             // - a module is being edited
             // - a column is resized
+            // - on 'sek-maybe-print-loader'
             // @params {
             //    element : $(),
             //    action : '',
@@ -64,16 +65,43 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }, 4000 ) );
                         }
                   }
+                  if ( true === params.fullPageLoader ) {
+                        var $loaderWrapper = $('<div>', { id : 'nimble-full-page-loader-wrapper', class: 'white-loader'} );
+                        $('body').append($loaderWrapper);
+                        $loaderWrapper.fadeIn('fast').append( self._css_loader_html ).find('.sek-css-loader').fadeIn( 'fast' );
+                        // Blur locations
+                        $('[data-sek-level="location"]').each( function() {
+                              $(this).addClass('sek-blur');
+                        });
+
+                        // Start the countdown for auto-cleaning
+                        clearTimeout( $.data( this, '_nimble_full_page_loader_active_timer_') );
+                        $.data( this, '_nimble_full_page_loader_active_timer_', setTimeout(function() {
+                              self.cleanLoader( { cleanFullPageLoader : true });
+                        }, 6000 ) );
+                  }
             },
 
             // scheduled in ::initialize(), on 'sek-modules-refreshed sek-columns-refreshed sek-section-added sek-refresh-level'
             // invoked in ::mayBePrintLoader() in an auto-clean scenario
-            cleanLoader : function() {
+            // or on wp.customize.send('sek-clean-loader', { cleanFullPageLoader : true })
+            // {
+            //  cleanFullPageLoader : true
+            // }
+            cleanLoader : function( params ) {
                   var self = this;
                   $('.sek-level-clone').remove();
                   $('[data-sek-level]').each( function() {
                         $(this).removeClass('sek-refreshing');
                   });
+                  params = params || {};
+                  if ( true === params.cleanFullPageLoader ) {
+                        // Unblur locations
+                        $('[data-sek-level="location"]').each( function() {
+                              $(this).removeClass('sek-blur');
+                        });
+                        $('#nimble-full-page-loader-wrapper').remove();
+                  }
             }
 
       });//$.extend()
