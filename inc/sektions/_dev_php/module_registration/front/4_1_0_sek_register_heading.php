@@ -92,6 +92,7 @@ function sek_get_module_params_for_czr_heading_spacing_child() {
                     'title'       => __( 'Margin and padding', 'text_domain_to_be_replaced' ),
                     'default'     => array( 'desktop' => array() ),
                     'width-100'   => true,
+                    'title_width' => 'width-100',
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'spacing_with_device_switcher',
