@@ -58,9 +58,8 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
 
         $parent_section = sek_get_parent_level_model( $level['id'] );
 
-        if ( $total_horizontal_margin > 0 && !empty( $parent_section ) ) {
+        if ( $total_horizontal_margin > 0 && is_array( $parent_section ) && !empty( $parent_section ) ) {
             $total_horizontal_margin_with_unit = $total_horizontal_margin . $device_unit;//20px
-
 
             $col_number = ( array_key_exists( 'collection', $parent_section ) && is_array( $parent_section['collection'] ) ) ? count( $parent_section['collection'] ) : 1;
             $col_number = 12 < $col_number ? 12 : $col_number;
@@ -93,8 +92,10 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
 
             if ( $has_section_custom_breakpoint ) {
                 $breakpoint = $section_custom_breakpoint;
+                $selector =  sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
             } else if ( $has_global_custom_breakpoint ) {
                 $breakpoint = $global_custom_breakpoint;
+                $selector = sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
             }
 
             $responsive_css_rules = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', $col_width_in_percent, $total_horizontal_margin_with_unit );
@@ -102,7 +103,7 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
             // we need to override the rule defined in : Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
             // that's why we use a long specific selector here
             $rules[] = array(
-                'selector' => sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] ),
+                'selector' => $selector,
                 'css_rules' => $responsive_css_rules,
                 'mq' => "(min-width: {$breakpoint}px)"
             );
