@@ -169,6 +169,12 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     $content_collection = array(
                         array(
                             'content-type' => 'preset_section',
+                            'content-id' => 'intro_three',
+                            'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
+                            'thumb' => 'intro_three.jpg'
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
                             'content-id' => 'intro_one',
                             'title' => __('1 column, full-width background', 'text-domain' ),
                             'thumb' => 'intro_one.jpg'
@@ -178,12 +184,6 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                             'content-id' => 'intro_two',
                             'title' => __('2 columns, call to action, full-width background', 'text-domain' ),
                             'thumb' => 'intro_two.jpg'
-                        ),
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'intro_three',
-                            'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
-                            'thumb' => 'intro_three.jpg'
                         )
                     );
                 break;
@@ -194,6 +194,13 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                             'content-id' => 'features_one',
                             'title' => __('3 columns with icon and call to action', 'text-domain' ),
                             'thumb' => 'features_one.jpg',
+                            //'height' => '188px'
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'features_two',
+                            'title' => __('3 columns with icon', 'text-domain' ),
+                            'thumb' => 'features_two.jpg',
                             //'height' => '188px'
                         )
                     );
