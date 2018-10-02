@@ -20,6 +20,7 @@ function sek_get_module_params_for_sek_global_widths() {
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
+                    'notice_after' => __('Those width options will be applied by default to all Nimble sections of your site, unless a page or a section has specific width options.')
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker',
