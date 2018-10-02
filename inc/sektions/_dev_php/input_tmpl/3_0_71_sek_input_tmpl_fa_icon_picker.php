@@ -39,7 +39,7 @@ function sek_get_fa_icon_list_tmpl( $html, $requested_tmpl = '', $posted_params 
 function sek_retrieve_decoded_font_awesome_icons() {
     // this file must be generated with: https://github.com/presscustomizr/nimble-builder/issues/57
     $faicons_json_path      = NIMBLE_BASE_PATH . '/assets/faicons.json';
-    $faicons_transient_name = 'sek_font_awesome_july_2018';
+    $faicons_transient_name = 'sek_font_awesome_october_2018';
     if ( false == get_transient( $faicons_transient_name ) ) {
         if ( file_exists( $faicons_json_path ) ) {
             $faicons_raw      = @file_get_contents( $faicons_json_path );
