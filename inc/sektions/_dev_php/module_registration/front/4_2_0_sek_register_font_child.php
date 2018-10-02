@@ -6,7 +6,7 @@ function sek_get_module_params_for_czr_font_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_font_child',
-        'name' => __( 'Font settings', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Text settings : font, color, size, ...', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_domain_to_be_replaced'),
