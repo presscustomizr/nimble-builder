@@ -68,7 +68,7 @@ function sek_get_module_params_for_sek_intro_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_intro_sec_picker_module',
-        'name' => __('Intro Sections', 'text_domain_to_be_replaced'),
+        'name' => __('Sections for an introduction', 'text_domain_to_be_replaced'),
         'tmpl' => array(
             'item-inputs' => array(
                 'intro_sections' => sek_get_default_section_input_params()
@@ -80,7 +80,7 @@ function sek_get_module_params_for_sek_features_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_features_sec_picker_module',
-        'name' => __('Features Sections', 'text_domain_to_be_replaced'),
+        'name' => __('Sections for services and features', 'text_domain_to_be_replaced'),
         'tmpl' => array(
             'item-inputs' => array(
                 'features_sections' => sek_get_default_section_input_params()

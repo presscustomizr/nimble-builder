@@ -38,7 +38,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         sek_intro_sec_picker_module : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_intro_sec_picker_module',
-                              controlLabel :  sektionsLocalizedData.i18n['Intro Sections'],
+                              controlLabel :  sektionsLocalizedData.i18n['Sections for an introduction'],
                               content_type : 'section',
                               expandAndFocusOnInit : true,
                               priority : 10,
@@ -47,7 +47,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         sek_features_sec_picker_module : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_features_sec_picker_module',
-                              controlLabel :  sektionsLocalizedData.i18n['Features Sections'],
+                              controlLabel :  sektionsLocalizedData.i18n['Sections for services and features'],
                               content_type : 'section',
                               expandAndFocusOnInit : false,
                               priority : 10,
