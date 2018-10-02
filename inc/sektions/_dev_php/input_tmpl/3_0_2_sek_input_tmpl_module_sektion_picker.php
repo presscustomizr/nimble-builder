@@ -191,10 +191,10 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     $content_collection = array(
                         array(
                             'content-type' => 'preset_section',
-                            'content-id' => 'img_text_two',
-                            'title' => __('2 columns with image and text', 'text-domain' ),
-                            'thumb' => 'img_text_two.jpg',
-                            'height' => '188px'
+                            'content-id' => 'features_one',
+                            'title' => __('3 columns with icon and call to action', 'text-domain' ),
+                            'thumb' => 'features_one.jpg',
+                            //'height' => '188px'
                         )
                     );
                 break;
