@@ -15,9 +15,15 @@
       -moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;
       box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0;
     }
-    .sek-icon i{
-      -webkit-transition: all 0.15s ease-in-out;
-      -o-transition: all 0.15s ease-in-out;
-      transition: all 0.15s ease-in-out;
+    .sek-icon {
+      i {
+        webkit-transition: all 0.15s ease-in-out;
+        -o-transition: all 0.15s ease-in-out;
+        transition: all 0.15s ease-in-out;
+      }
+      // fix for themes (like Hueman) styling the width of the font awesome icons
+      .fas, .far, .fab {
+        width: auto;
+      }
     }
 }
