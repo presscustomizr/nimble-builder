@@ -99,8 +99,8 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
 
             $responsive_css_rules = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', $col_width_in_percent, $total_horizontal_margin_with_unit );
 
-            // we need to override the rule defined here : Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
-
+            // we need to override the rule defined in : Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
+            // that's why we use a long specific selector here
             $rules[] = array(
                 'selector' => sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] ),
                 'css_rules' => $responsive_css_rules,
