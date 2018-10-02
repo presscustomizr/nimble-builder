@@ -46,6 +46,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
         )//tmpl
     );
 }
+
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
@@ -58,7 +59,7 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
         $col_width_in_percent = 100/$col_number;
         $col_suffix = floor( $col_width_in_percent );
 
-        $responsive_css_rules = "flex: 0 0 {$col_suffix}%;max-width: {$col_suffix}%;";
+        $responsive_css_rules = sprintf( '-ms-flex: 0 0 %1$s%%;flex: 0 0 %1$s%%;max-width: %1$s%%', $col_suffix );
         $rules[] = array(
             'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-'.$col_suffix,
             'css_rules' => $responsive_css_rules,
