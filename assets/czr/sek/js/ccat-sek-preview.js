@@ -949,13 +949,32 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }, 4000 ) );
                         }
                   }
+                  if ( true === params.fullPageLoader ) {
+                        var $loaderWrapper = $('<div>', { id : 'nimble-full-page-loader-wrapper', class: 'white-loader'} );
+                        $('body').append($loaderWrapper);
+                        $loaderWrapper.fadeIn('fast').append( self._css_loader_html ).find('.sek-css-loader').fadeIn( 'fast' );
+                        $('[data-sek-level="location"]').each( function() {
+                              $(this).addClass('sek-blur');
+                        });
+                        clearTimeout( $.data( this, '_nimble_full_page_loader_active_timer_') );
+                        $.data( this, '_nimble_full_page_loader_active_timer_', setTimeout(function() {
+                              self.cleanLoader( { cleanFullPageLoader : true });
+                        }, 6000 ) );
+                  }
             },
-            cleanLoader : function() {
+            cleanLoader : function( params ) {
                   var self = this;
                   $('.sek-level-clone').remove();
                   $('[data-sek-level]').each( function() {
                         $(this).removeClass('sek-refreshing');
                   });
+                  params = params || {};
+                  if ( true === params.cleanFullPageLoader ) {
+                        $('[data-sek-level="location"]').each( function() {
+                              $(this).removeClass('sek-blur');
+                        });
+                        $('#nimble-full-page-loader-wrapper').remove();
+                  }
             }
 
       });//$.extend()
@@ -977,6 +996,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             'sek-resize-columns' : 'ajaxResizeColumns',
 
+                            'sek-maybe-print-loader' : function( params ) {
+                                  try { self.mayBePrintLoader( params ); } catch( er ) {
+                                        api.errare( 'sek-clean-loader => error', er );
+                                  }
+                            },
+                            'sek-clean-loader' : function( params ) {
+                                  try { self.cleanLoader( params ); } catch( er ) {
+                                        api.errare( 'sek-clean-loader => error', er );
+                                  }
+                            },
                             'sek-remove' : function( params ) {
                                   var removeCandidateId = params.apiParams.id,
                                       $candidateEl = $('div[data-sek-id="' + removeCandidateId + '"]' ),

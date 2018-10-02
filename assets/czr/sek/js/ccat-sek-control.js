@@ -543,7 +543,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return;
                                   }
                             }
-
+                            if ( _.isUndefined( level.ver_ini ) ) {
+                                  _errorDetected_('validation error => a ' + level.level + ' should have a version property : "ver_ini"' );
+                                  return;
+                            }
                             switch ( level.level ) {
                                   case 'location' :
                                         if ( ! _.isEmpty( parentLevel.level ) ) {
@@ -911,7 +914,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     apiParams.droppedModuleId = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
                                               break;
                                               case 'preset_section' :
-
+                                                    api.previewer.send( 'sek-maybe-print-loader', { loader_located_in_level_id : params.location });
+                                                    api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true });
                                               break;
                                         }
                                         return self.updateAPISetting( apiParams );
@@ -924,11 +928,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           id : params.apiParams.droppedModuleId
                                                     });
                                               break;
+                                              case 'preset_section' :
+                                                    api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
+                                              break;
                                         }
+                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
                                         api.previewer.send( 'sek-refresh-stylesheet', {
                                               skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         });
-                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
                                                     level : 'location',
@@ -952,7 +959,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         apiParams = params;
                                         apiParams.action = 'sek-add-preset-section-in-new-nested-sektion';
                                         apiParams.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
-
+                                        api.previewer.send( 'sek-maybe-print-loader', { loader_located_in_level_id : params.location });
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
@@ -1072,17 +1079,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     })
                                     .fail( function( er ) {
                                           api.errare( 'reactToPreviewMsg => error when firing ' + msgId, er );
-                                          api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
-                                                api.notifications.add( new api.Notification( 'sek-react-to-preview', {
-                                                      type: 'info',
-                                                      message:  er,
-                                                      dismissible: true
-                                                } ) );
-                                                _.delay( function() {
-                                                      api.notifications.remove( 'sek-react-to-preview' );
-                                                }, 5000 );
-                                          });
+                                          api.previewer.trigger('sek-notify', {
+                                                type : 'error',
+                                                duration : 30000,
+                                                message : [
+                                                      '<span style="font-size:0.95em">',
+                                                        '<strong>' + er + '</strong>',
+                                                        '<br>',
+                                                        sektionsLocalizedData.i18n['If this problem locks the Nimble builder, you might try to reset the sections for this page.'],
+                                                        '<br>',
+                                                        '<span style="text-align:center;display:block">',
+                                                          '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n['Reset'] + '" data-sek-reset="true">' + sektionsLocalizedData.i18n['Reset'] + '</button>',
+                                                        '</span>',
+                                                      '</span>'
+                                                ].join('')
 
+                                          });
                                     }); } catch( _er_ ) {
                                           api.errare( 'reactToPreviewMsg => error when receiving ' + msgId, _er_ );
                                     }
@@ -1133,7 +1145,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   api.previewer.bind( 'sek-to-json', function( params ) {
                         var sectionModel = $.extend( true, {}, self.getLevelModel( params.id ) );
-                        popupCenter( JSON.stringify( cleanIds( sectionModel ) ) );
+                        console.log( JSON.stringify( cleanIds( sectionModel ) ) );
                   });
             }//schedulePrintSectionJson
       });//$.extend()
@@ -2200,9 +2212,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 collection : [{
                                                       id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
                                                       level : 'column',
-                                                      collection : []
+                                                      collection : [],
+                                                      ver_ini : sektionsLocalizedData.nimbleVersion
                                                 }],
-                                                is_nested : true
+                                                is_nested : true,
+                                                ver_ini : sektionsLocalizedData.nimbleVersion
                                           });
                                     } else {
                                           locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
@@ -2227,8 +2241,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 collection : [{
                                                       id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
                                                       level : 'column',
-                                                      collection : []
-                                                }]
+                                                      collection : [],
+                                                      ver_ini : sektionsLocalizedData.nimbleVersion
+                                                }],
+                                                ver_ini : sektionsLocalizedData.nimbleVersion
                                           });
                                     }
                               break;
@@ -2358,7 +2374,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     sektionCandidate.collection.push({
                                           id :  params.id,
                                           level : 'column',
-                                          collection : []
+                                          collection : [],
+                                          ver_ini : sektionsLocalizedData.nimbleVersion
                                     });
                               break;
 
@@ -2520,7 +2537,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var _moduleParams = {
                                           id : params.id,
                                           level : 'module',
-                                          module_type : params.module_type
+                                          module_type : params.module_type,
+                                          ver_ini : sektionsLocalizedData.nimbleVersion
                                     };
                                     startingModuleValue = self.getModuleStartingValue( params.module_type );
                                     if ( 'no_starting_value' !== startingModuleValue ) {
@@ -2720,7 +2738,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         }
                                                                   ]
                                                             }
-                                                      ]
+                                                      ],
+                                                      ver_ini : sektionsLocalizedData.nimbleVersion
                                                 });
                                           break;
                                           case 'preset_section' :
@@ -2747,7 +2766,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             __presetSectionInjected__.reject( _er_ );
                                                       })
                                                       .done( function( sectionReadyToInject ) {
-                                                            api.infoLog( 'sectionReadyToInject', sectionReadyToInject );
                                                             var insertedInANestedSektion = false;
                                                             if ( ! _.isEmpty( params.sektion_to_replace ) ) {
                                                                   var sektionToReplace = self.getLevelModel( params.sektion_to_replace, newSetValue.collection );
@@ -2762,7 +2780,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   locationCandidate.collection.splice( position, 0, {
                                                                         id : params.id,
                                                                         level : 'section',
-                                                                        collection : sectionReadyToInject.collection
+                                                                        collection : sectionReadyToInject.collection,
+                                                                        options : sectionReadyToInject.options || {},
+                                                                        ver_ini : sektionsLocalizedData.nimbleVersion
                                                                   });
                                                             } else {
                                                                   columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
@@ -2784,7 +2804,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         id : params.id,
                                                                         is_nested : true,
                                                                         level : 'section',
-                                                                        collection : sectionReadyToInject.collection
+                                                                        collection : sectionReadyToInject.collection,
+                                                                        options : sectionReadyToInject.options || {},
+                                                                        ver_ini : sektionsLocalizedData.nimbleVersion
                                                                   });
                                                             }
                                                             __presetSectionInjected__.resolve();
@@ -2843,7 +2865,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       id : params.id,
                                                       level : 'section',
                                                       collection : sectionReadyToInject.collection,
-                                                      is_nested : true
+                                                      options : sectionReadyToInject.options || {},
+                                                      is_nested : true,
+                                                      ver_ini : sektionsLocalizedData.nimbleVersion
                                                 });
                                                 __presetSectionInjected__.resolve();
                                           });//self.preparePresetSectionForInjection.done()
@@ -2913,8 +2937,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                         return collection;
                   };
+
+                  var setVersion = function( collection ) {
+                        _.each( collection, function( levelData ) {
+                              levelData.ver_ini = sektionsLocalizedData.nimbleVersion;
+                              if ( _.isArray( levelData.collection ) ) {
+                                    setVersion( levelData.collection );
+                              }
+                        });
+                        return collection;
+                  };
                   presetCandidate.id = sectionParams.section_id;
                   presetCandidate.collection = setIds( presetCandidate.collection );
+                  presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
+                  presetCandidate.collection = setVersion( presetCandidate.collection );
                   return presetCandidate;
             },
             preparePresetSectionForInjection : function( columnCollection ) {
@@ -4463,6 +4499,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 ( function ( api, $, _ ) {
       api.czrInputMap = api.czrInputMap || {};
       $.extend( api.czrInputMap, {
+            /* ------------------------------------------------------------------------- *
+             *  BG POSITION SIMPLE
+            /* ------------------------------------------------------------------------- */
             bg_position : function( input_options ) {
                   var input = this;
                   $('.sek-bg-pos-wrapper', input.container ).on( 'change', 'input[type="radio"]', function(evt) {
@@ -4470,6 +4509,56 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   if ( ! _.isEmpty( input() ) ) {
                         input.container.find('input[value="'+ input() +'"]').attr('checked', true).trigger('click');
+                  }
+            },
+
+
+            /* ------------------------------------------------------------------------- *
+             *  BG POSITION WITH DEVICE SWITCHER
+            /* ------------------------------------------------------------------------- */
+            bgPositionWithDeviceSwitcher : function( input_options ) {
+                  var input = this,
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {};
+                  api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
+
+                  var getCurrentDeviceActualOrInheritedValue = function( inputValues, currentDevice ) {
+                        var deviceHierarchy = [ 'mobile' , 'tablet', 'desktop' ];
+                        if ( _.has( inputValues, currentDevice ) ) {
+                              return inputValues[ currentDevice ];
+                        } else {
+                              var deviceIndex = _.findIndex( deviceHierarchy, function( _d_ ) { return currentDevice === _d_; });
+                              if ( ! _.isEmpty( currentDevice ) && deviceIndex < deviceHierarchy.length ) {
+                                    return getCurrentDeviceActualOrInheritedValue( inputValues, deviceHierarchy[ deviceIndex + 1 ] );
+                              } else {
+                                    return {};
+                              }
+                        }
+                  };
+                  var syncWithPreviewedDevice = function( currentDevice ) {
+                        var inputValues = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
+                            clonedDefault = $.extend( true, {}, defaultVal );
+                        inputValues = _.isObject( inputValues ) ? $.extend( clonedDefault, inputValues ) : clonedDefault;
+                        var _currentDeviceValue = getCurrentDeviceActualOrInheritedValue( inputValues, currentDevice );
+
+                        input.container.find('input[value="'+ _currentDeviceValue +'"]').attr('checked', true).trigger('click', { previewed_device_switched : true } );
+                  };
+                  $('.sek-bg-pos-wrapper', input.container ).on( 'change', 'input[type="radio"]', function( evt ) {
+                        var changedRadioVal = $(this).val(),
+                            _newInputVal;
+
+                        _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                        _newInputVal[ api.previewedDevice() || 'desktop' ] = changedRadioVal;
+
+                        input( _newInputVal );
+                  });
+                  input.previewedDevice.bind( function( currentDevice ) {
+                        try { syncWithPreviewedDevice( currentDevice ); } catch( er ) {
+                              api.errare('Error when firing syncWithPreviewedDevice for input type spacingWithDeviceSwitcher for input id ' + input.id , er );
+                        }
+                  });
+                  try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
+                        api.errare('Error when firing syncWithPreviewedDevice for input type bgPositionWithDeviceSwitcher for input id ' + input.id , er );
                   }
             }
       });//$.extend( api.czrInputMap, {})
@@ -5493,6 +5582,63 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
             }
+      });//$.extend( api.czrInputMap, {})
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      api.czrInputMap = api.czrInputMap || {};
+
+      var hAlignWithDeviceSwitcher = function( params ) {
+            var input = this,
+                inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {},
+                $wrapper = $('.sek-h-align-wrapper', input.container );
+            api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
+
+            var getCurrentDeviceActualOrInheritedValue = function( inputValues, currentDevice ) {
+                  var deviceHierarchy = [ 'mobile' , 'tablet', 'desktop' ];
+                  if ( _.has( inputValues, currentDevice ) ) {
+                        return inputValues[ currentDevice ];
+                  } else {
+                        var deviceIndex = _.findIndex( deviceHierarchy, function( _d_ ) { return currentDevice === _d_; });
+                        if ( ! _.isEmpty( currentDevice ) && deviceIndex < deviceHierarchy.length ) {
+                              return getCurrentDeviceActualOrInheritedValue( inputValues, deviceHierarchy[ deviceIndex + 1 ] );
+                        } else {
+                              return {};
+                        }
+                  }
+            };
+            var syncWithPreviewedDevice = function( currentDevice ) {
+                  var inputValues = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
+                      clonedDefault = $.extend( true, {}, defaultVal );
+                  inputValues = _.isObject( inputValues ) ? $.extend( clonedDefault, inputValues ) : clonedDefault;
+                  var _currentDeviceValue = getCurrentDeviceActualOrInheritedValue( inputValues, currentDevice );
+                  $wrapper.find('.selected').removeClass('selected');
+                  $wrapper.find( 'div[data-sek-align="' + _currentDeviceValue +'"]' ).addClass('selected');
+            };
+            $wrapper.on( 'click', '[data-sek-align]', function(evt) {
+                  evt.preventDefault();
+                  var _newInputVal;
+
+                  _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                  _newInputVal[ api.previewedDevice() || 'desktop' ] = $(this).data('sek-align');
+
+                  $wrapper.find('.selected').removeClass('selected');
+                  $.when( $(this).addClass('selected') ).done( function() {
+                        input( _newInputVal );
+                  });
+            });
+            input.previewedDevice.bind( function( currentDevice ) {
+                  try { syncWithPreviewedDevice( currentDevice ); } catch( er ) {
+                        api.errare('Error when firing syncWithPreviewedDevice for input type spacingWithDeviceSwitcher for input id ' + input.id , er );
+                  }
+            });
+            try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
+                  api.errare('Error when firing syncWithPreviewedDevice for input type bgPositionWithDeviceSwitcher for input id ' + input.id , er );
+            }
+      };
+      $.extend( api.czrInputMap, {
+            horizTextAlignmentWithDeviceSwitcher : hAlignWithDeviceSwitcher,
+            horizAlignmentWithDeviceSwitcher : hAlignWithDeviceSwitcher
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData, serverControlParams
 /* ------------------------------------------------------------------------- *
@@ -6802,7 +6948,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_icon_spacing_border_child' )
             }
       });
-})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+})( wp.customize , jQuery, _ );/* ------------------------------------------------------------------------- *
+ *  HEADING MAIN CHILD
+/* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
       var HeadingModuleConstructor  = {
             initialize: function( id, options ) {
@@ -6826,6 +6974,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_heading_child' )
+            }
+      });
+})( wp.customize , jQuery, _ );
+
+/* ------------------------------------------------------------------------- *
+ *  HEADING SPACING
+/* ------------------------------------------------------------------------- */
+( function ( api, $, _ ) {
+      var HeadingModuleConstructor  = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+            },//initialize
+
+            CZRHeadingInputMths: {
+                  setupSelect : function() {
+                        api.czr_sektions.setupSelectInput.call( this );
+                  }
+            },//CZRHeadingsInputMths
+      };//HeadingModuleConstructor
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_heading_spacing_child : {
+                  mthds : HeadingModuleConstructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_spacing_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_heading_spacing_child' )
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams

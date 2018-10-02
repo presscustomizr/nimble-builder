@@ -412,7 +412,7 @@ function sek_error_log( $title, $content = null ) {
 }
 function sek_get_locale_template(){
     $path = null;
-    $localSkopeNimble = sek_get_skoped_seks( skp_build_skope_id() );
+    $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
     if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['template'] ) && ! empty( $localSkopeNimble['options']['template']['local_template'] ) && 'default' !== $localSkopeNimble['options']['template']['local_template'] ) {
         $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['template']['local_template'] . '.php';
         if ( file_exists( $path ) ) {
@@ -426,7 +426,7 @@ function sek_get_locale_template(){
 }
 function render_content_sections_for_nimble_template() {
     foreach( sek_get_locations() as $location ) {
-        $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
+        $locationSettingValue = sek_get_skoped_seks( skp_get_skope_id(), $location );
         if ( 'loop_start' === $location || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
             do_action( "sek_before_location_{$location}" );
             SEK_Fire()->_render_seks_for_location( $location, $locationSettingValue );
@@ -476,6 +476,29 @@ function sek_get_section_custom_breakpoint( $section ) {
       return;
 
     return $custom_breakpoint;
+}
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  FONT AWESOME HELPER
+/* ------------------------------------------------------------------------- */
+function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
+    if ( !$bool ) {
+        if ( is_null( $recursive_data ) ) {
+            $recursive_data = sek_get_skoped_seks( skp_get_skope_id() );
+        }
+        foreach ($recursive_data as $key => $value) {
+            if ( is_array( $value ) && array_key_exists('module_type', $value) && in_array($value['module_type'], array( 'czr_button_module', 'czr_icon_module' ) ) ) {
+                $bool = true;
+                break;
+            } else if ( is_array( $value ) ) {
+                $bool = sek_front_needs_font_awesome( $bool, $value );
+            }
+        }
+    }
+    return $bool;
 }
 ?><?php
 register_post_type( NIMBLE_CPT , array(
@@ -709,7 +732,7 @@ function sek_do_compat_1_0_to_1_1() {
         $seks_data = is_array( $seks_data ) ? $seks_data : array();
         if ( empty( $seks_data ) )
           continue;
-        $seks_data = sek_walk_sections_and_do_map_compat( $seks_data );
+        $seks_data = sek_walk_levels_and_do_map_compat( $seks_data );
         $new_post_data = array(
             'ID'          => $post_object->ID,
             'post_title'  => $post_object->post_title,
@@ -725,9 +748,12 @@ function sek_do_compat_1_0_to_1_1() {
     }
     set_transient( 'sek_do_compat_1_0_to_1_1', 'done', 60*60*24*3650 );
 }
-function sek_walk_sections_and_do_map_compat( $seks_data ) {
+function sek_walk_levels_and_do_map_compat( $seks_data ) {
     $new_seks_data = array();
     foreach ( $seks_data as $key => $value ) {
+        if ( is_array($value) && array_key_exists('level', $value) && ! array_key_exists('ver_ini', $value) ) {
+            $value['ver_ini'] = '1.0.4';
+        }
         $new_seks_data[$key] = $value;
         if ( ! empty( $value ) && is_array( $value ) && 'options' === $key ) {
             if ( array_key_exists( 'bg', $value ) )
@@ -800,9 +826,8 @@ function sek_walk_sections_and_do_map_compat( $seks_data ) {
             }
 
             $new_seks_data[$key]['value'] = $new_value;
-
-        } else if ( is_array( $value ) ) {
-            $new_seks_data[$key] = sek_walk_sections_and_do_map_compat( $value );
+        } else if ( is_array($value) ) {
+            $new_seks_data[$key] = sek_walk_levels_and_do_map_compat( $value );
         }
     }
     return $new_seks_data;
@@ -853,6 +878,7 @@ function sek_enqueue_controls_js_css() {
         'sektionsLocalizedData',
         apply_filters( 'nimble-sek-localized-customizer-control-params',
             array(
+                'nimbleVersion' => NIMBLE_VERSION,
                 'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
                 'baseUrl' => NIMBLE_BASE_URL,
                 'sektionsPanelId' => '__sektions__',
@@ -1447,12 +1473,15 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___spacing( $input_id, $input_data );
         break;
         case 'bg_position' :
+        case 'bgPositionWithDeviceSwitcher' :
             sek_set_input_tmpl___bg_position( $input_id, $input_data );
         break;
         case 'h_alignment' :
+        case 'horizAlignmentWithDeviceSwitcher' :
             sek_set_input_tmpl___h_alignment( $input_id, $input_data );
         break;
-         case 'h_text_alignment' :
+        case 'h_text_alignment' :
+        case 'horizTextAlignmentWithDeviceSwitcher' :
             sek_set_input_tmpl___h_text_alignment( $input_id, $input_data );
         break;
         case 'v_alignment' :
@@ -1652,9 +1681,21 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     $content_collection = array(
                         array(
                             'content-type' => 'preset_section',
-                            'content-id' => 'img_text_one',
-                            'title' => __('2 columns with image and text', 'text-domain' ),
-                            'thumb' => 'img_text_one.jpg'
+                            'content-id' => 'intro_one',
+                            'title' => __('1 column, full-width background', 'text-domain' ),
+                            'thumb' => 'intro_one.jpg'
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'intro_two',
+                            'title' => __('2 columns, call to action, full-width background', 'text-domain' ),
+                            'thumb' => 'intro_two.jpg'
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'intro_three',
+                            'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
+                            'thumb' => 'intro_three.jpg'
                         )
                     );
                 break;
@@ -1671,7 +1712,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                 break;
             }
             foreach( $content_collection as $_params) {
-                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"></div>',
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"><div class="sek-overlay"></div></div>',
                     $_params['content-type'],
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
@@ -2477,8 +2518,6 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
         $_pad_marg[ 'mobile' ][ 'mq' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
     }
 
-
-
     foreach( array_filter( $_pad_marg ) as $_spacing_rules ) {
         $css_rules = implode(';',
             array_map( function( $key, $value ) {
@@ -2491,6 +2530,39 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
             'css_rules' => $css_rules,
             'mq' =>$_spacing_rules[ 'mq' ]
         );
+    }
+    return $rules;
+}
+function sek_set_mq_css_rules( $params, $rules ) {
+    $params = wp_parse_args( $params, array(
+        'value' => array(),
+        'css_property' => '',
+        'selector' => '',
+        'is_important' => false
+    ));
+    if ( ! empty( $params['value'][ 'desktop' ] ) ) {
+        $_font_size_mq[ 'desktop' ] = null;
+    }
+
+    if ( ! empty( $params['value'][ 'tablet' ] ) ) {
+        $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+    }
+
+    if ( ! empty( $params['value'][ 'mobile' ] ) ) {
+        $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+    }
+    foreach ( $params['value'] as $device => $val ) {
+        if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
+            sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
+            continue;
+        }
+        if ( ! empty(  $val ) ) {
+            $rules[] = array(
+                'selector' => $params['selector'],
+                'css_rules' => sprintf( '%1$s:%2$s%3$s;', $params['css_property'], $val, $params['is_important'] ? '!important' : '' ),
+                'mq' => $_font_size_mq[ $device ]
+            );
+        }
     }
     return $rules;
 }
@@ -2895,6 +2967,7 @@ function sek_register_modules() {
         'czr_image_borders_corners_child',
         'czr_heading_module',
         'czr_heading_child',
+        'czr_heading_spacing_child',
 
         'czr_spacer_module',
         'czr_divider_module',
@@ -3191,10 +3264,6 @@ function sek_get_module_params_for_sek_level_bg_module() {
         'dynamic_registration' => true,
         'module_type' => 'sek_level_bg_module',
         'name' => __('Background', 'text_domain_to_be_replaced'),
-        'starting_value' => array(
-            'bg-color-overlay'  => '#000000',
-            'bg-opacity-overlay' => '40'
-        ),
         'tmpl' => array(
             'item-inputs' => array(
                 'bg-color' => array(
@@ -3209,9 +3278,10 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'default'     => '',
                 ),
                 'bg-position' => array(
-                    'input_type'  => 'bg_position',
+                    'input_type'  => 'bgPositionWithDeviceSwitcher',
                     'title'       => __('Image position', 'text_domain_to_be_replaced'),
-                    'default'     => 'center'
+                    'default'     => array( 'desktop' => 'center' ),
+                    'title_width' => 'width-100',
                 ),
                 'bg-attachment' => array(
                     'input_type'  => 'gutencheck',
@@ -3235,7 +3305,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __('Overlay Color', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
-                    'default'     => ''
+                    'default'     => '#000000'
                 ),
                 'bg-opacity-overlay' => array(
                     'input_type'  => 'range_simple',
@@ -3243,6 +3313,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'orientation' => 'horizontal',
                     'min' => 0,
                     'max' => 100,
+                    'default'  => '40',
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 )
@@ -3268,13 +3339,14 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
       return $rules;
 
     $background_properties = array();
+    $bg_property_selector = '[data-sek-id="'.$level['id'].'"]';
 
     /* The general syntax of the background property is:
     * https://www.webpagefx.com/blog/web-design/background-css-shorthand/
     * background: [background-image] [background-position] / [background-size] [background-repeat] [background-attachment] [background-origin] [background-clip] [background-color];
     */
     if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
-        $background_properties[] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
+        $background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
         if ( ! empty( $bg_options[ 'bg-position'] ) ) {
             $pos_map = array(
                 'top_left'    => '0% 0%',
@@ -3287,32 +3359,45 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
                 'bottom'      => '50% 100%',
                 'bottom_right'=> '100% 100%'
             );
+            if ( is_string( $bg_options[ 'bg-position'] ) ) {
+                $raw_pos                    = $bg_options[ 'bg-position'];
+                $background_properties[ 'background-position' ] = array_key_exists($raw_pos, $pos_map) ? $pos_map[ $raw_pos ] : $pos_map[ 'center' ];
+            } else if ( is_array( $bg_options[ 'bg-position'] ) ) {
+                $mapped_bg_options = array();
+                foreach ($bg_options[ 'bg-position'] as $device => $user_val ) {
+                    if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
+                        sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
+                        continue;
+                    }
+                    $mapped_bg_options[$device] = array_key_exists($user_val, $pos_map) ? $pos_map[ $user_val ] : $pos_map[ 'center' ];
+                }
 
-            $raw_pos                    = $bg_options[ 'bg-position'];
-            $background_properties[]         = array_key_exists($raw_pos, $pos_map) ? $pos_map[ $raw_pos ] : $pos_map[ 'center' ];
-        }
-        if ( ! empty( $bg_options[ 'bg-scale'] ) && 'default' != $bg_options[ 'bg-scale'] ) {
-            if ( ! empty( $bg_options[ 'bg-position'] ) ) {
-                $background_properties[] = '/ ' . $bg_options[ 'bg-scale'];
-            } else {
-                $background_size    = $bg_options[ 'bg-scale'];
+                $rules = sek_set_mq_css_rules(array(
+                    'value' => $mapped_bg_options,
+                    'css_property' => 'background-position',
+                    'selector' => $bg_property_selector
+                ), $rules );
             }
         }
-        $background_properties[] = 'no-repeat';
+        if ( ! empty( $bg_options[ 'bg-scale'] ) && 'default' != $bg_options[ 'bg-scale'] ) {
+            $background_properties[ 'background-size' ] = $bg_options[ 'bg-scale'];
+        }
+        $background_properties[ 'background-repeat' ] = 'no-repeat';
         if ( ! empty( $bg_options[ 'bg-attachment'] ) && sek_is_checked( $bg_options[ 'bg-attachment'] ) ) {
-            $background_properties[] = 'fixed';
+            $background_properties[ 'background-attachment' ] = 'fixed';
         }
 
     }
     if ( ! empty( $bg_options[ 'bg-color' ] ) ) {
-        $background_properties[] = $bg_options[ 'bg-color' ];
+        $background_properties[ 'background-color' ] = $bg_options[ 'bg-color' ];
     }
     if ( ! empty( $background_properties ) ) {
-        $background_css_rules      = "background:" . implode( ' ', array_filter( $background_properties ) );
-        $background_css_rules      = isset( $background_size ) ? $css_rules . ';background-size:' . $background_size : $background_css_rules;
-
+        $background_css_rules = '';
+        foreach ($background_properties as $bg_prop => $bg_css_val ) {
+            $background_css_rules .= sprintf('%1$s:%2$s;', $bg_prop, $bg_css_val );
+        }
         $rules[] = array(
-            'selector' => '[data-sek-id="'.$level['id'].'"]',
+            'selector' => $bg_property_selector,
             'css_rules' => $background_css_rules,
             'mq' =>null
         );
@@ -3362,8 +3447,8 @@ function sek_get_module_params_for_sek_level_border_module() {
         'name' => __('Borders', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'borders' => array(
-                  '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
-              )
+                '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+            )
         ),
         'tmpl' => array(
             'item-inputs' => array(
@@ -3417,21 +3502,23 @@ add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_fo
 function sek_add_css_rules_for_border( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     $default_value_model  = sek_get_default_module_model( 'sek_level_border_module' );
-    $border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
-    $border_options = wp_parse_args( $border_options , is_array( $default_value_model ) ? $default_value_model : array() );
+    $normalized_border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
+    $normalized_border_options = wp_parse_args( $normalized_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
-    if ( empty( $border_options ) )
+    if ( empty( $normalized_border_options ) )
       return $rules;
 
-    $border_settings = ! empty( $border_options[ 'borders' ] ) ? $border_options[ 'borders' ] : FALSE;
-    $border_type = $border_options[ 'border-type' ];
+    $border_settings = ! empty( $normalized_border_options[ 'borders' ] ) ? $normalized_border_options[ 'borders' ] : FALSE;
+    $border_type = $normalized_border_options[ 'border-type' ];
     $has_border_settings  = FALSE !== $border_settings && is_array( $border_settings ) && ! empty( $border_type ) && 'none' != $border_type;
     if ( $has_border_settings ) {
         $rules = sek_generate_css_rules_for_multidimensional_border_options( $rules, $border_settings, $border_type, '[data-sek-id="'.$level['id'].'"]'  );
     }
 
-    if ( ! empty( $border_options['border-radius'] ) && is_array( $border_options['border-radius'] ) ) {
-        $rules = sek_generate_css_rules_for_border_radius_options( $rules, $border_options['border-radius'], '[data-sek-id="'.$level['id'].'"]' );
+    $has_border_radius = ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) && !empty( $options[ 'border' ]['border-radius'] );
+    if ( $has_border_radius ) {
+        $radius_settings = $normalized_border_options['border-radius'];
+        $rules = sek_generate_css_rules_for_border_radius_options( $rules, $normalized_border_options['border-radius'], '[data-sek-id="'.$level['id'].'"]' );
     }
 
     return $rules;
@@ -3442,13 +3529,13 @@ function sek_add_css_rules_for_border( $rules, $level ) {
 function sek_add_css_rules_for_boxshadow( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     $default_value_model  = sek_get_default_module_model( 'sek_level_border_module' );
-    $border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
-    $border_options = wp_parse_args( $border_options , is_array( $default_value_model ) ? $default_value_model : array() );
+    $normalized_border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
+    $normalized_border_options = wp_parse_args( $normalized_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
-    if ( empty( $border_options) )
+    if ( empty( $normalized_border_options) )
       return $rules;
 
-    if ( !empty( $border_options[ 'shadow' ] ) &&  sek_is_checked( $border_options[ 'shadow'] ) ) {
+    if ( !empty( $normalized_border_options[ 'shadow' ] ) &&  sek_is_checked( $normalized_border_options[ 'shadow'] ) ) {
         $css_rules = '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;';
         if ( skp_is_customizing() ) {
             $css_rules = '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;';
@@ -3479,12 +3566,13 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'choices'     => sek_get_select_options_for_input_id( 'height-type' )
                 ),
                 'custom-height' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Custom height', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '50',
-                    'width-100'   => true
+                    'default'     => array( 'desktop' => '50%' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
                 ),
                 'v_alignment' => array(
                     'input_type'  => 'v_alignment',
@@ -3539,24 +3627,49 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             );
         }
     }
+
     if ( ! empty( $options[ 'height' ][ 'height-type' ] ) ) {
         if ( 'custom' == $options[ 'height' ][ 'height-type' ] && array_key_exists( 'custom-height', $options[ 'height' ] ) ) {
-            $height = $options[ 'height' ][ 'custom-height' ];
-            $css_rules = '';
-            if ( isset( $height ) && FALSE !== $height ) {
-                $numeric = sek_extract_numeric_value( $height );
-                if ( !empty( $numeric ) ) {
-                    $unit = sek_extract_unit( $height );
-                    $unit = '%' === $unit ? 'vh' : $unit;
-                    $css_rules .= 'height:' . $numeric . $unit . ';';
+            $custom_user_height = $options[ 'height' ][ 'custom-height' ];
+            $selector = '[data-sek-id="'.$level['id'].'"]';
+            if ( is_string( $custom_user_height ) ) {
+                $css_rules = '';
+                if ( isset( $custom_user_height ) && FALSE !== $custom_user_height ) {
+                    $numeric = sek_extract_numeric_value( $custom_user_height );
+                    if ( !empty( $numeric ) ) {
+                        $unit = sek_extract_unit( $custom_user_height );
+                        $unit = '%' === $unit ? 'vh' : $unit;
+                        $css_rules .= 'height:' . $numeric . $unit . ';';
+                    }
                 }
-            }
-            if ( !empty( $css_rules ) ) {
-                $rules[]     = array(
-                        'selector' => '[data-sek-id="'.$level['id'].'"]',
+                if ( !empty( $css_rules ) ) {
+                    $rules[]     = array(
+                        'selector' => $selector,
                         'css_rules' => $css_rules,
-                        'mq' =>null
-                );
+                        'mq' => null
+                    );
+                }
+            } else if ( is_array( $custom_user_height ) ) {
+                $custom_user_height = wp_parse_args( $custom_user_height, array(
+                    'desktop' => '50%',
+                    'tablet' => '',
+                    'mobile' => ''
+                ));
+                $height_value = $custom_user_height;
+                foreach ( $custom_user_height as $device => $num_unit ) {
+                    $numeric = sek_extract_numeric_value( $num_unit );
+                    if ( ! empty( $numeric ) ) {
+                        $unit = sek_extract_unit( $num_unit );
+                        $unit = '%' === $unit ? 'vh' : $unit;
+                        $height_value[$device] = $numeric . $unit;
+                    }
+                }
+
+                $rules = sek_set_mq_css_rules(array(
+                    'value' => $height_value,
+                    'css_property' => 'height',
+                    'selector' => $selector
+                ), $rules );
             }
         }
     }
@@ -3595,13 +3708,62 @@ function sek_get_module_params_for_sek_level_spacing_module() {
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
-add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_spacing', 10, 3 );
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_spacing', 10, 2 );
 function sek_add_css_rules_for_spacing( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     if ( empty( $options[ 'spacing' ] ) || empty( $options[ 'spacing' ][ 'pad_marg' ] ) )
       return $rules;
+    $pad_marg_options = $options[ 'spacing' ][ 'pad_marg' ];
+    if ( ! is_array( $pad_marg_options ) )
+      return $rules;
 
-    $rules = sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $options[ 'spacing' ][ 'pad_marg' ], '[data-sek-id="'.$level['id'].'"]' );
+    $rules = sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $pad_marg_options, '[data-sek-id="'.$level['id'].'"]' );
+    if ( 'column' === $level['level'] && ! empty( $pad_marg_options['desktop'] ) ) {
+        $margin_left = array_key_exists('margin-left', $pad_marg_options['desktop'] ) ? $pad_marg_options['desktop']['margin-left'] : 0;
+        $margin_right = array_key_exists('margin-right', $pad_marg_options['desktop'] ) ? $pad_marg_options['desktop']['margin-right'] : 0;
+        $device_unit = array_key_exists('unit', $pad_marg_options['desktop'] ) ? $pad_marg_options['desktop']['unit'] : 'px';
+
+        $total_horizontal_margin = (int)$margin_left + (int)$margin_right;
+
+        $parent_section = sek_get_parent_level_model( $level['id'] );
+
+        if ( $total_horizontal_margin > 0 && !empty( $parent_section ) ) {
+            $total_horizontal_margin_with_unit = $total_horizontal_margin . $device_unit;//20px
+
+
+            $col_number = ( array_key_exists( 'collection', $parent_section ) && is_array( $parent_section['collection'] ) ) ? count( $parent_section['collection'] ) : 1;
+            $col_number = 12 < $col_number ? 12 : $col_number;
+
+            $col_width_in_percent = 100/$col_number;
+            $col_suffix = floor( $col_width_in_percent );
+            $custom_width   = ( ! empty( $level[ 'width' ] ) && is_numeric( $level[ 'width' ] ) ) ? $level['width'] : null;
+            if ( ! is_null( $custom_width ) ) {
+                $col_width_in_percent = $custom_width;
+            }
+            if ( $col_suffix < 1 )
+              return $rules;
+            $breakpoint = Sek_Dyn_CSS_Builder::$breakpoints[ Sek_Dyn_CSS_Builder::COLS_MOBILE_BREAKPOINT ];//COLS_MOBILE_BREAKPOINT = 'md' <=> 768px
+            $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+            $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
+            $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_section ) );
+            $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
+
+            if ( $has_section_custom_breakpoint ) {
+                $breakpoint = $section_custom_breakpoint;
+            } else if ( $has_global_custom_breakpoint ) {
+                $breakpoint = $global_custom_breakpoint;
+            }
+
+            $responsive_css_rules = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', $col_width_in_percent, $total_horizontal_margin_with_unit );
+
+            $rules[] = array(
+                'selector' => sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] ),
+                'css_rules' => $responsive_css_rules,
+                'mq' => "(min-width: {$breakpoint}px)"
+            );
+        }//if ( $total_horizontal_margin > 0 && !empty( $parent_section ) ) {
+    }// if column
+
     return $rules;
 }
 
@@ -3620,12 +3782,13 @@ function sek_get_module_params_for_sek_level_width_module() {
                     'choices'     => sek_get_select_options_for_input_id( 'width-type' )
                 ),
                 'custom-width' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Custom width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '100%',
+                    'default'     => array( 'desktop' => '100%' ),
                     'width-100'   => true,
+                    'title_width' => 'width-100',
                 ),
                 'h_alignment' => array(
                     'input_type'  => 'h_alignment',
@@ -3683,21 +3846,39 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
 
     if ( ! empty( $options[ 'width' ][ 'width-type' ] ) ) {
         if ( 'custom' == $options[ 'width' ][ 'width-type' ] && array_key_exists( 'custom-width', $options[ 'width' ] ) ) {
-            $width = $options[ 'width' ][ 'custom-width' ];
-            $css_rules = '';
-            if ( isset( $width ) && FALSE !== $width ) {
-                $numeric = sek_extract_numeric_value( $width );
-                if ( !empty( $numeric ) ) {
-                    $unit = sek_extract_unit( $width );
-                    $css_rules .= 'width:' . $numeric . $unit . ';';
+            $user_custom_width_value = $options[ 'width' ][ 'custom-width' ];
+            $selector = '[data-sek-id="'.$module['id'].'"]';
+
+            if ( is_string( $user_custom_width_value ) ) {
+                $numeric = sek_extract_numeric_value( $user_custom_width_value );
+                if ( ! empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $user_custom_width_value );
+                    $rules[]     = array(
+                            'selector' => $selector,// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
+                            'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
+                            'mq' =>null
+                    );
                 }
-            }
-            if ( !empty( $css_rules ) ) {
-                $rules[]     = array(
-                        'selector' => '[data-sek-id="'.$module['id'].'"]',
-                        'css_rules' => $css_rules,
-                        'mq' =>null
-                );
+            } else if ( is_array( $user_custom_width_value ) ) {
+                $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
+                    'desktop' => '100%',
+                    'tablet' => '',
+                    'mobile' => ''
+                ));
+                $width_value = $user_custom_width_value;
+                foreach ( $user_custom_width_value as $device => $num_unit ) {
+                    $numeric = sek_extract_numeric_value( $num_unit );
+                    if ( ! empty( $numeric ) ) {
+                        $unit = sek_extract_unit( $num_unit );
+                        $width_value[$device] = $numeric . $unit;
+                    }
+                }
+
+                $rules = sek_set_mq_css_rules(array(
+                    'value' => $width_value,
+                    'css_property' => 'width',
+                    'selector' => $selector
+                ), $rules );
             }
         }
     }
@@ -3726,20 +3907,22 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'refresh_stylesheet' => true
                 ),
                 'outer-section-width' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Outer section width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '',
-                    'width-100'   => true
+                    'default'     => array( 'desktop' => '100%' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
                 ),
                 'inner-section-width' => array(
-                    'input_type'  => 'range_with_unit_picker',
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Inner section width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default' => '',
-                    'width-100'   => true
+                    'default'     => array( 'desktop' => '100%' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
                 )
             )
         )//tmpl
@@ -3754,33 +3937,64 @@ function sek_get_module_params_for_sek_level_width_section() {
 add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_section_width', 10, 3 );
 function sek_add_css_rules_for_section_width( $rules, $section ) {
     $options = empty( $section[ 'options' ] ) ? array() : $section['options'];
-    if ( empty( $options[ 'width' ] ) )
+    if ( empty( $options[ 'width' ] ) || ! is_array( $options[ 'width' ] ) )
       return $rules;
 
     if ( empty( $options[ 'width' ][ 'use-custom-width' ] ) || false === sek_booleanize_checkbox_val( $options[ 'width' ][ 'use-custom-width' ] ) )
       return $rules;
-    if ( ! empty( $options[ 'width' ][ 'outer-section-width'] ) ) {
-          $numeric = sek_extract_numeric_value( $options[ 'width' ][ 'outer-section-width'] );
-          if ( ! empty( $numeric ) ) {
-              $unit = sek_extract_unit( $options[ 'width' ][ 'outer-section-width'] );
-              $rules[]     = array(
-                      'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]',// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
-                      'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
-                      'mq' =>null
-              );
-          }
-    }
-    if ( ! empty( $options[ 'width' ][ 'inner-section-width'] ) ) {
-          $numeric = sek_extract_numeric_value( $options[ 'width' ][ 'inner-section-width'] );
-          if ( ! empty( $numeric ) ) {
-              $unit = sek_extract_unit( $options[ 'width' ][ 'inner-section-width'] );
-              $rules[]     = array(
-                      'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner',// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
-                      'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
-                      'mq' =>null
-              );
-          }
-    }
+
+    $user_widths = array(
+        'outer-section-width' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]',
+        'inner-section-width' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner'
+    );
+
+    foreach ( $user_widths as $width_opt_name => $selector ) {
+        if ( empty( $options[ 'width' ][ $width_opt_name ] ) )
+          continue;
+        $user_custom_width_value = $options[ 'width' ][ $width_opt_name ];
+        if ( is_string( $user_custom_width_value ) ) {
+            $numeric = sek_extract_numeric_value( $user_custom_width_value );
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $user_custom_width_value );
+                $rules[]     = array(
+                        'selector' => $selector,// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
+                        'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
+                        'mq' =>null
+                );
+            }
+        } else if ( is_array( $user_custom_width_value ) ) {
+            $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
+                'desktop' => '100%',
+                'tablet' => '',
+                'mobile' => ''
+            ));
+            $max_width_value = $user_custom_width_value;
+            $margin_value = array();
+            foreach ($user_custom_width_value as $device => $num_unit ) {
+                $numeric = sek_extract_numeric_value( $num_unit );
+                if ( ! empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $num_unit );
+                    $max_width_value[$device] = $numeric . $unit;
+                    $margin_value[$device] = '0 auto';
+                }
+            }
+
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $max_width_value,
+                'css_property' => 'max-width',
+                'selector' => $selector
+            ), $rules );
+
+            if ( ! empty( $margin_value ) ) {
+                $rules = sek_set_mq_css_rules(array(
+                    'value' => $margin_value,
+                    'css_property' => 'margin',
+                    'selector' => $selector
+                ), $rules );
+            }
+        }
+    }//foreach
+
     return $rules;
 }
 
@@ -3887,6 +4101,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
         )//tmpl
     );
 }
+
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
@@ -3899,7 +4114,7 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
         $col_width_in_percent = 100/$col_number;
         $col_suffix = floor( $col_width_in_percent );
 
-        $responsive_css_rules = "flex: 0 0 {$col_suffix}%;max-width: {$col_suffix}%;";
+        $responsive_css_rules = sprintf( '-ms-flex: 0 0 %1$s%%;flex: 0 0 %1$s%%;max-width: %1$s%%', $col_suffix );
         $rules[] = array(
             'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-'.$col_suffix,
             'css_rules' => $responsive_css_rules,
@@ -4252,13 +4467,23 @@ function sek_get_module_params_for_czr_tinymce_child() {
                     'default'     => ''
                 ),
                 'h_alignment_css' => array(
-                    'input_type'  => 'h_text_alignment',
+                    'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
-                    'default'     => is_rtl() ? 'right' : 'left',
+                    'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'h_alignment'
-                )
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                ),
+                'autop' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Automatically convert text into paragraph', 'text_domain_to_be_replaced'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('WordPress wraps the editor text inside "p" tags by default. You can disable this behaviour by unchecking this option.', 'text-domain')
+                ),
             )
         ),
         'render_tmpl_path' =>'',
@@ -4340,12 +4565,14 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'input_width' => 'width-20',
                 ),
                 'h_alignment_css' => array(
-                    'input_type'  => 'h_alignment',
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
-                    'default'     => 'center',
+                    'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'h_alignment'
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 ),
                 'use_custom_width' => array(
                     'input_type'  => 'gutencheck',
@@ -4602,13 +4829,14 @@ function sek_get_module_params_for_czr_heading_module() {
         'is_father' => true,
         'children' => array(
             'main_settings'   => 'czr_heading_child',
-            'font_settings' => 'czr_font_child'
+            'font_settings' => 'czr_font_child',
+            'spacing' => 'czr_heading_spacing_child'
         ),
-        'name' => __('Text Editor', 'text_domain_to_be_replaced'),
+        'name' => __('Heading', 'text_domain_to_be_replaced'),
         'starting_value' => array(
             'main_settings' => array(
                 'heading_text' => 'This is a heading.',
-                'h_alignment_css' => 'center'
+                'h_alignment_css' => array( 'desktop' => 'center')
             )
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-heading' ),
@@ -4643,19 +4871,49 @@ function sek_get_module_params_for_czr_heading_child() {
                     'default'            => 'h1',
                     'choices'            => sek_get_select_options_for_input_id( 'heading_tag' )
                 ),
-                'h_alignment_css'        => array(
-                    'input_type'         => 'h_text_alignment',
-                    'title'              => __( 'Alignment', 'text_domain_to_be_replaced' ),
-                    'default'            => is_rtl() ? 'right' : 'left',
+                'h_alignment_css' => array(
+                    'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
+                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                ),
+            )
+        ),
+        'render_tmpl_path' =>'',
+    );
+}
+
+
+/* ------------------------------------------------------------------------- *
+ *  HEADING SPACING CHILD
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_heading_spacing_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_heading_spacing_child',
+        'name' => __('Spacing', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'spacing_css'     => array(
+                    'input_type'  => 'spacingWithDeviceSwitcher',
+                    'title'       => __( 'Margin and padding', 'text_domain_to_be_replaced' ),
+                    'default'     => array( 'desktop' => array() ),
+                    'width-100'   => true,
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'h_alignment'
+                    'css_identifier' => 'spacing_with_device_switcher',
                 )
             )
         ),
         'render_tmpl_path' =>'',
     );
 }
+
+
 
 
 function sanitize_callback__czr_heading_module( $value ) {
@@ -4769,13 +5027,15 @@ function sek_get_module_params_for_czr_divider_module() {
                     'css_identifier' => 'border_radius'
                 ),
                 'h_alignment_css' => array(
-                    'input_type'  => 'h_alignment',
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
-                    'default'     => 'center',
+                    'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_selectors' => '.sek-module-inner',
-                    'css_identifier' => 'h_alignment'
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 ),
                 'v_spacing_css' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -4882,13 +5142,15 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                     'css_identifier' => 'font_size'
                 ),
                 'h_alignment_css' => array(
-                    'input_type'  => 'h_alignment',
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
-                    'default'     => 'center',
+                    'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'h_alignment',
-                    'css_selectors' => '.sek-icon'
+                    'css_selectors' => '.sek-icon',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 ),
                 'color_css' => array(
                     'input_type'  => 'wp_color_alpha',
@@ -5737,13 +5999,15 @@ function sek_get_module_params_for_czr_btn_design_child() {
                     'css_identifier' => 'border_radius',
                 ),
                 'h_alignment_css'        => array(
-                    'input_type'         => 'h_alignment',
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
-                    'default'            => 'center',
+                    'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
                     'css_identifier'     => 'h_alignment',
-                    'css_selectors'      => '.sek-module-inner'
+                    'css_selectors'      => '.sek-module-inner',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 ),
                 'spacing_css'        => array(
                     'input_type'         => 'spacing',
@@ -6128,13 +6392,15 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                     'css_selectors'=> $css_selectors
                 ),
                 'h_alignment_css'        => array(
-                    'input_type'         => 'h_alignment',
-                    'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
-                    'default'            => is_rtl() ? 'right' : 'left',
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
+                    'title'       => __( 'Button alignment', 'text_domain_to_be_replaced' ),
+                    'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'h_alignment',
-                    'css_selectors'=> '.sek-form-btn-wrapper'
+                    'css_selectors'=> '.sek-form-btn-wrapper',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 ),
                 'spacing_css'        => array(
                     'input_type'         => 'spacing',
@@ -7836,12 +8102,12 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
 
     switch ( $css_identifier ) {
         case 'font_size' :
-            if ( is_string( $value ) ) {
+            if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
                   if ( ! empty( $numeric ) ) {
                       $properties_to_render['font-size'] = $value;
                   }
-            } else if ( is_array( $value ) ) {
+            } else if ( is_array( $value ) ) { // <= by device
                   $important = false;
                   if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
                       $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
@@ -7894,7 +8160,25 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             $properties_to_render['background-color'] = $value;
         break;
         case 'h_alignment' :
-            $properties_to_render['text-align'] = $value;
+            if ( is_string( $value ) ) {// <= simple
+                $properties_to_render['text-align'] = $value;
+            } else if ( is_array( $value ) ) {// <= by device
+                  $important = false;
+                  if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+                      $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
+                  }
+                  $value = wp_parse_args( $value, array(
+                      'desktop' => '',
+                      'tablet' => '',
+                      'mobile' => ''
+                  ));
+                  $rules = sek_set_mq_css_rules( array(
+                      'value' => $value,
+                      'css_property' => 'text-align',
+                      'selector' => $selector,
+                      'is_important' => $important,
+                  ), $rules );
+            }
         break;
         case 'v_alignment' :
             switch ( $value ) {
@@ -7929,14 +8213,14 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
 
         /* Spacer */
         case 'height' :
-            if ( is_string( $value ) ) {
+            if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
                   if ( ! empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
                       $unit = '%' === $unit ? 'vh' : $unit;
                       $properties_to_render['height'] = $numeric . $unit;
                   }
-            } else if ( is_array( $value ) ) {
+            } else if ( is_array( $value ) ) { // <= by device
                   $important = false;
                   if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
                       $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
@@ -8003,13 +8287,13 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
 
         case 'width' :
-            if ( is_string( $value ) ) {
+            if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
                   if ( ! empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
                       $properties_to_render['width'] = $numeric . $unit;
                   }
-            } else if ( is_array( $value ) ) {
+            } else if ( is_array( $value ) ) { // <= by device
                   $important = false;
                   if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
                       $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
@@ -8038,7 +8322,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
 
         case 'v_spacing' :
-            if ( is_string( $value ) ) {
+            if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
                   if ( ! empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
@@ -8048,7 +8332,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
                           'margin-bottom' => $numeric . $unit
                       );
                   }
-            } else if ( is_array( $value ) ) {
+            } else if ( is_array( $value ) ) { // <= by device
                   $important = false;
                   if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
                       $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
@@ -8170,36 +8454,6 @@ function sek_is_flagged_important( $input_id, $module_value, $registered_input_l
     }
     return $important;
 }
-function sek_set_mq_css_rules( $params, $rules ) {
-    $params = wp_parse_args( $params, array(
-        'value' => array(),
-        'css_property' => '',
-        'selector' => '',
-        'is_important' => false
-    ));
-    if ( ! empty( $params['value'][ 'desktop' ] ) ) {
-        $_font_size_mq[ 'desktop' ] = null;
-    }
-
-    if ( ! empty( $params['value'][ 'tablet' ] ) ) {
-        $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
-    }
-
-    if ( ! empty( $params['value'][ 'mobile' ] ) ) {
-        $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
-    }
-    foreach ( $params['value'] as $device => $val ) {
-        if ( ! empty(  $val ) ) {
-            $rules[] = array(
-                'selector' => $params['selector'],
-                'css_rules' => sprintf( '%1$s:%2$s%3$s;', $params['css_property'], $val, $params['is_important'] ? '!important' : '' ),
-                'mq' => $_font_size_mq[ $device ]
-            );
-        }
-    }
-    return $rules;
-}
-
 ?><?php
 if ( ! class_exists( 'SEK_Front_Construct' ) ) :
     class SEK_Front_Construct {
@@ -8602,6 +8856,15 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 NIMBLE_ASSETS_VERSION,
                 true
             );
+            if ( ! skp_is_customizing() && sek_front_needs_font_awesome() ) {
+                wp_enqueue_style(
+                    'czr-font-awesome',
+                    NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    $media = 'all'
+                );
+            }
         }
         function sek_schedule_customize_preview_assets() {
             add_action( 'wp_footer', array( $this, 'sek_print_ui_tmpl' ) );
