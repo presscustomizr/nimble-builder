@@ -739,7 +739,12 @@ button.sek-btn,
 }
 
 [data-sek-module-type="czr_icon_module"] .sek-icon i {
+  webkit-transition: all 0.15s ease-in-out;
   transition: all 0.15s ease-in-out;
+}
+
+[data-sek-module-type="czr_icon_module"] .sek-icon .fas, [data-sek-module-type="czr_icon_module"] .sek-icon .far, [data-sek-module-type="czr_icon_module"] .sek-icon .fab {
+  width: auto;
 }
 
 .sek-quote p {
@@ -918,6 +923,19 @@ button.sek-btn,
 
 .sek-simple-form-wrapper.use-inset-shadow .sek-form-field input[type="text"], .sek-simple-form-wrapper.use-inset-shadow .sek-form-field textarea {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+
+.sek-module-inner {
+  line-height: 1.5em;
+}
+
+.sek-module-inner h1, .sek-module-inner h2, .sek-module-inner h3, .sek-module-inner h4, .sek-module-inner h5, .sek-module-inner h6, .sek-module-inner p {
+  line-height: 1.5em;
+}
+
+.sek-module-inner p {
+  margin: 0 0 1em;
+  padding: 0;
 }
 
 /* make sure that the location level occupies 100% of the width */

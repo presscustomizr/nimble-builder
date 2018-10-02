@@ -501,6 +501,145 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
     return $bool;
 }
 ?><?php
+function sek_maybe_do_version_mapping() {
+    if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
+      return;
+    $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+    $global_options = is_array( $global_options ) ? $global_options : array();
+    $global_options['retro_compat_mappings'] = isset( $global_options['retro_compat_mappings'] ) ? $global_options['retro_compat_mappings'] : array();
+
+    if ( ! array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
+        $status_1_0_4_to_1_1_0 = sek_do_compat_1_0_4_to_1_1_0();
+        $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] = 'done';
+    }
+    update_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS, $global_options );
+}
+function sek_do_compat_1_0_4_to_1_1_0() {
+    $sek_post_query_vars = array(
+        'post_type'              => NIMBLE_CPT,
+        'post_status'            => get_post_stati(),
+        'posts_per_page'         => -1,
+        'no_found_rows'          => true,
+        'cache_results'          => true,
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
+        'lazy_load_term_meta'    => false,
+    );
+    $query = new \WP_Query( $sek_post_query_vars );
+    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+      return;
+
+    $status = 'success';
+    foreach ($query->posts as $post_object ) {
+        if ( $post_object ) {
+            $seks_data = maybe_unserialize( $post_object->post_content );
+        }
+
+        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        if ( empty( $seks_data ) )
+          continue;
+        $seks_data = sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data );
+        $new_post_data = array(
+            'ID'          => $post_object->ID,
+            'post_title'  => $post_object->post_title,
+            'post_name'   => sanitize_title( $post_object->post_title ),
+            'post_type'   => NIMBLE_CPT,
+            'post_status' => 'publish',
+            'post_content' => maybe_serialize( $seks_data )
+        );
+        $r = wp_update_post( wp_slash( $new_post_data ), true );
+        if ( is_wp_error( $r ) ) {
+            $status = 'error';
+            sek_error_log( __FUNCTION__ . ' => error', $r );
+        }
+    }//foreach
+    return $status;
+}
+function sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data ) {
+    $new_seks_data = array();
+    foreach ( $seks_data as $key => $value ) {
+        if ( is_array($value) && array_key_exists('level', $value) && ! array_key_exists('ver_ini', $value) ) {
+            $value['ver_ini'] = '1.0.4';
+        }
+        $new_seks_data[$key] = $value;
+        if ( ! empty( $value ) && is_array( $value ) && 'options' === $key ) {
+            if ( array_key_exists( 'bg', $value ) )
+              continue;
+            $new_seks_data[$key] = array();
+            foreach( $value as $_opt_group => $_opt_group_data ) {
+                if ( 'spacing' === $_opt_group || 'layout' === $_opt_group )
+                  continue;
+                if ( 'bg_border' === $_opt_group ) {
+                    foreach ( $_opt_group_data as $input_id => $val ) {
+                        if ( false !== strpos( $input_id , 'bg-' ) ) {
+                            $new_seks_data[$key]['bg'][$input_id] = $val;
+                        }
+                    }
+                }
+            }
+        } // module mapping
+        else if ( is_array( $value ) && array_key_exists('module_type', $value ) ) {
+            $new_seks_data[$key] = $value;
+            $new_value = $value['value'];
+
+            switch ( $value['module_type'] ) {
+                case 'czr_image_module':
+                    if ( is_array( $value['value'] ) ) {
+                        if ( array_key_exists( 'main_settings', $value['value'] ) || array_key_exists( 'borders_corners', $value['value'] ) )
+                          break;
+                        $new_value = array( 'main_settings' => array(), 'borders_corners' => array() );
+                        foreach ( $value['value'] as $input_id => $input_data ) {
+                            if ( in_array( $input_id, array( 'main_settings', 'borders_corners' ) ) )
+                              break;
+                            switch ($input_id) {
+                                case 'border-type':
+                                case 'borders':
+                                case 'border_radius_css':
+                                    $new_value['borders_corners'][$input_id] = $input_data;
+                                break;
+
+                                default:
+                                    $new_value['main_settings'][$input_id] = $input_data;
+                                break;
+                            }
+                        }
+                    }
+                break;
+
+                case 'czr_tiny_mce_editor_module':
+                    if ( is_array( $value['value'] ) ) {
+                        if ( array_key_exists( 'main_settings', $value['value'] ) || array_key_exists( 'font_settings', $value['value'] ) )
+                          break;
+                        $new_value = array( 'main_settings' => array(), 'font_settings' => array() );
+                        foreach ( $value['value'] as $input_id => $input_data ) {
+                            if ( in_array( $input_id, array( 'main_settings', 'font_settings' ) ) )
+                              break;
+                            switch ($input_id) {
+                                case 'content':
+                                case 'h_alignment_css':
+                                    $new_value['main_settings'][$input_id] = $input_data;
+                                break;
+
+                                default:
+                                    $new_value['font_settings'][$input_id] = $input_data;
+                                break;
+                            }
+                        }
+                    }
+                break;
+                default :
+                    $new_value = $value['value'];
+                break;
+            }
+
+            $new_seks_data[$key]['value'] = $new_value;
+        } else if ( is_array($value) ) {
+            $new_seks_data[$key] = sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $value );
+        }
+    }
+    return $new_seks_data;
+}
+?><?php
 register_post_type( NIMBLE_CPT , array(
     'labels' => array(
       'name'          => __( 'Nimble sections', 'text_domain_to_be_replaced' ),
@@ -704,133 +843,6 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
         return $r;
     }
     return get_post( $r );
-}
-function sek_do_compat_1_0_to_1_1() {
-    if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
-      return;
-    if ( 'done' === get_transient( 'sek_do_compat_1_0_to_1_1' ) )
-      return;
-    $sek_post_query_vars = array(
-        'post_type'              => NIMBLE_CPT,
-        'post_status'            => get_post_stati(),
-        'posts_per_page'         => -1,
-        'no_found_rows'          => true,
-        'cache_results'          => true,
-        'update_post_meta_cache' => false,
-        'update_post_term_cache' => false,
-        'lazy_load_term_meta'    => false,
-    );
-    $query = new \WP_Query( $sek_post_query_vars );
-    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
-      return;
-
-    foreach ($query->posts as $post_object ) {
-        if ( $post_object ) {
-            $seks_data = maybe_unserialize( $post_object->post_content );
-        }
-
-        $seks_data = is_array( $seks_data ) ? $seks_data : array();
-        if ( empty( $seks_data ) )
-          continue;
-        $seks_data = sek_walk_levels_and_do_map_compat( $seks_data );
-        $new_post_data = array(
-            'ID'          => $post_object->ID,
-            'post_title'  => $post_object->post_title,
-            'post_name'   => sanitize_title( $post_object->post_title ),
-            'post_type'   => NIMBLE_CPT,
-            'post_status' => 'publish',
-            'post_content' => maybe_serialize( $seks_data )
-        );
-        $r = wp_update_post( wp_slash( $new_post_data ), true );
-        if ( is_wp_error( $r ) ) {
-            sek_error_log( __FUNCTION__ . ' => error', $r );
-        }
-    }
-    set_transient( 'sek_do_compat_1_0_to_1_1', 'done', 60*60*24*3650 );
-}
-function sek_walk_levels_and_do_map_compat( $seks_data ) {
-    $new_seks_data = array();
-    foreach ( $seks_data as $key => $value ) {
-        if ( is_array($value) && array_key_exists('level', $value) && ! array_key_exists('ver_ini', $value) ) {
-            $value['ver_ini'] = '1.0.4';
-        }
-        $new_seks_data[$key] = $value;
-        if ( ! empty( $value ) && is_array( $value ) && 'options' === $key ) {
-            if ( array_key_exists( 'bg', $value ) )
-              continue;
-            $new_seks_data[$key] = array();
-            foreach( $value as $_opt_group => $_opt_group_data ) {
-                if ( 'spacing' === $_opt_group || 'layout' === $_opt_group )
-                  continue;
-                if ( 'bg_border' === $_opt_group ) {
-                    foreach ( $_opt_group_data as $input_id => $val ) {
-                        if ( false !== strpos( $input_id , 'bg-' ) ) {
-                            $new_seks_data[$key]['bg'][$input_id] = $val;
-                        }
-                    }
-                }
-            }
-        } // module mapping
-        else if ( is_array( $value ) && array_key_exists('module_type', $value ) ) {
-            $new_seks_data[$key] = $value;
-            $new_value = $value['value'];
-
-            switch ( $value['module_type'] ) {
-                case 'czr_image_module':
-                    if ( is_array( $value['value'] ) ) {
-                        if ( array_key_exists( 'main_settings', $value['value'] ) || array_key_exists( 'borders_corners', $value['value'] ) )
-                          break;
-                        $new_value = array( 'main_settings' => array(), 'borders_corners' => array() );
-                        foreach ( $value['value'] as $input_id => $input_data ) {
-                            if ( in_array( $input_id, array( 'main_settings', 'borders_corners' ) ) )
-                              break;
-                            switch ($input_id) {
-                                case 'border-type':
-                                case 'borders':
-                                case 'border_radius_css':
-                                    $new_value['borders_corners'][$input_id] = $input_data;
-                                break;
-
-                                default:
-                                    $new_value['main_settings'][$input_id] = $input_data;
-                                break;
-                            }
-                        }
-                    }
-                break;
-
-                case 'czr_tiny_mce_editor_module':
-                    if ( is_array( $value['value'] ) ) {
-                        if ( array_key_exists( 'main_settings', $value['value'] ) || array_key_exists( 'font_settings', $value['value'] ) )
-                          break;
-                        $new_value = array( 'main_settings' => array(), 'font_settings' => array() );
-                        foreach ( $value['value'] as $input_id => $input_data ) {
-                            if ( in_array( $input_id, array( 'main_settings', 'font_settings' ) ) )
-                              break;
-                            switch ($input_id) {
-                                case 'content':
-                                case 'h_alignment_css':
-                                    $new_value['main_settings'][$input_id] = $input_data;
-                                break;
-
-                                default:
-                                    $new_value['font_settings'][$input_id] = $input_data;
-                                break;
-                            }
-                        }
-                    }
-                break;
-                default :
-                    $new_value = $value['value'];
-                break;
-            }
-
-            $new_seks_data[$key]['value'] = $new_value;
-        } else if ( is_array($value) ) {
-            $new_seks_data[$key] = sek_walk_levels_and_do_map_compat( $value );
-        }
-    }
-    return $new_seks_data;
 }
 ?><?php
 require_once(  dirname( __FILE__ ) . '/customizer/seks_tiny_mce_editor_actions.php' );
@@ -1189,8 +1201,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_domain_to_be_replaced'),
             'Select a content type' => __('Select a content type', 'text_domain_to_be_replaced'),
 
-            'Intro Sections' => __('Intro Sections', 'text_domain_to_be_replaced'),
-            'Features Sections' => __('Features Sections', 'text_domain_to_be_replaced'),
+            'Sections for an introduction' => __('Sections for an introduction', 'text_domain_to_be_replaced'),
+            'Sections for services and features' => __('Sections for services and features', 'text_domain_to_be_replaced'),
 
             'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
 
@@ -1681,6 +1693,12 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     $content_collection = array(
                         array(
                             'content-type' => 'preset_section',
+                            'content-id' => 'intro_three',
+                            'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
+                            'thumb' => 'intro_three.jpg'
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
                             'content-id' => 'intro_one',
                             'title' => __('1 column, full-width background', 'text-domain' ),
                             'thumb' => 'intro_one.jpg'
@@ -1690,12 +1708,6 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                             'content-id' => 'intro_two',
                             'title' => __('2 columns, call to action, full-width background', 'text-domain' ),
                             'thumb' => 'intro_two.jpg'
-                        ),
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'intro_three',
-                            'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
-                            'thumb' => 'intro_three.jpg'
                         )
                     );
                 break;
@@ -1703,10 +1715,15 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     $content_collection = array(
                         array(
                             'content-type' => 'preset_section',
-                            'content-id' => 'img_text_two',
-                            'title' => __('2 columns with image and text', 'text-domain' ),
-                            'thumb' => 'img_text_two.jpg',
-                            'height' => '188px'
+                            'content-id' => 'features_one',
+                            'title' => __('3 columns with icon and call to action', 'text-domain' ),
+                            'thumb' => 'features_one.jpg',
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'features_two',
+                            'title' => __('3 columns with icon', 'text-domain' ),
+                            'thumb' => 'features_two.jpg',
                         )
                     );
                 break;
@@ -1971,7 +1988,7 @@ function sek_get_fa_icon_list_tmpl( $html, $requested_tmpl = '', $posted_params 
 }
 function sek_retrieve_decoded_font_awesome_icons() {
     $faicons_json_path      = NIMBLE_BASE_PATH . '/assets/faicons.json';
-    $faicons_transient_name = 'sek_font_awesome_july_2018';
+    $faicons_transient_name = 'sek_font_awesome_october_2018';
     if ( false == get_transient( $faicons_transient_name ) ) {
         if ( file_exists( $faicons_json_path ) ) {
             $faicons_raw      = @file_get_contents( $faicons_json_path );
@@ -3238,7 +3255,7 @@ function sek_get_module_params_for_sek_intro_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_intro_sec_picker_module',
-        'name' => __('Intro Sections', 'text_domain_to_be_replaced'),
+        'name' => __('Sections for an introduction', 'text_domain_to_be_replaced'),
         'tmpl' => array(
             'item-inputs' => array(
                 'intro_sections' => sek_get_default_section_input_params()
@@ -3250,7 +3267,7 @@ function sek_get_module_params_for_sek_features_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_features_sec_picker_module',
-        'name' => __('Features Sections', 'text_domain_to_be_replaced'),
+        'name' => __('Sections for services and features', 'text_domain_to_be_replaced'),
         'tmpl' => array(
             'item-inputs' => array(
                 'features_sections' => sek_get_default_section_input_params()
@@ -3727,9 +3744,8 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
 
         $parent_section = sek_get_parent_level_model( $level['id'] );
 
-        if ( $total_horizontal_margin > 0 && !empty( $parent_section ) ) {
+        if ( $total_horizontal_margin > 0 && is_array( $parent_section ) && !empty( $parent_section ) ) {
             $total_horizontal_margin_with_unit = $total_horizontal_margin . $device_unit;//20px
-
 
             $col_number = ( array_key_exists( 'collection', $parent_section ) && is_array( $parent_section['collection'] ) ) ? count( $parent_section['collection'] ) : 1;
             $col_number = 12 < $col_number ? 12 : $col_number;
@@ -3750,14 +3766,15 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
 
             if ( $has_section_custom_breakpoint ) {
                 $breakpoint = $section_custom_breakpoint;
+                $selector =  sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
             } else if ( $has_global_custom_breakpoint ) {
                 $breakpoint = $global_custom_breakpoint;
+                $selector = sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
             }
 
             $responsive_css_rules = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', $col_width_in_percent, $total_horizontal_margin_with_unit );
-
             $rules[] = array(
-                'selector' => sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] ),
+                'selector' => $selector,
                 'css_rules' => $responsive_css_rules,
                 'mq' => "(min-width: {$breakpoint}px)"
             );
@@ -4179,6 +4196,7 @@ function sek_get_module_params_for_sek_local_widths() {
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
+                    'notice_after' => __('Those width options will be applied by default to the Nimble sections of the currently previewed page, unless a section has specific width options.')
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker',
@@ -4341,6 +4359,7 @@ function sek_get_module_params_for_sek_global_widths() {
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
+                    'notice_after' => __('Those width options will be applied by default to all Nimble sections of your site, unless a page or a section has specific width options.')
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker',
@@ -4903,6 +4922,7 @@ function sek_get_module_params_for_czr_heading_spacing_child() {
                     'title'       => __( 'Margin and padding', 'text_domain_to_be_replaced' ),
                     'default'     => array( 'desktop' => array() ),
                     'width-100'   => true,
+                    'title_width' => 'width-100',
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'spacing_with_device_switcher',
@@ -7004,7 +7024,7 @@ function sek_get_module_params_for_czr_font_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_font_child',
-        'name' => __( 'Font settings', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Text settings : font, color, size, ...', 'text_domain_to_be_replaced' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'font_family_css' => array(

@@ -1447,7 +1447,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         sek_intro_sec_picker_module : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_intro_sec_picker_module',
-                              controlLabel :  sektionsLocalizedData.i18n['Intro Sections'],
+                              controlLabel :  sektionsLocalizedData.i18n['Sections for an introduction'],
                               content_type : 'section',
                               expandAndFocusOnInit : true,
                               priority : 10,
@@ -1456,7 +1456,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         sek_features_sec_picker_module : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_features_sec_picker_module',
-                              controlLabel :  sektionsLocalizedData.i18n['Features Sections'],
+                              controlLabel :  sektionsLocalizedData.i18n['Sections for services and features'],
                               content_type : 'section',
                               expandAndFocusOnInit : false,
                               priority : 10,
@@ -1993,17 +1993,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 }
                                           }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
-                                    var initialModuleValues = {},
-                                        startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
+                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
                                         currentSetValue = api( self.sekCollectionSettingId() )(),
                                         allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.options ) ? currentSetValue.options : {} ),
-                                        optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {};
+                                        optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {},
+                                        initialModuleValues = optionTypeValue;
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
                                           var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
-                                          initialModuleValues = $.extend( clonedStartingModuleValue, optionTypeValue );
+                                          initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
                                     }
-
                                     api.CZR_Helpers.register( {
                                           origin : 'nimble',
                                           level : params.level,
