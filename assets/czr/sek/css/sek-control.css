@@ -82,9 +82,25 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
 
 [data-sek-content-type="preset_section"] {
   width: 95%;
-  height: 130px;
+  height: 165px;
+  position: relative
 }
-
+[data-sek-content-type="preset_section"] .sek-overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000000;
+    opacity: 0;
+     -webkit-transition: opacity .35s ease;
+    transition: opacity .35s ease;
+    -o-transition: opacity .35s ease;
+}
+[data-sek-content-type="preset_section"]:hover .sek-overlay {
+    opacity: 0.15;
+}
 [data-sek-content-type]:hover {
   -webkit-box-shadow: 0 12px 20px rgba(0,0,0,.2);
   box-shadow: 0 12px 20px rgba(0,0,0,.2);
@@ -403,7 +419,19 @@ div[data-sek-align] {
     border-radius: 4px;
     cursor: pointer;
 }
-
+horizAlignmentWithDeviceSwitcher
+div[data-input-type="horizTextAlignmentWithDeviceSwitcher"] .czr-input {
+  text-align: center;
+}
+div[data-input-type="horizTextAlignmentWithDeviceSwitcher"] .sek-h-align-wrapper {
+  display: inline-block;
+}
+div[data-input-type="horizAlignmentWithDeviceSwitcher"] .czr-input {
+  text-align: center;
+}
+div[data-input-type="horizAlignmentWithDeviceSwitcher"] .sek-h-align-wrapper {
+  display: inline-block;
+}
 .sek-h-align-wrapper .sek-align-icons {
   float: right
 }
