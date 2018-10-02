@@ -169,9 +169,21 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     $content_collection = array(
                         array(
                             'content-type' => 'preset_section',
-                            'content-id' => 'img_text_one',
-                            'title' => __('2 columns with image and text', 'text-domain' ),
-                            'thumb' => 'img_text_one.jpg'
+                            'content-id' => 'intro_one',
+                            'title' => __('1 column, full-width background', 'text-domain' ),
+                            'thumb' => 'intro_one.jpg'
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'intro_two',
+                            'title' => __('2 columns, call to action, full-width background', 'text-domain' ),
+                            'thumb' => 'intro_two.jpg'
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'intro_three',
+                            'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
+                            'thumb' => 'intro_three.jpg'
                         )
                     );
                 break;
@@ -188,7 +200,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                 break;
             }
             foreach( $content_collection as $_params) {
-                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"></div>',
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"><div class="sek-overlay"></div></div>',
                     $_params['content-type'],
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
