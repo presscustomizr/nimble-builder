@@ -534,11 +534,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // @hook 'template_include'
         // @return template path
         function sek_maybe_set_local_nimble_template( $template ) {
+            //sek_error_log('sek_get_skoped_seks( skp_get_skope_id() )', sek_get_skoped_seks( skp_get_skope_id() ) );
             $locale_template = sek_get_locale_template();
             if ( !empty( $locale_template ) ) {
                 $template = $locale_template;
             }
-            // error_log( 'DID_ACTION WP => ' . did_action('wp') );
+            //sek_error_log( 'TEMPLATE ? => ' . did_action('wp'), $template );
             return $template;
         }
     }//class
