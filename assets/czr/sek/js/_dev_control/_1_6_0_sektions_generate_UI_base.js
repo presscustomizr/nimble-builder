@@ -26,11 +26,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // The registered elements are cleaned (self.cleanRegistered()) in the callbacks,
                         // because we want to check if the requested UI is not the one already rendered, and fire a button-see-me animation if yes.
                         case 'sek-generate-module-ui' :
-                              dfd = self.generateUIforFrontModules( params, dfd );
+                              try{ dfd = self.generateUIforFrontModules( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
                         break;
 
                         case 'sek-generate-level-options-ui' :
-                              dfd = self.generateUIforLevelOptions( params, dfd );
+                              try{ dfd = self.generateUIforLevelOptions( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
                         break;
 
                         // Possible content types :
@@ -39,21 +45,30 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         case 'sek-generate-draggable-candidates-picker-ui' :
                               // Clean previously generated UI elements
                               self.cleanRegistered();
-                              dfd = self.generateUIforDraggableContent( params, dfd );
+                              try{ dfd = self.generateUIforDraggableContent( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
                         break;
 
                         // Fired in ::initialize()
                         case 'sek-generate-local-skope-options-ui' :
                               // Clean previously generated UI elements
                               self.cleanRegistered();
-                              dfd = self.generateUIforLocalSkopeOptions( params, dfd );
+                              try{ dfd = self.generateUIforLocalSkopeOptions( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
                         break;
 
                         // Fired in ::initialize()
                         case 'sek-generate-global-options-ui' :
                               // Clean previously generated UI elements
                               self.cleanRegistered();
-                              dfd = self.generateUIforGlobalOptions( params, dfd );
+                              try{ dfd = self.generateUIforGlobalOptions( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
                         break;
                   }//switch
 
