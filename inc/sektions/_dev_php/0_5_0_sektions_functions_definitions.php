@@ -25,7 +25,7 @@ function register_location( $location ) {
 // @return array
 // @used when populating the customizer localized params
 function sek_get_default_sektions_value() {
-    $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
+    $defaut_sektions_value = [ 'collection' => [], 'local_options' => [] ];
     foreach( sek_get_locations() as $location ) {
         $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location ], SEK_Fire()->default_location_model );
     }
@@ -618,8 +618,9 @@ function sek_error_log( $title, $content = null ) {
 function sek_get_locale_template(){
     $path = null;
     $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
-    if ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['options']) && ! empty( $localSkopeNimble['options']['template'] ) && ! empty( $localSkopeNimble['options']['template']['local_template'] ) && 'default' !== $localSkopeNimble['options']['template']['local_template'] ) {
-        $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $localSkopeNimble['options']['template']['local_template'] . '.php';
+    $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
+    if ( ! empty( $local_options ) && ! empty( $local_options['template'] ) && ! empty( $local_options['template']['local_template'] ) && 'default' !== $local_options['template']['local_template'] ) {
+        $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $local_options['template']['local_template'] . '.php';
         if ( file_exists( $path ) ) {
             $template = $path;
         } else {

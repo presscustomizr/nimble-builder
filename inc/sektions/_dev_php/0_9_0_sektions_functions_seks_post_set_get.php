@@ -122,7 +122,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         $seks_data = is_array( $seks_data ) ? $seks_data : array();
 
         // normalizes
-        // [ 'collection' => [], 'options' => [] ];
+        // [ 'collection' => [], 'local_options' => [] ];
         $default_collection = sek_get_default_sektions_value();
         $seks_data = wp_parse_args( $seks_data, $default_collection );
 

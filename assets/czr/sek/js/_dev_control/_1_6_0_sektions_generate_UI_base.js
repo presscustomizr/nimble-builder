@@ -220,7 +220,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         } else {
                               // LEVEL OPTION CASE => LOCAL
                               return self.updateAPISetting({
-                                    action : params.uiParams.action,// mandatory : 'sek-generate-level-options-ui', 'sek_local_skope_options_module',...
+                                    action : params.uiParams.action,// mandatory : 'sek-generate-level-options-ui', 'sek-generate-local-skope-options-ui',...
                                     id : params.uiParams.id,
                                     value : moduleValueCandidate,
                                     in_column : params.uiParams.in_column,//not mandatory

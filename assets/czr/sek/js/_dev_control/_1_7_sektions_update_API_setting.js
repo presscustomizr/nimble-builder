@@ -695,10 +695,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //-------------------------------------------------------------------------------------------------
                               //-- LOCAL SKOPE OPTIONS
                               //-------------------------------------------------------------------------------------------------
+                              // Note : this is saved in "local_options"
                               case 'sek-generate-local-skope-options-ui' :
                                     _valueCandidate = {};
 
-                                    var _currentOptions = $.extend( true, {}, _.isObject( newSetValue.options ) ? newSetValue.options : {} );
+                                    var _currentOptions = $.extend( true, {}, _.isObject( newSetValue.local_options ) ? newSetValue.local_options : {} );
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
                                     _.each( params.value || {}, function( _val_, _key_ ) {
@@ -713,7 +714,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else {
                                           var newOptionsValues = {};
                                           newOptionsValues[ params.options_type ] = _valueCandidate;
-                                          newSetValue.options = $.extend( _currentOptions, newOptionsValues );
+                                          newSetValue.local_options = $.extend( _currentOptions, newOptionsValues );
                                     }
                               break;
 

@@ -37,7 +37,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_local_template',
                               controlLabel : sektionsLocalizedData.i18n['Page template'],
                               expandAndFocusOnInit : true,
-                              //icon : '<i class="material-icons sek-level-option-icon">devices</i>'
+                              icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
                         },
                         widths : {
                               settingControlId : _id_ + '__widths',
@@ -86,7 +86,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // Let's add the starting values if provided when registrating the module
                                     var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
                                         currentSetValue = api( self.sekCollectionSettingId() )(),
-                                        allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.options ) ? currentSetValue.options : {} ),
+                                        allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} ),
                                         optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {},
                                         initialModuleValues = optionTypeValue;
 
