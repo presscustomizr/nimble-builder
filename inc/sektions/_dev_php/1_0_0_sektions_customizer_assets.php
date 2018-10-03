@@ -513,18 +513,21 @@ function add_sektion_values_to_skope_export( $skopes ) {
 
 // @return array() of json decoded sections
 // used when js localizing the preset_sections for the customizer
+// the transient is refreshed
 function sek_get_preset_sektions() {
-    if ( false == get_transient( 'nimble_preset_sections_1_1_0' ) || ( defined( 'NIMBLE_DEV') && true === NIMBLE_DEV ) ) {
-        $preset_raw      = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
+    $transient_name = 'nimble_preset_sections_' . NIMBLE_VERSION;
+    $transient_data = get_transient( $transient_name );
+    if ( false == $transient_data || empty( $transient_data ) || ( defined( 'NIMBLE_DEV') && true === NIMBLE_DEV ) ) {
+        $preset_raw = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
         if ( $preset_raw === false ) {
           $preset_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
         }
 
-        $presets_decoded   = json_decode( $preset_raw, true );
-        set_transient( 'nimble_preset_sections_1_1_0' , $presets_decoded , 60*60*24*30 );
+        $presets_decoded = json_decode( $preset_raw, true );
+        set_transient( $transient_name , $presets_decoded , 60*60*24*30 );
     }
     else {
-        $presets_decoded = get_transient( 'nimble_preset_sections_1_1_0' );
+        $presets_decoded = $transient_data;
     }
     return $presets_decoded;
 }
