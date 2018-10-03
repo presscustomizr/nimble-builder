@@ -21,7 +21,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'id' => '',
             'level' => 'location',
             'collection' => [],
-            'options' => []
+            'options' => [],
+            'ver_ini' => NIMBLE_VERSION
         ];
 
         public static function get_instance( $params ) {
