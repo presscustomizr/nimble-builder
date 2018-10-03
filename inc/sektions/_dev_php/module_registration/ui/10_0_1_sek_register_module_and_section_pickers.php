@@ -20,7 +20,7 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
                     'notice_after' => sprintf(
                         __('Note : you can %1$s to replace your default theme template. Depending on your theme structure, it can allow you to display your sections in full-width mode.'),
                         sprintf('<a href="%2$s" title="%1$s">%1$s</a>',
-                            __('select the Nimble page template', 'text-domain'),
+                            __('use the Nimble page template', 'text-domain'),
                             "javascript:if ( sektionsLocalizedData && sektionsLocalizedData.sektionsPanelId ) { wp.customize.panel(sektionsLocalizedData.sektionsPanelId, function( _panel_ ) { try{wp.customize.czr_sektions.rootPanelFocus(); _panel_.focus();}catch(er){} } ) }"
                         )
                     )
