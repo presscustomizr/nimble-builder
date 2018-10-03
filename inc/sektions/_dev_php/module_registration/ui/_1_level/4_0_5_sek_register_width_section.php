@@ -7,15 +7,15 @@ function sek_get_module_params_for_sek_level_width_section() {
         'name' => __('Width options', 'text_domain_to_be_replaced'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'starting_value' => array(
-            'outer-section-width' => '100%',
-            'inner-section-width' => '100%'
-        ),
+        // 'starting_value' => array(
+        //     'outer-section-width' => '100%',
+        //     'inner-section-width' => '100%'
+        // ),
         'tmpl' => array(
             'item-inputs' => array(
-                'use-custom-width' => array(
+                'use-custom-outer-width' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Define custom outer and inner widths for this section', 'text_domain_to_be_replaced'),
+                    'title'       => __('Define a custom outer width for this section', 'text_domain_to_be_replaced'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -27,18 +27,27 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'title'       => __('Outer section width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default'     => array( 'desktop' => '100%' ),
+                    'default'     => array( 'desktop' => '' ),
                     'width-100'   => true,
-                    'title_width' => 'width-100',
+                    'title_width' => 'width-100'
+                ),
+                'use-custom-inner-width' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Define a custom inner width for this section', 'text_domain_to_be_replaced'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => true,
+                    'refresh_stylesheet' => true
                 ),
                 'inner-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Inner section width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default'     => array( 'desktop' => '100%' ),
+                    'default'     => array( 'desktop' => '' ),
                     'width-100'   => true,
-                    'title_width' => 'width-100',
+                    'title_width' => 'width-100'
                 )
             )
         )//tmpl
@@ -56,18 +65,23 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
     if ( empty( $options[ 'width' ] ) || ! is_array( $options[ 'width' ] ) )
       return $rules;
 
-    if ( empty( $options[ 'width' ][ 'use-custom-width' ] ) || false === sek_booleanize_checkbox_val( $options[ 'width' ][ 'use-custom-width' ] ) )
+    $width_options = $options[ 'width' ];
+    $user_widths = array();
+
+    if ( ! empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
+        $user_widths['outer-section-width'] = 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]';
+    }
+    if ( ! empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
+        $user_widths['inner-section-width'] = 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner';
+    }
+
+    if ( empty( $user_widths ) )
       return $rules;
 
-    $user_widths = array(
-        'outer-section-width' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]',
-        'inner-section-width' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner'
-    );
-
     foreach ( $user_widths as $width_opt_name => $selector ) {
-        if ( empty( $options[ 'width' ][ $width_opt_name ] ) )
+        if ( empty( $width_options[ $width_opt_name ] ) )
           continue;
-        $user_custom_width_value = $options[ 'width' ][ $width_opt_name ];
+        $user_custom_width_value = $width_options[ $width_opt_name ];
         if ( is_string( $user_custom_width_value ) ) {
             $numeric = sek_extract_numeric_value( $user_custom_width_value );
             if ( ! empty( $numeric ) ) {

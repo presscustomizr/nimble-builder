@@ -55,11 +55,13 @@
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    case 'use-custom-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
+                                    case 'use-custom-outer-width' :
+                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
                                                 return input();
                                           });
-                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
+                                    break;
+                                    case 'use-custom-inner-width' :
+                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
                                                 return input();
                                           });
                                     break;
