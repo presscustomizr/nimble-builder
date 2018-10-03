@@ -14,9 +14,16 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
             'item-inputs' => array(
                 'content_type' => array(
                     'input_type'  => 'content_type_switcher',
-                    'title'       => __('Which type of content would you like to insert in your page ?', 'text_domain_to_be_replaced'),
+                    'title'       => '',//__('Which type of content would you like to drop in your page ?', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'notice_after' => sprintf(
+                        __('Note : you can %1$s to replace your default theme template. Depending on your theme structure, it can allow you to display your sections in full-width mode.'),
+                        sprintf('<a href="%2$s" title="%1$s">%1$s</a>',
+                            __('select the Nimble page template', 'text-domain'),
+                            "javascript:if ( sektionsLocalizedData && sektionsLocalizedData.sektionsPanelId ) { wp.customize.panel(sektionsLocalizedData.sektionsPanelId, function( _panel_ ) { try{wp.customize.czr_sektions.rootPanelFocus(); _panel_.focus();}catch(er){} } ) }"
+                        )
+                    )
                 )
             )
         )

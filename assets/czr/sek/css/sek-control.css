@@ -544,6 +544,11 @@ div[data-sek-align].selected {
 }
 
 /* Button style for the content type switcher */
+.sek-content-type-wrapper {
+  margin-bottom: 8px;
+  width: 100%;
+  float: left;
+}
 .sek-content-type-wrapper .sek-ui-button-group {
   display: block;
 }
