@@ -3,11 +3,15 @@
       // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
 
-      var hAlignWithDeviceSwitcher = function( params ) {
+      // Generic method to instantiate the following input types :
+      // horizTextAlignmentWithDeviceSwitcher and horizAlignmentWithDeviceSwitcher => tmpl => 3_0_5_sek_input_tmpl_horizontal_alignment.php
+      // verticalAlignWithDeviceSwitcher => tmpl => 3_0_6_sek_input_tmpl_vertical_alignment.php
+      var x_or_y_AlignWithDeviceSwitcher = function( params ) {
             var input = this,
                 inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                 defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {},
-                $wrapper = $('.sek-h-align-wrapper', input.container );
+                tmplSelector = 'verticalAlignWithDeviceSwitcher' === input.type ? '.sek-v-align-wrapper' : '.sek-h-align-wrapper',// <= because used by 2 different input tmpl
+                $wrapper = $( tmplSelector, input.container );
 
             // SETUP
             api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
@@ -38,9 +42,6 @@
                   $wrapper.find( 'div[data-sek-align="' + _currentDeviceValue +'"]' ).addClass('selected');
             };
 
-            // on init
-            //$wrapper.find( 'div[data-sek-align="' + input() +'"]' ).addClass('selected');
-
             // on click
             $wrapper.on( 'click', '[data-sek-align]', function(evt) {
                   evt.preventDefault();
@@ -59,13 +60,13 @@
             // input.previewedDevice is updated in api.czr_sektions.maybeSetupDeviceSwitcherForInput()
             input.previewedDevice.bind( function( currentDevice ) {
                   try { syncWithPreviewedDevice( currentDevice ); } catch( er ) {
-                        api.errare('Error when firing syncWithPreviewedDevice for input type spacingWithDeviceSwitcher for input id ' + input.id , er );
+                        api.errare('Error when firing syncWithPreviewedDevice for input type : ' + input.type + ' for input id ' + input.id , er );
                   }
             });
 
             // INITIALIZES
             try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
-                  api.errare('Error when firing syncWithPreviewedDevice for input type bgPositionWithDeviceSwitcher for input id ' + input.id , er );
+                  api.errare('Error when firing syncWithPreviewedDevice for input type : ' + input.type + ' for input id ' + input.id , er );
             }
       };
 
@@ -75,7 +76,8 @@
       // For example, a content picker can be given params to display only taxonomies
       // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
-            horizTextAlignmentWithDeviceSwitcher : hAlignWithDeviceSwitcher,
-            horizAlignmentWithDeviceSwitcher : hAlignWithDeviceSwitcher
+            horizTextAlignmentWithDeviceSwitcher : x_or_y_AlignWithDeviceSwitcher,
+            horizAlignmentWithDeviceSwitcher : x_or_y_AlignWithDeviceSwitcher,
+            verticalAlignWithDeviceSwitcher : x_or_y_AlignWithDeviceSwitcher
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );

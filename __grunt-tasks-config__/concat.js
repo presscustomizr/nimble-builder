@@ -291,7 +291,7 @@ module.exports = {
       // Inputs
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_0_spacing_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_1_bg_position_input.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_2_vertical_alignment_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_2_vert_and_horiz_alignment_inputs.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_3_font_size_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_4_line_height_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_5_font_picker_input.js',
@@ -304,7 +304,6 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_1_border_radius.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_2_buttons_choice.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_3_reset_button.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_4_horizTextAlignmentWithDeviceSwitcher.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',

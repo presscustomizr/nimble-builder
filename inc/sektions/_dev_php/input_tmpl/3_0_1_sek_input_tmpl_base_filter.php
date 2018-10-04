@@ -35,7 +35,7 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'horizTextAlignmentWithDeviceSwitcher' :
             sek_set_input_tmpl___h_text_alignment( $input_id, $input_data );
         break;
-        case 'v_alignment' :
+        case 'verticalAlignWithDeviceSwitcher' :
             sek_set_input_tmpl___v_alignment( $input_id, $input_data );
         break;
         case 'font_picker' :
