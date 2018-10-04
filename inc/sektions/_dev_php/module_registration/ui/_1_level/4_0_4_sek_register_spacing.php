@@ -82,6 +82,9 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
             // define a default breakpoint : 768
             $breakpoint = Sek_Dyn_CSS_Builder::$breakpoints[ Sek_Dyn_CSS_Builder::COLS_MOBILE_BREAKPOINT ];//COLS_MOBILE_BREAKPOINT = 'md' <=> 768px
 
+            // define a default selector
+            $selector = sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
+
             // Is there a global custom breakpoint set ?
             $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
             $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
@@ -92,10 +95,11 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
 
             if ( $has_section_custom_breakpoint ) {
                 $breakpoint = $section_custom_breakpoint;
+                // In this case, we need to use ".sek-section-custom-breakpoint-col-{}"
+                // @see sek_add_css_rules_for_sections_breakpoint
                 $selector =  sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
             } else if ( $has_global_custom_breakpoint ) {
                 $breakpoint = $global_custom_breakpoint;
-                $selector = sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
             }
 
             $responsive_css_rules = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', $col_width_in_percent, $total_horizontal_margin_with_unit );
