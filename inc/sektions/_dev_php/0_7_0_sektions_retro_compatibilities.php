@@ -4,6 +4,7 @@
 function sek_maybe_do_version_mapping() {
     if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
       return;
+    //delete_option(NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS);
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
     $global_options = is_array( $global_options ) ? $global_options : array();
     $global_options['retro_compat_mappings'] = isset( $global_options['retro_compat_mappings'] ) ? $global_options['retro_compat_mappings'] : array();
