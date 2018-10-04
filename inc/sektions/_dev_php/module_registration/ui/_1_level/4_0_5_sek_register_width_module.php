@@ -25,12 +25,14 @@ function sek_get_module_params_for_sek_level_width_module() {
                     'title_width' => 'width-100',
                 ),
                 'h_alignment' => array(
-                    'input_type'  => 'h_alignment',
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'       => __('Horizontal alignment', 'text_domain_to_be_replaced'),
-                    'default'     => 'center',
+                    'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'h_alignment'
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 )
             )
         )//tmpl
@@ -45,75 +47,74 @@ function sek_get_module_params_for_sek_level_width_module() {
 add_filter( 'sek_add_css_rules_for__module__options', '\Nimble\sek_add_css_rules_for_module_width', 10, 3 );
 function sek_add_css_rules_for_module_width( $rules, $module ) {
     $options = empty( $module[ 'options' ] ) ? array() : $module['options'];
-    if ( empty( $options[ 'width' ] ) )
+    if ( empty( $options[ 'width' ] ) || ! is_array( $options[ 'width' ] ) )
       return $rules;
 
-    if ( ! empty( $options[ 'width' ][ 'h_alignment' ] ) ) {
-        $h_alignment_value = $options[ 'width' ][ 'h_alignment' ];
-        switch ( $h_alignment_value ) {
-            case 'left' :
-                $h_align_value = "flex-start";
-            break;
-            case 'center' :
-                $h_align_value = "center";
-            break;
-            case 'right' :
-                $h_align_value = "flex-end";
-            break;
-            default :
-                $h_align_value = "center";
-            break;
+    $width_options = $options[ 'width' ];
+
+    // ALIGNMENT BY DEVICE
+    if ( ! empty( $width_options[ 'h_alignment' ] ) ) {
+        if ( ! is_array( $width_options[ 'h_alignment' ] ) ) {
+            sek_error_log( __FUNCTION__ . ' => error => the h_alignment option should be an array( {device} => {alignment} )');
         }
-        $css_rules = '';
-        if ( isset( $h_align_value ) ) {
-            $css_rules .= 'align-self:' . $h_align_value;
+        $h_alignment_value = is_array( $width_options[ 'h_alignment' ] ) ? $width_options[ 'h_alignment' ] : array();
+        $h_alignment_value = wp_parse_args( $h_alignment_value, array(
+            'desktop' => '',
+            'tablet' => '',
+            'mobile' => ''
+        ));
+        $mapped_values = array();
+        foreach ( $h_alignment_value as $device => $align_val ) {
+            switch ( $align_val ) {
+                case 'left' :
+                    $mapped_values[$device] = "flex-start";
+                break;
+                case 'center' :
+                    $mapped_values[$device] = "center";
+                break;
+                case 'right' :
+                    $mapped_values[$device] = "flex-end";
+                break;
+            }
         }
 
-        if ( !empty( $css_rules ) ) {
-            $rules[]     = array(
-                    'selector' => '[data-sek-id="'.$module['id'].'"]',
-                    'css_rules' => $css_rules,
-                    'mq' =>null
-            );
-        }
+        $rules = sek_set_mq_css_rules( array(
+            'value' => $mapped_values,
+            'css_property' => 'align-self',
+            'selector' => '[data-sek-id="'.$module['id'].'"]'
+        ), $rules );
     }
 
-    if ( ! empty( $options[ 'width' ][ 'width-type' ] ) ) {
-        if ( 'custom' == $options[ 'width' ][ 'width-type' ] && array_key_exists( 'custom-width', $options[ 'width' ] ) ) {
-            $user_custom_width_value = $options[ 'width' ][ 'custom-width' ];
+
+    // CUSTOM WIDTH BY DEVICE
+    if ( ! empty( $width_options[ 'width-type' ] ) ) {
+        if ( 'custom' == $width_options[ 'width-type' ] && array_key_exists( 'custom-width', $width_options ) ) {
+            $user_custom_width_value = $width_options[ 'custom-width' ];
             $selector = '[data-sek-id="'.$module['id'].'"]';
 
-            if ( is_string( $user_custom_width_value ) ) {
-                $numeric = sek_extract_numeric_value( $user_custom_width_value );
-                if ( ! empty( $numeric ) ) {
-                    $unit = sek_extract_unit( $user_custom_width_value );
-                    $rules[]     = array(
-                            'selector' => $selector,// we need to use the specificity body .sektion-wrapper, in order to override any local skope or global inner / outer setting
-                            'css_rules' => sprintf( 'max-width:%1$s%2$s;margin: 0 auto;', $numeric, $unit ),
-                            'mq' =>null
-                    );
-                }
-            } else if ( is_array( $user_custom_width_value ) ) {
-                $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
-                    'desktop' => '100%',
-                    'tablet' => '',
-                    'mobile' => ''
-                ));
-                $width_value = $user_custom_width_value;
-                foreach ( $user_custom_width_value as $device => $num_unit ) {
-                    $numeric = sek_extract_numeric_value( $num_unit );
-                    if ( ! empty( $numeric ) ) {
-                        $unit = sek_extract_unit( $num_unit );
-                        $width_value[$device] = $numeric . $unit;
-                    }
-                }
-
-                $rules = sek_set_mq_css_rules(array(
-                    'value' => $width_value,
-                    'css_property' => 'width',
-                    'selector' => $selector
-                ), $rules );
+            if ( ! empty( $user_custom_width_value ) && ! is_array( $user_custom_width_value ) ) {
+                sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
             }
+            $user_custom_width_value = is_array( $user_custom_width_value ) ? $user_custom_width_value : array();
+            $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
+                'desktop' => '100%',
+                'tablet' => '',
+                'mobile' => ''
+            ));
+            $width_value = $user_custom_width_value;
+            foreach ( $user_custom_width_value as $device => $num_unit ) {
+                $numeric = sek_extract_numeric_value( $num_unit );
+                if ( ! empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $num_unit );
+                    $width_value[$device] = $numeric . $unit;
+                }
+            }
+
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $width_value,
+                'css_property' => 'width',
+                'selector' => $selector
+            ), $rules );
         }
     }
     //error_log( print_r($rules, true) );
