@@ -50,7 +50,7 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
     if ( empty( $options[ 'width' ] ) || ! is_array( $options[ 'width' ] ) )
       return $rules;
 
-    $width_options = $options[ 'width' ];
+    $width_options = is_array( $options[ 'width' ] ) ? $options[ 'width' ] : array();
 
     // ALIGNMENT BY DEVICE
     if ( ! empty( $width_options[ 'h_alignment' ] ) ) {
