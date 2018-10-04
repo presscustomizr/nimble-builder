@@ -861,7 +861,7 @@ credits : Gutenberg team @wordpress */
   /*visibility: hidden;*/
   opacity: 0.3;
   top : 0%;
-  background: rgba(0, 0, 0, 0.29);
+  background: rgba(0, 0, 0, 0.5);
   padding: 2px;
   z-index: 99999;
   display: -webkit-box;
@@ -936,6 +936,11 @@ body.nimble-top-bar-visible #nimble-top-bar {
 }
 #nimble-top-bar .sek-add-content button {
   padding-top: 3px;
+}
+#nimble-top-bar .sek-nimble-doc {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
 }
 
 
