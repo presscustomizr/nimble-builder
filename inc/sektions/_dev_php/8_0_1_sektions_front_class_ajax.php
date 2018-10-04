@@ -6,6 +6,13 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             add_action( 'wp_ajax_sek_get_content', array( $this, 'sek_get_level_content_for_injection' ) );
             //add_action( 'wp_ajax_sek_get_preview_ui_element', array( $this, 'sek_get_ui_content_for_injection' ) );
 
+            // Fetches the preset_sections
+            // This dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
+            // It allows us to hackily fetch anything from the server by using a specific dynamic suffix ( normally module type )
+            // $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
+            add_filter( "ac_set_ajax_czr_tmpl___preset_sections_server_collection", '\Nimble\sek_get_preset_sektions' );
+            // hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
+
             // This is the list of accepted actions
             $this -> ajax_action_map = array(
                   'sek-add-section',

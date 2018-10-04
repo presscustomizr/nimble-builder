@@ -65,7 +65,7 @@ function sek_enqueue_controls_js_css() {
 
                 'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 
-                'presetSections' => sek_get_preset_sektions(),
+                //'presetSections' => sek_get_preset_sektions(), <= fetched on demand in ajax
 
                 'registeredModules' => CZR_Fmk_Base() -> registered_modules,
 
@@ -415,7 +415,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_domain_to_be_replaced'),
             //
 
-            'General options' => __( 'General options', 'text_domain_to_be_replaced'),
+            'Site wide options' => __( 'Site wide options', 'text_domain_to_be_replaced'),
 
 
             // Levels
