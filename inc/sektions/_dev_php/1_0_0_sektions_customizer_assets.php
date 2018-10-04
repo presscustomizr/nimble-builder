@@ -596,6 +596,12 @@ function sek_print_nimble_customizer_tmpl() {
               <span class="screen-reader-text"><?php _e('Global settings', 'text_domain'); ?></span>
             </button>
           </div>
+          <div class="sek-nimble-doc" data-doc-href="https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin">
+            <span class="sek-pointer" title="<?php _e('Nimble online documentation', 'text_domain'); ?>"><?php _e('Nimble online documentation', 'text_domain'); ?></span>
+            <button class="far fa-question-circle" type="button" title="<?php _e('Nimble online documentation', 'text_domain'); ?>" data-nimble-state="enabled">
+              <span class="screen-reader-text"><?php _e('Nimble online documentation', 'text_domain'); ?></span>
+            </button>
+          </div>
       </div>
     </script>
     <?php

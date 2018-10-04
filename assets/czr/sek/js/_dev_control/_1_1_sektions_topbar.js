@@ -11,7 +11,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.toggleTopBar( visible );
                   });
 
-
                   self.mouseMovedRecently = new api.Value( {} );
                   self.mouseMovedRecently.bind( function( position ) {
                         self.topBarVisible( ! _.isEmpty( position ) );
@@ -125,6 +124,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $('.sek-add-content', '#nimble-top-bar').on( 'click', function(evt) {
                         evt.preventDefault();
                         api.previewer.trigger( 'sek-pick-content', {});
+                  });
+                  $('.sek-nimble-doc', '#nimble-top-bar').on( 'click', function(evt) {
+                        evt.preventDefault();
+                        window.open($(this).data('doc-href'), '_blank');
                   });
                   return $( '#nimble-top-bar' );
             },
