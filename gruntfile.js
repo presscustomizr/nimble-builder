@@ -70,10 +70,12 @@ module.exports = function(grunt) {
               'uglify:czr_sektions_customizer_libs_js',
 
               'cssmin:sek_customizer_css',
+              //'cssmin:czr_css_fmk_fonts',
 
               'sass:sek_main',
               'postcss:sek_main',
-              'cssmin:sek_front_css'
+              'cssmin:sek_front_css',
+              //'cssmin:sek_front_fonts_css'
           ],
 
           build : [
