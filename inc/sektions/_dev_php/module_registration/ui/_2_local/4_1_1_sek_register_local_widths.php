@@ -150,8 +150,13 @@ function sek_add_raw_local_widths_css( $css ) {
         if ( 'inner-section-width' === $width_opt_name ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
-                'css_property' => 'padding',
-                'selector' => '[data-sek-level="section"] > .sek-container-fluid'
+                'css_property' => 'padding-left',
+                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid'
+            ), $rules );
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $padding_of_the_parent_container,
+                'css_property' => 'padding-right',
+                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid'
             ), $rules );
         }
 

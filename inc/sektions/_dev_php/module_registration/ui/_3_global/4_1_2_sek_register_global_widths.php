@@ -87,27 +87,6 @@ function sek_get_module_params_for_sek_global_widths() {
 add_action('wp_head', '\Nimble\sek_write_global_custom_section_widths', 1000 );
 function sek_write_global_custom_section_widths() {
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    // if ( is_array( $global_options ) && ! empty( $global_options['widths'] ) ) {
-    //     $width_options = $global_options['widths'];
-    //     if ( ! empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
-    //         if ( ! empty( $width_options[ 'outer-section-width'] ) ) {
-    //               $numeric = sek_extract_numeric_value( $width_options[ 'outer-section-width'] );
-    //               if ( ! empty( $numeric ) ) {
-    //                   $unit = sek_extract_unit( $width_options[ 'outer-section-width'] );
-    //                   $css .= sprintf( '[data-sek-level="section"]{max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
-    //               }
-    //         }
-    //     }
-    //     if ( ! empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
-    //         if ( ! empty( $width_options[ 'inner-section-width'] ) ) {
-    //               $numeric = sek_extract_numeric_value( $width_options[ 'inner-section-width'] );
-    //               if ( ! empty( $numeric ) ) {
-    //                   $unit = sek_extract_unit( $width_options[ 'inner-section-width'] );
-    //                   $css .= sprintf( '[data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner {max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
-    //               }
-    //         }
-    //     }
-    // }
 
     if ( ! is_array( $global_options ) || empty( $global_options['widths'] ) || !is_array( $global_options['widths'] ) )
       return;
@@ -162,7 +141,12 @@ function sek_write_global_custom_section_widths() {
         if ( 'inner-section-width' === $width_opt_name ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
-                'css_property' => 'padding',
+                'css_property' => 'padding-left',
+                'selector' => '[data-sek-level="section"] > .sek-container-fluid'
+            ), $rules );
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $padding_of_the_parent_container,
+                'css_property' => 'padding-right',
                 'selector' => '[data-sek-level="section"] > .sek-container-fluid'
             ), $rules );
         }
