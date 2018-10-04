@@ -28,12 +28,14 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'title_width' => 'width-100',
                 ),
                 'v_alignment' => array(
-                    'input_type'  => 'v_alignment',
+                    'input_type'  => 'verticalAlignWithDeviceSwitcher',
                     'title'       => __('Inner vertical alignment', 'text_domain_to_be_replaced'),
-                    'default'     => 'center',
+                    'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'v_alignment'
+                    'css_identifier' => 'v_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
                 )
             )
         )//tmpl
@@ -51,43 +53,46 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
     if ( empty( $options[ 'height' ] ) )
       return $rules;
 
-    if ( ! empty( $options[ 'height' ][ 'v_alignment' ] ) ) {
-        $v_alignment_value = $options[ 'height' ][ 'v_alignment' ];
-        switch ( $v_alignment_value ) {
-            case 'top' :
-                $v_align_value = "flex-start";
-            break;
-            case 'center' :
-                $v_align_value = "center";
-            break;
-            case 'bottom' :
-                $v_align_value = "flex-end";
-            break;
-            default :
-                $v_align_value = "center";
-            break;
-        }
-        $css_rules = '';
-        if ( isset( $v_align_value ) ) {
-            $css_rules .= 'align-items:' . $v_align_value;
-        }
+    $height_options = is_array( $options[ 'height' ] ) ? $options[ 'height' ] : array();
 
-        if ( !empty( $css_rules ) ) {
-            $rules[]     = array(
-                    'selector' => '[data-sek-id="'.$level['id'].'"]',
-                    'css_rules' => $css_rules,
-                    'mq' =>null
-            );
+    if ( ! empty( $height_options[ 'v_alignment' ] ) ) {
+        if ( ! is_array( $height_options[ 'v_alignment' ] ) ) {
+            sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
         }
+        $v_alignment_value = is_array( $height_options[ 'v_alignment' ] ) ? $height_options[ 'v_alignment' ] : array();
+        $v_alignment_value = wp_parse_args( $v_alignment_value, array(
+            'desktop' => 'center',
+            'tablet' => '',
+            'mobile' => ''
+        ));
+        $mapped_values = array();
+        foreach ( $v_alignment_value as $device => $align_val ) {
+            switch ( $align_val ) {
+                case 'top' :
+                    $mapped_values[$device] = "flex-start";
+                break;
+                case 'center' :
+                    $mapped_values[$device] = "center";
+                break;
+                case 'bottom' :
+                    $mapped_values[$device] = "flex-end";
+                break;
+            }
+        }
+        $rules = sek_set_mq_css_rules( array(
+            'value' => $mapped_values,
+            'css_property' => 'align-items',
+            'selector' => '[data-sek-id="'.$level['id'].'"]'
+        ), $rules );
     }
 
     // CUSTOM HEIGHT BY DEVICE
-    if ( ! empty( $options[ 'height' ][ 'height-type' ] ) ) {
-        if ( 'custom' === $options[ 'height' ][ 'height-type' ] ) {
-            $custom_user_height = array_key_exists( 'custom-height', $options[ 'height' ] ) ? $options[ 'height' ][ 'custom-height' ] : array();
+    if ( ! empty( $height_options[ 'height-type' ] ) ) {
+        if ( 'custom' === $height_options[ 'height-type' ] ) {
+            $custom_user_height = array_key_exists( 'custom-height', $height_options ) ? $height_options[ 'custom-height' ] : array();
             $selector = '[data-sek-id="'.$level['id'].'"]';
             if ( ! is_array( $custom_user_height ) ) {
-                sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )');
+                sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
             }
             $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
             $custom_user_height = wp_parse_args( $custom_user_height, array(
