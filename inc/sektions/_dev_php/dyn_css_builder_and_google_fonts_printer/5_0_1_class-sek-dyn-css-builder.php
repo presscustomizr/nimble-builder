@@ -253,7 +253,7 @@ class Sek_Dyn_CSS_Builder {
 
 
     // @return string
-    private function sek_maybe_wrap_in_media_query( $css,  $mq_device = 'all_devices' ) {
+    public static function sek_maybe_wrap_in_media_query( $css,  $mq_device = 'all_devices' ) {
         if ( 'all_devices' === $mq_device ) {
             return $css;
         }
@@ -268,7 +268,7 @@ class Sek_Dyn_CSS_Builder {
     // sorts the media queries from all_devices to the smallest width
     // This doesn't make the difference between max-width and min-width
     // @return integer
-    private function user_defined_array_key_sort_fn($a, $b) {
+    public static function user_defined_array_key_sort_fn($a, $b) {
         if ( 'all_devices' === $a ) {
             return -1;
         }
@@ -287,7 +287,7 @@ class Sek_Dyn_CSS_Builder {
         $collection = apply_filters( 'nimble_css_rules_collection_before_printing_stylesheet', $this->collection );
         if ( is_array( $collection ) && !empty( $collection ) ) {
             // Sort the collection by media queries
-            uksort( $collection, array( $this, 'user_defined_array_key_sort_fn' ) );
+            uksort( $collection, array( get_called_class(), 'user_defined_array_key_sort_fn' ) );
 
             // process
             foreach ( $collection as $mq_device => $selectors ) {
@@ -297,12 +297,95 @@ class Sek_Dyn_CSS_Builder {
                     $_css .=  $selector . '{' . $css_rules . '}';
                     $_css =  str_replace(';;', ';', $_css);//@fixes https://github.com/presscustomizr/nimble-builder/issues/137
                 }
-                $_css = $this->sek_maybe_wrap_in_media_query( $_css, $mq_device );
+                $_css = self::sek_maybe_wrap_in_media_query( $_css, $mq_device );
                 $css .= $_css;
             }
         }
         return apply_filters( 'nimble_get_dynamic_stylesheet', $css );
     }
+
+
+
+
+
+
+
+    // Helper
+    // @return css string including media queries
+    // @used for example when generating the rules for used defined section widths locally and globally
+    public static function sek_generate_css_stylesheet_for_a_set_of_rules( $rules ) {
+        $rules_collection = array();
+        $css = '';
+
+        if ( empty( $rules ) || ! is_array( $rules ) )
+          return $css;
+
+        // POPULATE THE CSS RULES COLLECTION
+        foreach( $rules as $rule ) {
+            if ( ! is_array( $rule ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a css rule should be represented by an array', $rule );
+                continue;
+            }
+            if ( empty($rule['selector']) || ! is_string( $rule['selector'] ) ) {
+                sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . '=> a css rule is missing the selector param', $rule );
+                continue;
+            }
+
+            $selector = $rule[ 'selector' ];
+            $css_rules = $rule[ 'css_rules' ];
+            $mq = $rule[ 'mq' ];
+
+            if ( ! is_string( $css_rules ) )
+              continue;
+
+            // Assign a default media device
+            //TODO: allowed media query?
+            $mq_device = 'all_devices';
+
+            // If a media query is requested, build it
+            if ( !empty( $mq ) ) {
+                if ( false === strpos($mq, 'max') && false === strpos($mq, 'min')) {
+                    error_log( __FUNCTION__ . ' ' . __CLASS__ . ' => the media queries only accept max-width and min-width rules');
+                } else {
+                    $mq_device = $mq;
+                }
+            }
+
+            // if the media query for this device is not yet added, add it
+            if ( !isset( $rules_collection[ $mq_device ] ) ) {
+                $rules_collection[ $mq_device ] = array();
+            }
+
+            if ( !isset( $rules_collection[ $mq_device ][ $selector ] ) ) {
+                $rules_collection[ $mq_device ][ $selector ] = array();
+            }
+
+            $rules_collection[ $mq_device ][ $selector ][] = $css_rules;
+        }//foreach
+
+        // GENERATE CSS
+        if ( is_array( $rules_collection ) && !empty( $rules_collection ) ) {
+            // Sort the collection by media queries
+            // get_called_class() is supported by php >= 5.3.0. Nimble needs 5.4
+            // @see https://developer.wordpress.org/reference/functions/add_action/
+            uksort( $rules_collection, array( get_called_class(), 'user_defined_array_key_sort_fn' ) );
+
+            // process
+            foreach ( $rules_collection as $mq_device => $selectors ) {
+                $_css = '';
+                foreach ( $selectors as $selector => $css_rules ) {
+                    $css_rules = is_array( $css_rules ) ? implode( ';', $css_rules ) : $css_rules;
+                    $_css .=  $selector . '{' . $css_rules . '}';
+                    $_css =  str_replace(';;', ';', $_css);//@fixes https://github.com/presscustomizr/nimble-builder/issues/137
+                }
+                $_css = self::sek_maybe_wrap_in_media_query( $_css, $mq_device );
+                $css .= $_css;
+            }
+        }
+
+        return $css;
+    }//sek_generate_css_stylesheet_for_a_set_of_rules()
+
 
 
 
