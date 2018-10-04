@@ -82,7 +82,7 @@ function sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data ) {
             $value['ver_ini'] = '1.0.4';
         }
         $new_seks_data[$key] = $value;
-        // Level options mapping
+        // LEVEL OPTIONS mapping
         // remove spacing
         // remove layout
         // copy all background related options ( bg-* ) from "bg_border" to "bg"
@@ -97,7 +97,7 @@ function sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data ) {
               continue;
             $new_seks_data[$key] = array();
             foreach( $value as $_opt_group => $_opt_group_data ) {
-                if ( 'spacing' === $_opt_group || 'layout' === $_opt_group )
+                if ( 'layout' === $_opt_group )
                   continue;
                 if ( 'bg_border' === $_opt_group ) {
                     foreach ( $_opt_group_data as $input_id => $val ) {
@@ -106,8 +106,12 @@ function sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data ) {
                         }
                     }
                 }
+                if ( 'spacing' === $_opt_group ) {
+                    $new_seks_data[$key]['spacing'] = array( 'pad_marg' => sek_map_compat_1_0_4_to_1_1_0_do_level_spacing_mapping( $_opt_group_data ) );
+                }
             }
-        } // module mapping
+        } // end of Level mapping
+        // MODULE mapping
         else if ( is_array( $value ) && array_key_exists('module_type', $value ) ) {
             $new_seks_data[$key] = $value;
             // Assign a default value to the new_value in case we have no matching case
@@ -166,13 +170,82 @@ function sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data ) {
                     $new_value = $value['value'];
                 break;
             }
-
             $new_seks_data[$key]['value'] = $new_value;
-        } else if ( is_array($value) ) {
-            // go recursive
+        } // End of module mapping
+        // go recursive if possible
+        else if ( is_array($value) ) {
             $new_seks_data[$key] = sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $value );
         }
     }
     return $new_seks_data;
+}
+
+// mapping from
+// [spacing] => Array
+// (
+//     [desktop_pad_marg] => Array
+//         (
+//             [padding-top] => 20
+//             [padding-bottom] => 20
+//         )
+
+//     [desktop_unit] => em
+//     [tablet_pad_marg] => Array
+//         (
+//             [padding-left] => 30
+//             [padding-right] => 30
+//         )
+
+//     [tablet_unit] => percent
+// )
+// to
+// [spacing] => Array
+// (
+//     [pad_marg] => Array
+//         (
+//             [desktop] => Array
+//                 (
+//                     [padding-top] => 20
+//                     [padding-bottom] => 20
+//                     [unit] => em
+//                 )
+
+//             [tablet] => Array
+//                 (
+//                     [padding-right] => 30
+//                     [padding-left] => 30
+//                     [unit] => %
+//                 )
+
+//         )
+
+// )
+function sek_map_compat_1_0_4_to_1_1_0_do_level_spacing_mapping( $old_user_data ) {
+    $old_data_structure = array(
+        'desktop_pad_marg',
+        'desktop_unit',
+        'tablet_pad_marg',
+        'tablet_unit',
+        'mobile_pad_marg',
+        'mobile_unit'
+    );
+    //sek_error_log('$old_user_data', $old_user_data);
+    $mapped_data = array();
+    foreach ( $old_data_structure as $old_key ) {
+        if ( false !== strpos( $old_key , 'pad_marg' ) ) {
+            $device = str_replace('_pad_marg', '', $old_key );
+            if ( array_key_exists( $old_key, $old_user_data ) ) {
+                $mapped_data[$device] = $old_user_data[$old_key];
+            }
+        }
+        if ( false !== strpos( $old_key , 'unit' ) ) {
+            $device = str_replace('_unit', '', $old_key );
+            if ( array_key_exists( $old_key, $old_user_data ) ) {
+                $mapped_data[$device] = is_array( $mapped_data[$device] ) ? $mapped_data[$device] : array();
+                $mapped_data[$device]['unit'] = 'percent' === $old_user_data[$old_key] ? '%' : $old_user_data[$old_key];
+            }
+        }
+    }
+    return $mapped_data;
 }
 ?>
