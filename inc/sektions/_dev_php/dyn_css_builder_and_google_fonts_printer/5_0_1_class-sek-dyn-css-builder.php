@@ -43,6 +43,8 @@ class Sek_Dyn_CSS_Builder {
         // filter fired in sek_css_rules_sniffer_walker()
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
 
+        //sek_error_log('FIRING THE CSS BUILDER');
+
         $this->sek_css_rules_sniffer_walker();
     }
 
