@@ -254,7 +254,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         origin : 'nimble',
                         what : 'section',
                         id : '__globalAndLocalOptionsSection',
-                        title: sektionsLocalizedData.i18n['General options'],
+                        title: sektionsLocalizedData.i18n['Site wide options'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 20,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
