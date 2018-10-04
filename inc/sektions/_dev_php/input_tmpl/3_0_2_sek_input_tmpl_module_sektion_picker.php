@@ -205,6 +205,28 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                         )
                     );
                 break;
+                case 'layout_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'two_columns',
+                            'title' => __('two columns layout', 'text-domain' ),
+                            'thumb' => 'two_columns.jpg'
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'three_columns',
+                            'title' => __('three columns layout', 'text-domain' ),
+                            'thumb' => 'three_columns.jpg'
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'four_columns',
+                            'title' => __('four columns layout', 'text-domain' ),
+                            'thumb' => 'four_columns.jpg'
+                        ),
+                    );
+                break;
             }
             foreach( $content_collection as $_params) {
                 printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"><div class="sek-overlay"></div></div>',

@@ -95,4 +95,17 @@ function sek_get_module_params_for_sek_features_sec_picker_module() {
         )
     );
 }
+
+function sek_get_module_params_for_sek_column_layouts_sec_picker_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_column_layouts_sec_picker_module',
+        'name' => __('Empty sections with columns layout', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'layout_sections' => sek_get_default_section_input_params()
+            )
+        )
+    );
+}
 ?>

@@ -9,6 +9,7 @@ function sek_register_modules() {
 
         'sek_intro_sec_picker_module',
         'sek_features_sec_picker_module',
+        'sek_column_layouts_sec_picker_module',
 
         // UI LEVEL MODULES
         'sek_level_bg_module',
