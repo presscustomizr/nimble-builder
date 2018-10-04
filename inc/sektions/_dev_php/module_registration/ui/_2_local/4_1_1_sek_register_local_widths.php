@@ -27,7 +27,7 @@ function sek_get_module_params_for_sek_local_widths() {
                     'title'       => __('Outer sections width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default'     => array( 'desktop' => '' ),
+                    'default'     => array( 'desktop' => '100%' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'refresh_markup' => false,
@@ -48,7 +48,7 @@ function sek_get_module_params_for_sek_local_widths() {
                     'title'       => __('Inner sections width', 'text_domain_to_be_replaced'),
                     'min' => 0,
                     'max' => 500,
-                    'default'     => array( 'desktop' => '' ),
+                    'default'     => array( 'desktop' => '100%' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'refresh_markup' => false,
@@ -61,35 +61,111 @@ function sek_get_module_params_for_sek_local_widths() {
 }
 
 
-// add user local custom css
+// Add user local custom inner and outer widths for the sections
+// Data structure since v1.1.0. Oct 2018
+// [width] => Array
+// (
+//   [use-custom-outer-width] => 1
+//   [outer-section-width] => Array
+//       (
+//           [desktop] => 99%
+//           [mobile] => 66%
+//           [tablet] => 93%
+//       )
+
+//   [use-custom-inner-width] => 1
+//   [inner-section-width] => Array
+//       (
+//           [desktop] => 98em
+//           [tablet] => 11em
+//           [mobile] => 8em
+//       )
+// )
+// The inner and outer widths can be set at 3 levels :
+// 1) global
+// 2) skope ( local )
+// 3) section
+// And for 3 different types of devices : desktop, tablet, mobiles.
+//
+// Nimble implements an inheritance for both logic, determined by the css selectors, and the media query rules.
+// For example, an inner width of 85% applied for skope will win against the global one, but can be overriden by a specific inner width set at a section level.
 add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_widths_css' );
 //@filter 'nimble_get_dynamic_stylesheet'
 function sek_add_raw_local_widths_css( $css ) {
+    $css = is_string( $css ) ? $css : '';
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
     // otherwise we fallback on the normal utility skp_build_skope_id()
     $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
-    if ( is_array( $local_options ) && !empty( $local_options['local_options']) && ! empty( $local_options['local_options']['widths'] ) ) {
-        $width_options = $local_options['local_options']['widths'];
 
-        if ( ! empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
-            if ( ! empty( $width_options['outer-section-width'] ) ) {
-                  $numeric = sek_extract_numeric_value( $width_options['outer-section-width'] );
-                  if ( ! empty( $numeric ) ) {
-                      $unit = sek_extract_unit( $width_options['outer-section-width'] );
-                      $css .= sprintf( '.sektion-wrapper [data-sek-level="section"]{max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
-                  }
-            }
-        }
-        if ( ! empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
-            if ( ! empty( $width_options['inner-section-width'] ) ) {
-                  $numeric = sek_extract_numeric_value( $width_options[ 'inner-section-width'] );
-                  if ( ! empty( $numeric ) ) {
-                      $unit = sek_extract_unit( $width_options[ 'inner-section-width'] );
-                      $css .= sprintf( '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner {max-width:%1$s%2$s;margin: 0 auto;}', $numeric, $unit );
-                  }
-            }
-        }
+    if ( ! is_array( $local_options ) || empty( $local_options['local_options']) || empty( $local_options['local_options']['widths'] ) )
+      return $css;
+
+    $width_options = $local_options['local_options']['widths'];
+    $user_defined_widths = array();
+
+    if ( ! empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
+        $user_defined_widths['outer-section-width'] = '.sektion-wrapper [data-sek-level="section"]';
     }
-    return $css;
+    if ( ! empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
+        $user_defined_widths['inner-section-width'] = '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner';
+    }
+
+    $rules = array();
+
+    // Note that the option 'outer-section-width' and 'inner-section-width' can be empty when set to a value === default
+    // @see js czr_setions::normalizeAndSanitizeSingleItemInputValues()
+    foreach ( $user_defined_widths as $width_opt_name => $selector ) {
+        if ( ! empty( $width_options[ $width_opt_name ] ) && ! is_array( $width_options[ $width_opt_name ] ) ) {
+            sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
+        }
+        // $width_options[ $width_opt_name ] should be an array( {device} => {number}{unit} )
+        // If not set in the width options , it means that it is equal to default
+        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || ! is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
+        $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
+            'desktop' => '100%',
+            'tablet' => '',
+            'mobile' => ''
+        ));
+        $max_width_value = $user_custom_width_value;
+        $margin_value = array();
+
+        foreach ( $user_custom_width_value as $device => $num_unit ) {
+            $numeric = sek_extract_numeric_value( $num_unit );
+            if ( ! empty( $numeric ) ) {
+                $unit = sek_extract_unit( $num_unit );
+                $max_width_value[$device] = $numeric . $unit;
+                $margin_value[$device] = '0 auto';
+                $padding_of_the_parent_container[$device] = 'inherit';
+            }
+        }
+
+        $rules = sek_set_mq_css_rules(array(
+            'value' => $max_width_value,
+            'css_property' => 'max-width',
+            'selector' => $selector
+        ), $rules );
+
+        // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
+        // @see assets/front/scss/_grid.scss
+        if ( 'inner-section-width' === $width_opt_name ) {
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $padding_of_the_parent_container,
+                'css_property' => 'padding',
+                'selector' => '[data-sek-level="section"] > .sek-container-fluid'
+            ), $rules );
+        }
+
+        if ( ! empty( $margin_value ) ) {
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $margin_value,
+                'css_property' => 'margin',
+                'selector' => $selector
+            ), $rules );
+        }
+    }//foreach
+
+    $width_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
+
+    return is_string( $width_options_css ) ? $css . $width_options_css : $css;
 }
 ?>
