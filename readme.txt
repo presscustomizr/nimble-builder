@@ -22,6 +22,9 @@ The Nimble Builder is a lightweight section builder intended to be the content c
 * Leverage the customizer auto-drafting and schedule publishing features, and safely build and save drafts of your content before deploying in production.
 * Works in any WordPress contexts : home, pages, posts, custom post types, archives, author pages, search page, ...
 
+== Documentation ==
+You'll find an online knowledge base for the Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder).
+
 == Screenshots ==
 1. Dragging and dropping a pre-designed section
 2. Editing content in live preview
