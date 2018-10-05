@@ -1,8 +1,13 @@
 # Nimble Builder v1.1.0 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 ![Nimble Builder](/nimble.jpg)
 
-> Drag and drop page builder for the WordPress live customizer.
+> Drag-and-drop section builder companion of the Customizr and Hueman themes.
 
 ## Development Workflows
-- Adding a new module : https://github.com/presscustomizr/nimble-builder/issues/35
-- Adding a new input : https://github.com/presscustomizr/nimble-builder/issues/64
+- https://github.com/presscustomizr/nimble-builder/issues?utf8=%E2%9C%93&q=label%3AWorkflow+
+
+## Marketing
+- https://github.com/presscustomizr/nimble-builder/issues?utf8=%E2%9C%93&q=label%3AMarketing
+
+## Design
+- https://github.com/presscustomizr/nimble-builder/issues?utf8=%E2%9C%93&q=label%3ADesign+

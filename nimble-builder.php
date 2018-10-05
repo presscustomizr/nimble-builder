@@ -1,7 +1,7 @@
 <?php
 /**
 * Plugin Name: Nimble Builder
-* Description: Drag and drop page builder for the WordPress live customizer.
+* Description: Drag-and-drop section builder companion of the Customizr and Hueman themes.
 * Version: 1.1.0
 * Text Domain: nimble-builder
 * Author: Press Customizr

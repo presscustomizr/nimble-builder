@@ -10,22 +10,22 @@ Stable tag: 1.1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Drag and drop page builder for the WordPress live customizer.
+Drag-and-drop section builder companion of the Customizr and Hueman themes.
 
 == Description ==
-The Nimble Builder is a lightweight drag and drop page builder designed to work in the WordPress live customizer.
+The Nimble Builder is a lightweight section builder intended to be the content creation companion of the Customizr and Hueman themes. It allows you to drag and drop pre-designed sections, or create your own sections, in live preview from the WordPress customizer.
 
 == Features ==
-* Easily create responsive layouts composed of sections and colums.
-* Drag and drop content modules in your pages.
+* Drag and drop beautiful and ready-to-use sections in any pages.
+* Easily create responsive column layouts.
 * Create content, style, move / duplicate / remove elements in live preview.
 * Leverage the customizer auto-drafting and schedule publishing features, and safely build and save drafts of your content before deploying in production.
 * Works in any WordPress contexts : home, pages, posts, custom post types, archives, author pages, search page, ...
 
 == Screenshots ==
-1. Inserting a module
-2. Editing and styling text content live
-3. Creating layouts with columns
+1. Dragging and dropping a pre-designed section
+2. Editing content in live preview
+3. Creating columns layouts
 4. Customizing a section with an image background
 
 == Installation ==
@@ -38,9 +38,14 @@ The Nimble Builder is a lightweight drag and drop page builder designed to work 
 == Frequently Asked Questions ==
 = Can I use the Nimble Builder with any theme ? =
 
-Yes, the Nimble Builder works with any WordPress theme. If you experience any problem with a particular theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
+The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
+= 1.1.1 : October 5th, 2018 =
+* This version includes major improvements. Many new modules and pre-designed sections are now available to create your pages.
+* New modules : heading, icon, button, Google map, Html content, quote, spacer, divider, contact form.
+* The user interface has been enhanced with a non intrusive top bar, including do/undo buttons, and global settings for the Nimble builder.
+
 = 1.0.4 : June 14th, 2018 =
 * fixed : when margins and paddings are not defined ( number field emptied ), no related CSS properties should be printed.
 * fixed : sek-sektion-inner should not have a padding of 15px on front.
