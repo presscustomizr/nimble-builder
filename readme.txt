@@ -44,7 +44,7 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.1.1 : October 5th, 2018 =
+= 1.1.0 : October 5th, 2018 =
 * This version includes major improvements. Many new modules and pre-designed sections are now available to create your pages.
 * New modules : heading, icon, button, Google map, Html content, quote, spacer, divider, contact form.
 * The user interface has been enhanced with a non intrusive top bar, including do/undo buttons, and global settings for the Nimble builder.
