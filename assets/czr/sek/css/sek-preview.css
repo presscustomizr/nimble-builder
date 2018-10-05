@@ -941,6 +941,9 @@
     -o-transition: all .20s ease;
     transition: all .20s ease;
     opacity: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-size: 13px;
+    line-height: 26px;
 }
 .sek-add-content-btn.sek-mouse-is-close {
     z-index: 10000;
@@ -960,26 +963,26 @@
     box-shadow: 0 2px 6px rgba(0,0,0,.2);
 }
 .sek-click-on-button-icon {
-  font-size: 19px;
-  left: 4px;
-  top: -4px;
-  position: relative;
+  line-height: 18px;
+  width: 18px;
 }
 .sek-add-content-btn:hover .sek-click-on-button-icon {
-  font-size: 19px;
-  left: 8px;
-  top: 0px;
+  padding-left: 6px;
+  font-size: 13px;
+  line-height: 26px;
 }
 
 .action-button-text {
     visibility: hidden;
+    display: none;
     white-space: nowrap;
-    padding-left: 14px;
+    padding-left: 5px;
     padding-bottom: 2px;
 }
 
 .sek-add-content-btn:not(.disabled):hover .action-button-text {
     visibility: visible;
+    display: inline-block;
 }
 
 
