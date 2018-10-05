@@ -132,7 +132,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         origin : 'nimble',
                         what : 'section',
                         id : '__globalAndLocalOptionsSection',
-                        title: sektionsLocalizedData.i18n['General options'],
+                        title: sektionsLocalizedData.i18n['Site wide options'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 20,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
@@ -221,7 +221,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.topBarVisible.bind( function( visible ){
                         self.toggleTopBar( visible );
                   });
-
 
                   self.mouseMovedRecently = new api.Value( {} );
                   self.mouseMovedRecently.bind( function( position ) {
@@ -314,6 +313,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $('.sek-add-content', '#nimble-top-bar').on( 'click', function(evt) {
                         evt.preventDefault();
                         api.previewer.trigger( 'sek-pick-content', {});
+                  });
+                  $('.sek-nimble-doc', '#nimble-top-bar').on( 'click', function(evt) {
+                        evt.preventDefault();
+                        window.open($(this).data('doc-href'), '_blank');
                   });
                   return $( '#nimble-top-bar' );
             },
@@ -1163,23 +1166,38 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   switch ( params.action ) {
                         case 'sek-generate-module-ui' :
-                              dfd = self.generateUIforFrontModules( params, dfd );
+                              try{ dfd = self.generateUIforFrontModules( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
                         break;
 
                         case 'sek-generate-level-options-ui' :
-                              dfd = self.generateUIforLevelOptions( params, dfd );
+                              try{ dfd = self.generateUIforLevelOptions( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
                         break;
                         case 'sek-generate-draggable-candidates-picker-ui' :
                               self.cleanRegistered();
-                              dfd = self.generateUIforDraggableContent( params, dfd );
+                              try{ dfd = self.generateUIforDraggableContent( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
                         break;
                         case 'sek-generate-local-skope-options-ui' :
                               self.cleanRegistered();
-                              dfd = self.generateUIforLocalSkopeOptions( params, dfd );
+                              try{ dfd = self.generateUIforLocalSkopeOptions( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
                         break;
                         case 'sek-generate-global-options-ui' :
                               self.cleanRegistered();
-                              dfd = self.generateUIforGlobalOptions( params, dfd );
+                              try{ dfd = self.generateUIforGlobalOptions( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
                         break;
                   }//switch
 
@@ -1264,7 +1282,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api( sektionsLocalizedData.optNameForGlobalOptions )( clonedGlobalOptions );
                         } else {
                               return self.updateAPISetting({
-                                    action : params.uiParams.action,// mandatory : 'sek-generate-level-options-ui', 'sek_local_skope_options_module',...
+                                    action : params.uiParams.action,// mandatory : 'sek-generate-level-options-ui', 'sek-generate-local-skope-options-ui',...
                                     id : params.uiParams.id,
                                     value : moduleValueCandidate,
                                     in_column : params.uiParams.in_column,//not mandatory
@@ -1457,6 +1475,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_features_sec_picker_module',
                               controlLabel :  sektionsLocalizedData.i18n['Sections for services and features'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
+                        sek_column_layouts_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_column_layouts_sec_picker_module',
+                              controlLabel :  sektionsLocalizedData.i18n['Empty sections with columns layout'],
                               content_type : 'section',
                               expandAndFocusOnInit : false,
                               priority : 10,
@@ -1953,6 +1980,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_local_template',
                               controlLabel : sektionsLocalizedData.i18n['Page template'],
                               expandAndFocusOnInit : true,
+                              icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
                         },
                         widths : {
                               settingControlId : _id_ + '__widths',
@@ -1995,7 +2023,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });//api( Id, function( _setting_ ) {})
                                     var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
                                         currentSetValue = api( self.sekCollectionSettingId() )(),
-                                        allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.options ) ? currentSetValue.options : {} ),
+                                        allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} ),
                                         optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {},
                                         initialModuleValues = optionTypeValue;
 
@@ -2683,7 +2711,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'sek-generate-local-skope-options-ui' :
                                     _valueCandidate = {};
 
-                                    var _currentOptions = $.extend( true, {}, _.isObject( newSetValue.options ) ? newSetValue.options : {} );
+                                    var _currentOptions = $.extend( true, {}, _.isObject( newSetValue.local_options ) ? newSetValue.local_options : {} );
                                     _.each( params.value || {}, function( _val_, _key_ ) {
                                           if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
                                             return;
@@ -2694,7 +2722,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else {
                                           var newOptionsValues = {};
                                           newOptionsValues[ params.options_type ] = _valueCandidate;
-                                          newSetValue.options = $.extend( _currentOptions, newOptionsValues );
+                                          newSetValue.local_options = $.extend( _currentOptions, newOptionsValues );
                                     }
                               break;
                               case 'sek-add-content-in-new-sektion' :
@@ -2743,76 +2771,75 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                           case 'preset_section' :
                                                 __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
-                                                var presetColumnCollection;
-                                                try { presetColumnCollection = self.getPresetSectionCollection({
+
+                                                var _doWhenPresetSectionCollectionFetched = function( presetColumnCollection ) {
+                                                      self.preparePresetSectionForInjection( presetColumnCollection )
+                                                            .fail( function( _er_ ){
+                                                                  __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
+                                                                  __presetSectionInjected__.reject( _er_ );
+                                                            })
+                                                            .done( function( sectionReadyToInject ) {
+                                                                  var insertedInANestedSektion = false;
+                                                                  if ( ! _.isEmpty( params.sektion_to_replace ) ) {
+                                                                        var sektionToReplace = self.getLevelModel( params.sektion_to_replace, newSetValue.collection );
+                                                                        if ( 'no_match' === sektionToReplace ) {
+                                                                              api.errare( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched' );
+                                                                              __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched');
+                                                                        }
+                                                                        insertedInANestedSektion = true === sektionToReplace.is_nested;
+                                                                  }
+
+                                                                  if ( ! insertedInANestedSektion ) {
+                                                                        locationCandidate.collection.splice( position, 0, {
+                                                                              id : params.id,
+                                                                              level : 'section',
+                                                                              collection : sectionReadyToInject.collection,
+                                                                              options : sectionReadyToInject.options || {},
+                                                                              ver_ini : sektionsLocalizedData.nimbleVersion
+                                                                        });
+                                                                  } else {
+                                                                        columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
+                                                                        if ( 'no_match' === columnCandidate ) {
+                                                                              api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                                                              __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                                                        }
+
+                                                                        columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                                                                        _.each( columnCandidate.collection, function( moduleOrSectionModel, index ) {
+                                                                              if ( params.before_section === moduleOrSectionModel.id ) {
+                                                                                    position = index;
+                                                                              }
+                                                                              if ( params.after_section === moduleOrSectionModel.id ) {
+                                                                                    position = index + 1;
+                                                                              }
+                                                                        });
+                                                                        columnCandidate.collection.splice( position, 0, {
+                                                                              id : params.id,
+                                                                              is_nested : true,
+                                                                              level : 'section',
+                                                                              collection : sectionReadyToInject.collection,
+                                                                              options : sectionReadyToInject.options || {},
+                                                                              ver_ini : sektionsLocalizedData.nimbleVersion
+                                                                        });
+                                                                  }
+                                                                  __presetSectionInjected__.resolve();
+                                                            });// self.preparePresetSectionForInjection.done()
+                                                };//_doWhenPresetSectionCollectionFetched()
+                                                self.getPresetSectionCollection({
                                                             presetSectionType : params.content_id,
                                                             section_id : params.id//<= we need to use the section id already generated, and passed for ajax action @see ::reactToPreviewMsg, case "sek-add-section"
-                                                      });
-                                                } catch( _er_ ) {
-                                                      api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
-                                                      __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
-                                                      break;
-                                                }
-                                                if ( ! _.isObject( presetColumnCollection ) || _.isEmpty( presetColumnCollection ) ) {
-                                                      api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnCollection );
-                                                      __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
-                                                      break;
-                                                }
-
-                                                self.preparePresetSectionForInjection( presetColumnCollection )
-                                                      .fail( function( _er_ ){
-                                                            __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
-                                                            __presetSectionInjected__.reject( _er_ );
                                                       })
-                                                      .done( function( sectionReadyToInject ) {
-                                                            var insertedInANestedSektion = false;
-                                                            if ( ! _.isEmpty( params.sektion_to_replace ) ) {
-                                                                  var sektionToReplace = self.getLevelModel( params.sektion_to_replace, newSetValue.collection );
-                                                                  if ( 'no_match' === sektionToReplace ) {
-                                                                        api.errare( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched' );
-                                                                        __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched');
-                                                                  }
-                                                                  insertedInANestedSektion = true === sektionToReplace.is_nested;
+                                                      .fail( function() {
+                                                            api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
+                                                            __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                                                      })
+                                                      .done( function( presetColumnCollection ) {
+                                                            if ( ! _.isObject( presetColumnCollection ) || _.isEmpty( presetColumnCollection ) ) {
+                                                                  api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnCollection );
+                                                                  __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                                             }
-
-                                                            if ( ! insertedInANestedSektion ) {
-                                                                  locationCandidate.collection.splice( position, 0, {
-                                                                        id : params.id,
-                                                                        level : 'section',
-                                                                        collection : sectionReadyToInject.collection,
-                                                                        options : sectionReadyToInject.options || {},
-                                                                        ver_ini : sektionsLocalizedData.nimbleVersion
-                                                                  });
-                                                            } else {
-                                                                  columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                                                  if ( 'no_match' === columnCandidate ) {
-                                                                        api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                                                        __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
-                                                                  }
-
-                                                                  columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                                                  _.each( columnCandidate.collection, function( moduleOrSectionModel, index ) {
-                                                                        if ( params.before_section === moduleOrSectionModel.id ) {
-                                                                              position = index;
-                                                                        }
-                                                                        if ( params.after_section === moduleOrSectionModel.id ) {
-                                                                              position = index + 1;
-                                                                        }
-                                                                  });
-                                                                  columnCandidate.collection.splice( position, 0, {
-                                                                        id : params.id,
-                                                                        is_nested : true,
-                                                                        level : 'section',
-                                                                        collection : sectionReadyToInject.collection,
-                                                                        options : sectionReadyToInject.options || {},
-                                                                        ver_ini : sektionsLocalizedData.nimbleVersion
-                                                                  });
-                                                            }
-                                                            __presetSectionInjected__.resolve();
-                                                      });// self.preparePresetSectionForInjection.done()
-
-
-
+                                                            _doWhenPresetSectionCollectionFetched( presetColumnCollection );
+                                                      });//self.getPresetSectionCollection().done()
                                           break;
                                     }//switch( params.content_type)
                               break;
@@ -2840,37 +2867,39 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var presetColumnCollection;
                                     __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
 
-                                    try { presetColumnCollection = self.getPresetSectionCollection({
+                                    _doWhenPresetSectionCollectionFetched = function( presetColumnCollection ) {
+                                          self.preparePresetSectionForInjection( presetColumnCollection )
+                                                .fail( function( _er_ ){
+                                                      __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
+                                                      __presetSectionInjected__.reject( _er_ );
+                                                })
+                                                .done( function( sectionReadyToInject ) {
+                                                      columnCandidate.collection.push({
+                                                            id : params.id,
+                                                            level : 'section',
+                                                            collection : sectionReadyToInject.collection,
+                                                            options : sectionReadyToInject.options || {},
+                                                            is_nested : true,
+                                                            ver_ini : sektionsLocalizedData.nimbleVersion
+                                                      });
+                                                      __presetSectionInjected__.resolve();
+                                                });//self.preparePresetSectionForInjection.done()
+                                    };//_doWhenPresetSectionCollectionFetched
+                                    self.getPresetSectionCollection({
                                                 presetSectionType : params.content_id,
                                                 section_id : params.id//<= we need to use the section id already generated, and passed for ajax action @see ::reactToPreviewMsg, case "sek-add-section"
-                                          });
-                                    } catch( _er_ ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
-                                          break;
-                                    }
-                                    if ( ! _.isObject( presetColumnCollection ) || _.isEmpty( presetColumnCollection ) ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnCollection );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
-                                          break;
-                                    }
-                                    self.preparePresetSectionForInjection( presetColumnCollection )
-                                          .fail( function( _er_ ){
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
-                                                __presetSectionInjected__.reject( _er_ );
                                           })
-                                          .done( function( sectionReadyToInject ) {
-                                                columnCandidate.collection.push({
-                                                      id : params.id,
-                                                      level : 'section',
-                                                      collection : sectionReadyToInject.collection,
-                                                      options : sectionReadyToInject.options || {},
-                                                      is_nested : true,
-                                                      ver_ini : sektionsLocalizedData.nimbleVersion
-                                                });
-                                                __presetSectionInjected__.resolve();
-                                          });//self.preparePresetSectionForInjection.done()
-
+                                          .fail( function() {
+                                                api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                                          })
+                                          .done( function( presetColumnCollection ) {
+                                                if ( ! _.isObject( presetColumnCollection ) || _.isEmpty( presetColumnCollection ) ) {
+                                                      api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnCollection );
+                                                      __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
+                                                }
+                                                _doWhenPresetSectionCollectionFetched( presetColumnCollection );
+                                          });//self.getPresetSectionCollection().done()
                               break;
                               case 'sek-update-fonts' :
                                     var currentGfonts = self.sniffGFonts();
@@ -2916,41 +2945,79 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//updateAPISetting
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
-                      presetSection,
-                      allPresets = $.extend( true, {}, sektionsLocalizedData.presetSections );
-
-                  if ( ! _.isObject( allPresets ) || _.isEmpty( allPresets ) ) {
-                        throw new Error( 'getPresetSectionCollection => Invalid sektionsLocalizedData.presetSections');
-                  }
-                  if ( _.isEmpty( allPresets[ sectionParams.presetSectionType ] ) ) {
-                        throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionType + ' has not been found in sektionsLocalizedData.presetSections');
-                  }
-                  var presetCandidate = allPresets[ sectionParams.presetSectionType ];
-
-                  var setIds = function( collection ) {
-                        _.each( collection, function( levelData ) {
-                              levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
-                              if ( _.isArray( levelData.collection ) ) {
-                                    setIds( levelData.collection );
+                      __dfd__ = $.Deferred(),
+                      _getPresetSections = function() {
+                        var dfd = $.Deferred();
+                        if ( ! _.isEmpty( api.sek_presetSections ) ) {
+                              dfd.resolve( api.sek_presetSections );
+                        } else {
+                              var _ajaxRequest_;
+                              if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
+                                    _ajaxRequest_ = api.sek_fetchingPresetSections;
+                              } else {
+                                    _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
+                                          tmpl : 'font_list',
+                                          module_type: 'preset_sections_server_collection',
+                                          module_id : 'no_module_id'
+                                    } );
+                                    api.sek_fetchingPresetSections = _ajaxRequest_;
                               }
-                        });
-                        return collection;
+
+                              _ajaxRequest_.done( function( _collection_ ) {
+                                    api.sek_presetSections = _collection_;
+                                    dfd.resolve( api.sek_presetSections );
+                              }).fail( function( _r_ ) {
+                                    dfd.reject( _r_ );
+                              });
+
+                        }
+                        return dfd.promise();
                   };
 
-                  var setVersion = function( collection ) {
-                        _.each( collection, function( levelData ) {
-                              levelData.ver_ini = sektionsLocalizedData.nimbleVersion;
-                              if ( _.isArray( levelData.collection ) ) {
-                                    setVersion( levelData.collection );
+
+                  _getPresetSections()
+                        .fail( function( er ) {
+                              __dfd__.reject( er );
+                        })
+                        .done( function( _collection_ ) {
+                              var presetSection,
+                                  allPresets = $.extend( true, {}, _.isObject( _collection_ ) ? _collection_ : {} );
+
+                              if ( _.isEmpty( allPresets ) ) {
+                                    throw new Error( 'getPresetSectionCollection => Invalid collection');
                               }
-                        });
-                        return collection;
-                  };
-                  presetCandidate.id = sectionParams.section_id;
-                  presetCandidate.collection = setIds( presetCandidate.collection );
-                  presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
-                  presetCandidate.collection = setVersion( presetCandidate.collection );
-                  return presetCandidate;
+                              if ( _.isEmpty( allPresets[ sectionParams.presetSectionType ] ) ) {
+                                    throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionType + '" has not been found in the collection');
+                              }
+                              var presetCandidate = allPresets[ sectionParams.presetSectionType ];
+
+                              var setIds = function( collection ) {
+                                    _.each( collection, function( levelData ) {
+                                          levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                                          if ( _.isArray( levelData.collection ) ) {
+                                                setIds( levelData.collection );
+                                          }
+                                    });
+                                    return collection;
+                              };
+
+                              var setVersion = function( collection ) {
+                                    _.each( collection, function( levelData ) {
+                                          levelData.ver_ini = sektionsLocalizedData.nimbleVersion;
+                                          if ( _.isArray( levelData.collection ) ) {
+                                                setVersion( levelData.collection );
+                                          }
+                                    });
+                                    return collection;
+                              };
+                              presetCandidate.id = sectionParams.section_id;
+                              presetCandidate.collection = setIds( presetCandidate.collection );
+                              presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
+                              presetCandidate.collection = setVersion( presetCandidate.collection );
+                              __dfd__.resolve( presetCandidate );
+                        });//_getPresetSections.done()
+
+                  return __dfd__.promise();
             },
             preparePresetSectionForInjection : function( columnCollection ) {
                 var self = this,
@@ -4566,22 +4633,61 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
       api.czrInputMap = api.czrInputMap || {};
-      $.extend( api.czrInputMap, {
-            v_alignment : function( input_options ) {
-                  var input = this,
-                      $wrapper = $('.sek-v-align-wrapper', input.container );
-                  $wrapper.find( 'div[data-sek-align="' + input() +'"]' ).addClass('selected');
-                  $wrapper.on( 'click', '[data-sek-align]', function(evt) {
-                        evt.preventDefault();
-                        $wrapper.find('.selected').removeClass('selected');
-                        $.when( $(this).addClass('selected') ).done( function() {
-                              input( $(this).data('sek-align') );
-                        });
+      var x_or_y_AlignWithDeviceSwitcher = function( params ) {
+            var input = this,
+                inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {},
+                tmplSelector = 'verticalAlignWithDeviceSwitcher' === input.type ? '.sek-v-align-wrapper' : '.sek-h-align-wrapper',// <= because used by 2 different input tmpl
+                $wrapper = $( tmplSelector, input.container );
+            api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
+
+            var getCurrentDeviceActualOrInheritedValue = function( inputValues, currentDevice ) {
+                  var deviceHierarchy = [ 'mobile' , 'tablet', 'desktop' ];
+                  if ( _.has( inputValues, currentDevice ) ) {
+                        return inputValues[ currentDevice ];
+                  } else {
+                        var deviceIndex = _.findIndex( deviceHierarchy, function( _d_ ) { return currentDevice === _d_; });
+                        if ( ! _.isEmpty( currentDevice ) && deviceIndex < deviceHierarchy.length ) {
+                              return getCurrentDeviceActualOrInheritedValue( inputValues, deviceHierarchy[ deviceIndex + 1 ] );
+                        } else {
+                              return {};
+                        }
+                  }
+            };
+            var syncWithPreviewedDevice = function( currentDevice ) {
+                  var inputValues = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
+                      clonedDefault = $.extend( true, {}, defaultVal );
+                  inputValues = _.isObject( inputValues ) ? $.extend( clonedDefault, inputValues ) : clonedDefault;
+                  var _currentDeviceValue = getCurrentDeviceActualOrInheritedValue( inputValues, currentDevice );
+                  $wrapper.find('.selected').removeClass('selected');
+                  $wrapper.find( 'div[data-sek-align="' + _currentDeviceValue +'"]' ).addClass('selected');
+            };
+            $wrapper.on( 'click', '[data-sek-align]', function(evt) {
+                  evt.preventDefault();
+                  var _newInputVal;
+
+                  _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                  _newInputVal[ api.previewedDevice() || 'desktop' ] = $(this).data('sek-align');
+
+                  $wrapper.find('.selected').removeClass('selected');
+                  $.when( $(this).addClass('selected') ).done( function() {
+                        input( _newInputVal );
                   });
+            });
+            input.previewedDevice.bind( function( currentDevice ) {
+                  try { syncWithPreviewedDevice( currentDevice ); } catch( er ) {
+                        api.errare('Error when firing syncWithPreviewedDevice for input type : ' + input.type + ' for input id ' + input.id , er );
+                  }
+            });
+            try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
+                  api.errare('Error when firing syncWithPreviewedDevice for input type : ' + input.type + ' for input id ' + input.id , er );
             }
+      };
+      $.extend( api.czrInputMap, {
+            horizTextAlignmentWithDeviceSwitcher : x_or_y_AlignWithDeviceSwitcher,
+            horizAlignmentWithDeviceSwitcher : x_or_y_AlignWithDeviceSwitcher,
+            verticalAlignWithDeviceSwitcher : x_or_y_AlignWithDeviceSwitcher
       });//$.extend( api.czrInputMap, {})
-
-
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
       api.czrInputMap = api.czrInputMap || {};
@@ -5582,63 +5688,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             }
       });//$.extend( api.czrInputMap, {})
-})( wp.customize, jQuery, _ );//global sektionsLocalizedData
-( function ( api, $, _ ) {
-      api.czrInputMap = api.czrInputMap || {};
-
-      var hAlignWithDeviceSwitcher = function( params ) {
-            var input = this,
-                inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
-                defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {},
-                $wrapper = $('.sek-h-align-wrapper', input.container );
-            api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
-
-            var getCurrentDeviceActualOrInheritedValue = function( inputValues, currentDevice ) {
-                  var deviceHierarchy = [ 'mobile' , 'tablet', 'desktop' ];
-                  if ( _.has( inputValues, currentDevice ) ) {
-                        return inputValues[ currentDevice ];
-                  } else {
-                        var deviceIndex = _.findIndex( deviceHierarchy, function( _d_ ) { return currentDevice === _d_; });
-                        if ( ! _.isEmpty( currentDevice ) && deviceIndex < deviceHierarchy.length ) {
-                              return getCurrentDeviceActualOrInheritedValue( inputValues, deviceHierarchy[ deviceIndex + 1 ] );
-                        } else {
-                              return {};
-                        }
-                  }
-            };
-            var syncWithPreviewedDevice = function( currentDevice ) {
-                  var inputValues = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
-                      clonedDefault = $.extend( true, {}, defaultVal );
-                  inputValues = _.isObject( inputValues ) ? $.extend( clonedDefault, inputValues ) : clonedDefault;
-                  var _currentDeviceValue = getCurrentDeviceActualOrInheritedValue( inputValues, currentDevice );
-                  $wrapper.find('.selected').removeClass('selected');
-                  $wrapper.find( 'div[data-sek-align="' + _currentDeviceValue +'"]' ).addClass('selected');
-            };
-            $wrapper.on( 'click', '[data-sek-align]', function(evt) {
-                  evt.preventDefault();
-                  var _newInputVal;
-
-                  _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
-                  _newInputVal[ api.previewedDevice() || 'desktop' ] = $(this).data('sek-align');
-
-                  $wrapper.find('.selected').removeClass('selected');
-                  $.when( $(this).addClass('selected') ).done( function() {
-                        input( _newInputVal );
-                  });
-            });
-            input.previewedDevice.bind( function( currentDevice ) {
-                  try { syncWithPreviewedDevice( currentDevice ); } catch( er ) {
-                        api.errare('Error when firing syncWithPreviewedDevice for input type spacingWithDeviceSwitcher for input id ' + input.id , er );
-                  }
-            });
-            try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
-                  api.errare('Error when firing syncWithPreviewedDevice for input type bgPositionWithDeviceSwitcher for input id ' + input.id , er );
-            }
-      };
-      $.extend( api.czrInputMap, {
-            horizTextAlignmentWithDeviceSwitcher : hAlignWithDeviceSwitcher,
-            horizAlignmentWithDeviceSwitcher : hAlignWithDeviceSwitcher
-      });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData, serverControlParams
 /* ------------------------------------------------------------------------- *
  *  CONTENT TYPE SWITCHER
@@ -5732,7 +5781,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       _.each([
             'sek_intro_sec_picker_module',
-            'sek_features_sec_picker_module'
+            'sek_features_sec_picker_module',
+            'sek_column_layouts_sec_picker_module'
       ], function( module_type ) {
             api.czrModuleMap[ module_type ] = {
                   crud : false,
@@ -6167,11 +6217,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    case 'use-custom-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
+                                    case 'use-custom-outer-width' :
+                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
                                                 return input();
                                           });
-                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
+                                    break;
+                                    case 'use-custom-inner-width' :
+                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
                                                 return input();
                                           });
                                     break;
@@ -6276,11 +6328,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    case 'use-custom-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
+                                    case 'use-custom-outer-width' :
+                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
                                                 return input();
                                           });
-                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
+                                    break;
+                                    case 'use-custom-inner-width' :
+                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
                                                 return input();
                                           });
                                     break;
@@ -6433,11 +6487,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    case 'use-custom-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
+                                    case 'use-custom-outer-width' :
+                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
                                                 return input();
                                           });
-                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
+                                    break;
+                                    case 'use-custom-inner-width' :
+                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
                                                 return input();
                                           });
                                     break;
