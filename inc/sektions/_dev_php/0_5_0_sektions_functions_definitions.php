@@ -30,7 +30,7 @@ function register_location( $location_id, $params = array() ) {
 // @used when populating the customizer localized params
 function sek_get_default_sektions_value() {
     $defaut_sektions_value = [ 'collection' => [], 'local_options' => [] ];
-    foreach( sek_get_locations() as $location_id ) {
+    foreach( sek_get_locations() as $location_id => $params ) {
         $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location_id ], SEK_Fire()->default_location_model );
     }
     return $defaut_sektions_value;
@@ -638,15 +638,15 @@ function sek_get_locale_template(){
 
 //@return void()
 function render_content_sections_for_nimble_template() {
-    foreach( sek_get_locations() as $location_id ) {
+    foreach( sek_get_locations() as $location_id => $params ) {
         $locationSettingValue = sek_get_skoped_seks( skp_get_skope_id(), $location_id );
         // We don't need to render the locations with no sections
         // But we need at least one location : let's always render loop_start.
         // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
         if ( 'loop_start' === $location_id || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
-            do_action( "sek_before_location_{$location}" );
+            do_action( "sek_before_location_{$location_id}" );
             SEK_Fire()->_render_seks_for_location( $location_id, $locationSettingValue );
-            do_action( "sek_after_location_{$location}" );
+            do_action( "sek_after_location_{$location_id}" );
         }
     }
 }
