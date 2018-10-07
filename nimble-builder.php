@@ -57,7 +57,9 @@ function nimble_display_min_requirement_notice( $requires_what, $requires_what_v
 add_action( 'after_setup_theme', 'nimble_load_czr_base_fmk', 10 );
 function nimble_load_czr_base_fmk() {
     if ( did_action( 'nimble_base_fmk_loaded' ) ) {
-        error_log('The czr_base_fmk has already been loaded');
+        if ( ( defined( 'CZR_DEV' ) && CZR_DEV ) || ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) ) {
+            error_log( __FILE__ . '  => The czr_base_fmk has already been loaded');
+        }
         return;
     }
     require_once(  dirname( __FILE__ ) . '/inc/czr-base-fmk/czr-base-fmk.php' );
