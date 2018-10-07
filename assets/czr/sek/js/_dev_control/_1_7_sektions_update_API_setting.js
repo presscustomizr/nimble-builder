@@ -781,9 +781,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                               id : params.droppedModuleId,
                                                                               level : 'module',
                                                                               module_type : params.content_id,
-                                                                              value : 'no_starting_value' !== startingModuleValue ? startingModuleValue : null
+                                                                              value : 'no_starting_value' !== startingModuleValue ? startingModuleValue : null,
+                                                                              ver_ini : sektionsLocalizedData.nimbleVersion
                                                                         }
-                                                                  ]
+                                                                  ],
+                                                                  ver_ini : sektionsLocalizedData.nimbleVersion
                                                             }
                                                       ],
                                                       ver_ini : sektionsLocalizedData.nimbleVersion
