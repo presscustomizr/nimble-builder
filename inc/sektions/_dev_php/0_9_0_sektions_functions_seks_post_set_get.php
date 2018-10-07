@@ -134,7 +134,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             }
         }
 
-        foreach( SEK_Fire()->registered_locations as $loc_id ) {
+        foreach( SEK_Fire()->registered_locations as $loc_id => $params ) {
             if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
                 $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], SEK_Fire()->default_location_model );
             }
@@ -154,8 +154,8 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
     // sek_error_log( '<sek_get_skoped_seks() location => ' . $location .  array_key_exists( 'collection', $seks_data ), $seks_data );
     // if a location is specified, return specifically the sections of this location
     if ( array_key_exists( 'collection', $seks_data ) && ! empty( $location_id ) ) {
-        if ( ! in_array( $location_id, sek_get_locations() ) ) {
-            error_log('Error => location ' . $location_id . ' is not registered in the available locations' );
+        if ( ! array_key_exists( $location_id, sek_get_locations() ) ) {
+            error_log( __FUNCTION__ . ' Error => location ' . $location_id . ' is not registered in the available locations' );
         } else {
             $seks_data = sek_get_level_model( $location_id, $seks_data['collection'] );
         }

@@ -11,10 +11,10 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $cached_input_lists = array(); // <= will be populated to cache the input_list of each registered module. Useful when we need to get info like css_selector for a particular input type or id.
         public $ajax_action_map = array();
         public $default_locations = [
-            'loop_start',
-            'before_content',
-            'after_content',
-            'loop_end'
+            'loop_start' => array( 'priority' => 10 ),
+            'before_content' => array(),
+            'after_content' => array(),
+            'loop_end' => array( 'priority' => 10 ),
         ];
         public $registered_locations = [];
         public $default_location_model = [

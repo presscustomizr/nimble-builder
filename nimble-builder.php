@@ -93,10 +93,10 @@ function nimble_load_plugin_textdomain() {
 }
 
 // @return void()
-function nimble_register_location( $location ) {
+function nimble_register_location( $location, $params = array() ) {
     if ( empty( $location ) || ! is_string( $location ) )
       return;
-    \Nimble\register_location( $location );
+    \Nimble\register_location( $location, $params );
 }
 
 // Fire the retro compatibility functions

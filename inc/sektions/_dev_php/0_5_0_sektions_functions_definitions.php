@@ -14,20 +14,24 @@ function sek_get_locations() {
   return apply_filters( 'sek_locations', array_merge( SEK_Fire()->default_locations, SEK_Fire()->registered_locations ) );
 }
 
-function register_location( $location ) {
+// @param $location_id ( string ). Example '__after_header'
+function register_location( $location_id, $params = array() ) {
+    $params = is_array( $params ) ? $params : array();
+    $params = wp_parse_args( $params, array( 'priority' => 10 ) );
     $registered_locations = SEK_Fire()->registered_locations;
     if ( is_array( $registered_locations ) ) {
-        $registered_locations[] = $location;
+        $registered_locations[$location_id] = $params;
     }
     SEK_Fire()->registered_locations = $registered_locations;
+    //sek_error_log('SEK_Fire()->registered_locations', SEK_Fire()->registered_locations );
 }
 
 // @return array
 // @used when populating the customizer localized params
 function sek_get_default_sektions_value() {
     $defaut_sektions_value = [ 'collection' => [], 'local_options' => [] ];
-    foreach( sek_get_locations() as $location ) {
-        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location ], SEK_Fire()->default_location_model );
+    foreach( sek_get_locations() as $location_id ) {
+        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location_id ], SEK_Fire()->default_location_model );
     }
     return $defaut_sektions_value;
 }
@@ -634,14 +638,14 @@ function sek_get_locale_template(){
 
 //@return void()
 function render_content_sections_for_nimble_template() {
-    foreach( sek_get_locations() as $location ) {
-        $locationSettingValue = sek_get_skoped_seks( skp_get_skope_id(), $location );
+    foreach( sek_get_locations() as $location_id ) {
+        $locationSettingValue = sek_get_skoped_seks( skp_get_skope_id(), $location_id );
         // We don't need to render the locations with no sections
         // But we need at least one location : let's always render loop_start.
         // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
-        if ( 'loop_start' === $location || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
+        if ( 'loop_start' === $location_id || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
             do_action( "sek_before_location_{$location}" );
-            SEK_Fire()->_render_seks_for_location( $location, $locationSettingValue );
+            SEK_Fire()->_render_seks_for_location( $location_id, $locationSettingValue );
             do_action( "sek_after_location_{$location}" );
         }
     }

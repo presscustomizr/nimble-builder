@@ -26,12 +26,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !empty( $locale_template ) )
               return;
 
+            //sek_error_log('sek_get_locations()', sek_get_locations() );
+
             // SCHEDULE THE ACTIONS ON HOOKS AND CONTENT FILTERS
-            foreach( sek_get_locations() as $hook ) {
-                switch ( $hook ) {
+            foreach( sek_get_locations() as $location_id => $params ) {
+                $params = is_array( $params ) ? $params : array();
+                $params = wp_parse_args( $params, array( 'priority' => 10 ) );
+                switch ( $location_id ) {
                     case 'loop_start' :
                     case 'loop_end' :
-                        add_action( $hook, array( $this, 'sek_schedule_sektions_rendering' ) );
+                        add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
                     break;
                     case 'before_content' :
                         add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
@@ -41,7 +45,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     break;
                     // Defaut is typically used when for custom locations
                     default :
-                        add_action( $hook, array( $this, 'sek_schedule_sektions_rendering' ) );
+                        add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
                     break;
                 }
             }
@@ -128,7 +132,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // the $location_data can be provided. Typically when using the function render_content_sections_for_nimble_template in the Nimble page template.
         public function _render_seks_for_location( $location = '', $location_data = array() ) {
-            if ( ! in_array( $location, sek_get_locations() ) ) {
+            if ( ! array_key_exists( $location, sek_get_locations() ) ) {
                 error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
             }
