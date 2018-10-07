@@ -25,7 +25,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 $skope_id = skp_build_skope_id();
             } else {
                 if ( empty( $skope_id ) ) {
-                    wp_send_json_error(  __FUNCTION__ . ' => missing skope_id' );
+                    //wp_send_json_error(  __FUNCTION__ . ' => missing skope_id' ); <= https://github.com/presscustomizr/pro-bundle/issues/147
                     return;
                 }
             }
