@@ -4,9 +4,12 @@ namespace Nimble;
 /* ------------------------------------------------------------------------- *
  * FOR TEST
 /* ------------------------------------------------------------------------- */
-function render_test_logs() {
+function render_test_logs( $query = null ) {
     if ( ! skp_is_customizing() )
       return;
+    if ( is_object( $query ) && is_a( $query, 'WP_Query' ) && ! $query->is_main_query() ) {
+        return;
+    }
     $skope_id = skp_build_skope_id();
     //delete_option( "nimble___{$skope_id}" );
     /* if ( is_array(') )

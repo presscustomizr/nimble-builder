@@ -547,8 +547,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   }
                             }
                             if ( _.isUndefined( level.ver_ini ) ) {
-                                  _errorDetected_('validation error => a ' + level.level + ' should have a version property : "ver_ini"' );
-                                  return;
+                                  api.errare( 'validateSettingValue() => validation error => a ' + level.level + ' should have a version property : "ver_ini"' );
                             }
                             switch ( level.level ) {
                                   case 'location' :
@@ -2761,9 +2760,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                               id : params.droppedModuleId,
                                                                               level : 'module',
                                                                               module_type : params.content_id,
-                                                                              value : 'no_starting_value' !== startingModuleValue ? startingModuleValue : null
+                                                                              value : 'no_starting_value' !== startingModuleValue ? startingModuleValue : null,
+                                                                              ver_ini : sektionsLocalizedData.nimbleVersion
                                                                         }
-                                                                  ]
+                                                                  ],
+                                                                  ver_ini : sektionsLocalizedData.nimbleVersion
                                                             }
                                                       ],
                                                       ver_ini : sektionsLocalizedData.nimbleVersion

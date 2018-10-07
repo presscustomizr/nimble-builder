@@ -415,7 +415,8 @@ function sek_get_locale_template(){
     $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
     $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
     if ( ! empty( $local_options ) && ! empty( $local_options['template'] ) && ! empty( $local_options['template']['local_template'] ) && 'default' !== $local_options['template']['local_template'] ) {
-        $path = NIMBLE_BASE_PATH . "/tmpl/page-templates/" . $local_options['template']['local_template'] . '.php';
+        $template_file_name = $local_options['template']['local_template'];
+        $path = apply_filters( 'nimble_get_locale_template_path', NIMBLE_BASE_PATH . '/tmpl/page-templates/' . $template_file_name . '.php', $template_file_name );
         if ( file_exists( $path ) ) {
             $template = $path;
         } else {
