@@ -228,12 +228,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           .append( $sidePanelTitleElSpan );
                               }
 
-                              // generate the UI for the content picker if no done yet
-                              _mainPanel_.expanded.bind( function( expanded ) {
-                                    if ( expanded && ! api.section.has( '__content_picker__' ) ) {
-                                          api.previewer.trigger('sek-pick-content', { focus : false } );
-                                    }
-                              });
                               // default looks like
                               // <span class="preview-notice">You are customizing <strong class="panel-title">Nimble Builder</strong></span>
                               // if ( 0 < $topPanelTitleEl.length ) {
@@ -345,7 +339,42 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         transport : 'refresh',//'refresh',//// ,
                         type : 'option'
                   });
-            },//mayBeRegisterAndSetupAddNewSektionSection()
+
+
+                  // CONTENT PICKER SECTION
+                  api.CZR_Helpers.register({
+                        origin : 'nimble',
+                        what : 'section',
+                        id : '__content_picker__',
+                        title: sektionsLocalizedData.i18n['Content Picker'],
+                        panel : sektionsLocalizedData.sektionsPanelId,
+                        priority : 30,
+                        track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                        constructWith : api.Section.extend({
+                              //attachEvents : function () {},
+                              // Always make the section active, event if we have no control in it
+                              isContextuallyActive : function () {
+                                return this.active();
+                              },
+                              _toggleActive : function(){ return true; }
+                        })
+                  }).done( function() {
+                        // generate the UI for the content picker if not done yet
+                        // defer this action when the section is instantiated AND the api.previewer is active, so we can trigger event on it
+                        // => we also need the local skope to be set, that's why api.czr_initialSkopeCollectionPopulated is convenient because it ensures the api.previewer is ready and we have a local skope set.
+                        // @see czr-skope-base.js
+                        // @fixes https://github.com/presscustomizr/nimble-builder/issues/187
+                        api.section( '__content_picker__', function( _section_ ) {
+                              if ( 'resolved' != api.czr_initialSkopeCollectionPopulated.state() ) {
+                                    api.czr_initialSkopeCollectionPopulated.done( function() {
+                                          api.previewer.trigger('sek-pick-content', { focus : false });
+                                    });
+                              } else {
+                                    api.previewer.trigger('sek-pick-content', { focus : false });
+                              }
+                        });
+                  });
+            },//registerAndSetupDefaultPanelSectionOptions()
 
 
 

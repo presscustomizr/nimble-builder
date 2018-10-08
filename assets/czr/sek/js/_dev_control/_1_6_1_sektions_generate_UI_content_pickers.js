@@ -137,7 +137,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // we set the focus to false when firing api.previewer.trigger( 'sek-pick-content', { focus : false }); in ::initialize()
                                           if ( true === params.focus ) {
                                                 _control_.focus({
-                                                    completeCallback : function() {}
+                                                      completeCallback : function() {}
                                                 });
                                           }
 
@@ -157,6 +157,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 // setup the initial state + initial click
                                                 _control_.container.attr('data-sek-expanded', "false" );
                                                 if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
+                                                      _control_.container.find('.czr-items-wrapper').show();
                                                       $title.trigger('click');
                                                 }
                                           } else {
@@ -168,48 +169,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//_.each
                   };//_do_register_
 
-                  // CONTENT PICKER SECTION
-                  api.CZR_Helpers.register({
-                        origin : 'nimble',
-                        what : 'section',
-                        id : '__content_picker__',
-                        title: sektionsLocalizedData.i18n['Content Picker'],
-                        panel : sektionsLocalizedData.sektionsPanelId,
-                        priority : 30,
-                        track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
-                        constructWith : api.Section.extend({
-                              //attachEvents : function () {},
-                              // Always make the section active, event if we have no control in it
-                              isContextuallyActive : function () {
-                                return this.active();
-                              },
-                              _toggleActive : function(){ return true; }
-                        })
-                  }).done( function() {
-                        api.section( '__content_picker__', function( _section_ ) {
-                              _do_register_();
 
-                              // Style the section title
-                              var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
-                                  $panelTitleEl = _section_.container.find('.customize-section-title h3');
+                  // the '__content_picker__' section is registered on initialize
+                  // @fixes https://github.com/presscustomizr/nimble-builder/issues/187
+                  api.section( '__content_picker__', function( _section_ ) {
+                        _do_register_();
 
-                              // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
-                              if ( 0 < $sectionTitleEl.length && $sectionTitleEl.find('.sek-level-option-icon').length < 1 ) {
-                                    $sectionTitleEl.prepend( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
-                              }
+                        // Style the section title
+                        var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
+                            $panelTitleEl = _section_.container.find('.customize-section-title h3');
 
-                              // The default title looks like this : <span class="customize-action">Customizing</span> Title
-                              if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
-                                    $panelTitleEl.find('.customize-action').after( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
-                              }
+                        // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
+                        if ( 0 < $sectionTitleEl.length && $sectionTitleEl.find('.sek-level-option-icon').length < 1 ) {
+                              $sectionTitleEl.prepend( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
+                        }
 
-                              // Schedule the accordion behaviour
-                              self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
+                        // The default title looks like this : <span class="customize-action">Customizing</span> Title
+                        if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
+                              $panelTitleEl.find('.customize-action').after( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
+                        }
 
-                              // Fetch the presetSectionCollection from the server now, so we save a few milliseconds when injecting the first preset_section
-                              // it populates api.sek_presetSections
-                              self._maybeFetchSectionsFromServer();
-                        });
+                        // Schedule the accordion behaviour
+                        self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
+
+                        // Fetch the presetSectionCollection from the server now, so we save a few milliseconds when injecting the first preset_section
+                        // it populates api.sek_presetSections
+                        self._maybeFetchSectionsFromServer();
                   });
                   return dfd;
             }
