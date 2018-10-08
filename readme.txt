@@ -44,6 +44,11 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
+= 1.1.2 : October 8th, 2018 =
+* improved : the content picker should be available when expanding the main Nimble panel for the first time.
+* improved : the collection of pre-designed sections is fetched earlier for better perforamnces.
+* improved : a set of params can now be passed to a custom location when registering.
+
 = 1.1.1 : October 7th, 2018 =
 * fixed : wrong error message, indicating a missing "ver_ini" property for column and module generated when dropping a module in a section to create
 * added : a filter 'nimble_get_locale_template_path', used for example in the Hueman theme to define a custom Nimble template path
