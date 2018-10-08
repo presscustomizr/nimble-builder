@@ -11,18 +11,19 @@ if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFI
 function sek_get_locations() {
   return apply_filters( 'sek_locations', array_merge( SEK_Fire()->default_locations, SEK_Fire()->registered_locations ) );
 }
-
-function register_location( $location ) {
+function register_location( $location_id, $params = array() ) {
+    $params = is_array( $params ) ? $params : array();
+    $params = wp_parse_args( $params, array( 'priority' => 10 ) );
     $registered_locations = SEK_Fire()->registered_locations;
     if ( is_array( $registered_locations ) ) {
-        $registered_locations[] = $location;
+        $registered_locations[$location_id] = $params;
     }
     SEK_Fire()->registered_locations = $registered_locations;
 }
 function sek_get_default_sektions_value() {
     $defaut_sektions_value = [ 'collection' => [], 'local_options' => [] ];
-    foreach( sek_get_locations() as $location ) {
-        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location ], SEK_Fire()->default_location_model );
+    foreach( sek_get_locations() as $location_id => $params ) {
+        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location_id ], SEK_Fire()->default_location_model );
     }
     return $defaut_sektions_value;
 }
@@ -427,12 +428,12 @@ function sek_get_locale_template(){
     return $path;
 }
 function render_content_sections_for_nimble_template() {
-    foreach( sek_get_locations() as $location ) {
-        $locationSettingValue = sek_get_skoped_seks( skp_get_skope_id(), $location );
-        if ( 'loop_start' === $location || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
-            do_action( "sek_before_location_{$location}" );
-            SEK_Fire()->_render_seks_for_location( $location, $locationSettingValue );
-            do_action( "sek_after_location_{$location}" );
+    foreach( sek_get_locations() as $location_id => $params ) {
+        $locationSettingValue = sek_get_skoped_seks( skp_get_skope_id(), $location_id );
+        if ( 'loop_start' === $location_id || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
+            do_action( "sek_before_location_{$location_id}" );
+            SEK_Fire()->_render_seks_for_location( $location_id, $locationSettingValue );
+            do_action( "sek_after_location_{$location_id}" );
         }
     }
 }
@@ -793,7 +794,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             }
         }
 
-        foreach( SEK_Fire()->registered_locations as $loc_id ) {
+        foreach( SEK_Fire()->registered_locations as $loc_id => $params ) {
             if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
                 $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], SEK_Fire()->default_location_model );
             }
@@ -807,8 +808,8 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         $location_id
     );
     if ( array_key_exists( 'collection', $seks_data ) && ! empty( $location_id ) ) {
-        if ( ! in_array( $location_id, sek_get_locations() ) ) {
-            error_log('Error => location ' . $location_id . ' is not registered in the available locations' );
+        if ( ! array_key_exists( $location_id, sek_get_locations() ) ) {
+            error_log( __FUNCTION__ . ' Error => location ' . $location_id . ' is not registered in the available locations' );
         } else {
             $seks_data = sek_get_level_model( $location_id, $seks_data['collection'] );
         }
@@ -8735,10 +8736,10 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $cached_input_lists = array(); // <= will be populated to cache the input_list of each registered module. Useful when we need to get info like css_selector for a particular input type or id.
         public $ajax_action_map = array();
         public $default_locations = [
-            'loop_start',
-            'before_content',
-            'after_content',
-            'loop_end'
+            'loop_start' => array( 'priority' => 10 ),
+            'before_content' => array(),
+            'after_content' => array(),
+            'loop_end' => array( 'priority' => 10 ),
         ];
         public $registered_locations = [];
         public $default_location_model = [
@@ -9354,11 +9355,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $locale_template = sek_get_locale_template();
             if ( !empty( $locale_template ) )
               return;
-            foreach( sek_get_locations() as $hook ) {
-                switch ( $hook ) {
+            foreach( sek_get_locations() as $location_id => $params ) {
+                $params = is_array( $params ) ? $params : array();
+                $params = wp_parse_args( $params, array( 'priority' => 10 ) );
+                switch ( $location_id ) {
                     case 'loop_start' :
                     case 'loop_end' :
-                        add_action( $hook, array( $this, 'sek_schedule_sektions_rendering' ) );
+                        add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
                     break;
                     case 'before_content' :
                         add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
@@ -9367,7 +9370,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
                     break;
                     default :
-                        add_action( $hook, array( $this, 'sek_schedule_sektions_rendering' ) );
+                        add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
                     break;
                 }
             }
@@ -9427,7 +9430,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return $html;
         }
         public function _render_seks_for_location( $location = '', $location_data = array() ) {
-            if ( ! in_array( $location, sek_get_locations() ) ) {
+            if ( ! array_key_exists( $location, sek_get_locations() ) ) {
                 error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
             }
@@ -9786,7 +9789,6 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 $skope_id = skp_build_skope_id();
             } else {
                 if ( empty( $skope_id ) ) {
-                    wp_send_json_error(  __FUNCTION__ . ' => missing skope_id' );
                     return;
                 }
             }
