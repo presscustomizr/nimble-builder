@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 4.9.8
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -44,6 +44,9 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
+= 1.1.3 : October 9th, 2018 =
+* fixed : user interface not generated on the first click in some cases
+
 = 1.1.2 : October 8th, 2018 =
 * improved : the content picker should be available when expanding the main Nimble panel for the first time.
 * improved : the collection of pre-designed sections is fetched earlier for better perforamnces.

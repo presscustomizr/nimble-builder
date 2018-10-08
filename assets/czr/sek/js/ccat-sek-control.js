@@ -117,11 +117,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           .html( logoHtml )
                                           .append( $sidePanelTitleElSpan );
                               }
-                              _mainPanel_.expanded.bind( function( expanded ) {
-                                  if ( expanded && ! api.section.has( '__content_picker__' ) ) {
-                                      api.previewer.trigger('sek-pick-content', { focus : false } );
-                                  }
-                              });
                         });
                   });
                   api.CZR_Helpers.register({
@@ -196,7 +191,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         transport : 'refresh',//'refresh',//// ,
                         type : 'option'
                   });
-            },//mayBeRegisterAndSetupAddNewSektionSection()
+                  api.CZR_Helpers.register({
+                        origin : 'nimble',
+                        what : 'section',
+                        id : '__content_picker__',
+                        title: sektionsLocalizedData.i18n['Content Picker'],
+                        panel : sektionsLocalizedData.sektionsPanelId,
+                        priority : 30,
+                        track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                        constructWith : api.Section.extend({
+                              isContextuallyActive : function () {
+                                return this.active();
+                              },
+                              _toggleActive : function(){ return true; }
+                        })
+                  }).done( function() {
+                        api.section( '__content_picker__', function( _section_ ) {
+                              if ( 'resolved' != api.czr_initialSkopeCollectionPopulated.state() ) {
+                                    api.czr_initialSkopeCollectionPopulated.done( function() {
+                                          api.previewer.trigger('sek-pick-content', { focus : false });
+                                    });
+                              } else {
+                                    api.previewer.trigger('sek-pick-content', { focus : false });
+                              }
+                        });
+                  });
+            },//registerAndSetupDefaultPanelSectionOptions()
             setContextualCollectionSettingIdWhenSkopeSet : function( newSkopes, previousSkopes ) {
                   var self = this;
                   previousSkopes = previousSkopes || {};
@@ -1551,7 +1571,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _control_.content_type = optionData.content_type;//<= used to handle visibility when switching content type with the "content_type_switcher" control
                                           if ( true === params.focus ) {
                                                 _control_.focus({
-                                                    completeCallback : function() {}
+                                                      completeCallback : function() {}
                                                 });
                                           }
 
@@ -1564,6 +1584,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
                                                 _control_.container.attr('data-sek-expanded', "false" );
                                                 if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
+                                                      _control_.container.find('.czr-items-wrapper').show();
                                                       $title.trigger('click');
                                                 }
                                           } else {
@@ -1574,34 +1595,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });//_.each
                   };//_do_register_
-                  api.CZR_Helpers.register({
-                        origin : 'nimble',
-                        what : 'section',
-                        id : '__content_picker__',
-                        title: sektionsLocalizedData.i18n['Content Picker'],
-                        panel : sektionsLocalizedData.sektionsPanelId,
-                        priority : 30,
-                        track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
-                        constructWith : api.Section.extend({
-                              isContextuallyActive : function () {
-                                return this.active();
-                              },
-                              _toggleActive : function(){ return true; }
-                        })
-                  }).done( function() {
-                        api.section( '__content_picker__', function( _section_ ) {
-                              _do_register_();
-                              var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
-                                  $panelTitleEl = _section_.container.find('.customize-section-title h3');
-                              if ( 0 < $sectionTitleEl.length && $sectionTitleEl.find('.sek-level-option-icon').length < 1 ) {
-                                    $sectionTitleEl.prepend( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
-                              }
-                              if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
-                                    $panelTitleEl.find('.customize-action').after( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
-                              }
-                              self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
-                              self._maybeFetchSectionsFromServer();
-                        });
+                  api.section( '__content_picker__', function( _section_ ) {
+                        _do_register_();
+                        var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
+                            $panelTitleEl = _section_.container.find('.customize-section-title h3');
+                        if ( 0 < $sectionTitleEl.length && $sectionTitleEl.find('.sek-level-option-icon').length < 1 ) {
+                              $sectionTitleEl.prepend( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
+                        }
+                        if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
+                              $panelTitleEl.find('.customize-action').after( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
+                        }
+                        self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
+                        self._maybeFetchSectionsFromServer();
                   });
                   return dfd;
             }
