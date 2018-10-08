@@ -230,9 +230,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // generate the UI for the content picker if no done yet
                               _mainPanel_.expanded.bind( function( expanded ) {
-                                  if ( expanded && ! api.section.has( '__content_picker__' ) ) {
-                                      api.previewer.trigger('sek-pick-content', { focus : false } );
-                                  }
+                                    if ( expanded && ! api.section.has( '__content_picker__' ) ) {
+                                          api.previewer.trigger('sek-pick-content', { focus : false } );
+                                    }
                               });
                               // default looks like
                               // <span class="preview-notice">You are customizing <strong class="panel-title">Nimble Builder</strong></span>
