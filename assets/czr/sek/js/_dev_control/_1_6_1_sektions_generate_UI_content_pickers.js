@@ -205,6 +205,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // Schedule the accordion behaviour
                               self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
+
+                              // Fetch the presetSectionCollection from the server now, so we save a few milliseconds when injecting the first preset_section
+                              // it populates api.sek_presetSections
+                              self._maybeFetchSectionsFromServer();
                         });
                   });
                   return dfd;

@@ -1045,7 +1045,39 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+            // @return a promise()
+            // caches the sections in api.sek_presetSections on the first ajax request
+            _maybeFetchSectionsFromServer : function() {
 
+                  var dfd = $.Deferred();
+                  if ( ! _.isEmpty( api.sek_presetSections ) ) {
+                        dfd.resolve( api.sek_presetSections );
+                  } else {
+                        var _ajaxRequest_;
+                        if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
+                              _ajaxRequest_ = api.sek_fetchingPresetSections;
+                        } else {
+                              // This utility handles a cached version of the preset_sections once fetched the first time
+                              // @see api.CZR_Helpers.czr_cachedTmpl
+                              _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
+                                    tmpl : 'font_list',
+                                    module_type: 'preset_sections_server_collection',
+                                    module_id : 'no_module_id'
+                              } );
+                              api.sek_fetchingPresetSections = _ajaxRequest_;
+                        }
+
+                        _ajaxRequest_.done( function( _collection_ ) {
+                              //api.sek_presetSections = JSON.parse( _collection_ );
+                              api.sek_presetSections = _collection_;
+                              dfd.resolve( api.sek_presetSections );
+                        }).fail( function( _r_ ) {
+                              dfd.reject( _r_ );
+                        });
+
+                  }
+                  return dfd.promise();
+            },
 
 
 
@@ -1065,40 +1097,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Because this id has been generated ::reactToPreviewMsg, case "sek-add-section", and is the identifier that we'll need when ajaxing ( $_POST['id'])
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
-                      __dfd__ = $.Deferred(),
-                      _getPresetSections = function() {
-                        var dfd = $.Deferred();
-                        if ( ! _.isEmpty( api.sek_presetSections ) ) {
-                              dfd.resolve( api.sek_presetSections );
-                        } else {
-                              var _ajaxRequest_;
-                              if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
-                                    _ajaxRequest_ = api.sek_fetchingPresetSections;
-                              } else {
-                                    // This utility handles a cached version of the preset_sections once fetched the first time
-                                    // @see api.CZR_Helpers.czr_cachedTmpl
-                                    _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
-                                          tmpl : 'font_list',
-                                          module_type: 'preset_sections_server_collection',
-                                          module_id : 'no_module_id'
-                                    } );
-                                    api.sek_fetchingPresetSections = _ajaxRequest_;
-                              }
+                      __dfd__ = $.Deferred();
 
-                              _ajaxRequest_.done( function( _collection_ ) {
-                                    //api.sek_presetSections = JSON.parse( _collection_ );
-                                    api.sek_presetSections = _collection_;
-                                    dfd.resolve( api.sek_presetSections );
-                              }).fail( function( _r_ ) {
-                                    dfd.reject( _r_ );
-                              });
-
-                        }
-                        return dfd.promise();
-                  };
-
-
-                  _getPresetSections()
+                  self._maybeFetchSectionsFromServer()
                         .fail( function( er ) {
                               __dfd__.reject( er );
                         })
@@ -1153,7 +1154,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // the other level's version have to be added
                               presetCandidate.collection = setVersion( presetCandidate.collection );
                               __dfd__.resolve( presetCandidate );
-                        });//_getPresetSections.done()
+                        });//_maybeFetchSectionsFromServer.done()
 
                   return __dfd__.promise();
             },

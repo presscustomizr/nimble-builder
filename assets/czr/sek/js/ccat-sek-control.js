@@ -117,6 +117,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           .html( logoHtml )
                                           .append( $sidePanelTitleElSpan );
                               }
+                              _mainPanel_.expanded.bind( function( expanded ) {
+                                  if ( expanded && ! api.section.has( '__content_picker__' ) ) {
+                                      api.previewer.trigger('sek-pick-content', { focus : false } );
+                                  }
+                              });
                         });
                   });
                   api.CZR_Helpers.register({
@@ -1595,6 +1600,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     $panelTitleEl.find('.customize-action').after( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
                               }
                               self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
+                              self._maybeFetchSectionsFromServer();
                         });
                   });
                   return dfd;
@@ -2944,39 +2950,39 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });//api( self.sekCollectionSettingId(), function( sektionSetInstance ) {}
                   return __updateAPISettingDeferred__.promise();
             },//updateAPISetting
+            _maybeFetchSectionsFromServer : function() {
+
+                  var dfd = $.Deferred();
+                  if ( ! _.isEmpty( api.sek_presetSections ) ) {
+                        dfd.resolve( api.sek_presetSections );
+                  } else {
+                        var _ajaxRequest_;
+                        if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
+                              _ajaxRequest_ = api.sek_fetchingPresetSections;
+                        } else {
+                              _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
+                                    tmpl : 'font_list',
+                                    module_type: 'preset_sections_server_collection',
+                                    module_id : 'no_module_id'
+                              } );
+                              api.sek_fetchingPresetSections = _ajaxRequest_;
+                        }
+
+                        _ajaxRequest_.done( function( _collection_ ) {
+                              api.sek_presetSections = _collection_;
+                              dfd.resolve( api.sek_presetSections );
+                        }).fail( function( _r_ ) {
+                              dfd.reject( _r_ );
+                        });
+
+                  }
+                  return dfd.promise();
+            },
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
-                      __dfd__ = $.Deferred(),
-                      _getPresetSections = function() {
-                        var dfd = $.Deferred();
-                        if ( ! _.isEmpty( api.sek_presetSections ) ) {
-                              dfd.resolve( api.sek_presetSections );
-                        } else {
-                              var _ajaxRequest_;
-                              if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
-                                    _ajaxRequest_ = api.sek_fetchingPresetSections;
-                              } else {
-                                    _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
-                                          tmpl : 'font_list',
-                                          module_type: 'preset_sections_server_collection',
-                                          module_id : 'no_module_id'
-                                    } );
-                                    api.sek_fetchingPresetSections = _ajaxRequest_;
-                              }
+                      __dfd__ = $.Deferred();
 
-                              _ajaxRequest_.done( function( _collection_ ) {
-                                    api.sek_presetSections = _collection_;
-                                    dfd.resolve( api.sek_presetSections );
-                              }).fail( function( _r_ ) {
-                                    dfd.reject( _r_ );
-                              });
-
-                        }
-                        return dfd.promise();
-                  };
-
-
-                  _getPresetSections()
+                  self._maybeFetchSectionsFromServer()
                         .fail( function( er ) {
                               __dfd__.reject( er );
                         })
@@ -3016,7 +3022,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
                               presetCandidate.collection = setVersion( presetCandidate.collection );
                               __dfd__.resolve( presetCandidate );
-                        });//_getPresetSections.done()
+                        });//_maybeFetchSectionsFromServer.done()
 
                   return __dfd__.promise();
             },
