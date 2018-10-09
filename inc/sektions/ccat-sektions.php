@@ -6394,7 +6394,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_fields_child',
-        'name' => __( 'Form fields and button Labels', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form fields and button labels', 'text_domain_to_be_replaced' ),
         'css_selectors' => array( '.sek-module-inner' ),
         'tmpl' => array(
             'item-inputs' => array(
