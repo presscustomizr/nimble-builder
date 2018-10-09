@@ -673,7 +673,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               });
                                         }
                                         api.previewer.trigger( 'sek-pick-content', {});
-                                        api.previewer.send('sek-focus-on', { id : params.apiParams.id });
+                                        api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                   }
                             },
 
@@ -899,6 +899,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           level : 'section',
                                                           in_sektion : params.apiParams.id
                                                     });
+                                                    api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                               break;
                                               case 'sek-duplicate-column' :
                                                     api.previewer.trigger('sek-edit-options', {
@@ -920,7 +921,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         api.previewer.send( 'sek-refresh-stylesheet', {
                                               skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         });
-                                        api.previewer.send('sek-focus-on', { id : params.apiParams.id });
+
                                   }
                             },
                             'sek-resize-columns' : function( params ) {
@@ -7650,6 +7651,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                         api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
                                                   }
                                             });
+                                      break;
+                                      case 'border-type' :
+                                          _.each( [ 'borders' ] , function(_inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'none' !== input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
                                       break;
                                       case 'use_box_shadow' :
                                             _.each( [ 'push_effect' ] , function( _inputId_ ) {

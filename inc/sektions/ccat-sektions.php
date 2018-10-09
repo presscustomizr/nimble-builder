@@ -6360,7 +6360,8 @@ function sek_get_module_params_for_czr_simple_form_module() {
                 'push_effect' => 1
             ),
             'form_fonts' => array(
-                'fl_font_family_css' => '[cfont]Lucida Console,Monaco,monospace'
+                'fl_font_family_css' => '[cfont]Lucida Console,Monaco,monospace',
+                'btn_color_css' => '#ffffff'
             ),
             'form_submission' => array(
                 'email_footer' => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_domain_to_be_replaced' ),
@@ -6393,7 +6394,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_fields_child',
-        'name' => __( 'Form Fields', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form fields and button Labels', 'text_domain_to_be_replaced' ),
         'css_selectors' => array( '.sek-module-inner' ),
         'tmpl' => array(
             'item-inputs' => array(
@@ -6466,6 +6467,13 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'title'       => __('Email field label', 'text_domain_to_be_replaced'),
                     'default'     => __('Email', 'translate')
                 ),
+
+                'button_text' => array(
+                    'input_type'  => 'text',
+                    'width-100'         => true,
+                    'title'       => __('Button text', 'text_domain_to_be_replaced'),
+                    'default'     => __('Submit', 'translate')
+                ),
             )
         ),
         'render_tmpl_path' => '',
@@ -6486,7 +6494,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_design_child',
-        'name' => __( 'Form Design', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form fields design', 'text_domain_to_be_replaced' ),
         'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
@@ -6562,7 +6570,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_button_child',
-        'name' => __( 'Form Button', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form button design', 'text_domain_to_be_replaced' ),
         'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
@@ -6593,6 +6601,28 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_selectors'=> $css_selectors
+                ),
+                'border-type' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Border', 'text_domain_to_be_replaced'),
+                    'default' => 'none',
+                    'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),
+                'borders' => array(
+                    'input_type'  => 'borders',
+                    'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                    'min' => 0,
+                    'max' => 100,
+                    'default' => array(
+                        '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+                    ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'css_selectors'=> '.sek-icon i'
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'range_with_unit_picker',
@@ -7102,7 +7132,7 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_submission_child',
-        'name' => __( 'Form Submission', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form submission options', 'text_domain_to_be_replaced' ),
         'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
@@ -7169,9 +7199,10 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
 
     $value = $complete_modul_model['value'];
     if ( ! empty( $value['form_button'] ) && is_array( $value['form_button'] ) ) {
-        $bg_color = $value['form_button']['bg_color_css'];
-        if ( sek_booleanize_checkbox_val( $value['form_button']['use_custom_bg_color_on_hover'] ) ) {
-            $bg_color_hover = $value['form_button']['bg_color_hover'];
+        $form_button_options = $value['form_button'];
+        $bg_color = $form_button_options['bg_color_css'];
+        if ( sek_booleanize_checkbox_val( $form_button_options['use_custom_bg_color_on_hover'] ) ) {
+            $bg_color_hover = $form_button_options['bg_color_hover'];
         } else {
             if ( 0 === strpos( $bg_color, 'rgba' ) ) {
                 list( $rgb, $alpha ) = sek_rgba2rgb_a( $bg_color );
@@ -7183,11 +7214,23 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
                 $bg_color_hover      = sek_lighten_hex( $bg_color, $percent=15 );
             }
         }
+
         $rules[] = array(
             'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] input[type="submit"]:hover',
             'css_rules' => 'background-color:' . $bg_color_hover . ';',
             'mq' =>null
         );
+        $border_settings = $form_button_options[ 'borders' ];
+        $border_type = $form_button_options[ 'border-type' ];
+        $has_border_settings  = 'none' != $border_type && !empty( $border_type );
+        if ( $has_border_settings ) {
+            $rules = sek_generate_css_rules_for_multidimensional_border_options(
+                $rules,
+                $border_settings,
+                $border_type,
+                '[data-sek-id="'.$complete_modul_model['id'].'"] input[type="submit"]'
+            );
+        }
     }
     $border_settings = $value[ 'fields_design' ][ 'borders' ];
     $border_type = $value[ 'fields_design' ][ 'border-type' ];
@@ -8199,7 +8242,9 @@ class Sek_Dyn_CSS_Handler {
      * @return string The absolute CSS file URI
      */
     private function _sek_dyn_css_build_uri() {
-        $base_uri = isset( $this->base_uri ) ? $this->base_uri : $this->_sek_dyn_css_build_base_uri();
+        if ( ! isset( $this->base_uri ) ) {
+            $this->_sek_dyn_css_build_base_uri();
+        }
         return wp_normalize_path( trailingslashit( $this->base_uri ) . "{$this->id}.css" );
     }
 
@@ -8215,8 +8260,9 @@ class Sek_Dyn_CSS_Handler {
      * @return string The absolute CSS file URL
      */
     private function _sek_dyn_css_build_url() {
-
-        $base_url = isset( $this->base_uri ) ? $this->base_url : $this->_sek_dyn_css_build_base_uri();
+        if ( ! isset( $this->base_url ) ) {
+            $this->_sek_dyn_css_build_base_url();
+        }
         return trailingslashit( $this->base_url ) . "{$this->id}.css";
     }
 
@@ -8253,7 +8299,7 @@ class Sek_Dyn_CSS_Handler {
         $upload_dir         = wp_get_upload_dir();
 
         $relative_base_path = isset( $this->relative_base_path ) ? $this->relative_base_path : $this->_sek_dyn_css_build_relative_base_path();
-        return trailingslashit( $upload_dir['baseurl'] ) . $relative_base_path;
+        return set_url_scheme( trailingslashit( $upload_dir['baseurl'] ) . $relative_base_path );
     }
 
 
@@ -9992,6 +10038,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                         }
                     }
                     $user_form_composition[$field_id]['additional_attrs']['class'] = 'sek-btn' . $visual_effect_class;
+                    $user_form_composition[$field_id]['value'] = esc_attr( $form_fields_options['button_text'] );
                 break;
                 case 'nimble_skope_id':
                     $user_form_composition[$field_id] = $field_data;

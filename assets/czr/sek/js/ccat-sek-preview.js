@@ -384,9 +384,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.maybeMakeColumnResizableInSektion.call( this );
                   });
                   $('body').on(
-                        'sek-level-refreshed sek-modules-refreshed sek-columns-refreshed',
+                        'sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added',
                         '[data-sek-level="location"]',
-                        function() {
+                        function( evt ) {
                               $(this).find('[data-sek-level="section"]').each( function() {
                                     self.maybeMakeColumnResizableInSektion.call( this );
                               });
@@ -1204,7 +1204,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   $('.sortable-placeholder').remove();
                                   $('.sek-dynamic-drop-zone').remove();
                             },
-                            'sek-focus-on' : function( params ) {
+                            'sek-animate-to-level' : function( params ) {
                                   var $elToFocusOn = $('div[data-sek-id="' + params.id + '"]' );
                                   if ( $elToFocusOn.length > 0 ) {
                                         $('html, body').animate({
@@ -1232,20 +1232,25 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           api.preview.send( 'selective-refresh-setting-validities', _ajaxResponse_.data.setting_validities );
                                     }
                               };
-
+                              $('body').addClass( msgId );
                               try {
-                                    $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) ).done( function( _ajaxResponse_ ) {
+                                    $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) )
+                                    .done( function( _ajaxResponse_ ) {
                                           sendSuccessDataToPanel( _ajaxResponse_ );
-                                    }).fail( function() {
+                                    })
+                                    .fail( function() {
                                           api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
-                                    }).then( function() {
+                                    })
+                                    .always( function( _ajaxResponse_ ) {
+                                          $('body').removeClass( msgId );
+                                    })
+                                    .then( function() {
                                           api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
                                     });
                               } catch( _er_ ) {
                                     self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
+                                    $('body').removeClass( msgId );
                               }
-
-
                         });
                   });
             }//schedulePanelMsgReactions()

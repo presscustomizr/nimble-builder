@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 4.9.8
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -44,6 +44,12 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
+= 1.1.5 : October 10th, 2018 =
+* fixed : columns of a pre-designed sections not resizable after a drop
+* fixed : don't animate when duplicating a column or a module
+* fixed : added the missing button text option for the form module
+* improved : better support for https secure protocol when building the stylesheet URL
+
 = 1.1.4 : October 9th, 2018 =
 * fixed : code typo generating a php error ( https://wordpress.org/support/topic/unable-to-activate-44/ )
 * fixed : use 'https' when building the dynamic stylesheet url when is_ssl()
@@ -74,6 +80,12 @@ The Nimble builder has been optimized to work with the Customizr and Hueman them
 * fixed : dynamic CSS can be printed twice : inline and enqueued as CSS file when user logged in.
 
 == Changelog ==
+= 1.1.5 : October 10th, 2018 =
+* fixed : columns of a pre-designed sections not resizable after a drop
+* fixed : don't animate when duplicating a column or a module
+* fixed : added the missing button text option for the form module
+* improved : better support for https secure protocol when building the stylesheet URL
+
 = 1.1.4 : October 9th, 2018 =
 * fixed : code typo generating a php error ( https://wordpress.org/support/topic/unable-to-activate-44/ )
 * fixed : use 'https' when building the dynamic stylesheet url when is_ssl()
