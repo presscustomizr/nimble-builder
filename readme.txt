@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 4.9.8
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -44,6 +44,10 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
+= 1.1.4 : October 9th, 2018 =
+* fixed : code typo generating a php error ( https://wordpress.org/support/topic/unable-to-activate-44/ )
+* fixed : use 'https' when building the dynamic stylesheet url when is_ssl()
+
 = 1.1.3 : October 9th, 2018 =
 * fixed : user interface not generated on the first click in some cases
 
@@ -70,6 +74,27 @@ The Nimble builder has been optimized to work with the Customizr and Hueman them
 * fixed : dynamic CSS can be printed twice : inline and enqueued as CSS file when user logged in.
 
 == Changelog ==
+= 1.1.4 : October 9th, 2018 =
+* fixed : code typo generating a php error ( https://wordpress.org/support/topic/unable-to-activate-44/ )
+* fixed : use 'https' when building the dynamic stylesheet url when is_ssl()
+
+= 1.1.3 : October 9th, 2018 =
+* fixed : user interface not generated on the first click in some cases
+
+= 1.1.2 : October 8th, 2018 =
+* improved : the content picker should be available when expanding the main Nimble panel for the first time.
+* improved : the collection of pre-designed sections is fetched earlier for better perforamnces.
+* improved : a set of params can now be passed to a custom location when registering.
+
+= 1.1.1 : October 7th, 2018 =
+* fixed : wrong error message, indicating a missing "ver_ini" property for column and module generated when dropping a module in a section to create
+* added : a filter 'nimble_get_locale_template_path', used for example in the Hueman theme to define a custom Nimble template path
+
+= 1.1.0 : October 5th, 2018 =
+* This version includes major improvements. Many new modules and pre-designed sections are now available to create your pages.
+* New modules : heading, icon, button, Google map, Html content, quote, spacer, divider, contact form.
+* The user interface has been enhanced with a non intrusive top bar, including do/undo buttons, and global settings for the Nimble builder.
+
 = 1.0.4 : June 14th, 2018 =
 * fixed : when margins and paddings are not defined ( number field emptied ), no related CSS properties should be printed.
 * fixed : sek-sektion-inner should not have a padding of 15px on front.

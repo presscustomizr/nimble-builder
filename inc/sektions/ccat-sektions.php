@@ -2405,7 +2405,7 @@ function sek_set_input_tmpl___buttons_choice( $input_id, $input_data ) {
     ?>
       <# //console.log( 'IN php::sek_set_input_tmpl___buttons_choice() => data range_slide => ', data ); #>
       <?php
-        if ( ! is_array( $input_data ) || empty( $input_data['choices'] || ! is_array( $input_data['choices'] ) ) ) {
+        if ( ! is_array( $input_data ) || empty( $input_data['choices'] ) || ! is_array( $input_data['choices'] ) ) {
             sek_error_log( __FUNCTION__ . ' error => missing choices property' );
             return;
         }
@@ -7975,7 +7975,7 @@ class Sek_Dyn_CSS_Handler {
         $this->base_url             = $this->_sek_dyn_css_build_base_url();
 
         $this->uri                  = $this->_sek_dyn_css_build_uri();
-        $this->url                  = $this->_sek_dyn_css_build_url();
+        $this->url                  = $this->_ssl_maybe_fix_url( $this->_sek_dyn_css_build_url() );
 
         $this->file_exists          = $this->_sek_dyn_css_file_exists();
 
@@ -7984,6 +7984,21 @@ class Sek_Dyn_CSS_Handler {
                 $this->mode = self::MODE_INLINE;
             }
         }
+    }
+
+
+    /**
+    * replace http: URL with https: URL
+    * @fix https://github.com/presscustomizr/nimble-builder/issues/188
+    * @param string $url
+    * @return string
+    */
+    private function _ssl_maybe_fix_url($url) {
+      if ( is_ssl() && is_string($url) && stripos($url, 'http://') === 0 ) {
+        $url = 'https' . substr($url, 4);
+      }
+
+      return $url;
     }
 
 
@@ -8200,6 +8215,7 @@ class Sek_Dyn_CSS_Handler {
      * @return string The absolute CSS file URL
      */
     private function _sek_dyn_css_build_url() {
+
         $base_url = isset( $this->base_uri ) ? $this->base_url : $this->_sek_dyn_css_build_base_uri();
         return trailingslashit( $this->base_url ) . "{$this->id}.css";
     }
