@@ -339,7 +339,7 @@ class Sek_Dyn_CSS_Handler {
         $this->base_url             = $this->_sek_dyn_css_build_base_url();
 
         $this->uri                  = $this->_sek_dyn_css_build_uri();
-        $this->url                  = $this->_sek_dyn_css_build_url();
+        $this->url                  = $this->_ssl_maybe_fix_url( $this->_sek_dyn_css_build_url() );
 
         $this->file_exists          = $this->_sek_dyn_css_file_exists();
 
@@ -351,6 +351,20 @@ class Sek_Dyn_CSS_Handler {
     }
 
 
+    /**
+    * replace http: URL with https: URL
+    * @fix https://github.com/presscustomizr/nimble-builder/issues/188
+    * @param string $url
+    * @return string
+    */
+    private function _ssl_maybe_fix_url($url) {
+      // only fix if source URL starts with http://
+      if ( is_ssl() && is_string($url) && stripos($url, 'http://') === 0 ) {
+        $url = 'https' . substr($url, 4);
+      }
+
+      return $url;
+    }
 
 
     /**
