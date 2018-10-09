@@ -48,7 +48,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               });
                                         }
                                         api.previewer.trigger( 'sek-pick-content', {});
-                                        api.previewer.send('sek-focus-on', { id : params.apiParams.id });
+                                        api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                   }
                             },
 
@@ -292,6 +292,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           level : 'section',
                                                           in_sektion : params.apiParams.id
                                                     });
+                                                    // Focus on the cloned level
+                                                    api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                               break;
                                               case 'sek-duplicate-column' :
                                                     api.previewer.trigger('sek-edit-options', {
@@ -314,8 +316,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         api.previewer.send( 'sek-refresh-stylesheet', {
                                               skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         });
-                                        // Focus on the cloned level
-                                        api.previewer.send('sek-focus-on', { id : params.apiParams.id });
+
                                   }
                             },
                             'sek-resize-columns' : function( params ) {
