@@ -339,7 +339,7 @@ class Sek_Dyn_CSS_Handler {
         $this->base_url             = $this->_sek_dyn_css_build_base_url();
 
         $this->uri                  = $this->_sek_dyn_css_build_uri();
-        $this->url                  = $this->_ssl_maybe_fix_url( $this->_sek_dyn_css_build_url() );
+        $this->url                  = $this->_sek_dyn_css_build_url();
 
         $this->file_exists          = $this->_sek_dyn_css_file_exists();
 
@@ -351,20 +351,6 @@ class Sek_Dyn_CSS_Handler {
     }
 
 
-    /**
-    * replace http: URL with https: URL
-    * @fix https://github.com/presscustomizr/nimble-builder/issues/188
-    * @param string $url
-    * @return string
-    */
-    private function _ssl_maybe_fix_url($url) {
-      // only fix if source URL starts with http://
-      if ( is_ssl() && is_string($url) && stripos($url, 'http://') === 0 ) {
-        $url = 'https' . substr($url, 4);
-      }
-
-      return $url;
-    }
 
 
     /**
@@ -598,7 +584,9 @@ class Sek_Dyn_CSS_Handler {
      * @return string The absolute CSS file URI
      */
     private function _sek_dyn_css_build_uri() {
-        $base_uri = isset( $this->base_uri ) ? $this->base_uri : $this->_sek_dyn_css_build_base_uri();
+        if ( ! isset( $this->base_uri ) ) {
+            $this->_sek_dyn_css_build_base_uri();
+        }
         return wp_normalize_path( trailingslashit( $this->base_uri ) . "{$this->id}.css" );
     }
 
@@ -614,8 +602,9 @@ class Sek_Dyn_CSS_Handler {
      * @return string The absolute CSS file URL
      */
     private function _sek_dyn_css_build_url() {
-
-        $base_url = isset( $this->base_uri ) ? $this->base_url : $this->_sek_dyn_css_build_base_uri();
+        if ( ! isset( $this->base_url ) ) {
+            $this->_sek_dyn_css_build_base_url();
+        }
         return trailingslashit( $this->base_url ) . "{$this->id}.css";
     }
 
@@ -654,7 +643,7 @@ class Sek_Dyn_CSS_Handler {
         $upload_dir         = wp_get_upload_dir();
 
         $relative_base_path = isset( $this->relative_base_path ) ? $this->relative_base_path : $this->_sek_dyn_css_build_relative_base_path();
-        return trailingslashit( $upload_dir['baseurl'] ) . $relative_base_path;
+        return set_url_scheme( trailingslashit( $upload_dir['baseurl'] ) . $relative_base_path );
     }
 
 
