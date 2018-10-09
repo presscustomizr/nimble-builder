@@ -381,7 +381,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
                             // FOCUS
-                            'sek-focus-on' : function( params ) {
+                            // Sent from the panel when duplicating a section level for example
+                            'sek-animate-to-level' : function( params ) {
                                   var $elToFocusOn = $('div[data-sek-id="' + params.id + '"]' );
                                   if ( $elToFocusOn.length > 0 ) {
                                         $('html, body').animate({
@@ -421,20 +422,28 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           api.preview.send( 'selective-refresh-setting-validities', _ajaxResponse_.data.setting_validities );
                                     }
                               };
-
+                              // the action being processed is added as a css class to the body of the preview
+                              // it's used to enable/disable specific css properties during the action
+                              // for example, we don't want css transitions while duplicating or removing a column
+                              $('body').addClass( msgId );
                               try {
-                                    $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) ).done( function( _ajaxResponse_ ) {
+                                    $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) )
+                                    .done( function( _ajaxResponse_ ) {
                                           sendSuccessDataToPanel( _ajaxResponse_ );
-                                    }).fail( function() {
+                                    })
+                                    .fail( function() {
                                           api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
-                                    }).then( function() {
+                                    })
+                                    .always( function( _ajaxResponse_ ) {
+                                          $('body').removeClass( msgId );
+                                    })
+                                    .then( function() {
                                           api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
                                     });
                               } catch( _er_ ) {
                                     self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
+                                    $('body').removeClass( msgId );
                               }
-
-
                         });
                   });
             }//schedulePanelMsgReactions()

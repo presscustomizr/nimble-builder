@@ -53,6 +53,13 @@
   -o-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;
 }
+/* the preview action is added as a css class to the body while being processed
+@see sek-preview::schedulePanelMsgReactions */
+.sek-duplicate [data-sek-level], .sek-remove [data-sek-level], .sek-refresh-stylesheet [data-sek-level]{
+  -webkit-transition: inherit!important;
+  -o-transition: inherit!important;
+  transition: inherit!important;
+}
 
 /* MODULES SPECIFICS WHEN CUSTOMIZING */
 /* image module transitions when customizing */
