@@ -357,7 +357,7 @@ class Sek_Dyn_CSS_Handler {
     * @param string $url
     * @return string
     */
-    function _ssl_maybe_fix_url($url) {
+    private function _ssl_maybe_fix_url($url) {
       // only fix if source URL starts with http://
       if ( is_ssl() && is_string($url) && stripos($url, 'http://') === 0 ) {
         $url = 'https' . substr($url, 4);
