@@ -58,7 +58,8 @@ function sek_get_module_params_for_czr_simple_form_module() {
                 'push_effect' => 1
             ),
             'form_fonts' => array(
-                'fl_font_family_css' => '[cfont]Lucida Console,Monaco,monospace'
+                'fl_font_family_css' => '[cfont]Lucida Console,Monaco,monospace',
+                'btn_color_css' => '#ffffff'
             ),
             'form_submission' => array(
                 'email_footer' => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_domain_to_be_replaced' ),
@@ -91,7 +92,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_fields_child',
-        'name' => __( 'Form Fields', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form fields and button Labels', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_domain_to_be_replaced'),
@@ -176,6 +177,13 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'title'       => __('Email field label', 'text_domain_to_be_replaced'),
                     'default'     => __('Email', 'translate')
                 ),
+
+                'button_text' => array(
+                    'input_type'  => 'text',
+                    'width-100'         => true,
+                    'title'       => __('Button text', 'text_domain_to_be_replaced'),
+                    'default'     => __('Submit', 'translate')
+                ),
             )
         ),
         'render_tmpl_path' => '',
@@ -196,7 +204,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_design_child',
-        'name' => __( 'Form Design', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form fields design', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_domain_to_be_replaced'),
@@ -284,7 +292,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_button_child',
-        'name' => __( 'Form Button', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form button design', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_domain_to_be_replaced'),
@@ -328,6 +336,28 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                     'refresh_stylesheet' => true,
                     //'css_identifier' => 'background_color_hover',
                     'css_selectors'=> $css_selectors
+                ),
+                'border-type' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Border', 'text_domain_to_be_replaced'),
+                    'default' => 'none',
+                    'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),
+                'borders' => array(
+                    'input_type'  => 'borders',
+                    'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                    'min' => 0,
+                    'max' => 100,
+                    'default' => array(
+                        '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
+                    ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'css_selectors'=> '.sek-icon i'
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'range_with_unit_picker',
@@ -857,7 +887,7 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_submission_child',
-        'name' => __( 'Form Submission', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form submission options', 'text_domain_to_be_replaced' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_domain_to_be_replaced'),
@@ -948,9 +978,10 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
 
     // BUTTON
     if ( ! empty( $value['form_button'] ) && is_array( $value['form_button'] ) ) {
-        $bg_color = $value['form_button']['bg_color_css'];
-        if ( sek_booleanize_checkbox_val( $value['form_button']['use_custom_bg_color_on_hover'] ) ) {
-            $bg_color_hover = $value['form_button']['bg_color_hover'];
+        $form_button_options = $value['form_button'];
+        $bg_color = $form_button_options['bg_color_css'];
+        if ( sek_booleanize_checkbox_val( $form_button_options['use_custom_bg_color_on_hover'] ) ) {
+            $bg_color_hover = $form_button_options['bg_color_hover'];
         } else {
             // Build the lighter rgb from the user picked bg color
             if ( 0 === strpos( $bg_color, 'rgba' ) ) {
@@ -963,15 +994,31 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
                 $bg_color_hover      = sek_lighten_hex( $bg_color, $percent=15 );
             }
         }
+
         $rules[] = array(
             'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] input[type="submit"]:hover',
             'css_rules' => 'background-color:' . $bg_color_hover . ';',
             'mq' =>null
         );
+
+        // BUTTON BORDERS
+        $border_settings = $form_button_options[ 'borders' ];
+        $border_type = $form_button_options[ 'border-type' ];
+        $has_border_settings  = 'none' != $border_type && !empty( $border_type );
+
+        //border width + type + color
+        if ( $has_border_settings ) {
+            $rules = sek_generate_css_rules_for_multidimensional_border_options(
+                $rules,
+                $border_settings,
+                $border_type,
+                '[data-sek-id="'.$complete_modul_model['id'].'"] input[type="submit"]'
+            );
+        }
     }
 
 
-    // BORDERS
+    // FIELDS BORDERS
     $border_settings = $value[ 'fields_design' ][ 'borders' ];
     $border_type = $value[ 'fields_design' ][ 'border-type' ];
     $has_border_settings  = 'none' != $border_type && !empty( $border_type );

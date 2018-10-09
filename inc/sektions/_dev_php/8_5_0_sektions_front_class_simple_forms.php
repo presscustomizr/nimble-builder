@@ -207,6 +207,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                         }
                     }
                     $user_form_composition[$field_id]['additional_attrs']['class'] = 'sek-btn' . $visual_effect_class;
+                    $user_form_composition[$field_id]['value'] = esc_attr( $form_fields_options['button_text'] );
                 break;
                 case 'nimble_skope_id':
                     $user_form_composition[$field_id] = $field_data;

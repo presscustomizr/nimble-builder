@@ -70,6 +70,15 @@
                                                   }
                                             });
                                       break;
+                                      case 'border-type' :
+                                          _.each( [ 'borders' ] , function(_inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'none' !== input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                      break;
                                       case 'use_box_shadow' :
                                             _.each( [ 'push_effect' ] , function( _inputId_ ) {
                                                   try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
