@@ -47,6 +47,7 @@ The Nimble builder has been optimized to work with the Customizr and Hueman them
 = 1.1.6 : October 11th, 2018 =
 * fixed : normalized the text style of the user interface when previewing, so it's not impacted by the theme or other's plugins style
 * improved : added a way to make <a> links unclickable. partially fixes #193
+* added : a "Contact-us" category of sections, including 2 new pre-designed sections
 
 = 1.1.5 : October 10th, 2018 =
 * fixed : columns of a pre-designed sections not resizable after a drop

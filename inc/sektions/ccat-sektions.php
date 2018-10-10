@@ -1243,6 +1243,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             'Sections for an introduction' => __('Sections for an introduction', 'text_domain_to_be_replaced'),
             'Sections for services and features' => __('Sections for services and features', 'text_domain_to_be_replaced'),
+            'Contact-us sections' => __('Contact-us sections', 'text_domain_to_be_replaced'),
             'Empty sections with columns layout' => __('Empty sections with columns layout', 'text_domain_to_be_replaced'),
 
             'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
@@ -1773,6 +1774,22 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                             'content-id' => 'features_two',
                             'title' => __('3 columns with icon', 'text-domain' ),
                             'thumb' => 'features_two.jpg',
+                        )
+                    );
+                break;
+                case 'contact_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'contact_one',
+                            'title' => __('A contact form and a Google map', 'text-domain' ),
+                            'thumb' => 'contact_one.jpg',
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'contact_two',
+                            'title' => __('A contact form with an image background', 'text-domain' ),
+                            'thumb' => 'contact_two.jpg',
                         )
                     );
                 break;
@@ -3030,6 +3047,7 @@ function sek_register_modules() {
 
         'sek_intro_sec_picker_module',
         'sek_features_sec_picker_module',
+        'sek_contact_sec_picker_module',
         'sek_column_layouts_sec_picker_module',
         'sek_level_bg_module',
         'sek_level_border_module',
@@ -3350,6 +3368,19 @@ function sek_get_module_params_for_sek_features_sec_picker_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'features_sections' => sek_get_default_section_input_params()
+            )
+        )
+    );
+}
+
+function sek_get_module_params_for_sek_contact_sec_picker_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_contact_sec_picker_module',
+        'name' => __('Contact-us sections', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'contact_sections' => sek_get_default_section_input_params()
             )
         )
     );
@@ -5582,7 +5613,7 @@ function sek_get_module_params_for_czr_map_module() {
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Height', 'text_domain_to_be_replaced' ),
                     'min' => 1,
-                    'max' => 400,
+                    'max' => 600,
                     'default'     => array( 'desktop' => '200px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',

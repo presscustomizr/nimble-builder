@@ -1505,6 +1505,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
+                        sek_contact_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_contact_sec_picker_module',
+                              controlLabel :  sektionsLocalizedData.i18n['Contact-us sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
                         sek_column_layouts_sec_picker_module : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_column_layouts_sec_picker_module',
@@ -5795,6 +5804,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       _.each([
             'sek_intro_sec_picker_module',
             'sek_features_sec_picker_module',
+            'sek_contact_sec_picker_module',
             'sek_column_layouts_sec_picker_module'
       ], function( module_type ) {
             api.czrModuleMap[ module_type ] = {

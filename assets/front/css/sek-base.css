@@ -900,6 +900,7 @@ button.sek-btn,
 
 .sek-simple-form-wrapper textarea {
   height: auto;
+  max-height: 150px;
 }
 
 .sek-simple-form-wrapper .sek-form-field {
