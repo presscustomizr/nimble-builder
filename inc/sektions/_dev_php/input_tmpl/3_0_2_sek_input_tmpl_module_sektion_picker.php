@@ -205,6 +205,24 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                         )
                     );
                 break;
+                case 'contact_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'contact_one',
+                            'title' => __('A contact form and a Google map', 'text-domain' ),
+                            'thumb' => 'contact_one.jpg',
+                            //'height' => '188px'
+                        ),
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'contact_two',
+                            'title' => __('A contact form with an image background', 'text-domain' ),
+                            'thumb' => 'contact_two.jpg',
+                            //'height' => '188px'
+                        )
+                    );
+                break;
                 case 'layout_sections' :
                     $content_collection = array(
                         array(

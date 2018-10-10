@@ -96,6 +96,19 @@ function sek_get_module_params_for_sek_features_sec_picker_module() {
     );
 }
 
+function sek_get_module_params_for_sek_contact_sec_picker_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_contact_sec_picker_module',
+        'name' => __('Contact-us sections', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'contact_sections' => sek_get_default_section_input_params()
+            )
+        )
+    );
+}
+
 function sek_get_module_params_for_sek_column_layouts_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
