@@ -3,11 +3,20 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+function sek_is_debug_mode() {
+  return isset( $_GET['nimble_debug'] );
+}
+function sek_is_dev_mode() {
+  return ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || sek_is_debug_mode();
+}
 
 if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
 if ( ! defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
+if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) {
+    define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION );
+}
 function sek_get_locations() {
   return apply_filters( 'sek_locations', array_merge( SEK_Fire()->default_locations, SEK_Fire()->registered_locations ) );
 }
@@ -886,7 +895,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/css/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-control.css' : 'sek-control.min.css'
+            sek_is_dev_mode() ? 'sek-control.css' : 'sek-control.min.css'
         ),
         array(),
         NIMBLE_ASSETS_VERSION,
@@ -899,7 +908,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
+            sek_is_dev_mode() ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
         ),
         array( 'czr-skope-base' , 'jquery', 'underscore' ),
         NIMBLE_ASSETS_VERSION,
@@ -911,7 +920,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
+            sek_is_dev_mode() ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
         ),
         array( 'jquery' ),
         NIMBLE_ASSETS_VERSION,
@@ -924,7 +933,7 @@ function sek_enqueue_controls_js_css() {
         apply_filters( 'nimble-sek-localized-customizer-control-params',
             array(
                 'nimbleVersion' => NIMBLE_VERSION,
-                'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
+                'isDevMode' => sek_is_dev_mode(),
                 'baseUrl' => NIMBLE_BASE_URL,
                 'sektionsPanelId' => '__sektions__',
                 'addNewSektionId' => 'sek_add_new_sektion',
@@ -1321,7 +1330,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
 function sek_get_preset_sektions() {
     $transient_name = 'nimble_preset_sections_' . NIMBLE_VERSION;
     $transient_data = get_transient( $transient_name );
-    if ( false == $transient_data || empty( $transient_data ) || ( defined( 'NIMBLE_DEV') && true === NIMBLE_DEV ) ) {
+    if ( false == $transient_data || empty( $transient_data ) || sek_is_dev_mode() ) {
         $preset_raw = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
         if ( $preset_raw === false ) {
           $preset_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
@@ -9178,7 +9187,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/front/css/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? "sek-base{$rtl_suffix}.css" : "sek-base{$rtl_suffix}.min.css"
+                    sek_is_dev_mode() ? "sek-base{$rtl_suffix}.css" : "sek-base{$rtl_suffix}.min.css"
                 ),
                 array(),
                 NIMBLE_ASSETS_VERSION,
@@ -9200,6 +9209,16 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     $media = 'all'
                 );
             }
+            wp_localize_script(
+                'sek-main-js',
+                'sekFrontLocalized',
+                array(
+                    'isDevMode' => sek_is_dev_mode(),
+                    'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+                    'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
+                    'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : ''
+                )
+            );
         }
         function sek_schedule_customize_preview_assets() {
             add_action( 'wp_footer', array( $this, 'sek_print_ui_tmpl' ) );
@@ -9209,7 +9228,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/czr/sek/css/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-preview.css' : 'sek-preview.min.css'
+                    sek_is_dev_mode() ? 'sek-preview.css' : 'sek-preview.min.css'
                 ),
                 array( 'sek-base' ),
                 NIMBLE_ASSETS_VERSION,
@@ -9227,7 +9246,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sprintf(
                     '%1$s/assets/czr/sek/js/%2$s' ,
                     NIMBLE_BASE_URL,
-                    defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'ccat-sek-preview.js' : 'ccat-sek-preview.min.js'
+                    sek_is_dev_mode() ? 'ccat-sek-preview.js' : 'ccat-sek-preview.min.js'
                 ),
                 array( 'customize-preview', 'underscore'),
                 NIMBLE_ASSETS_VERSION,
@@ -9247,7 +9266,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         'section' => __('section', 'text_domain_to_be_replaced'),
                         'nested section' => __('nested section', 'text_domain_to_be_replaced')
                     ),
-                    'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
+                    'isDevMode' => sek_is_dev_mode(),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
 
@@ -9273,7 +9292,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                     <div class="sek-add-content-button-wrapper">
                      <# var hook_location = ''; #>
-                      <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
+                      <?php if ( sek_is_dev_mode() ) : ?>
                           <# if ( data.location ) {
                               hook_location = '( @hook : ' + data.location + ')';
                           } #>
@@ -9297,7 +9316,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
-                        <?php if ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) : ?>
+                        <?php if ( sek_is_dev_mode() ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
                         <# if ( ! data.is_nested ) { #>
