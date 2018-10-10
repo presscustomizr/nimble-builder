@@ -10,7 +10,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/css/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'sek-control.css' : 'sek-control.min.css'
+            sek_is_dev_mode() ? 'sek-control.css' : 'sek-control.min.css'
         ),
         array(),
         NIMBLE_ASSETS_VERSION,
@@ -24,7 +24,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
+            sek_is_dev_mode() ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
         ),
         array( 'czr-skope-base' , 'jquery', 'underscore' ),
         NIMBLE_ASSETS_VERSION,
@@ -37,7 +37,7 @@ function sek_enqueue_controls_js_css() {
         sprintf(
             '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
-            defined('NIMBLE_DEV') && true === NIMBLE_DEV ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
+            sek_is_dev_mode() ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
         ),
         array( 'jquery' ),
         NIMBLE_ASSETS_VERSION,
@@ -50,7 +50,7 @@ function sek_enqueue_controls_js_css() {
         apply_filters( 'nimble-sek-localized-customizer-control-params',
             array(
                 'nimbleVersion' => NIMBLE_VERSION,
-                'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('NIMBLE_DEV') && true === NIMBLE_DEV ),
+                'isDevMode' => sek_is_dev_mode(),
                 'baseUrl' => NIMBLE_BASE_URL,
                 'sektionsPanelId' => '__sektions__',
                 'addNewSektionId' => 'sek_add_new_sektion',
@@ -518,7 +518,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
 function sek_get_preset_sektions() {
     $transient_name = 'nimble_preset_sections_' . NIMBLE_VERSION;
     $transient_data = get_transient( $transient_name );
-    if ( false == $transient_data || empty( $transient_data ) || ( defined( 'NIMBLE_DEV') && true === NIMBLE_DEV ) ) {
+    if ( false == $transient_data || empty( $transient_data ) || sek_is_dev_mode() ) {
         $preset_raw = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
         if ( $preset_raw === false ) {
           $preset_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );

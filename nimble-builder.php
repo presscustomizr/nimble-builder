@@ -2,7 +2,7 @@
 /**
 * Plugin Name: Nimble Builder
 * Description: Drag-and-drop section builder companion of the Customizr and Hueman themes.
-* Version: 1.1.5
+* Version: 1.1.51
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://presscustomizr.com
@@ -11,11 +11,8 @@
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "1.1.5";
+$current_version = "1.1.51";
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
-if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) {
-    define( 'NIMBLE_ASSETS_VERSION', ( ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) ? time() : NIMBLE_VERSION );
-}
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
 if ( !defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
 if ( !defined( 'NIMBLE_BASE_PATH' ) ) { define( 'NIMBLE_BASE_PATH' , dirname( __FILE__ ) ); }
