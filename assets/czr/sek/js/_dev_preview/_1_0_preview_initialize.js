@@ -37,6 +37,36 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               $updatedSektion.toggleClass( 'sek-has-modules', $updatedSektion.find('[data-sek-level="module"]').length > 0 );
                         }
                   });
+
+                  // Deactivates the links
+                  self.deactivateLinks();
+
+                  $('body').on([
+                        'sek-modules-refreshed',
+                        'sek-columns-refreshed',
+                        'sek-section-added',
+                        'sek-level-refreshed',
+                        'sek-edit-module'
+                  ].join(' '), function( evt ) {
+                        self.deactivateLinks(evt);
+                  });
+            },
+
+            // Fired on initialize()
+            // and on user generated events
+            deactivateLinks : function( evt ) {
+                  evt = evt || {};
+                  $('body').find('[data-sek-level="module"]').each( function() {
+                        $(this).find('a').each( function() {
+                              if ( "yes" === $(this).data('sek-unlinked') )
+                                return;
+                              $(this).addClass('nimble-unclickable');
+                              $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', '#');
+                              $(this).on('click', function(evt) {
+                                    evt.preventDefault();
+                              });
+                        });
+                  });
             },
 
             // Hightlight the currently level in the preview, corresponding to the active ui in the panel
