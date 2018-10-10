@@ -60,7 +60,7 @@ function sek_get_module_params_for_czr_map_module() {
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Height', 'text_domain_to_be_replaced' ),
                     'min' => 1,
-                    'max' => 400,
+                    'max' => 600,
                     'default'     => array( 'desktop' => '200px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
