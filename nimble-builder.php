@@ -32,6 +32,12 @@ if ( version_compare( $wp_version, NIMBLE_MIN_WP_VERSION, '<' ) ) {
     add_action( 'admin_notices' , 'nimble_display_min_wp_message' );
     return;
 }
+
+function nimble_pass_requirements(){
+  global $wp_version;
+  return ! version_compare( phpversion(), NIMBLE_MIN_PHP_VERSION, '<' ) && ! version_compare( $wp_version, NIMBLE_MIN_WP_VERSION, '<' );
+}
+
 function nimble_display_min_php_message() {
     nimble_display_min_requirement_notice( __( 'PHP', 'text_domain_to_be_replaced' ), NIMBLE_MIN_PHP_VERSION );
 }
@@ -53,6 +59,8 @@ function nimble_display_min_requirement_notice( $requires_what, $requires_what_v
 /* ------------------------------------------------------------------------- */
 add_action( 'after_setup_theme', 'nimble_load_czr_base_fmk', 10 );
 function nimble_load_czr_base_fmk() {
+    if ( ! nimble_pass_requirements() )
+      return;
     if ( did_action( 'nimble_base_fmk_loaded' ) ) {
         if ( ( defined( 'CZR_DEV' ) && CZR_DEV ) || ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) ) {
             error_log( __FILE__ . '  => The czr_base_fmk has already been loaded');
@@ -65,36 +73,36 @@ function nimble_load_czr_base_fmk() {
        'version' => NIMBLE_VERSION
     ));
 }
+if ( nimble_pass_requirements() ) {
+    require_once( plugin_dir_path( __FILE__ ) . 'inc/czr-skope/index.php' );
+    add_action( 'after_setup_theme', function() {
+        \Nimble\Flat_Skop_Base( array(
+            'base_url_path' => NIMBLE_BASE_URL . '/inc/czr-skope'
+        ) );
+    });
+    require_once( plugin_dir_path( __FILE__ ) . 'inc/sektions/ccat-sektions.php' );
 
-require_once( plugin_dir_path( __FILE__ ) . 'inc/czr-skope/index.php' );
-add_action( 'after_setup_theme', function() {
-    \Nimble\Flat_Skop_Base( array(
-        'base_url_path' => NIMBLE_BASE_URL . '/inc/czr-skope'
-    ) );
-});
+    if ( defined( 'NIMBLE_PRINT_TEST' ) && NIMBLE_PRINT_TEST && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
+        require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
+    }
 
-require_once( plugin_dir_path( __FILE__ ) . 'inc/sektions/ccat-sektions.php' );
+    add_action('plugins_loaded', 'nimble_load_plugin_textdomain');
+    /**
+    * Load language files
+    * @action plugins_loaded
+    */
+    function nimble_load_plugin_textdomain() {
+        // Note to self, the third argument must not be hardcoded, to account for relocated folders.
+        load_plugin_textdomain( 'nimble-builder' );
+    }
 
-if ( defined( 'NIMBLE_PRINT_TEST' ) && NIMBLE_PRINT_TEST && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
-    require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
+    // @return void()
+    function nimble_register_location( $location, $params = array() ) {
+        if ( empty( $location ) || ! is_string( $location ) )
+          return;
+        \Nimble\register_location( $location, $params );
+    }
+
+    // Fire the retro compatibility functions
+    add_action( 'wp_loaded', '\Nimble\sek_maybe_do_version_mapping' );
 }
-
-add_action('plugins_loaded', 'nimble_load_plugin_textdomain');
-/**
-* Load language files
-* @action plugins_loaded
-*/
-function nimble_load_plugin_textdomain() {
-    // Note to self, the third argument must not be hardcoded, to account for relocated folders.
-    load_plugin_textdomain( 'nimble-builder' );
-}
-
-// @return void()
-function nimble_register_location( $location, $params = array() ) {
-    if ( empty( $location ) || ! is_string( $location ) )
-      return;
-    \Nimble\register_location( $location, $params );
-}
-
-// Fire the retro compatibility functions
-add_action( 'wp_loaded', '\Nimble\sek_maybe_do_version_mapping' );
