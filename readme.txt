@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 4.9.8
-Stable tag: 1.1.6
+Stable tag: 1.1.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -44,6 +44,9 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
+= 1.1.7 : October 11th, 2018 =
+* fixed : check on php and wordpress version not preventing some plugin functions to be fired.
+
 = 1.1.6 : October 11th, 2018 =
 * fixed : normalized the text style of the user interface when previewing, so it's not impacted by the theme or other's plugins style
 * improved : added a way to make <a> links unclickable. partially fixes #193
@@ -85,6 +88,14 @@ The Nimble builder has been optimized to work with the Customizr and Hueman them
 * fixed : dynamic CSS can be printed twice : inline and enqueued as CSS file when user logged in.
 
 == Changelog ==
+= 1.1.7 : October 11th, 2018 =
+* fixed : check on php and wordpress version not preventing some plugin functions to be fired.
+
+= 1.1.6 : October 11th, 2018 =
+* fixed : normalized the text style of the user interface when previewing, so it's not impacted by the theme or other's plugins style
+* improved : added a way to make <a> links unclickable. partially fixes #193
+* added : a "Contact-us" category of sections, including 2 new pre-designed sections
+
 = 1.1.5 : October 10th, 2018 =
 * fixed : columns of a pre-designed sections not resizable after a drop
 * fixed : don't animate when duplicating a column or a module
