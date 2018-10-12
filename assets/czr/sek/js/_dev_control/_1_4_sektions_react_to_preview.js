@@ -101,9 +101,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         // because there might be a google font specified in the starting value
                                         self.updateAPISetting({ action : 'sek-update-fonts' } );
 
-                                        // Refresh the stylesheet to generate the css rules of the module
-                                        api.previewer.send( 'sek-refresh-stylesheet', {
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        // Refresh the stylesheet to generate the css rules of the clone
+                                        // api.previewer.send( 'sek-refresh-stylesheet', {
+                                        //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        // });
+                                        api.previewer.trigger('sek-refresh-stylesheet', {
+                                              id : params.apiParams.in_column,
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
                                   }
                             },
@@ -285,6 +289,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
+                                        var idForStyleSheetRefresh;
                                         switch( params.apiParams.action ) {
                                               case 'sek-duplicate-section' :
                                                     api.previewer.trigger('sek-edit-options', {
@@ -292,6 +297,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           level : 'section',
                                                           in_sektion : params.apiParams.id
                                                     });
+                                                    idForStyleSheetRefresh = params.apiParams.location;
                                                     // Focus on the cloned level
                                                     api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                               break;
@@ -302,6 +308,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           in_sektion : params.apiParams.in_sektion,
                                                           in_column : params.apiParams.in_column
                                                     });
+                                                    idForStyleSheetRefresh = params.apiParams.in_sektion;
                                               break;
                                               case 'sek-duplicate-module' :
                                                     api.previewer.trigger('sek-edit-module', {
@@ -310,11 +317,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           in_sektion : params.apiParams.in_sektion,
                                                           in_column : params.apiParams.in_column
                                                     });
+                                                    idForStyleSheetRefresh = params.apiParams.in_column;
                                               break;
                                         }
                                         // Refresh the stylesheet to generate the css rules of the clone
-                                        api.previewer.send( 'sek-refresh-stylesheet', {
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        // api.previewer.send( 'sek-refresh-stylesheet', {
+                                        //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        // });
+                                        api.previewer.trigger('sek-refresh-stylesheet', {
+                                              id : idForStyleSheetRefresh,
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
 
                                   }
@@ -373,11 +385,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         // => because there might be a google font specified in the starting value or in a preset section
                                         self.updateAPISetting({ action : 'sek-update-fonts' } );
 
-                                        // Refresh the stylesheet to generate the css rules of the module
-                                        api.previewer.send( 'sek-refresh-stylesheet', {
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        // Refresh the stylesheet to generate the css rules of the clone
+                                        // api.previewer.send( 'sek-refresh-stylesheet', {
+                                        //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        // });
+                                        api.previewer.trigger('sek-refresh-stylesheet', {
+                                              id : params.apiParams.location,
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
-
 
                                         // Refresh when a section is created ( not duplicated )
                                         if ( params.apiParams.is_first_section ) {
@@ -429,9 +444,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        // Refresh the stylesheet to generate the css rules of the module
-                                        api.previewer.send( 'sek-refresh-stylesheet', {
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        // Refresh the stylesheet to generate the css rules of the clone
+                                        // api.previewer.send( 'sek-refresh-stylesheet', {
+                                        //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        // });
+                                        api.previewer.trigger('sek-refresh-stylesheet', {
+                                              id : params.apiParams.in_sektion,
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
 
                                         // Always update the root fonts property after a module addition
@@ -537,6 +556,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         uiParams = {};
                                         this.resolve();
                                   });
+                            },
+
+                            'sek-refresh-stylesheet' : {
+                                  callback : function( params ) {
+                                        params = params || {};
+                                        return $.Deferred(function() {
+                                              apiParams = {id : params.id};
+                                              uiParams = {};
+                                              this.resolve();
+                                        });
+                                  },
+                                  complete : function( params ) {}
                             }
                       };//msgCollection
 
