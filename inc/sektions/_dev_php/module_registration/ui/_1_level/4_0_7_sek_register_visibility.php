@@ -34,7 +34,8 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => true,
-                    'refresh_stylesheet' => false
+                    'refresh_stylesheet' => false,
+                    'notice_after' => __('Note that those options are not applied during the live customization of your site, but only when the changes are published.', 'text_domain')
                 ),
             )
         )//tmpl
