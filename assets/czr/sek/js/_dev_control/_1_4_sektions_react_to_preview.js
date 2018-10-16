@@ -390,7 +390,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         // });
                                         api.previewer.trigger('sek-refresh-stylesheet', {
-                                              id : params.apiParams.location,
+                                              //id : params.apiParams.location,
                                               skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
 
@@ -547,27 +547,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             'sek-refresh-level' : function( params ) {
                                   sendToPreview = true;
-                                  return $.Deferred(function() {
+                                  return $.Deferred(function(_dfd_) {
                                         apiParams = {
                                               action : 'sek-refresh-level',
                                               level : params.level,
                                               id : params.id
                                         };
                                         uiParams = {};
-                                        this.resolve();
+                                        _dfd_.resolve();
                                   });
                             },
 
-                            'sek-refresh-stylesheet' : {
-                                  callback : function( params ) {
-                                        params = params || {};
-                                        return $.Deferred(function() {
-                                              apiParams = {id : params.id};
-                                              uiParams = {};
-                                              this.resolve();
-                                        });
-                                  },
-                                  complete : function( params ) {}
+                            'sek-refresh-stylesheet' : function( params ) {
+                                  sendToPreview = true;
+                                  params = params || {};
+                                  return $.Deferred(function(_dfd_) {
+                                        apiParams = {id : params.id};
+                                        uiParams = {};
+                                        _dfd_.resolve();
+                                  });
                             }
                       };//msgCollection
 
