@@ -731,4 +731,71 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
     }
     return $bool;
 }
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SMART LOAD HELPER
+/* ------------------------------------------------------------------------- */
+/**
+* callback of preg_replace_callback in SEK_Front_Render::sek_maybe_process_img_for_js_smart_load
+* @return string
+*/
+function nimble_regex_callback( $matches ) {
+    $_placeholder = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+    if ( false !== strpos( $matches[0], 'data-sek-src' ) || preg_match('/ data-sek-smartload *= *"false" */', $matches[0]) ) {
+      return $matches[0];
+    } else {
+      return apply_filters( 'nimble_img_smartloaded',
+        str_replace( array('srcset=', 'sizes='), array('data-sek-srcset=', 'data-sek-sizes='),
+            sprintf('<img %1$s src="%2$s" data-sek-src="%3$s" %4$s>',
+                $matches[1],
+                $_placeholder,
+                $matches[2],
+                $matches[3]
+            )
+        )
+      );
+    }
+}
+
+
+// @return boolean
+// img smartload can be set globally with 'global-img-smart-load' and locally with 'local-img-smart-load'
+// the local option wins
+// if local is set to inherit, return the global option
+// This option is cached
+function sek_is_img_smartload_enabled() {
+    if ( 'not_cached' !== SEK_Fire()->img_smartload_enabled ) {
+        return SEK_Fire()->img_smartload_enabled;
+    }
+    $is_img_smartload_enabled = false;
+    // LOCAL OPTION
+    // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
+    // otherwise we fallback on the normal utility skp_build_skope_id()
+    $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
+    $local_smartload = 'inherit';
+    if ( is_array( $local_options ) && !empty( $local_options['local_options']) && is_array( $local_options['local_options']) && !empty($local_options['local_options']['local_performances'] ) && is_array( $local_options['local_options']['local_performances'] ) ) {
+        if ( ! empty( $local_options['local_options']['local_performances']['local-img-smart-load'] ) && 'inherit' !== $local_options['local_options']['local_performances']['local-img-smart-load'] ) {
+              $local_smartload = 'yes' === $local_options['local_options']['local_performances']['local-img-smart-load'];
+        }
+    }
+
+    if ( 'inherit' !== $local_smartload ) {
+        $is_img_smartload_enabled = $local_smartload;
+    } else {
+        // GLOBAL OPTION
+        $glob_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+        if ( is_array( $glob_options ) && !empty($glob_options['performances']) && is_array( $glob_options['performances'] ) && !empty( $glob_options['performances']['global-img-smart-load'] ) ) {
+            $is_img_smartload_enabled = sek_booleanize_checkbox_val( $glob_options['performances']['global-img-smart-load'] );
+        }
+    }
+
+    // CACHE THE OPTION
+    SEK_Fire()->img_smartload_enabled = $is_img_smartload_enabled;
+
+    return SEK_Fire()->img_smartload_enabled;
+}
 ?>

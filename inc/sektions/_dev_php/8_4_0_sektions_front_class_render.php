@@ -17,7 +17,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             // USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
+
+            // SMART LOAD
+            add_filter( 'nimble_parse_for_smart_load', array( $this, 'sek_maybe_process_img_for_js_smart_load') );
         }
+
 
         // When using the default theme template, let's schedule the default hooks rendering
         // When using the Nimble template, this is done with render_content_sections_for_nimble_template();
@@ -133,7 +137,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // the $location_data can be provided. Typically when using the function render_content_sections_for_nimble_template in the Nimble page template.
         public function _render_seks_for_location( $location = '', $location_data = array() ) {
             if ( ! array_key_exists( $location, sek_get_locations() ) ) {
-                error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
             }
             $locationSettingValue = array();
@@ -232,12 +236,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
 
                     ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s" %5$s>',
+                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s" %5$s %6$s>',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
                         $this->get_level_visibility_css_class( $model ),
-                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"'
+                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                        $this -> sek_maybe_add_smart_loaded_bg_attributes( $model )
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -545,6 +550,71 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             //sek_error_log( 'TEMPLATE ? => ' . did_action('wp'), $template );
             return $template;
+        }
+
+
+
+        /* ------------------------------------------------------------------------- *
+         *  SMART LOAD.
+        /* ------------------------------------------------------------------------- */
+        // @return string
+        // adds the lazy load data attributes when sek_is_img_smartload_enabled()
+        // img smartload can be set globally with 'global-img-smart-load' and locally with 'local-img-smart-load'
+        // the local option wins
+        function sek_maybe_add_smart_loaded_bg_attributes( $model ) {
+            if ( !sek_is_img_smartload_enabled() )
+              return false;
+            $bg_url = '';
+            if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
+                $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
+                if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
+                    //no repeat by default?
+                    $bg_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
+                }
+            }
+            return ! empty( $bg_url ) ? sprintf('data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url ) : '';
+        }
+
+
+        // @filter nimble_parse_for_smart_load
+        // this filter is used in several modules : tiny_mce_editor, image module, ...
+        // img smartload can be set globally with 'global-img-smart-load' and locally with 'local-img-smart-load'
+        // deactivated when customizing
+        // @return html string
+        function sek_maybe_process_img_for_js_smart_load( $html ) {
+            if ( !sek_is_img_smartload_enabled() )
+              return $html;
+            if ( skp_is_customizing() )
+                return $html;
+            if ( ! is_string( $html ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => provided html is not a string', $html );
+                return $html;
+            }
+            if ( is_feed() || is_preview() )
+                return $html;
+
+            $allowed_image_extensions = apply_filters( 'nimble_smartload_allowed_img_extensions', array(
+                'bmp',
+                'gif',
+                'jpeg',
+                'jpg',
+                'jpe',
+                'tif',
+                'tiff',
+                'ico',
+                'png',
+                'svg',
+                'svgz'
+            ) );
+
+            if ( empty( $allowed_image_extensions ) || ! is_array( $allowed_image_extensions ) ) {
+              return $html;
+            }
+
+            $img_extensions_pattern = sprintf( "(?:%s)", implode( '|', $allowed_image_extensions ) );
+            $pattern                = '#<img([^>]+?)src=[\'"]?([^\'"\s>]+\.'.$img_extensions_pattern.'[^\'"\s>]*)[\'"]?([^>]*)>#i';
+
+            return preg_replace_callback( $pattern, '\Nimble\nimble_regex_callback', $html);
         }
     }//class
 endif;

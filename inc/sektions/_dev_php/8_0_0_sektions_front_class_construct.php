@@ -30,6 +30,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
               self::$instance = new Sek_Simple_Form( $params );
             return self::$instance;
         }
+        public $img_smartload_enabled = 'not_cached';
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
