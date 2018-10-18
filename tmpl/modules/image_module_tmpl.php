@@ -65,7 +65,7 @@ if ( ! function_exists( '\Nimble\sek_get_img_module_img_html') ) {
                 }
             }
         }
-        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) );
+        return apply_filters( 'nimble_parse_for_smart_load', sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) ) );
     }
 }
 

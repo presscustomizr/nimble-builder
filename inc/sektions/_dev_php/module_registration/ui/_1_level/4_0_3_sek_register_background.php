@@ -124,8 +124,10 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     */
     // Img background
     if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
-        //no repeat by default?
-        $background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
+        if ( ! sek_is_img_smartload_enabled() ) {
+            //no repeat by default?
+            $background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
+        }
 
         // Img Bg Position
         if ( ! empty( $bg_options[ 'bg-position'] ) ) {
