@@ -148,26 +148,25 @@ jQuery( function($){
       //can access this.element and this.option
       Plugin.prototype.init = function () {
             var self        = this,
-                $_bgElements   = $( '[data-sek-src]:not('+ this.options.excludeImg.join() +')' , this.element );
+                $_ImgOrBackgroundElements   = $( '[data-sek-src]:not('+ this.options.excludeImg.join() +')' , this.element );
 
             this.increment  = 1;//used to wait a little bit after the first user scroll actions to trigger the timer
             this.timer      = 0;
 
-
-            $_bgElements
+            $_ImgOrBackgroundElements
                   //avoid intersecting containers to parse the same images
                   .addClass( skipImgClass )
                   //attach action to the load event
-                  .bind( 'load_bg_img', {}, function() {
+                  .bind( 'sek_load_img', {}, function() {
                         self._load_img(this);
                   });
 
             //the scroll event gets throttled with the requestAnimationFrame
-            $(window).scroll( function( _evt ) { self._better_scroll_event_handler( $_bgElements, _evt ); } );
+            $(window).scroll( function( _evt ) { self._better_scroll_event_handler( $_ImgOrBackgroundElements, _evt ); } );
             //debounced resize event
-            $(window).resize( _.debounce( function( _evt ) { self._maybe_trigger_load( $_bgElements, _evt ); }, 100 ) );
+            $(window).resize( _.debounce( function( _evt ) { self._maybe_trigger_load( $_ImgOrBackgroundElements, _evt ); }, 100 ) );
             //on load
-            this._maybe_trigger_load( $_bgElements );
+            this._maybe_trigger_load( $_ImgOrBackgroundElements );
       };
 
 
@@ -177,12 +176,12 @@ jQuery( function($){
       * @return : void
       * scroll event performance enhancer => avoid browser stack if too much scrolls
       */
-      Plugin.prototype._better_scroll_event_handler = function( $_bgElements , _evt ) {
+      Plugin.prototype._better_scroll_event_handler = function( $_ImgOrBackgroundElements , _evt ) {
             var self = this;
             if ( ! this.doingAnimation ) {
                   this.doingAnimation = true;
                   window.requestAnimationFrame(function() {
-                        self._maybe_trigger_load( $_bgElements , _evt );
+                        self._maybe_trigger_load( $_ImgOrBackgroundElements , _evt );
                         self.doingAnimation = false;
                   });
             }
@@ -194,13 +193,13 @@ jQuery( function($){
       * @param : current event
       * @return : void
       */
-      Plugin.prototype._maybe_trigger_load = function( $_bgElements , _evt ) {
+      Plugin.prototype._maybe_trigger_load = function( $_ImgOrBackgroundElements , _evt ) {
             var self = this,
                 //get the visible images list
-                _visible_list = $_bgElements.filter( function( ind, _el ) { return self._is_visible( _el ,  _evt ); } );
-            //trigger load_bg_img event for visible images
+                _visible_list = $_ImgOrBackgroundElements.filter( function( ind, _el ) { return self._is_visible( _el ,  _evt ); } );
+            //trigger sek_load_img event for visible images
             _visible_list.map( function( ind, _el ) {
-                  $(_el).trigger( 'load_bg_img' );
+                  $(_el).trigger( 'sek_load_img' );
             });
       };
 
@@ -235,35 +234,42 @@ jQuery( function($){
       Plugin.prototype._load_img = function( _el_ ) {
             var $_el_    = $(_el_),
                 _src     = $_el_.attr( 'data-sek-src' ),
+                _src_set = $_el_.attr( 'data-sek-srcset' ),
+                _sizes   = $_el_.attr( 'data-sek-sizes' ),
                 self = this,
                 $jQueryImgToLoad = $("<img />", { src : _src } );
 
             $_el_.addClass('lazy-loading');
-            $_el_.unbind('load_bg_img');
+            $_el_.unbind('sek_load_img');
 
             $jQueryImgToLoad
                   // .hide()
-                  // //https://api.jquery.com/removeAttr/
-                  // //An attribute to remove; as of version 1.7, it can be a space-separated list of attributes.
-                  // //minimum supported wp version (3.4+) embeds jQuery 1.7.2
-                  // .removeAttr( this.options.attribute.join(' ') )
-                  //.css( 'src', _src )
                   .load( function () {
-                        if($_el_.data("sek-lazy-bg")){
+                        if( $_el_.data("sek-lazy-bg") ){
                               $_el_.css('backgroundImage', 'url('+_src+')');
                         } else {
+                              //https://api.jquery.com/removeAttr/
+                              //An attribute to remove; as of version 1.7, it can be a space-separated list of attributes.
+                              //minimum supported wp version (3.4+) embeds jQuery 1.7.2
+                              $_el_.removeAttr( [ 'data-sek-src', 'data-sek-srcset', 'data-sek-sizes' ] .join(' ') );
                               $_el_.attr("src", _src );
+                              if ( _src_set ) {
+                                    $_el_.attr("srcset", _src_set );
+                              }
+                              if ( _sizes ) {
+                                    $_el_.attr("sizes", _sizes );
+                              }
                         }
                         //prevent executing this twice on an already smartloaded img
-                        if ( ! $_el_.hasClass('bg-lazy-loaded') ) {
-                              $_el_.addClass('bg-lazy-loaded');
+                        if ( ! $_el_.hasClass('sek-lazy-loaded') ) {
+                              $_el_.addClass('sek-lazy-loaded');
                         }
                         //Following would be executed twice if needed, as some browsers at the
                         //first execution of the load callback might still have not actually loaded the img
 
                         $_el_.trigger('smartload');
                         //flag to avoid double triggering
-                        $_el_.data('bg-lazy-loaded', true );
+                        $_el_.data('sek-lazy-loaded', true );
                   });//<= create a load() fn
             //http://stackoverflow.com/questions/1948672/how-to-tell-if-an-image-is-loaded-or-cached-in-jquery
             if ( $jQueryImgToLoad[0].complete ) {
@@ -287,6 +293,10 @@ jQuery( function($){
 
 jQuery(function($){
       $('.sektion-wrapper').each( function() {
-          $(this).nimbleLazyLoad();
+            try { $(this).nimbleLazyLoad(); } catch( er ) {
+                  if ( typeof window.console.log === 'function' ) {
+                        console.log( er );
+                  }
+            }
       });
 });
