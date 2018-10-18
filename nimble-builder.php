@@ -2,7 +2,7 @@
 /**
 * Plugin Name: Nimble Builder
 * Description: Drag-and-drop section builder companion of the Customizr and Hueman themes.
-* Version: 1.1.7
+* Version: 1.1.8
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://presscustomizr.com
@@ -11,13 +11,14 @@
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "1.1.7";
+$current_version = "1.1.8";
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
 if ( !defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
 if ( !defined( 'NIMBLE_BASE_PATH' ) ) { define( 'NIMBLE_BASE_PATH' , dirname( __FILE__ ) ); }
 if ( !defined( 'NIMBLE_MIN_PHP_VERSION' ) ) { define ( 'NIMBLE_MIN_PHP_VERSION', '5.4' ); }
 if ( !defined( 'NIMBLE_MIN_WP_VERSION' ) ) { define ( 'NIMBLE_MIN_WP_VERSION', '4.7' ); }
+if ( ! defined( 'NIMBLE_PLUGIN_FILE' ) ) {define( 'NIMBLE_PLUGIN_FILE', __FILE__ ); }// Plugin Root File used register_activation_hook( NIMBLE_PLUGIN_FILE, 'nimble_install' );
 
 
 /* ------------------------------------------------------------------------- *
@@ -67,23 +68,23 @@ function nimble_load_czr_base_fmk() {
         }
         return;
     }
-    require_once(  dirname( __FILE__ ) . '/inc/czr-base-fmk/czr-base-fmk.php' );
+    require_once(  NIMBLE_BASE_PATH . '/inc/czr-base-fmk/czr-base-fmk.php' );
     \Nimble\CZR_Fmk_Base( array(
        'base_url' => NIMBLE_BASE_URL . '/inc/czr-base-fmk',
        'version' => NIMBLE_VERSION
     ));
 }
 if ( nimble_pass_requirements() ) {
-    require_once( plugin_dir_path( __FILE__ ) . 'inc/czr-skope/index.php' );
+    require_once( NIMBLE_BASE_PATH . '/inc/czr-skope/index.php' );
     add_action( 'after_setup_theme', function() {
         \Nimble\Flat_Skop_Base( array(
             'base_url_path' => NIMBLE_BASE_URL . '/inc/czr-skope'
         ) );
     });
-    require_once( plugin_dir_path( __FILE__ ) . 'inc/sektions/ccat-sektions.php' );
+    require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions.php' );
 
     if ( defined( 'NIMBLE_PRINT_TEST' ) && NIMBLE_PRINT_TEST && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
-        require_once( plugin_dir_path( __FILE__ ) . 'tests.php' );
+        require_once( NIMBLE_BASE_PATH . '/tests.php' );
     }
 
     add_action('plugins_loaded', 'nimble_load_plugin_textdomain');
@@ -105,4 +106,12 @@ if ( nimble_pass_requirements() ) {
 
     // Fire the retro compatibility functions
     add_action( 'wp_loaded', '\Nimble\sek_maybe_do_version_mapping' );
+
+    // Load admin
+    if ( is_admin() ) {
+        require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-admin.php' );
+    }
+
+    // Load install
+    require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-install.php' );
 }
