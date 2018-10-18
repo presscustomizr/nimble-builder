@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_reset() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_reset',
-        'name' => __('Rest all sections site wide', 'text_domain_to_be_replaced'),
+        'name' => __('Reset all sections site wide', 'text_domain_to_be_replaced'),
         // 'starting_value' => array(
 
         // ),
