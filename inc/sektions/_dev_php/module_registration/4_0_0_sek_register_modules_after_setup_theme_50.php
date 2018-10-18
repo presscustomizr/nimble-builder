@@ -29,11 +29,13 @@ function sek_register_modules() {
         'sek_local_widths',
         'sek_local_custom_css',
         'sek_local_reset',
+        'sek_local_performances',
 
         // global options modules
         'sek_global_breakpoint',
         'sek_global_widths',
         //'sek_global_reset',
+        'sek_global_performances',
 
         // FRONT MODULES
         'czr_simple_html_module',

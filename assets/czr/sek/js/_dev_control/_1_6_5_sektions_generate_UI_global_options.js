@@ -38,6 +38,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_global_widths',
                               controlLabel : sektionsLocalizedData.i18n['Site wide inner and outer sections widths'],
                               icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
+                        },
+                        performances : {
+                              settingControlId : _id_ + '__performances',
+                              module_type : 'sek_global_performances',
+                              controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
+                              icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
                         }
                   });
 
