@@ -512,6 +512,60 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
     }
     return $bool;
 }
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SMART LOAD HELPER
+/* ------------------------------------------------------------------------- */
+/**
+* callback of preg_replace_callback in SEK_Front_Render::sek_maybe_process_img_for_js_smart_load
+* @return string
+*/
+function nimble_regex_callback( $matches ) {
+    $_placeholder = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+    if ( false !== strpos( $matches[0], 'data-sek-src' ) || preg_match('/ data-sek-smartload *= *"false" */', $matches[0]) ) {
+      return $matches[0];
+    } else {
+      return apply_filters( 'nimble_img_smartloaded',
+        str_replace( array('srcset=', 'sizes='), array('data-sek-srcset=', 'data-sek-sizes='),
+            sprintf('<img %1$s src="%2$s" data-sek-src="%3$s" %4$s>',
+                $matches[1],
+                $_placeholder,
+                $matches[2],
+                $matches[3]
+            )
+        )
+      );
+    }
+}
+function sek_is_img_smartload_enabled() {
+    if ( 'not_cached' !== SEK_Fire()->img_smartload_enabled ) {
+        return SEK_Fire()->img_smartload_enabled;
+    }
+    $is_img_smartload_enabled = false;
+    $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
+    $local_smartload = 'inherit';
+    if ( is_array( $local_options ) && !empty( $local_options['local_options']) && is_array( $local_options['local_options']) && !empty($local_options['local_options']['local_performances'] ) && is_array( $local_options['local_options']['local_performances'] ) ) {
+        if ( ! empty( $local_options['local_options']['local_performances']['local-img-smart-load'] ) && 'inherit' !== $local_options['local_options']['local_performances']['local-img-smart-load'] ) {
+              $local_smartload = 'yes' === $local_options['local_options']['local_performances']['local-img-smart-load'];
+        }
+    }
+
+    if ( 'inherit' !== $local_smartload ) {
+        $is_img_smartload_enabled = $local_smartload;
+    } else {
+        $glob_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+        if ( is_array( $glob_options ) && !empty($glob_options['performances']) && is_array( $glob_options['performances'] ) && !empty( $glob_options['performances']['global-img-smart-load'] ) ) {
+            $is_img_smartload_enabled = sek_booleanize_checkbox_val( $glob_options['performances']['global-img-smart-load'] );
+        }
+    }
+    SEK_Fire()->img_smartload_enabled = $is_img_smartload_enabled;
+
+    return SEK_Fire()->img_smartload_enabled;
+}
 ?><?php
 function sek_maybe_do_version_mapping() {
     if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
@@ -1268,9 +1322,12 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Inner and outer widths' => __( 'Inner and outer widths', 'text_domain_to_be_replaced'),
             'Custom CSS' => __( 'Custom CSS', 'text_domain_to_be_replaced'),
             'Remove the sections in this page' => __( 'Remove the sections in this page', 'text_domain_to_be_replaced'),
+            'Page speed optimizations' => __( 'Page speed optimizations', 'text_domain_to_be_replaced'),
 
             'Site wide breakpoint for Nimble sections' => __( 'Site wide breakpoint for Nimble sections', 'text_domain_to_be_replaced'),
             'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'text_domain_to_be_replaced'),
+
+            'Site wide page speed optimizations' => __( 'Site wide page speed optimizations', 'text_domain_to_be_replaced'),
             'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_domain_to_be_replaced'),
             'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_domain_to_be_replaced'),
 
@@ -3062,8 +3119,10 @@ function sek_register_modules() {
         'sek_local_widths',
         'sek_local_custom_css',
         'sek_local_reset',
+        'sek_local_performances',
         'sek_global_breakpoint',
         'sek_global_widths',
+        'sek_global_performances',
         'czr_simple_html_module',
 
         'czr_tiny_mce_editor_module',
@@ -3486,7 +3545,9 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     * background: [background-image] [background-position] / [background-size] [background-repeat] [background-attachment] [background-origin] [background-clip] [background-color];
     */
     if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
-        $background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
+        if ( ! sek_is_img_smartload_enabled() ) {
+            $background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
+        }
         if ( ! empty( $bg_options[ 'bg-position'] ) ) {
             $pos_map = array(
                 'top_left'    => '0% 0%',
@@ -4187,7 +4248,8 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => true,
-                    'refresh_stylesheet' => false
+                    'refresh_stylesheet' => false,
+                    'notice_after' => __('Note that those options are not applied during the live customization of your site, but only when the changes are published.', 'text_domain')
                 ),
             )
         )//tmpl
@@ -4476,6 +4538,31 @@ function sek_get_module_params_for_sek_local_reset() {
     );
 }
 ?><?php
+function sek_get_module_params_for_sek_local_performances() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_local_performances',
+        'name' => __('Performance optimizations', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'local-img-smart-load' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Select how you want to load the images in the sections of this page.', 'text_domain_to_be_replaced'),
+                    'default'     => 'inherit',
+                    'choices'     => array(
+                        'inherit' => __('Inherit the site wide option', 'text_domain' ),
+                        'yes' => __('Load images on scroll ( optimized )', 'text_domain' ),
+                        'no'  => __('Load all images on page load ( not optimized )', 'text_domain' )
+                    ),
+                    'notice_after' => __( 'When you select "Load images on scroll", images below the viewport are loaded dynamically on scroll. This can boost performances by reducing the weight of long web pages designed with several images.', 'text_domain_to_be_replaced'),
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                )
+            )
+        )//tmpl
+    );
+}
+?><?php
 function sek_get_module_params_for_sek_global_breakpoint() {
     return array(
         'dynamic_registration' => true,
@@ -4643,6 +4730,27 @@ function sek_write_global_custom_section_widths() {
         printf('<style type="text/css" id="nimble-global-options">%1$s</style>', $width_options_css );
     }
 }
+?><?php
+function sek_get_module_params_for_sek_global_performances() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_global_performances',
+        'name' => __('Site wide performance options', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'global-img-smart-load' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Load images on scroll', 'text_domain_to_be_replaced'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __( 'Check this option to delay the loading of non visible images. Images below the viewport will be loaded dynamically on scroll. This can boost performances by reducing the weight of long web pages designed with several images.', 'text_domain_to_be_replaced')
+                ),
+            )
+        )//tmpl
+    );
+}
+
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER SIMPLE HTML MODULE
@@ -8857,6 +8965,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
               self::$instance = new Sek_Simple_Form( $params );
             return self::$instance;
         }
+        public $img_smartload_enabled = 'not_cached';
         function __construct( $params = array() ) {
             $this -> _schedule_front_ajax_actions();
             $this -> _schedule_img_import_ajax_actions();
@@ -9226,8 +9335,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             );
             wp_enqueue_script(
                 'sek-main-js',
-                NIMBLE_BASE_URL . '/assets/front/js/sek-main.js',
-                array( 'jquery', 'underscore'),
+                NIMBLE_BASE_URL . '/assets/front/js/nimble-front.js',
+                array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 true
             );
@@ -9462,6 +9571,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
+            add_filter( 'nimble_parse_for_smart_load', array( $this, 'sek_maybe_process_img_for_js_smart_load') );
         }
         function sek_schedule_rendering_hooks() {
             $locale_template = sek_get_locale_template();
@@ -9543,7 +9653,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
         public function _render_seks_for_location( $location = '', $location_data = array() ) {
             if ( ! array_key_exists( $location, sek_get_locations() ) ) {
-                error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
             }
             $locationSettingValue = array();
@@ -9619,12 +9729,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
 
                     ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s" %5$s>',
+                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s" %5$s %6$s>',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
                         $this->get_level_visibility_css_class( $model ),
-                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"'
+                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                        $this -> sek_maybe_add_smart_loaded_bg_attributes( $model )
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -9887,6 +9998,59 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 $template = $locale_template;
             }
             return $template;
+        }
+
+
+
+        /* ------------------------------------------------------------------------- *
+         *  SMART LOAD.
+        /* ------------------------------------------------------------------------- */
+        function sek_maybe_add_smart_loaded_bg_attributes( $model ) {
+            if ( !sek_is_img_smartload_enabled() )
+              return false;
+            $bg_url = '';
+            if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
+                $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
+                if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
+                    $bg_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
+                }
+            }
+            return ! empty( $bg_url ) ? sprintf('data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url ) : '';
+        }
+        function sek_maybe_process_img_for_js_smart_load( $html ) {
+            if ( !sek_is_img_smartload_enabled() )
+              return $html;
+            if ( skp_is_customizing() )
+                return $html;
+            if ( ! is_string( $html ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => provided html is not a string', $html );
+                return $html;
+            }
+            if ( is_feed() || is_preview() )
+                return $html;
+
+            $allowed_image_extensions = apply_filters( 'nimble_smartload_allowed_img_extensions', array(
+                'bmp',
+                'gif',
+                'jpeg',
+                'jpg',
+                'jpe',
+                'tif',
+                'tiff',
+                'ico',
+                'png',
+                'svg',
+                'svgz'
+            ) );
+
+            if ( empty( $allowed_image_extensions ) || ! is_array( $allowed_image_extensions ) ) {
+              return $html;
+            }
+
+            $img_extensions_pattern = sprintf( "(?:%s)", implode( '|', $allowed_image_extensions ) );
+            $pattern                = '#<img([^>]+?)src=[\'"]?([^\'"\s>]+\.'.$img_extensions_pattern.'[^\'"\s>]*)[\'"]?([^>]*)>#i';
+
+            return preg_replace_callback( $pattern, '\Nimble\nimble_regex_callback', $html);
         }
     }//class
 endif;

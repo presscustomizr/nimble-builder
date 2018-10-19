@@ -105,13 +105,11 @@ if ( nimble_pass_requirements() ) {
     }
 
     // Fire the retro compatibility functions
+    // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
     add_action( 'wp_loaded', '\Nimble\sek_maybe_do_version_mapping' );
 
     // Load admin
     if ( is_admin() ) {
         require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-admin.php' );
     }
-
-    // Load install
-    require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-install.php' );
 }

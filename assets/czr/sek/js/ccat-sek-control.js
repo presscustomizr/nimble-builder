@@ -720,8 +720,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               in_column : params.apiParams.in_column
                                         });
                                         self.updateAPISetting({ action : 'sek-update-fonts' } );
-                                        api.previewer.send( 'sek-refresh-stylesheet', {
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        api.previewer.trigger('sek-refresh-stylesheet', {
+                                              id : params.apiParams.in_column,
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
                                   }
                             },
@@ -892,6 +893,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
+                                        var idForStyleSheetRefresh;
                                         switch( params.apiParams.action ) {
                                               case 'sek-duplicate-section' :
                                                     api.previewer.trigger('sek-edit-options', {
@@ -899,6 +901,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           level : 'section',
                                                           in_sektion : params.apiParams.id
                                                     });
+                                                    idForStyleSheetRefresh = params.apiParams.location;
                                                     api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                               break;
                                               case 'sek-duplicate-column' :
@@ -908,6 +911,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           in_sektion : params.apiParams.in_sektion,
                                                           in_column : params.apiParams.in_column
                                                     });
+                                                    idForStyleSheetRefresh = params.apiParams.in_sektion;
                                               break;
                                               case 'sek-duplicate-module' :
                                                     api.previewer.trigger('sek-edit-module', {
@@ -916,10 +920,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           in_sektion : params.apiParams.in_sektion,
                                                           in_column : params.apiParams.in_column
                                                     });
+                                                    idForStyleSheetRefresh = params.apiParams.in_column;
                                               break;
                                         }
-                                        api.previewer.send( 'sek-refresh-stylesheet', {
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        api.previewer.trigger('sek-refresh-stylesheet', {
+                                              id : idForStyleSheetRefresh,
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
 
                                   }
@@ -961,8 +967,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               break;
                                         }
                                         self.updateAPISetting({ action : 'sek-update-fonts' } );
-                                        api.previewer.send( 'sek-refresh-stylesheet', {
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        api.previewer.trigger('sek-refresh-stylesheet', {
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
@@ -991,8 +997,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        api.previewer.send( 'sek-refresh-stylesheet', {
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        api.previewer.trigger('sek-refresh-stylesheet', {
+                                              id : params.apiParams.in_sektion,
+                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
                                         self.updateAPISetting({ action : 'sek-update-fonts' } );
 
@@ -1065,14 +1072,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             'sek-refresh-level' : function( params ) {
                                   sendToPreview = true;
-                                  return $.Deferred(function() {
+                                  return $.Deferred(function(_dfd_) {
                                         apiParams = {
                                               action : 'sek-refresh-level',
                                               level : params.level,
                                               id : params.id
                                         };
                                         uiParams = {};
-                                        this.resolve();
+                                        _dfd_.resolve();
+                                  });
+                            },
+
+                            'sek-refresh-stylesheet' : function( params ) {
+                                  sendToPreview = true;
+                                  params = params || {};
+                                  return $.Deferred(function(_dfd_) {
+                                        apiParams = {id : params.id};
+                                        uiParams = {};
+                                        _dfd_.resolve();
                                   });
                             }
                       };//msgCollection
@@ -2019,6 +2036,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_local_reset',
                               controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
                               icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                        },
+                        local_performances : {
+                              settingControlId : _id_ + '__local_performances',
+                              module_type : 'sek_local_performances',
+                              controlLabel : sektionsLocalizedData.i18n['Page speed optimizations'],
+                              icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
                         }
                   });
 
@@ -2126,6 +2149,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_global_widths',
                               controlLabel : sektionsLocalizedData.i18n['Site wide inner and outer sections widths'],
                               icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
+                        },
+                        performances : {
+                              settingControlId : _id_ + '__performances',
+                              module_type : 'sek_global_performances',
+                              controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
+                              icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
                         }
                   });
 
@@ -6420,6 +6449,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+            }//initialize
+      };
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_local_performances : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_performances', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_local_performances' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  module.inputConstructor = api.CZRInput.extend({
+                        setupSelect : function() {
+                              api.czr_sektions.setupSelectInput.call( this );
+                        }
+                  });
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
@@ -6536,6 +6593,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_widths' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+( function ( api, $, _ ) {
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_global_performances : {
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_performances', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_performances' )
                   )
             },
       });
