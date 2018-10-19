@@ -35,13 +35,13 @@
           //with intersecting cointainers:
           //- to avoid race conditions
           //- to avoid multi processing in general
-          skipImgClass = 'tc-smart-load-skip';
+          skipImgClass = 'smartload-skip';
 
 
       function Plugin( element, options ) {
             this.element = element;
             this.options = $.extend( {}, defaults, options) ;
-            //add .tc-smart-load-skip to the excludeImg
+            //add .smartload-skip to the excludeImg
             if ( _.isArray( this.options.excludeImg ) ) {
                   this.options.excludeImg.push( '.'+skipImgClass );
             } else {
