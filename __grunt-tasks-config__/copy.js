@@ -45,10 +45,8 @@ module.exports = {
       '!inc/sektions/_dev_php/**',
 
       // front dev fmk js
-      '!assets/front/js/_front_js_fmk/**',
-      '!assets/front/js/parts/**',
-      '!assets/front/js/libs/**',
-      '!assets/front/js/_front_js_fmk.js',
+      '!assets/front/js/__FRONT_JS_FMK_TO_BE_UPDATED/**',
+      '!assets/front/js/_dev_front/**',
 
       // front dev sass
       '!assets/front/scss/**',

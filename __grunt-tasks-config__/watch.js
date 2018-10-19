@@ -256,6 +256,22 @@ module.exports = {
   //   ],
   // },
 
+  sektions_front_js : {
+    options: {
+      spawn : false,
+      // Start a live reload server on the default port 35729
+      livereload : true
+    },
+    files : [
+      '<%= paths.front_assets %>js/_dev_front/**/*.js',
+    ],
+    tasks : [
+      'jshint:those',
+      'concat:sektions_front_js',
+    ],
+  },
+
+
   sektions_modules : {
     options: {
       spawn : false,
