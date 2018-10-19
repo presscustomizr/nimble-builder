@@ -4,6 +4,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
+ * Modified to comment the user agent string for Nimble
+ * Nicolas Guillaume on 10/18/2018
+ *
  * Modified to remove var
  * Chris Christoff on 12/26/2012
  * Changes: Changes vars to publics
@@ -386,9 +389,9 @@ class Browser {
 		$wordwrapped = chunk_split( $towrapUA, 32, "\n $space" );
 		return "Platform:                 {$this->getPlatform()} \n".
 			"Browser Name:             {$this->getBrowser()}  \n" .
-			"Browser Version:          {$this->getVersion()} \n" .
-			"User Agent String:        $UAline1 \n\t\t\t  " .
-			"$wordwrapped";
+			"Browser Version:          {$this->getVersion()} \n";
+			// "User Agent String:        $UAline1 \n\t\t\t  " .
+			// "$wordwrapped";
 	}
 	/**
 	 * Protected routine to calculate and determine what the browser is in use (including platform)
