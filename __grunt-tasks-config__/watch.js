@@ -132,14 +132,14 @@ module.exports = {
 
 
 
-  sektions_dev_php : {
+  sektions_front_dev_php : {
     options: {
       spawn : false,
       // Start a live reload server on the default port 35729
       livereload : true
     },
     files : [
-      '<%= paths.sektions %>_dev_php/**/*.php'
+      '<%= paths.sektions %>_front_dev_php/**/*.php'
     ],
     tasks : [
       'concat:czr_sektions_php',

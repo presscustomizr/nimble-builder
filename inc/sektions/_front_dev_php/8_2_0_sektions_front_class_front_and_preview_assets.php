@@ -39,6 +39,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 'sek-main-js',
                 NIMBLE_BASE_URL . '/assets/front/js/nimble-front.js',
                 //array( 'jquery', 'underscore'),
+                // october 2018 => underscore is concatenated in the main front js file.
                 array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 true
