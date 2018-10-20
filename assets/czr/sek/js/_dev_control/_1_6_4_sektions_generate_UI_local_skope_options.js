@@ -51,17 +51,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
                               icon : '<i class="material-icons sek-level-option-icon">code</i>'
                         },
-                        local_reset : {
-                              settingControlId : _id_ + '__local_reset',
-                              module_type : 'sek_local_reset',
-                              controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
-                              icon : '<i class="material-icons sek-level-option-icon">cached</i>'
-                        },
                         local_performances : {
                               settingControlId : _id_ + '__local_performances',
                               module_type : 'sek_local_performances',
                               controlLabel : sektionsLocalizedData.i18n['Page speed optimizations'],
                               icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                        },
+                        local_reset : {
+                              settingControlId : _id_ + '__local_reset',
+                              module_type : 'sek_local_reset',
+                              controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
+                              icon : '<i class="material-icons sek-level-option-icon">cached</i>'
                         }
                   });
 
