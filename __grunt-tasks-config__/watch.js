@@ -142,8 +142,23 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/**/*.php'
     ],
     tasks : [
-      'concat:czr_sektions_php',
+      'concat:czr_sektions_front_php',
       'comments:php'
+    ],
+  },
+
+  sektions_customizer_dev_php : {
+    options: {
+      spawn : false,
+      // Start a live reload server on the default port 35729
+      livereload : true
+    },
+    files : [
+      '<%= paths.sektions %>_customizer_dev_php/**/*.php'
+    ],
+    tasks : [
+      'concat:czr_sektions_customizer_php',
+      'comments:sektions_front_php'
     ],
   },
 
@@ -159,17 +174,17 @@ module.exports = {
     tasks : [],
   },
 
-  sektions_customizer_folder_php : {
-    options: {
-      spawn : false,
-      // Start a live reload server on the default port 35729
-      livereload : true
-    },
-    files : [
-      '<%= paths.sektions %>customizer/**/*.php'
-    ],
-    tasks : [],
-  },
+  // sektions_customizer_folder_php : {
+  //   options: {
+  //     spawn : false,
+  //     // Start a live reload server on the default port 35729
+  //     livereload : true
+  //   },
+  //   files : [
+  //     '<%= paths.sektions %>customizer/**/*.php'
+  //   ],
+  //   tasks : [],
+  // },
 
   sektions_customizer_js : {
     options: {

@@ -43,8 +43,8 @@ module.exports = {
       '!assets/czr/sek/js/_dev_preview/**',
       // sektions dev php
       '!inc/sektions/_front_dev_php/**',
-      '!inc/sektions/_admin_dev_php/**',
       '!inc/sektions/_customizer_dev_php/**',
+      //'!inc/sektions/_admin_dev_php/**',
 
       // front dev fmk js
       '!assets/front/js/__FRONT_JS_FMK_TO_BE_UPDATED/**',

@@ -3,7 +3,6 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-
 /**
  * This handles validation, sanitization and saving of the value.
  */
@@ -180,3 +179,5 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
       return $post_id;
   }
 }
+
+?>

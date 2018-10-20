@@ -24,7 +24,7 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         //@action 'customize_register'
         function load_nimble_setting_class() {
-            require_once(  dirname( __FILE__ ) . '/customizer/seks_setting_class.php' );
+            require_once(  NIMBLE_BASE_PATH . '/inc/sektions/seks_setting_class.php' );
         }
 
         //@filter 'customize_dynamic_setting_args'

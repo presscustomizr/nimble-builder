@@ -1,11 +1,19 @@
 module.exports = {
-  php: {
+  sektions_front_php: {
     // Target-specific file lists and/or options go here.
     options: {
         singleline: true,
         multiline: false
     },
     src: [ '<%= paths.sektions %>ccat-sektions.php' ] // files to remove comments from
+  },
+  sektions_customizer_php: {
+    // Target-specific file lists and/or options go here.
+    options: {
+        singleline: true,
+        multiline: false
+    },
+    src: [ '<%= paths.sektions %>ccat-czr-sektions.php' ] // files to remove comments from
   },
   czr_base_control_js : {
     // Target-specific file lists and/or options go here.

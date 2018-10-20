@@ -56,8 +56,10 @@ module.exports = function(grunt) {
           ],
 
           'build_sektion_php_js_css' : [
-              'concat:czr_sektions_php',
-              'comments:php',
+              'concat:czr_sektions_front_php',
+              'comments:sektions_front_php',
+              'concat:czr_sektions_customizer_php',
+              'comments:sektions_customizer_php',
 
               'concat:czr_sektions_customizer_control_js',
               'comments:czr_base_control_js',

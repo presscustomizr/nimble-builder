@@ -1,9 +1,4 @@
 <?php
-namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
-
 /*
 * This approach has been inspired by the excellent https://github.com/xwp/wp-customize-posts
 */
@@ -47,3 +42,5 @@ function sek_enqueue_tiny_mce_editor() {
         add_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'enqueue_scripts' ) );
     }
 }
+
+?>

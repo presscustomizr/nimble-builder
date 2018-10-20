@@ -735,6 +735,54 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
 
 
 
+
+/* ------------------------------------------------------------------------- *
+ *  IMAGE HELPER
+/* ------------------------------------------------------------------------- */
+// @see https://codex.wordpress.org/Function_Reference/get_intermediate_image_sizes
+// used in sek_get_select_options_for_input_id()
+function sek_get_img_sizes() {
+    global $_wp_additional_image_sizes;
+
+    $sizes = array();
+    $to_return = array(
+        'original' => __('Original image dimensions', 'text_domain_to_be_replaced')
+    );
+
+    foreach ( get_intermediate_image_sizes() as $_size ) {
+
+        $first_to_upper_size = ucfirst(strtolower($_size));
+        $first_to_upper_size = preg_replace_callback( '/[.!?].*?\w/', '\Nimble\sek_img_sizes_preg_replace_callback', $first_to_upper_size );
+
+        if ( in_array( $_size, array('thumbnail', 'medium', 'medium_large', 'large') ) ) {
+            $sizes[ $_size ]['width']  = get_option( "{$_size}_size_w" );
+            $sizes[ $_size ]['height'] = get_option( "{$_size}_size_h" );
+            $sizes[ $_size ]['title'] =  $first_to_upper_size;
+            //$sizes[ $_size ]['crop']   = (bool) get_option( "{$_size}_crop" );
+        } elseif ( isset( $_wp_additional_image_sizes[ $_size ] ) ) {
+            $sizes[ $_size ] = array(
+                'width'  => $_wp_additional_image_sizes[ $_size ]['width'],
+                'height' => $_wp_additional_image_sizes[ $_size ]['height'],
+                'title' =>  $first_to_upper_size
+                //'crop'   => $_wp_additional_image_sizes[ $_size ]['crop'],
+            );
+        }
+    }
+    foreach ( $sizes as $_size => $data ) {
+        $to_return[ $_size ] = $data['title'] . ' - ' . $data['width'] . ' x ' . $data['height'];
+    }
+
+    return $to_return;
+}
+
+function sek_img_sizes_preg_replace_callback( $matches ) {
+    return strtoupper( $matches[0] );
+}
+
+
+
+
+
 /* ------------------------------------------------------------------------- *
  *  SMART LOAD HELPER
 /* ------------------------------------------------------------------------- */

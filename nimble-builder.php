@@ -82,6 +82,17 @@ if ( nimble_pass_requirements() ) {
         ) );
     });
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions.php' );
+    // $_POST['ac_get_template'] <= scenario of an input template getting ajaxily fetched
+    if ( \Nimble\skp_is_customizing() || isset( $_POST['ac_get_template']) || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
+        require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-czr-sektions.php' );
+    }
+    function nimble_setup_dyn_register( $params = array() ) {
+        if ( \Nimble\skp_is_customizing() ) {
+            // instantiate is not done yet
+            \Nimble\SEK_CZR_Dyn_Register::get_instance( $params );
+        }
+    }
+    add_action( 'after_setup_theme', 'nimble_setup_dyn_register', 20 );
 
     if ( defined( 'NIMBLE_PRINT_TEST' ) && NIMBLE_PRINT_TEST && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
         require_once( NIMBLE_BASE_PATH . '/tests.php' );
