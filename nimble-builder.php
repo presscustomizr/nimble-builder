@@ -68,31 +68,40 @@ function nimble_load_czr_base_fmk() {
         }
         return;
     }
+
     require_once(  NIMBLE_BASE_PATH . '/inc/czr-base-fmk/czr-base-fmk.php' );
-    \Nimble\CZR_Fmk_Base( array(
-       'base_url' => NIMBLE_BASE_URL . '/inc/czr-base-fmk',
-       'version' => NIMBLE_VERSION
-    ));
+    if ( class_exists('\Nimble\CZR_Fmk_Base') ) {
+        \Nimble\CZR_Fmk_Base( array(
+           'base_url' => NIMBLE_BASE_URL . '/inc/czr-base-fmk',
+           'version' => NIMBLE_VERSION
+        ));
+    }
 }
 if ( nimble_pass_requirements() ) {
+
     require_once( NIMBLE_BASE_PATH . '/inc/czr-skope/index.php' );
-    add_action( 'after_setup_theme', function() {
-        \Nimble\Flat_Skop_Base( array(
-            'base_url_path' => NIMBLE_BASE_URL . '/inc/czr-skope'
-        ) );
-    });
+    add_action( 'after_setup_theme', 'nimble_load_skope_php');
+    function nimble_load_skope_php() {
+        if ( class_exists('\Nimble\Flat_Skop_Base') ) {
+            \Nimble\Flat_Skop_Base( array(
+                'base_url_path' => NIMBLE_BASE_URL . '/inc/czr-skope'
+            ) );
+        }
+    }
+
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions.php' );
     // $_POST['ac_get_template'] <= scenario of an input template getting ajaxily fetched
     if ( \Nimble\skp_is_customizing() || isset( $_POST['ac_get_template']) || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
         require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-czr-sektions.php' );
     }
+
+    add_action( 'after_setup_theme', 'nimble_setup_dyn_register', 20 );
     function nimble_setup_dyn_register( $params = array() ) {
-        if ( \Nimble\skp_is_customizing() ) {
-            // instantiate is not done yet
+        if ( class_exists('\Nimble\SEK_CZR_Dyn_Register') ) {
+            // instantiate if not done yet
             \Nimble\SEK_CZR_Dyn_Register::get_instance( $params );
         }
     }
-    add_action( 'after_setup_theme', 'nimble_setup_dyn_register', 20 );
 
     if ( defined( 'NIMBLE_PRINT_TEST' ) && NIMBLE_PRINT_TEST && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
         require_once( NIMBLE_BASE_PATH . '/tests.php' );
