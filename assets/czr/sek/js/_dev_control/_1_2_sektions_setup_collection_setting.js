@@ -134,7 +134,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       sektionsLocalizedData.i18n['If this problem locks the Nimble builder, you might try to reset the sections for this page.'],
                                       '<br>',
                                       '<span style="text-align:center;display:block">',
-                                        '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n['Reset'] + '" data-sek-reset="true">' + sektionsLocalizedData.i18n['Reset'] + '</button>',
+                                        '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
                                       '</span>',
                                     '</span>'
                               ].join('')

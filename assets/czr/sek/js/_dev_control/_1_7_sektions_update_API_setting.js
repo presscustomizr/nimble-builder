@@ -35,7 +35,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             //duplication variable
                             cloneId, //will be passed in resolve()
                             startingModuleValue,// will be populated by the optional starting value specificied on module registration
-                            __presetSectionInjected__ = false;
+                            __presetSectionInjected__ = false,
+                            parentSektionCandidate;
 
                         // make sure we have a collection array to populate
                         newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.defaultSektionSettingValue.collection;
@@ -58,7 +59,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                           // can we add this nested sektion ?
                                           // if the parent sektion of the column has is_nested = true, then we can't
-                                          var parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
+                                          parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                           if ( 'no_match' == parentSektionCandidate ) {
                                                 __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
                                                 break;
@@ -907,7 +908,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // can we add this nested sektion ?
                                     // if the parent sektion of the column has is_nested = true, then we can't
-                                    var parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
+                                    parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' == parentSektionCandidate ) {
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
                                           break;
@@ -1196,8 +1197,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       _.each( data, function( val, key ) {
                             if ( _.isObject( val ) || _.isArray( val ) ) {
                                   _replaceImgPlaceholderById( val, imgList );
-                            } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) && _.has( imgList, val ) ) {
-                                  data[ key ] = imgList[ val ][ 'id'];
+                            } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) && _.has( imgList, val ) && _.isObject( imgList[ val ] ) ) {
+                                  data[ key ] = imgList[ val ].id;
                             }
                       });
                       return columnCollection;

@@ -53,7 +53,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         }
                   } else {
-                        modulesRegistrationParams[ '__no_option_group_to_be_updated_by_children_modules__' ] = {
+                        modulesRegistrationParams.__no_option_group_to_be_updated_by_children_modules__ = {
                               settingControlId : params.id,
                               module_type : moduleType,
                               controlLabel : moduleName

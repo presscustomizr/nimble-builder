@@ -153,11 +153,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return {};
                   }
                   // This method should normally not be invoked for a father module type
-                  if ( sektionsLocalizedData.registeredModules[moduleType]['is_father'] ) {
+                  if ( sektionsLocalizedData.registeredModules[moduleType].is_father ) {
                         api.errare( 'getDefaultItemModelFromRegisteredModuleData => Father modules should be treated specifically' );
                         return;
                   }
-                  var data = sektionsLocalizedData.registeredModules[ moduleType ]['tmpl']['item-inputs'],
+                  var data = sektionsLocalizedData.registeredModules[ moduleType ].tmpl['item-inputs'],
                       // title, id are always included in the defaultItemModel but those properties don't need to be saved in database
                       // title and id are legacy entries that can be used in multi-items modules to identify and name the item
                       defaultItemModel = {
@@ -170,7 +170,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         switch ( _key_ ) {
                               case 'tabs' :
                                     _.each( _d_ , function( _tabData_ ) {
-                                          _.each( _tabData_['inputs'], function( _inputData_, _id_ ) {
+                                          _.each( _tabData_.inputs, function( _inputData_, _id_ ) {
                                                 defaultItemModel[ _id_ ] = _inputData_['default'] || '';
                                           });
                                     });
@@ -270,12 +270,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return;
                   }
                   // This method should normally not be invoked for a father module type
-                  if ( sektionsLocalizedData.registeredModules[module_type]['is_father'] ) {
+                  if ( sektionsLocalizedData.registeredModules[module_type].is_father ) {
                         api.errare( 'getInputDefaultValue => Father modules should be treated specifically' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
-                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                        level = sektionsLocalizedData.registeredModules[ module_type ].tmpl;
                   }
                   var _defaultVal_ = 'no_default_value_specified';
                   _.each( level, function( levelData, _key_ ) {
@@ -320,12 +320,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getInputType => missing ' + module_type + ' in sektionsLocalizedData.registeredModules' );
                         return;
                   }
-                  if ( sektionsLocalizedData.registeredModules[module_type]['is_father'] ) {
+                  if ( sektionsLocalizedData.registeredModules[module_type].is_father ) {
                         api.errare( 'getInputType => Father modules should be treated specifically' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
-                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                        level = sektionsLocalizedData.registeredModules[ module_type ].tmpl;
                   }
                   var _inputType_ = 'no_input_type_specified';
                   _.each( level, function( levelData, _key_ ) {
@@ -373,12 +373,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return;
                   }
                   // This method should normally not be invoked for a father module type
-                  if ( sektionsLocalizedData.registeredModules[module_type]['is_father'] ) {
+                  if ( sektionsLocalizedData.registeredModules[module_type].is_father ) {
                         api.errare( 'getInputRegistrationParams => Father modules should be treated specifically' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
-                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                        level = sektionsLocalizedData.registeredModules[ module_type ].tmpl;
                   }
                   var _params_ = {};
                   _.each( level, function( levelData, _key_ ) {
@@ -467,7 +467,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getModuleStartingValue => the module type ' + module_type + ' is not registered' );
                         return 'no_starting_value';
                   }
-                  var starting_value = sektionsLocalizedData.registeredModules[ module_type ][ 'starting_value' ];
+                  var starting_value = sektionsLocalizedData.registeredModules[ module_type ].starting_value;
                   return _.isEmpty( starting_value ) ? 'no_starting_value' : starting_value;
             },
 
