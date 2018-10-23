@@ -174,17 +174,17 @@ module.exports = {
     tasks : [],
   },
 
-  // sektions_customizer_folder_php : {
-  //   options: {
-  //     spawn : false,
-  //     // Start a live reload server on the default port 35729
-  //     livereload : true
-  //   },
-  //   files : [
-  //     '<%= paths.sektions %>customizer/**/*.php'
-  //   ],
-  //   tasks : [],
-  // },
+  sektions_admin_folder_php : {
+    options: {
+      spawn : false,
+      // Start a live reload server on the default port 35729
+      livereload : true
+    },
+    files : [
+      'inc/admin/**/*.php'
+    ],
+    tasks : [],
+  },
 
   sektions_customizer_js : {
     options: {
