@@ -3,7 +3,9 @@ namespace Nimble;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// VERSIONNING
+// /* ------------------------------------------------------------------------- *
+// *  VERSIONNING
+// /* ------------------------------------------------------------------------- */
 add_action( 'plugins_loaded', '\Nimble\sek_versionning');
 // @see https://wordpress.stackexchange.com/questions/144870/wordpress-update-plugin-hook-action-since-3-9
 function sek_versionning() {
@@ -14,16 +16,21 @@ function sek_versionning() {
         update_option( 'nimble_version', NIMBLE_VERSION );
     }
     // Write the version that the user started with.
-    // Note : this has been implemented starting from v1.1.8 in October 2018. At this time 3000+ websites were already using the plugin, and therefore started with a version <= 1.1.7.
+    // Note : this has been implemented starting from v1.1.8 in October 2018. At this time 4000+ websites were already using the plugin, and therefore started with a version <= 1.1.7.
     $started_with = get_option( 'nimble_started_with_version' );
     if ( empty( $started_with ) ) {
         update_option( 'nimble_started_with_version', $current_version );
     }
+    $start_date = get_option( 'nimble_start_date' );
+    if ( empty( $start_date ) ) {
+        update_option( 'nimble_start_date', date("Y-m-d H:i:s") );
+    }
 }
 
 
-
-// SYSTEM INFOS
+// /* ------------------------------------------------------------------------- *
+// *  SYSTEM INFOS
+// /* ------------------------------------------------------------------------- */
 add_action('admin_menu', '\Nimble\sek_plugin_menu');
 function sek_plugin_menu() {
   add_plugins_page(__( 'System infos', 'text_domain' ), __( 'System infos', 'text_domain' ), 'read', 'nimble-builder', '\Nimble\sek_plugin_page');
@@ -220,4 +227,196 @@ function sek_let_to_num( $v ) {
         break;
     }
     return $ret;
+}
+
+// /* ------------------------------------------------------------------------- *
+// *  UPDATE NOTIFICATIONS
+// /* ------------------------------------------------------------------------- */
+add_action( 'admin_init' , '\Nimble\sek_admin_style' );
+function sek_admin_style() {
+    wp_enqueue_style(
+        'nimble-admin-css',
+        sprintf(
+            '%1$s/assets/admin/css/%2$s' ,
+            NIMBLE_BASE_URL,
+            'nimble-admin.css'
+        ),
+        array(),
+        NIMBLE_ASSETS_VERSION,
+        'all'
+    );
+}
+
+
+
+// /* ------------------------------------------------------------------------- *
+// *  UPDATE NOTIFICATIONS
+// /* ------------------------------------------------------------------------- */
+if( ! defined( 'DISPLAY_UPDATE_NOTIFICATION' ) ) { define( 'DISPLAY_UPDATE_NOTIFICATION', true ); }
+add_action( 'admin_notices'                         , '\Nimble\sek_may_be_display_update_notice');
+// always add the ajax action
+add_action( 'wp_ajax_dismiss_nimble_update_notice'  ,  '\Nimble\sek_dismiss_update_notice_action' );
+add_action( 'admin_footer'                          ,  '\Nimble\sek_write_ajax_dismis_script' );
+// beautify admin notice text using some defaults the_content filter callbacks
+foreach ( array( 'wptexturize', 'convert_smilies', 'wpautop') as $callback ) {
+  if ( function_exists( $callback ) )
+      add_filter( 'sek_update_notice', $callback );
+}
+
+
+/**
+* @hook : admin_notices
+*/
+function sek_may_be_display_update_notice() {
+    if ( ! defined('DISPLAY_UPDATE_NOTIFICATION') || ! DISPLAY_UPDATE_NOTIFICATION )
+      return;
+    $last_update_notice_values  = get_option( 'nimble_last_update_notice' );
+    $show_new_notice = false;
+    $display_ct = 5;
+
+    if ( ! $last_update_notice_values || ! is_array($last_update_notice_values) ) {
+        //first time user of the theme, the option does not exist
+        // 1) initialize it => set it to the current Hueman version, displayed 0 times.
+        // 2) update in db
+        $last_update_notice_values = array( "version" => NIMBLE_VERSION, "display_count" => 0 );
+        update_option( 'nimble_last_update_notice', $last_update_notice_values );
+        //already user of the theme ? => show the notice if
+        if ( sek_user_started_before_version( NIMBLE_VERSION ) ) {
+            $show_new_notice = true;
+        }
+    }
+
+    $_db_version          = $last_update_notice_values["version"];
+    $_db_displayed_count  = $last_update_notice_values["display_count"];
+
+    //user who just upgraded the theme will be notified until he/she clicks on the dismiss link
+    //or until the notice has been displayed n times.
+    if ( version_compare( NIMBLE_VERSION, $_db_version , '>' ) ) {
+        //CASE 1 : displayed less than n times
+        if ( $_db_displayed_count < $display_ct ) {
+            $show_new_notice = true;
+            //increments the counter
+            (int) $_db_displayed_count++;
+            $last_update_notice_values["display_count"] = $_db_displayed_count;
+            //updates the option val with the new count
+            update_option( 'nimble_last_update_notice', $last_update_notice_values );
+        }
+        //CASE 2 : displayed n times => automatic dismiss
+        else {
+            //reset option value with new version and counter to 0
+            $new_val  = array( "version" => NIMBLE_VERSION, "display_count" => 0 );
+            update_option('nimble_last_update_notice', $new_val );
+        }//end else
+    }//end if
+
+    //always display in dev mode
+    //$show_new_notice = ( defined( 'CZR_DEV' ) && CZR_DEV ) ? true : $show_new_notice;
+
+    if ( ! $show_new_notice )
+      return;
+
+    ob_start();
+      ?>
+      <div class="updated czr-update-notice" style="position:relative;">
+        <?php
+          printf('<h3>%1$s %2$s %3$s %4$s :D</h3>',
+              __( "Thanks, you successfully upgraded", 'text_domain_to_be_replaced'),
+              'Nimble Builder',
+              __( "to version", 'text_domain_to_be_replaced'),
+              NIMBLE_VERSION
+          );
+        ?>
+        <?php
+          printf( '<h4>%1$s <a class="" href="%2$s" title="%3$s" target="_blank">%3$s &raquo;</a></h4>',
+              __( "We'd like to introduce the new features we've been working on.", 'text_domain_to_be_replaced'),
+              "https://presscustomizr.com/category/nimble-releases/",
+              __( "Read the latest release notes" , 'text_domain_to_be_replaced' )
+              // ! NIMBLE_IS_PRO ? sprintf( '<p style="position: absolute;right: 7px;top: 4px;"><a class="button button-primary upgrade-to-pro" href="%1$s" title="%2$s" target="_blank">%2$s &raquo;</a></p>',
+              //   esc_url('presscustomizr.com/hueman-pro?ref=a'),
+              //   __( "Upgrade to Hueman Pro", 'text_domain_to_be_replaced' )
+              // ) : ''
+          );
+        ?>
+        <p style="text-align:right;position: absolute;font-size: 1.1em;<?php echo is_rtl()? 'left' : 'right';?>: 7px;bottom: -6px;">
+        <?php printf('<a href="#" title="%1$s" class="nimble-dismiss-update-notice"> ( %1$s <strong>X</strong> ) </a>',
+            __('close' , 'text_domain_to_be_replaced')
+          );
+        ?>
+        </p>
+        <p>
+          <?php
+          printf(
+            __( 'If you like %1$s please leave us a %2$s rating. A huge thanks in advance!', 'text_domain_to_be_replaced' ),
+            sprintf( '<strong>%s</strong>', esc_html__( 'the Nimble Builder', 'text_domain_to_be_replaced' ) ),
+            sprintf( '<a href="%1$s" target="_blank" class="czr-rating-link">&#9733;&#9733;&#9733;&#9733;&#9733;</a>', esc_url( 'wordpress.org/support/plugin/nimble-builder/reviews/?filter=5#new-post') )
+          );
+          ?>
+        </p>
+      </div>
+      <?php
+    $_html = ob_get_contents();
+    if ($_html) ob_end_clean();
+    echo apply_filters( 'sek_update_notice', $_html );
+}
+
+
+/**
+* hook : wp_ajax_dismiss_nimble_update_notice
+* => sets the last_update_notice to the current Hueman version when user click on dismiss notice link
+*/
+function sek_dismiss_update_notice_action() {
+    check_ajax_referer( 'dismiss-update-notice-nonce', 'dismissUpdateNoticeNonce' );
+    //reset option value with new version and counter to 0
+    $new_val  = array( "version" => NIMBLE_VERSION, "display_count" => 0 );
+    update_option( 'nimble_last_update_notice', $new_val );
+    wp_die();
+}
+
+
+
+/**
+* hook : admin_footer
+*/
+function sek_write_ajax_dismis_script() {
+    ?>
+    <script type="text/javascript" id="nimble-dismiss-update-notice">
+      ( function($){
+        var _ajax_action = function( $_el ) {
+            var AjaxUrl = "<?php echo admin_url( 'admin-ajax.php' ); ?>",
+                _query  = {
+                    action  : 'dismiss_nimble_update_notice',
+                    dismissUpdateNoticeNonce :  "<?php echo wp_create_nonce( 'dismiss-update-notice-nonce' ); ?>"
+                },
+                $ = jQuery,
+                request = $.post( AjaxUrl, _query );
+
+            request.fail( function ( response ) {
+              console.log('response when failed : ', response);
+            });
+            request.done( function( response ) {
+              console.log('RESPONSE DONE', $_el, response);
+              // Check if the user is logged out.
+              if ( '0' === response )
+                return;
+              // Check for cheaters.
+              if ( '-1' === response )
+                return;
+
+              $_el.closest('.updated').slideToggle('fast');
+            });
+        };//end of fn
+
+        //on load
+        $( function($) {
+          $('.nimble-dismiss-update-notice').click( function( e ) {
+            e.preventDefault();
+            _ajax_action( $(this) );
+          } );
+        } );
+
+      } )( jQuery );
+
+
+    </script>
+    <?php
 }

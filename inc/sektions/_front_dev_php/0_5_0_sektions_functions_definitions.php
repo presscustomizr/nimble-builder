@@ -846,4 +846,23 @@ function sek_is_img_smartload_enabled() {
 
     return SEK_Fire()->img_smartload_enabled;
 }
+
+
+
+/**
+* Returns a boolean
+* check if user started to use the plugin before ( strictly < ) the requested version
+* @param $_ver : string free version
+*/
+function sek_user_started_before_version( $requested_version ) {
+    $started_with = get_option( 'nimble_started_with_version' );
+    //the transient is set in HU_utils::hu_init_properties()
+    if ( ! $started_with )
+      return false;
+
+    if ( ! is_string( $requested_version ) )
+      return false;
+
+    return version_compare( $started_with , $requested_version, '<' );
+}
 ?>
