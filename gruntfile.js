@@ -39,6 +39,7 @@ module.exports = function(grunt) {
           //This task concat the css and js base and full + strip comments + uglify + copy to the themes and plugin folders
           'build_customizer_css_js_php_fmk_panel_and_preview' : [
               'concat:czr_base_fmk_php',
+              'comments:czr_base_fmk_php',
 
               'concat:czr_fmk_control_js',
               'concat:czr_theme_control_js',
@@ -51,6 +52,7 @@ module.exports = function(grunt) {
 
           'build_skope_php_js' : [
               'concat:czr_flat_skope_php',
+              'comments:czr_skope_php',
               'concat:czr_flat_skope_js',
               'uglify:czr_flat_skope_js'
           ],
@@ -62,6 +64,7 @@ module.exports = function(grunt) {
               'comments:sektions_customizer_php',
 
               'concat:sektions_front_js',
+              'comments:sektions_front_js',
               'uglify:sektions_front_js',
 
               'concat:czr_sektions_customizer_control_js',
@@ -91,7 +94,9 @@ module.exports = function(grunt) {
             'clean',
             'copy:main',
             'addtextdomain',
-            'compress'
+            'compress',
+            //clean comments in some files once copied in the __build__ folder
+            'comments:sektions_admin_php'
           ],
 
           build_and_copy_czr_fmk : [

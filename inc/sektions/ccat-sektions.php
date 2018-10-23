@@ -586,6 +586,8 @@ function nimble_regex_callback( $matches ) {
     }
 }
 function sek_is_img_smartload_enabled() {
+    if ( skp_is_customizing() )
+      return false;
     if ( 'not_cached' !== SEK_Fire()->img_smartload_enabled ) {
         return SEK_Fire()->img_smartload_enabled;
     }
@@ -609,6 +611,24 @@ function sek_is_img_smartload_enabled() {
     SEK_Fire()->img_smartload_enabled = $is_img_smartload_enabled;
 
     return SEK_Fire()->img_smartload_enabled;
+}
+
+
+
+/**
+* Returns a boolean
+* check if user started to use the plugin before ( strictly < ) the requested version
+* @param $_ver : string free version
+*/
+function sek_user_started_before_version( $requested_version ) {
+    $started_with = get_option( 'nimble_started_with_version' );
+    if ( ! $started_with )
+      return false;
+
+    if ( ! is_string( $requested_version ) )
+      return false;
+
+    return version_compare( $started_with , $requested_version, '<' );
 }
 ?><?php
 function sek_maybe_do_version_mapping() {
@@ -7790,7 +7810,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             );
             wp_enqueue_script(
                 'sek-main-js',
-                NIMBLE_BASE_URL . '/assets/front/js/nimble-front.js',
+                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.js' : NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.min.js',
                 array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 true
@@ -8475,8 +8495,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         function sek_maybe_process_img_for_js_smart_load( $html ) {
             if ( !sek_is_img_smartload_enabled() )
               return $html;
-            if ( skp_is_customizing() )
-                return $html;
             if ( ! is_string( $html ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => provided html is not a string', $html );
                 return $html;

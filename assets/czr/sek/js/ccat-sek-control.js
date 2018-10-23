@@ -515,7 +515,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       sektionsLocalizedData.i18n['If this problem locks the Nimble builder, you might try to reset the sections for this page.'],
                                       '<br>',
                                       '<span style="text-align:center;display:block">',
-                                        '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n['Reset'] + '" data-sek-reset="true">' + sektionsLocalizedData.i18n['Reset'] + '</button>',
+                                        '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
                                       '</span>',
                                     '</span>'
                               ].join('')
@@ -1134,7 +1134,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                         sektionsLocalizedData.i18n['If this problem locks the Nimble builder, you might try to reset the sections for this page.'],
                                                         '<br>',
                                                         '<span style="text-align:center;display:block">',
-                                                          '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n['Reset'] + '" data-sek-reset="true">' + sektionsLocalizedData.i18n['Reset'] + '</button>',
+                                                          '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
                                                         '</span>',
                                                       '</span>'
                                                 ].join('')
@@ -1678,7 +1678,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         }
                   } else {
-                        modulesRegistrationParams[ '__no_option_group_to_be_updated_by_children_modules__' ] = {
+                        modulesRegistrationParams.__no_option_group_to_be_updated_by_children_modules__ = {
                               settingControlId : params.id,
                               module_type : moduleType,
                               controlLabel : moduleName
@@ -2031,17 +2031,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
                               icon : '<i class="material-icons sek-level-option-icon">code</i>'
                         },
-                        local_reset : {
-                              settingControlId : _id_ + '__local_reset',
-                              module_type : 'sek_local_reset',
-                              controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
-                              icon : '<i class="material-icons sek-level-option-icon">cached</i>'
-                        },
                         local_performances : {
                               settingControlId : _id_ + '__local_performances',
                               module_type : 'sek_local_performances',
                               controlLabel : sektionsLocalizedData.i18n['Page speed optimizations'],
                               icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                        },
+                        local_reset : {
+                              settingControlId : _id_ + '__local_reset',
+                              module_type : 'sek_local_reset',
+                              controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
+                              icon : '<i class="material-icons sek-level-option-icon">cached</i>'
                         }
                   });
 
@@ -2253,7 +2253,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             reorderedCollection,
                             cloneId, //will be passed in resolve()
                             startingModuleValue,// will be populated by the optional starting value specificied on module registration
-                            __presetSectionInjected__ = false;
+                            __presetSectionInjected__ = false,
+                            parentSektionCandidate;
                         newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.defaultSektionSettingValue.collection;
 
                         switch( params.action ) {
@@ -2267,7 +2268,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                                     if ( true === params.is_nested ) {
                                           columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                          var parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
+                                          parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                           if ( 'no_match' == parentSektionCandidate ) {
                                                 __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
                                                 break;
@@ -2900,7 +2901,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                    var parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
+                                    parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' == parentSektionCandidate ) {
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
                                           break;
@@ -3091,8 +3092,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       _.each( data, function( val, key ) {
                             if ( _.isObject( val ) || _.isArray( val ) ) {
                                   _replaceImgPlaceholderById( val, imgList );
-                            } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) && _.has( imgList, val ) ) {
-                                  data[ key ] = imgList[ val ][ 'id'];
+                            } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) && _.has( imgList, val ) && _.isObject( imgList[ val ] ) ) {
+                                  data[ key ] = imgList[ val ].id;
                             }
                       });
                       return columnCollection;
@@ -3268,11 +3269,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( ! this.isModuleRegistered( moduleType ) ) {
                         return {};
                   }
-                  if ( sektionsLocalizedData.registeredModules[moduleType]['is_father'] ) {
+                  if ( sektionsLocalizedData.registeredModules[moduleType].is_father ) {
                         api.errare( 'getDefaultItemModelFromRegisteredModuleData => Father modules should be treated specifically' );
                         return;
                   }
-                  var data = sektionsLocalizedData.registeredModules[ moduleType ]['tmpl']['item-inputs'],
+                  var data = sektionsLocalizedData.registeredModules[ moduleType ].tmpl['item-inputs'],
                       defaultItemModel = {
                             id : '',
                             title : ''
@@ -3283,7 +3284,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         switch ( _key_ ) {
                               case 'tabs' :
                                     _.each( _d_ , function( _tabData_ ) {
-                                          _.each( _tabData_['inputs'], function( _inputData_, _id_ ) {
+                                          _.each( _tabData_.inputs, function( _inputData_, _id_ ) {
                                                 defaultItemModel[ _id_ ] = _inputData_['default'] || '';
                                           });
                                     });
@@ -3342,12 +3343,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getInputDefaultValue => missing ' + module_type + ' in sektionsLocalizedData.registeredModules' );
                         return;
                   }
-                  if ( sektionsLocalizedData.registeredModules[module_type]['is_father'] ) {
+                  if ( sektionsLocalizedData.registeredModules[module_type].is_father ) {
                         api.errare( 'getInputDefaultValue => Father modules should be treated specifically' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
-                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                        level = sektionsLocalizedData.registeredModules[ module_type ].tmpl;
                   }
                   var _defaultVal_ = 'no_default_value_specified';
                   _.each( level, function( levelData, _key_ ) {
@@ -3380,12 +3381,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getInputType => missing ' + module_type + ' in sektionsLocalizedData.registeredModules' );
                         return;
                   }
-                  if ( sektionsLocalizedData.registeredModules[module_type]['is_father'] ) {
+                  if ( sektionsLocalizedData.registeredModules[module_type].is_father ) {
                         api.errare( 'getInputType => Father modules should be treated specifically' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
-                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                        level = sektionsLocalizedData.registeredModules[ module_type ].tmpl;
                   }
                   var _inputType_ = 'no_input_type_specified';
                   _.each( level, function( levelData, _key_ ) {
@@ -3418,12 +3419,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getInputRegistrationParams => missing ' + module_type + ' in sektionsLocalizedData.registeredModules' );
                         return;
                   }
-                  if ( sektionsLocalizedData.registeredModules[module_type]['is_father'] ) {
+                  if ( sektionsLocalizedData.registeredModules[module_type].is_father ) {
                         api.errare( 'getInputRegistrationParams => Father modules should be treated specifically' );
                         return;
                   }
                   if ( _.isUndefined( level ) ) {
-                        level = sektionsLocalizedData.registeredModules[ module_type ][ 'tmpl' ];
+                        level = sektionsLocalizedData.registeredModules[ module_type ].tmpl;
                   }
                   var _params_ = {};
                   _.each( level, function( levelData, _key_ ) {
@@ -3479,7 +3480,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getModuleStartingValue => the module type ' + module_type + ' is not registered' );
                         return 'no_starting_value';
                   }
-                  var starting_value = sektionsLocalizedData.registeredModules[ module_type ][ 'starting_value' ];
+                  var starting_value = sektionsLocalizedData.registeredModules[ module_type ].starting_value;
                   return _.isEmpty( starting_value ) ? 'no_starting_value' : starting_value;
             },
 

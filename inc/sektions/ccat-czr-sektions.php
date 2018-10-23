@@ -3,10 +3,6 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-// TINY MCE EDITOR
-//require_once(  dirname( __FILE__ ) . '/customizer/seks_tiny_mce_editor_actions.php' );
-
-// ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
 add_action ( 'customize_controls_enqueue_scripts', '\Nimble\sek_enqueue_controls_js_css', 20 );
 function sek_enqueue_controls_js_css() {
     wp_enqueue_style(
@@ -24,7 +20,6 @@ function sek_enqueue_controls_js_css() {
 
     wp_enqueue_script(
         'czr-sektions',
-        //dev / debug mode mode?
         sprintf(
             '%1$s/assets/czr/sek/js/%2$s' ,
             NIMBLE_BASE_URL,
@@ -37,7 +32,6 @@ function sek_enqueue_controls_js_css() {
 
     wp_enqueue_script(
         'czr-color-picker',
-        //dev / debug mode mode?
         sprintf(
             '%1$s/assets/czr/sek/js/libs/%2$s' ,
             NIMBLE_BASE_URL,
@@ -69,23 +63,11 @@ function sek_enqueue_controls_js_css() {
 
                 'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 
-                //'presetSections' => sek_get_preset_sektions(), <= fetched on demand in ajax
-
                 'registeredModules' => CZR_Fmk_Base() -> registered_modules,
-
-                // Dnd
                 'preDropElementClass' => 'sortable-placeholder',
                 'dropSelectors' => implode(',', [
-                    // 'module' type
-                    //'.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                    //'[data-sek-level="location"]',
-                    //'.sek-not-empty-col',// the drop zone when there is at least one module
-                    //'.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
-                    //'.sek-content-module-drop-zone',//between sections
                     '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
                     'body',// body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
-
-                    // 'preset_section' type
                     '.sek-content-preset_section-drop-zone'//between sections
                 ])
             )
@@ -162,7 +144,6 @@ function nimble_get_code_editor_settings( $args ) {
             'outline-none' => true,
         ),
         'jshint' => array(
-            // The following are copied from <https://github.com/WordPress/wordpress-develop/blob/4.8.1/.jshintrc>.
             'boss' => true,
             'curly' => true,
             'eqeqeq' => true,
@@ -208,8 +189,6 @@ function nimble_get_code_editor_settings( $args ) {
 
     if ( isset( $args['type'] ) ) {
         $type = $args['type'];
-
-        // Remap MIME types to ones that CodeMirror modes will recognize.
         if ( 'application/x-patch' === $type || 'text/x-patch' === $type ) {
             $type = 'text/x-diff';
         }
@@ -325,8 +304,6 @@ function nimble_get_code_editor_settings( $args ) {
     if ( ! empty( $settings['codemirror']['lint'] ) ) {
         $settings['codemirror']['gutters'][] = 'CodeMirror-lint-markers';
     }
-
-    // Let settings supplied via args override any defaults.
     foreach ( wp_array_slice_assoc( $args, array( 'codemirror', 'csslint', 'jshint', 'htmlhint' ) ) as $key => $value ) {
         $settings[ $key ] = array_merge(
             $settings[ $key ],
@@ -373,11 +350,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'If this problem locks the Nimble builder, you might try to reset the sections for this page.' => __('If this problem locks the Nimble builder, you might try to reset the sections for this page.', 'text_domain_to_be_replaced'),
             'Reset' => __('Reset', 'text_domain_to_be_replaced'),
             'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
-
-            // Header button title text
             'Drag and drop content' => __('Drag and drop content', 'text_domain_to_be_replaced'),
-
-            // Generated UI
             'Content Picker' => __('Content Picker', 'text_domain_to_be_replaced'),
             'Pick a module' => __('Pick a module', 'text_domain_to_be_replaced'),
             'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_domain_to_be_replaced'),
@@ -405,8 +378,6 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_domain_to_be_replaced'),
 
             'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
-
-            // UI global and local options
             'Current page options' => __( 'Current page options', 'text_domain_to_be_replaced'),
             'Page template' => __( 'Page template', 'text_domain_to_be_replaced'),
             'Inner and outer widths' => __( 'Inner and outer widths', 'text_domain_to_be_replaced'),
@@ -418,29 +389,19 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'text_domain_to_be_replaced'),
 
             'Site wide page speed optimizations' => __( 'Site wide page speed optimizations', 'text_domain_to_be_replaced'),
-
-            // DEPRECATED
             'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_domain_to_be_replaced'),
             'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_domain_to_be_replaced'),
-            //
 
             'Site wide options' => __( 'Site wide options', 'text_domain_to_be_replaced'),
-
-
-            // Levels
             'location' => __('location', 'text_domain_to_be_replaced'),
             'section' => __('section', 'text_domain_to_be_replaced'),
             'column' => __('column', 'text_domain_to_be_replaced'),
             'module' => __('module', 'text_domain_to_be_replaced'),
 
             'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
-
-            // DRAG n DROP
             'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
             'Insert in a new section' => __('Insert in a new section', 'text_domain_to_be_replaced'),
             'Insert a new section here' => __('Insert a new section here', 'text_domain_to_be_replaced'),
-
-            // MODULES
             'Select a font family' => __('Select a font family', 'text_domain_to_be_replaced'),
             'Web Safe Fonts' => __('Web Safe Fonts', 'text_domain_to_be_replaced'),
             'Google Fonts' => __('Google Fonts', 'text_domain_to_be_replaced'),
@@ -450,35 +411,16 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
 
             'Select an icon'     => __( 'Select an icon', 'text_domain_to_be_replaced' ),
-
-            // Code Editor
             'codeEditorSingular'   => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_domain_to_be_replaced' ),
             'codeEditorPlural'     => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_domain_to_be_replaced' ),
-
-            // Various
             'Settings on desktops' => __('Settings on desktops', 'text_domain_to_be_replaced'),
             'Settings on tablets' => __('Settings on tablets', 'text_domain_to_be_replaced'),
             'Settings on mobiles' => __('Settings on mobiles', 'text_domain_to_be_replaced')
-
-
-            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
-            // 'Module' => __('Module', 'text_domain_to_be_replaced'),
 
         )//array()
     )//array()
     );//array_merge
 }//'nimble_add_i18n_localized_control_params'
-
-
-
-
-
-
-
-// ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
 add_filter( 'skp_json_export_ready_skopes', '\Nimble\add_sektion_values_to_skope_export' );
 function add_sektion_values_to_skope_export( $skopes ) {
     if ( ! is_array( $skopes ) ) {
@@ -499,30 +441,11 @@ function add_sektion_values_to_skope_export( $skopes ) {
             'db_values' => sek_get_skoped_seks( $skope_id ),
             'setting_id' => sek_get_seks_setting_id( $skope_id )//nimble___loop_start[skp__post_page_home]
         );
-        // foreach( [
-        //     'loop_start',
-        //     'loop_end',
-        //     'before_content',
-        //     'after_content',
-        //     'global'
-        //     ] as $location ) {
-        //     $skp_data[ 'sektions' ][ $location ] = array(
-        //         'db_values' => sek_get_skoped_seks( $skope_id, $location ),
-        //         'setting_id' => sek_get_seks_setting_id( $skope_id, $location )//nimble___loop_start[skp__post_page_home]
-        //     );
-        // }
         $new_skopes[] = $skp_data;
     }
 
-    // sek_error_log( '//////////////////// => new_skopes', $new_skopes);
-
     return $new_skopes;
 }
-
-
-// @return array() of json decoded sections
-// used when js localizing the preset_sections for the customizer
-// the transient is refreshed
 function sek_get_preset_sektions() {
     $transient_name = 'nimble_preset_sections_' . NIMBLE_VERSION;
     $transient_data = get_transient( $transient_name );
@@ -580,7 +503,6 @@ function sek_print_nimble_customizer_tmpl() {
 /* ------------------------------------------------------------------------- *
  *  SETUP DYNAMIC SERVER REGISTRATION FOR SETTING
 /* ------------------------------------------------------------------------- */
-// Fired @'after_setup_theme:20'
 if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
     class SEK_CZR_Dyn_Register {
         static $instance;
@@ -593,32 +515,22 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         }
 
         function __construct( $params = array() ) {
-            // Schedule the loading the skoped settings class
             add_action( 'customize_register', array( $this, 'load_nimble_setting_class' ) );
 
             add_filter( 'customize_dynamic_setting_args', array( $this, 'set_dyn_setting_args' ), 10, 2 );
             add_filter( 'customize_dynamic_setting_class', array( $this, 'set_dyn_setting_class') , 10, 3 );
         }//__construct
-
-        //@action 'customize_register'
         function load_nimble_setting_class() {
             require_once(  NIMBLE_BASE_PATH . '/inc/sektions/seks_setting_class.php' );
         }
-
-        //@filter 'customize_dynamic_setting_args'
         function set_dyn_setting_args( $setting_args, $setting_id ) {
-            // shall start with "nimble___" or "__nimble_options__"
             if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) ) {
-                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
                     'type' => 'option',
                     'default' => array(),
-                    //'sanitize_callback'    => array( $this, 'sanitize_callback' )
-                    //'validate_callback'    => array( $this, 'validate_callback' )
                 );
             } else if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) ) {
-                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
                     'type' => '_nimble_ui_',//won't be saved as is,
@@ -628,21 +540,12 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                 );
             }
             return $setting_args;
-            //return wp_parse_args( array( 'default' => array() ), $setting_args );
         }
-
-
-        //@filter 'customize_dynamic_setting_class'
         function set_dyn_setting_class( $class, $setting_id, $args ) {
-            // shall start with 'nimble___'
             if ( 0 !== strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
               return $class;
-            //sek_error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
             return '\Nimble\Nimble_Customizer_Setting';
         }
-
-
-        // Uses the sanitize_callback function specified on module registration if any
         function sanitize_callback( $setting_data, $setting_instance ) {
             if ( isset( $_POST['skope_id'] ) ) {
                 $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
@@ -659,12 +562,8 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     }
                 }
             }
-            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
             return $setting_data;
         }
-
-        // Uses the validate_callback function specified on module registration if any
-        // @return validity object
         function validate_callback( $validity, $setting_data, $setting_instance ) {
             $validated = true;
             if ( isset( $_POST['skope_id'] ) ) {
@@ -682,7 +581,6 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     }
                 }
             }
-            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
             if ( true !== $validated ) {
                 if ( is_wp_error( $validated ) ) {
                     $validation_msg = $validation_msg->get_error_message();
@@ -715,7 +613,6 @@ function sek_print_tiny_mce_editor_template() {
         </div>
 
         <?php
-          // The settings passed in here are inspired from edit-form-advanced.php.
           wp_editor( '', 'czr-customize-content_editor', array(
               '_content_editor_dfw' => false,
               'drag_drop_upload' => true,
@@ -738,24 +635,18 @@ function sek_print_tiny_mce_editor_template() {
  */
 add_action( 'customize_controls_init', '\Nimble\sek_enqueue_tiny_mce_editor' );
 function sek_enqueue_tiny_mce_editor() {
-    //add_action( 'customize_controls_print_footer_scripts', 'render_editor' , 0 );
-    // @todo These should be included in \_WP_Editors::editor_settings()
     if ( false === has_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'enqueue_scripts' ) ) ) {
         add_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'enqueue_scripts' ) );
     }
 }
 
 ?><?php
-// Set input content
 add_action( 'czr_set_input_tmpl_content', '\Nimble\sek_set_input_tmpl_content', 10, 3 );
 function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
-    // error_log( print_r( $input_data, true ) );
-    // error_log('$input_type' . $input_type );
     if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
          wp_send_json_error( 'sek_set_input_tmpl_content => missing input type for input id : ' . $input_id );
     }
     switch( $input_type ) {
-        // Content picker group
         case 'content_type_switcher' :
             sek_set_input_tmpl___content_type_switcher( $input_id, $input_data );
         break;
@@ -826,7 +717,6 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  CONTENT TYPE SWITCHER INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___content_type_switcher( $input_id, $input_data ) {
     ?>
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
@@ -843,7 +733,6 @@ function sek_set_input_tmpl___content_type_switcher( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  MODULE PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
     ?>
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
@@ -938,20 +827,10 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'icon' => 'Nimble_contact-form_icon.svg'
                 ),
 
-                // array(
-                //   'content-type' => 'module',
-                //   'content-id' => 'czr_featured_pages_module',
-                //   'title' => __( 'Featured pages',  'text_domain_to_be_replaced' ),
-                //   'icon' => 'Nimble__featured_icon.svg'
-                // ),
-
 
             );
             $i = 0;
             foreach( $content_collection as $_params) {
-                // if ( $i % 2 == 0 ) {
-                //   //printf('<div class="sek-module-raw"></div');
-                // }
                 $icon_img_src = '';
                 if ( !empty( $_params['icon'] ) ) {
                     $icon_img_src = NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' . $_params['icon'];
@@ -981,7 +860,6 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  SECTION PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
     ?>
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
@@ -1017,14 +895,12 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                             'content-id' => 'features_one',
                             'title' => __('3 columns with icon and call to action', 'text-domain' ),
                             'thumb' => 'features_one.jpg',
-                            //'height' => '188px'
                         ),
                         array(
                             'content-type' => 'preset_section',
                             'content-id' => 'features_two',
                             'title' => __('3 columns with icon', 'text-domain' ),
                             'thumb' => 'features_two.jpg',
-                            //'height' => '188px'
                         )
                     );
                 break;
@@ -1035,14 +911,12 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                             'content-id' => 'contact_one',
                             'title' => __('A contact form and a Google map', 'text-domain' ),
                             'thumb' => 'contact_one.jpg',
-                            //'height' => '188px'
                         ),
                         array(
                             'content-type' => 'preset_section',
                             'content-id' => 'contact_two',
                             'title' => __('A contact form with an image background', 'text-domain' ),
                             'thumb' => 'contact_two.jpg',
-                            //'height' => '188px'
                         )
                     );
                 break;
@@ -1090,7 +964,6 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  SPACING INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
     ?>
     <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
@@ -1169,7 +1042,6 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  BACKGROUND POSITION INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___bg_position( $input_id, $input_data ) {
     ?>
         <div class="sek-bg-pos-wrapper">
@@ -1264,11 +1136,9 @@ function sek_set_input_tmpl___bg_position( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  HORIZONTAL ALIGNMENT INPUT
 /* ------------------------------------------------------------------------- */
-// AND
 /* ------------------------------------------------------------------------- *
  *  HORIZONTAL ALIGNMENT INPUT FOR TEXT => includes the 'justify' icon
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___h_alignment( $input_id, $input_data ) {
     ?>
         <div class="sek-h-align-wrapper">
@@ -1299,7 +1169,6 @@ function sek_set_input_tmpl___h_text_alignment( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  VERTICAL ALIGNMENT INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
     ?>
         <div class="sek-v-align-wrapper">
@@ -1317,24 +1186,12 @@ function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  FONT AWESOME ICON PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___fa_icon_picker( $input_id, $input_data ) {
     ?>
         <select data-czrtype="<?php echo $input_id; ?>"></select>
     <?php
 }
-
-
-// this dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
-// It allows us to populate the server response with the relevant module html template
-// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
 add_filter( "ac_set_ajax_czr_tmpl___fa_icon_picker_input", '\Nimble\sek_get_fa_icon_list_tmpl', 10, 3 );
-// hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
-// this dynamic filter is declared on wp_ajax_ac_get_template
-// It allows us to populate the server response with the relevant module html template
-// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
-//
-// For czr_tiny_mce_editor_module, we request the font_list tmpl
 function sek_get_fa_icon_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
     if ( empty( $requested_tmpl ) ) {
         wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
@@ -1344,15 +1201,7 @@ function sek_get_fa_icon_list_tmpl( $html, $requested_tmpl = '', $posted_params 
         sek_retrieve_decoded_font_awesome_icons()
     );//will be sent by wp_send_json_success() in ::ac_set_ajax_czr_tmpl()
 }
-
-
-
-//retrieves faicons:
-// 1) from faicons.json if needed (transient doesn't exists, or is new version => set in TC_wfc ) and decodes them
-// otherwise
-// 2) from the transient set if it exists
 function sek_retrieve_decoded_font_awesome_icons() {
-    // this file must be generated with: https://github.com/presscustomizr/nimble-builder/issues/57
     $faicons_json_path      = NIMBLE_BASE_PATH . '/assets/faicons.json';
     $faicons_transient_name = 'sek_font_awesome_october_2018';
     if ( false == get_transient( $faicons_transient_name ) ) {
@@ -1381,20 +1230,12 @@ function sek_retrieve_decoded_font_awesome_icons() {
 /* ------------------------------------------------------------------------- *
  *  FONT PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___font_picker( $input_id, $input_data ) {
     ?>
         <select data-czrtype="<?php echo $input_id; ?>"></select>
     <?php
 }
-
-
-// this dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
-// It allows us to populate the server response with the relevant module html template
-// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
 add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_list_tmpl', 10, 3 );
-// hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
-// For czr_tiny_mce_editor_module, we request the font_list tmpl
 function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
     if ( empty( $requested_tmpl ) ) {
         wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
@@ -1426,7 +1267,6 @@ function sek_get_cfonts() {
         'Verdana,Geneva,sans-serif',
     );
     foreach ( $raw_cfonts as $font ) {
-      //no subsets for cfonts => epty array()
       $cfonts[] = array(
           'name'    => $font ,
           'subsets'   => array()
@@ -1434,18 +1274,6 @@ function sek_get_cfonts() {
     }
     return apply_filters( 'sek_font_picker_cfonts', $cfonts );
 }
-
-
-//retrieves gfonts:
-// 1) from webfonts.json if needed (transient doesn't exists, or is new version => set in TC_wfc ) and decodes them
-// otherwise
-// 2) from the transiet set if it exists
-//
-// => Until June 2017, the webfonts have been stored in 'tc_gfonts' transient
-// => In June 2017, the Google Fonts have been updated with a new webfonts.json
-// generated from : https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyBID8gp8nBOpWyH5MrsF7doP4fczXGaHdA
-//
-// => The transient name is now : czr_gfonts_june_2017
 function sek_retrieve_decoded_gfonts() {
     if ( false == get_transient( 'sek_gfonts_may_2018' ) ) {
         $gfont_raw      = @file_get_contents( NIMBLE_BASE_PATH ."/assets/webfonts.json" );
@@ -1463,47 +1291,19 @@ function sek_retrieve_decoded_gfonts() {
 
     return $gfonts_decoded;
 }
-
-
-
-//@return the google fonts
 function sek_get_gfonts( $what = null ) {
-  //checks if transient exists or has expired
 
   $gfonts_decoded = sek_retrieve_decoded_gfonts();
   $gfonts = array();
-  //$subsets = array();
-
-  // $subsets['all-subsets'] = sprintf( '%1$s ( %2$s %3$s )',
-  //   __( 'All languages' , 'text_domain_to_be_replaced' ),
-  //   count($gfonts_decoded['items']) + count( $this -> get_cfonts() ),
-  //   __('fonts' , 'text_domain_to_be_replaced' )
-  // );
 
   foreach ( $gfonts_decoded['items'] as $font ) {
     foreach ( $font['variants'] as $variant ) {
       $name     = str_replace( ' ', '+', $font['family'] );
       $gfonts[]   = array(
           'name'    => $name . ':' .$variant
-          //'subsets'   => $font['subsets']
       );
     }
-    //generates subset list : subset => font number
-    // foreach ( $font['subsets'] as $sub ) {
-    //   $subsets[$sub] = isset($subsets[$sub]) ? $subsets[$sub]+1 : 1;
-    // }
   }
-
-  //finalizes the subset array
-  // foreach ( $subsets as $subset => $font_number ) {
-  //   if ( 'all-subsets' == $subset )
-  //     continue;
-  //   $subsets[$subset] = sprintf('%1$s ( %2$s %3$s )',
-  //     $subset,
-  //     $font_number,
-  //     __('fonts' , 'text_domain_to_be_replaced' )
-  //   );
-  // }
 
   return ('subsets' == $what) ? apply_filters( 'sek_font_picker_gfonts_subsets ', $subsets ) : apply_filters( 'sek_font_picker_gfonts', $gfonts )  ;
 }
@@ -1513,17 +1313,12 @@ function sek_get_gfonts( $what = null ) {
 /* ------------------------------------------------------------------------- *
  *  FONT SIZE
 /* ------------------------------------------------------------------------- */
-// AND
 /* ------------------------------------------------------------------------- *
  *  LINE HEIGHT INPUT TMPLS
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
     ?>
       <?php
-            // we save the int value + unit
-            // we want to keep only the numbers when printing the tmpl
-            // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
           ?>
           <#
             var value = data['<?php echo $input_id; ?>'],
@@ -1551,7 +1346,6 @@ function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  CODE EDITOR INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___code_editor( $input_id, $input_data ) {
     /*
     * Needed to form the correct params to pass to the code mirror editor, based on the code type
@@ -1568,13 +1362,9 @@ function sek_set_input_tmpl___code_editor( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  CODE EDITOR INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___range_simple( $input_id, $input_data ) {
     ?>
     <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <#
       var value = data['<?php echo $input_id; ?>'],
@@ -1607,13 +1397,9 @@ function sek_set_input_tmpl___range_simple( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  CODE EDITOR INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data ) {
     ?>
     <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <#
       var value = data['<?php echo $input_id; ?>'],
@@ -1650,13 +1436,9 @@ function sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  CODE EDITOR INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id, $input_data ) {
     ?>
     <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <#
       var value = data['<?php echo $input_id; ?>'],
@@ -1693,13 +1475,9 @@ function sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id,
 /* ------------------------------------------------------------------------- *
  *  BORDERS INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___borders( $input_id, $input_data ) {
     ?>
     <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <div class="sek-borders">
         <# //console.log( 'IN php::sek_set_input_tmpl___borders() => data range_slide => ', data ); #>
@@ -1738,13 +1516,9 @@ function sek_set_input_tmpl___borders( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  BORDER RADIUS INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___border_radius( $input_id, $input_data ) {
     ?>
     <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <div class="sek-borders">
         <# //console.log( 'IN php::sek_set_input_tmpl___border_radius() => data range_slide => ', data ); #>
@@ -1780,7 +1554,6 @@ function sek_set_input_tmpl___border_radius( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  MULTIPLE BUTTON CHOICES INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___buttons_choice( $input_id, $input_data ) {
     ?>
       <# //console.log( 'IN php::sek_set_input_tmpl___buttons_choice() => data range_slide => ', data ); #>
@@ -1810,7 +1583,6 @@ function sek_set_input_tmpl___buttons_choice( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  RESET BUTTON INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___reset_button( $input_id, $input_data ) {
     ?>
       <# //console.log( 'IN php::sek_set_input_tmpl___buttons_choice() => data range_slide => ', data ); #>
