@@ -815,7 +815,10 @@ function nimble_regex_callback( $matches ) {
 // the local option wins
 // if local is set to inherit, return the global option
 // This option is cached
+// deactivated when customizing
 function sek_is_img_smartload_enabled() {
+    if ( skp_is_customizing() )
+      return false;
     if ( 'not_cached' !== SEK_Fire()->img_smartload_enabled ) {
         return SEK_Fire()->img_smartload_enabled;
     }

@@ -561,6 +561,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // adds the lazy load data attributes when sek_is_img_smartload_enabled()
         // img smartload can be set globally with 'global-img-smart-load' and locally with 'local-img-smart-load'
         // the local option wins
+        // deactivated when customizing @see function sek_is_img_smartload_enabled()
         function sek_maybe_add_smart_loaded_bg_attributes( $model ) {
             if ( !sek_is_img_smartload_enabled() )
               return false;
@@ -579,13 +580,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // @filter nimble_parse_for_smart_load
         // this filter is used in several modules : tiny_mce_editor, image module, ...
         // img smartload can be set globally with 'global-img-smart-load' and locally with 'local-img-smart-load'
-        // deactivated when customizing
+        // deactivated when customizing @see function sek_is_img_smartload_enabled()
         // @return html string
         function sek_maybe_process_img_for_js_smart_load( $html ) {
             if ( !sek_is_img_smartload_enabled() )
               return $html;
-            if ( skp_is_customizing() )
-                return $html;
             if ( ! is_string( $html ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => provided html is not a string', $html );
                 return $html;
