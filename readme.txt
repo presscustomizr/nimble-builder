@@ -26,10 +26,11 @@ The Nimble Builder is a lightweight section builder intended to be the content c
 You'll find an online knowledge base for the Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder).
 
 == Screenshots ==
-1. Dragging and dropping a pre-designed section
-2. Editing content in live preview
-3. Creating columns layouts
-4. Customizing a section with an image background
+1. Creating a page with 3 sections
+2. Dragging and dropping a pre-designed section
+3. Editing content in live preview
+4. Creating columns layouts
+5. Customizing a section with an image background
 
 == Installation ==
 1. Install the plugin through the WordPress plugins screen. Or download the plugin, unzip the package and upload it to your /wp-content/plugins/ directory
@@ -44,9 +45,10 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.1.8 : October 18th, 2018 =
-* improved : performance improvements implementation with new options to lazy load images
+= 1.1.8 : October 23rd, 2018 =
+* improved : performance improvements with new options to lazy load images
 * added : an admin page for Nimble Builder, to display the system informations
+* added : a dismissable update notifications in admin
 
 = 1.1.7 : October 11th, 2018 =
 * fixed : check on php and wordpress version not preventing some plugin functions to be fired.
@@ -92,9 +94,10 @@ The Nimble builder has been optimized to work with the Customizr and Hueman them
 * fixed : dynamic CSS can be printed twice : inline and enqueued as CSS file when user logged in.
 
 == Changelog ==
-= 1.1.8 : October 18th, 2018 =
-* improved : performance improvements implementation with new options to lazy load images
+= 1.1.8 : October 23rd, 2018 =
+* improved : performance improvements with new options to lazy load images
 * added : an admin page for Nimble Builder, to display the system informations
+* added : a dismissable update notifications in admin
 
 = 1.1.7 : October 11th, 2018 =
 * fixed : check on php and wordpress version not preventing some plugin functions to be fired.
