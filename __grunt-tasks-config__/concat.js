@@ -185,7 +185,7 @@ module.exports = {
       '<%= paths.front_assets %>js/_dev_front/1_0_1_front_smartload.js',
       '<%= paths.front_assets %>js/_dev_front/9_9_9_front_fire.js'
     ],
-    dest: '<%= paths.front_assets %>js/nimble-front.js',
+    dest: '<%= paths.front_assets %>js/ccat-nimble-front.js',
   },
 
 

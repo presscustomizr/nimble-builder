@@ -43,6 +43,16 @@ module.exports = {
     }]
   },
 
+  sektions_front_js : {
+    files: [{
+      expand: true,
+      cwd: '<%= paths.front_assets %>js/',
+      src: [ 'ccat-nimble-front.js' ],
+      dest: '<%= paths.front_assets %>js/',
+      ext: '.min.js'
+    }]
+  },
+
   czr_sektions_customizer_control_js : {
     files: [{
       expand: true,

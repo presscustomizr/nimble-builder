@@ -37,7 +37,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             // );
             wp_enqueue_script(
                 'sek-main-js',
-                NIMBLE_BASE_URL . '/assets/front/js/nimble-front.js',
+                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.js' : NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.min.js',
                 //array( 'jquery', 'underscore'),
                 // october 2018 => underscore is concatenated in the main front js file.
                 array( 'jquery'),

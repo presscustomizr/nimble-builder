@@ -196,7 +196,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/**/*.js'
     ],
     tasks : [
-      'jshint:those',
+      'jshint:sektion_customizer_js',
       'concat:czr_sektions_customizer_control_js',
       'comments:czr_base_control_js'
     ],
@@ -224,7 +224,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_preview/**/*.js'
     ],
     tasks : [
-      'jshint:those',
+      'jshint:sektion_customizer_js',
       'concat:czr_sektions_customizer_preview_js',
       'comments:czr_base_preview_js'
     ],
@@ -242,17 +242,17 @@ module.exports = {
     tasks : [],
   },
 
-  sektions_front_main_js : {
-    options: {
-      spawn : false,
-      // Start a live reload server on the default port 35729
-      livereload : true
-    },
-    files : [
-      '<%= paths.front_assets %>js/sek-main.js'
-    ],
-    tasks : [],
-  },
+  // sektions_front_main_js : {
+  //   options: {
+  //     spawn : false,
+  //     // Start a live reload server on the default port 35729
+  //     livereload : true
+  //   },
+  //   files : [
+  //     '<%= paths.front_assets %>js/sek-main.js'
+  //   ],
+  //   tasks : [],
+  // },
 
   // sektions_front_fmk_js : {
   //   options: {
@@ -281,7 +281,7 @@ module.exports = {
       '<%= paths.front_assets %>js/_dev_front/**/*.js',
     ],
     tasks : [
-      'jshint:those',
+      'jshint:front_js',
       'concat:sektions_front_js',
     ],
   },
