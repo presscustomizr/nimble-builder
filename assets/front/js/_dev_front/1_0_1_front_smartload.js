@@ -154,13 +154,13 @@
             $jQueryImgToLoad
                   // .hide()
                   .load( function () {
+                        //https://api.jquery.com/removeAttr/
+                        //An attribute to remove; as of version 1.7, it can be a space-separated list of attributes.
+                        //minimum supported wp version (3.4+) embeds jQuery 1.7.2
+                        $_el_.removeAttr( [ 'data-sek-src', 'data-sek-srcset', 'data-sek-sizes' ].join(' ') );
                         if( $_el_.data("sek-lazy-bg") ){
                               $_el_.css('backgroundImage', 'url('+_src+')');
                         } else {
-                              //https://api.jquery.com/removeAttr/
-                              //An attribute to remove; as of version 1.7, it can be a space-separated list of attributes.
-                              //minimum supported wp version (3.4+) embeds jQuery 1.7.2
-                              $_el_.removeAttr( [ 'data-sek-src', 'data-sek-srcset', 'data-sek-sizes' ] .join(' ') );
                               $_el_.attr("src", _src );
                               if ( _src_set ) {
                                     $_el_.attr("srcset", _src_set );
