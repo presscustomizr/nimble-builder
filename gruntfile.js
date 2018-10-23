@@ -61,6 +61,9 @@ module.exports = function(grunt) {
               'concat:czr_sektions_customizer_php',
               'comments:sektions_customizer_php',
 
+              'concat:sektions_front_js',
+              'uglify:sektions_front_js',
+
               'concat:czr_sektions_customizer_control_js',
               'comments:czr_base_control_js',
               'uglify:czr_sektions_customizer_control_js',
