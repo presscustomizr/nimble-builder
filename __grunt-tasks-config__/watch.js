@@ -143,7 +143,7 @@ module.exports = {
     ],
     tasks : [
       'concat:czr_sektions_front_php',
-      'comments:php'
+      'comments:sektions_front_php'
     ],
   },
 
@@ -158,7 +158,7 @@ module.exports = {
     ],
     tasks : [
       'concat:czr_sektions_customizer_php',
-      'comments:sektions_front_php'
+      'comments:sektions_customizer_php'
     ],
   },
 
