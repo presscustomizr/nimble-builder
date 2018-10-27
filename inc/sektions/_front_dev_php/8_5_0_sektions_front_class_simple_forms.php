@@ -823,7 +823,10 @@ class Sek_Mailer {
         //     $allow_html ? '<br><br><br>': "\r\n\r\n\r\n"
         // );
 
-        $before_message = '';//$sender_website;
+        // the sender's email is written in the email's header reply-to field.
+        // But it is also written inside the message body following this issue, https://github.com/presscustomizr/nimble-builder/issues/218
+        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'text_domain_to_be_replaced'), $sender_name, $sender_email );//$sender_website;
+        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'text_domain_to_be_replaced'), $subject );
         $after_message  = '';
 
         if ( array_key_exists( 'email_footer', $submission_options ) ) {
@@ -837,9 +840,10 @@ class Sek_Mailer {
 
         $body           = sprintf( '%1$s%2$s%3$s%4$s%5$s',
                             $before_message,
-                            sprintf( '%1$s',
-                                 //$allow_html ? '<br><br>': "\r\n\r\n",
-                                 $this->form->get_field('nimble_message')->get_input()->get_value()
+                            sprintf( '<br><br>%1$s: <br>%2$s',
+                                __('Message body', 'text_domain_to_be_replaced'),
+                                //$allow_html ? '<br><br>': "\r\n\r\n",
+                                $this->form->get_field('nimble_message')->get_input()->get_value()
                             ),
                             $after_message,
                             $allow_html ? '<br><br>--<br>': "\r\n\r\n--\r\n",
