@@ -111,6 +111,16 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
                 'css_rules' => $responsive_css_rules,
                 'mq' => "(min-width: {$breakpoint}px)"
             );
+
+            // the horizontal margin should be subtracted also to the column width of 100%, below the mobile breakpoint: basically the margin should be always subtracted to the column width for each viewport it is set
+            // @see https://github.com/presscustomizr/nimble-builder/issues/217
+            $responsive_css_rules_for_100_percent_width = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', 100, $total_horizontal_margin_with_unit );
+            $rules[] = array(
+                'selector' => sprintf('.sek-sektion-inner > [data-sek-id="%1$s"]', $level['id'] ),
+                'css_rules' => $responsive_css_rules_for_100_percent_width,
+                //$breakpoint_for_100_percent_width = $breakpoint-1;
+                'mq' => null,// "(max-width: {$breakpoint_for_100_percent_width}px)"
+            );
             //sek_error_log('padding margin', $rules );
         }//if ( $total_horizontal_margin > 0 && !empty( $parent_section ) ) {
     }// if column
