@@ -9472,8 +9472,8 @@ class Sek_Mailer {
         } else {
             $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_domain_to_be_replaced' ), get_bloginfo( 'name' ) );
         }
-
-        $before_message = '';//$sender_website;
+        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'text_domain_to_be_replaced'), $sender_name, $sender_email );//$sender_website;
+        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'text_domain_to_be_replaced'), $subject );
         $after_message  = '';
 
         if ( array_key_exists( 'email_footer', $submission_options ) ) {
@@ -9487,8 +9487,9 @@ class Sek_Mailer {
 
         $body           = sprintf( '%1$s%2$s%3$s%4$s%5$s',
                             $before_message,
-                            sprintf( '%1$s',
-                                 $this->form->get_field('nimble_message')->get_input()->get_value()
+                            sprintf( '<br><br>%1$s: <br>%2$s',
+                                __('Message body', 'text_domain_to_be_replaced'),
+                                $this->form->get_field('nimble_message')->get_input()->get_value()
                             ),
                             $after_message,
                             $allow_html ? '<br><br>--<br>': "\r\n\r\n--\r\n",
