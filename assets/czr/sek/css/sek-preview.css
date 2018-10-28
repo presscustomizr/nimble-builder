@@ -48,7 +48,7 @@
 /* LEVELS WRAPPER ANIMATION WHEN CUSTOMIZING
   For example when setting border radius
 */
-[data-sek-level] {
+[data-sek-level]:not([data-sek-bg-parallax]) {
   -webkit-transition: all 0.2s ease-out;
   -o-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;

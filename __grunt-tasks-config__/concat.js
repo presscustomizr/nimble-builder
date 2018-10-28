@@ -183,6 +183,7 @@ module.exports = {
       '<%= paths.front_assets %>js/_dev_front/0_0_0_front_underscore.js',
       '<%= paths.front_assets %>js/_dev_front/1_0_0_front_fittext.js',
       '<%= paths.front_assets %>js/_dev_front/1_0_1_front_smartload.js',
+      '<%= paths.front_assets %>js/_dev_front/1_0_2_front_parallax_background.js',
       '<%= paths.front_assets %>js/_dev_front/9_9_9_front_fire.js'
     ],
     dest: '<%= paths.front_assets %>js/ccat-nimble-front.js',

@@ -39,13 +39,20 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'title'       => __('Fixed background', 'text_domain_to_be_replaced'),
                     'default'     => 0
                 ),
+                'bg-parallax' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Parallax effect on scroll', 'text_domain_to_be_replaced'),
+                    'default'     => 0,
+                    'notice_after' => __('When enabled, the background image moves slower than the page elements on scroll. Not enabled on mobile devices.', 'text_domain_to_be_replaced'),
+                    'refresh_markup' => true,
+                ),
                 // 'bg-repeat' => array(
                 //     'input_type'  => 'select',
                 //     'title'       => __('repeat', 'text_domain_to_be_replaced')
                 // ),
                 'bg-scale' => array(
                     'input_type'  => 'select',
-                    'title'       => __('scale', 'text_domain_to_be_replaced'),
+                    'title'       => __('Scale', 'text_domain_to_be_replaced'),
                     'default'     => 'cover',
                     'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
                 ),

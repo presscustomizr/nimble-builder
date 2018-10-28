@@ -242,7 +242,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $has_at_least_one_module ? 'sek-has-modules' : '',
                         $this->get_level_visibility_css_class( $model ),
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
-                        $this -> sek_maybe_add_smart_loaded_bg_attributes( $model )
+                        // add smartload + parallax attributes
+                        $this -> sek_maybe_add_bg_attributes( $model )
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -381,7 +382,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'visibility' ] ) ) {
                 if ( is_array( $model[ 'options' ][ 'visibility' ] ) ) {
                     foreach ( $model[ 'options' ][ 'visibility' ] as $device_type => $device_visibility_bool ) {
-                        if ( true !== sek_booleanize_checkbox_val( $device_visibility_bool  ) ) {
+                        if ( true !== sek_booleanize_checkbox_val( $device_visibility_bool ) ) {
                             $visibility_class .= " sek-hidden-on-{$device_type}";
                         }
                     }
@@ -559,21 +560,40 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         /* ------------------------------------------------------------------------- */
         // @return string
         // adds the lazy load data attributes when sek_is_img_smartload_enabled()
+        // adds the parallax attributes
         // img smartload can be set globally with 'global-img-smart-load' and locally with 'local-img-smart-load'
         // the local option wins
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
-        function sek_maybe_add_smart_loaded_bg_attributes( $model ) {
-            if ( !sek_is_img_smartload_enabled() )
-              return false;
+        function sek_maybe_add_bg_attributes( $model ) {
+            $attributes = '';
             $bg_url = '';
+            $parallax_enabled = false;
+            $width = '';
+            $height = '';
+
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
-                    //no repeat by default?
-                    $bg_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
+                    if ( sek_is_img_smartload_enabled() ) {
+                        $bg_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
+                    }
+                    $parallax_enabled = !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
+                    if ( $parallax_enabled ) {
+                        $image = wp_get_attachment_image_src( $bg_options[ 'bg-image'], 'full' );
+                        if ( $image ) {
+                            list( $src, $width, $height ) = $image;
+                        }
+                    }
                 }
             }
-            return ! empty( $bg_url ) ? sprintf('data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url ) : '';
+
+            if ( ! empty( $bg_url ) ) {
+                $attributes = sprintf('data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url );
+            }
+            if ( $parallax_enabled ) {
+                $attributes .= sprintf('%1$s data-sek-bg-parallax="true" data-bg-width="%2$s" data-bg-height="%3$s"', $attributes, $width, $height );
+            }
+            return $attributes;
         }
 
 
