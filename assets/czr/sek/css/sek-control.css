@@ -956,6 +956,58 @@ body.nimble-top-bar-visible #nimble-top-bar {
 }
 
 
+
+/* TOP SAVE SECTION UI */
+#nimble-top-save-ui {
+  height: 300px;
+  padding: 20px;
+  position: absolute;
+  top: -300px;
+  /*text-align: center;*/
+  right: 0;
+  left: 0;
+  z-index: 20;
+  color: #fff;
+  display: block;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all, 0.3s ease-in-out;
+  -ms-transition: all, 0.3s ease-in-out;
+  -o-transition: all, 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  /*visibility: hidden;*/
+  opacity: 0.3;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99999;
+  /*display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+    -ms-flex-align: center;
+        align-items: center;
+  flex: 0 0 100%;*/
+  max-width: 100%;
+}
+
+#nimble-top-save-ui > div {
+  width: 100%;
+}
+
+body.nimble-save-ui-visible #nimble-top-save-ui {
+  /*visibility: inherit;*/
+  opacity: 1;
+  top:36px;
+}
+
+#nimble-top-save-ui .sek-cancel-save {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+#nimble-top-save-ui #sek-saved-section-title.error {
+  border: 1px solid #ff0000;
+}
+
 /*.czr-preview-notification a, .czr-preview-notification h2 {color: #fff; margin: 1em 0;}
 
 .czr-preview-notification .czr-preview-note-close {

@@ -764,7 +764,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // .done( function( data) {
                   //       api.infoLog('relpath and DATA ' + relpath , data );
                   // });
-            }
+            },
 
+
+
+
+
+
+            // recursive helper
+            // used when saving a section
+            cleanIds : function( levelData ) {
+                  levelData.id = "";
+                  var self = this;
+                  _.each( levelData.collection, function( levelData ) {
+                        levelData.id = "";
+                        if ( _.isArray( levelData.collection ) ) {
+                              self.cleanIds( levelData );
+                        }
+                  });
+                  return levelData;
+            }
       });//$.extend()
 })( wp.customize, jQuery );

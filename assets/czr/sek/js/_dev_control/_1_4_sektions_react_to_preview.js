@@ -566,6 +566,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         uiParams = {};
                                         _dfd_.resolve();
                                   });
+                            },
+
+                            'sek-toggle-save-section-ui' : function( params ) {
+                                  sendToPreview = false;
+                                  self.saveUIVisible( true, params );
+                                  return $.Deferred(function(_dfd_) {
+                                        apiParams = {
+                                              // action : 'sek-refresh-level',
+                                              // level : params.level,
+                                              // id : params.id
+                                        };
+                                        uiParams = {};
+                                        _dfd_.resolve();
+                                  });
                             }
                       };//msgCollection
 
@@ -659,15 +673,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-
-
-
-
-
-
-
-
-
             // Fired in initialized on api(ready)
             schedulePrintSectionJson : function() {
                   var self = this;
@@ -693,20 +698,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             newWindow.focus();
                         }
                   };
-                  var cleanIds = function( levelData ) {
-                        levelData.id = "";
-                        _.each( levelData.collection, function( levelData ) {
-                              levelData.id = "";
-                              if ( _.isArray( levelData.collection ) ) {
-                                    cleanIds( levelData );
-                              }
-                        });
-                        return levelData;
-                  };
 
                   api.previewer.bind( 'sek-to-json', function( params ) {
                         var sectionModel = $.extend( true, {}, self.getLevelModel( params.id ) );
-                        console.log( JSON.stringify( cleanIds( sectionModel ) ) );
+                        console.log( JSON.stringify( self.cleanIds( sectionModel ) ) );
                         //popupCenter( JSON.stringify( cleanIds( sectionModel ) ) );
                   });
             }//schedulePrintSectionJson

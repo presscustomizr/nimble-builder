@@ -69,6 +69,8 @@ function sek_enqueue_controls_js_css() {
 
                 'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 
+                'userSavedSektions' => get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS),
+
                 //'presetSections' => sek_get_preset_sektions(), <= fetched on demand in ajax
 
                 'registeredModules' => CZR_Fmk_Base() -> registered_modules,
@@ -573,7 +575,30 @@ function sek_print_nimble_customizer_tmpl() {
           </div>
       </div>
     </script>
+
+    <script type="text/html" id="tmpl-nimble-top-save-ui">
+      <div id="nimble-top-save-ui" class="czr-preview-notification">
+          <input id="sek-saved-section-id" type="hidden" value="">
+          <div class="sek-section-title">
+              <label for="sek-saved-section-title" class="customize-control-title"><?php _e('Section title', 'text_domain_to_be_replaced'); ?></label>
+              <input id="sek-saved-section-title" type="text" value="">
+          </div>
+          <div class="sek-section-description">
+              <label for="sek-saved-section-description" class="customize-control-title"><?php _e('Section description', 'text_domain_to_be_replaced'); ?></label>
+              <textarea id="sek-saved-section-description" type="text" value=""></textarea>
+          </div>
+          <div class="sek-section-save">
+              <button class="button sek-do-save-section far fa-save" type="button" title="<?php _e('Save', 'text_domain'); ?>">
+                <?php _e('Save', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Save', 'text_domain'); ?></span>
+              </button>
+          </div>
+          <button class="button sek-cancel-save far fa-times-circle" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
+              <?php _e('Cancel', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Cancel', 'text_domain'); ?></span>
+          </button>
+      </div>
+    </script>
     <?php
 }
+
 
 ?>
