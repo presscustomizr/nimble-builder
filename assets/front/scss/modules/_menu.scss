@@ -111,9 +111,15 @@
 .#{$project-prefix}nav-toggler {
     -webkit-appearance: none !important;
     cursor: pointer;
-    background: 0 0;
-    background-color: rgba(0, 0, 0, 0);
-    border: none;
+    &, &:hover, &:focus {
+        //following 3 should be customizable
+        background: 0 0;
+        background-color: rgba(0, 0, 0, 0);
+        color: black;
+
+        border: none;
+    }
+
     height: 40px;
     width: 40px;
     padding: 0;
