@@ -198,16 +198,43 @@
                               var input = this,
                                   html = '',
                                   $wrapper = input.container.find('.sek-content-type-wrapper'),
-                                  creation_date = '';
+                                  creation_date = '',
+                                  // https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
+                                  formatDate = function(date) {
+                                      var monthNames = [
+                                          "January", "February", "March",
+                                          "April", "May", "June", "July",
+                                          "August", "September", "October",
+                                          "November", "December"
+                                      ];
+
+                                      var day = date.getDate(),
+                                          monthIndex = date.getMonth(),
+                                          year = date.getFullYear(),
+                                          hours = date.getHours(),
+                                          minutes = date.getMinutes(),
+                                          seconds = date.getSeconds();
+
+                                      return [
+                                            day,
+                                            monthNames[monthIndex],
+                                            year
+                                            //[hours,minutes,seconds].join(':')
+                                      ].join(' ');
+                                  };
 
                               _.each( sektionsLocalizedData.userSavedSektions, function( secData, secKey ) {
-                                    creation_date = new Date( secData.creation_date.replace( /-/g, '/' ) );
+                                    try { creation_date = formatDate( new Date( secData.creation_date.replace( /-/g, '/' ) ) ); } catch( er ) {
+                                          api.errare( '::renderUserSavedSections => formatDate => error', er );
+                                    }
                                     html = [
-                                          '<div draggable="true" data-sek-is-user-section="true" data-sek-section-type="' + secData.type +'" data-sek-content-type="preset_section" data-sek-content-id="' + secKey +'" style="" title="' + secData.title + '">',
-                                            '<div class="sek-overlay"></div>',
-                                            '<div class="sek-saved-section-title">' + secData.title + '</div>',
-                                            '<div class="sek-saved-section-date"> @missi18n Created : ' + creation_date + '</div>',
-                                            '<div class="sek-saved-section-description">' + secData.description + '</div>',
+                                          '<div class="sek-user-section-wrapper">',
+                                            '<div class="sek-saved-section-title"><i class="sek-remove-user-section far fa-trash-alt"></i>' + secData.title + '</div>',
+                                            '<div draggable="true" data-sek-is-user-section="true" data-sek-section-type="' + secData.type +'" data-sek-content-type="preset_section" data-sek-content-id="' + secKey +'" style="" title="' + secData.title + '">',
+                                              '<div class="sek-overlay"></div>',
+                                              '<div class="sek-saved-section-description">' + secData.description + '</div>',
+                                              ! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> @missi18n Created : ' + creation_date + '</div>' ) : '',
+                                            '</div>',
                                           '</div>'
                                     ].join('');
                                     $wrapper.append( html );
