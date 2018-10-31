@@ -234,6 +234,8 @@ function sek_let_to_num( $v ) {
 // /* ------------------------------------------------------------------------- */
 add_action( 'admin_init' , '\Nimble\sek_admin_style' );
 function sek_admin_style() {
+    if ( skp_is_customizing() )
+      return;
     wp_enqueue_style(
         'nimble-admin-css',
         sprintf(
