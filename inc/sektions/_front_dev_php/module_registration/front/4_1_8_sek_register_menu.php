@@ -58,7 +58,15 @@ function sek_get_module_params_for_czr_menu_module() {
             // )
         ),
         'css_selectors' => array( '.sek-menu-module .menu-item' ),//<=@see tmpl/modules/menu_module_tmpl.php
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/menu_module_tmpl.php"
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/menu_module_tmpl.php",
+        'front_assets' => array(
+              'czr-font-awesome' => array(
+                  'type' => 'css',
+                  //'handle' => 'czr-font-awesome',
+                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
+                  //'deps' => array()
+              )
+        )
     );
 }
  /* ------------------------------------------------------------------------- *
