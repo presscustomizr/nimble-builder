@@ -12,10 +12,10 @@
     display: none;
   }
 }
-
+/*
 .#{$project-prefix}collapsing {
   position: relative;
   height: 0;
   overflow: hidden;
-  @include transition($transition-collapse);
-}
+  //@include transition($transition-collapse);
+}*/

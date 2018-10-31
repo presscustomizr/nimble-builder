@@ -13,7 +13,7 @@ $submenu_opening_effect_class = '';//sek-submenu-fade';
 
 ?>
  <nav class="sek-nav-wrap">
-    <button class="sek-nav-toggler sek-collapsed" type="button" data-toggle="sek-collapse" data-target="#<?php echo $model['id'] ?>" aria-controls="<?php echo $model['id'] ?>" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'textdomain_to_be_replaced' ) ?>">
+    <button class="sek-nav-toggler sek-collapsed" type="button" data-sek-toggle="sek-collapse" data-target="#<?php echo $model['id'] ?>" aria-controls="<?php echo $model['id'] ?>" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'textdomain_to_be_replaced' ) ?>">
         <div class="sek-ham__span-wrapper">
           <span class="line line-1"></span>
           <span class="line line-2"></span>
