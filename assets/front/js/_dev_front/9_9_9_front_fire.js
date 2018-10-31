@@ -71,6 +71,7 @@ jQuery( function($){
                 HIDDEN    : 'hidden' + EVENT_KEY,
                 HIDE      : 'hide' + EVENT_KEY,
                 CLICK     : 'click' + EVENT_KEY,
+                TAP       : 'tap' + EVENT_KEY,
               },
               ClassName = {
                 DROPDOWN                : 'sek-dropdown-menu',
@@ -95,8 +96,6 @@ jQuery( function($){
           //Handle dropdown on hover via js
           var dropdownMenuOnHover = function() {
                 var _dropdown_selector = Selector.HOVER_PARENT;
-
-                enableDropdownOnHover();
 
                 function _addOpenClass () {
                       var $_el = $(this);
@@ -145,17 +144,16 @@ jQuery( function($){
                       _debounced_removeOpenClass();
                 }
 
-                function enableDropdownOnHover() {
-                      $( 'body' )
-                          .on( 'mouseenter', _dropdown_selector, _addOpenClass )
-                          .on( 'mouseleave', _dropdown_selector , _removeOpenClass );
-                }
+                //BIND
+                $( 'body' )
+                    .on( 'mouseenter', _dropdown_selector, _addOpenClass )
+                    .on( 'mouseleave', _dropdown_selector , _removeOpenClass );
 
-          };
+          },
 
 
           //SNAKE
-          var dropdownPlacement = function() {
+          dropdownPlacement = function() {
                 var isRTL = 'rtl' === $('html').attr('dir'),
                     doingAnimation = false;
 
@@ -293,16 +291,21 @@ jQuery( function($){
           //FireAll
           dropdownMenuOnHover();
           dropdownPlacement();
+    },
+    Collapse = function() {
+
     }
 
 
     DropDown();
+    Collapse();
 
     // handle the mobile hamburger hover effect
     $( 'body' )
           .on( 'mouseenter', '.sek-nav-toggler', function(){ $(this).addClass( 'hovering' ); } )
           .on( 'mouseleave', '.sek-nav-toggler', function(){ $(this).removeClass( 'hovering' ); } )
-          .on( 'show.sek.sekCollapse hide.sek.sekCollapse', '.sek-nav-collapse', function(){
-                $('[data-target=#'+$(this).attr('id')+']').removeClass( 'hovering' ); }
-          );
+          .on( 'show.sek.sekCollapse hide.sek.sekCollapse', '.sek-nav-collapse', function() {
+                $('[data-target=#'+$(this).attr('id')+']').removeClass( 'hovering' );
+                $(window).trigger('scroll');
+          });
 });
