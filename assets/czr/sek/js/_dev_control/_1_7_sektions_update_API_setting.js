@@ -1058,7 +1058,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             _maybeFetchSectionsFromServer : function( params ) {
                   var dfd = $.Deferred(),
                       _ajaxRequest_;
-                  console.log('PARAMS IN _maybeFetchSectionsFromServer ', params, api.sek_userSavedSections, api.sek_presetSections );
+
                   params = params || { is_user_section : false };
                   if ( true === params.is_user_section ) {
                         if ( ! _.isEmpty( api.sek_userSavedSections ) && ! _.isEmpty( api.sek_userSavedSections[ params.preset_section_id ] ) ) {
