@@ -134,15 +134,33 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         $fields       = isset( $this->fields ) ? $this->fields : $this->simple_form_generate_fields( $form_composition );
         //generate form
         $form         = isset( $this->form ) ? $this->form : $this->simple_form_generate_form( $fields );
+
+        $module_id = is_array( $module_model ) && array_key_exists('id', $module_model ) ? $module_model['id'] : '';
         ob_start();
         ?>
         <div id="sek-form-respond">
           <?php
             $echo_form = true;
+            // When loading the page after a send attempt, focus on the module html element with a javascript animation
             if ( ! is_null( $this->mailer ) ) {
                 if ( 'sent' == $status_code = $this->mailer->get_status() ) {
                     $echo_form = false;
                 }
+                ?>
+                  <script type="text/javascript">
+                      jQuery( function($) {
+                          var $elToFocusOn = $('div[data-sek-id="<?php echo $module_id; ?>"]' );
+                          if ( $elToFocusOn.length > 0 ) {
+                                var _do = function() {
+                                    $('html, body').animate({
+                                        scrollTop : $elToFocusOn.offset().top - ( $(window).height() / 2 ) + ( $elToFocusOn.outerHeight() / 2 )
+                                    }, 'slow');
+                                };
+                                try { _do(); } catch(er) {}
+                          }
+                      });
+                  </script>
+                <?php
                 printf( '<span class="sek-form-message">%1$s</span>', $this->mailer->get_message( $status_code, $module_model ) );
             }
 
