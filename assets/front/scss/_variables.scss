@@ -3,6 +3,7 @@ $project-prefix: $project-base + '-' !default;
 $project-base-wrapper: 'sektion-wrapper' !default;
 
 $enable-grid-classes: true !default;
+$enable-transitions: true !default;
 
 // Grid breakpoints
 //
@@ -88,3 +89,8 @@ $cursor-disabled  : not-allowed !default;
 
 $monotypeFont : monospace !default;
 $serviceFont  : sans-serif !default;
+
+
+$transition-base:             all .2s ease-in-out !default;
+$transition-fade:             opacity .15s linear !default;
+$transition-collapse:         height .35s ease !default;
