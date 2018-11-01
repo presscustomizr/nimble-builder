@@ -47,12 +47,12 @@
     .#{$project-prefix}module .#{$project-prefix}module-inner & {
         &,
         & ul {
-            list-style: none;
-            margin: 0 -10px;
+            list-style: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
         }
-        & ul {
-            margin: 0;
-        }
+        margin-right: -10px !important;
+        margin-left: -10px !important;
         li {
             margin: 0 5px;
             & > ul li {
@@ -72,6 +72,9 @@
             align-items: center;
             justify-content: space-between;
             color: inherit;
+            .#{$project-prefix}nav-wrap & {
+                text-decoration: none;
+            }
         }
         &:not(:last-of-type) {
             border-bottom: 1px solid;
