@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.0
-Stable tag: 1.1.8
+Stable tag: 1.1.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -45,55 +45,25 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.1.8 =
-* improved : performance improvements with new options to lazy load images
-* added : an admin page for Nimble Builder, to display the system informations
-* added : a dismissable update notifications in admin
-
-= 1.1.7 =
-* fixed : check on php and wordpress version not preventing some plugin functions to be fired.
-
-= 1.1.6 =
-* fixed : normalized the text style of the user interface when previewing, so it's not impacted by the theme or other's plugins style
-* improved : added a way to make <a> links unclickable. partially fixes #193
-* added : a "Contact-us" category of sections, including 2 new pre-designed sections
-
-= 1.1.5 =
-* fixed : columns of a pre-designed sections not resizable after a drop
-* fixed : don't animate when duplicating a column or a module
-* fixed : added the missing button text option for the form module
-* improved : better support for https secure protocol when building the stylesheet URL
-
-= 1.1.4 =
-* fixed : code typo generating a php error ( https://wordpress.org/support/topic/unable-to-activate-44/ )
-* fixed : use 'https' when building the dynamic stylesheet url when is_ssl()
-
-= 1.1.3 =
-* fixed : user interface not generated on the first click in some cases
-
-= 1.1.2 =
-* improved : the content picker should be available when expanding the main Nimble panel for the first time.
-* improved : the collection of pre-designed sections is fetched earlier for better perforamnces.
-* improved : a set of params can now be passed to a custom location when registering.
-
-= 1.1.1 =
-* fixed : wrong error message, indicating a missing "ver_ini" property for column and module generated when dropping a module in a section to create
-* added : a filter 'nimble_get_locale_template_path', used for example in the Hueman theme to define a custom Nimble template path
-
-= 1.1.0 =
-* This version includes major improvements. Many new modules and pre-designed sections are now available to create your pages.
-* New modules : heading, icon, button, Google map, Html content, quote, spacer, divider, contact form.
-* The user interface has been enhanced with a non intrusive top bar, including do/undo buttons, and global settings for the Nimble builder.
-
-= 1.0.4 =
-* fixed : when margins and paddings are not defined ( number field emptied ), no related CSS properties should be printed.
-* fixed : sek-sektion-inner should not have a padding of 15px on front.
-* fixed : a nested sektion should reset its parent column padding.
-* fixed : empty sektions wrapper should only be printed when customizing.
-* fixed : prevent element in the wp content to be displayed out of the wp-content-wrapper when previewing.
-* fixed : dynamic CSS can be printed twice : inline and enqueued as CSS file when user logged in.
+= 1.1.9 =
+* fixed : broken column width in mobiles for columns with a custom horizontal margin.
+* fixed : conflict with Anspress plugin when uploading an image on front.
+* fixed : the content picker input ( for link creation ) was broken : "Set custom url" could be printed multiple times, no search results was generating an error, some pages or posts could not be listed.
+* fixed : conflict with HappyForms plugin when customizing a form.
+* improved : simple form module, added sender's email in the body of the message.
+* improved : simple form module, animate with a scroll action to focus on the message after a send action.
+* added : an option for a parallax effect on section's background image. Compatible with lazy loading.
 
 == Changelog ==
+= 1.1.9 : October 31st, 2018 =
+* fixed : broken column width in mobiles for columns with a custom horizontal margin.
+* fixed : conflict with Anspress plugin when uploading an image on front.
+* fixed : the content picker input ( for link creation ) was broken : "Set custom url" could be printed multiple times, no search results was generating an error, some pages or posts could not be listed.
+* fixed : conflict with HappyForms plugin when customizing a form.
+* improved : simple form module, added sender's email in the body of the message.
+* improved : simple form module, animate with a scroll action to focus on the message after a send action.
+* added : an option for a parallax effect on section's background image. Compatible with lazy loading.
+
 = 1.1.8 : October 23rd, 2018 =
 * improved : performance improvements with new options to lazy load images
 * added : an admin page for Nimble Builder, to display the system informations

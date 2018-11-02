@@ -927,6 +927,10 @@ button.sek-btn,
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
 }
 
+.sek-simple-form-wrapper #sek-form-respond {
+  padding: 20px 0;
+}
+
 .sek-module-inner {
   line-height: 1.5em;
 }

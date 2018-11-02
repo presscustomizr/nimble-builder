@@ -1233,7 +1233,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   var $elToFocusOn = $('div[data-sek-id="' + params.id + '"]' );
                                   if ( $elToFocusOn.length > 0 ) {
                                         $('html, body').animate({
-                                              scrollTop : $('div[data-sek-id="' + params.id + '"]' ).offset().top - 100
+                                              scrollTop : $elToFocusOn.offset().top - 100
                                         }, 'slow');
                                   }
                             }

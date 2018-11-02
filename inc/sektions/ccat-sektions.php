@@ -1962,9 +1962,16 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'title'       => __('Fixed background', 'text_domain_to_be_replaced'),
                     'default'     => 0
                 ),
+                'bg-parallax' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Parallax effect on scroll', 'text_domain_to_be_replaced'),
+                    'default'     => 0,
+                    'notice_after' => __('When enabled, the background image moves slower than the page elements on scroll. This effect is not enabled on mobile devices.', 'text_domain_to_be_replaced'),
+                    'refresh_markup' => true,
+                ),
                 'bg-scale' => array(
                     'input_type'  => 'select',
-                    'title'       => __('scale', 'text_domain_to_be_replaced'),
+                    'title'       => __('Scale', 'text_domain_to_be_replaced'),
                     'default'     => 'cover',
                     'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
                 ),
@@ -2425,6 +2432,12 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
                 'selector' => $selector,
                 'css_rules' => $responsive_css_rules,
                 'mq' => "(min-width: {$breakpoint}px)"
+            );
+            $responsive_css_rules_for_100_percent_width = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', 100, $total_horizontal_margin_with_unit );
+            $rules[] = array(
+                'selector' => sprintf('.sek-sektion-inner > [data-sek-id="%1$s"]', $level['id'] ),
+                'css_rules' => $responsive_css_rules_for_100_percent_width,
+                'mq' => null,// "(max-width: {$breakpoint_for_100_percent_width}px)"
             );
         }//if ( $total_horizontal_margin > 0 && !empty( $parent_section ) ) {
     }// if column
@@ -8210,7 +8223,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $has_at_least_one_module ? 'sek-has-modules' : '',
                         $this->get_level_visibility_css_class( $model ),
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
-                        $this -> sek_maybe_add_smart_loaded_bg_attributes( $model )
+                        $this -> sek_maybe_add_bg_attributes( $model )
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -8327,7 +8340,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'visibility' ] ) ) {
                 if ( is_array( $model[ 'options' ][ 'visibility' ] ) ) {
                     foreach ( $model[ 'options' ][ 'visibility' ] as $device_type => $device_visibility_bool ) {
-                        if ( true !== sek_booleanize_checkbox_val( $device_visibility_bool  ) ) {
+                        if ( true !== sek_booleanize_checkbox_val( $device_visibility_bool ) ) {
                             $visibility_class .= " sek-hidden-on-{$device_type}";
                         }
                     }
@@ -8480,17 +8493,36 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         /* ------------------------------------------------------------------------- *
          *  SMART LOAD.
         /* ------------------------------------------------------------------------- */
-        function sek_maybe_add_smart_loaded_bg_attributes( $model ) {
-            if ( !sek_is_img_smartload_enabled() )
-              return false;
+        function sek_maybe_add_bg_attributes( $model ) {
+            $attributes = '';
             $bg_url = '';
+            $parallax_enabled = false;
+            $width = '';
+            $height = '';
+
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
-                    $bg_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
+                    if ( sek_is_img_smartload_enabled() ) {
+                        $bg_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
+                    }
+                    $parallax_enabled = !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
+                    if ( $parallax_enabled ) {
+                        $image = wp_get_attachment_image_src( $bg_options[ 'bg-image'], 'full' );
+                        if ( $image ) {
+                            list( $src, $width, $height ) = $image;
+                        }
+                    }
                 }
             }
-            return ! empty( $bg_url ) ? sprintf('data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url ) : '';
+
+            if ( ! empty( $bg_url ) ) {
+                $attributes = sprintf('data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url );
+            }
+            if ( $parallax_enabled ) {
+                $attributes .= sprintf('%1$s data-sek-bg-parallax="true" data-bg-width="%2$s" data-bg-height="%3$s"', $attributes, $width, $height );
+            }
+            return $attributes;
         }
         function sek_maybe_process_img_for_js_smart_load( $html ) {
             if ( !sek_is_img_smartload_enabled() )
@@ -8658,6 +8690,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         $form_composition = $this->_set_form_composition( $this->form_composition, $module_model );
         $fields       = isset( $this->fields ) ? $this->fields : $this->simple_form_generate_fields( $form_composition );
         $form         = isset( $this->form ) ? $this->form : $this->simple_form_generate_form( $fields );
+
+        $module_id = is_array( $module_model ) && array_key_exists('id', $module_model ) ? $module_model['id'] : '';
         ob_start();
         ?>
         <div id="sek-form-respond">
@@ -8667,6 +8701,21 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 if ( 'sent' == $status_code = $this->mailer->get_status() ) {
                     $echo_form = false;
                 }
+                ?>
+                  <script type="text/javascript">
+                      jQuery( function($) {
+                          var $elToFocusOn = $('div[data-sek-id="<?php echo $module_id; ?>"]' );
+                          if ( $elToFocusOn.length > 0 ) {
+                                var _do = function() {
+                                    $('html, body').animate({
+                                        scrollTop : $elToFocusOn.offset().top - ( $(window).height() / 2 ) + ( $elToFocusOn.outerHeight() / 2 )
+                                    }, 'slow');
+                                };
+                                try { _do(); } catch(er) {}
+                          }
+                      });
+                  </script>
+                <?php
                 printf( '<span class="sek-form-message">%1$s</span>', $this->mailer->get_message( $status_code, $module_model ) );
             }
 
@@ -9303,8 +9352,8 @@ class Sek_Mailer {
         } else {
             $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_domain_to_be_replaced' ), get_bloginfo( 'name' ) );
         }
-
-        $before_message = '';//$sender_website;
+        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'text_domain_to_be_replaced'), $sender_name, $sender_email );//$sender_website;
+        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'text_domain_to_be_replaced'), $subject );
         $after_message  = '';
 
         if ( array_key_exists( 'email_footer', $submission_options ) ) {
@@ -9318,8 +9367,9 @@ class Sek_Mailer {
 
         $body           = sprintf( '%1$s%2$s%3$s%4$s%5$s',
                             $before_message,
-                            sprintf( '%1$s',
-                                 $this->form->get_field('nimble_message')->get_input()->get_value()
+                            sprintf( '<br><br>%1$s: <br>%2$s',
+                                __('Message body', 'text_domain_to_be_replaced'),
+                                $this->form->get_field('nimble_message')->get_input()->get_value()
                             ),
                             $after_message,
                             $allow_html ? '<br><br>--<br>': "\r\n\r\n--\r\n",

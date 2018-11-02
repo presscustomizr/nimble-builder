@@ -1,5 +1,4 @@
 
-
 (function() {
   var root = typeof self == 'object' && self.self === self && self ||
             typeof global == 'object' && global.global === global && global ||
@@ -25,9 +24,9 @@
     if (typeof module != 'undefined' && !module.nodeType && module.exports) {
       exports = module.exports = _;
     }
-    exports._ = _;
+    exports._utils_ = _;
   } else {
-    root._ = _;
+    root._utils_ = _;
   }
   _.VERSION = '1.9.1';
   var optimizeCb = function(func, context, argCount) {
@@ -1274,7 +1273,7 @@
       function Plugin( element, options ) {
             this.element = element;
             this.options = $.extend( {}, defaults, options) ;
-            if ( _.isArray( this.options.excludeImg ) ) {
+            if ( _utils_.isArray( this.options.excludeImg ) ) {
                   this.options.excludeImg.push( '.'+skipImgClass );
             } else {
                   this.options.excludeImg = [ '.'+skipImgClass ];
@@ -1297,7 +1296,7 @@
                         self._load_img(this);
                   });
             $(window).scroll( function( _evt ) { self._better_scroll_event_handler( $_ImgOrBackgroundElements, _evt ); } );
-            $(window).resize( _.debounce( function( _evt ) { self._maybe_trigger_load( $_ImgOrBackgroundElements, _evt ); }, 100 ) );
+            $(window).resize( _utils_.debounce( function( _evt ) { self._maybe_trigger_load( $_ImgOrBackgroundElements, _evt ); }, 100 ) );
             this._maybe_trigger_load( $_ImgOrBackgroundElements );
       };
 
@@ -1360,41 +1359,41 @@
       * replace src place holder by data-src attr val which should include the real src
       */
       Plugin.prototype._load_img = function( _el_ ) {
-            var $_el_    = $(_el_),
-                _src     = $_el_.attr( 'data-sek-src' ),
-                _src_set = $_el_.attr( 'data-sek-srcset' ),
-                _sizes   = $_el_.attr( 'data-sek-sizes' ),
+            var $_el    = $(_el_),
+                _src     = $_el.attr( 'data-sek-src' ),
+                _src_set = $_el.attr( 'data-sek-srcset' ),
+                _sizes   = $_el.attr( 'data-sek-sizes' ),
                 self = this,
                 $jQueryImgToLoad = $("<img />", { src : _src } );
 
-            $_el_.addClass('lazy-loading');
-            $_el_.unbind('sek_load_img');
+            $_el.addClass('lazy-loading');
+            $_el.unbind('sek_load_img');
 
             $jQueryImgToLoad
                   .load( function () {
-                        $_el_.removeAttr( [ 'data-sek-src', 'data-sek-srcset', 'data-sek-sizes' ].join(' ') );
-                        if( $_el_.data("sek-lazy-bg") ){
-                              $_el_.css('backgroundImage', 'url('+_src+')');
+                        $_el.removeAttr( [ 'data-sek-src', 'data-sek-srcset', 'data-sek-sizes' ].join(' ') );
+                        if( $_el.data("sek-lazy-bg") ){
+                              $_el.css('backgroundImage', 'url('+_src+')');
                         } else {
-                              $_el_.attr("src", _src );
+                              $_el.attr("src", _src );
                               if ( _src_set ) {
-                                    $_el_.attr("srcset", _src_set );
+                                    $_el.attr("srcset", _src_set );
                               }
                               if ( _sizes ) {
-                                    $_el_.attr("sizes", _sizes );
+                                    $_el.attr("sizes", _sizes );
                               }
                         }
-                        if ( ! $_el_.hasClass('sek-lazy-loaded') ) {
-                              $_el_.addClass('sek-lazy-loaded');
+                        if ( ! $_el.hasClass('sek-lazy-loaded') ) {
+                              $_el.addClass('sek-lazy-loaded');
                         }
 
-                        $_el_.trigger('smartload');
-                        $_el_.data('sek-lazy-loaded', true );
+                        $_el.trigger('smartload');
+                        $_el.data('sek-lazy-loaded', true );
                   });//<= create a load() fn
             if ( $jQueryImgToLoad[0].complete ) {
                   $jQueryImgToLoad.load();
             }
-            $_el_.removeClass('lazy-loading');
+            $_el.removeClass('lazy-loading');
       };
       $.fn[pluginName] = function ( options ) {
             return this.each(function () {
@@ -1403,6 +1402,106 @@
                         new Plugin( this, options ));
                   }
             });
+      };
+})( jQuery, window );
+/* ===================================================
+ * jquery.fn.parallaxBg v1.0.0
+ * Created in October 2018.
+ * Inspired from https://github.com/presscustomizr/front-jquery-plugins/blob/master/jqueryParallax.js
+ * ===================================================
+*/
+(function ( $, window ) {
+      var pluginName = 'parallaxBg',
+          defaults = {
+                parallaxRatio : 0.5,
+                parallaxDirection : 1,
+                parallaxOverflowHidden : true,
+                oncustom : [],//list of event here
+                matchMedia : 'only screen and (max-width: 800px)'
+          };
+
+      function Plugin( element, options ) {
+            this.element         = $(element);
+            this.options         = $.extend( {}, defaults, options, this.parseElementDataOptions() ) ;
+            this._defaults       = defaults;
+            this._name           = pluginName;
+            this.init();
+      }
+
+      Plugin.prototype.parseElementDataOptions = function () {
+            return this.element.data();
+      };
+      Plugin.prototype.init = function () {
+            var self = this;
+            this.$_document   = $(document);
+            this.$_window     = $(window);
+            this.doingAnimation = false;
+            _utils_.bindAll( this, 'maybeParallaxMe', 'parallaxMe' );
+            $(window).scroll( function(_evt) { self.maybeParallaxMe(); } );
+            $(window).resize( _utils_.debounce( function(_evt) { self.maybeParallaxMe(); }, 100 ) );
+            self.maybeParallaxMe();
+      };
+
+      Plugin.prototype._is_visible = function( _evt ) {
+          var $element       = this.element,
+              wt = $(window).scrollTop(),
+              wb = wt + $(window).height(),
+              it  = $element.offset().top,
+              ib  = it + $element.outerHeight(),
+              threshold = 0;
+          if ( _evt && 'scroll' == _evt.type && this.options.load_all_images_on_first_scroll )
+            return true;
+
+          return ib >= wt - threshold && it <= wb + threshold;
+      };
+      /*
+      * In order to handle a smooth scroll
+      */
+      Plugin.prototype.maybeParallaxMe = function() {
+            var self = this;
+            if ( ! this._is_visible() )
+              return;
+            if ( _utils_.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
+                  this.element.css({'background-position-y' : '', 'background-attachment' : '' });
+                  return;
+            }
+
+            if ( ! this.doingAnimation ) {
+                  this.doingAnimation = true;
+                  window.requestAnimationFrame(function() {
+                        self.parallaxMe();
+                        self.doingAnimation = false;
+                  });
+            }
+      };
+      Plugin.prototype.setTopPosition = function( _top_ ) {
+            _top_ = _top_ || 0;
+            this.element.css({
+                  'background-position-y' : ( -1 * _top_ ) + 'px',
+                  'background-attachment' : 'fixed',
+            });
+      };
+
+      Plugin.prototype.parallaxMe = function() {
+            /*
+            if ( ! ( this.element.hasClass( 'is-selected' ) || this.element.parent( '.is-selected' ).length ) )
+              return;
+            */
+            var $element       = this.element;
+            var ratio = this.options.parallaxRatio,
+                parallaxDirection = this.options.parallaxDirection,
+                ElementDistanceToTop  = $element.offset().top,
+                value = ratio * parallaxDirection * ( this.$_document.scrollTop() - ElementDistanceToTop );
+
+            this.setTopPosition( parallaxDirection * value );
+      };
+      $.fn[pluginName] = function ( options ) {
+          return this.each(function () {
+              if (!$.data(this, 'plugin_' + pluginName)) {
+                  $.data(this, 'plugin_' + pluginName,
+                  new Plugin( this, options ));
+              }
+          });
       };
 })( jQuery, window );/* ------------------------------------------------------------------------- *
  *  SMARTLOAD
@@ -1416,6 +1515,18 @@ jQuery(function($){
             }
       });
 });
+
+
+/* ------------------------------------------------------------------------- *
+ *  BG PARALLAX
+/* ------------------------------------------------------------------------- */
+jQuery(function($){
+      $('[data-sek-bg-parallax="true"]').parallaxBg();
+      $('body').on('sek-level-refreshed', '[data-sek-bg-parallax="true"]', function() {
+            $(this).parallaxBg();
+      });
+});
+
 
 /* ------------------------------------------------------------------------- *
  *  FITTEXT

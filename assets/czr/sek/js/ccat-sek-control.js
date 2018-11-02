@@ -5912,25 +5912,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    case 'bg-image' :
-                                          _.each( [ 'bg-position', 'bg-attachment', 'bg-scale', 'bg-apply-overlay', 'bg-color-overlay', 'bg-opacity-overlay' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      var bool = false;
-                                                      switch( _inputId_ ) {
-                                                            case 'bg-color-overlay' :
-                                                            case 'bg-opacity-overlay' :
-                                                                  bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-apply-overlay')() );
-                                                            break;
-                                                            default :
-                                                                  bool = ! _.isEmpty( input() + '' );
-                                                            break;
-                                                      }
-                                                      return bool;
-                                                }); } catch( er ) {
-                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
                                     case 'bg-apply-overlay' :
                                           _.each( [ 'bg-color-overlay', 'bg-opacity-overlay' ] , function(_inputId_ ) {
                                                 try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
