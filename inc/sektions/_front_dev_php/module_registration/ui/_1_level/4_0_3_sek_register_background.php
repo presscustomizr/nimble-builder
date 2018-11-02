@@ -43,7 +43,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'input_type'  => 'gutencheck',
                     'title'       => __('Parallax effect on scroll', 'text_domain_to_be_replaced'),
                     'default'     => 0,
-                    'notice_after' => __('When enabled, the background image moves slower than the page elements on scroll. Not enabled on mobile devices.', 'text_domain_to_be_replaced'),
+                    'notice_after' => __('When enabled, the background image moves slower than the page elements on scroll. This effect is not enabled on mobile devices.', 'text_domain_to_be_replaced'),
                     'refresh_markup' => true,
                 ),
                 // 'bg-repeat' => array(
