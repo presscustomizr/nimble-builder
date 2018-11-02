@@ -5,7 +5,7 @@
  * Inspired from https://github.com/presscustomizr/front-jquery-plugins/blob/master/jqueryParallax.js
  * ===================================================
 */
-(function ( $, window, _ ) {
+(function ( $, window ) {
       //defaults
       var pluginName = 'parallaxBg',
           defaults = {
@@ -40,11 +40,11 @@
 
             //this.initWaypoints();
             //this.stageParallaxElements();
-            _.bindAll( this, 'maybeParallaxMe', 'parallaxMe' );
+            _utils_.bindAll( this, 'maybeParallaxMe', 'parallaxMe' );
             //the scroll event gets throttled with the requestAnimationFrame
             $(window).scroll( function(_evt) { self.maybeParallaxMe(); } );
             //debounced resize event
-            $(window).resize( _.debounce( function(_evt) { self.maybeParallaxMe(); }, 100 ) );
+            $(window).resize( _utils_.debounce( function(_evt) { self.maybeParallaxMe(); }, 100 ) );
             //on load
             self.maybeParallaxMe();
       };
@@ -73,7 +73,7 @@
 
             //options.matchMedia is set to 'only screen and (max-width: 768px)' by default
             //if a match is found, then reset the top position
-            if ( _.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
+            if ( _utils_.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
                   //return this.setTopPosition();
                   this.element.css({'background-position-y' : '', 'background-attachment' : '' });
                   return;
@@ -125,4 +125,4 @@
               }
           });
       };
-})( jQuery, window, _ );
+})( jQuery, window );

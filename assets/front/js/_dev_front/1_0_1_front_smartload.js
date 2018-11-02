@@ -42,7 +42,7 @@
             this.element = element;
             this.options = $.extend( {}, defaults, options) ;
             //add .smartload-skip to the excludeImg
-            if ( _.isArray( this.options.excludeImg ) ) {
+            if ( _utils_.isArray( this.options.excludeImg ) ) {
                   this.options.excludeImg.push( '.'+skipImgClass );
             } else {
                   this.options.excludeImg = [ '.'+skipImgClass ];
@@ -73,7 +73,7 @@
             //the scroll event gets throttled with the requestAnimationFrame
             $(window).scroll( function( _evt ) { self._better_scroll_event_handler( $_ImgOrBackgroundElements, _evt ); } );
             //debounced resize event
-            $(window).resize( _.debounce( function( _evt ) { self._maybe_trigger_load( $_ImgOrBackgroundElements, _evt ); }, 100 ) );
+            $(window).resize( _utils_.debounce( function( _evt ) { self._maybe_trigger_load( $_ImgOrBackgroundElements, _evt ); }, 100 ) );
             //on load
             this._maybe_trigger_load( $_ImgOrBackgroundElements );
       };
@@ -141,15 +141,15 @@
       * replace src place holder by data-src attr val which should include the real src
       */
       Plugin.prototype._load_img = function( _el_ ) {
-            var $_el_    = $(_el_),
-                _src     = $_el_.attr( 'data-sek-src' ),
-                _src_set = $_el_.attr( 'data-sek-srcset' ),
-                _sizes   = $_el_.attr( 'data-sek-sizes' ),
+            var $_el    = $(_el_),
+                _src     = $_el.attr( 'data-sek-src' ),
+                _src_set = $_el.attr( 'data-sek-srcset' ),
+                _sizes   = $_el.attr( 'data-sek-sizes' ),
                 self = this,
                 $jQueryImgToLoad = $("<img />", { src : _src } );
 
-            $_el_.addClass('lazy-loading');
-            $_el_.unbind('sek_load_img');
+            $_el.addClass('lazy-loading');
+            $_el.unbind('sek_load_img');
 
             $jQueryImgToLoad
                   // .hide()
@@ -157,34 +157,34 @@
                         //https://api.jquery.com/removeAttr/
                         //An attribute to remove; as of version 1.7, it can be a space-separated list of attributes.
                         //minimum supported wp version (3.4+) embeds jQuery 1.7.2
-                        $_el_.removeAttr( [ 'data-sek-src', 'data-sek-srcset', 'data-sek-sizes' ].join(' ') );
-                        if( $_el_.data("sek-lazy-bg") ){
-                              $_el_.css('backgroundImage', 'url('+_src+')');
+                        $_el.removeAttr( [ 'data-sek-src', 'data-sek-srcset', 'data-sek-sizes' ].join(' ') );
+                        if( $_el.data("sek-lazy-bg") ){
+                              $_el.css('backgroundImage', 'url('+_src+')');
                         } else {
-                              $_el_.attr("src", _src );
+                              $_el.attr("src", _src );
                               if ( _src_set ) {
-                                    $_el_.attr("srcset", _src_set );
+                                    $_el.attr("srcset", _src_set );
                               }
                               if ( _sizes ) {
-                                    $_el_.attr("sizes", _sizes );
+                                    $_el.attr("sizes", _sizes );
                               }
                         }
                         //prevent executing this twice on an already smartloaded img
-                        if ( ! $_el_.hasClass('sek-lazy-loaded') ) {
-                              $_el_.addClass('sek-lazy-loaded');
+                        if ( ! $_el.hasClass('sek-lazy-loaded') ) {
+                              $_el.addClass('sek-lazy-loaded');
                         }
                         //Following would be executed twice if needed, as some browsers at the
                         //first execution of the load callback might still have not actually loaded the img
 
-                        $_el_.trigger('smartload');
+                        $_el.trigger('smartload');
                         //flag to avoid double triggering
-                        $_el_.data('sek-lazy-loaded', true );
+                        $_el.data('sek-lazy-loaded', true );
                   });//<= create a load() fn
             //http://stackoverflow.com/questions/1948672/how-to-tell-if-an-image-is-loaded-or-cached-in-jquery
             if ( $jQueryImgToLoad[0].complete ) {
                   $jQueryImgToLoad.load();
             }
-            $_el_.removeClass('lazy-loading');
+            $_el.removeClass('lazy-loading');
       };
 
 

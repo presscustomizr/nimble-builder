@@ -2,9 +2,11 @@
 //     http://underscorejs.org
 //     (c) 2009-2018 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
-
+//
+//     Modified by Nicolas GUILLAUME => replace the globally exposed underscore object window._ by window._utils_
+//     => fixes issues generated when plugins are using different versions of underscore
+//     @see https://github.com/presscustomizr/nimble-builder/issues/221
 (function() {
-
   // Baseline setup
   // --------------
 
@@ -54,9 +56,11 @@
     if (typeof module != 'undefined' && !module.nodeType && module.exports) {
       exports = module.exports = _;
     }
-    exports._ = _;
+    // modification by @nikeo, November 2, 2018
+    exports._utils_ = _;
   } else {
-    root._ = _;
+    // modification by @nikeo, November 2, 2018
+    root._utils_ = _;
   }
 
   // Current version.

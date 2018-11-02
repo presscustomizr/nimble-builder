@@ -43,7 +43,7 @@ jQuery( function($){
 
     };
     //doFitText();
-    // if ( 'function' == typeof(_) && ! _.isUndefined( wp.customize ) ) {
+    // if ( 'function' == typeof(_) && ! _utils_.isUndefined( wp.customize ) ) {
     //     wp.customize.selectiveRefresh.bind('partial-content-rendered' , function() {
     //         doFitText();
     //     });
