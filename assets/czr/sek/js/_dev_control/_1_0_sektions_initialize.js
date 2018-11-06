@@ -187,7 +187,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.setupTopBar();//@see specific dev file
 
                         // SAVE SECTION UI
-                        self.setupSaveUI();
+                        if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+                              self.setupSaveUI();
+                        }
                   });//api.bind( 'ready' )
 
             },// initialize()

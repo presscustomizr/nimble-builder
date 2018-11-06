@@ -89,7 +89,9 @@ function sek_enqueue_controls_js_css() {
 
                     // 'preset_section' type
                     '.sek-content-preset_section-drop-zone'//between sections
-                ])
+                ]),
+
+                'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true
             )
         )
     );//wp_localize_script()

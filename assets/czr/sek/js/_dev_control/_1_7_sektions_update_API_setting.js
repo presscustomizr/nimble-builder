@@ -1125,7 +1125,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
                       __dfd__ = $.Deferred();
-                  console.log('ALORS SECTION PARAMS BEFORE FETCH', sectionParams );
+                  //console.log('ALORS SECTION PARAMS BEFORE FETCH', sectionParams );
 
                   self._maybeFetchSectionsFromServer({
                         is_user_section : sectionParams.is_user_section,

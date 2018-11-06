@@ -263,16 +263,18 @@
       //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
-      $.extend( api.czrModuleMap, {
-            sek_my_sections_sec_picker_module : {
-                  mthds : Constructor,
-                  crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
-                  has_mod_opt : false,
-                  ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
-            },
-      });
+      if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+            $.extend( api.czrModuleMap, {
+                  sek_my_sections_sec_picker_module : {
+                        mthds : Constructor,
+                        crud : false,
+                        name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
+                        has_mod_opt : false,
+                        ready_on_section_expanded : true,
+                        defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
+                  },
+            });
+      }
 })( wp.customize , jQuery, _ );
 
 

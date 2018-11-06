@@ -71,7 +71,9 @@ function sek_enqueue_controls_js_css() {
                     '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
                     'body',// body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
                     '.sek-content-preset_section-drop-zone'//between sections
-                ])
+                ]),
+
+                'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true
             )
         )
     );//wp_localize_script()

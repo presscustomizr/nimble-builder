@@ -93,7 +93,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                         self.setupTopBar();//@see specific dev file
-                        self.setupSaveUI();
+                        if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+                              self.setupSaveUI();
+                        }
                   });//api.bind( 'ready' )
 
             },// initialize()
@@ -1671,17 +1673,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                        },
-                        sek_my_sections_sec_picker_module : {
-                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                              module_type : 'sek_my_sections_sec_picker_module',
-                              controlLabel :  '@missi18n My sections',
-                              content_type : 'section',
-                              expandAndFocusOnInit : false,
-                              priority : 10,
-                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                        },
+                        }
                   });
+
+                  if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+                        $.extend( modulesRegistrationParams, {
+                              sek_my_sections_sec_picker_module : {
+                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                                    module_type : 'sek_my_sections_sec_picker_module',
+                                    controlLabel :  '@missi18n My sections',
+                                    content_type : 'section',
+                                    expandAndFocusOnInit : false,
+                                    priority : 10,
+                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                              }
+                        });
+                  }
                   var firstKey = _.keys( modulesRegistrationParams )[0],
                       firstControlId = modulesRegistrationParams[firstKey].settingControlId;
 
@@ -3188,7 +3195,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
                       __dfd__ = $.Deferred();
-                  console.log('ALORS SECTION PARAMS BEFORE FETCH', sectionParams );
 
                   self._maybeFetchSectionsFromServer({
                         is_user_section : sectionParams.is_user_section,
@@ -6103,16 +6109,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//initialize
       };
       api.czrModuleMap = api.czrModuleMap || {};
-      $.extend( api.czrModuleMap, {
-            sek_my_sections_sec_picker_module : {
-                  mthds : Constructor,
-                  crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
-                  has_mod_opt : false,
-                  ready_on_section_expanded : true,
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
-            },
-      });
+      if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+            $.extend( api.czrModuleMap, {
+                  sek_my_sections_sec_picker_module : {
+                        mthds : Constructor,
+                        crud : false,
+                        name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
+                        has_mod_opt : false,
+                        ready_on_section_expanded : true,
+                        defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
+                  },
+            });
+      }
 })( wp.customize , jQuery, _ );
 
 
