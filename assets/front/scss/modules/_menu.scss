@@ -54,6 +54,7 @@
         margin-right: -10px !important;
         margin-left: -10px !important;
         li {
+            list-style: none;
             margin: 0 5px;
             & > ul li {
                 @if ( true == $is_rtl ) {
