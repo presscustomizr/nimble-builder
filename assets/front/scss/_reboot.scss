@@ -18,5 +18,8 @@
     svg:not(:root) {
         overflow: hidden; // Hide the overflow in IE
     }
+    figure {
+        margin: 0;
+    }
 }
 //consider to extend this with other rules from bs _reboot.scss
