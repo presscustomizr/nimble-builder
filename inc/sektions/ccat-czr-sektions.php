@@ -63,13 +63,17 @@ function sek_enqueue_controls_js_css() {
 
                 'defaultSektionSettingValue' => sek_get_default_sektions_value(),
 
+                'userSavedSektions' => get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS),
+
                 'registeredModules' => CZR_Fmk_Base() -> registered_modules,
                 'preDropElementClass' => 'sortable-placeholder',
                 'dropSelectors' => implode(',', [
                     '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
                     'body',// body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
                     '.sek-content-preset_section-drop-zone'//between sections
-                ])
+                ]),
+
+                'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true
             )
         )
     );//wp_localize_script()
@@ -496,8 +500,31 @@ function sek_print_nimble_customizer_tmpl() {
           </div>
       </div>
     </script>
+
+    <script type="text/html" id="tmpl-nimble-top-save-ui">
+      <div id="nimble-top-save-ui" class="czr-preview-notification">
+          <input id="sek-saved-section-id" type="hidden" value="">
+          <div class="sek-section-title">
+              <label for="sek-saved-section-title" class="customize-control-title"><?php _e('Section title', 'text_domain_to_be_replaced'); ?></label>
+              <input id="sek-saved-section-title" type="text" value="">
+          </div>
+          <div class="sek-section-description">
+              <label for="sek-saved-section-description" class="customize-control-title"><?php _e('Section description', 'text_domain_to_be_replaced'); ?></label>
+              <textarea id="sek-saved-section-description" type="text" value=""></textarea>
+          </div>
+          <div class="sek-section-save">
+              <button class="button sek-do-save-section far fa-save" type="button" title="<?php _e('Save', 'text_domain'); ?>">
+                <?php _e('Save', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Save', 'text_domain'); ?></span>
+              </button>
+          </div>
+          <button class="button sek-cancel-save far fa-times-circle" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
+              <?php _e('Cancel', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Cancel', 'text_domain'); ?></span>
+          </button>
+      </div>
+    </script>
     <?php
 }
+
 
 ?><?php
 /* ------------------------------------------------------------------------- *
@@ -871,6 +898,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
         <div class="sek-content-type-wrapper">
           <?php
+            $content_collection = array();
             switch( $input_id ) {
                 case 'intro_sections' :
                     $content_collection = array(
@@ -950,7 +978,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                 break;
             }
             foreach( $content_collection as $_params) {
-                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"><div class="sek-overlay"></div></div>',
+                printf('<div draggable="true" data-sek-section-type="content" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"><div class="sek-overlay"></div></div>',
                     $_params['content-type'],
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',

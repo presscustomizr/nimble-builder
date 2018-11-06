@@ -164,6 +164,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
         <div class="sek-content-type-wrapper">
           <?php
+            $content_collection = array();
             switch( $input_id ) {
                 case 'intro_sections' :
                     $content_collection = array(
@@ -247,7 +248,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                 break;
             }
             foreach( $content_collection as $_params) {
-                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"><div class="sek-overlay"></div></div>',
+                printf('<div draggable="true" data-sek-section-type="content" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"><div class="sek-overlay"></div></div>',
                     $_params['content-type'],
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',

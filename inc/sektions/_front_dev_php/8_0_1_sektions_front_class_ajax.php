@@ -7,10 +7,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             //add_action( 'wp_ajax_sek_get_preview_ui_element', array( $this, 'sek_get_ui_content_for_injection' ) );
 
             // Fetches the preset_sections
-            // This dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
-            // It allows us to hackily fetch anything from the server by using a specific dynamic suffix ( normally module type )
-            // $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
-            add_filter( "ac_set_ajax_czr_tmpl___preset_sections_server_collection", '\Nimble\sek_get_preset_sektions' );
+            add_action( 'wp_ajax_sek_get_preset_sections', array( $this, 'sek_get_preset_sektions' ) );
+
             // hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
 
             // This is the list of accepted actions
@@ -45,6 +43,44 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function _schedule_img_import_ajax_actions() {
             add_action( 'wp_ajax_sek_import_attachment', array( $this, 'sek_ajax_import_attachemnt' ) );
         }
+
+        // Fired in __construct()
+        function _schedule_section_saving_ajax_actions() {
+            // Writes the saved section in a CPT + update the saved section option
+            add_action( 'wp_ajax_sek_save_section', array( $this, 'sek_ajax_save_section' ) );
+            // Fetches the user_saved sections
+            add_action( 'wp_ajax_sek_get_user_saved_sections', array( $this, 'sek_sek_get_user_saved_sections' ) );
+        }
+
+        // hook : 'wp_ajax_sek_get_preset_sektions'
+        function sek_get_preset_sektions() {
+            $action = 'save-customize_' . get_stylesheet();
+            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+                 wp_send_json_error( array(
+                    'code' => 'invalid_nonce',
+                    'message' => __( 'sek_ajax_save_section => check_ajax_referer() failed.' ),
+                ) );
+            }
+            if ( ! is_user_logged_in() ) {
+                wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
+            }
+            if ( ! current_user_can( 'edit_theme_options' ) ) {
+              wp_send_json_error( __FUNCTION__ . ' => user_cant_edit_theme_options');
+            }
+            if ( ! current_user_can( 'customize' ) ) {
+                status_header( 403 );
+                wp_send_json_error( __FUNCTION__ . ' => customize_not_allowed' );
+            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+                status_header( 405 );
+                wp_send_json_error( __FUNCTION__ . ' => bad_method' );
+            }
+            $preset_sections = sek_get_preset_sektions();
+            if ( empty( $preset_sections ) ) {
+                wp_send_json_error( __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sektions()' );
+            }
+            wp_send_json_success( $preset_sections );
+        }
+
 
 
         // hook : 'wp_ajax_sek_get_html_for_injection'
@@ -285,6 +321,20 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         /////////////////////////////////////////////////////////////////
         // hook : wp_ajax_sek_import_attachment
         function sek_ajax_import_attachemnt() {
+            if ( ! is_user_logged_in() ) {
+                wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
+            }
+            if ( ! current_user_can( 'edit_theme_options' ) ) {
+              wp_send_json_error( __FUNCTION__ . ' => user_cant_edit_theme_options');
+            }
+            if ( ! current_user_can( 'customize' ) ) {
+                status_header( 403 );
+                wp_send_json_error( __FUNCTION__ . ' => customize_not_allowed' );
+            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+                status_header( 405 );
+                wp_send_json_error( __FUNCTION__ . ' => bad_method' );
+            }
+
             //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
             $relative_path = $_POST['rel_path'];
 
@@ -382,7 +432,115 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
 
 
+        /////////////////////////////////////////////////////////////////
+        // hook : wp_ajax_sek_save_section
+        function sek_ajax_save_section() {
+            $action = 'save-customize_' . get_stylesheet();
+            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+                 wp_send_json_error( array(
+                    'code' => 'invalid_nonce',
+                    'message' => __( 'sek_ajax_save_section => check_ajax_referer() failed.' ),
+                ) );
+            }
+            if ( ! is_user_logged_in() ) {
+                wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
+            }
+            if ( ! current_user_can( 'edit_theme_options' ) ) {
+              wp_send_json_error( __FUNCTION__ . ' => user_cant_edit_theme_options');
+            }
+            if ( ! current_user_can( 'customize' ) ) {
+                status_header( 403 );
+                wp_send_json_error( __FUNCTION__ . ' => customize_not_allowed' );
+            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+                status_header( 405 );
+                wp_send_json_error( __FUNCTION__ . ' => bad_method' );
+            }
+            // We must have a title and a section_id and sektion data
+            if ( empty( $_POST['sek_title']) ) {
+                wp_send_json_error( __FUNCTION__ . ' => missing title' );
+            }
+            if ( empty( $_POST['sek_id']) ) {
+                wp_send_json_error( __FUNCTION__ . ' => missing sektion_id' );
+            }
+            if ( empty( $_POST['sek_data']) ) {
+                wp_send_json_error( __FUNCTION__ . ' => missing sektion data' );
+            }
+            if ( ! is_string( $_POST['sek_data'] ) ) {
+                wp_send_json_error( __FUNCTION__ . ' => the sektion data must be a json stringified' );
+            }
+            // sek_error_log('SEKS DATA ?', $_POST['sek_data'] );
+            // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
+            $sektion_to_save = array(
+                'title' => $_POST['sek_title'],
+                'description' => $_POST['sek_description'],
+                'id' => $_POST['sek_id'],
+                'type' => 'content',//in the future will be used to differentiate header, content and footer sections
+                'creation_date' => date("Y-m-d H:i:s"),
+                'update_date' => '',
+                'data' => $_POST['sek_data']//<= json stringified
+            );
 
+            $saved_section_post = sek_update_saved_seks_post( $sektion_to_save );
+            if ( is_wp_error( $saved_section_post ) ) {
+                wp_send_json_error( __FUNCTION__ . ' => error when invoking sek_update_saved_seks_post()' );
+            } else {
+                // sek_error_log( 'ALORS CE POST?', $saved_section_post );
+                wp_send_json_success( [ 'section_post_id' => $saved_section_post -> ID ] );
+            }
+
+            //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
+        }
+
+
+        // @hook wp_ajax_sek_sek_get_user_saved_sections
+        function sek_sek_get_user_saved_sections() {
+            $action = 'save-customize_' . get_stylesheet();
+            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+                 wp_send_json_error( array(
+                    'code' => 'invalid_nonce',
+                    'message' => __( 'sek_ajax_save_section => check_ajax_referer() failed.' ),
+                ) );
+            }
+            if ( ! is_user_logged_in() ) {
+                wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
+            }
+            if ( ! current_user_can( 'edit_theme_options' ) ) {
+              wp_send_json_error( __FUNCTION__ . ' => user_cant_edit_theme_options');
+            }
+            if ( ! current_user_can( 'customize' ) ) {
+                status_header( 403 );
+                wp_send_json_error( __FUNCTION__ . ' => customize_not_allowed' );
+            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+                status_header( 405 );
+                wp_send_json_error( __FUNCTION__ . ' => bad_method' );
+            }
+            // We must have a section_id provided
+            if ( empty( $_POST['preset_section_id']) || ! is_string( $_POST['preset_section_id'] ) ) {
+                wp_send_json_error( __FUNCTION__ . ' => missing or invalid preset_section_id' );
+            }
+            $section_id = $_POST['preset_section_id'];
+
+            $section_data_decoded_from_custom_post_type = sek_get_saved_sektion_data( $section_id );
+            if ( ! empty( $section_data_decoded_from_custom_post_type ) ) {
+                wp_send_json_success( $section_data_decoded_from_custom_post_type );
+            } else {
+                $all_saved_seks = get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS );
+                if ( ! is_array( $all_saved_seks ) || empty( $all_saved_seks[$section_id]) ) {
+                    sek_error_log( __FUNCTION__ . ' => missing section data in get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS )' );
+                }
+                // $section_infos is an array
+                // Array
+                // (
+                //     [post_id] => 399
+                //     [title] => My section one
+                //     [description] =>
+                //     [creation_date] => 2018-10-29 13:52:54
+                //     [type] => content
+                // )
+                $section_infos = $all_saved_seks[$section_id];
+                wp_send_json_error( __FUNCTION__ . ' => missing post data for section title ' . $section_infos['title'] );
+            }
+        }
 
 
 

@@ -185,6 +185,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // TOP BAR
                         // Setup the topbar including do/undo action buttons
                         self.setupTopBar();//@see specific dev file
+
+                        // SAVE SECTION UI
+                        if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+                              self.setupSaveUI();
+                        }
                   });//api.bind( 'ready' )
 
             },// initialize()

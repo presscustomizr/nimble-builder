@@ -39,6 +39,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // emitted by the module_picker or the section_picker module
                   // @params { type : 'section' || 'module', input_container : input.container }
                   self.bind( 'sek-refresh-dragzones', function( params ) {
+                        // Detecting HTML5 Drag And Drop support in javascript
+                        // https://stackoverflow.com/questions/2856262/detecting-html5-drag-and-drop-support-in-javascript#2856275
                         if ( 'draggable' in document.createElement('span') ) {
                               self.setupNimbleDragZones( params.input_container );//<= module or section picker
                         } else {
@@ -94,6 +96,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var _onStart = function( evt ) {
                         evt.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
                         evt.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
+                        evt.originalEvent.dataTransfer.setData( "sek-section-type", $(this).data('sek-section-type') );
+                        evt.originalEvent.dataTransfer.setData( "sek-is-user-section", $(this).data('sek-is-user-section') );
                         // evt.originalEvent.dataTransfer.effectAllowed = "move";
                         // evt.originalEvent.dataTransfer.dropEffect = "move";
                         // Notify if not supported : https://caniuse.com/#feat=dragndrop
@@ -482,7 +486,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         after_section : $dropTarget.data('drop-zone-after-section'),
 
                         content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                        content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
+                        content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
+
+                        section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),
+                        // Saved sections
+                        is_user_section : "true" === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" )
                   });
             },
 
@@ -508,7 +516,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // @param {
                   //    drop_target_element : $(el) in which the content has been dropped
                   //    position : 'bottom' or 'top' compared to the drop-zone
-                  //    content_type : single module, empty layout, preset module template
+                  //    before_section : $(this).data('drop-zone-before-section'),
+                  //    after_section : $(this).data('drop-zone-after-section'),
+                  //    content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                  //    content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
+                  //    section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),//<= content, header, footer
+                  //    is_user_section : true === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" ),
                   // }
                   var _do_ = function( params ) {
                         if ( ! _.isObject( params ) ) {
@@ -624,7 +637,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       before_section : $(this).data('drop-zone-before-section'),
                   //       after_section : $(this).data('drop-zone-after-section'),
                   //       content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                  //       content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
+                  //       content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
+                  //       is_user_section : true === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" ),
                   // });
                   this.bind( 'sek-content-dropped', function( params ) {
                         //api.infoLog('sek-content-dropped', params );

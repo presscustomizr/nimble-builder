@@ -866,10 +866,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 // Try to fetch the sections from the server
                                                 // if sucessfull, resolve __presetSectionInjected__.promise()
                                                 self.getPresetSectionCollection({
-                                                            presetSectionType : params.content_id,
+                                                            is_user_section : params.is_user_section,
+                                                            presetSectionId : params.content_id,
                                                             section_id : params.id//<= we need to use the section id already generated, and passed for ajax action @see ::reactToPreviewMsg, case "sek-add-section"
                                                       })
-                                                      .fail( function() {
+                                                      .fail( function( _er_ ) {
                                                             api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
                                                             __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
                                                       })
@@ -956,7 +957,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // Try to fetch the sections from the server
                                     // if sucessfull, resolve __presetSectionInjected__.promise()
                                     self.getPresetSectionCollection({
-                                                presetSectionType : params.content_id,
+                                                is_user_section : params.is_user_section,
+                                                presetSectionId : params.content_id,
                                                 section_id : params.id//<= we need to use the section id already generated, and passed for ajax action @see ::reactToPreviewMsg, case "sek-add-section"
                                           })
                                           .fail( function() {
@@ -1047,36 +1049,59 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             // @return a promise()
-            // caches the sections in api.sek_presetSections on the first ajax request
-            _maybeFetchSectionsFromServer : function() {
+            // caches the sections in api.sek_presetSections when api.section( '__content_picker__') is registered
+            // caches the user saved sections on the first drag and drop of a user-saved section
+            // @params {
+            //  is_user_section : sectionParams.is_user_section
+            //  preset_section_id : '' <= used for user_saved section
+            // }
+            _maybeFetchSectionsFromServer : function( params ) {
+                  var dfd = $.Deferred(),
+                      _ajaxRequest_;
 
-                  var dfd = $.Deferred();
-                  if ( ! _.isEmpty( api.sek_presetSections ) ) {
-                        dfd.resolve( api.sek_presetSections );
-                  } else {
-                        var _ajaxRequest_;
-                        if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
-                              _ajaxRequest_ = api.sek_fetchingPresetSections;
+                  params = params || { is_user_section : false };
+                  if ( true === params.is_user_section ) {
+                        if ( ! _.isEmpty( api.sek_userSavedSections ) && ! _.isEmpty( api.sek_userSavedSections[ params.preset_section_id ] ) ) {
+                              dfd.resolve( api.sek_userSavedSections );
                         } else {
-                              // This utility handles a cached version of the preset_sections once fetched the first time
-                              // @see api.CZR_Helpers.czr_cachedTmpl
-                              _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
-                                    tmpl : 'font_list',
-                                    module_type: 'preset_sections_server_collection',
-                                    module_id : 'no_module_id'
-                              } );
-                              api.sek_fetchingPresetSections = _ajaxRequest_;
+                              api.sek_userSavedSections = api.sek_userSavedSections || {};
+                              if ( ! _.isUndefined( api.sek_fetchingUserSavedSections ) && 'pending' == api.sek_fetchingUserSavedSections.state() ) {
+                                    _ajaxRequest_ = api.sek_fetchingUserSavedSections;
+                              } else {
+                                    _ajaxRequest_ = wp.ajax.post( 'sek_get_user_saved_sections', {
+                                          nonce: api.settings.nonce.save,
+                                          preset_section_id : params.preset_section_id
+                                    });
+                                    api.sek_fetchingUserSavedSections = _ajaxRequest_;
+                              }
+                              _ajaxRequest_.done( function( _sectionData_ ) {
+                                    //api.sek_presetSections = JSON.parse( _collection_ );
+                                    api.sek_userSavedSections[ params.preset_section_id ] = _sectionData_;
+                                    dfd.resolve( api.sek_userSavedSections );
+                              }).fail( function( _r_ ) {
+                                    dfd.reject( _r_ );
+                              });
                         }
-
-                        _ajaxRequest_.done( function( _collection_ ) {
-                              //api.sek_presetSections = JSON.parse( _collection_ );
-                              api.sek_presetSections = _collection_;
+                  } else {
+                        if ( ! _.isEmpty( api.sek_presetSections ) ) {
                               dfd.resolve( api.sek_presetSections );
-                        }).fail( function( _r_ ) {
-                              dfd.reject( _r_ );
-                        });
-
+                        } else {
+                              if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
+                                    _ajaxRequest_ = api.sek_fetchingPresetSections;
+                              } else {
+                                    _ajaxRequest_ = wp.ajax.post( 'sek_get_preset_sections', { nonce: api.settings.nonce.save } );
+                                    api.sek_fetchingPresetSections = _ajaxRequest_;
+                              }
+                              _ajaxRequest_.done( function( _collection_ ) {
+                                    //api.sek_presetSections = JSON.parse( _collection_ );
+                                    api.sek_presetSections = _collection_;
+                                    dfd.resolve( api.sek_presetSections );
+                              }).fail( function( _r_ ) {
+                                    dfd.reject( _r_ );
+                              });
+                        }
                   }
+
                   return dfd.promise();
             },
 
@@ -1091,7 +1116,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // ready for insertion
             //
             // @sectionParams : {
-            //       presetSectionType : params.content_id,
+            //       is_user_section : bool, //<= is this section a "saved" section ?
+            //       presetSectionId : params.content_id,
             //       section_id : params.id
             // }
             // Why is the section_id provided ?
@@ -1099,8 +1125,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
                       __dfd__ = $.Deferred();
+                  //console.log('ALORS SECTION PARAMS BEFORE FETCH', sectionParams );
 
-                  self._maybeFetchSectionsFromServer()
+                  self._maybeFetchSectionsFromServer({
+                        is_user_section : sectionParams.is_user_section,
+                        preset_section_id : sectionParams.presetSectionId
+                  })
                         .fail( function( er ) {
                               __dfd__.reject( er );
                         })
@@ -1112,14 +1142,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( _.isEmpty( allPresets ) ) {
                                     throw new Error( 'getPresetSectionCollection => Invalid collection');
                               }
-                              if ( _.isEmpty( allPresets[ sectionParams.presetSectionType ] ) ) {
-                                    throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionType + '" has not been found in the collection');
+                              if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
+                                    throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
                               }
-                              var presetCandidate = allPresets[ sectionParams.presetSectionType ];
+                              var presetCandidate = allPresets[ sectionParams.presetSectionId ];
 
                               // Ensure we have a string that's JSON.parse-able
                               // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
-                              //       throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionType + ' is not JSON.parse-able');
+                              //       throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
                               // }
                               // presetCandidate = JSON.parse( presetCandidate );
 

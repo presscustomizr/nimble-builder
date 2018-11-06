@@ -93,6 +93,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                         self.setupTopBar();//@see specific dev file
+                        if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+                              self.setupSaveUI();
+                        }
                   });//api.bind( 'ready' )
 
             },// initialize()
@@ -432,6 +435,136 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         newHistoryLog.push( newLog );
                   });
                   self.historyLog( newHistoryLog );
+            }
+      });//$.extend()
+})( wp.customize, jQuery );
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
+            setupSaveUI : function() {
+                  var self = this;
+                  self.saveUIVisible = new api.Value( false );
+                  self.saveUIVisible.bind( function( to, from, params ){
+                        self.toggleSaveUI( to, params ? params.id : null );
+                  });
+            },
+            toggleSaveUI : function( visible, sectionId ) {
+                  visible = _.isUndefined( visible ) ? true : visible;
+                  var self = this,
+                      _renderAndSetup = function() {
+                            $.when( self.renderAndSetupSaveUITmpl({}) ).done( function( $_el ) {
+                                  self.saveUIContainer = $_el;
+                                  _.delay( function() {
+                                      $('body').addClass('nimble-save-ui-visible');
+                                  }, 200 );
+                                  $('#sek-saved-section-id').val( sectionId );
+                            });
+                      },
+                      _hide = function() {
+                            var dfd = $.Deferred();
+                            $('body').removeClass('nimble-save-ui-visible');
+                            if ( $( '#nimble-top-save-ui' ).length > 0 ) {
+                                  _.delay( function() {
+
+                                        self.saveUIContainer.remove();
+                                        dfd.resolve();
+                                  }, 300 );
+                            } else {
+                                dfd.resolve();
+                            }
+                            return dfd.promise();
+                      };
+
+                  if ( visible ) {
+                        _renderAndSetup();
+                  } else {
+                        _hide().done( function() {
+                              self.saveUIVisible( false );//should be already false
+                        });
+                  }
+            },
+            preProcessSektion : function( sectionModel ) {
+                  var self = this, sektionCandidate = self.cleanIds( sectionModel );
+                  return _.omit( sektionCandidate, function( val, key ) {
+                        return _.contains( ['id', 'level'], key );
+                  });
+            },
+            renderAndSetupSaveUITmpl : function( params ) {
+                  if ( $( '#nimble-top-save-ui' ).length > 0 )
+                    return $( '#nimble-top-save-ui' );
+
+                  var self = this;
+
+                  try {
+                        _tmpl =  wp.template( 'nimble-top-save-ui' )( {} );
+                  } catch( er ) {
+                        api.errare( 'Error when parsing the the top note template', er );
+                        return false;
+                  }
+                  $('#customize-preview').after( $( _tmpl ) );
+                  $('.sek-do-save-section', '#nimble-top-save-ui').on( 'click', function(evt) {
+                        evt.preventDefault();
+                        var sectionModel = $.extend( true, {}, self.getLevelModel( $('#sek-saved-section-id').val() ) ),
+                            sek_title = $('#sek-saved-section-title').val(),
+                            sek_description = $('#sek-saved-section-description').val(),
+                            sek_id = self.guid(),
+                            sek_data = self.preProcessSektion(sectionModel);
+
+                        if ( _.isEmpty( sek_title ) ) {
+                            $('#sek-saved-section-title').addClass('error');
+                            api.previewer.trigger('sek-notify', {
+                                  type : 'error',
+                                  duration : 10000,
+                                  message : [
+                                        '<span style="font-size:0.95em">',
+                                          '<strong>@missi18n You need to set a title</strong>',
+                                        '</span>'
+                                  ].join('')
+
+                            });
+                            return;
+                        }
+
+                        $('#sek-saved-section-title').removeClass('error');
+
+                        wp.ajax.post( 'sek_save_section', {
+                              nonce: api.settings.nonce.save,
+                              sek_title: sek_title,
+                              sek_description: sek_description,
+                              sek_id: sek_id,
+                              sek_data: JSON.stringify( sek_data )
+                        })
+                        .done( function( response ) {
+                              api.previewer.trigger('sek-notify', {
+                                  type : 'success',
+                                  duration : 10000,
+                                  message : [
+                                        '<span style="font-size:0.95em">',
+                                          '<strong>@missi18n Your section has been saved.</strong>',
+                                        '</span>'
+                                  ].join('')
+                              });
+                        })
+                        .fail( function( er ) {
+                              api.errorLog( 'ajax sek_save_section => error', er );
+                              api.previewer.trigger('sek-notify', {
+                                  type : 'error',
+                                  duration : 10000,
+                                  message : [
+                                        '<span style="font-size:0.95em">',
+                                          '<strong>@missi18n You need to set a title</strong>',
+                                        '</span>'
+                                  ].join('')
+                              });
+                        });
+                  });//on click
+
+                  $('.sek-cancel-save', '#nimble-top-save-ui').on( 'click', function(evt) {
+                        evt.preventDefault();
+                        self.saveUIVisible(false);
+                  });
+
+                  return $( '#nimble-top-save-ui' );
             }
       });//$.extend()
 })( wp.customize, jQuery );
@@ -1091,6 +1224,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         uiParams = {};
                                         _dfd_.resolve();
                                   });
+                            },
+
+                            'sek-toggle-save-section-ui' : function( params ) {
+                                  sendToPreview = false;
+                                  self.saveUIVisible( true, params );
+                                  return $.Deferred(function(_dfd_) {
+                                        apiParams = {
+                                        };
+                                        uiParams = {};
+                                        _dfd_.resolve();
+                                  });
                             }
                       };//msgCollection
                   _.each( msgCollection, function( callbackFn, msgId ) {
@@ -1177,20 +1321,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             newWindow.focus();
                         }
                   };
-                  var cleanIds = function( levelData ) {
-                        levelData.id = "";
-                        _.each( levelData.collection, function( levelData ) {
-                              levelData.id = "";
-                              if ( _.isArray( levelData.collection ) ) {
-                                    cleanIds( levelData );
-                              }
-                        });
-                        return levelData;
-                  };
 
                   api.previewer.bind( 'sek-to-json', function( params ) {
                         var sectionModel = $.extend( true, {}, self.getLevelModel( params.id ) );
-                        console.log( JSON.stringify( cleanIds( sectionModel ) ) );
+                        console.log( JSON.stringify( self.cleanIds( sectionModel ) ) );
                   });
             }//schedulePrintSectionJson
       });//$.extend()
@@ -1539,8 +1673,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                        },
+                        }
                   });
+
+                  if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+                        $.extend( modulesRegistrationParams, {
+                              sek_my_sections_sec_picker_module : {
+                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                                    module_type : 'sek_my_sections_sec_picker_module',
+                                    controlLabel :  '@missi18n My sections',
+                                    content_type : 'section',
+                                    expandAndFocusOnInit : false,
+                                    priority : 10,
+                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                              }
+                        });
+                  }
                   var firstKey = _.keys( modulesRegistrationParams )[0],
                       firstControlId = modulesRegistrationParams[firstKey].settingControlId;
 
@@ -2878,10 +3026,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             });// self.preparePresetSectionForInjection.done()
                                                 };//_doWhenPresetSectionCollectionFetched()
                                                 self.getPresetSectionCollection({
-                                                            presetSectionType : params.content_id,
+                                                            is_user_section : params.is_user_section,
+                                                            presetSectionId : params.content_id,
                                                             section_id : params.id//<= we need to use the section id already generated, and passed for ajax action @see ::reactToPreviewMsg, case "sek-add-section"
                                                       })
-                                                      .fail( function() {
+                                                      .fail( function( _er_ ) {
                                                             api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
                                                             __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
                                                       })
@@ -2938,7 +3087,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 });//self.preparePresetSectionForInjection.done()
                                     };//_doWhenPresetSectionCollectionFetched
                                     self.getPresetSectionCollection({
-                                                presetSectionType : params.content_id,
+                                                is_user_section : params.is_user_section,
+                                                presetSectionId : params.content_id,
                                                 section_id : params.id//<= we need to use the section id already generated, and passed for ajax action @see ::reactToPreviewMsg, case "sek-add-section"
                                           })
                                           .fail( function() {
@@ -2995,39 +3145,61 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });//api( self.sekCollectionSettingId(), function( sektionSetInstance ) {}
                   return __updateAPISettingDeferred__.promise();
             },//updateAPISetting
-            _maybeFetchSectionsFromServer : function() {
+            _maybeFetchSectionsFromServer : function( params ) {
+                  var dfd = $.Deferred(),
+                      _ajaxRequest_;
 
-                  var dfd = $.Deferred();
-                  if ( ! _.isEmpty( api.sek_presetSections ) ) {
-                        dfd.resolve( api.sek_presetSections );
-                  } else {
-                        var _ajaxRequest_;
-                        if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
-                              _ajaxRequest_ = api.sek_fetchingPresetSections;
+                  params = params || { is_user_section : false };
+                  if ( true === params.is_user_section ) {
+                        if ( ! _.isEmpty( api.sek_userSavedSections ) && ! _.isEmpty( api.sek_userSavedSections[ params.preset_section_id ] ) ) {
+                              dfd.resolve( api.sek_userSavedSections );
                         } else {
-                              _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
-                                    tmpl : 'font_list',
-                                    module_type: 'preset_sections_server_collection',
-                                    module_id : 'no_module_id'
-                              } );
-                              api.sek_fetchingPresetSections = _ajaxRequest_;
+                              api.sek_userSavedSections = api.sek_userSavedSections || {};
+                              if ( ! _.isUndefined( api.sek_fetchingUserSavedSections ) && 'pending' == api.sek_fetchingUserSavedSections.state() ) {
+                                    _ajaxRequest_ = api.sek_fetchingUserSavedSections;
+                              } else {
+                                    _ajaxRequest_ = wp.ajax.post( 'sek_get_user_saved_sections', {
+                                          nonce: api.settings.nonce.save,
+                                          preset_section_id : params.preset_section_id
+                                    });
+                                    api.sek_fetchingUserSavedSections = _ajaxRequest_;
+                              }
+                              _ajaxRequest_.done( function( _sectionData_ ) {
+                                    api.sek_userSavedSections[ params.preset_section_id ] = _sectionData_;
+                                    dfd.resolve( api.sek_userSavedSections );
+                              }).fail( function( _r_ ) {
+                                    dfd.reject( _r_ );
+                              });
                         }
-
-                        _ajaxRequest_.done( function( _collection_ ) {
-                              api.sek_presetSections = _collection_;
+                  } else {
+                        if ( ! _.isEmpty( api.sek_presetSections ) ) {
                               dfd.resolve( api.sek_presetSections );
-                        }).fail( function( _r_ ) {
-                              dfd.reject( _r_ );
-                        });
-
+                        } else {
+                              if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
+                                    _ajaxRequest_ = api.sek_fetchingPresetSections;
+                              } else {
+                                    _ajaxRequest_ = wp.ajax.post( 'sek_get_preset_sections', { nonce: api.settings.nonce.save } );
+                                    api.sek_fetchingPresetSections = _ajaxRequest_;
+                              }
+                              _ajaxRequest_.done( function( _collection_ ) {
+                                    api.sek_presetSections = _collection_;
+                                    dfd.resolve( api.sek_presetSections );
+                              }).fail( function( _r_ ) {
+                                    dfd.reject( _r_ );
+                              });
+                        }
                   }
+
                   return dfd.promise();
             },
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
                       __dfd__ = $.Deferred();
 
-                  self._maybeFetchSectionsFromServer()
+                  self._maybeFetchSectionsFromServer({
+                        is_user_section : sectionParams.is_user_section,
+                        preset_section_id : sectionParams.presetSectionId
+                  })
                         .fail( function( er ) {
                               __dfd__.reject( er );
                         })
@@ -3038,10 +3210,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( _.isEmpty( allPresets ) ) {
                                     throw new Error( 'getPresetSectionCollection => Invalid collection');
                               }
-                              if ( _.isEmpty( allPresets[ sectionParams.presetSectionType ] ) ) {
-                                    throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionType + '" has not been found in the collection');
+                              if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
+                                    throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
                               }
-                              var presetCandidate = allPresets[ sectionParams.presetSectionType ];
+                              var presetCandidate = allPresets[ sectionParams.presetSectionId ];
 
                               var setIds = function( collection ) {
                                     _.each( collection, function( levelData ) {
@@ -3700,8 +3872,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   .fail( function( _er_ ) {
                         api.errare( 'sek_import_attachment ajax action failed for image ' +  relpath, _er_ );
                   });
+            },
+            cleanIds : function( levelData ) {
+                  levelData.id = "";
+                  var self = this;
+                  _.each( levelData.collection, function( levelData ) {
+                        levelData.id = "";
+                        if ( _.isArray( levelData.collection ) ) {
+                              self.cleanIds( levelData );
+                        }
+                  });
+                  return levelData;
             }
-
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 /**
@@ -3749,6 +3931,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var _onStart = function( evt ) {
                         evt.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
                         evt.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
+                        evt.originalEvent.dataTransfer.setData( "sek-section-type", $(this).data('sek-section-type') );
+                        evt.originalEvent.dataTransfer.setData( "sek-is-user-section", $(this).data('sek-is-user-section') );
                         try {
                               evt.originalEvent.dataTransfer.setData( 'browserSupport', 'browserSupport' );
                               evt.originalEvent.dataTransfer.setData( 'browserSupport', 'browserSupport' );
@@ -4028,7 +4212,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         after_section : $dropTarget.data('drop-zone-after-section'),
 
                         content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                        content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" )
+                        content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
+
+                        section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),
+                        is_user_section : "true" === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" )
                   });
             },
             reactToDrop : function() {
@@ -5835,7 +6022,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             'sek_intro_sec_picker_module',
             'sek_features_sec_picker_module',
             'sek_contact_sec_picker_module',
-            'sek_column_layouts_sec_picker_module'
+            'sek_column_layouts_sec_picker_module',
       ], function( module_type ) {
             api.czrModuleMap[ module_type ] = {
                   crud : false,
@@ -5848,8 +6035,104 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   )
             };
       });
+})( wp.customize , jQuery, _ );
 
 
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  MY SECTIONS MODULE
+/* ------------------------------------------------------------------------- */
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  module.inputConstructor = api.CZRInput.extend({
+                        initialize : function( name, options ) {
+                              var input = this;
+                              api.CZRInput.prototype.initialize.call( input, name, options );
+                              input.isReady.then( function() {
+                                    input.renderUserSavedSections();
+                                    api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
+                              });
+                        },
+
+
+                        renderUserSavedSections : function() {
+                              var input = this,
+                                  html = '',
+                                  $wrapper = input.container.find('.sek-content-type-wrapper'),
+                                  creation_date = '',
+                                  formatDate = function(date) {
+                                      var monthNames = [
+                                          "January", "February", "March",
+                                          "April", "May", "June", "July",
+                                          "August", "September", "October",
+                                          "November", "December"
+                                      ];
+
+                                      var day = date.getDate(),
+                                          monthIndex = date.getMonth(),
+                                          year = date.getFullYear(),
+                                          hours = date.getHours(),
+                                          minutes = date.getMinutes(),
+                                          seconds = date.getSeconds();
+
+                                      return [
+                                            day,
+                                            monthNames[monthIndex],
+                                            year
+                                      ].join(' ');
+                                  };
+
+                              _.each( sektionsLocalizedData.userSavedSektions, function( secData, secKey ) {
+                                    try { creation_date = formatDate( new Date( secData.creation_date.replace( /-/g, '/' ) ) ); } catch( er ) {
+                                          api.errare( '::renderUserSavedSections => formatDate => error', er );
+                                    }
+                                    html = [
+                                          '<div class="sek-user-section-wrapper">',
+                                            '<div class="sek-saved-section-title"><i class="sek-remove-user-section far fa-trash-alt"></i>' + secData.title + '</div>',
+                                            '<div draggable="true" data-sek-is-user-section="true" data-sek-section-type="' + secData.type +'" data-sek-content-type="preset_section" data-sek-content-id="' + secKey +'" style="" title="' + secData.title + '">',
+                                              '<div class="sek-overlay"></div>',
+                                              '<div class="sek-saved-section-description">' + secData.description + '</div>',
+                                              ! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> @missi18n Created : ' + creation_date + '</div>' ) : '',
+                                            '</div>',
+                                          '</div>'
+                                    ].join('');
+                                    $wrapper.append( html );
+                              });
+                        }
+                  });
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+            },//initialize
+      };
+      api.czrModuleMap = api.czrModuleMap || {};
+      if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+            $.extend( api.czrModuleMap, {
+                  sek_my_sections_sec_picker_module : {
+                        mthds : Constructor,
+                        crud : false,
+                        name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
+                        has_mod_opt : false,
+                        ready_on_section_expanded : true,
+                        defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
+                  },
+            });
+      }
+})( wp.customize , jQuery, _ );
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SECTION PICKER INPUT
+/* ------------------------------------------------------------------------- */
+( function ( api, $, _ ) {
       api.czrInputMap = api.czrInputMap || {};
       $.extend( api.czrInputMap, {
             section_picker : function( input_options ) {

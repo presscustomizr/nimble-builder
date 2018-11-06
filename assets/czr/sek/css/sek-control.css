@@ -65,6 +65,11 @@ li[id*="__nimble__"].customize-control span.customize-control-title:first-child 
 
 
 
+
+
+
+
+
 /* MODULE AND SECTION PICKER INPUT */
 [data-sek-content-type] {
     float: left;
@@ -116,6 +121,29 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
 [data-sek-content-type]:hover {
   -webkit-box-shadow: 0 12px 20px rgba(0,0,0,.2);
   box-shadow: 0 12px 20px rgba(0,0,0,.2);
+}
+
+/* USER SECTIONS */
+.sek-user-section-wrapper {
+  margin-bottom: 15px;
+  float: left;
+}
+.sek-user-section-wrapper {
+  width: 100%
+}
+.sek-user-section-wrapper [data-sek-is-user-section="true"] {
+  height: auto;
+  padding: 2%;
+  width: 89%;
+}
+.sek-saved-section-date {
+  font-size: 11px;
+  text-align: left;
+}
+.sek-saved-section-description {
+  font-size: 13px;
+  font-style: italic;
+  text-align: left;
 }
 
 .sek-dragging [data-sek-content-type] {
@@ -343,6 +371,9 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
 .reset-spacing-wrap:hover {
   color: #006799;
 }
+
+
+
 
 
 
@@ -955,6 +986,58 @@ body.nimble-top-bar-visible #nimble-top-bar {
   cursor: pointer;
 }
 
+
+
+/* TOP SAVE SECTION UI */
+#nimble-top-save-ui {
+  height: 300px;
+  padding: 20px;
+  position: absolute;
+  top: -300px;
+  /*text-align: center;*/
+  right: 0;
+  left: 0;
+  z-index: 20;
+  color: #fff;
+  display: block;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all, 0.3s ease-in-out;
+  -ms-transition: all, 0.3s ease-in-out;
+  -o-transition: all, 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  /*visibility: hidden;*/
+  opacity: 0.3;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99999;
+  /*display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+    -ms-flex-align: center;
+        align-items: center;
+  flex: 0 0 100%;*/
+  max-width: 100%;
+}
+
+#nimble-top-save-ui > div {
+  width: 100%;
+}
+
+body.nimble-save-ui-visible #nimble-top-save-ui {
+  /*visibility: inherit;*/
+  opacity: 1;
+  top:36px;
+}
+
+#nimble-top-save-ui .sek-cancel-save {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+#nimble-top-save-ui #sek-saved-section-title.error {
+  border: 1px solid #ff0000;
+}
 
 /*.czr-preview-notification a, .czr-preview-notification h2 {color: #fff; margin: 1em 0;}
 
