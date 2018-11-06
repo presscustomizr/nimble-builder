@@ -133,3 +133,8 @@ if ( nimble_pass_requirements() ) {
         require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-admin.php' );
     }
 }
+
+
+// WP 5.0.0 compat
+// @see https://core.trac.wordpress.org/ticket/45292
+if ( false !== has_filter( 'content_save_pre', 'wp_targeted_link_rel' ) ) { remove_filter( 'content_save_pre', 'wp_targeted_link_rel' ); }
