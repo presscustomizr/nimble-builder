@@ -24,7 +24,7 @@ jQuery( function($){
                 'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-refresh-level',
                 'div[data-sek-level="section"]',
                 function( evt ) {
-                      $.find(".sek-module-placeholder").fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
+                      $(this).find(".sek-module-placeholder").fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
                 }
           );
 
@@ -59,7 +59,7 @@ jQuery( function($){
 /* ------------------------------------------------------------------------- */
 jQuery( function($){
     //DROPDOWN
-    var DropDown = function() {
+    var Dropdown = function() {
           //dropdown
           var DATA_KEY  = 'sek.sekDropdown',
               EVENT_KEY = '.' + DATA_KEY,
@@ -71,6 +71,7 @@ jQuery( function($){
                 HIDDEN    : 'hidden' + EVENT_KEY,
                 HIDE      : 'hide' + EVENT_KEY,
                 CLICK     : 'click' + EVENT_KEY,
+                TAP       : 'tap' + EVENT_KEY,
               },
               ClassName = {
                 DROPDOWN                : 'sek-dropdown-menu',
@@ -95,8 +96,6 @@ jQuery( function($){
           //Handle dropdown on hover via js
           var dropdownMenuOnHover = function() {
                 var _dropdown_selector = Selector.HOVER_PARENT;
-
-                enableDropdownOnHover();
 
                 function _addOpenClass () {
                       var $_el = $(this);
@@ -145,17 +144,14 @@ jQuery( function($){
                       _debounced_removeOpenClass();
                 }
 
-                function enableDropdownOnHover() {
-                      $( 'body' )
-                          .on( 'mouseenter', _dropdown_selector, _addOpenClass )
-                          .on( 'mouseleave', _dropdown_selector , _removeOpenClass );
-                }
-
-          };
-
+                //BIND
+                $( document )
+                    .on( 'mouseenter', _dropdown_selector, _addOpenClass )
+                    .on( 'mouseleave', _dropdown_selector , _removeOpenClass );
+          },
 
           //SNAKE
-          var dropdownPlacement = function() {
+          dropdownPlacement = function() {
                 var isRTL = 'rtl' === $('html').attr('dir'),
                     doingAnimation = false;
 
@@ -174,7 +170,7 @@ jQuery( function($){
 
                     });
 
-                $( 'body' )
+                $( document )
                     .on( Event.PLACE_ALL, function() {
                                 //trigger a placement on all
                                 $( Selector.SNAKE_PARENTS )
@@ -293,16 +289,101 @@ jQuery( function($){
           //FireAll
           dropdownMenuOnHover();
           dropdownPlacement();
-    }
+    },
+
+    SimpleCollapse = function() {
+        var NAME = 'sekCollapse',
+            DATA_KEY = 'sek.sekCollapse',
+            EVENT_KEY = "." + DATA_KEY,
+            TRANSITION_DURATION = 600,
+            DATA_API_KEY = '.data-api',
+            Event = {
+              SHOW: "show" + EVENT_KEY,
+              SHOWN: "shown" + EVENT_KEY,
+              HIDE: "hide" + EVENT_KEY,
+              HIDDEN: "hidden" + EVENT_KEY,
+              CLICK_DATA_API: "click" + EVENT_KEY + DATA_API_KEY
+            },
+            ClassName = {
+              SHOW: 'show',
+              COLLAPSE: 'sek-collapse',
+              COLLAPSING: 'sek-collapsing',
+              COLLAPSED: 'sek-collapsed'
+            };
+            Selector = {
+              ACTIVES: '.show, .sek-collapsing',
+              DATA_TOGGLE: '[data-sek-toggle="sek-collapse"]'
+            }
+            _onSlidingCompleteResetCSS = function( $_el ) {
+                  $_el   = $_el ? $_el : $(this);
+                  $_el.css({
+                        'display'    : '',
+                        'paddingTop' : '',
+                        'marginTop' : '',
+                        'paddingBottom' : '',
+                        'marginBottom' : '',
+                        'height' : ''
+                  });
+            };
+
+          //bind
+          $(document).on( Event.CLICK_DATA_API, Selector.DATA_TOGGLE, function (event) {
+                // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
+                if (event.currentTarget.tagName === 'A') {
+                      event.preventDefault();
+                }
+
+                var $toggler             = $(this),
+                   //get the data toggle
+                   _collapsible_selector = $toggler.data('target');
+
+                $(_collapsible_selector).each( function () {
+                      var $collapsible = $(this),
+                          collapse = $collapsible.hasClass(ClassName.SHOW);
+
+                      $collapsible.stop()[ collapse ? 'slideUp' : 'slideDown' ]({
+                            duration: TRANSITION_DURATION,
+                            start : function() {
+                                  $collapsible.addClass(ClassName.COLLAPSING).trigger( collapse ? Event.HIDE : Event.SHOW )
+                                  if ( collapse ) {
+                                      $toggler.addClass( ClassName.COLLAPSED ).attr( 'aria-expanded', 'false' );
+                                  } else {
+                                      $toggler.removeClass( ClassName.COLLAPSED ).attr( 'aria-expanded', 'true' );
+                                  }
+                            },
+                            complete: function() {
+                                  var removeClass,
+                                      addClass,
+                                      event;
+
+                                  if ( collapse ) {
+                                        removeClass = ClassName.SHOW;
+                                        addClass    = ClassName.COLLAPSE;
+                                        event       = Event.HIDDEN;
+                                  } else {
+                                        removeClass = ClassName.COLLAPSE;
+                                        addClass    = ClassName.SHOW;
+                                        event       = Event.SHOWN;
+                                  }
+                                  $collapsible.removeClass(ClassName.COLLAPSING + ' ' + removeClass).addClass( addClass ).trigger(event);
+                                  //remove all the inline style added by the slideUp/Down methods
+                                  _onSlidingCompleteResetCSS( $collapsible );
+                            }
+                      })//end slideUp/slideDown
+                });//end each
+          });//end document bind
+    };
 
 
-    DropDown();
+    Dropdown();
+    SimpleCollapse();
 
     // handle the mobile hamburger hover effect
-    $( 'body' )
+    $( document )
           .on( 'mouseenter', '.sek-nav-toggler', function(){ $(this).addClass( 'hovering' ); } )
           .on( 'mouseleave', '.sek-nav-toggler', function(){ $(this).removeClass( 'hovering' ); } )
-          .on( 'show.sek.sekCollapse hide.sek.sekCollapse', '.sek-nav-collapse', function(){
-                $('[data-target=#'+$(this).attr('id')+']').removeClass( 'hovering' ); }
-          );
+          .on( 'show.sek.sekCollapse hide.sek.sekCollapse', '.sek-nav-collapse', function() {
+                $('[data-target=#'+$(this).attr('id')+']').removeClass( 'hovering' );
+                $(window).trigger('scroll');
+          });
 });
