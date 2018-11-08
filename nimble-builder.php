@@ -2,7 +2,7 @@
 /**
 * Plugin Name: Nimble Builder
 * Description: Drag-and-drop section builder companion of the Customizr and Hueman themes.
-* Version: 1.1.9
+* Version: 1.2.0
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://presscustomizr.com
@@ -11,7 +11,7 @@
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "1.1.9";
+$current_version = "1.2.0";
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
 if ( !defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
@@ -19,7 +19,7 @@ if ( !defined( 'NIMBLE_BASE_PATH' ) ) { define( 'NIMBLE_BASE_PATH' , dirname( __
 if ( !defined( 'NIMBLE_MIN_PHP_VERSION' ) ) { define ( 'NIMBLE_MIN_PHP_VERSION', '5.4' ); }
 if ( !defined( 'NIMBLE_MIN_WP_VERSION' ) ) { define ( 'NIMBLE_MIN_WP_VERSION', '4.7' ); }
 if ( !defined( 'NIMBLE_PLUGIN_FILE' ) ) { define( 'NIMBLE_PLUGIN_FILE', __FILE__ ); }// Plugin Root File used register_activation_hook( NIMBLE_PLUGIN_FILE, 'nimble_install' );
-if ( !defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ) { define ( 'NIMBLE_SAVED_SECTIONS_ENABLED', true ); }
+if ( !defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ) { define ( 'NIMBLE_SAVED_SECTIONS_ENABLED', false ); }
 
 /* ------------------------------------------------------------------------- *
  *  CHECK PHP AND WP REQUIREMENTS

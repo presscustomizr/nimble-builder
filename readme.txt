@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.0
-Stable tag: 1.1.9
+Stable tag: 1.2.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -45,16 +45,17 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.1.9 =
-* fixed : broken column width in mobiles for columns with a custom horizontal margin.
-* fixed : conflict with Anspress plugin when uploading an image on front.
-* fixed : the content picker input ( for link creation ) was broken : "Set custom url" could be printed multiple times, no search results was generating an error, some pages or posts could not be listed.
-* fixed : conflict with HappyForms plugin when customizing a form.
-* improved : simple form module, added sender's email in the body of the message.
-* improved : simple form module, animate with a scroll action to focus on the message after a send action.
-* added : an option for a parallax effect on section's background image. Compatible with lazy loading.
+= 1.2.0 =
+* fixed : added compatibility patch for WordPress 5.0. Waiting for core decision on : https://core.trac.wordpress.org/ticket/45292
+* fixed : parallax effect not being applied on preset section drop
+* improved : image module margins are not inherited from the theme
 
 == Changelog ==
+= 1.2.0 : November 8th, 2018 =
+* fixed : added compatibility patch for WordPress 5.0. Waiting for core decision on : https://core.trac.wordpress.org/ticket/45292
+* fixed : parallax effect not being applied on preset section drop
+* improved : image module margins are not inherited from the theme
+
 = 1.1.9 : October 31st, 2018 =
 * fixed : broken column width in mobiles for columns with a custom horizontal margin.
 * fixed : conflict with Anspress plugin when uploading an image on front.

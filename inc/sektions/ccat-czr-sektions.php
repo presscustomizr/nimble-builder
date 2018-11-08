@@ -626,6 +626,14 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 endif;
 
 ?><?php
+add_action( 'customize_save_validation_before', '\Nimble\sek_remove_callback_wp_targeted_link_rel' );
+function sek_remove_callback_wp_targeted_link_rel( $wp_customize ) {
+    if ( false !== has_filter( 'content_save_pre', 'wp_targeted_link_rel' ) ) {
+        remove_filter( 'content_save_pre', 'wp_targeted_link_rel' );
+    }
+};
+
+?><?php
 /*
 * This approach has been inspired by the excellent https://github.com/xwp/wp-customize-posts
 */

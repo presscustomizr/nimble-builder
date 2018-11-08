@@ -127,7 +127,9 @@ module.exports = function(grunt) {
             'replace:skope_namespace_from_hueman_to_nimble'
           ],
 
-          build_and_copy : [ 'build_and_copy_czr_fmk', 'build_and_copy_skope']
+          build_and_copy : [ 'build_and_copy_czr_fmk', 'build_and_copy_skope'],
+
+          dev : [ 'clean', 'watch']
         },
         uglify_requested_paths : {
           src : '' || grunt.option('src'),

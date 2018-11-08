@@ -1118,8 +1118,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         }
 
                                         $placeHolder.remove();
-                                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
-                                              .trigger( 'sek-level-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
+                                        $( '[data-sek-id="' + params.apiParams.id + '"]' ).trigger( 'sek-level-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                                   });
                             },
                             'sek-move' : function( params ) {

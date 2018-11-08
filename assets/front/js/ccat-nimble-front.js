@@ -1522,8 +1522,12 @@ jQuery(function($){
 /* ------------------------------------------------------------------------- */
 jQuery(function($){
       $('[data-sek-bg-parallax="true"]').parallaxBg();
-      $('body').on('sek-level-refreshed', '[data-sek-bg-parallax="true"]', function() {
-            $(this).parallaxBg();
+      $('body').on('sek-level-refreshed sek-section-added', function( evt ){
+            if ( "true" === $(this).attr( 'data-sek-bg-parallax' ) ) {
+                  $(this).parallaxBg();
+            } else {
+                  $(this).find('[data-sek-bg-parallax="true"]').parallaxBg();
+            }
       });
 });
 
@@ -1537,7 +1541,7 @@ jQuery( function($){
                 $(this).fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
           });
           $('.sektion-wrapper').on(
-                'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-refresh-level',
+                'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed',
                 'div[data-sek-level="section"]',
                 function( evt ) {
                       $(this).find(".sek-module-placeholder").fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
