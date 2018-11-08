@@ -41,7 +41,7 @@ jQuery( function($){
           });
           // Delegate instantiation
           $('.sektion-wrapper').on(
-                'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-refresh-level',
+                'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed',
                 'div[data-sek-level="section"]',
                 function( evt ) {
                       $(this).find(".sek-module-placeholder").fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
