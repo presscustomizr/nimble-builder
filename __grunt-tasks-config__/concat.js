@@ -390,6 +390,7 @@ module.exports = {
       src: [
         '<%= paths.sektions %>_customizer_dev_php/1_0_0_sektions_customizer_assets.php',
         '<%= paths.sektions %>_customizer_dev_php/2_0_0_sektions_customizer_dynamic_registration.php',
+        '<%= paths.sektions %>_customizer_dev_php/9_0_0_sektions_wp_5_0_gutenberg_compat.php',
         '<%= paths.sektions %>_customizer_dev_php/seks_tiny_mce_editor_actions.php',
 
         // INPUT TEMPLATES
