@@ -345,15 +345,15 @@ function sek_may_be_display_update_notice() {
           );
         ?>
         </p>
-        <p>
+        <!-- <p>
           <?php
-          printf(
-            __( 'If you like %1$s please leave us a %2$s rating. A huge thanks in advance!', 'text_domain_to_be_replaced' ),
-            sprintf( '<strong>%s</strong>', esc_html__( 'the Nimble Builder', 'text_domain_to_be_replaced' ) ),
-            sprintf( '<a href="%1$s" target="_blank" class="czr-rating-link">&#9733;&#9733;&#9733;&#9733;&#9733;</a>', esc_url( 'wordpress.org/support/plugin/nimble-builder/reviews/?filter=5#new-post') )
-          );
+          // printf(
+          //   __( 'If you like %1$s please leave us a %2$s rating. A huge thanks in advance!', 'text_domain_to_be_replaced' ),
+          //   sprintf( '<strong>%s</strong>', esc_html__( 'the Nimble Builder', 'text_domain_to_be_replaced' ) ),
+          //   sprintf( '<a href="%1$s" target="_blank" class="czr-rating-link">&#9733;&#9733;&#9733;&#9733;&#9733;</a>', esc_url( 'wordpress.org/support/plugin/nimble-builder/reviews/?filter=5#new-post') )
+          // );
           ?>
-        </p>
+        </p> -->
       </div>
       <?php
     $_html = ob_get_contents();
