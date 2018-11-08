@@ -18,8 +18,15 @@ jQuery(function($){
 jQuery(function($){
       $('[data-sek-bg-parallax="true"]').parallaxBg();
       // When previewing, react to level refresh
-      $('body').on('sek-level-refreshed', '[data-sek-bg-parallax="true"]', function() {
-            $(this).parallaxBg();
+      // This can occur to any level. We listen to the bubbling event on 'body' tag
+      // and salmon up to maybe instantiate any missing candidate
+      // Example : when a preset_section is injected
+      $('body').on('sek-level-refreshed sek-section-added', function( evt ){
+            if ( "true" === $(this).attr( 'data-sek-bg-parallax' ) ) {
+                  $(this).parallaxBg();
+            } else {
+                  $(this).find('[data-sek-bg-parallax="true"]').parallaxBg();
+            }
       });
 });
 
