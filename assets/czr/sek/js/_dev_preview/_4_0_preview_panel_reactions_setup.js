@@ -141,9 +141,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                                         $placeHolder.remove();
 
-                                        //=> 'sek-level-refreshed' is listened to clean the loader overlay in time
-                                        $( '[data-sek-id="' + params.apiParams.id + '"]' )
-                                              .trigger( 'sek-level-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
+                                        //=> 'sek-level-refreshed' is listened to ( for example ) clean the loader overlay in time
+                                        $( '[data-sek-id="' + params.apiParams.id + '"]' ).trigger( 'sek-level-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                                   });
                             },
 
