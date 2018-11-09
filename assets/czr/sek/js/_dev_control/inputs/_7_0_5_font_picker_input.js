@@ -47,13 +47,13 @@
                   };
                   var _preprocessSelect2ForFontFamily = function() {
                         /*
-                        * Override select2 Results Adapter in order to select on highlight
+                        * Override czrSelect2 Results Adapter in order to select on highlight
                         * deferred needed cause the selects needs to be instantiated when this override is complete
                         * selec2.amd.require is asynchronous
                         */
                         var selectFocusResults = $.Deferred();
-                        if ( 'undefined' !== typeof $.fn.select2 && 'undefined' !== typeof $.fn.select2.amd && 'function' === typeof $.fn.select2.amd.require ) {
-                              $.fn.select2.amd.require(['select2/results', 'select2/utils'], function (Result, Utils) {
+                        if ( 'undefined' !== typeof $.fn.czrSelect2 && 'undefined' !== typeof $.fn.czrSelect2.amd && 'function' === typeof $.fn.czrSelect2.amd.require ) {
+                              $.fn.czrSelect2.amd.require(['czrSelect2/results', 'czrSelect2/utils'], function (Result, Utils) {
                                     var ResultsAdapter = function($element, options, dataAdapter) {
                                       ResultsAdapter.__super__.constructor.call(this, $element, options, dataAdapter);
                                     };
@@ -81,8 +81,8 @@
                   };//_preprocessSelect2ForFontFamily
 
                   // @return void();
-                  // Instantiates a select2 select input
-                  // http://ivaynberg.github.io/select2/#documentation
+                  // Instantiates a czrSelect2 select input
+                  // http://ivaynberg.github.io/czrSelect2/#documentation
                   var _setupSelectForFontFamilySelector = function( customResultsAdapter, fontCollections ) {
                         var _model = item(),
                             _googleFontsFilteredBySubset = function() {
@@ -147,7 +147,7 @@
                               $fontSelectElement.append( $optGroup );
                         });
 
-                        var _fonts_select2_params = {
+                        var _fonts_czrSelect2_params = {
                                 //minimumResultsForSearch: -1, //no search box needed
                             //templateResult: paintFontOptionElement,
                             //templateSelection: paintFontOptionElement,
@@ -157,16 +157,16 @@
                         * Maybe use custom adapter
                         */
                         if ( customResultsAdapter ) {
-                              $.extend( _fonts_select2_params, {
+                              $.extend( _fonts_czrSelect2_params, {
                                     resultsAdapter: customResultsAdapter,
                                     closeOnSelect: false,
                               } );
                         }
 
-                        //http://ivaynberg.github.io/select2/#documentation
+                        //http://ivaynberg.github.io/czrSelect2/#documentation
                         //FONTS
-                        $fontSelectElement.select2( _fonts_select2_params );
-                        $( '.select2-selection__rendered', input.container ).css( getInlineFontStyle( input() ) );
+                        $fontSelectElement.czrSelect2( _fonts_czrSelect2_params );
+                        $( '.czrSelect2-selection__rendered', input.container ).css( getInlineFontStyle( input() ) );
 
                   };//_setupSelectForFontFamilySelector
 

@@ -140,12 +140,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
 
                               // CLEAN SELECT2
-                              // => we need to destroy the select2 instance, otherwise it can stay open when switching to another ui.
+                              // => we need to destroy the czrSelect2 instance, otherwise it can stay open when switching to another ui.
                               if ( 'control' == params.what ) {
                                     api.control( params.id, function( _ctrl_ ) {
                                           _ctrl_.container.find( 'select' ).each( function() {
-                                                if ( ! _.isUndefined( $(this).data('select2') ) ) {
-                                                      $(this).select2('destroy');
+                                                if ( ! _.isUndefined( $(this).data('czrSelect2') ) ) {
+                                                      $(this).czrSelect2('destroy');
                                                 }
                                           });
                                     });
