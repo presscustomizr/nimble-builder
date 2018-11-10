@@ -154,6 +154,31 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         return 'not_set';
                   }
                   return sekPreviewLocalized.registeredModules[ moduleType ][ property ];
-            }
+            },
+
+            // @params = { id : '', level : '' }
+            // Recursively walk the level tree until a match is found
+            // @return the level model object
+            getLevelModel : function( id, collection ) {
+                  var self = this, _data_ = 'no_match';
+                  // do we have a collection ?
+                  // if not, let's use the root one
+                  if ( _.isUndefined( collection ) ) {
+                        self.errare( 'getLevelModel => a collection must be provided' );
+                  }
+                  _.each( collection, function( levelData ) {
+                        // did we have a match recursively ?
+                        if ( 'no_match' != _data_ )
+                          return;
+                        if ( id === levelData.id ) {
+                              _data_ = levelData;
+                        } else {
+                              if ( _.isArray( levelData.collection ) ) {
+                                    _data_ = self.getLevelModel( id, levelData.collection );
+                              }
+                        }
+                  });
+                  return _data_;
+            },
       });//$.extend()
 })( wp.customize, jQuery, _ );
