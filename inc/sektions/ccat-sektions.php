@@ -1776,7 +1776,7 @@ function sek_register_modules() {
         'czr_simple_form_submission_child',
         'czr_font_child'
     ] as $module_name ) {
-        $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
+        $fn = "Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
             $params = $fn();
             if ( is_array( $params ) ) {
@@ -8349,6 +8349,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
             add_filter( 'nimble_parse_for_smart_load', array( $this, 'sek_maybe_process_img_for_js_smart_load') );
+            $this -> sek_setup_tiny_mce_content_filters();
         }
         function sek_schedule_rendering_hooks() {
             $locale_template = sek_get_locale_template();
@@ -8544,11 +8545,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
                     ?>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s" %4$s>',
+                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s" %4$s %5$s>',
                               $id,
                               $grid_column_class,
                               $this->get_level_visibility_css_class( $model ),
-                              empty( $collection ) ? 'data-sek-no-modules="true"' : ''
+                              empty( $collection ) ? 'data-sek-no-modules="true"' : '',
+                              $this -> sek_maybe_add_bg_attributes( $model )
                           );
                       ?>
                         <?php
@@ -8595,11 +8597,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $title_attribute = 'title="'.$title_attribute.'"';
                     }
                     ?>
-                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s>',
+                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s %5$s>',
                           $id,
                           $module_type,
                           $this->get_level_visibility_css_class( $model ),
-                          $title_attribute
+                          $title_attribute,
+                          $this -> sek_maybe_add_bg_attributes( $model )
                         );?>
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>
@@ -8845,6 +8848,25 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $pattern                = '#<img([^>]+?)src=[\'"]?([^\'"\s>]+\.'.$img_extensions_pattern.'[^\'"\s>]*)[\'"]?([^>]*)>#i';
 
             return preg_replace_callback( $pattern, '\Nimble\nimble_regex_callback', $html);
+        }
+        private function sek_setup_tiny_mce_content_filters() {
+            add_filter( 'the_nimble_tinymce_module_content', 'do_blocks', 9 );
+            add_filter( 'the_nimble_tinymce_module_content', 'wptexturize' );
+            add_filter( 'the_nimble_tinymce_module_content', 'convert_smilies', 20 );
+            add_filter( 'the_nimble_tinymce_module_content', 'wpautop' );
+            add_filter( 'the_nimble_tinymce_module_content', 'shortcode_unautop' );
+            add_filter( 'the_nimble_tinymce_module_content', 'prepend_attachment' );
+            add_filter( 'the_nimble_tinymce_module_content', 'wp_make_content_images_responsive' );
+            add_filter( 'the_nimble_tinymce_module_content', 'do_shortcode', 11 ); // AFTER wpautop()
+            add_filter( 'the_nimble_tinymce_module_content', 'capital_P_dangit', 9 );
+            add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_parse_content_for_video_embed') , 8 );
+        }
+        function sek_parse_content_for_video_embed( $content ) {
+            if ( array_key_exists( 'wp_embed', $GLOBALS ) && $GLOBALS['wp_embed'] instanceof \WP_Embed ) {
+                return $GLOBALS['wp_embed']->autoembed( $content );
+            } else {
+                return $content;
+            }
         }
     }//class
 endif;

@@ -1176,19 +1176,25 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   self.activeLevelUI( params.uiParams.id );
                             },
                             'sek-drag-start' : function( params ) {
-                                  var i = 1;
-                                  $('.sektion-wrapper').children('[data-sek-level="section"]').each( function() {
-                                        if ( $('[data-drop-zone-before-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
+                                  var i = 1, previousSectionIsEmpty = false;
+                                  $('[data-sek-level="location"]').children('[data-sek-level="section"]').each( function() {
+                                        var sectionId = $(this).data('sek-id'),
+                                            columnNb = $(this).find('[data-sek-level="column"]').length,
+                                            moduleNb = $(this).find('[data-sek-level="module"]').length,
+                                            isEmptySection = columnNb < 2 && moduleNb < 1,
+                                            canPrintBefore = ! previousSectionIsEmpty && ! isEmptySection;
+                                        if ( canPrintBefore && $('[data-drop-zone-before-section="' + sectionId +'"]').length < 1 ) {
                                               $(this).before(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + $(this).data('sek-id') +'"></div>'
+                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + sectionId +'"></div>'
                                               );
                                         }
-                                        if (  i == $('.sektion-wrapper').children('[data-sek-level="section"]').length ) {
+                                        if ( ! isEmptySection && i == $('.sektion-wrapper').children('[data-sek-level="section"]').length ) {
                                               $(this).after(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + $(this).data('sek-id') +'"></div>'
+                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + sectionId +'"></div>'
                                               );
                                         }
                                         i++;
+                                        previousSectionIsEmpty = isEmptySection;
                                   });
                                   $('.sek-empty-location-placeholder').each( function() {
                                         $.when( $(this).append(
@@ -1634,7 +1640,25 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         return 'not_set';
                   }
                   return sekPreviewLocalized.registeredModules[ moduleType ][ property ];
-            }
+            },
+            getLevelModel : function( id, collection ) {
+                  var self = this, _data_ = 'no_match';
+                  if ( _.isUndefined( collection ) ) {
+                        self.errare( 'getLevelModel => a collection must be provided' );
+                  }
+                  _.each( collection, function( levelData ) {
+                        if ( 'no_match' != _data_ )
+                          return;
+                        if ( id === levelData.id ) {
+                              _data_ = levelData;
+                        } else {
+                              if ( _.isArray( levelData.collection ) ) {
+                                    _data_ = self.getLevelModel( id, levelData.collection );
+                              }
+                        }
+                  });
+                  return _data_;
+            },
       });//$.extend()
 })( wp.customize, jQuery, _ );//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};

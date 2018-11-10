@@ -3935,7 +3935,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         evt.originalEvent.dataTransfer.setData( "sek-is-user-section", $(this).data('sek-is-user-section') );
                         try {
                               evt.originalEvent.dataTransfer.setData( 'browserSupport', 'browserSupport' );
-                              evt.originalEvent.dataTransfer.setData( 'browserSupport', 'browserSupport' );
                               evt.originalEvent.dataTransfer.clearData( 'browserSupport' );
                         } catch ( er ) {
                               api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
