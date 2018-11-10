@@ -291,11 +291,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
                     ?>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s" %4$s>',
+                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s" %4$s %5$s>',
                               $id,
                               $grid_column_class,
                               $this->get_level_visibility_css_class( $model ),
-                              empty( $collection ) ? 'data-sek-no-modules="true"' : ''
+                              empty( $collection ) ? 'data-sek-no-modules="true"' : '',
+                              // add smartload + parallax attributes
+                              $this -> sek_maybe_add_bg_attributes( $model )
                           );
                       ?>
                         <?php
@@ -346,11 +348,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $title_attribute = 'title="'.$title_attribute.'"';
                     }
                     ?>
-                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s>',
+                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s %5$s>',
                           $id,
                           $module_type,
                           $this->get_level_visibility_css_class( $model ),
-                          $title_attribute
+                          $title_attribute,
+                          // add smartload + parallax attributes
+                          $this -> sek_maybe_add_bg_attributes( $model )
                         );?>
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>
