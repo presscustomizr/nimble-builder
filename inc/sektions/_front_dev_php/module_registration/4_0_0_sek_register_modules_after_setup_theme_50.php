@@ -82,7 +82,11 @@ function sek_register_modules() {
         // GENERIC FRONT CHILD MODULES
         'czr_font_child'
     ] as $module_name ) {
-        $fn = "\Nimble\sek_get_module_params_for_{$module_name}";
+        // Was previously written "\Nimble\sek_get_module_params_for_{$module_name}";
+        // But this syntax can lead to function_exists() return false even if the function exists
+        // Probably due to a php version issue. Bug detected with php version 5.6.38
+        // bug report detailed here https://github.com/presscustomizr/nimble-builder/issues/234
+        $fn = "Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
             $params = $fn();
             if ( is_array( $params ) ) {
