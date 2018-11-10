@@ -290,24 +290,33 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             // when the module ui has been generated in the panel, we receive back this msg
                             //'sek-generate-module-ui' : function( params ) {},
 
-                            //@params { type : module || preset_section }
+                            //@params {
+                            //    type : module || preset_section,
+                            // }
                             'sek-drag-start' : function( params ) {
                                   // append the drop zones between sections
-                                  var i = 1;
-                                  $('.sektion-wrapper').children('[data-sek-level="section"]').each( function() {
-                                        // Always before
-                                        if ( $('[data-drop-zone-before-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
+                                  var i = 1, previousSectionIsEmpty = false;
+                                  $('[data-sek-level="location"]').children('[data-sek-level="section"]').each( function() {
+                                        var sectionId = $(this).data('sek-id'),
+                                            columnNb = $(this).find('[data-sek-level="column"]').length,
+                                            moduleNb = $(this).find('[data-sek-level="module"]').length,
+                                            isEmptySection = columnNb < 2 && moduleNb < 1,
+                                            canPrintBefore = ! previousSectionIsEmpty && ! isEmptySection;
+
+                                        // Print a dropzone before if the previous section and current section are not empty.
+                                        if ( canPrintBefore && $('[data-drop-zone-before-section="' + sectionId +'"]').length < 1 ) {
                                               $(this).before(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + $(this).data('sek-id') +'"></div>'
+                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + sectionId +'"></div>'
                                               );
                                         }
                                         // After the last one
-                                        if (  i == $('.sektion-wrapper').children('[data-sek-level="section"]').length ) {
+                                        if ( ! isEmptySection && i == $('.sektion-wrapper').children('[data-sek-level="section"]').length ) {
                                               $(this).after(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + $(this).data('sek-id') +'"></div>'
+                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + sectionId +'"></div>'
                                               );
                                         }
                                         i++;
+                                        previousSectionIsEmpty = isEmptySection;
                                   });
 
                                   // Append the drop zone in empty locations
