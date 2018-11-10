@@ -103,7 +103,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Notify if not supported : https://caniuse.com/#feat=dragndrop
                         try {
                               evt.originalEvent.dataTransfer.setData( 'browserSupport', 'browserSupport' );
-                              evt.originalEvent.dataTransfer.setData( 'browserSupport', 'browserSupport' );
                               evt.originalEvent.dataTransfer.clearData( 'browserSupport' );
                         } catch ( er ) {
                               api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
