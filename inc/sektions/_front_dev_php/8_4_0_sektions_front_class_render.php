@@ -30,13 +30,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // When using the Nimble template, this is done with render_content_sections_for_nimble_template();
         function sek_schedule_rendering_hooks() {
             $locale_template = sek_get_locale_template();
+            // cache all locations now
+            $this->all_nimble_locations = sek_get_locations();
+
             if ( !empty( $locale_template ) )
               return;
 
             //sek_error_log('sek_get_locations()', sek_get_locations() );
 
             // SCHEDULE THE ACTIONS ON HOOKS AND CONTENT FILTERS
-            foreach( sek_get_locations() as $location_id => $params ) {
+            foreach( $this->all_nimble_locations as $location_id => $params ) {
                 $params = is_array( $params ) ? $params : array();
                 $params = wp_parse_args( $params, array( 'priority' => 10 ) );
                 switch ( $location_id ) {
@@ -78,7 +81,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
 
-        // hook : loop_start, loop_end
+        // hook : loop_start, loop_end, and all custom locations
         function sek_schedule_sektions_rendering( $query = null ) {
             // Check if the passed query is the main_query, bail if not
             // fixes: https://github.com/presscustomizr/nimble-builder/issues/154 2.
@@ -90,16 +93,17 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 return;
             }
 
-            $hook = current_filter();
+            $location = current_filter();
             // A location can be rendered only once
             // for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
             // @see issue with Twenty Seventeen here : https://github.com/presscustomizr/nimble-builder/issues/14
             // That's why we check if did_action( ... )
-            if ( did_action( "sek_before_location_{$hook}" ) )
+            if ( did_action( "sek_before_location_{$location}" ) )
               return;
-            do_action( "sek_before_location_{$hook}" );
-            $this->_render_seks_for_location( $hook );
-            do_action( "sek_after_location_{$hook}" );
+
+            do_action( "sek_before_location_{$location}" );
+            $this->_render_seks_for_location( $location );
+            do_action( "sek_after_location_{$location}" );
         }
 
         // hook : 'the_content'::-9999
@@ -139,13 +143,19 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // the $location_data can be provided. Typically when using the function render_content_sections_for_nimble_template in the Nimble page template.
         public function _render_seks_for_location( $location = '', $location_data = array() ) {
-            if ( ! array_key_exists( $location, sek_get_locations() ) ) {
+            //maybe cache locations
+            if ( empty( $this->all_nimble_locations ) ) {
+                 $this->all_nimble_locations = sek_get_locations();
+            }
+
+            if ( ! array_key_exists( $location, $this->all_nimble_locations ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
             }
             $locationSettingValue = array();
             if ( empty( $location_data ) ) {
-                $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
+                $skope_id = sek_is_global_location( $location )  ? NIMBLE_GLOBAL_LOCATIONS_OPTION_SUFFIX : skp_build_skope_id();
+                $locationSettingValue = sek_get_skoped_seks( $skope_id, $location );
             } else {
                 $locationSettingValue = $location_data;
             }
@@ -209,7 +219,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     //empty sektions wrapper are only printed when customizing
                     ?>
                       <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
-                          <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $id ?>">
+                            <?php
+                              printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s>',
+                                  $id,
+                                  sek_is_global_location( $id ) ? 'data-sek-is-global-location="true"' : ''
+                              );
+                            ?>
                             <?php
                               $this -> parent_model = $model;
                               foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
@@ -218,7 +233,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                              <?php if ( empty( $collection ) ) : ?>
                                 <div class="sek-empty-location-placeholder"></div>
                             <?php endif; ?>
-                          </div>
+                          </div><?php //class="sektion-wrapper" ?>
                       <?php endif; ?>
                     <?php
                 break;
@@ -257,7 +272,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                 ?>
                             </div>
                           </div>
-                      </div>
+                      </div><?php //data-sek-level="section" ?>
                     <?php
                 break;
 
@@ -332,7 +347,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               }
                             ?>
                         </div>
-                      </div>
+                      </div><?php //data-sek-level="column" ?>
                     <?php
                 break;
 
@@ -362,7 +377,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>
                             </div>
-                      </div>
+                      </div><?php //data-sek-level="module" ?>
                     <?php
                 break;
             }
