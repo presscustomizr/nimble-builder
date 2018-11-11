@@ -790,7 +790,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isUndefined( localOrGlobal ) || !_.contains( [ 'local', 'global' ], localOrGlobal ) ) {
                         api.errare( 'getDefaultSektionSettingValue => the skope should be set to local or global');
                   }
-                  return 'global' === localOrGlobal ? sektionsLocalizedData.defaultGlobalSektionSettingValue : self.getDefaultSektionSettingValue( 'local' );
+                  return 'global' === localOrGlobal ? sektionsLocalizedData.defaultGlobalSektionSettingValue : sektionsLocalizedData.defaultLocalSektionSettingValue;
             }
 
       });//$.extend()
