@@ -21,7 +21,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Define a default value for the sektion setting value, used when no server value has been sent
                   // @see php function
-                  // function sek_get_default_sektions_value() {
+                  // function sek_get_default_location_model() {
                   //     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
                   //     foreach( sek_get_locations() as $location ) {
                   //         $defaut_sektions_value['collection'][] = [
