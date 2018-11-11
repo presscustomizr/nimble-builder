@@ -192,7 +192,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // set the new setting Value
                   if( ! _.isUndefined( newSettingValue ) ) {
-                        api( self.sekCollectionSettingId() )( self.validateSettingValue( newSettingValue ), { navigatingHistoryLogs : true } );
+                        api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue ), { navigatingHistoryLogs : true } );
                         // If the information is available, refresh only the relevant sections
                         // otherwise fallback on a full refresh
                         var previewHasBeenRefreshed = false;

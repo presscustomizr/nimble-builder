@@ -33,10 +33,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //     }
                   //     return $defaut_sektions_value;
                   // }
-                  self.defaultSektionSettingValue = sektionsLocalizedData.defaultSektionSettingValue;
+                  self.defaultLocalSektionSettingValue = self.getDefaultSektionSettingValue( 'local' );
 
                   // Store the contextual setting prefix
-                  self.sekCollectionSettingId = new api.Value( {} );
+                  self.localSectionsSettingId = new api.Value( {} );
 
                   // Keep track of the registered ui elements dynamically registered
                   // this collection is populated in ::register(), if the track param is true
@@ -52,11 +52,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // schedule reaction to collection setting ids => the setup of the collection setting when the collection setting ids are set
                         //=> on skope change
                         //@see setContextualCollectionSettingIdWhenSkopeSet
-                        self.sekCollectionSettingId.callbacks.add( function( collectionSettingIds, previousCollectionSettingIds ) {
+                        self.localSectionsSettingId.callbacks.add( function( collectionSettingIds, previousCollectionSettingIds ) {
                               // register the collection setting id
                               // and schedule the reaction to different collection changes : refreshModules, ...
                               try { self.setupSettingToBeSaved(); } catch( er ) {
-                                    api.errare( 'Error in self.sekCollectionSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
+                                    api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
                               }
                         });
 
@@ -401,7 +401,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.previewer.trigger('sek-pick-content');
                   }
 
-                  // set the sekCollectionSettingId now, and update it on skope change
+                  // set the localSectionsSettingId now, and update it on skope change
                   sektionsData = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local');
                   if ( sektionsLocalizedData.isDevMode ) {
                         api.infoLog( '::setContextualCollectionSettingIdWhenSkopeSet => SEKTIONS DATA ? ', sektionsData );
@@ -412,7 +412,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isEmpty( sektionsData.setting_id ) ) {
                         api.errare('::setContextualCollectionSettingIdWhenSkopeSet() => missing setting_id');
                   }
-                  self.sekCollectionSettingId( sektionsData.setting_id );
+                  self.localSectionsSettingId( sektionsData.setting_id );
             }
       });//$.extend()
 })( wp.customize, jQuery );

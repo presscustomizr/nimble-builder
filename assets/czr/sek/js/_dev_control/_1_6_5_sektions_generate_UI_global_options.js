@@ -138,7 +138,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Defer the registration when the parent section gets added to the api
                   // the section '__globalAndLocalOptionsSection' is registered in ::initialize()
                   api.section( '__globalAndLocalOptionsSection', function( _section_ ) {
-                        api( self.sekCollectionSettingId(), function() {
+                        api( self.localSectionsSettingId(), function() {
                               _do_register_();
                         });
                   });

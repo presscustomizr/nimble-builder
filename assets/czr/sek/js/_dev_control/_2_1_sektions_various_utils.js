@@ -35,8 +35,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // do we have a collection ?
                   // if not, let's use the root one
                   if ( _.isUndefined( collection ) ) {
-                        var currentSektionSettingValue = api( self.sekCollectionSettingId() )();
-                        var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
+                        var currentSektionSettingValue = api( self.localSectionsSettingId() )();
+                        var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.getDefaultSektionSettingValue( 'local' );
                         collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
                   }
                   _.each( collection, function( levelData ) {
@@ -59,8 +59,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // do we have a collection ?
                   // if not, let's use the root one
                   if ( _.isUndefined( collection ) ) {
-                        var currentSektionSettingValue = api( self.sekCollectionSettingId() )();
-                        var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
+                        var currentSektionSettingValue = api( self.localSectionsSettingId() )();
+                        var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.getDefaultSektionSettingValue( 'local' );
                         collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
                   }
                   _.each( collection, function( levelData, _key_ ) {
@@ -209,8 +209,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   gfonts = gfonts || [];
 
                   if ( _.isUndefined( level ) ) {
-                        var currentSektionSettingValue = api( self.sekCollectionSettingId() )();
-                        level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
+                        var currentSektionSettingValue = api( self.localSectionsSettingId() )();
+                        level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.getDefaultSektionSettingValue( 'local' );
                   }
                   _.each( level, function( levelData, _key_ ) {
                         // example of input_id candidate 'font_family_css'
@@ -783,6 +783,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   return levelData;
+            },
+
+            // @return { collection[] ... }
+            getDefaultSektionSettingValue : function( localOrGlobal ) {
+                  if ( _.isUndefined( localOrGlobal ) || !_.contains( [ 'local', 'global' ], localOrGlobal ) ) {
+                        api.errare( 'getDefaultSektionSettingValue => the skope should be set to local or global');
+                  }
+                  return 'global' === localOrGlobal ? sektionsLocalizedData.defaultGlobalSektionSettingValue : self.getDefaultSektionSettingValue( 'local' );
             }
+
       });//$.extend()
 })( wp.customize, jQuery );

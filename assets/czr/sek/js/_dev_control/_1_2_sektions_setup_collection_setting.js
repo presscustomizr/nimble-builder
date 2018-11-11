@@ -2,7 +2,7 @@
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // Fired on api 'ready', in reaction to ::setContextualCollectionSettingIdWhenSkopeSet => ::sekCollectionSettingId
+            // Fired on api 'ready', in reaction to ::setContextualCollectionSettingIdWhenSkopeSet => ::localSectionsSettingId
             // 1) register the collection setting nimble___[{$skope_id}] ( ex : nimble___[skp__post_page_20] )
             // 2) validate that the setting is well formed before being changed
             // 3) schedule reactions on change ?
@@ -13,7 +13,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   serverCollection = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local').db_values;
                   // maybe register the sektion_collection setting
-                  var collectionSettingId = self.sekCollectionSettingId();// [ 'nimble___' , '[', newSkopes.local, ']' ].join('');
+                  var collectionSettingId = self.localSectionsSettingId();// [ 'nimble___' , '[', newSkopes.local, ']' ].join('');
                   if ( _.isEmpty( collectionSettingId ) ) {
                         throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
                   }
@@ -24,7 +24,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var __collectionSettingInstance__ = api.CZR_Helpers.register({
                               what : 'setting',
                               id : collectionSettingId,
-                              value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.defaultSektionSettingValue ),
+                              value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( 'local' )  ),
                               transport : 'postMessage',//'refresh'
                               type : 'option',
                               track : false,//don't register in the self.registered()
@@ -279,7 +279,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // triggered when clicking on [data-sek-reset="true"]
             // scheduled in ::initialize()
             // Note :
-            // 1) this is not a real reset, the customizer setting is set to self.defaultSektionSettingValue
+            // 1) this is not a real reset, the customizer setting is set to self.getDefaultSektionSettingValue( 'local' )
             // @see php function which defines the defaults
             // function sek_get_default_sektions_value() {
             //     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
@@ -296,11 +296,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 2) a real reset should delete the sektion post ( nimble_post_type, with for example title nimble___skp__post_page_21 ) and its database option storing its id ( for example : nimble___skp__post_page_21 )
             resetCollectionSetting : function() {
                   var self = this;
-                  if ( _.isEmpty( self.sekCollectionSettingId() ) ) {
+                  if ( _.isEmpty( self.localSectionsSettingId() ) ) {
                         throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
                   }
                   // reset the setting to default
-                  api( self.sekCollectionSettingId() )( self.defaultSektionSettingValue );
+                  api( self.localSectionsSettingId() )( self.getDefaultSektionSettingValue( 'local' ) );
                   // refresh the preview
                   api.previewer.refresh();
                   // remove any previous notification

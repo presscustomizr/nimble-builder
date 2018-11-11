@@ -67,7 +67,8 @@ function sek_enqueue_controls_js_css() {
 
                 'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// '__nimble_options__'
 
-                'defaultSektionSettingValue' => sek_get_default_sektions_value(),
+                'defaultLocalSektionSettingValue' => sek_get_default_sektions_value(),
+                'defaultGlobalSektionSettingValue' => sek_get_default_sektions_value( NIMBLE_GLOBAL_LOCATIONS_OPTION_SUFFIX ),
 
                 'userSavedSektions' => get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS),
 

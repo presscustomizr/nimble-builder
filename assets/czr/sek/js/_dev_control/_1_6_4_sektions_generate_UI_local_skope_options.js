@@ -91,7 +91,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // Let's add the starting values if provided when registrating the module
                                     var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
-                                        currentSetValue = api( self.sekCollectionSettingId() )(),
+                                        currentSetValue = api( self.localSectionsSettingId() )(),
                                         allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} ),
                                         optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {},
                                         initialModuleValues = optionTypeValue;
@@ -156,7 +156,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Defer the registration when the parent section gets added to the api
                   // the section '__localOptionsSection' is registered in ::initialize()
                   api.section( '__localOptionsSection', function( _section_ ) {
-                        api( self.sekCollectionSettingId(), function() {
+                        api( self.localSectionsSettingId(), function() {
                               _do_register_();
                               _section_.container.on('click', '.accordion-section-title',function() {
                                     // Generate UI for the local skope options

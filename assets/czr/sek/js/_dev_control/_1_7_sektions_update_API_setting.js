@@ -13,7 +13,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       __updateAPISettingDeferred__ = $.Deferred();
 
                   // Update the sektion collection
-                  api( self.sekCollectionSettingId(), function( sektionSetInstance ) {
+                  api( self.localSectionsSettingId(), function( sektionSetInstance ) {
                         // sektionSetInstance() = {
                         //    collection : [
                         //       'loop_start' :  { level : location,  collection : [ 'sek124' : { collection : [], level : section, options : {} }], options : {}},
@@ -24,7 +24,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //
                         // }
                         var currentSetValue = sektionSetInstance(),
-                            newSetValue = _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.defaultSektionSettingValue,
+                            newSetValue = _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.getDefaultSektionSettingValue( 'local' ),
                             locationCandidate,
                             sektionCandidate,
                             columnCandidate,
@@ -39,7 +39,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             parentSektionCandidate;
 
                         // make sure we have a collection array to populate
-                        newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.defaultSektionSettingValue.collection;
+                        newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.getDefaultSektionSettingValue( 'local' ).collection;
 
                         switch( params.action ) {
                               //-------------------------------------------------------------------------------------------------
@@ -1026,7 +1026,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           } else {
                                                 __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value did not pass the validation checks for action ' + params.action );
                                           }
-                                          //api.infoLog('COLLECTION SETTING UPDATED => ', self.sekCollectionSettingId(), api( self.sekCollectionSettingId() )() );
+                                          //api.infoLog('COLLECTION SETTING UPDATED => ', self.localSectionsSettingId(), api( self.localSectionsSettingId() )() );
                                     }
                               };//mayBeUpdateSektionsSetting()
 
@@ -1042,7 +1042,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                               }
                         }
-                  });//api( self.sekCollectionSettingId(), function( sektionSetInstance ) {}
+                  });//api( self.localSectionsSettingId(), function( sektionSetInstance ) {}
                   return __updateAPISettingDeferred__.promise();
             },//updateAPISetting
 
