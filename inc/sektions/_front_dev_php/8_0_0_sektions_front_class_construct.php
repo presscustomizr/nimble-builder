@@ -5,6 +5,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
     class SEK_Front_Construct {
         static $instance;
         public $local_seks = 'not_cached';// <= used to cache the sektions for the local skope_id
+        public $global_seks = 'not_cached';// <= used to cache the sektions for the global skope_id
         public $model = array();//<= when rendering, the current level model
         public $parent_model = array();//<= when rendering, the current parent model
         public $default_models = array();// <= will be populated to cache the default models when invoking sek_get_default_module_model
@@ -17,6 +18,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'loop_end' => array( 'priority' => 10 ),
         ];
         public $registered_locations = [];
+        public $all_nimble_locations = [];// will be cached @wp_head. See SEK_Front_Render::_schedule_front_rendering()
         public $default_location_model = [
             'id' => '',
             'level' => 'location',
