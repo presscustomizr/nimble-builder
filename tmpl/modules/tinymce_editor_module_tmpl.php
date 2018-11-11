@@ -11,7 +11,7 @@ $value = $value['main_settings'];
 // Utility to print the text content generated with tinyMce
 // should be wrapped in a specific selector when customizing,
 //  => so we can listen to user click actions and open the editor on for each separate tiny_mce_editor input
-if ( ! function_exists( '\Nimble\sek_print_tiny_mce_text_content') ) {
+if ( ! function_exists( 'Nimble\sek_print_tiny_mce_text_content') ) {
     function sek_print_tiny_mce_text_content( $tiny_mce_content, $input_id, $value ) {
         if ( empty( $tiny_mce_content ) ) {
             echo SEK_Fire()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );

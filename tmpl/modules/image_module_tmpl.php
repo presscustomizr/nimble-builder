@@ -18,7 +18,7 @@ $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $main_settings = $value['main_settings'];
 //$borders_corners_settings = $value['borders_corners'];
 
-if ( ! function_exists( '\Nimble\sek_get_img_module_img_html') ) {
+if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
     function sek_get_img_module_img_html( $value ) {
         $visual_effect_class = '';
         //visual effect classes
@@ -72,7 +72,7 @@ if ( ! function_exists( '\Nimble\sek_get_img_module_img_html') ) {
     }
 }
 
-if ( ! function_exists( '\Nimble\sek_get_img_module_img_link' ) ) {
+if ( ! function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
     function sek_get_img_module_img_link( $value ) {
         $link = 'javascript:void(0);';
         if ( skp_is_customizing() ) {

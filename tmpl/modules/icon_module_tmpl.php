@@ -28,7 +28,7 @@ Array
     [color_hover_css] => #590606
 )
 */
-if ( ! function_exists( '\Nimble\sek_get_icon_module_icon_html') ) {
+if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_html') ) {
     function sek_get_icon_module_icon_html( $value ) {
         $html = '';
         $icon_settings = $value['icon_settings'];
