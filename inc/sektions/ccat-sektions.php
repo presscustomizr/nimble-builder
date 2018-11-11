@@ -8850,7 +8850,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return preg_replace_callback( $pattern, '\Nimble\nimble_regex_callback', $html);
         }
         private function sek_setup_tiny_mce_content_filters() {
-            add_filter( 'the_nimble_tinymce_module_content', 'do_blocks', 9 );
+            if ( function_exists( 'do_blocks' ) ) {
+                add_filter( 'the_nimble_tinymce_module_content', 'do_blocks', 9 );
+            }
             add_filter( 'the_nimble_tinymce_module_content', 'wptexturize' );
             add_filter( 'the_nimble_tinymce_module_content', 'convert_smilies', 20 );
             add_filter( 'the_nimble_tinymce_module_content', 'wpautop' );

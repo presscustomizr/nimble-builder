@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.0
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -45,14 +45,15 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.2.1 =
-* fixed : php function function_exists() can return false when the tested namespaced function starts with a backslash.
-* fixed : parallax background only applied to section level
-* fixed : background smart load only applied to section level
-* improved : when dragging content, no need to print dropzones before or after empty sections
-* improved : introduce a Nimble content filter for the TinyMce editor module, in order to prevent a content "corruption" by third party plugins
+= 1.2.2 =
+* fixed : function_exists( '\Nimble\ ... ) breaks in some version of php ( 5.6.38 )
+* fixed : always check if 'do_blocks' exists for retrocompatibility with WP < 5.0
 
 == Changelog ==
+= 1.2.2 : November 11th, 2018 =
+* fixed : php function_exists( '\Nimble\ ... ) breaks in some version of php ( 5.6.38 )
+* fixed : always check if 'do_blocks' exists for retrocompatibility with WP < 5.0
+
 = 1.2.1 : November 10th, 2018 =
 * fixed : php function function_exists() can return false when the tested namespaced function starts with a backslash.
 * fixed : parallax background only applied to section level
