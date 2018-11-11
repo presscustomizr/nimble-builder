@@ -7,80 +7,90 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 2) validate that the setting is well formed before being changed
             // 3) schedule reactions on change ?
             // @return void()
-            setupSettingToBeSaved : function() {
+            setupSettingsToBeSaved : function() {
                   var self = this,
                       serverCollection;
 
-                  serverCollection = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local').db_values;
-                  // maybe register the sektion_collection setting
-                  var collectionSettingId = self.localSectionsSettingId();// [ 'nimble___' , '[', newSkopes.local, ']' ].join('');
-                  if ( _.isEmpty( collectionSettingId ) ) {
-                        throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
-                  }
+                  // maybe register the sektion_collection settings
+                  var _settingsToRegister_ = {
+                        'local' : { collectionSettingId : self.localSectionsSettingId() },
+                        'global' : { collectionSettingId : sektionsLocalizedData.settingIdForGlobalSections }
+                  };
 
-                  // if the collection setting is not registered yet
-                  // => register it and bind it
-                  if ( ! api.has( collectionSettingId ) ) {
-                        var __collectionSettingInstance__ = api.CZR_Helpers.register({
-                              what : 'setting',
-                              id : collectionSettingId,
-                              value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( 'local' )  ),
-                              transport : 'postMessage',//'refresh'
-                              type : 'option',
-                              track : false,//don't register in the self.registered()
-                              origin : 'nimble'
-                        });
+                  _.each( _settingsToRegister_, function( settingData, localOrGlobal ) {
+                        serverCollection = api.czr_skopeBase.getSkopeProperty( 'sektions', localOrGlobal ).db_values;
+                        if ( _.isEmpty( settingData.collectionSettingId ) ) {
+                              throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
+                        }
+                        // if the collection setting is not registered yet
+                        // => register it and bind it
+                        if ( ! api.has( settingData.collectionSettingId ) ) {
+                              var __collectionSettingInstance__ = api.CZR_Helpers.register({
+                                    what : 'setting',
+                                    id : settingData.collectionSettingId,
+                                    value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( localOrGlobal )  ),
+                                    transport : 'postMessage',//'refresh'
+                                    type : 'option',
+                                    track : false,//don't register in the self.registered()
+                                    origin : 'nimble'
+                              });
 
-                        //if ( sektionsLocalizedData.isDevMode ) {}
-                        api( collectionSettingId, function( sektionSetInstance ) {
-                              // self.historyLog is declared in ::initialize()
-                              self.historyLog([{
-                                    status : 'current',
-                                    value : sektionSetInstance(),
-                                    action : 'initial'
-                              }]);
-                              // Schedule reactions to a collection change
-                              sektionSetInstance.bind( _.debounce( function( newSektionSettingValue, previousValue, params ) {
-                                    // api.infoLog( 'sektionSettingValue is updated',
-                                    //       {
-                                    //             newValue : newSektionSettingValue,
-                                    //             previousValue : previousValue,
-                                    //             params : params
-                                    //       }
-                                    // );
 
-                                    // Track changes, if not currently navigating the logs
-                                    // Always clean future values if the logs have been previously navigated back
-                                    if ( params && true !== params.navigatingHistoryLogs ) {
-                                          var newHistoryLog = [],
-                                              historyLog = $.extend( true, [], self.historyLog() ),
-                                              sektionToRefresh;
-
-                                          if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
-                                                sektionToRefresh = params.in_sektion;
-                                          } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
-                                                sektionToRefresh = params.to_sektion;
-                                          }
-
-                                          _.each( historyLog, function( log ) {
-                                                var newStatus = 'previous';
-                                                if ( 'future' == log.status )
-                                                  return;
-                                                $.extend( log, { status : 'previous' } );
-                                                newHistoryLog.push( log );
-                                          });
-                                          newHistoryLog.push({
+                              //if ( sektionsLocalizedData.isDevMode ) {}
+                              api( settingData.collectionSettingId, function( sektionSetInstance ) {
+                                    if ( 'local' === localOrGlobal ) {
+                                          // self.historyLog is declared in ::initialize()
+                                          self.historyLog([{
                                                 status : 'current',
-                                                value : newSektionSettingValue,
-                                                action : _.isObject( params ) ? ( params.action || '' ) : '',
-                                                sektionToRefresh : sektionToRefresh
-                                          });
-                                          self.historyLog( newHistoryLog );
+                                                value : sektionSetInstance(),
+                                                action : 'initial'
+                                          }]);
                                     }
 
-                              }, 1000 ) );
-                        });//api( collectionSettingId, function( sektionSetInstance ){}
-                  }
+                                    // Schedule reactions to a collection change
+                                    sektionSetInstance.bind( _.debounce( function( newSektionSettingValue, previousValue, params ) {
+                                          // api.infoLog( 'sektionSettingValue is updated',
+                                          //       {
+                                          //             newValue : newSektionSettingValue,
+                                          //             previousValue : previousValue,
+                                          //             params : params
+                                          //       }
+                                          // );
+
+                                          // Track changes, if not currently navigating the logs
+                                          // Always clean future values if the logs have been previously navigated back
+                                          if ( 'local' === localOrGlobal && params && true !== params.navigatingHistoryLogs ) {
+                                                var newHistoryLog = [],
+                                                    historyLog = $.extend( true, [], self.historyLog() ),
+                                                    sektionToRefresh;
+
+                                                if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
+                                                      sektionToRefresh = params.in_sektion;
+                                                } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
+                                                      sektionToRefresh = params.to_sektion;
+                                                }
+
+                                                _.each( historyLog, function( log ) {
+                                                      var newStatus = 'previous';
+                                                      if ( 'future' == log.status )
+                                                        return;
+                                                      $.extend( log, { status : 'previous' } );
+                                                      newHistoryLog.push( log );
+                                                });
+                                                newHistoryLog.push({
+                                                      status : 'current',
+                                                      value : newSektionSettingValue,
+                                                      action : _.isObject( params ) ? ( params.action || '' ) : '',
+                                                      sektionToRefresh : sektionToRefresh
+                                                });
+                                                self.historyLog( newHistoryLog );
+                                          }
+
+                                    }, 1000 ) );
+                              });//api( settingData.collectionSettingId, function( sektionSetInstance ){}
+                        }//if ( ! api.has( settingData.collectionSettingId ) ) {
+                  });//_.each(
+
 
 
                   // global options for all collection setting of this skope_id
@@ -281,7 +291,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Note :
             // 1) this is not a real reset, the customizer setting is set to self.getDefaultSektionSettingValue( 'local' )
             // @see php function which defines the defaults
-            // function sek_get_default_sektions_value() {
+            // function sek_get_default_location_model() {
             //     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
             //     foreach( sek_get_locations() as $location ) {
             //         $defaut_sektions_value['collection'][] = [

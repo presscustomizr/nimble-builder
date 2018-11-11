@@ -55,7 +55,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.localSectionsSettingId.callbacks.add( function( collectionSettingIds, previousCollectionSettingIds ) {
                               // register the collection setting id
                               // and schedule the reaction to different collection changes : refreshModules, ...
-                              try { self.setupSettingToBeSaved(); } catch( er ) {
+                              try { self.setupSettingsToBeSaved(); } catch( er ) {
                                     api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
                               }
                         });
