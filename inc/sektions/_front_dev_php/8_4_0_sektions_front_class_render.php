@@ -649,7 +649,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // Fired in the constructor
         private function sek_setup_tiny_mce_content_filters() {
             // @see filters in wp-includes/default-filters.php
-            add_filter( 'the_nimble_tinymce_module_content', 'do_blocks', 9 );
+            // always check if 'do_blocks' exists for retrocompatibility with WP < 5.0. @see https://github.com/presscustomizr/nimble-builder/issues/237
+            if ( function_exists( 'do_blocks' ) ) {
+                add_filter( 'the_nimble_tinymce_module_content', 'do_blocks', 9 );
+            }
             add_filter( 'the_nimble_tinymce_module_content', 'wptexturize' );
             add_filter( 'the_nimble_tinymce_module_content', 'convert_smilies', 20 );
             add_filter( 'the_nimble_tinymce_module_content', 'wpautop' );
