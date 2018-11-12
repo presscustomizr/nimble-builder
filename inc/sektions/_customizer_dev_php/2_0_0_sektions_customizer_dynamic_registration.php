@@ -66,8 +66,8 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         // Uses the sanitize_callback function specified on module registration if any
         function sanitize_callback( $setting_data, $setting_instance ) {
-            if ( isset( $_POST['skope_id'] ) ) {
-                $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
+            if ( isset( $_POST['location_skope_id'] ) ) {
+                $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
                 if ( is_array( $sektionSettingValue ) ) {
                     $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
                     if ( is_array( $sektion_collection ) ) {
@@ -89,8 +89,8 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         // @return validity object
         function validate_callback( $validity, $setting_data, $setting_instance ) {
             $validated = true;
-            if ( isset( $_POST['skope_id'] ) ) {
-                $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
+            if ( isset( $_POST['location_skope_id'] ) ) {
+                $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
                 if ( is_array( $sektionSettingValue ) ) {
                     $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
                     if ( is_array( $sektion_collection ) ) {

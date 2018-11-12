@@ -33,7 +33,7 @@ add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_custom_c
 function sek_add_raw_local_custom_css( $css ) {
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
     // otherwise we fallback on the normal utility skp_build_skope_id()
-    $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
+    $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
     if ( is_array( $local_options ) && !empty( $local_options['local_options']) && ! empty( $local_options['local_options']['custom_css'] ) ) {
         $options = $local_options['local_options']['custom_css'];
         if ( ! empty( $options['local_custom_css'] ) ) {

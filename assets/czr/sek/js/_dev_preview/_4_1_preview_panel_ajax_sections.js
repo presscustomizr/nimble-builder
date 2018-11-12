@@ -11,12 +11,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   self.mayBePrintLoader({
                         loader_located_in_level_id : params.apiParams.location
                   });
-                  return self.doAjax( {
+                  return self.doAjax({
                         action : 'sek_get_content',
                         id : params.apiParams.id,
                         in_sektion : params.apiParams.in_sektion,
                         in_column : params.apiParams.in_column,
-                        skope_id : params.skope_id,
+                        location_skope_id : params.location_skope_id,
+                        local_skope_id : params.local_skope_id,
                         sek_action : params.apiParams.action,
                         is_nested : params.apiParams.is_nested
                   }).done( function( _r_ ) {

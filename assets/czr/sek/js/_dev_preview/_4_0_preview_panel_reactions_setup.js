@@ -99,8 +99,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   self.mayBePrintLoader({
                                         loader_located_in_level_id : params.apiParams.id
                                   });
-                                  return self.doAjax( {
-                                        skope_id : params.skope_id,
+                                  return self.doAjax({
+                                        location_skope_id : params.location_skope_id,
+                                        local_skope_id : params.local_skope_id,
                                         action : 'sek_get_content',
                                         id : params.apiParams.id,
                                         level : params.apiParams.level,
@@ -274,7 +275,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
                             // @params =  {
-                            //   skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                            //   location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                             //   apiParams : apiParams,
                             //   uiParams : uiParams
                             // }
@@ -404,11 +405,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   _.each( msgCollection, function( callbackFn, msgId ) {
                         api.preview.bind( msgId, function( params ) {
                               params = _.extend( {
-                                  skope_id : '',
+                                  location_skope_id : '',
                                   apiParams : {},
                                   uiParams : {}
                               }, params || {} );
-
 
                               // If the ajax response is an array formed this way ( @see sek-refresh-level case ) :
                               // @see SEK_Front_Ajax::sek_get_level_content_for_injection

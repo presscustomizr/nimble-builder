@@ -15,7 +15,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         action : 'sek_get_content',
                         id : params.apiParams.id,
                         in_sektion : params.apiParams.in_sektion,
-                        skope_id : params.skope_id,
+                        location_skope_id : params.location_skope_id,
+                        local_skope_id : params.local_skope_id,
                         sek_action : params.apiParams.action// sek-add-column || sek-remove-column
                   }).done( function( _r_ ) {
                         var html_content = '';
@@ -62,7 +63,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         action : 'sek_get_content',
                         resized_column : params.apiParams.resized_column,
                         sister_column : params.apiParams.sister_column,
-                        skope_id : params.skope_id,
+                        location_skope_id : params.location_skope_id,
+                        local_skope_id : params.local_skope_id,
                         sek_action : 'sek-resize-columns'
                   }).done( function( _r_ ) {
                         var html_content = '';
@@ -80,7 +82,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
 
                         //Append
-                        self.appendDynStyleSheet( params.skope_id, html_content );
+                        self.appendDynStyleSheet( params.location_skope_id, html_content );
 
                         // say it
                         // listened to clean the loader just in time

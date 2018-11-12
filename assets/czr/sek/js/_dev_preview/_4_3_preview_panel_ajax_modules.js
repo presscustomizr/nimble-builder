@@ -16,7 +16,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           id : params.apiParams.id,
                           in_sektion : params.apiParams.in_sektion,
                           in_column : params.apiParams.in_column,
-                          skope_id : params.skope_id,
+                          location_skope_id : params.location_skope_id,
+                          local_skope_id : params.local_skope_id,
                           sek_action : params.apiParams.action, // can be sek-add-module / refresh-modules-in-column
                           is_nested : params.apiParams.is_nested
                     }).done( function( _r_ ) {

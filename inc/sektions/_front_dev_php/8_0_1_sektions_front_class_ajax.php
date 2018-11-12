@@ -85,7 +85,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
         // hook : 'wp_ajax_sek_get_html_for_injection'
         function sek_get_level_content_for_injection( $params ) {
-            // sek_error_log( 'ajax sek_get_level_content_for_injection', $_POST );
+            sek_error_log( 'ajax sek_get_level_content_for_injection', $_POST );
             if ( ! is_user_logged_in() ) {
                 wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
             }
@@ -100,7 +100,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error( __FUNCTION__ . ' => bad_method' );
             }
 
-            if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+            if ( ! isset( $_POST['location_skope_id'] ) || empty( $_POST['location_skope_id'] ) ) {
                 wp_send_json_error(  __FUNCTION__ . ' => missing skope_id' );
             }
 
@@ -169,7 +169,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             // the $_POST['customized'] has already been updated
             // so invoking sek_get_skoped_seks() will ensure that we get the latest data
             // since wp has not been fired yet, we need to use the posted skope_id param.
-            $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
+            $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
             if ( ! is_array( $sektionSettingValue ) ) {
                 wp_send_json_error( __FUNCTION__ . ' => invalid sektionSettingValue => it should be an array().' );
                 return;
@@ -286,7 +286,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             ob_start();
 
             if ( $is_stylesheet ) {
-                $r = $this -> print_or_enqueue_seks_style( $_POST['skope_id'] );
+                $r = $this -> print_or_enqueue_seks_style( $_POST['location_skope_id'] );
             } else {
                 if ( 'no_match' == $level_model ) {
                     wp_send_json_error(  __FUNCTION__ . ' ' . $sek_action . ' => missing level model' );
@@ -574,7 +574,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error(  __FUNCTION__ . ' => missing level id' );
                 return;
             }
-            if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+            if ( ! isset( $_POST['location_skope_id'] ) || empty( $_POST['location_skope_id'] ) ) {
                 wp_send_json_error(  __FUNCTION__ . ' => missing skope_id' );
                 return;
             }
@@ -583,7 +583,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             // the $_POST['customized'] has already been updated
             // so invoking sek_get_skoped_seks() will ensure that we get the latest data
             // since wp has not been fired yet, we need to use the posted skope_id param.
-            $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
+            $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
             if ( ! is_array( $sektionSettingValue ) || ! array_key_exists( 'collection', $sektionSettingValue ) || ! is_array( $sektionSettingValue['collection'] ) ) {
                 wp_send_json_error( __FUNCTION__ . ' => invalid sektionSettingValue' );
                 return;

@@ -10,7 +10,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
                   return self.doAjax( {
                         action : 'sek_get_content',
-                        skope_id : params.skope_id,
+                        location_skope_id : params.location_skope_id,
+                        local_skope_id : params.local_skope_id,
                         sek_action : 'sek-refresh-stylesheet'
                   }).done( function( _r_ ) {
                         var html_content = '';
@@ -20,7 +21,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         } else {
                               self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
                         }
-                        self.appendDynStyleSheet( params.skope_id, html_content );
+                        self.appendDynStyleSheet( params.location_skope_id, html_content );
                         //=> 'sek-level-refreshed' is listened to clean the loader overlay in time
                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
                               .trigger( 'sek-stylesheet-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
@@ -31,9 +32,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
             },
 
-            appendDynStyleSheet : function( skope_id, styleMarkup ) {
-                var _stylesheet_id_ = '#sek-' + skope_id,//@see php Sek_Dyn_CSS_Handler
-                    _gfonts_id_ = '#sek-gfonts-' + skope_id;//@see php Sek_Dyn_CSS_Handler
+            appendDynStyleSheet : function( location_skope_id, styleMarkup ) {
+                var _stylesheet_id_ = '#sek-' + location_skope_id,//@see php Sek_Dyn_CSS_Handler
+                    _gfonts_id_ = '#sek-gfonts-' + location_skope_id;//@see php Sek_Dyn_CSS_Handler
 
                 // Remove a dynamic inline stylesheet if already printed
                 if ( 0 < $('head').find( _stylesheet_id_ ).length ) {
