@@ -133,3 +133,8 @@ if ( nimble_pass_requirements() ) {
         require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-admin.php' );
     }
 }
+
+if ( \Nimble\sek_is_dev_mode() ) {
+    error_log('to be removed//////');
+    nimble_register_location('nimble_global_test', array( 'is_global_location' => true )  );
+}
