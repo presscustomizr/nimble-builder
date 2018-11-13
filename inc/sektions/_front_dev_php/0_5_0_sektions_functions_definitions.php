@@ -13,6 +13,7 @@ function sek_is_dev_mode() {
 
 if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
+if ( ! defined( 'NIMBLE_GLOBAL_SKOPE_ID' ) ) { define( 'NIMBLE_GLOBAL_SKOPE_ID' , 'skp__global' ); }
 if ( ! defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
 if ( ! defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' , 'nimble_saved_sektions' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
@@ -20,15 +21,37 @@ if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) {
     define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION );
 }
 
+/* ------------------------------------------------------------------------- *
+ *  LOCATIONS UTILITIES
+/* ------------------------------------------------------------------------- */
 // @return array
 function sek_get_locations() {
-  return apply_filters( 'sek_locations', array_merge( SEK_Fire()->default_locations, SEK_Fire()->registered_locations ) );
+    if ( ! is_array( SEK_Fire()->registered_locations ) ) {
+        sek_error_log( __FUNCTION__ . ' error => the registered locations must be an array');
+        return SEK_Fire()->default_locations;
+    }
+    return apply_filters( 'sek_locations', array_merge( SEK_Fire()->default_locations, SEK_Fire()->registered_locations ) );
 }
+
+// @return bool
+function sek_is_global_location( $location_id ) {
+    if ( empty( SEK_Fire()->all_nimble_locations ) ) {
+        SEK_Fire()->all_nimble_locations = sek_get_locations();
+    }
+    if ( ! isset( SEK_Fire()->all_nimble_locations[$location_id] ) || ! is_array( SEK_Fire()->all_nimble_locations[$location_id] ) )
+      return false;
+    $location_params = SEK_Fire()->all_nimble_locations[$location_id];
+    return ! empty( $location_params['is_global_location'] ) && true === $location_params['is_global_location'];
+}
+
 
 // @param $location_id ( string ). Example '__after_header'
 function register_location( $location_id, $params = array() ) {
     $params = is_array( $params ) ? $params : array();
-    $params = wp_parse_args( $params, array( 'priority' => 10 ) );
+    $params = wp_parse_args( $params, array(
+        'priority' => 10,
+        'is_global_location' => false
+    ));
     $registered_locations = SEK_Fire()->registered_locations;
     if ( is_array( $registered_locations ) ) {
         $registered_locations[$location_id] = $params;
@@ -37,12 +60,30 @@ function register_location( $location_id, $params = array() ) {
     //sek_error_log('SEK_Fire()->registered_locations', SEK_Fire()->registered_locations );
 }
 
+
 // @return array
 // @used when populating the customizer localized params
-function sek_get_default_sektions_value() {
-    $defaut_sektions_value = [ 'collection' => [], 'local_options' => [] ];
+// @param $skope_id optional. Specified when we need to differentiate the local and global locations
+function sek_get_default_location_model( $skope_id = null ) {
+    $is_global_skope = NIMBLE_GLOBAL_SKOPE_ID === $skope_id;
+    if ( $is_global_skope ) {
+        $defaut_sektions_value = [ 'collection' => [] ];
+    } else {
+        $defaut_sektions_value = [ 'collection' => [], 'local_options' => [] ];
+    }
     foreach( sek_get_locations() as $location_id => $params ) {
-        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location_id ], SEK_Fire()->default_location_model );
+        $is_global_location = sek_is_global_location( $location_id );
+        if ( $is_global_skope && ! $is_global_location )
+          continue;
+        if ( ! $is_global_skope && $is_global_location )
+          continue;
+
+        $location_model = wp_parse_args( [ 'id' => $location_id ], SEK_Fire()->default_location_model );
+        if ( $is_global_location ) {
+            $location_model[ 'is_global_location' ] = true;
+        }
+
+        $defaut_sektions_value['collection'][] = $location_model;
     }
     return $defaut_sektions_value;
 }
@@ -57,6 +98,13 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 }
 
 
+// return bool
+function sek_has_global_sections() {
+    if ( skp_is_customizing() )
+      return true;
+    $maybe_global_sek_post = sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID );
+    return ! is_null($maybe_global_sek_post) || !!$maybe_global_sek_post;
+}
 
 
 
@@ -75,14 +123,18 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 
 // Recursively walk the level tree until a match is found
 // @param id = the id of the level for which the model shall be returned
-// @param $collection = sek_get_skoped_seks( $skope_id )['collection']; <= the root collection must always be provided
+// @param $collection = sek_get_skoped_seks( $skope_id )['collection']; <= the root collection must always be provided, so we are sure it's
 function sek_get_level_model( $id, $collection = array() ) {
     $_data = 'no_match';
+    if ( ! is_array( $collection ) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid collection param when getting model for id : ' . $id );
+        return $_data;
+    }
     foreach ( $collection as $level_data ) {
         // stop here and return if a match was recursively found
         if ( 'no_match' != $_data )
           break;
-        if ( $id === $level_data['id'] ) {
+        if ( array_key_exists( 'id', $level_data ) && $id === $level_data['id'] ) {
             $_data = $level_data;
         } else {
             if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
@@ -95,26 +147,40 @@ function sek_get_level_model( $id, $collection = array() ) {
 
 // Recursive helper
 // Typically used when ajaxing
-function sek_get_parent_level_model( $child_level_id, $collection = array(), $skope_id = '' ) {
+// Is also used when building the dyn_css or when firing sek_add_css_rules_for_spacing()
+// @param id : mandatory
+// @param collection : optional <= that's why if missing we must walk all collections : local and global
+function sek_get_parent_level_model( $child_level_id = '', $collection = array(), $skope_id = '' ) {
+    $_parent_level_data = 'no_match';
+    if ( ! is_string( $child_level_id ) || empty( $child_level_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
+        return $_parent_level_data;
+    }
+
+    // When no collection is provided, we must walk all collections, local and global.
     if ( empty( $collection ) ) {
         if ( empty( $skope_id ) ) {
-            if ( is_array( $_POST ) && ! empty( $_POST['skope_id'] ) ) {
-                $skope_id = $_POST['skope_id'];
+            if ( is_array( $_POST ) && ! empty( $_POST['location_skope_id'] ) ) {
+                $skope_id = $_POST['location_skope_id'];
             } else {
                 $skope_id = skp_get_skope_id();
             }
         }
-        $skoped_setting = sek_get_skoped_seks( $skope_id );
-        $collection = ( is_array( $skoped_setting ) && !empty( $skoped_setting['collection'] ) ) ? $skoped_setting['collection'] : array();
+        $local_skope_settings = sek_get_skoped_seks( $skope_id );
+        $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+        $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+        $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+
+        $collection = array_merge( $local_collection, $global_collection );
     }
-    $_parent_level_data = 'no_match';
+
     foreach ( $collection as $level_data ) {
         // stop here and return if a match was recursively found
         if ( 'no_match' !== $_parent_level_data )
           break;
         if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
             foreach ( $level_data['collection'] as $child_level_data ) {
-                if ( $child_level_id == $child_level_data['id'] ) {
+                if ( array_key_exists( 'id', $child_level_data ) && $child_level_id == $child_level_data['id'] ) {
                     $_parent_level_data = $level_data;
                     //match found, break this loop
                     break;
@@ -150,6 +216,41 @@ function sek_section_has_modules( $model, $has_module = null ) {
     }
     return $has_module;
 }
+
+
+// Return the skope id in which a level will be rendered
+// For that, walk the collections local and global to see if there's a match
+// Fallback skope is local.
+// used for example in the simple form module to print the hidden skope id, needed on submission.
+// Recursive helper
+// @param id : mandatory
+// @param collection : optional <= that's why if missing we must walk all collections : local and global
+function sek_get_level_skope_id( $level_id = '' ) {
+    $level_skope_id = skp_get_skope_id();
+    if ( ! is_string( $level_id ) || empty( $level_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
+        return $level_skope_id;
+    }
+
+    $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+    $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+    // if the level id has not been found in the local sections, we know it's a global level.
+    // In dev mode, always make sure that the level id is found in the global locations.
+    if ( 'no_match' === sek_get_level_model( $level_id, $local_collection ) ) {
+        $level_skope_id = NIMBLE_GLOBAL_SKOPE_ID;
+        if ( sek_is_dev_mode() ) {
+            $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+            $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+            if ( 'no_match' === sek_get_level_model( $level_id, $global_collection ) ) {
+                sek_error_log( __FUNCTION__ . ' => warning, a level id ( ' . $level_id .' ) was not found in local and global sections.');
+            }
+        }
+    }
+
+    return $level_skope_id;
+}
+
+
 
 
 
@@ -716,10 +817,16 @@ function sek_get_section_custom_breakpoint( $section ) {
 // @return bool
 // 2 modules use font awesome :
 // czr_button_module and czr_icon_module
+// Typically fired in 'wp_enqueue_scripts' to check if font awesome is needed
 function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
     if ( !$bool ) {
         if ( is_null( $recursive_data ) ) {
-            $recursive_data = sek_get_skoped_seks( skp_get_skope_id() );
+            $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+            $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+            $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+            $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+
+            $recursive_data = array_merge( $local_collection, $global_collection );
         }
         foreach ($recursive_data as $key => $value) {
             if ( is_array( $value ) && array_key_exists('module_type', $value) && in_array($value['module_type'], array( 'czr_button_module', 'czr_icon_module' ) ) ) {
@@ -827,7 +934,7 @@ function sek_is_img_smartload_enabled() {
     // LOCAL OPTION
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
     // otherwise we fallback on the normal utility skp_build_skope_id()
-    $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
+    $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
     $local_smartload = 'inherit';
     if ( is_array( $local_options ) && !empty( $local_options['local_options']) && is_array( $local_options['local_options']) && !empty($local_options['local_options']['local_performances'] ) && is_array( $local_options['local_options']['local_performances'] ) ) {
         if ( ! empty( $local_options['local_options']['local_performances']['local-img-smart-load'] ) && 'inherit' !== $local_options['local_options']['local_performances']['local-img-smart-load'] ) {
