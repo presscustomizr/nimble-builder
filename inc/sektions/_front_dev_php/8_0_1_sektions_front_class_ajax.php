@@ -85,7 +85,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
         // hook : 'wp_ajax_sek_get_html_for_injection'
         function sek_get_level_content_for_injection( $params ) {
-            sek_error_log( 'ajax sek_get_level_content_for_injection', $_POST );
+            //sek_error_log( 'ajax sek_get_level_content_for_injection', $_POST );
             if ( ! is_user_logged_in() ) {
                 wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
             }
