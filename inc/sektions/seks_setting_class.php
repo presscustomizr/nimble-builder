@@ -82,7 +82,6 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
    * @return array of skope settings
    */
   public function filter_previewed_sek_get_skoped_seks( $seks_collection, $skope_id, $location ) {
-    //error_log( 'in filter_previewed_sek_get_skoped_seks => ' . $skope_id . ' | ' . $this->skope_id );
     if ( $skope_id === $this->skope_id ) {
         $customized_value = $this->post_value( null );
         if ( ! is_null( $customized_value ) ) {
@@ -109,7 +108,7 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
     }
     $id_base = $this->id_data['base'];
 
-    error_log('id_base in Nimble_Customizer_Setting class => ' . $this->id_data['base'] );
+    //error_log('id_base in Nimble_Customizer_Setting class => ' . $this->id_data['base'] );
 
     $value = '';
     $post = sek_get_seks_post( $this->skope_id );
@@ -139,7 +138,7 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
       if ( ! is_array( $seks_collection ) ) {
           $seks_collection = array();
       }
-
+      //error_log( __CLASS__. ' in update => ' . $this->skope_id );
       if ( empty( $this->skope_id ) || ! is_string( $this->skope_id ) ) {
           throw new Exception( 'Nimble_Customizer_Setting => update => invalid skope id' );
       }

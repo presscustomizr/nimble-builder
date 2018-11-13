@@ -399,6 +399,7 @@ class Sek_Dyn_CSS_Handler {
      * @return void()
      */
     public function sek_dyn_css_enqueue_or_print_and_google_fonts_print() {
+        //sek_error_log( __CLASS__ . ' | ' . __FUNCTION__ . ' => ' . $this->id );
         // CSS FILE
         //case enqueue file : front end + user with customize caps not logged in
         if ( self::MODE_FILE == $this->mode ) {
