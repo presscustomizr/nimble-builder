@@ -419,6 +419,10 @@ class Sek_Dyn_CSS_Builder {
 
         // Does the parent section have a custom breakpoint set ?
         $parent_section = sek_get_parent_level_model( $column['id'] );
+        if ( 'no_match' === $parent_section ) {
+            sek_error_log( __FUNCTION__ . ' => $parent_section not found for column id : ' . $column['id'] );
+            return $rules;
+        }
         $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_section ) );
         $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
 
