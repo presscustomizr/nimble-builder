@@ -13,8 +13,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return promise()
             generateUI : function( params ) {
                   var self = this,
-                      dfd = $.Deferred(),
-                      _do_register_;
+                      dfd = $.Deferred();
 
                   if ( _.isEmpty( params.action ) ) {
                         dfd.reject( 'generateUI => missing action' );
@@ -230,11 +229,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     options_type : params.options_type,// mandatory : 'layout', 'spacing', 'bg_border', 'height', ...
 
                                     settingParams : params.settingParams
-                              }).done( function( ) {
+                              }).done( function( promiseParams ) {
                                     // STYLESHEET => default action when modifying the level options
                                     if ( true === refresh_stylesheet ) {
                                           api.previewer.send( 'sek-refresh-stylesheet', {
-                                                skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                 apiParams : {
                                                       action : 'sek-refresh-stylesheet',
                                                       id : params.uiParams.id,
@@ -246,6 +246,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // MARKUP
                                     if ( true === refresh_markup ) {
                                           api.previewer.send( 'sek-refresh-level', {
+                                                location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                 apiParams : {
                                                       action : 'sek-refresh-level',
                                                       id : params.uiParams.id,
@@ -272,11 +274,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', newFontFamily );
                               return;
                         }
+
                         // add it only if gfont
                         if ( newFontFamily.indexOf('gfont') > -1 ) {
                               self.updateAPISetting({
                                     action : 'sek-update-fonts',
-                                    font_family : newFontFamily
+                                    font_family : newFontFamily,
+                                    is_global_location : self.isGlobalLocation( params.uiParams )
                               })
                               // we use always() instead of done here, because the api section setting might not be changed ( and therefore return a reject() promise ).
                               // => this can occur when a user is setting a google font already picked elsewhere
@@ -288,7 +292,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // Because the first refresh was done before actually setting the new font family, so based on a previous set of fonts
                                           // which leads to have potentially an additional google fonts that we don't need after the first refresh
                                           // that's why this second refresh is required. It wont trigger any preview ajax actions. Simply refresh the root fonts property of the main api setting.
-                                          self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                          self.updateAPISetting({
+                                                action : 'sek-update-fonts',
+                                                is_global_location : self.isGlobalLocation( params.uiParams )
+                                          });
                                     });
                               });
                         } else {

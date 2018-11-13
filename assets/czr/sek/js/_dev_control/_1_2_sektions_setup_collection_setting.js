@@ -13,8 +13,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // maybe register the sektion_collection settings
                   var _settingsToRegister_ = {
-                        'local' : { collectionSettingId : self.localSectionsSettingId() },
-                        'global' : { collectionSettingId : sektionsLocalizedData.settingIdForGlobalSections }
+                        'local' : { collectionSettingId : self.localSectionsSettingId() },//<= "nimble___[skp__post_page_10]"
+                        'global' : { collectionSettingId : self.getGlobalSectionsSettingId() }//<= "nimble___[skp__global]"
                   };
 
                   _.each( _settingsToRegister_, function( settingData, localOrGlobal ) {

@@ -7,7 +7,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // AND
             // always send back a confirmation to the preview, so we can fire the ajax actions
             // the message sent back is used in particular to
-            // - always pass the skope_id, which otherwise would be impossible to get in ajax
+            // - always pass the location_skope_id, which otherwise would be impossible to get in ajax
             // - in a duplication case, to pass the the newly generated id of the cloned level
             reactToPreviewMsg : function() {
                   var self = this,
@@ -99,15 +99,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         });
                                         // always update the root fonts property after a module addition
                                         // because there might be a google font specified in the starting value
-                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                        self.updateAPISetting({
+                                              action : 'sek-update-fonts',
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
+                                        });
 
                                         // Refresh the stylesheet to generate the css rules of the clone
                                         // api.previewer.send( 'sek-refresh-stylesheet', {
-                                        //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        //       location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         // });
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               id : params.apiParams.in_column,
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
+                                              location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
                                   }
                             },
@@ -156,7 +159,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         api.previewer.trigger( 'sek-pick-content', {});
                                         // always update the root fonts property after a removal
                                         // because the removed level(s) might had registered fonts
-                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                        self.updateAPISetting({
+                                              action : 'sek-update-fonts',
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
+                                        });
 
                                         // When the last section of a location gets removed, make sure we refresh the location level, to print the sek-empty-location-placeholder
                                         if ( 'sek-remove-section' === params.apiParams.action ) {
@@ -322,11 +328,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         }
                                         // Refresh the stylesheet to generate the css rules of the clone
                                         // api.previewer.send( 'sek-refresh-stylesheet', {
-                                        //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        //       location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         // });
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               id : idForStyleSheetRefresh,
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
+                                              location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
 
                                   }
@@ -383,15 +389,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                         // Always update the root fonts property after a module addition
                                         // => because there might be a google font specified in the starting value or in a preset section
-                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                        self.updateAPISetting({
+                                              action : 'sek-update-fonts',
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
+                                        });
 
                                         // Refresh the stylesheet to generate the css rules of the clone
                                         // api.previewer.send( 'sek-refresh-stylesheet', {
-                                        //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        //       location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         // });
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               //id : params.apiParams.location,
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
+                                              location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
 
                                         // Refresh when a section is created ( not duplicated )
@@ -418,7 +427,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         // _.delay( function() {
                                         //       // Refresh the stylesheet to generate the css rules of the module
                                         //       api.previewer.send( 'sek-refresh-stylesheet', {
-                                        //             skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        //             location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         //       });
                                         // }, 1000 );
                                   }
@@ -446,16 +455,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   complete : function( params ) {
                                         // Refresh the stylesheet to generate the css rules of the clone
                                         // api.previewer.send( 'sek-refresh-stylesheet', {
-                                        //       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                        //       location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         // });
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               id : params.apiParams.in_sektion,
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
+                                              location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
 
                                         // Always update the root fonts property after a module addition
                                         // => because there might be a google font specified in the starting value or in a preset section
-                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                        self.updateAPISetting({
+                                              action : 'sek-update-fonts',
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
+                                        });
 
                                         api.previewer.trigger( 'sek-refresh-level', {
                                               level : 'section',
@@ -541,11 +553,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     api.notifications.remove( 'sek-notify' );
                                               }, params.duration || 5000 );
                                         });
-                                        this.resolve();
+                                        // always pass the local or global skope of the currently customized location id when resolving the promise.
+                                        // It will be send to the preview and used when ajaxing
+                                        this.resolve({
+                                              is_global_location : self.isGlobalLocation( params )
+                                        });
                                   });
                             },
 
                             'sek-refresh-level' : function( params ) {
+                                  //console.log('PARAMS IN SEK REFRESH LEVEL', params );
                                   sendToPreview = true;
                                   return $.Deferred(function(_dfd_) {
                                         apiParams = {
@@ -554,7 +571,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               id : params.id
                                         };
                                         uiParams = {};
-                                        _dfd_.resolve();
+                                        // always pass the local or global skope of the currently customized location id when resolving the promise.
+                                        // It will be send to the preview and used when ajaxing
+                                        _dfd_.resolve({
+                                              is_global_location : self.isGlobalLocation( params )
+                                        });
                                   });
                             },
 
@@ -564,7 +585,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return $.Deferred(function(_dfd_) {
                                         apiParams = {id : params.id};
                                         uiParams = {};
-                                        _dfd_.resolve();
+                                        // always pass the local or global skope of the currently customized location id when resolving the promise.
+                                        // It will be send to the preview and used when ajaxing
+                                        _dfd_.resolve({
+                                              is_global_location : self.isGlobalLocation( params )
+                                        });
                                   });
                             },
 
@@ -578,7 +603,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               // id : params.id
                                         };
                                         uiParams = {};
-                                        _dfd_.resolve();
+                                        // always pass the local or global skope of the currently customized location id when resolving the promise.
+                                        // It will be send to the preview and used when ajaxing
+                                        _dfd_.resolve({
+                                              is_global_location : self.isGlobalLocation( params )
+                                        });
                                   });
                             }
                       };//msgCollection
@@ -600,16 +629,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               try { _cb_( params )
                                     // the cloneId is passed when resolving the ::updateAPISetting() promise()
                                     // they are needed on level duplication to get the newly generated level id.
-                                    .done( function( cloneId ) {
+                                    .done( function( promiseParams ) {
+                                          promiseParams = promiseParams || {};
                                           // Send to the preview
                                           if ( sendToPreview ) {
                                                 api.previewer.send(
                                                       msgId,
                                                       {
-                                                            skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                            location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                            local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
                                                             apiParams : apiParams,
                                                             uiParams : uiParams,
-                                                            cloneId : ! _.isEmpty( cloneId ) ? cloneId : false
+                                                            cloneId : ! _.isEmpty( promiseParams.cloneId ) ? promiseParams.cloneId : false
                                                       }
                                                 );
                                           } else {

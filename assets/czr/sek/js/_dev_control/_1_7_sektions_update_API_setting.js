@@ -9,11 +9,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //    in_column
             // }
             updateAPISetting : function( params ) {
+
                   var self = this,
                       __updateAPISettingDeferred__ = $.Deferred();
 
+                  // Are we in global location ?
+                  // Add the global information to the params
+                  // => is used to determine the skope id when resolving the promise in reactToPreviewMsg
+                  params = params || {};
+                  params.is_global_location = self.isGlobalLocation( params );
+
+                  var _collectionSettingId_ = params.is_global_location ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
+
                   // Update the sektion collection
-                  api( self.localSectionsSettingId(), function( sektionSetInstance ) {
+                  api( _collectionSettingId_, function( sektionSetInstance ) {
                         // sektionSetInstance() = {
                         //    collection : [
                         //       'loop_start' :  { level : location,  collection : [ 'sek124' : { collection : [], level : section, options : {} }], options : {}},
@@ -24,7 +33,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //
                         // }
                         var currentSetValue = sektionSetInstance(),
-                            newSetValue = _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.getDefaultSektionSettingValue( 'local' ),
+                            newSetValue = _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
                             locationCandidate,
                             sektionCandidate,
                             columnCandidate,
@@ -39,7 +48,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             parentSektionCandidate;
 
                         // make sure we have a collection array to populate
-                        newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.getDefaultSektionSettingValue( 'local' ).collection;
+                        newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ).collection;
 
                         switch( params.action ) {
                               //-------------------------------------------------------------------------------------------------
@@ -994,9 +1003,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //       font_family : newFontFamily,
                               // }
                               case 'sek-update-fonts' :
-                                    // api.infoLog('PARAMS in sek-add-fonts', params );
                                     // Get the gfonts from the level options and modules values
-                                    var currentGfonts = self.sniffGFonts();
+                                    var currentGfonts = self.sniffGFonts( { is_global_location : params && true === params.is_global_location } );
                                     if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
                                           if ( params.font_family.indexOf('gfont') < 0 ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
@@ -1022,11 +1030,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else {
                                           if ( null !== self.validateSettingValue( newSetValue ) ) {
                                                 sektionSetInstance( newSetValue, params );
-                                                __updateAPISettingDeferred__.resolve( cloneId );// the cloneId is only needed in the duplication scenarii
+                                                // Add the cloneId to the params when we resolve
+                                                // the cloneId is only needed in the duplication scenarii
+                                                params.cloneId = cloneId;
+                                                __updateAPISettingDeferred__.resolve( params );
                                           } else {
                                                 __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value did not pass the validation checks for action ' + params.action );
                                           }
-                                          //api.infoLog('COLLECTION SETTING UPDATED => ', self.localSectionsSettingId(), api( self.localSectionsSettingId() )() );
+                                          //api.infoLog('COLLECTION SETTING UPDATED => ', _collectionSettingId_, api( _collectionSettingId_ )() );
                                     }
                               };//mayBeUpdateSektionsSetting()
 
@@ -1042,7 +1053,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                               }
                         }
-                  });//api( self.localSectionsSettingId(), function( sektionSetInstance ) {}
+                  });//api( _collectionSettingId_, function( sektionSetInstance ) {}
                   return __updateAPISettingDeferred__.promise();
             },//updateAPISetting
 

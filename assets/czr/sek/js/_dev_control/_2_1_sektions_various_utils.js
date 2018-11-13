@@ -27,56 +27,136 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return s4() + s4() + s4();//s4() + s4() + s4() + s4() + s4() + s4();
             },
 
+            //@return a string "nimble___[skp__global]"
+            getGlobalSectionsSettingId : function() {
+                  return sektionsLocalizedData.settingIdForGlobalSections;
+            },
+
             // @params = { id : '', level : '' }
             // Recursively walk the level tree until a match is found
             // @return the level model object
             getLevelModel : function( id, collection ) {
-                  var self = this, _data_ = 'no_match';
-                  // do we have a collection ?
-                  // if not, let's use the root one
-                  if ( _.isUndefined( collection ) ) {
-                        var currentSektionSettingValue = api( self.localSectionsSettingId() )();
-                        var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.getDefaultSektionSettingValue( 'local' );
-                        collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
-                  }
-                  _.each( collection, function( levelData ) {
-                        // did we have a match recursively ?
-                        if ( 'no_match' != _data_ )
-                          return;
-                        if ( id === levelData.id ) {
-                              _data_ = levelData;
-                        } else {
-                              if ( _.isArray( levelData.collection ) ) {
-                                    _data_ = self.getLevelModel( id, levelData.collection );
-                              }
+                  var self = this, _data_ = 'no_match',
+                      _walk_ = function( id, collectionSettingId, localOrGlobal, collection ) {
+                            // do we have a collection ?
+                            // if not, let's use the root one
+                            if ( _.isUndefined( collection ) ) {
+                                  var currentSektionSettingValue = api( collectionSettingId )();
+                                  var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
+                                  collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
+                            }
+                            _.each( collection, function( levelData ) {
+                                  // did we found a match recursively ?
+                                  if ( 'no_match' != _data_ )
+                                    return;
+                                  if ( id === levelData.id ) {
+                                        _data_ = levelData;
+                                  } else {
+                                        if ( _.isArray( levelData.collection ) ) {
+                                              _data_ = _walk_( id, collectionSettingId, localOrGlobal, levelData.collection );
+                                        }
+                                  }
+                            });
+                            return _data_;
+                      };
+                  _.each( {
+                        local : self.localSectionsSettingId(),
+                        global : self.getGlobalSectionsSettingId()
+                  }, function( collectionSettingId, localOrGlobal ) {
+                        if ( 'no_match' === _data_ ) {
+                              _walk_( id, collectionSettingId, localOrGlobal, collection );
                         }
                   });
                   return _data_;
             },
 
-            getLevelPositionInCollection : function( id, collection ) {
-                  var self = this, _position_ = 'no_match';
-                  // do we have a collection ?
-                  // if not, let's use the root one
-                  if ( _.isUndefined( collection ) ) {
-                        var currentSektionSettingValue = api( self.localSectionsSettingId() )();
-                        var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.getDefaultSektionSettingValue( 'local' );
-                        collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
+
+            // used in react to preview or update api settings
+            // @params is an object {
+            //
+            // }
+            isGlobalLocation : function( params ) {
+                  var self = this, is_global_location = false;
+                  params = params || {};
+                  if ( _.has( params, 'is_global_location' ) ) {
+                        is_global_location = params.is_global_location;
+                  } else if ( !_.isEmpty( params.location ) ) {
+                        is_global_location = self.isChildOfAGlobalLocation( params.location );
+                  } else if ( !_.isEmpty( params.in_sektion ) ) {
+                        is_global_location = self.isChildOfAGlobalLocation( params.in_sektion );
+                  } else if ( !_.isEmpty( params.id ) ) {
+                        is_global_location = self.isChildOfAGlobalLocation( params.id );
                   }
-                  _.each( collection, function( levelData, _key_ ) {
-                        // did we have a match recursively ?
-                        if ( 'no_match' != _position_ )
-                          return;
-                        if ( id === levelData.id ) {
-                              _position_ = _key_;
-                        } else {
-                              if ( _.isArray( levelData.collection ) ) {
-                                    _position_ = self.getLevelPositionInCollection( id, levelData.collection );
+                  return is_global_location;
+            },
+
+            // @params = { id : '', level : '' }
+            // Recursively walk the level tree until a match is found
+            // @return the level model object
+            isChildOfAGlobalLocation : function( id ) {
+                  var self = this,
+                      walkCollection = function( id, collection ) {
+                            var _data_ = 'no_match';
+                            // do we have a collection ?
+                            // if not, let's use the root global one
+                            if ( _.isUndefined( collection ) ) {
+                                  var currentSettingValue = api( self.getGlobalSectionsSettingId() )();
+                                  var sektionSettingValue = _.isObject( currentSettingValue ) ? $.extend( true, {}, currentSettingValue ) : self.getDefaultSektionSettingValue( 'global' );
+                                  collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
+                            }
+                            _.each( collection, function( levelData ) {
+                                  // did we found a match recursively ?
+                                  if ( 'no_match' != _data_ )
+                                    return;
+                                  if ( id === levelData.id ) {
+                                        _data_ = levelData;
+                                  } else {
+                                        if ( _.isArray( levelData.collection ) ) {
+                                              _data_ = walkCollection( id, levelData.collection );
+                                        }
+                                  }
+                            });
+                            return _data_;
+                      };
+                  return walkCollection( id ) !== 'no_match';
+            },
+
+
+            getLevelPositionInCollection : function( id, collection ) {
+                  var self = this, _position_ = 'no_match',
+                  _walk_ = function( id, collectionSettingId, localOrGlobal, collection ) {
+                        // do we have a collection ?
+                        // if not, let's use the root one
+                        if ( _.isUndefined( collection ) ) {
+                              var currentSektionSettingValue = api( collectionSettingId )();
+                              var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
+                              collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
+                        }
+                        _.each( collection, function( levelData, _key_ ) {
+                              // did we find a match recursively ?
+                              if ( 'no_match' != _position_ )
+                                return;
+                              if ( id === levelData.id ) {
+                                    _position_ = _key_;
+                              } else {
+                                    if ( _.isArray( levelData.collection ) ) {
+                                          _position_ = _walk_( id, collectionSettingId, localOrGlobal, levelData.collection );
+                                    }
                               }
+                        });
+                  };
+
+                  _.each( {
+                        local : self.localSectionsSettingId(),
+                        global : self.getGlobalSectionsSettingId()
+                  }, function( collectionSettingId, localOrGlobal ) {
+                        if ( 'no_match' === _position_ ) {
+                              _walk_( id, collectionSettingId, localOrGlobal, collection );
                         }
                   });
                   return _position_;
             },
+
 
             // @params = { property : 'options', id :  }
             // @return mixed type
@@ -203,39 +283,40 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 1) be the value of a '{...}_css' input id
             // 2) this input must be a font modifier ( @see 'refresh_fonts' params set on parent module registration )
             // 2) the font should start with [gfont]
+            // @param args { is_global_location : bool }
             // @return array
-            sniffGFonts : function( gfonts, level ) {
-                  var self = this;
-                  gfonts = gfonts || [];
-
-                  if ( _.isUndefined( level ) ) {
-                        var currentSektionSettingValue = api( self.localSectionsSettingId() )();
-                        level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.getDefaultSektionSettingValue( 'local' );
-                  }
-                  _.each( level, function( levelData, _key_ ) {
-                        // example of input_id candidate 'font_family_css'
-                        if ( _.isString( _key_ ) && '_css' === _key_.substr( _key_.length - 4 ) ) {
-                              if ( true === self.inputIsAFontFamilyModifier( _key_ ) ) {
-                                    if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
-                                          gfonts.push( levelData );
+            sniffGFonts : function( args ) {
+                  args = args || { is_global_location : false };
+                  var self = this,
+                  gfonts = [],
+                  _snifff_ = function( collectionSettingId, localOrGlobal, level ) {
+                        if ( _.isUndefined( level ) ) {
+                              var currentSektionSettingValue = api( collectionSettingId )();
+                              level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
+                        }
+                        _.each( level, function( levelData, _key_ ) {
+                              // example of input_id candidate 'font_family_css'
+                              if ( _.isString( _key_ ) && '_css' === _key_.substr( _key_.length - 4 ) ) {
+                                    if ( true === self.inputIsAFontFamilyModifier( _key_ ) ) {
+                                          if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
+                                                gfonts.push( levelData );
+                                          }
                                     }
                               }
-                        }
 
-                        if ( _.isArray( levelData ) || _.isObject( levelData ) ) {
-                              self.sniffGFonts( gfonts, levelData );
-                        }
-                  });
+                              if ( _.isArray( levelData ) || _.isObject( levelData ) ) {
+                                    _snifff_( collectionSettingId, localOrGlobal, levelData );
+                              }
+                        });
+                  };
+                  if ( args.is_global_location ) {
+                        _snifff_( self.getGlobalSectionsSettingId(), 'global' );
+                  } else {
+                        _snifff_( self.localSectionsSettingId(), 'local' );
+                  }
+
                   return gfonts;
             },
-
-
-
-
-
-
-
-
 
 
 
