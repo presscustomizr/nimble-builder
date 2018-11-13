@@ -25,7 +25,14 @@ function render_test_logs( $query = null ) {
       <br/>
 
       <div>
-        <h2>SEKTIONS</h2>
+        <h2>GLOBAL SEKTIONS</h2>
+        <pre style="font-size: 0.6em;overflow:visible;">
+          <?php print_r( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID )  ); ?>
+        </pre>
+      </div>
+
+      <div>
+        <h2>LOCAL SEKTIONS</h2>
         <pre style="font-size: 0.6em;overflow:visible;">
           <?php print_r( sek_get_skoped_seks( $skope_id )  ); ?>
         </pre>
