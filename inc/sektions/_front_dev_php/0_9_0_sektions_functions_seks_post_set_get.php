@@ -106,14 +106,24 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
     if ( empty( $skope_id ) ) {
         $skope_id = skp_get_skope_id( $skope_level );
     }
-    // use the cached value when available ( after did_action('wp') )
-    if ( did_action('wp') && 'not_cached' != SEK_Fire()->local_seks ) {
-        $seks_data = SEK_Fire()->local_seks;
-    } else {
+    $is_global_skope = NIMBLE_GLOBAL_SKOPE_ID === $skope_id;
+    $is_cached = false;
 
+    // use the cached value when available ( after did_action('wp') )
+    if ( did_action('wp') ) {
+        if ( !$is_global_skope && 'not_cached' != SEK_Fire()->local_seks ) {
+            $is_cached = true;
+            $seks_data = SEK_Fire()->local_seks;
+        }
+        if ( $is_global_skope && 'not_cached' != SEK_Fire()->global_seks ) {
+            $is_cached = true;
+            $seks_data = SEK_Fire()->global_seks;
+        }
+    }
+
+    if ( ! $is_cached ) {
         $seks_data = array();
         $post = sek_get_seks_post( $skope_id );
-        // sek_error_log( 'sek_get_skoped_seks() => $post', $post);
         if ( $post ) {
             $seks_data = maybe_unserialize( $post->post_content );
         }
@@ -121,7 +131,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
 
         // normalizes
         // [ 'collection' => [], 'local_options' => [] ];
-        $default_collection = sek_get_default_sektions_value();
+        $default_collection = sek_get_default_location_model( $skope_id );
         $seks_data = wp_parse_args( $seks_data, $default_collection );
 
         // Maybe add missing registered locations
@@ -138,7 +148,12 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             }
         }
         // cache now
-        SEK_Fire()->local_seks = $seks_data;
+        if ( $is_global_skope ) {
+            SEK_Fire()->global_seks = $seks_data;
+        } else {
+            SEK_Fire()->local_seks = $seks_data;
+        }
+
     }//end if
 
     // when customizing, let us filter the value with the 'customized' ones
