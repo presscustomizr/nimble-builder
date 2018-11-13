@@ -231,7 +231,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     $user_form_composition[$field_id] = $field_data;
                     // always use the posted skope_id
                     // => in a scenario in which we post the form several times, the skp_get_skope_id() won't be available after the first submit action
-                    $user_form_composition[$field_id]['value'] = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : skp_get_skope_id();
+                    $user_form_composition[$field_id]['value'] = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : sek_get_level_skope_id( $module_model['id'] );
                 break;
                 case 'nimble_level_id':
                     $user_form_composition[$field_id] = $field_data;
