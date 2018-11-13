@@ -67,8 +67,11 @@ function sek_enqueue_controls_js_css() {
 
                 'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// '__nimble_options__'
 
-                'defaultLocalSektionSettingValue' => sek_get_default_sektions_value(),
-                'defaultGlobalSektionSettingValue' => sek_get_default_sektions_value( NIMBLE_GLOBAL_LOCATIONS_OPTION_SUFFIX ),
+                'defaultLocalSektionSettingValue' => sek_get_default_location_model(),
+                'defaultGlobalSektionSettingValue' => sek_get_default_location_model( NIMBLE_GLOBAL_SKOPE_ID ),
+
+                'settingIdForGlobalSections' => sek_get_seks_setting_id( NIMBLE_GLOBAL_SKOPE_ID ),
+                'globalSkopeId' => NIMBLE_GLOBAL_SKOPE_ID,
 
                 'userSavedSektions' => get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS),
 
@@ -487,11 +490,15 @@ function nimble_add_i18n_localized_control_params( $params ) {
 add_filter( 'skp_json_export_ready_skopes', '\Nimble\add_sektion_values_to_skope_export' );
 function add_sektion_values_to_skope_export( $skopes ) {
     if ( ! is_array( $skopes ) ) {
-        error_log( 'skp_json_export_ready_skopes filter => the filtered skopes must be an array.' );
+        sek_error_log( __FUNCTION__ . ' error => skp_json_export_ready_skopes filter => the filtered skopes must be an array.' );
     }
     $new_skopes = array();
     foreach ( $skopes as $skp_data ) {
-        if ( 'global' == $skp_data['skope'] || 'group' == $skp_data['skope'] ) {
+        if ( ! is_array( $skp_data ) || empty( $skp_data['skope'] ) ) {
+            sek_error_log( __FUNCTION__ . ' error => missing skope informations' );
+            continue;
+        }
+        if ( 'group' == $skp_data['skope'] ) {
             $new_skopes[] = $skp_data;
             continue;
         }
@@ -499,10 +506,10 @@ function add_sektion_values_to_skope_export( $skopes ) {
             error_log( 'skp_json_export_ready_skopes filter => the skope data must be an array.' );
             continue;
         }
-        $skope_id = skp_get_skope_id( $skp_data['skope'] );
+        $skope_id = 'global' === $skp_data['skope'] ? NIMBLE_GLOBAL_SKOPE_ID : skp_get_skope_id( $skp_data['skope'] );
         $skp_data[ 'sektions' ] = array(
             'db_values' => sek_get_skoped_seks( $skope_id ),
-            'setting_id' => sek_get_seks_setting_id( $skope_id )//nimble___loop_start[skp__post_page_home]
+            'setting_id' => sek_get_seks_setting_id( $skope_id )//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
         );
         // foreach( [
         //     'loop_start',
