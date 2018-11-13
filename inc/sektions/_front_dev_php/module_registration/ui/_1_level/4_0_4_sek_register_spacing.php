@@ -57,6 +57,10 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
         $total_horizontal_margin = (int)$margin_left + (int)$margin_right;
 
         $parent_section = sek_get_parent_level_model( $level['id'] );
+        if ( 'no_match' === $parent_section ) {
+            sek_error_log( __FUNCTION__ . ' => $parent_section not found for level id : ' . $level['id'] );
+            return $rules;
+        }
 
         if ( $total_horizontal_margin > 0 && is_array( $parent_section ) && !empty( $parent_section ) ) {
             $total_horizontal_margin_with_unit = $total_horizontal_margin . $device_unit;//20px
