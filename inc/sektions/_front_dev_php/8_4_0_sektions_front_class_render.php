@@ -154,7 +154,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             $locationSettingValue = array();
             if ( empty( $location_data ) ) {
-                $skope_id = sek_is_global_location( $location )  ? NIMBLE_GLOBAL_LOCATIONS_OPTION_SUFFIX : skp_build_skope_id();
+                $skope_id = sek_is_global_location( $location )  ? NIMBLE_GLOBAL_SKOPE_ID : skp_build_skope_id();
                 $locationSettingValue = sek_get_skoped_seks( $skope_id, $location );
             } else {
                 $locationSettingValue = $location_data;
