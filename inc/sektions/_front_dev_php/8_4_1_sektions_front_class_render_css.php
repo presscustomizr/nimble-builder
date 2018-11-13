@@ -30,6 +30,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 }
             }
 
+            // LOCAL SECTIONS STYLESHEET
             new Sek_Dyn_CSS_Handler( array(
                 'id'             => $skope_id,
                 'skope_id'       => $skope_id,
@@ -38,8 +39,21 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 'force_write'    => true, //<- write if the file doesn't exist
                 'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
                 'hook'           => ( ! defined( 'DOING_AJAX' ) && is_customize_preview() ) ? 'wp_head' : ''
-            ) );
+            ));
 
+            // sek_has_global_sections always returns true when customizing
+            if ( sek_has_global_sections() ) {
+                // GLOBAL SECTIONS STYLESHEET
+                new Sek_Dyn_CSS_Handler( array(
+                    'id'             => NIMBLE_GLOBAL_SKOPE_ID,
+                    'skope_id'       => NIMBLE_GLOBAL_SKOPE_ID,
+                    'mode'           => is_customize_preview() ? Sek_Dyn_CSS_Handler::MODE_INLINE : Sek_Dyn_CSS_Handler::MODE_FILE,
+                    //these are taken in account only when 'mode' is 'file'
+                    'force_write'    => true, //<- write if the file doesn't exist
+                    'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
+                    'hook'           => ( ! defined( 'DOING_AJAX' ) && is_customize_preview() ) ? 'wp_head' : ''
+                ));
+            }
 
         }//print_or_enqueue_seks_style
     }//class
