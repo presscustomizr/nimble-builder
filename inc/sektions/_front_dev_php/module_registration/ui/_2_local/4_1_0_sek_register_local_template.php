@@ -14,6 +14,7 @@ function sek_get_module_params_for_sek_local_template() {
                     'input_type'  => 'select',
                     'title'       => __('Select a template', 'text_domain_to_be_replaced'),
                     'default'     => 'default',
+                    'width-100'   => true,
                     'choices'     => sek_get_select_options_for_input_id( 'local_template' ),
                     'refresh_preview' => true
                 )
