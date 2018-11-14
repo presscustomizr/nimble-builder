@@ -23,8 +23,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             // SETUP OUR the_content FILTER for the Tiny MCE module
             $this -> sek_setup_tiny_mce_content_filters();
+
+            // REGISTER HEADER AND FOOTER GLOBAL LOCATIONS
+            add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
         }
 
+        // Fired in the constructor
+        function sek_register_nimble_global_locations() {
+            register_location('nimble_global_header', array( 'is_global_location' => true, 'is_nimble_header' => true ) );
+            register_location('nimble_global_footer', array( 'is_global_location' => true, 'is_nimble_footer' => true ) );
+        }
 
         // When using the default theme template, let's schedule the default hooks rendering
         // When using the Nimble template, this is done with render_content_sections_for_nimble_template();
