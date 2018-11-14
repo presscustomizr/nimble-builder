@@ -44,4 +44,3 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 </body>
 </html>
-get_footer();
