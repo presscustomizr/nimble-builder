@@ -40,4 +40,4 @@ function render_test_logs( $query = null ) {
     <?php
 }
 add_action('loop_end', '\Nimble\render_test_logs', 50 );
-add_action('nimble_after_content_sections', '\Nimble\render_test_logs', 50 );//@see tmpl/page-templates/nimble_template.php
+add_action('sek_after_location_loop_end', '\Nimble\render_test_logs', 50 );//@see tmpl/page-templates/nimble_template.php
