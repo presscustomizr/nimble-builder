@@ -28,8 +28,10 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         ];
 
         public static function get_instance( $params ) {
-            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Sek_Simple_Form ) )
-              self::$instance = new Sek_Simple_Form( $params );
+            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Sek_Simple_Form ) ) {
+                self::$instance = new Sek_Simple_Form( $params );
+                do_action( 'nimble_front_classes_ready', self::$instance );
+            }
             return self::$instance;
         }
         public $img_smartload_enabled = 'not_cached';
