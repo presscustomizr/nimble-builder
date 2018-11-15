@@ -19,6 +19,14 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         ];
         public $registered_locations = [];
         public $all_nimble_locations = [];// will be cached @wp_head. See SEK_Front_Render::_schedule_front_rendering()
+        // the model used to register a location
+        public $default_registered_location_model = [
+          'priority' => 10,
+          'is_global_location' => false,
+          'is_header_location' => false,
+          'is_footer_location' => false
+        ];
+        // the model used when saving a location in db
         public $default_location_model = [
             'id' => '',
             'level' => 'location',
