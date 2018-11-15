@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <?php render_nimble_locations( 'nimble_global_header' ); ?>
   </header><!-- #masthead -->
 
-  <div id="content" class="site-content">
+  <div id="nimble-content" class="">
     <?php
       render_nimble_locations(
           array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
