@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$model = SEK_Fire() -> model;
+$model = Nimble_Manager() -> model;
 $module_type = $model['module_type'];
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $content_settings = $value['content'];

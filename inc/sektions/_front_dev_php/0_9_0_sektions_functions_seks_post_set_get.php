@@ -111,13 +111,13 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
 
     // use the cached value when available ( after did_action('wp') )
     if ( did_action('wp') ) {
-        if ( !$is_global_skope && 'not_cached' != SEK_Fire()->local_seks ) {
+        if ( !$is_global_skope && 'not_cached' != Nimble_Manager()->local_seks ) {
             $is_cached = true;
-            $seks_data = SEK_Fire()->local_seks;
+            $seks_data = Nimble_Manager()->local_seks;
         }
-        if ( $is_global_skope && 'not_cached' != SEK_Fire()->global_seks ) {
+        if ( $is_global_skope && 'not_cached' != Nimble_Manager()->global_seks ) {
             $is_cached = true;
-            $seks_data = SEK_Fire()->global_seks;
+            $seks_data = Nimble_Manager()->global_seks;
         }
     }
 
@@ -142,16 +142,16 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             }
         }
 
-        foreach( SEK_Fire()->registered_locations as $loc_id => $params ) {
+        foreach( Nimble_Manager()->registered_locations as $loc_id => $params ) {
             if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
-                $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], SEK_Fire()->default_location_model );
+                $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], Nimble_Manager()->default_location_model );
             }
         }
         // cache now
         if ( $is_global_skope ) {
-            SEK_Fire()->global_seks = $seks_data;
+            Nimble_Manager()->global_seks = $seks_data;
         } else {
-            SEK_Fire()->local_seks = $seks_data;
+            Nimble_Manager()->local_seks = $seks_data;
         }
 
     }//end if
@@ -174,7 +174,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         }
     }
 
-    return 'no_match' === $seks_data ? SEK_Fire()->default_location_model : $seks_data;
+    return 'no_match' === $seks_data ? Nimble_Manager()->default_location_model : $seks_data;
 }
 
 

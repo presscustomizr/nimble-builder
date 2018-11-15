@@ -1,7 +1,7 @@
 <?php
-function SEK_Fire( $params = array() ) {
+function Nimble_Manager( $params = array() ) {
     return Sek_Simple_Form::get_instance( $params );
 }
 
-SEK_Fire();
+Nimble_Manager();
 ?>

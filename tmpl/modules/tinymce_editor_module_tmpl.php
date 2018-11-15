@@ -3,7 +3,7 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-$model = SEK_Fire() -> model;
+$model = Nimble_Manager() -> model;
 $module_type = $model['module_type'];
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $value = $value['main_settings'];
@@ -14,7 +14,7 @@ $value = $value['main_settings'];
 if ( ! function_exists( 'Nimble\sek_print_tiny_mce_text_content') ) {
     function sek_print_tiny_mce_text_content( $tiny_mce_content, $input_id, $value ) {
         if ( empty( $tiny_mce_content ) ) {
-            echo SEK_Fire()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
+            echo Nimble_Manager()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
         } else {
             if ( false === sek_booleanize_checkbox_val( $value['autop'] ) ) {
                 remove_filter( 'the_content', 'wpautop');

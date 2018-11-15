@@ -26,21 +26,21 @@ if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) {
 /* ------------------------------------------------------------------------- */
 // @return array
 function sek_get_locations() {
-    if ( ! is_array( SEK_Fire()->registered_locations ) ) {
+    if ( ! is_array( Nimble_Manager()->registered_locations ) ) {
         sek_error_log( __FUNCTION__ . ' error => the registered locations must be an array');
-        return SEK_Fire()->default_locations;
+        return Nimble_Manager()->default_locations;
     }
-    return apply_filters( 'sek_locations', array_merge( SEK_Fire()->default_locations, SEK_Fire()->registered_locations ) );
+    return apply_filters( 'sek_locations', array_merge( Nimble_Manager()->default_locations, Nimble_Manager()->registered_locations ) );
 }
 
 // @return bool
 function sek_is_global_location( $location_id ) {
-    if ( empty( SEK_Fire()->all_nimble_locations ) ) {
-        SEK_Fire()->all_nimble_locations = sek_get_locations();
+    if ( empty( Nimble_Manager()->all_nimble_locations ) ) {
+        Nimble_Manager()->all_nimble_locations = sek_get_locations();
     }
-    if ( ! isset( SEK_Fire()->all_nimble_locations[$location_id] ) || ! is_array( SEK_Fire()->all_nimble_locations[$location_id] ) )
+    if ( ! isset( Nimble_Manager()->all_nimble_locations[$location_id] ) || ! is_array( Nimble_Manager()->all_nimble_locations[$location_id] ) )
       return false;
-    $location_params = SEK_Fire()->all_nimble_locations[$location_id];
+    $location_params = Nimble_Manager()->all_nimble_locations[$location_id];
     return ! empty( $location_params['is_global_location'] ) && true === $location_params['is_global_location'];
 }
 
@@ -54,12 +54,12 @@ function register_location( $location_id, $params = array() ) {
         'is_nimble_header' => false,
         'is_nimble_footer' => false
     ));
-    $registered_locations = SEK_Fire()->registered_locations;
+    $registered_locations = Nimble_Manager()->registered_locations;
     if ( is_array( $registered_locations ) ) {
         $registered_locations[$location_id] = $params;
     }
-    SEK_Fire()->registered_locations = $registered_locations;
-    //sek_error_log('SEK_Fire()->registered_locations', SEK_Fire()->registered_locations );
+    Nimble_Manager()->registered_locations = $registered_locations;
+    //sek_error_log('Nimble_Manager()->registered_locations', Nimble_Manager()->registered_locations );
 }
 
 
@@ -80,7 +80,7 @@ function sek_get_default_location_model( $skope_id = null ) {
         if ( ! $is_global_skope && $is_global_location )
           continue;
 
-        $location_model = wp_parse_args( [ 'id' => $location_id ], SEK_Fire()->default_location_model );
+        $location_model = wp_parse_args( [ 'id' => $location_id ], Nimble_Manager()->default_location_model );
         if ( $is_global_location ) {
             $location_model[ 'is_global_location' ] = true;
         }
@@ -138,12 +138,12 @@ function render_nimble_locations( $locations, $options = array() ) {
             // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
             if ( $options[ 'fallback_location' ] === $location_id || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
                 do_action( "sek_before_location_{$location_id}" );
-                SEK_Fire()->_render_seks_for_location( $location_id, $locationSettingValue );
+                Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
                 do_action( "sek_after_location_{$location_id}" );
             }
         } else {
             do_action( "sek_before_location_{$location_id}" );
-            SEK_Fire()->_render_seks_for_location( $location_id, $locationSettingValue );
+            Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
             do_action( "sek_after_location_{$location_id}" );
         }
 
@@ -394,7 +394,7 @@ function sek_get_default_module_model( $module_type = '' ) {
       return $default;
 
     // Did we already cache it ?
-    $default_models = SEK_Fire()->default_models;
+    $default_models = Nimble_Manager()->default_models;
     if ( ! empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
@@ -432,7 +432,7 @@ function sek_get_default_module_model( $module_type = '' ) {
 
         // Cache
         $default_models[ $module_type ] = $default;
-        SEK_Fire()->default_models = $default_models;
+        Nimble_Manager()->default_models = $default_models;
         //sek_error_log( __FUNCTION__ . ' => $default_models', $default_models );
     }
     return $default;
@@ -519,7 +519,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
       return $input_list;
 
     // Did we already cache it ?
-    $cached_input_lists = SEK_Fire()->cached_input_lists;
+    $cached_input_lists = Nimble_Manager()->cached_input_lists;
     if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
         $input_list = $cached_input_lists[ $module_type ];
     } else {
@@ -574,7 +574,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 
         // Cache
         $cached_input_lists[ $module_type ] = $input_list;
-        SEK_Fire()->cached_input_lists = $cached_input_lists;
+        Nimble_Manager()->cached_input_lists = $cached_input_lists;
         // sek_error_log( __FUNCTION__ . ' => $cached_input_lists', $cached_input_lists );
     }
     return $input_list;
@@ -956,8 +956,8 @@ function nimble_regex_callback( $matches ) {
 function sek_is_img_smartload_enabled() {
     if ( skp_is_customizing() )
       return false;
-    if ( 'not_cached' !== SEK_Fire()->img_smartload_enabled ) {
-        return SEK_Fire()->img_smartload_enabled;
+    if ( 'not_cached' !== Nimble_Manager()->img_smartload_enabled ) {
+        return Nimble_Manager()->img_smartload_enabled;
     }
     $is_img_smartload_enabled = false;
     // LOCAL OPTION
@@ -982,9 +982,9 @@ function sek_is_img_smartload_enabled() {
     }
 
     // CACHE THE OPTION
-    SEK_Fire()->img_smartload_enabled = $is_img_smartload_enabled;
+    Nimble_Manager()->img_smartload_enabled = $is_img_smartload_enabled;
 
-    return SEK_Fire()->img_smartload_enabled;
+    return Nimble_Manager()->img_smartload_enabled;
 }
 
 
