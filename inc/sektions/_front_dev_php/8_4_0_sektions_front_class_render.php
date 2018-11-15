@@ -30,8 +30,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // Fired in the constructor
         function sek_register_nimble_global_locations() {
-            register_location('nimble_global_header', array( 'is_global_location' => true, 'is_nimble_header' => true ) );
-            register_location('nimble_global_footer', array( 'is_global_location' => true, 'is_nimble_footer' => true ) );
+            register_location('nimble_global_header', array( 'is_global_location' => true, 'is_header_location' => true ) );
+            register_location('nimble_global_footer', array( 'is_global_location' => true, 'is_footer_location' => true ) );
         }
 
         // When using the default theme template, let's schedule the default hooks rendering
@@ -228,9 +228,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     ?>
                       <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
                             <?php
-                              printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s>',
+                              printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s>',
                                   $id,
-                                  sek_is_global_location( $id ) ? 'data-sek-is-global-location="true"' : ''
+                                  sek_is_global_location( $id ) ? 'data-sek-is-global-location="true"' : '',
+                                  true === sek_get_registered_location_property( $id, 'is_header_location' ) ? 'data-sek-is-header-location="true"' : '',
+                                  true === sek_get_registered_location_property( $id, 'is_footer_location' ) ? 'data-sek-is-footer-location="true"' : ''
                               );
                             ?>
                             <?php
