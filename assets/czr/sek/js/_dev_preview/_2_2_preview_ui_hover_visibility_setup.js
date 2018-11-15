@@ -33,7 +33,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     //$el = $('.sektion-wrapper').find('[data-sek-id="' + id + '"]');
                                     params = _.extend( params, {
                                           is_nested : true === $(this).data('sek-is-nested'),
-                                          can_have_more_columns : $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12
+                                          can_have_more_columns : $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
+                                          is_global_location : true === $levelEl.closest( 'div[data-sek-level="location"]' ).data('sek-is-global-location')
                                     });
                               break;
                               case 'column' :
@@ -186,18 +187,23 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // </script>
                   // fired on mousemove and scroll, every 50ms
                   var _printAddContentButtons = function() {
+                        var _location, _is_global_location;
                         $('body').find( 'div[data-sek-level="location"]' ).each( function() {
                               $sectionCollection = $(this).children( 'div[data-sek-level="section"]' );
                               tmpl = self.parseTemplate( '#sek-tmpl-add-content-button' );
-                              var $btn_el,
-                                  _location = $(this).data('sek-id');
+                              var $btn_el;
+                              _location = $(this).data('sek-id');
+                              _is_global_location = true === $(this).data('sek-is-global-location');
 
                               // nested sections are not included
                               $sectionCollection.each( function() {
                                     if ( $(this).find('.sek-add-content-button').length > 0 )
                                       return;
 
-                                    $.when( $(this).prepend( tmpl({ location : _location }) ) ).done( function() {
+                                    $.when( $(this).prepend( tmpl({
+                                          location : _location,
+                                          is_global_location : _is_global_location
+                                    }) ) ).done( function() {
                                           $btn_el = $(this).find('.sek-add-content-button');
                                           if ( $(this).data('sek-id') ) {
                                                 $btn_el.attr('data-sek-before-section', $(this).data('sek-id') );//Will be used to insert the section at the right place
@@ -208,7 +214,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     //if is last section, append also
                                     //console.log('IS LAST ? => ', $sectionCollection.length, $(this).index() );
                                     if ( $sectionCollection.length == $(this).index() + 1 ) {
-                                          $.when( $(this).append( tmpl({ is_last : true, location : _location }) ) ).done( function() {
+                                          $.when( $(this).append( tmpl({
+                                                is_last : true,
+                                                location : _location,
+                                                is_global_location : _is_global_location
+                                          }) ) ).done( function() {
                                                 $btn_el = $(this).find('.sek-add-content-button').last();
                                                 if ( $(this).data('sek-id') ) {
                                                       $btn_el.attr('data-sek-after-section', $(this).data('sek-id') );//Will be used to insert the section at the right place
@@ -225,7 +235,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $('.sek-empty-location-placeholder').each( function() {
                               if ( $(this).find('.sek-add-content-button').length > 0 )
                                 return;
-                              $.when( $(this).append( tmpl({ location : $(this).closest( 'div[data-sek-level="location"]' ).data('sek-id') } ) ) ).done( function() {
+
+                              _location = $(this).closest( 'div[data-sek-level="location"]' ).data('sek-id');
+                              _is_global_location = true === $(this).closest( 'div[data-sek-level="location"]' ).data('sek-is-global-location');
+
+                              $.when( $(this).append( tmpl({
+                                          location : _location,
+                                          is_global_location : _is_global_location
+                              } ) ) ).done( function() {
                                     $btn_el = $(this).find('.sek-add-content-button');
                                     $btn_el.attr('data-sek-is-first-section', true );
                                     $btn_el.fadeIn( 300 );
