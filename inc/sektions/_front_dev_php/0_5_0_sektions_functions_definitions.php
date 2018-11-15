@@ -33,27 +33,38 @@ function sek_get_locations() {
     return apply_filters( 'sek_locations', array_merge( Nimble_Manager()->default_locations, Nimble_Manager()->registered_locations ) );
 }
 
-// @return bool
-function sek_is_global_location( $location_id ) {
+// @param location_id (string)
+function sek_get_registered_location_property( $location_id, $property_name = '' ) {
+    // make sure the nimble locations are cached
     if ( empty( Nimble_Manager()->all_nimble_locations ) ) {
         Nimble_Manager()->all_nimble_locations = sek_get_locations();
     }
-    if ( ! isset( Nimble_Manager()->all_nimble_locations[$location_id] ) || ! is_array( Nimble_Manager()->all_nimble_locations[$location_id] ) )
-      return false;
-    $location_params = Nimble_Manager()->all_nimble_locations[$location_id];
-    return ! empty( $location_params['is_global_location'] ) && true === $location_params['is_global_location'];
+    $default_property_val = 'not_set';
+
+    if ( ! isset( Nimble_Manager()->all_nimble_locations[$location_id] ) || ! is_array( Nimble_Manager()->all_nimble_locations[$location_id] ) ) {
+        sek_error_log( __FUNCTION__ . ' error => the location ' . $location_id . ' is invalid or not registered.');
+        return $default_property_val;
+    }
+
+    if ( empty( $property_name ) || ! is_string( $property_name ) ) {
+        sek_error_log( __FUNCTION__ . ' error => the requested property for location ' . $location_id . ' is invalid');
+        return $default_property_val;
+    }
+
+    $location_params = wp_parse_args( Nimble_Manager()->all_nimble_locations[$location_id], Nimble_Manager()->default_registered_location_model );
+    return ! empty( $location_params[$property_name] ) ? $location_params[$property_name] : $default_property_val;
 }
 
+// @return bool
+function sek_is_global_location( $location_id ) {
+    $is_global_location = sek_get_registered_location_property( $location_id, 'is_global_location' );
+    return 'not_set' === $is_global_location ? false : true === $is_global_location;
+}
 
 // @param $location_id ( string ). Example '__after_header'
 function register_location( $location_id, $params = array() ) {
     $params = is_array( $params ) ? $params : array();
-    $params = wp_parse_args( $params, array(
-        'priority' => 10,
-        'is_global_location' => false,
-        'is_nimble_header' => false,
-        'is_nimble_footer' => false
-    ));
+    $params = wp_parse_args( $params, Nimble_Manager()->default_registered_location_model );
     $registered_locations = Nimble_Manager()->registered_locations;
     if ( is_array( $registered_locations ) ) {
         $registered_locations[$location_id] = $params;
