@@ -73,8 +73,12 @@
 .sek-module [data-sek-input-type="tiny_mce_editor"]:hover {
   outline: 1px solid #1d85bb;
 }
-
-
+/* Make sure tinyMce module is always accessible
+  see https://github.com/presscustomizr/nimble-builder/issues/243
+*/
+.sek-module [data-sek-input-type="tiny_mce_editor"] {
+  min-height: 30px
+}
 
 
 
