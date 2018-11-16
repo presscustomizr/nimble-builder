@@ -13,7 +13,7 @@ module.exports = {
       '<%= paths.czr_assets %>fmk/js/base-fmk/lib/icheck.min.js',
       '<%= paths.czr_assets %>fmk/js/base-fmk/lib/selecter.min.js',
       '<%= paths.czr_assets %>fmk/js/base-fmk/lib/stepper.min.js',
-      '<%= paths.czr_assets %>fmk/js/base-fmk/lib/select2.min.js',
+      '<%= paths.czr_assets %>fmk/js/base-fmk/lib/czrSelect2.min.js',
       '<%= paths.czr_assets %>fmk/js/base-fmk/lib/rangeslider.min.js',
 
 
