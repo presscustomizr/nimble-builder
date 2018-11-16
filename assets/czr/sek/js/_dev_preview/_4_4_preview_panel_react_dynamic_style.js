@@ -46,7 +46,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                 $('head').append( styleMarkup );
                 // if we have something to print ( styleMarkup not empty ), there should be a dom element
                 if ( ! _.isEmpty( styleMarkup ) && 1 > $('head').find( _stylesheet_id_ ).length ) {
-                      this.errare( 'sek-preview => problem when printing the dynamic inline style for : '+ _stylesheet_id_ );
+                      this.errare( 'sek-preview => problem when printing the dynamic inline style for : '+ _stylesheet_id_, styleMarkup );
                 } else {
                       $('head').find( _stylesheet_id_ ).attr('sek-data-origin', 'customizer' );
                 }
