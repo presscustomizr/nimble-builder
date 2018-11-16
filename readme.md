@@ -1,7 +1,7 @@
 # Nimble Builder v1.2.2 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 ![Nimble Builder](/nimble.jpg)
 
-> Drag-and-drop section builder companion of the Customizr and Hueman themes.
+> Powerful drag and drop page builder using the native WordPress customizer.
 
 ## Development Workflows
 - https://github.com/presscustomizr/nimble-builder/issues?utf8=%E2%9C%93&q=label%3AWorkflow+

@@ -13,15 +13,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   self.MAX_NUMBER_OF_COLUMNS = 12;
                   self.SETTING_UPDATE_BUFFER = 50;
-                  self.defaultSektionSettingValue = sektionsLocalizedData.defaultSektionSettingValue;
-                  self.sekCollectionSettingId = new api.Value( {} );
+                  self.defaultLocalSektionSettingValue = self.getDefaultSektionSettingValue( 'local' );
+                  self.localSectionsSettingId = new api.Value( {} );
                   self.registered = new api.Value([]);
 
                   api.bind( 'ready', function() {
                         self.registerAndSetupDefaultPanelSectionOptions();
-                        self.sekCollectionSettingId.callbacks.add( function( collectionSettingIds, previousCollectionSettingIds ) {
-                              try { self.setupSettingToBeSaved(); } catch( er ) {
-                                    api.errare( 'Error in self.sekCollectionSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
+                        self.localSectionsSettingId.callbacks.add( function( collectionSettingIds, previousCollectionSettingIds ) {
+                              try { self.setupSettingsToBeSaved(); } catch( er ) {
+                                    api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
                               }
                         });
                         var doSkopeDependantActions = function( newSkopes, previousSkopes ) {
@@ -236,7 +236,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isEmpty( sektionsData.setting_id ) ) {
                         api.errare('::setContextualCollectionSettingIdWhenSkopeSet() => missing setting_id');
                   }
-                  self.sekCollectionSettingId( sektionsData.setting_id );
+                  self.localSectionsSettingId( sektionsData.setting_id );
             }
       });//$.extend()
 })( wp.customize, jQuery );
@@ -395,7 +395,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   if( ! _.isUndefined( newSettingValue ) ) {
-                        api( self.sekCollectionSettingId() )( self.validateSettingValue( newSettingValue ), { navigatingHistoryLogs : true } );
+                        api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue ), { navigatingHistoryLogs : true } );
                         var previewHasBeenRefreshed = false;
                         api.previewer.refresh();
                         api.previewer.trigger( 'sek-pick-content', {});
@@ -571,62 +571,69 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            setupSettingToBeSaved : function() {
+            setupSettingsToBeSaved : function() {
                   var self = this,
                       serverCollection;
+                  var _settingsToRegister_ = {
+                        'local' : { collectionSettingId : self.localSectionsSettingId() },//<= "nimble___[skp__post_page_10]"
+                        'global' : { collectionSettingId : self.getGlobalSectionsSettingId() }//<= "nimble___[skp__global]"
+                  };
 
-                  serverCollection = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local').db_values;
-                  var collectionSettingId = self.sekCollectionSettingId();// [ 'nimble___' , '[', newSkopes.local, ']' ].join('');
-                  if ( _.isEmpty( collectionSettingId ) ) {
-                        throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
-                  }
-                  if ( ! api.has( collectionSettingId ) ) {
-                        var __collectionSettingInstance__ = api.CZR_Helpers.register({
-                              what : 'setting',
-                              id : collectionSettingId,
-                              value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.defaultSektionSettingValue ),
-                              transport : 'postMessage',//'refresh'
-                              type : 'option',
-                              track : false,//don't register in the self.registered()
-                              origin : 'nimble'
-                        });
-                        api( collectionSettingId, function( sektionSetInstance ) {
-                              self.historyLog([{
-                                    status : 'current',
-                                    value : sektionSetInstance(),
-                                    action : 'initial'
-                              }]);
-                              sektionSetInstance.bind( _.debounce( function( newSektionSettingValue, previousValue, params ) {
-                                    if ( params && true !== params.navigatingHistoryLogs ) {
-                                          var newHistoryLog = [],
-                                              historyLog = $.extend( true, [], self.historyLog() ),
-                                              sektionToRefresh;
+                  _.each( _settingsToRegister_, function( settingData, localOrGlobal ) {
+                        serverCollection = api.czr_skopeBase.getSkopeProperty( 'sektions', localOrGlobal ).db_values;
+                        if ( _.isEmpty( settingData.collectionSettingId ) ) {
+                              throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
+                        }
+                        if ( ! api.has( settingData.collectionSettingId ) ) {
+                              var __collectionSettingInstance__ = api.CZR_Helpers.register({
+                                    what : 'setting',
+                                    id : settingData.collectionSettingId,
+                                    value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( localOrGlobal )  ),
+                                    transport : 'postMessage',//'refresh'
+                                    type : 'option',
+                                    track : false,//don't register in the self.registered()
+                                    origin : 'nimble'
+                              });
+                              api( settingData.collectionSettingId, function( sektionSetInstance ) {
+                                    if ( 'local' === localOrGlobal ) {
+                                          self.historyLog([{
+                                                status : 'current',
+                                                value : sektionSetInstance(),
+                                                action : 'initial'
+                                          }]);
+                                    }
+                                    sektionSetInstance.bind( _.debounce( function( newSektionSettingValue, previousValue, params ) {
+                                          if ( 'local' === localOrGlobal && params && true !== params.navigatingHistoryLogs ) {
+                                                var newHistoryLog = [],
+                                                    historyLog = $.extend( true, [], self.historyLog() ),
+                                                    sektionToRefresh;
 
-                                          if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
-                                                sektionToRefresh = params.in_sektion;
-                                          } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
-                                                sektionToRefresh = params.to_sektion;
+                                                if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
+                                                      sektionToRefresh = params.in_sektion;
+                                                } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
+                                                      sektionToRefresh = params.to_sektion;
+                                                }
+
+                                                _.each( historyLog, function( log ) {
+                                                      var newStatus = 'previous';
+                                                      if ( 'future' == log.status )
+                                                        return;
+                                                      $.extend( log, { status : 'previous' } );
+                                                      newHistoryLog.push( log );
+                                                });
+                                                newHistoryLog.push({
+                                                      status : 'current',
+                                                      value : newSektionSettingValue,
+                                                      action : _.isObject( params ) ? ( params.action || '' ) : '',
+                                                      sektionToRefresh : sektionToRefresh
+                                                });
+                                                self.historyLog( newHistoryLog );
                                           }
 
-                                          _.each( historyLog, function( log ) {
-                                                var newStatus = 'previous';
-                                                if ( 'future' == log.status )
-                                                  return;
-                                                $.extend( log, { status : 'previous' } );
-                                                newHistoryLog.push( log );
-                                          });
-                                          newHistoryLog.push({
-                                                status : 'current',
-                                                value : newSektionSettingValue,
-                                                action : _.isObject( params ) ? ( params.action || '' ) : '',
-                                                sektionToRefresh : sektionToRefresh
-                                          });
-                                          self.historyLog( newHistoryLog );
-                                    }
-
-                              }, 1000 ) );
-                        });//api( collectionSettingId, function( sektionSetInstance ){}
-                  }
+                                    }, 1000 ) );
+                              });//api( settingData.collectionSettingId, function( sektionSetInstance ){}
+                        }//if ( ! api.has( settingData.collectionSettingId ) ) {
+                  });//_.each(
             },
             validateSettingValue : function( valCandidate ) {
                   if ( ! _.isObject( valCandidate ) ) {
@@ -753,10 +760,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//validateSettingValue
             resetCollectionSetting : function() {
                   var self = this;
-                  if ( _.isEmpty( self.sekCollectionSettingId() ) ) {
+                  if ( _.isEmpty( self.localSectionsSettingId() ) ) {
                         throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
                   }
-                  api( self.sekCollectionSettingId() )( self.defaultSektionSettingValue );
+                  api( self.localSectionsSettingId() )( self.getDefaultSektionSettingValue( 'local' ) );
                   api.previewer.refresh();
                   api.notifications.remove( 'sek-notify' );
                   api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
@@ -852,10 +859,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               in_sektion : params.apiParams.in_sektion,
                                               in_column : params.apiParams.in_column
                                         });
-                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                        self.updateAPISetting({
+                                              action : 'sek-update-fonts',
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
+                                        });
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               id : params.apiParams.in_column,
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
+                                              location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
                                   }
                             },
@@ -902,7 +912,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   },
                                   complete : function( params ) {
                                         api.previewer.trigger( 'sek-pick-content', {});
-                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                        self.updateAPISetting({
+                                              action : 'sek-update-fonts',
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
+                                        });
                                         if ( 'sek-remove-section' === params.apiParams.action ) {
                                               var locationLevel = self.getLevelModel( params.apiParams.location );
                                               if ( _.isEmpty( locationLevel.collection ) ) {
@@ -1058,7 +1071,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         }
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               id : idForStyleSheetRefresh,
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
+                                              location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
 
                                   }
@@ -1099,9 +1112,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
                                               break;
                                         }
-                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                        self.updateAPISetting({
+                                              action : 'sek-update-fonts',
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
+                                        });
                                         api.previewer.trigger('sek-refresh-stylesheet', {
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
+                                              location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
@@ -1132,9 +1148,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   complete : function( params ) {
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               id : params.apiParams.in_sektion,
-                                              skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
+                                              location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
-                                        self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                        self.updateAPISetting({
+                                              action : 'sek-update-fonts',
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
+                                        });
 
                                         api.previewer.trigger( 'sek-refresh-level', {
                                               level : 'section',
@@ -1199,7 +1218,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     api.notifications.remove( 'sek-notify' );
                                               }, params.duration || 5000 );
                                         });
-                                        this.resolve();
+                                        this.resolve({
+                                              is_global_location : self.isGlobalLocation( params )
+                                        });
                                   });
                             },
 
@@ -1212,7 +1233,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               id : params.id
                                         };
                                         uiParams = {};
-                                        _dfd_.resolve();
+                                        _dfd_.resolve({
+                                              is_global_location : self.isGlobalLocation( params )
+                                        });
                                   });
                             },
 
@@ -1222,7 +1245,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return $.Deferred(function(_dfd_) {
                                         apiParams = {id : params.id};
                                         uiParams = {};
-                                        _dfd_.resolve();
+                                        _dfd_.resolve({
+                                              is_global_location : self.isGlobalLocation( params )
+                                        });
                                   });
                             },
 
@@ -1233,7 +1258,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         apiParams = {
                                         };
                                         uiParams = {};
-                                        _dfd_.resolve();
+                                        _dfd_.resolve({
+                                              is_global_location : self.isGlobalLocation( params )
+                                        });
                                   });
                             }
                       };//msgCollection
@@ -1250,15 +1277,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
 
                               try { _cb_( params )
-                                    .done( function( cloneId ) {
+                                    .done( function( promiseParams ) {
+                                          promiseParams = promiseParams || {};
                                           if ( sendToPreview ) {
                                                 api.previewer.send(
                                                       msgId,
                                                       {
-                                                            skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                            location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                            local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
                                                             apiParams : apiParams,
                                                             uiParams : uiParams,
-                                                            cloneId : ! _.isEmpty( cloneId ) ? cloneId : false
+                                                            cloneId : ! _.isEmpty( promiseParams.cloneId ) ? promiseParams.cloneId : false
                                                       }
                                                 );
                                           } else {
@@ -1334,8 +1363,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( CZRSeksPrototype, {
             generateUI : function( params ) {
                   var self = this,
-                      dfd = $.Deferred(),
-                      _do_register_;
+                      dfd = $.Deferred();
 
                   if ( _.isEmpty( params.action ) ) {
                         dfd.reject( 'generateUI => missing action' );
@@ -1466,10 +1494,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     options_type : params.options_type,// mandatory : 'layout', 'spacing', 'bg_border', 'height', ...
 
                                     settingParams : params.settingParams
-                              }).done( function( ) {
+                              }).done( function( promiseParams ) {
                                     if ( true === refresh_stylesheet ) {
                                           api.previewer.send( 'sek-refresh-stylesheet', {
-                                                skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                 apiParams : {
                                                       action : 'sek-refresh-stylesheet',
                                                       id : params.uiParams.id,
@@ -1479,6 +1508,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                                     if ( true === refresh_markup ) {
                                           api.previewer.send( 'sek-refresh-level', {
+                                                location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                 apiParams : {
                                                       action : 'sek-refresh-level',
                                                       id : params.uiParams.id,
@@ -1502,11 +1533,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( newFontFamily.indexOf('gfont') > -1 ) {
                               self.updateAPISetting({
                                     action : 'sek-update-fonts',
-                                    font_family : newFontFamily
+                                    font_family : newFontFamily,
+                                    is_global_location : self.isGlobalLocation( params.uiParams )
                               })
                               .always( function() {
                                     _doUpdateWithRequestedAction().then( function() {
-                                          self.updateAPISetting({ action : 'sek-update-fonts' } );
+                                          self.updateAPISetting({
+                                                action : 'sek-update-fonts',
+                                                is_global_location : self.isGlobalLocation( params.uiParams )
+                                          });
                                     });
                               });
                         } else {
@@ -2213,7 +2248,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
                                     var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
-                                        currentSetValue = api( self.sekCollectionSettingId() )(),
+                                        currentSetValue = api( self.localSectionsSettingId() )(),
                                         allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} ),
                                         optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {},
                                         initialModuleValues = optionTypeValue;
@@ -2262,7 +2297,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//_.each()
                   };//_do_register()
                   api.section( '__localOptionsSection', function( _section_ ) {
-                        api( self.sekCollectionSettingId(), function() {
+                        api( self.localSectionsSettingId(), function() {
                               _do_register_();
                               _section_.container.on('click', '.accordion-section-title',function() {
                                     self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
@@ -2376,7 +2411,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//_.each();
                   };//do register
                   api.section( '__globalAndLocalOptionsSection', function( _section_ ) {
-                        api( self.sekCollectionSettingId(), function() {
+                        api( self.localSectionsSettingId(), function() {
                               _do_register_();
                         });
                   });
@@ -2388,11 +2423,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
             updateAPISetting : function( params ) {
+
                   var self = this,
                       __updateAPISettingDeferred__ = $.Deferred();
-                  api( self.sekCollectionSettingId(), function( sektionSetInstance ) {
+                  params = params || {};
+                  params.is_global_location = self.isGlobalLocation( params );
+
+                  var _collectionSettingId_ = params.is_global_location ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
+                  api( _collectionSettingId_, function( sektionSetInstance ) {
                         var currentSetValue = sektionSetInstance(),
-                            newSetValue = _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.defaultSektionSettingValue,
+                            newSetValue = _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
                             locationCandidate,
                             sektionCandidate,
                             columnCandidate,
@@ -2403,7 +2443,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             startingModuleValue,// will be populated by the optional starting value specificied on module registration
                             __presetSectionInjected__ = false,
                             parentSektionCandidate;
-                        newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.defaultSektionSettingValue.collection;
+                        newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ).collection;
 
                         switch( params.action ) {
                               case 'sek-add-section' :
@@ -3104,7 +3144,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });//self.getPresetSectionCollection().done()
                               break;
                               case 'sek-update-fonts' :
-                                    var currentGfonts = self.sniffGFonts();
+                                    var currentGfonts = self.sniffGFonts( { is_global_location : params && true === params.is_global_location } );
                                     if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
                                           if ( params.font_family.indexOf('gfont') < 0 ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
@@ -3123,7 +3163,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else {
                                           if ( null !== self.validateSettingValue( newSetValue ) ) {
                                                 sektionSetInstance( newSetValue, params );
-                                                __updateAPISettingDeferred__.resolve( cloneId );// the cloneId is only needed in the duplication scenarii
+                                                params.cloneId = cloneId;
+                                                __updateAPISettingDeferred__.resolve( params );
                                           } else {
                                                 __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value did not pass the validation checks for action ' + params.action );
                                           }
@@ -3142,7 +3183,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                               }
                         }
-                  });//api( self.sekCollectionSettingId(), function( sektionSetInstance ) {}
+                  });//api( _collectionSettingId_, function( sektionSetInstance ) {}
                   return __updateAPISettingDeferred__.promise();
             },//updateAPISetting
             _maybeFetchSectionsFromServer : function( params ) {
@@ -3349,43 +3390,107 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   return s4() + s4() + s4();//s4() + s4() + s4() + s4() + s4() + s4();
             },
+            getGlobalSectionsSettingId : function() {
+                  return sektionsLocalizedData.settingIdForGlobalSections;
+            },
             getLevelModel : function( id, collection ) {
-                  var self = this, _data_ = 'no_match';
-                  if ( _.isUndefined( collection ) ) {
-                        var currentSektionSettingValue = api( self.sekCollectionSettingId() )();
-                        var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
-                        collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
-                  }
-                  _.each( collection, function( levelData ) {
-                        if ( 'no_match' != _data_ )
-                          return;
-                        if ( id === levelData.id ) {
-                              _data_ = levelData;
-                        } else {
-                              if ( _.isArray( levelData.collection ) ) {
-                                    _data_ = self.getLevelModel( id, levelData.collection );
-                              }
+                  var self = this, _data_ = 'no_match',
+                      _walk_ = function( id, collectionSettingId, localOrGlobal, collection ) {
+                            if ( _.isUndefined( collection ) ) {
+                                  var currentSektionSettingValue = api( collectionSettingId )();
+                                  var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
+                                  collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
+                            }
+                            _.each( collection, function( levelData ) {
+                                  if ( 'no_match' != _data_ )
+                                    return;
+                                  if ( id === levelData.id ) {
+                                        _data_ = levelData;
+                                  } else {
+                                        if ( _.isArray( levelData.collection ) ) {
+                                              _data_ = _walk_( id, collectionSettingId, localOrGlobal, levelData.collection );
+                                        }
+                                  }
+                            });
+                            return _data_;
+                      };
+                  _.each( {
+                        local : self.localSectionsSettingId(),
+                        global : self.getGlobalSectionsSettingId()
+                  }, function( collectionSettingId, localOrGlobal ) {
+                        if ( 'no_match' === _data_ ) {
+                              _walk_( id, collectionSettingId, localOrGlobal, collection );
                         }
                   });
                   return _data_;
             },
+            isGlobalLocation : function( params ) {
+                  var self = this, is_global_location = false;
+                  params = params || {};
+                  if ( _.has( params, 'is_global_location' ) ) {
+                        is_global_location = params.is_global_location;
+                  } else if ( !_.isEmpty( params.location ) ) {
+                        is_global_location = self.isChildOfAGlobalLocation( params.location );
+                  } else if ( !_.isEmpty( params.in_sektion ) ) {
+                        is_global_location = self.isChildOfAGlobalLocation( params.in_sektion );
+                  } else if ( !_.isEmpty( params.id ) ) {
+                        is_global_location = self.isChildOfAGlobalLocation( params.id );
+                  }
+                  return is_global_location;
+            },
+            isChildOfAGlobalLocation : function( id ) {
+                  var self = this,
+                      walkCollection = function( id, collection ) {
+                            var _data_ = 'no_match';
+                            if ( _.isUndefined( collection ) ) {
+                                  var currentSettingValue = api( self.getGlobalSectionsSettingId() )();
+                                  var sektionSettingValue = _.isObject( currentSettingValue ) ? $.extend( true, {}, currentSettingValue ) : self.getDefaultSektionSettingValue( 'global' );
+                                  collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
+                            }
+                            _.each( collection, function( levelData ) {
+                                  if ( 'no_match' != _data_ )
+                                    return;
+                                  if ( id === levelData.id ) {
+                                        _data_ = levelData;
+                                  } else {
+                                        if ( _.isArray( levelData.collection ) ) {
+                                              _data_ = walkCollection( id, levelData.collection );
+                                        }
+                                  }
+                            });
+                            return _data_;
+                      };
+                  return walkCollection( id ) !== 'no_match';
+            },
+
 
             getLevelPositionInCollection : function( id, collection ) {
-                  var self = this, _position_ = 'no_match';
-                  if ( _.isUndefined( collection ) ) {
-                        var currentSektionSettingValue = api( self.sekCollectionSettingId() )();
-                        var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
-                        collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
-                  }
-                  _.each( collection, function( levelData, _key_ ) {
-                        if ( 'no_match' != _position_ )
-                          return;
-                        if ( id === levelData.id ) {
-                              _position_ = _key_;
-                        } else {
-                              if ( _.isArray( levelData.collection ) ) {
-                                    _position_ = self.getLevelPositionInCollection( id, levelData.collection );
+                  var self = this, _position_ = 'no_match',
+                  _walk_ = function( id, collectionSettingId, localOrGlobal, collection ) {
+                        if ( _.isUndefined( collection ) ) {
+                              var currentSektionSettingValue = api( collectionSettingId )();
+                              var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
+                              collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
+                        }
+                        _.each( collection, function( levelData, _key_ ) {
+                              if ( 'no_match' != _position_ )
+                                return;
+                              if ( id === levelData.id ) {
+                                    _position_ = _key_;
+                              } else {
+                                    if ( _.isArray( levelData.collection ) ) {
+                                          _position_ = _walk_( id, collectionSettingId, localOrGlobal, levelData.collection );
+                                    }
                               }
+                        });
+                  };
+
+                  _.each( {
+                        local : self.localSectionsSettingId(),
+                        global : self.getGlobalSectionsSettingId()
+                  }, function( collectionSettingId, localOrGlobal ) {
+                        if ( 'no_match' === _position_ ) {
+                              _walk_( id, collectionSettingId, localOrGlobal, collection );
                         }
                   });
                   return _position_;
@@ -3477,27 +3582,35 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             isModuleRegistered : function( moduleType ) {
                   return sektionsLocalizedData.registeredModules && ! _.isUndefined( sektionsLocalizedData.registeredModules[ moduleType ] );
             },
-            sniffGFonts : function( gfonts, level ) {
-                  var self = this;
-                  gfonts = gfonts || [];
-
-                  if ( _.isUndefined( level ) ) {
-                        var currentSektionSettingValue = api( self.sekCollectionSettingId() )();
-                        level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : self.defaultSektionSettingValue;
-                  }
-                  _.each( level, function( levelData, _key_ ) {
-                        if ( _.isString( _key_ ) && '_css' === _key_.substr( _key_.length - 4 ) ) {
-                              if ( true === self.inputIsAFontFamilyModifier( _key_ ) ) {
-                                    if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
-                                          gfonts.push( levelData );
+            sniffGFonts : function( args ) {
+                  args = args || { is_global_location : false };
+                  var self = this,
+                  gfonts = [],
+                  _snifff_ = function( collectionSettingId, localOrGlobal, level ) {
+                        if ( _.isUndefined( level ) ) {
+                              var currentSektionSettingValue = api( collectionSettingId )();
+                              level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
+                        }
+                        _.each( level, function( levelData, _key_ ) {
+                              if ( _.isString( _key_ ) && '_css' === _key_.substr( _key_.length - 4 ) ) {
+                                    if ( true === self.inputIsAFontFamilyModifier( _key_ ) ) {
+                                          if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
+                                                gfonts.push( levelData );
+                                          }
                                     }
                               }
-                        }
 
-                        if ( _.isArray( levelData ) || _.isObject( levelData ) ) {
-                              self.sniffGFonts( gfonts, levelData );
-                        }
-                  });
+                              if ( _.isArray( levelData ) || _.isObject( levelData ) ) {
+                                    _snifff_( collectionSettingId, localOrGlobal, levelData );
+                              }
+                        });
+                  };
+                  if ( args.is_global_location ) {
+                        _snifff_( self.getGlobalSectionsSettingId(), 'global' );
+                  } else {
+                        _snifff_( self.localSectionsSettingId(), 'local' );
+                  }
+
                   return gfonts;
             },
             getInputDefaultValue : function( input_id, module_type, level ) {
@@ -3883,7 +3996,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   return levelData;
+            },
+            getDefaultSektionSettingValue : function( localOrGlobal ) {
+                  if ( _.isUndefined( localOrGlobal ) || !_.contains( [ 'local', 'global' ], localOrGlobal ) ) {
+                        api.errare( 'getDefaultSektionSettingValue => the skope should be set to local or global');
+                  }
+                  return 'global' === localOrGlobal ? sektionsLocalizedData.defaultGlobalSektionSettingValue : sektionsLocalizedData.defaultLocalSektionSettingValue;
             }
+
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 /**

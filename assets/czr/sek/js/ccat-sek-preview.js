@@ -532,7 +532,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               case 'section' :
                                     params = _.extend( params, {
                                           is_nested : true === $(this).data('sek-is-nested'),
-                                          can_have_more_columns : $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12
+                                          can_have_more_columns : $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
+                                          is_global_location : true === $levelEl.closest( 'div[data-sek-level="location"]' ).data('sek-is-global-location')
                                     });
                               break;
                               case 'column' :
@@ -643,16 +644,21 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   });
                   var _printAddContentButtons = function() {
+                        var _location, _is_global_location;
                         $('body').find( 'div[data-sek-level="location"]' ).each( function() {
                               $sectionCollection = $(this).children( 'div[data-sek-level="section"]' );
                               tmpl = self.parseTemplate( '#sek-tmpl-add-content-button' );
-                              var $btn_el,
-                                  _location = $(this).data('sek-id');
+                              var $btn_el;
+                              _location = $(this).data('sek-id');
+                              _is_global_location = true === $(this).data('sek-is-global-location');
                               $sectionCollection.each( function() {
                                     if ( $(this).find('.sek-add-content-button').length > 0 )
                                       return;
 
-                                    $.when( $(this).prepend( tmpl({ location : _location }) ) ).done( function() {
+                                    $.when( $(this).prepend( tmpl({
+                                          location : _location,
+                                          is_global_location : _is_global_location
+                                    }) ) ).done( function() {
                                           $btn_el = $(this).find('.sek-add-content-button');
                                           if ( $(this).data('sek-id') ) {
                                                 $btn_el.attr('data-sek-before-section', $(this).data('sek-id') );//Will be used to insert the section at the right place
@@ -660,7 +666,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           $btn_el.fadeIn( 300 );
                                     });
                                     if ( $sectionCollection.length == $(this).index() + 1 ) {
-                                          $.when( $(this).append( tmpl({ is_last : true, location : _location }) ) ).done( function() {
+                                          $.when( $(this).append( tmpl({
+                                                is_last : true,
+                                                location : _location,
+                                                is_global_location : _is_global_location
+                                          }) ) ).done( function() {
                                                 $btn_el = $(this).find('.sek-add-content-button').last();
                                                 if ( $(this).data('sek-id') ) {
                                                       $btn_el.attr('data-sek-after-section', $(this).data('sek-id') );//Will be used to insert the section at the right place
@@ -673,7 +683,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $('.sek-empty-location-placeholder').each( function() {
                               if ( $(this).find('.sek-add-content-button').length > 0 )
                                 return;
-                              $.when( $(this).append( tmpl({ location : $(this).closest( 'div[data-sek-level="location"]' ).data('sek-id') } ) ) ).done( function() {
+
+                              _location = $(this).closest( 'div[data-sek-level="location"]' ).data('sek-id');
+                              _is_global_location = true === $(this).closest( 'div[data-sek-level="location"]' ).data('sek-is-global-location');
+
+                              $.when( $(this).append( tmpl({
+                                          location : _location,
+                                          is_global_location : _is_global_location
+                              } ) ) ).done( function() {
                                     $btn_el = $(this).find('.sek-add-content-button');
                                     $btn_el.attr('data-sek-is-first-section', true );
                                     $btn_el.fadeIn( 300 );
@@ -1084,8 +1101,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   self.mayBePrintLoader({
                                         loader_located_in_level_id : params.apiParams.id
                                   });
-                                  return self.doAjax( {
-                                        skope_id : params.skope_id,
+                                  return self.doAjax({
+                                        location_skope_id : params.location_skope_id,
+                                        local_skope_id : params.local_skope_id,
                                         action : 'sek_get_content',
                                         id : params.apiParams.id,
                                         level : params.apiParams.level,
@@ -1248,7 +1266,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   _.each( msgCollection, function( callbackFn, msgId ) {
                         api.preview.bind( msgId, function( params ) {
                               params = _.extend( {
-                                  skope_id : '',
+                                  location_skope_id : '',
                                   apiParams : {},
                                   uiParams : {}
                               }, params || {} );
@@ -1294,12 +1312,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   self.mayBePrintLoader({
                         loader_located_in_level_id : params.apiParams.location
                   });
-                  return self.doAjax( {
+                  return self.doAjax({
                         action : 'sek_get_content',
                         id : params.apiParams.id,
                         in_sektion : params.apiParams.in_sektion,
                         in_column : params.apiParams.in_column,
-                        skope_id : params.skope_id,
+                        location_skope_id : params.location_skope_id,
+                        local_skope_id : params.local_skope_id,
                         sek_action : params.apiParams.action,
                         is_nested : params.apiParams.is_nested
                   }).done( function( _r_ ) {
@@ -1373,7 +1392,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         action : 'sek_get_content',
                         id : params.apiParams.id,
                         in_sektion : params.apiParams.in_sektion,
-                        skope_id : params.skope_id,
+                        location_skope_id : params.location_skope_id,
+                        local_skope_id : params.local_skope_id,
                         sek_action : params.apiParams.action// sek-add-column || sek-remove-column
                   }).done( function( _r_ ) {
                         var html_content = '';
@@ -1411,7 +1431,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         action : 'sek_get_content',
                         resized_column : params.apiParams.resized_column,
                         sister_column : params.apiParams.sister_column,
-                        skope_id : params.skope_id,
+                        location_skope_id : params.location_skope_id,
+                        local_skope_id : params.local_skope_id,
                         sek_action : 'sek-resize-columns'
                   }).done( function( _r_ ) {
                         var html_content = '';
@@ -1424,7 +1445,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               width : '',
                               height: ''
                         });
-                        self.appendDynStyleSheet( params.skope_id, html_content );
+                        self.appendDynStyleSheet( params.location_skope_id, html_content );
                         $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-resize-columns => ' , _r_ );
@@ -1447,7 +1468,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           id : params.apiParams.id,
                           in_sektion : params.apiParams.in_sektion,
                           in_column : params.apiParams.in_column,
-                          skope_id : params.skope_id,
+                          location_skope_id : params.location_skope_id,
+                          local_skope_id : params.local_skope_id,
                           sek_action : params.apiParams.action, // can be sek-add-module / refresh-modules-in-column
                           is_nested : params.apiParams.is_nested
                     }).done( function( _r_ ) {
@@ -1487,7 +1509,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
                   return self.doAjax( {
                         action : 'sek_get_content',
-                        skope_id : params.skope_id,
+                        location_skope_id : params.location_skope_id,
+                        local_skope_id : params.local_skope_id,
                         sek_action : 'sek-refresh-stylesheet'
                   }).done( function( _r_ ) {
                         var html_content = '';
@@ -1496,7 +1519,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         } else {
                               self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
                         }
-                        self.appendDynStyleSheet( params.skope_id, html_content );
+                        self.appendDynStyleSheet( params.location_skope_id, html_content );
                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
                               .trigger( 'sek-stylesheet-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                   }).fail( function( _r_ ) {
@@ -1506,9 +1529,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
             },
 
-            appendDynStyleSheet : function( skope_id, styleMarkup ) {
-                var _stylesheet_id_ = '#sek-' + skope_id,//@see php Sek_Dyn_CSS_Handler
-                    _gfonts_id_ = '#sek-gfonts-' + skope_id;//@see php Sek_Dyn_CSS_Handler
+            appendDynStyleSheet : function( location_skope_id, styleMarkup ) {
+                var _stylesheet_id_ = '#sek-' + location_skope_id,//@see php Sek_Dyn_CSS_Handler
+                    _gfonts_id_ = '#sek-gfonts-' + location_skope_id;//@see php Sek_Dyn_CSS_Handler
                 if ( 0 < $('head').find( _stylesheet_id_ ).length ) {
                       $('head').find( _stylesheet_id_ ).remove();
                 }

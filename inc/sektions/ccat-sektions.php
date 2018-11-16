@@ -12,28 +12,76 @@ function sek_is_dev_mode() {
 
 if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
+if ( ! defined( 'NIMBLE_GLOBAL_SKOPE_ID' ) ) { define( 'NIMBLE_GLOBAL_SKOPE_ID' , 'skp__global' ); }
 if ( ! defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
 if ( ! defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' , 'nimble_saved_sektions' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
 if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) {
     define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION );
 }
+
+/* ------------------------------------------------------------------------- *
+ *  LOCATIONS UTILITIES
+/* ------------------------------------------------------------------------- */
 function sek_get_locations() {
-  return apply_filters( 'sek_locations', array_merge( SEK_Fire()->default_locations, SEK_Fire()->registered_locations ) );
+    if ( ! is_array( Nimble_Manager()->registered_locations ) ) {
+        sek_error_log( __FUNCTION__ . ' error => the registered locations must be an array');
+        return Nimble_Manager()->default_locations;
+    }
+    return apply_filters( 'sek_locations', array_merge( Nimble_Manager()->default_locations, Nimble_Manager()->registered_locations ) );
+}
+function sek_get_registered_location_property( $location_id, $property_name = '' ) {
+    if ( empty( Nimble_Manager()->all_nimble_locations ) ) {
+        Nimble_Manager()->all_nimble_locations = sek_get_locations();
+    }
+    $default_property_val = 'not_set';
+
+    if ( ! isset( Nimble_Manager()->all_nimble_locations[$location_id] ) || ! is_array( Nimble_Manager()->all_nimble_locations[$location_id] ) ) {
+        sek_error_log( __FUNCTION__ . ' error => the location ' . $location_id . ' is invalid or not registered.');
+        return $default_property_val;
+    }
+
+    if ( empty( $property_name ) || ! is_string( $property_name ) ) {
+        sek_error_log( __FUNCTION__ . ' error => the requested property for location ' . $location_id . ' is invalid');
+        return $default_property_val;
+    }
+
+    $location_params = wp_parse_args( Nimble_Manager()->all_nimble_locations[$location_id], Nimble_Manager()->default_registered_location_model );
+    return ! empty( $location_params[$property_name] ) ? $location_params[$property_name] : $default_property_val;
+}
+function sek_is_global_location( $location_id ) {
+    $is_global_location = sek_get_registered_location_property( $location_id, 'is_global_location' );
+    return 'not_set' === $is_global_location ? false : true === $is_global_location;
 }
 function register_location( $location_id, $params = array() ) {
     $params = is_array( $params ) ? $params : array();
-    $params = wp_parse_args( $params, array( 'priority' => 10 ) );
-    $registered_locations = SEK_Fire()->registered_locations;
+    $params = wp_parse_args( $params, Nimble_Manager()->default_registered_location_model );
+    $registered_locations = Nimble_Manager()->registered_locations;
     if ( is_array( $registered_locations ) ) {
         $registered_locations[$location_id] = $params;
     }
-    SEK_Fire()->registered_locations = $registered_locations;
+    Nimble_Manager()->registered_locations = $registered_locations;
 }
-function sek_get_default_sektions_value() {
-    $defaut_sektions_value = [ 'collection' => [], 'local_options' => [] ];
+function sek_get_default_location_model( $skope_id = null ) {
+    $is_global_skope = NIMBLE_GLOBAL_SKOPE_ID === $skope_id;
+    if ( $is_global_skope ) {
+        $defaut_sektions_value = [ 'collection' => [] ];
+    } else {
+        $defaut_sektions_value = [ 'collection' => [], 'local_options' => [] ];
+    }
     foreach( sek_get_locations() as $location_id => $params ) {
-        $defaut_sektions_value['collection'][] = wp_parse_args( [ 'id' => $location_id ], SEK_Fire()->default_location_model );
+        $is_global_location = sek_is_global_location( $location_id );
+        if ( $is_global_skope && ! $is_global_location )
+          continue;
+        if ( ! $is_global_skope && $is_global_location )
+          continue;
+
+        $location_model = wp_parse_args( [ 'id' => $location_id ], Nimble_Manager()->default_location_model );
+        if ( $is_global_location ) {
+            $location_model[ 'is_global_location' ] = true;
+        }
+
+        $defaut_sektions_value['collection'][] = $location_model;
     }
     return $defaut_sektions_value;
 }
@@ -42,6 +90,43 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
       error_log( 'sek_get_seks_setting_id => empty skope id or location => collection setting id impossible to build' );
   }
   return NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "[{$skope_id}]";
+}
+function sek_has_global_sections() {
+    if ( skp_is_customizing() )
+      return true;
+    $maybe_global_sek_post = sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID );
+    return ! is_null($maybe_global_sek_post) || !!$maybe_global_sek_post;
+}
+function render_nimble_locations( $locations, $options = array() ) {
+    if ( is_string( $locations ) && ! empty( $locations ) ) {
+        $locations = array( $locations );
+    }
+    if ( ! is_array( $locations ) ) {
+        sek_error_log( __FUNCTION__ . ' error => missing or invalid locations provided');
+        return;
+    }
+    $options = ! is_array( $options ) ? array() : $options;
+    $options = wp_parse_args( $options, array(
+        'fallback_location' => null, // Typically set as 'loop_start' in the nimble templates
+    ));
+
+    foreach( $locations as $location_id ) {
+        $is_global = sek_is_global_location( $location_id );
+        $skope_id = $is_global ? NIMBLE_GLOBAL_SKOPE_ID : skp_get_skope_id();
+        $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );
+        if ( ! is_null( $options[ 'fallback_location' ]) ) {
+            if ( $options[ 'fallback_location' ] === $location_id || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
+                do_action( "sek_before_location_{$location_id}" );
+                Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
+                do_action( "sek_after_location_{$location_id}" );
+            }
+        } else {
+            do_action( "sek_before_location_{$location_id}" );
+            Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
+            do_action( "sek_after_location_{$location_id}" );
+        }
+
+    }
 }
 /*function sek_get_module_placeholder( $placeholder_icon = 'short_text' ) {
   $placeholder_icon = empty( $placeholder_icon ) ? 'not_interested' : $placeholder_icon;
@@ -53,10 +138,14 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 }*/
 function sek_get_level_model( $id, $collection = array() ) {
     $_data = 'no_match';
+    if ( ! is_array( $collection ) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid collection param when getting model for id : ' . $id );
+        return $_data;
+    }
     foreach ( $collection as $level_data ) {
         if ( 'no_match' != $_data )
           break;
-        if ( $id === $level_data['id'] ) {
+        if ( array_key_exists( 'id', $level_data ) && $id === $level_data['id'] ) {
             $_data = $level_data;
         } else {
             if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
@@ -66,25 +155,34 @@ function sek_get_level_model( $id, $collection = array() ) {
     }
     return $_data;
 }
-function sek_get_parent_level_model( $child_level_id, $collection = array(), $skope_id = '' ) {
+function sek_get_parent_level_model( $child_level_id = '', $collection = array(), $skope_id = '' ) {
+    $_parent_level_data = 'no_match';
+    if ( ! is_string( $child_level_id ) || empty( $child_level_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
+        return $_parent_level_data;
+    }
     if ( empty( $collection ) ) {
         if ( empty( $skope_id ) ) {
-            if ( is_array( $_POST ) && ! empty( $_POST['skope_id'] ) ) {
-                $skope_id = $_POST['skope_id'];
+            if ( is_array( $_POST ) && ! empty( $_POST['location_skope_id'] ) ) {
+                $skope_id = $_POST['location_skope_id'];
             } else {
                 $skope_id = skp_get_skope_id();
             }
         }
-        $skoped_setting = sek_get_skoped_seks( $skope_id );
-        $collection = ( is_array( $skoped_setting ) && !empty( $skoped_setting['collection'] ) ) ? $skoped_setting['collection'] : array();
+        $local_skope_settings = sek_get_skoped_seks( $skope_id );
+        $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+        $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+        $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+
+        $collection = array_merge( $local_collection, $global_collection );
     }
-    $_parent_level_data = 'no_match';
+
     foreach ( $collection as $level_data ) {
         if ( 'no_match' !== $_parent_level_data )
           break;
         if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
             foreach ( $level_data['collection'] as $child_level_data ) {
-                if ( $child_level_id == $child_level_data['id'] ) {
+                if ( array_key_exists( 'id', $child_level_data ) && $child_level_id == $child_level_data['id'] ) {
                     $_parent_level_data = $level_data;
                     break;
                 } else {
@@ -113,6 +211,30 @@ function sek_section_has_modules( $model, $has_module = null ) {
     }
     return $has_module;
 }
+function sek_get_level_skope_id( $level_id = '' ) {
+    $level_skope_id = skp_get_skope_id();
+    if ( ! is_string( $level_id ) || empty( $level_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
+        return $level_skope_id;
+    }
+
+    $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+    $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+    if ( 'no_match' === sek_get_level_model( $level_id, $local_collection ) ) {
+        $level_skope_id = NIMBLE_GLOBAL_SKOPE_ID;
+        if ( sek_is_dev_mode() ) {
+            $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+            $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+            if ( 'no_match' === sek_get_level_model( $level_id, $global_collection ) ) {
+                sek_error_log( __FUNCTION__ . ' => warning, a level id ( ' . $level_id .' ) was not found in local and global sections.');
+            }
+        }
+    }
+
+    return $level_skope_id;
+}
+
+
 
 
 
@@ -173,7 +295,7 @@ function sek_get_default_module_model( $module_type = '' ) {
     $default = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
       return $default;
-    $default_models = SEK_Fire()->default_models;
+    $default_models = Nimble_Manager()->default_models;
     if ( ! empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
@@ -206,7 +328,7 @@ function sek_get_default_module_model( $module_type = '' ) {
             $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
         }
         $default_models[ $module_type ] = $default;
-        SEK_Fire()->default_models = $default_models;
+        Nimble_Manager()->default_models = $default_models;
     }
     return $default;
 }
@@ -243,7 +365,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
     $input_list = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
       return $input_list;
-    $cached_input_lists = SEK_Fire()->cached_input_lists;
+    $cached_input_lists = Nimble_Manager()->cached_input_lists;
     if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
         $input_list = $cached_input_lists[ $module_type ];
     } else {
@@ -278,7 +400,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
             $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
         }
         $cached_input_lists[ $module_type ] = $input_list;
-        SEK_Fire()->cached_input_lists = $cached_input_lists;
+        Nimble_Manager()->cached_input_lists = $cached_input_lists;
     }
     return $input_list;
 }
@@ -437,16 +559,8 @@ function sek_get_locale_template(){
     }
     return $path;
 }
-function render_content_sections_for_nimble_template() {
-    foreach( sek_get_locations() as $location_id => $params ) {
-        $locationSettingValue = sek_get_skoped_seks( skp_get_skope_id(), $location_id );
-        if ( 'loop_start' === $location_id || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
-            do_action( "sek_before_location_{$location_id}" );
-            SEK_Fire()->_render_seks_for_location( $location_id, $locationSettingValue );
-            do_action( "sek_after_location_{$location_id}" );
-        }
-    }
-}
+
+
 
 
 
@@ -500,7 +614,12 @@ function sek_get_section_custom_breakpoint( $section ) {
 function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
     if ( !$bool ) {
         if ( is_null( $recursive_data ) ) {
-            $recursive_data = sek_get_skoped_seks( skp_get_skope_id() );
+            $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+            $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+            $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+            $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+
+            $recursive_data = array_merge( $local_collection, $global_collection );
         }
         foreach ($recursive_data as $key => $value) {
             if ( is_array( $value ) && array_key_exists('module_type', $value) && in_array($value['module_type'], array( 'czr_button_module', 'czr_icon_module' ) ) ) {
@@ -589,11 +708,11 @@ function nimble_regex_callback( $matches ) {
 function sek_is_img_smartload_enabled() {
     if ( skp_is_customizing() )
       return false;
-    if ( 'not_cached' !== SEK_Fire()->img_smartload_enabled ) {
-        return SEK_Fire()->img_smartload_enabled;
+    if ( 'not_cached' !== Nimble_Manager()->img_smartload_enabled ) {
+        return Nimble_Manager()->img_smartload_enabled;
     }
     $is_img_smartload_enabled = false;
-    $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
+    $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
     $local_smartload = 'inherit';
     if ( is_array( $local_options ) && !empty( $local_options['local_options']) && is_array( $local_options['local_options']) && !empty($local_options['local_options']['local_performances'] ) && is_array( $local_options['local_options']['local_performances'] ) ) {
         if ( ! empty( $local_options['local_options']['local_performances']['local-img-smart-load'] ) && 'inherit' !== $local_options['local_options']['local_performances']['local-img-smart-load'] ) {
@@ -609,9 +728,9 @@ function sek_is_img_smartload_enabled() {
             $is_img_smartload_enabled = sek_booleanize_checkbox_val( $glob_options['performances']['global-img-smart-load'] );
         }
     }
-    SEK_Fire()->img_smartload_enabled = $is_img_smartload_enabled;
+    Nimble_Manager()->img_smartload_enabled = $is_img_smartload_enabled;
 
-    return SEK_Fire()->img_smartload_enabled;
+    return Nimble_Manager()->img_smartload_enabled;
 }
 
 
@@ -901,17 +1020,27 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
     if ( empty( $skope_id ) ) {
         $skope_id = skp_get_skope_id( $skope_level );
     }
-    if ( did_action('wp') && 'not_cached' != SEK_Fire()->local_seks ) {
-        $seks_data = SEK_Fire()->local_seks;
-    } else {
+    $is_global_skope = NIMBLE_GLOBAL_SKOPE_ID === $skope_id;
+    $is_cached = false;
+    if ( did_action('wp') ) {
+        if ( !$is_global_skope && 'not_cached' != Nimble_Manager()->local_seks ) {
+            $is_cached = true;
+            $seks_data = Nimble_Manager()->local_seks;
+        }
+        if ( $is_global_skope && 'not_cached' != Nimble_Manager()->global_seks ) {
+            $is_cached = true;
+            $seks_data = Nimble_Manager()->global_seks;
+        }
+    }
 
+    if ( ! $is_cached ) {
         $seks_data = array();
         $post = sek_get_seks_post( $skope_id );
         if ( $post ) {
             $seks_data = maybe_unserialize( $post->post_content );
         }
         $seks_data = is_array( $seks_data ) ? $seks_data : array();
-        $default_collection = sek_get_default_sektions_value();
+        $default_collection = sek_get_default_location_model( $skope_id );
         $seks_data = wp_parse_args( $seks_data, $default_collection );
         $maybe_incomplete_locations = [];
         foreach( $seks_data['collection'] as $location_data ) {
@@ -920,12 +1049,17 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             }
         }
 
-        foreach( SEK_Fire()->registered_locations as $loc_id => $params ) {
+        foreach( Nimble_Manager()->registered_locations as $loc_id => $params ) {
             if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
-                $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], SEK_Fire()->default_location_model );
+                $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], Nimble_Manager()->default_location_model );
             }
         }
-        SEK_Fire()->local_seks = $seks_data;
+        if ( $is_global_skope ) {
+            Nimble_Manager()->global_seks = $seks_data;
+        } else {
+            Nimble_Manager()->local_seks = $seks_data;
+        }
+
     }//end if
     $seks_data = apply_filters(
         'sek_get_skoped_seks',
@@ -941,7 +1075,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         }
     }
 
-    return 'no_match' === $seks_data ? SEK_Fire()->default_location_model : $seks_data;
+    return 'no_match' === $seks_data ? Nimble_Manager()->default_location_model : $seks_data;
 }
 
 
@@ -1948,7 +2082,8 @@ function sek_get_select_options_for_input_id( $input_id ) {
         case 'local_template' :
             $options = array(
                 'default' => __('Default theme template','text_domain_to_be_replaced'),
-                'nimble_template' => __('Nimble template','text_domain_to_be_replaced')
+                'nimble_template' => __('Template with content from Nimble, header and footer from your theme','text_domain_to_be_replaced'),
+                'nimble_empty_template' => __('Template with all content from Nimble (beta)','text_domain_to_be_replaced')
             );
         break;
 
@@ -2552,6 +2687,10 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
         $total_horizontal_margin = (int)$margin_left + (int)$margin_right;
 
         $parent_section = sek_get_parent_level_model( $level['id'] );
+        if ( 'no_match' === $parent_section ) {
+            sek_error_log( __FUNCTION__ . ' => $parent_section not found for level id : ' . $level['id'] );
+            return $rules;
+        }
 
         if ( $total_horizontal_margin > 0 && is_array( $parent_section ) && !empty( $parent_section ) ) {
             $total_horizontal_margin_with_unit = $total_horizontal_margin . $device_unit;//20px
@@ -2993,6 +3132,7 @@ function sek_get_module_params_for_sek_local_template() {
                     'input_type'  => 'select',
                     'title'       => __('Select a template', 'text_domain_to_be_replaced'),
                     'default'     => 'default',
+                    'width-100'   => true,
                     'choices'     => sek_get_select_options_for_input_id( 'local_template' ),
                     'refresh_preview' => true
                 )
@@ -3057,7 +3197,7 @@ function sek_get_module_params_for_sek_local_widths() {
 add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_widths_css' );
 function sek_add_raw_local_widths_css( $css ) {
     $css = is_string( $css ) ? $css : '';
-    $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
+    $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
 
     if ( ! is_array( $local_options ) || empty( $local_options['local_options']) || empty( $local_options['local_options']['widths'] ) )
       return $css;
@@ -3150,7 +3290,7 @@ function sek_get_module_params_for_sek_local_custom_css() {
 }
 add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_custom_css' );
 function sek_add_raw_local_custom_css( $css ) {
-    $local_options = sek_get_skoped_seks( !empty( $_POST['skope_id'] ) ? $_POST['skope_id'] : skp_build_skope_id() );
+    $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
     if ( is_array( $local_options ) && !empty( $local_options['local_options']) && ! empty( $local_options['local_options']['custom_css'] ) ) {
         $options = $local_options['local_options']['custom_css'];
         if ( ! empty( $options['local_custom_css'] ) ) {
@@ -6475,6 +6615,10 @@ class Sek_Dyn_CSS_Builder {
         $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
         $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
         $parent_section = sek_get_parent_level_model( $column['id'] );
+        if ( 'no_match' === $parent_section ) {
+            sek_error_log( __FUNCTION__ . ' => $parent_section not found for column id : ' . $column['id'] );
+            return $rules;
+        }
         $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_section ) );
         $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
 
@@ -7582,6 +7726,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
     class SEK_Front_Construct {
         static $instance;
         public $local_seks = 'not_cached';// <= used to cache the sektions for the local skope_id
+        public $global_seks = 'not_cached';// <= used to cache the sektions for the global skope_id
         public $model = array();//<= when rendering, the current level model
         public $parent_model = array();//<= when rendering, the current parent model
         public $default_models = array();// <= will be populated to cache the default models when invoking sek_get_default_module_model
@@ -7594,6 +7739,13 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'loop_end' => array( 'priority' => 10 ),
         ];
         public $registered_locations = [];
+        public $all_nimble_locations = [];// will be cached @wp_head. See SEK_Front_Render::_schedule_front_rendering()
+        public $default_registered_location_model = [
+          'priority' => 10,
+          'is_global_location' => false,
+          'is_header_location' => false,
+          'is_footer_location' => false
+        ];
         public $default_location_model = [
             'id' => '',
             'level' => 'location',
@@ -7603,8 +7755,10 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         ];
 
         public static function get_instance( $params ) {
-            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Sek_Simple_Form ) )
-              self::$instance = new Sek_Simple_Form( $params );
+            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Sek_Simple_Form ) ) {
+                self::$instance = new Sek_Simple_Form( $params );
+                do_action( 'nimble_front_classes_ready', self::$instance );
+            }
             return self::$instance;
         }
         public $img_smartload_enabled = 'not_cached';
@@ -7696,7 +7850,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error( __FUNCTION__ . ' => bad_method' );
             }
 
-            if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+            if ( ! isset( $_POST['location_skope_id'] ) || empty( $_POST['location_skope_id'] ) ) {
                 wp_send_json_error(  __FUNCTION__ . ' => missing skope_id' );
             }
 
@@ -7735,7 +7889,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
         }//sek_get_content_for_injection()
         private function sek_ajax_fetch_content( $sek_action = '' ) {
-            $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
+            $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
             if ( ! is_array( $sektionSettingValue ) ) {
                 wp_send_json_error( __FUNCTION__ . ' => invalid sektionSettingValue => it should be an array().' );
                 return;
@@ -7838,7 +7992,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             ob_start();
 
             if ( $is_stylesheet ) {
-                $r = $this -> print_or_enqueue_seks_style( $_POST['skope_id'] );
+                $r = $this -> print_or_enqueue_seks_style( $_POST['location_skope_id'] );
             } else {
                 if ( 'no_match' == $level_model ) {
                     wp_send_json_error(  __FUNCTION__ . ' ' . $sek_action . ' => missing level model' );
@@ -8060,11 +8214,11 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error(  __FUNCTION__ . ' => missing level id' );
                 return;
             }
-            if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+            if ( ! isset( $_POST['location_skope_id'] ) || empty( $_POST['location_skope_id'] ) ) {
                 wp_send_json_error(  __FUNCTION__ . ' => missing skope_id' );
                 return;
             }
-            $sektionSettingValue = sek_get_skoped_seks( $_POST['skope_id'] );
+            $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
             if ( ! is_array( $sektionSettingValue ) || ! array_key_exists( 'collection', $sektionSettingValue ) || ! is_array( $sektionSettingValue['collection'] ) ) {
                 wp_send_json_error( __FUNCTION__ . ' => invalid sektionSettingValue' );
                 return;
@@ -8130,7 +8284,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 array(
                     'isDevMode' => sek_is_dev_mode(),
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
-                    'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : ''
+                    'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
+                    'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : ''
                 )
             );
         }
@@ -8177,8 +8332,12 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
                         'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
 
+                        'Insert a new section' => __('Insert a new section', 'text_domain_to_be_replaced' ),
+                        'Insert a new global section' => __('Insert a new global section', 'text_domain_to_be_replaced' ),
+
                         'section' => __('section', 'text_domain_to_be_replaced'),
-                        'nested section' => __('nested section', 'text_domain_to_be_replaced')
+                        'section (global)' => __('section (global)', 'text_domain_to_be_replaced'),
+                        'nested section' => __('nested section', 'text_domain_to_be_replaced'),
                     ),
                     'isDevMode' => sek_is_dev_mode(),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -8205,14 +8364,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <# //console.log( 'data', data ); #>
                   <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                     <div class="sek-add-content-button-wrapper">
-                     <# var hook_location = ''; #>
+                     <# var hook_location = '', btn_title = true !== data.is_global_location ? sekPreviewLocalized.i18n['Insert a new section'] : sekPreviewLocalized.i18n['Insert a new global section'], addContentBtnWidth = true !== data.is_global_location ? '83px' : '113px' #>
                       <?php if ( sek_is_dev_mode() ) : ?>
                           <# if ( data.location ) {
                               hook_location = '( @hook : ' + data.location + ')';
                           } #>
                       <?php endif; ?>
-                      <button title="<?php _e('Insert a new section', 'text_domain_to_be_replaced' ); ?> {{hook_location}}" data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:83px;">
-                        <span class="sek-click-on-button-icon sek-click-on">+</span><span class="action-button-text"><?php _e('Insert a new section', 'text_domain_to_be_replaced' ); ?></span>
+                      <button title="{{btn_title}} {{hook_location}}" data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:{{addContentBtnWidth}};">
+                        <span class="sek-click-on-button-icon sek-click-on">+</span><span class="action-button-text">{{btn_title}}</span>
                       </button>
                     </div>
                   </div>
@@ -8253,7 +8412,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
                           <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
                         </div>
-                        <div class="sek-dyn-ui-level-type"><# if ( ! data.is_nested ) { #>{{ sekPreviewLocalized.i18n['section'] }}<# } else { #>{{ sekPreviewLocalized.i18n['nested section'] }}<# } #></div>
+                        <#
+                          var section_title = true !== data.is_global_location ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['section (global)'];
+                          section_title = ! data.is_nested ? section_title : sekPreviewLocalized.i18n['nested section'];
+                        #>
+                        <div class="sek-dyn-ui-level-type">{{section_title}}</div>
                       </div><?php // .sek-dyn-ui-location-inner ?>
                       <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
                     </div><?php // .sek-dyn-ui-location-type ?>
@@ -8350,12 +8513,19 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
             add_filter( 'nimble_parse_for_smart_load', array( $this, 'sek_maybe_process_img_for_js_smart_load') );
             $this -> sek_setup_tiny_mce_content_filters();
+            add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
+        }
+        function sek_register_nimble_global_locations() {
+            register_location('nimble_global_header', array( 'is_global_location' => true, 'is_header_location' => true ) );
+            register_location('nimble_global_footer', array( 'is_global_location' => true, 'is_footer_location' => true ) );
         }
         function sek_schedule_rendering_hooks() {
             $locale_template = sek_get_locale_template();
+            $this->all_nimble_locations = sek_get_locations();
+
             if ( !empty( $locale_template ) )
               return;
-            foreach( sek_get_locations() as $location_id => $params ) {
+            foreach( $this->all_nimble_locations as $location_id => $params ) {
                 $params = is_array( $params ) ? $params : array();
                 $params = wp_parse_args( $params, array( 'priority' => 10 ) );
                 switch ( $location_id ) {
@@ -8394,12 +8564,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 return;
             }
 
-            $hook = current_filter();
-            if ( did_action( "sek_before_location_{$hook}" ) )
+            $location = current_filter();
+            if ( did_action( "sek_before_location_{$location}" ) )
               return;
-            do_action( "sek_before_location_{$hook}" );
-            $this->_render_seks_for_location( $hook );
-            do_action( "sek_after_location_{$hook}" );
+
+            do_action( "sek_before_location_{$location}" );
+            $this->_render_seks_for_location( $location );
+            do_action( "sek_after_location_{$location}" );
         }
         function sek_schedule_sektion_rendering_before_content( $html ) {
             if ( did_action( 'sek_before_location_before_content' ) )
@@ -8430,13 +8601,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return $html;
         }
         public function _render_seks_for_location( $location = '', $location_data = array() ) {
-            if ( ! array_key_exists( $location, sek_get_locations() ) ) {
+            if ( empty( $this->all_nimble_locations ) ) {
+                 $this->all_nimble_locations = sek_get_locations();
+            }
+
+            if ( ! array_key_exists( $location, $this->all_nimble_locations ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
             }
             $locationSettingValue = array();
             if ( empty( $location_data ) ) {
-                $locationSettingValue = sek_get_skoped_seks( skp_build_skope_id(), $location );
+                $skope_id = sek_is_global_location( $location )  ? NIMBLE_GLOBAL_SKOPE_ID : skp_build_skope_id();
+                $locationSettingValue = sek_get_skoped_seks( $skope_id, $location );
             } else {
                 $locationSettingValue = $location_data;
             }
@@ -8478,7 +8654,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 case 'location' :
                     ?>
                       <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
-                          <div class="sektion-wrapper" data-sek-level="location" data-sek-id="<?php echo $id ?>">
+                            <?php
+                              printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s>',
+                                  $id,
+                                  sek_is_global_location( $id ) ? 'data-sek-is-global-location="true"' : '',
+                                  true === sek_get_registered_location_property( $id, 'is_header_location' ) ? 'data-sek-is-header-location="true"' : '',
+                                  true === sek_get_registered_location_property( $id, 'is_footer_location' ) ? 'data-sek-is-footer-location="true"' : ''
+                              );
+                            ?>
                             <?php
                               $this -> parent_model = $model;
                               foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
@@ -8487,7 +8670,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                              <?php if ( empty( $collection ) ) : ?>
                                 <div class="sek-empty-location-placeholder"></div>
                             <?php endif; ?>
-                          </div>
+                          </div><?php //class="sektion-wrapper" ?>
                       <?php endif; ?>
                     <?php
                 break;
@@ -8523,7 +8706,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                 ?>
                             </div>
                           </div>
-                      </div>
+                      </div><?php //data-sek-level="section" ?>
                     <?php
                 break;
 
@@ -8579,7 +8762,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               }
                             ?>
                         </div>
-                      </div>
+                      </div><?php //data-sek-level="column" ?>
                     <?php
                 break;
 
@@ -8607,7 +8790,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>
                             </div>
-                      </div>
+                      </div><?php //data-sek-level="module" ?>
                     <?php
                 break;
             }
@@ -8886,7 +9069,6 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                     return;
                 }
             }
-
             new Sek_Dyn_CSS_Handler( array(
                 'id'             => $skope_id,
                 'skope_id'       => $skope_id,
@@ -8894,8 +9076,17 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 'force_write'    => true, //<- write if the file doesn't exist
                 'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
                 'hook'           => ( ! defined( 'DOING_AJAX' ) && is_customize_preview() ) ? 'wp_head' : ''
-            ) );
-
+            ));
+            if ( sek_has_global_sections() ) {
+                new Sek_Dyn_CSS_Handler( array(
+                    'id'             => NIMBLE_GLOBAL_SKOPE_ID,
+                    'skope_id'       => NIMBLE_GLOBAL_SKOPE_ID,
+                    'mode'           => is_customize_preview() ? Sek_Dyn_CSS_Handler::MODE_INLINE : Sek_Dyn_CSS_Handler::MODE_FILE,
+                    'force_write'    => true, //<- write if the file doesn't exist
+                    'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
+                    'hook'           => ( ! defined( 'DOING_AJAX' ) && is_customize_preview() ) ? 'wp_head' : ''
+                ));
+            }
 
         }//print_or_enqueue_seks_style
     }//class
@@ -9091,7 +9282,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 break;
                 case 'nimble_skope_id':
                     $user_form_composition[$field_id] = $field_data;
-                    $user_form_composition[$field_id]['value'] = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : skp_get_skope_id();
+                    $user_form_composition[$field_id]['value'] = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : sek_get_level_skope_id( $module_model['id'] );
                 break;
                 case 'nimble_level_id':
                     $user_form_composition[$field_id] = $field_data;
@@ -9807,9 +9998,9 @@ function simple_form_mail_template() {
 
 
 ?><?php
-function SEK_Fire( $params = array() ) {
+function Nimble_Manager( $params = array() ) {
     return Sek_Simple_Form::get_instance( $params );
 }
 
-SEK_Fire();
+Nimble_Manager();
 ?>

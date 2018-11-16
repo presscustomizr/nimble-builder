@@ -1,4 +1,4 @@
-=== Nimble Builder - Section builder companion of the Customizr and Hueman themes ===
+=== Nimble Page Builder ===
 Contributors: nikeo, d4z_c0nf
 Author URI: https://presscustomizr.com
 Plugin URI: https://wordpress.org/plugins/nimble-builder/
@@ -10,15 +10,17 @@ Stable tag: 1.2.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Drag-and-drop section builder companion of the Customizr and Hueman themes.
+Powerful drag and drop page builder using the native WordPress customizer.
 
 == Description ==
-The Nimble Builder is a lightweight section builder intended to be the content creation companion of the Customizr and Hueman themes. It allows you to drag and drop pre-designed sections, or create your own sections, in live preview from the WordPress customizer.
+The Nimble Builder is a powerful and lightweight page builder plugin for WordPress. It allows you to drag and drop pre-designed sections, or create your own sections, in live preview with the native WordPress customizer.
 
 == Features ==
 * Drag and drop beautiful and ready-to-use sections in any pages.
 * Easily create responsive column layouts.
 * Create content, style, move / duplicate / remove elements in live preview.
+* Embed shortcodes from other plugins, and see the result in live preview.
+* Embed WordPress blocks, videos, tweets or any embed types supported by WordPress, and see the result in live preview.
 * Leverage the customizer auto-drafting and schedule publishing features, and safely build and save drafts of your content before deploying in production.
 * Works in any WordPress contexts : home, pages, posts, custom post types, archives, author pages, search page, ...
 
@@ -42,7 +44,7 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 == Frequently Asked Questions ==
 = Can I use the Nimble Builder with any theme ? =
 
-The Nimble builder has been optimized to work with the Customizr and Hueman theme, but it works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
+The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
 = 1.2.2 =
