@@ -15,22 +15,31 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             //    - the css rules are printed inline in the <head>
             //    - we set to hook to wp_head
             //
-            // when the method is fired in an ajax refresh scenario
+            // when the method is fired in an ajax refresh scenario, like 'sek-refresh-stylesheet'
             //    - the skope_id must be passed as param
             //    - the css rules are printed inline in the <head>
             //    - we set the hook to ''
             //
             // in a front normal context, the css is enqueued from the already written file.
-            if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) {
-                $skope_id = skp_build_skope_id();
+            // AJAX REQUESTED STYLESHEET
+            if ( ( ! is_null( $skope_id ) && ! empty( $skope_id ) ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+                $this->_instantiate_css_handler( $skope_id );
             } else {
-                if ( empty( $skope_id ) ) {
-                    //wp_send_json_error(  __FUNCTION__ . ' => missing skope_id' ); <= https://github.com/presscustomizr/pro-bundle/issues/147
-                    return;
+                $skope_id = skp_build_skope_id();
+                // LOCAL SECTIONS STYLESHEET
+                $this->_instantiate_css_handler( skp_build_skope_id() );
+                if ( sek_has_global_sections() ) {
+                    // GLOBAL SECTIONS STYLESHEET
+                    $this->_instantiate_css_handler( NIMBLE_GLOBAL_SKOPE_ID );
                 }
             }
+            if ( empty( $skope_id ) ) {
+                sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . ' =>the skope_id should not be empty' );
+            }
+        }//print_or_enqueue_seks_style
 
-            // LOCAL SECTIONS STYLESHEET
+
+        private function _instantiate_css_handler( $skope_id ) {
             new Sek_Dyn_CSS_Handler( array(
                 'id'             => $skope_id,
                 'skope_id'       => $skope_id,
@@ -40,22 +49,8 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
                 'hook'           => ( ! defined( 'DOING_AJAX' ) && is_customize_preview() ) ? 'wp_head' : ''
             ));
+        }
 
-            // sek_has_global_sections always returns true when customizing
-            if ( sek_has_global_sections() ) {
-                // GLOBAL SECTIONS STYLESHEET
-                new Sek_Dyn_CSS_Handler( array(
-                    'id'             => NIMBLE_GLOBAL_SKOPE_ID,
-                    'skope_id'       => NIMBLE_GLOBAL_SKOPE_ID,
-                    'mode'           => is_customize_preview() ? Sek_Dyn_CSS_Handler::MODE_INLINE : Sek_Dyn_CSS_Handler::MODE_FILE,
-                    //these are taken in account only when 'mode' is 'file'
-                    'force_write'    => true, //<- write if the file doesn't exist
-                    'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
-                    'hook'           => ( ! defined( 'DOING_AJAX' ) && is_customize_preview() ) ? 'wp_head' : ''
-                ));
-            }
-
-        }//print_or_enqueue_seks_style
     }//class
 endif;
 
