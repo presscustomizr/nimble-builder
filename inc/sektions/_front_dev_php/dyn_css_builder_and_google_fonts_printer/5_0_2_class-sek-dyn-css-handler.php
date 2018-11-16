@@ -276,7 +276,8 @@ class Sek_Dyn_CSS_Handler {
         }
 
         if ( empty( $this -> skope_id ) ) {
-            throw new Exception( 'Sek_Dyn_CSS_Handler => __construct => skope_id not provided' );
+            sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' => __construct => skope_id not provided' );
+            return;
         }
 
         //build no parameterized properties
