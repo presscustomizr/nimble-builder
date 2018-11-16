@@ -48,10 +48,10 @@
                         } else {
                               $_placeholder = $('<option>', { selected: 'selected' } );
                         }
-                        //Initialize select2
+                        //Initialize czrSelect2
                         $( 'select[data-czrtype]', input.container )
                           .prepend( $_placeholder )
-                          .select2({
+                          .czrSelect2({
                                 templateResult: addIcon,
                                 templateSelection: addIcon,
                                 placeholder: sektionsLocalizedData.i18n['Select an icon'],
