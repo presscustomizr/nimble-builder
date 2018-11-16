@@ -216,8 +216,13 @@ function sek_get_parent_level_model( $child_level_id = '', $collection = array()
             if ( is_array( $_POST ) && ! empty( $_POST['location_skope_id'] ) ) {
                 $skope_id = $_POST['location_skope_id'];
             } else {
+                // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
+                // @see add_filter( 'skp_get_skope_id', '\Nimble\sek_filter_skp_get_skope_id', 10, 2 );
                 $skope_id = skp_get_skope_id();
             }
+        }
+        if ( empty( $skope_id ) || '_skope_not_set_' === $skope_id ) {
+            sek_error_log( __FUNCTION__ . ' => the skope_id should not be empty.');
         }
         $local_skope_settings = sek_get_skoped_seks( $skope_id );
         $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
@@ -1016,4 +1021,20 @@ function sek_user_started_before_version( $requested_version ) {
 
     return version_compare( $started_with , $requested_version, '<' );
 }
+
+
+// Filter the local skope id when invoking skp_get_skope_id in a customize_save ajax action
+add_filter( 'skp_get_skope_id', '\Nimble\sek_filter_skp_get_skope_id', 10, 2 );
+function sek_filter_skp_get_skope_id( $skope_id, $level ) {
+    // When ajaxing, @see the js callback on 'save-request-params', core hooks for the save query
+    // api.bind('save-request-params', function( query ) {
+    //       $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
+    // });
+    // implemented to fix : https://github.com/presscustomizr/nimble-builder/issues/242
+    if ( 'local' === $level && is_array( $_POST ) && ! empty( $_POST['local_skope_id'] ) && 'customize_save' === $_POST['action'] ) {
+        $skope_id = $_POST['local_skope_id'];
+    }
+    return $skope_id;
+}
+
 ?>
