@@ -309,8 +309,11 @@ class Sek_Dyn_CSS_Handler {
         if ( ! $this->customizer_save ) {
             $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
         } else {
+            //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
             if ( $this->css_string_to_enqueue_or_print ) {
                 $this->sek_dyn_css_maybe_write_css_file();
+            } else {
+                $this->sek_dyn_css_maybe_delete_file();
             }
         }
     }//__construct
@@ -586,7 +589,14 @@ class Sek_Dyn_CSS_Handler {
      */
     private function _sek_dyn_css_file_exists() {
         global $wp_filesystem;
-        return $wp_filesystem->is_readable( $this->uri );
+        //sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' SOOO ? => ' . $this->uri . $wp_filesystem->exists( $this->uri ), empty( $file_content ) );
+        if ( $wp_filesystem->exists( $this->uri ) ) {
+            $file_content = $wp_filesystem->get_contents( $this->uri );
+            return $wp_filesystem->is_readable( $this->uri ) && !empty( $file_content );
+        } else {
+            return false;
+        }
+
     }
 
 
