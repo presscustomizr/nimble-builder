@@ -1,4 +1,5 @@
 <?php
+// nimble_full_tmpl_ghf =>  nimble full tmpl with global header and footer
 namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
   exit;
@@ -20,6 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       </header><!-- #masthead -->
       <div id="nimble-content" class="">
         <?php
+          do_action('nimble_template_before_content_sections');
           render_nimble_locations(
               array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
               array(
@@ -29,6 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                   'fallback_location' => 'loop_start'
               )
           );
+          do_action('nimble_template_after_content_sections');
         ?>
       </div><!-- #content -->
       <footer id="nimble-footer" class="">
