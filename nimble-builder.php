@@ -125,6 +125,14 @@ if ( nimble_pass_requirements() ) {
         \Nimble\register_location( $location, $params );
     }
 
+    //@param $locations. mixed type
+    //@param $options (array)$options = wp_parse_args( $options, array(
+    //     'fallback_location' => null, // Typically set as 'loop_start' in the nimble templates
+    // ));
+    function render_nimble_locations( $locations, $options = array() ) {
+        \Nimble\render_nimble_locations( $locations, $options );
+    }
+
     // Fire the retro compatibility functions
     // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
     add_action( 'wp_loaded', '\Nimble\sek_maybe_do_version_mapping' );
