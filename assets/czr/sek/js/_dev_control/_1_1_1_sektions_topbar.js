@@ -3,7 +3,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
             // TOP BAR
-            // fired in ::initialize()
+            // fired in ::initialize(), at api.bind( 'ready', function() {})
             setupTopBar : function() {
                   var self = this;
                   self.topBarVisible = new api.Value( false );
@@ -26,22 +26,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $(window).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
                   api.previewer.bind('ready', function() {
                         $(api.previewer.targetWindow().document ).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
-                  });
-                  self.historyLog = new api.Value([]);
-                  // LISTEN TO HISTORY LOG CHANGES TO UPDATE THE BUTTON STATE
-                  self.historyLog.bind( function( newLog ) {
-                        if ( _.isEmpty( newLog ) )
-                          return;
-
-                        var newCurrentKey = _.findKey( newLog, { status : 'current'} );
-                        newCurrentKey = Number( newCurrentKey );
-                        $( '#nimble-top-bar' ).find('[data-nimble-history]').each( function() {
-                              if ( 'undo' === $(this).data('nimble-history') ) {
-                                    $(this).attr('data-nimble-state', 0 >= newCurrentKey ? 'disabled' : 'enabled');
-                              } else {
-                                    $(this).attr('data-nimble-state', newLog.length <= ( newCurrentKey + 1 ) ? 'disabled' : 'enabled');
-                              }
-                        });
                   });
             },
 
@@ -192,7 +176,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // set the new setting Value
                   if( ! _.isUndefined( newSettingValue ) ) {
-                        api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue ), { navigatingHistoryLogs : true } );
+                        if ( ! _.isEmpty( newSettingValue.local ) ) {
+                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local ), { navigatingHistoryLogs : true } );
+                        }
+                        if ( ! _.isEmpty( newSettingValue.global ) ) {
+                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global ), { navigatingHistoryLogs : true } );
+                        }
                         // If the information is available, refresh only the relevant sections
                         // otherwise fallback on a full refresh
                         var previewHasBeenRefreshed = false;

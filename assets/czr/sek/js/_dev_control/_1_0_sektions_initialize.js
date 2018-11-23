@@ -43,153 +43,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // this is used to know what ui elements are currently being displayed
                   self.registered = new api.Value([]);
 
+
                   api.bind( 'ready', function() {
-                        // the main sektion panel
-                        // the local and global options section
-                        self.registerAndSetupDefaultPanelSectionOptions();
-
-                        // Setup the collection setting => register the main setting and bind it
-                        // schedule reaction to collection setting ids => the setup of the collection setting when the collection setting ids are set
-                        //=> on skope change
-                        //@see setContextualCollectionSettingIdWhenSkopeSet
-                        self.localSectionsSettingId.callbacks.add( function( collectionSettingIds, previousCollectionSettingIds ) {
-                              // register the collection setting id
-                              // and schedule the reaction to different collection changes : refreshModules, ...
-                              try { self.setupSettingsToBeSaved(); } catch( er ) {
-                                    api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
-                              }
-                        });
-
-
-                        // POPULATE THE MAIN SETTING ID NOW
-                        // + GENERATE UI FOR THE LOCAL SKOPE OPTIONS
-                        // + GENERATE UI FOR THE GLOBAL OPTIONS
-                        var doSkopeDependantActions = function( newSkopes, previousSkopes ) {
-                              self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
-                              // Generate UI for the local skope options and the global options
-                              self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
-                              self.generateUI({ action : 'sek-generate-global-options-ui'});
-                        };
-                        // populate the setting ids now if skopes are set
-                        if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
-                              doSkopeDependantActions();
-                        }
-                        // ON SKOPE READY
-                        // - Set the contextual setting prefix
-                        // - Generate UI for Nimble local skope options
-                        // - Generate the content picker
-                        api.czr_activeSkopes.callbacks.add( function( newSkopes, previousSkopes ) {
-                              doSkopeDependantActions( newSkopes, previousSkopes );
-                        });
-
-
-                        // Communicate with the preview
-                        self.reactToPreviewMsg();
-
-                        // Setup Dnd
-                        self.setupDnd();
-
-
-                        // setup the tinyMce editor used for the tiny_mce_editor input
-                        // => one object listened to by each tiny_mce_editor input
-                        self.setupTinyMceEditor();
-
-                        // print json
-                        self.schedulePrintSectionJson();
-
-                        // Always set the previewed device back to desktop on ui change
-                        // event 'sek-ui-removed' id triggered when cleaning the registered ui controls
-                        // @see ::cleanRegistered()
-                        self.bind( 'sek-ui-removed', function() {
-                              api.previewedDevice( 'desktop' );
-                        });
-
-                        // Synchronize api.previewedDevice with the currently rendered ui
-                        // ensure that the selected device tab of the spacing module is the one being previewed
-                        // =>@see spacing module, in item constructor CZRSpacingItemMths
-                        api.previewedDevice.bind( function( device ) {
-                              var currentControls = _.filter( self.registered(), function( uiData ) {
-                                    return 'control' == uiData.what;
-                              });
-                              _.each( currentControls || [] , function( ctrlData ) {
-                                    api.control( ctrlData.id, function( _ctrl_ ) {
-                                          _ctrl_.container.find('[data-sek-device="' + device + '"]').each( function() {
-                                                $(this).trigger('click');
-                                          });
-                                    });
-                              });
-                        });
-
-                        // Schedule a reset
-                        $('#customize-notifications-area').on( 'click', '[data-sek-reset="true"]', function() {
-                              self.resetCollectionSetting();
-                        });
-
-
-                        // CLEAN UI BEFORE REMOVAL
-                        // 'sek-ui-pre-removal' is triggered in ::cleanRegistered
-                        // @params { what : control, id : '' }
-                        self.bind( 'sek-ui-pre-removal', function( params ) {
-                              // CLEAN DRAG N DROP
-                              if ( 'control' == params.what && -1 < params.id.indexOf( 'draggable') ) {
-                                    api.control( params.id, function( _ctrl_ ) {
-                                          _ctrl_.container.find( '[draggable]' ).each( function() {
-                                                $(this).off( 'dragstart dragend' );
-                                          });
-                                    });
-                              }
-
-                              // CLEAN SELECT2
-                              // => we need to destroy the czrSelect2 instance, otherwise it can stay open when switching to another ui.
-                              if ( 'control' == params.what ) {
-                                    api.control( params.id, function( _ctrl_ ) {
-                                          _ctrl_.container.find( 'select' ).each( function() {
-                                                if ( ! _.isUndefined( $(this).data('czrSelect2') ) ) {
-                                                      $(this).czrSelect2('destroy');
-                                                }
-                                          });
-                                    });
-                              }
-                        });
-
-
-                        // POPULATE THE REGISTERED COLLECTION
-                        // 'czr-new-registered' is fired in api.CZR_Helpers.register()
-                        api.bind( 'czr-new-registered', function( params ) {
-                              //console.log( 'czr-new-registered => ', params );
-                              // Check that we have an origin property and that make sure we populate only the registration emitted by 'nimble'
-                              if ( _.isUndefined( params.origin ) ) {
-                                    throw new Error( 'czr-new-registered event => missing params.origin' );
-                              }
-                              if ( 'nimble' !== params.origin )
-                                return;
-
-                              // when no collection is provided, we use
-                              if ( false !== params.track ) {
-                                    var currentlyRegistered = self.registered();
-                                    var newRegistered = $.extend( true, [], currentlyRegistered );
-                                    //Check for duplicates
-                                    var duplicateCandidate = _.findWhere( newRegistered, { id : params.id } );
-                                    if ( ! _.isEmpty( duplicateCandidate ) && _.isEqual( duplicateCandidate, params ) ) {
-                                          throw new Error( 'register => duplicated element in self.registered() collection ' + params.id );
-                                    }
-                                    newRegistered.push( params );
-                                    self.registered( newRegistered );
-
-                                    // say it
-                                    //this.trigger( [params.what, params.id , 'registered' ].join('__'), params );
-                              }
-                        });
-
-
-                        // TOP BAR
-                        // Setup the topbar including do/undo action buttons
-                        self.setupTopBar();//@see specific dev file
-
-                        // SAVE SECTION UI
-                        if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-                              self.setupSaveUI();
-                        }
+                        self.doSektionThinksOnApiReady();
                   });//api.bind( 'ready' )
 
                   // Add the skope id on save
@@ -206,13 +62,172 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },// initialize()
 
 
+            // Fired at api.bind( 'ready', function() {})
+            doSektionThinksOnApiReady : function() {
+                  var self = this;
+                  // the main sektion panel
+                  // the local and global options section
+                  self.registerAndSetupDefaultPanelSectionOptions();
+
+                  // Setup the collection settings => register the main settings for local and global skope and bind it
+                  // schedule reaction to collection setting ids => the setup of the collection setting when the collection setting ids are set
+                  //=> on skope change
+                  //@see setContextualCollectionSettingIdWhenSkopeSet
+                  //
+                  // var _settingsToRegister_ = {
+                  //       'local' : { collectionSettingId : self.localSectionsSettingId() },//<= "nimble___[skp__post_page_10]"
+                  //       'global' : { collectionSettingId : self.getGlobalSectionsSettingId() }//<= "nimble___[skp__global]"
+                  // };
+                  self.localSectionsSettingId.callbacks.add( function( collectionSettingIds, previousCollectionSettingIds ) {
+                        // register the collection setting id
+                        // and schedule the reaction to different collection changes : refreshModules, ...
+                        try { self.setupSettingsToBeSaved(); } catch( er ) {
+                              api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
+                        }
+
+                        // Now that the local and global settings are registered, initialize the history log
+                        self.initializeHistoryLogWhenSettingsRegistered();
+                  });
+
+
+                  // POPULATE THE MAIN SETTING ID NOW
+                  // + GENERATE UI FOR THE LOCAL SKOPE OPTIONS
+                  // + GENERATE UI FOR THE GLOBAL OPTIONS
+                  var doSkopeDependantActions = function( newSkopes, previousSkopes ) {
+                        self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
+                        // Generate UI for the local skope options and the global options
+                        self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
+                        self.generateUI({ action : 'sek-generate-global-options-ui'});
+                  };
+                  // populate the setting ids now if skopes are set
+                  if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
+                        doSkopeDependantActions();
+                  }
+                  // ON SKOPE READY
+                  // - Set the contextual setting prefix
+                  // - Generate UI for Nimble local skope options
+                  // - Generate the content picker
+                  api.czr_activeSkopes.callbacks.add( function( newSkopes, previousSkopes ) {
+                        doSkopeDependantActions( newSkopes, previousSkopes );
+                  });
+
+
+                  // Communicate with the preview
+                  self.reactToPreviewMsg();
+
+                  // Setup Dnd
+                  self.setupDnd();
+
+
+                  // setup the tinyMce editor used for the tiny_mce_editor input
+                  // => one object listened to by each tiny_mce_editor input
+                  self.setupTinyMceEditor();
+
+                  // print json
+                  self.schedulePrintSectionJson();
+
+                  // Always set the previewed device back to desktop on ui change
+                  // event 'sek-ui-removed' id triggered when cleaning the registered ui controls
+                  // @see ::cleanRegistered()
+                  self.bind( 'sek-ui-removed', function() {
+                        api.previewedDevice( 'desktop' );
+                  });
+
+                  // Synchronize api.previewedDevice with the currently rendered ui
+                  // ensure that the selected device tab of the spacing module is the one being previewed
+                  // =>@see spacing module, in item constructor CZRSpacingItemMths
+                  api.previewedDevice.bind( function( device ) {
+                        var currentControls = _.filter( self.registered(), function( uiData ) {
+                              return 'control' == uiData.what;
+                        });
+                        _.each( currentControls || [] , function( ctrlData ) {
+                              api.control( ctrlData.id, function( _ctrl_ ) {
+                                    _ctrl_.container.find('[data-sek-device="' + device + '"]').each( function() {
+                                          $(this).trigger('click');
+                                    });
+                              });
+                        });
+                  });
+
+                  // Schedule a reset
+                  $('#customize-notifications-area').on( 'click', '[data-sek-reset="true"]', function() {
+                        self.resetCollectionSetting();
+                  });
+
+
+                  // CLEAN UI BEFORE REMOVAL
+                  // 'sek-ui-pre-removal' is triggered in ::cleanRegistered
+                  // @params { what : control, id : '' }
+                  self.bind( 'sek-ui-pre-removal', function( params ) {
+                        // CLEAN DRAG N DROP
+                        if ( 'control' == params.what && -1 < params.id.indexOf( 'draggable') ) {
+                              api.control( params.id, function( _ctrl_ ) {
+                                    _ctrl_.container.find( '[draggable]' ).each( function() {
+                                          $(this).off( 'dragstart dragend' );
+                                    });
+                              });
+                        }
+
+                        // CLEAN SELECT2
+                        // => we need to destroy the czrSelect2 instance, otherwise it can stay open when switching to another ui.
+                        if ( 'control' == params.what ) {
+                              api.control( params.id, function( _ctrl_ ) {
+                                    _ctrl_.container.find( 'select' ).each( function() {
+                                          if ( ! _.isUndefined( $(this).data('czrSelect2') ) ) {
+                                                $(this).czrSelect2('destroy');
+                                          }
+                                    });
+                              });
+                        }
+                  });
+
+
+                  // POPULATE THE REGISTERED COLLECTION
+                  // 'czr-new-registered' is fired in api.CZR_Helpers.register()
+                  api.bind( 'czr-new-registered', function( params ) {
+                        //console.log( 'czr-new-registered => ', params );
+                        // Check that we have an origin property and that make sure we populate only the registration emitted by 'nimble'
+                        if ( _.isUndefined( params.origin ) ) {
+                              throw new Error( 'czr-new-registered event => missing params.origin' );
+                        }
+                        if ( 'nimble' !== params.origin )
+                          return;
+
+                        // when no collection is provided, we use
+                        if ( false !== params.track ) {
+                              var currentlyRegistered = self.registered();
+                              var newRegistered = $.extend( true, [], currentlyRegistered );
+                              //Check for duplicates
+                              var duplicateCandidate = _.findWhere( newRegistered, { id : params.id } );
+                              if ( ! _.isEmpty( duplicateCandidate ) && _.isEqual( duplicateCandidate, params ) ) {
+                                    throw new Error( 'register => duplicated element in self.registered() collection ' + params.id );
+                              }
+                              newRegistered.push( params );
+                              self.registered( newRegistered );
+
+                              // say it
+                              //this.trigger( [params.what, params.id , 'registered' ].join('__'), params );
+                        }
+                  });
+
+
+                  // TOP BAR
+                  // Setup the topbar including do/undo action buttons
+                  self.setupTopBar();//@see specific dev file
+
+                  // SAVE SECTION UI
+                  if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+                        self.setupSaveUI();
+                  }
+            },
 
 
 
 
 
 
-            // Fired in initialize()
+
+            // Fired at api "ready"
             registerAndSetupDefaultPanelSectionOptions : function() {
                   var self = this;
 
