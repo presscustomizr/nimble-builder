@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-do_action('nimble_before_content_sections');
+do_action('nimble_template_before_content_sections');
   render_nimble_locations(
       array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
       array(
@@ -16,6 +16,6 @@ do_action('nimble_before_content_sections');
           'fallback_location' => 'loop_start'
       )
   );
-do_action('nimble_after_content_sections');
+do_action('nimble_template_after_content_sections');
 
 get_footer();
