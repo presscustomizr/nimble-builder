@@ -63,31 +63,44 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // cache all locations now
             $all_locations = sek_get_locations();
 
-            if ( !empty( $locale_template ) )
-              return;
-
-            //sek_error_log('sek_get_locations()', sek_get_locations() );
-
+            // $default_locations = [
+            //     'loop_start' => array( 'priority' => 10 ),
+            //     'before_content' => array(),
+            //     'after_content' => array(),
+            //     'loop_end' => array( 'priority' => 10 ),
+            // ]
             // SCHEDULE THE ACTIONS ON HOOKS AND CONTENT FILTERS
             foreach( $all_locations as $location_id => $params ) {
                 $params = is_array( $params ) ? $params : array();
                 $params = wp_parse_args( $params, array( 'priority' => 10 ) );
-                switch ( $location_id ) {
-                    case 'loop_start' :
-                    case 'loop_end' :
-                        add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
-                    break;
-                    case 'before_content' :
-                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
-                    break;
-                    case 'after_content' :
-                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
-                    break;
-                    // Default is typically used for custom locations
-                    default :
-                        add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
-                    break;
+
+                // When a local template is used, the default locations are rendered with :
+                // render_nimble_locations(
+                //     array_keys( Nimble_Manager()->default_locations ),//array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
+                // );
+                // @see nimble tmpl/ template files
+                // That's why we don't need to add the rendering actions for the default locations. We only need to add action for the possible locations registered on the theme hooks
+                if ( !empty( $locale_template ) && !array_key_exists( $location_id, Nimble_Manager()->default_locations ) ) {
+                    add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
+                } else {
+                    switch ( $location_id ) {
+                        case 'loop_start' :
+                        case 'loop_end' :
+                            add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
+                        break;
+                        case 'before_content' :
+                            add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
+                        break;
+                        case 'after_content' :
+                            add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
+                        break;
+                        // Default is typically used for custom locations
+                        default :
+                            add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
+                        break;
+                    }
                 }
+
             }
         }
 
