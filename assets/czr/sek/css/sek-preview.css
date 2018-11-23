@@ -1326,6 +1326,9 @@ html.no-js [id*=sek-slider-loader-wrapper] {
 [data-sek-is-global-location="true"] .sek-empty-location-placeholder:hover {
   border: 2px dotted #ff0000;
 }
+[data-sek-is-global-location="true"] .sek-add-content-button-wrapper {
+  border: 1px dashed #ff7878
+}
 [data-sek-is-global-location="true"] .sek-mouse-is-close .sek-add-content-button-wrapper {
   border: 1px dashed #ff0000;
 }
@@ -1344,6 +1347,9 @@ html.no-js [id*=sek-slider-loader-wrapper] {
 }
 
 /* STYLE FOR FOOTER LOCATION */
-[data-sek-is-global-location="true"] {
-  margin-bottom: 40px;
+[data-sek-is-footer-location="true"] {
+  margin-bottom:40px;
+}
+[data-sek-is-header-location="true"] {
+  margin-top:0;
 }
