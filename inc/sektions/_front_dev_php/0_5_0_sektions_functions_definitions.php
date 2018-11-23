@@ -167,6 +167,15 @@ function render_nimble_locations( $locations, $options = array() ) {
     }//render_nimble_locations()
 }
 
+// DEPRECATED SINCE Nimble v1.3.0, november 2018
+// was used in the Hueman theme before version 3.4.9
+function render_content_sections_for_nimble_template() {
+    render_nimble_locations(
+        array_keys( \Nimble\Nimble_Manager()->default_locations ),//array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
+        array( 'fallback_location' => 'loop_start' )
+    );
+}
+
 // @return void()
 /*function sek_get_module_placeholder( $placeholder_icon = 'short_text' ) {
   $placeholder_icon = empty( $placeholder_icon ) ? 'not_interested' : $placeholder_icon;
