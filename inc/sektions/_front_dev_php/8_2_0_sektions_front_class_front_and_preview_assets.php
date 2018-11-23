@@ -112,6 +112,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 array(
                     'i18n' => array(
                         "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
+                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'text_domain_to_be_replaced'),
                         'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
                         'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
                         'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
@@ -178,7 +179,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <?php if ( sek_is_dev_mode() ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
-                        <# if ( ! data.is_nested ) { #>
+                        <# if ( ! data.is_nested && true !== data.is_global_location ) { #>
                           <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Move section', 'text_domain' ); ?>"></i>
                         <# } #>
                         <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>">tune</i>
