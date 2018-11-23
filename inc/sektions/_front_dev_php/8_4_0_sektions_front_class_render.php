@@ -26,48 +26,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             // REGISTER HEADER AND FOOTER GLOBAL LOCATIONS
             add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
-        }
+        }//_schedule_front_rendering()
 
-        // Fired in the constructor
-        function sek_register_nimble_global_locations() {
-            register_location('nimble_global_header', array( 'is_global_location' => true, 'is_header_location' => true ) );
-            register_location('nimble_global_footer', array( 'is_global_location' => true, 'is_footer_location' => true ) );
-        }
 
-        // When using the default theme template, let's schedule the default hooks rendering
-        // When using the Nimble template, this is done with render_content_sections_for_nimble_template();
-        function sek_schedule_rendering_hooks() {
-            $locale_template = sek_get_locale_template();
-            // cache all locations now
-            $this->all_nimble_locations = sek_get_locations();
-
-            if ( !empty( $locale_template ) )
-              return;
-
-            //sek_error_log('sek_get_locations()', sek_get_locations() );
-
-            // SCHEDULE THE ACTIONS ON HOOKS AND CONTENT FILTERS
-            foreach( $this->all_nimble_locations as $location_id => $params ) {
-                $params = is_array( $params ) ? $params : array();
-                $params = wp_parse_args( $params, array( 'priority' => 10 ) );
-                switch ( $location_id ) {
-                    case 'loop_start' :
-                    case 'loop_end' :
-                        add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
-                    break;
-                    case 'before_content' :
-                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
-                    break;
-                    case 'after_content' :
-                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
-                    break;
-                    // Defaut is typically used when for custom locations
-                    default :
-                        add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
-                    break;
-                }
-            }
-        }
 
         // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
         // @filter the_content::NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY
@@ -87,6 +48,49 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             return $html;
         }
+
+
+        // Fired in the constructor
+        function sek_register_nimble_global_locations() {
+            register_location('nimble_global_header', array( 'is_global_location' => true, 'is_header_location' => true ) );
+            register_location('nimble_global_footer', array( 'is_global_location' => true, 'is_footer_location' => true ) );
+        }
+
+        // When using the default theme template, let's schedule the default hooks rendering
+        // When using the Nimble template, this is done with render_content_sections_for_nimble_template();
+        function sek_schedule_rendering_hooks() {
+            $locale_template = sek_get_locale_template();
+            // cache all locations now
+            $all_locations = sek_get_locations();
+
+            if ( !empty( $locale_template ) )
+              return;
+
+            //sek_error_log('sek_get_locations()', sek_get_locations() );
+
+            // SCHEDULE THE ACTIONS ON HOOKS AND CONTENT FILTERS
+            foreach( $all_locations as $location_id => $params ) {
+                $params = is_array( $params ) ? $params : array();
+                $params = wp_parse_args( $params, array( 'priority' => 10 ) );
+                switch ( $location_id ) {
+                    case 'loop_start' :
+                    case 'loop_end' :
+                        add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
+                    break;
+                    case 'before_content' :
+                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
+                    break;
+                    case 'after_content' :
+                        add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
+                    break;
+                    // Default is typically used for custom locations
+                    default :
+                        add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
+                    break;
+                }
+            }
+        }
+
 
 
         // hook : loop_start, loop_end, and all custom locations
@@ -151,12 +155,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // the $location_data can be provided. Typically when using the function render_content_sections_for_nimble_template in the Nimble page template.
         public function _render_seks_for_location( $location = '', $location_data = array() ) {
-            //maybe cache locations
-            if ( empty( $this->all_nimble_locations ) ) {
-                 $this->all_nimble_locations = sek_get_locations();
-            }
+            $all_locations = sek_get_locations();
 
-            if ( ! array_key_exists( $location, $this->all_nimble_locations ) ) {
+            if ( ! array_key_exists( $location, $all_locations ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
                 return;
             }
@@ -230,7 +231,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             <?php
                               printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s>',
                                   $id,
-                                  sek_is_global_location( $id ) ? 'data-sek-is-global-location="true"' : '',
+                                  sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false'),
                                   true === sek_get_registered_location_property( $id, 'is_header_location' ) ? 'data-sek-is-header-location="true"' : '',
                                   true === sek_get_registered_location_property( $id, 'is_footer_location' ) ? 'data-sek-is-footer-location="true"' : ''
                               );

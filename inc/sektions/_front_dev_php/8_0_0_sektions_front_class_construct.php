@@ -18,7 +18,6 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'loop_end' => array( 'priority' => 10 ),
         ];
         public $registered_locations = [];
-        public $all_nimble_locations = [];// will be cached @wp_head. See SEK_Front_Render::_schedule_front_rendering()
         // the model used to register a location
         public $default_registered_location_model = [
           'priority' => 10,
@@ -47,6 +46,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {
+            // INITIALIZE THE REGISTERED LOCATIONS WITH THE DEFAULT LOCATIONS
+            $this->registered_locations = $this->default_locations;
+
             // AJAX
             $this -> _schedule_front_ajax_actions();
             $this -> _schedule_img_import_ajax_actions();

@@ -30,18 +30,16 @@ function sek_get_locations() {
         sek_error_log( __FUNCTION__ . ' error => the registered locations must be an array');
         return Nimble_Manager()->default_locations;
     }
-    return apply_filters( 'sek_locations', array_merge( Nimble_Manager()->default_locations, Nimble_Manager()->registered_locations ) );
+    //sek_error_log( __FUNCTION__ .' => locations ?',  array_merge( Nimble_Manager()->default_locations, Nimble_Manager()->registered_locations ) );
+    return apply_filters( 'sek_get_locations', Nimble_Manager()->registered_locations );
 }
 
 // @param location_id (string)
 function sek_get_registered_location_property( $location_id, $property_name = '' ) {
-    // make sure the nimble locations are cached
-    if ( empty( Nimble_Manager()->all_nimble_locations ) ) {
-        Nimble_Manager()->all_nimble_locations = sek_get_locations();
-    }
+    $all_locations = sek_get_locations();
     $default_property_val = 'not_set';
-
-    if ( ! isset( Nimble_Manager()->all_nimble_locations[$location_id] ) || ! is_array( Nimble_Manager()->all_nimble_locations[$location_id] ) ) {
+    //sek_error_log( __FUNCTION__ .' => locations ?',  $all_locations );
+    if ( ! isset( $all_locations[$location_id] ) || ! is_array( $all_locations[$location_id] ) ) {
         sek_error_log( __FUNCTION__ . ' error => the location ' . $location_id . ' is invalid or not registered.');
         return $default_property_val;
     }
@@ -51,12 +49,16 @@ function sek_get_registered_location_property( $location_id, $property_name = ''
         return $default_property_val;
     }
 
-    $location_params = wp_parse_args( Nimble_Manager()->all_nimble_locations[$location_id], Nimble_Manager()->default_registered_location_model );
+    $location_params = wp_parse_args( $all_locations[$location_id], Nimble_Manager()->default_registered_location_model );
     return ! empty( $location_params[$property_name] ) ? $location_params[$property_name] : $default_property_val;
 }
 
 // @return bool
 function sek_is_global_location( $location_id ) {
+    if ( ! is_string( $location_id ) || empty( $location_id ) ) {
+        sek_error_log( __FUNCTION__ . ' error => missing or invalid location_id param' );
+        return false;
+    }
     $is_global_location = sek_get_registered_location_property( $location_id, 'is_global_location' );
     return 'not_set' === $is_global_location ? false : true === $is_global_location;
 }
@@ -70,7 +72,7 @@ function register_location( $location_id, $params = array() ) {
         $registered_locations[$location_id] = $params;
     }
     Nimble_Manager()->registered_locations = $registered_locations;
-    //sek_error_log('Nimble_Manager()->registered_locations', Nimble_Manager()->registered_locations );
+    //sek_error_log( __FUNCTION__ .' => Nimble_Manager()->registered_locations', Nimble_Manager()->registered_locations );
 }
 
 
@@ -121,6 +123,7 @@ function sek_has_global_sections() {
 
 //@return void()
 //@param $locations. mixed type
+//@param $options (array)
 function render_nimble_locations( $locations, $options = array() ) {
     if ( is_string( $locations ) && ! empty( $locations ) ) {
         $locations = array( $locations );
@@ -133,11 +136,14 @@ function render_nimble_locations( $locations, $options = array() ) {
     // Normalize the $options
     $options = ! is_array( $options ) ? array() : $options;
     $options = wp_parse_args( $options, array(
-        // the location rendered even if empty.
+        // fallback_location => the location rendered even if empty.
         // This way, the user starts customizing with only one location for the content instead of four
         // But if the other locations were already customized, they will be printed.
         'fallback_location' => null, // Typically set as 'loop_start' in the nimble templates
     ));
+
+
+    //sek_error_log( __FUNCTION__ . ' sek_get_locations() ', sek_get_locations() );
 
     foreach( $locations as $location_id ) {
         $is_global = sek_is_global_location( $location_id );
@@ -158,7 +164,7 @@ function render_nimble_locations( $locations, $options = array() ) {
             do_action( "sek_after_location_{$location_id}" );
         }
 
-    }
+    }//render_nimble_locations()
 }
 
 // @return void()
