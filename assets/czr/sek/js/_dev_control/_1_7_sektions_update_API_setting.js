@@ -1026,7 +1026,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 'pending' == __updateAPISettingDeferred__.state() ) {
                               var mayBeUpdateSektionsSetting = function() {
                                     if ( _.isEqual( currentSetValue, newSetValue ) ) {
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
+                                          if ( sektionsLocalizedData.isDevMode ) {
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
+                                          }
                                     } else {
                                           if ( null !== self.validateSettingValue( newSetValue ) ) {
                                                 sektionSetInstance( newSetValue, params );
@@ -1035,7 +1037,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 params.cloneId = cloneId;
                                                 __updateAPISettingDeferred__.resolve( params );
                                           } else {
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value did not pass the validation checks for action ' + params.action );
+                                                __updateAPISettingDeferred__.reject( 'Validation problem for action ' + params.action );
                                           }
                                           //api.infoLog('COLLECTION SETTING UPDATED => ', _collectionSettingId_, api( _collectionSettingId_ )() );
                                     }
