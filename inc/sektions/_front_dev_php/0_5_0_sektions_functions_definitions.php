@@ -34,6 +34,35 @@ function sek_get_locations() {
     return apply_filters( 'sek_get_locations', Nimble_Manager()->registered_locations );
 }
 
+// @return array of "local" locations => locations in which sections are specific to a given skope id
+function sek_get_local_locations() {
+    $locations = array();
+    $all_locations = sek_get_locations();
+    if ( is_array( $all_locations ) ) {
+        foreach ( $all_locations as $loc_id => $loc_data) {
+            if ( ! sek_is_global_location( $loc_id ) ) {
+                $locations[$loc_id] = $loc_data;
+            }
+        }
+    }
+    return $locations;
+}
+
+// @return an array of "global" locations => in which the sections are displayed site wide
+function sek_get_global_locations() {
+    $locations = array();
+    $all_locations = sek_get_locations();
+    if ( is_array( $all_locations ) ) {
+        foreach ( $all_locations as $loc_id => $loc_data) {
+            if ( sek_is_global_location( $loc_id ) ) {
+                $locations[$loc_id] = $loc_data;
+            }
+        }
+    }
+    return $locations;
+}
+
+
 // @param location_id (string)
 function sek_get_registered_location_property( $location_id, $property_name = '' ) {
     $all_locations = sek_get_locations();
@@ -146,6 +175,10 @@ function render_nimble_locations( $locations, $options = array() ) {
     //sek_error_log( __FUNCTION__ . ' sek_get_locations() ', sek_get_locations() );
 
     foreach( $locations as $location_id ) {
+        if ( ! is_string( $location_id ) || empty( $location_id ) ) {
+            sek_error_log( __FUNCTION__ . ' => error => a location_id is not valid in the provided locations', $locations );
+            continue;
+        }
         $is_global = sek_is_global_location( $location_id );
         $skope_id = $is_global ? NIMBLE_GLOBAL_SKOPE_ID : skp_get_skope_id();
         $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );

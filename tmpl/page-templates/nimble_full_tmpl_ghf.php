@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php
           do_action('nimble_template_before_content_sections');
           render_nimble_locations(
-              array_keys( Nimble_Manager()->default_locations ),//array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
+              array_keys( sek_get_local_locations() ),//array( 'loop_start', 'before_content', 'after_content', 'loop_end', + other custom registered locations ),
               array(
                   // the location rendered even if empty.
                   // This way, the user starts customizing with only one location for the content instead of four
