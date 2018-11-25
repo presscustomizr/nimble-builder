@@ -754,7 +754,12 @@ function sek_filter_skp_get_skope_id( $skope_id, $level ) {
     }
     return $skope_id;
 }
-
+function render_content_sections_for_nimble_template() {
+    Nimble_Manager()->render_nimble_locations(
+        array_keys( Nimble_Manager()->default_locations ),//array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
+        array( 'fallback_location' => 'loop_start' )
+    );
+}
 ?><?php
 function sek_maybe_do_version_mapping() {
     if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
@@ -8702,14 +8707,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             }//render_nimble_locations()
         }
-        function render_content_sections_for_nimble_template() {
-            render_nimble_locations(
-                array_keys( \Nimble\Nimble_Manager()->default_locations ),//array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
-                array( 'fallback_location' => 'loop_start' )
-            );
-        }
-
-
 
 
 
