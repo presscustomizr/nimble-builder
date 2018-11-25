@@ -2,7 +2,7 @@
 /**
 * Plugin Name: Nimble Builder
 * Description: Powerful drag and drop page builder using the native WordPress customizer.
-* Version: 1.2.2
+* Version: 1.3.0-beta
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://presscustomizr.com
@@ -11,7 +11,7 @@
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "1.2.2";
+$current_version = "1.3.0-beta";
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
 if ( !defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
@@ -77,8 +77,8 @@ function nimble_load_czr_base_fmk() {
         ));
     }
 }
-if ( nimble_pass_requirements() ) {
 
+if ( nimble_pass_requirements() ) {
     require_once( NIMBLE_BASE_PATH . '/inc/czr-skope/index.php' );
     add_action( 'after_setup_theme', 'nimble_load_skope_php');
     function nimble_load_skope_php() {
@@ -104,8 +104,8 @@ if ( nimble_pass_requirements() ) {
         }
     }
 
-    if ( defined( 'NIMBLE_PRINT_TEST' ) && NIMBLE_PRINT_TEST && file_exists( plugin_dir_path( __FILE__ ) . 'tests.php' ) ) {
-        require_once( NIMBLE_BASE_PATH . '/tests.php' );
+    if ( defined( 'NIMBLE_PRINT_DEV_LOGS' ) && NIMBLE_PRINT_DEV_LOGS && file_exists( plugin_dir_path( __FILE__ ) . 'dev_logs.php' ) ) {
+        require_once( NIMBLE_BASE_PATH . '/dev_logs.php' );
     }
 
     add_action('plugins_loaded', 'nimble_load_plugin_textdomain');
@@ -141,4 +141,4 @@ if ( nimble_pass_requirements() ) {
     if ( is_admin() ) {
         require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-admin.php' );
     }
-}
+}//if ( nimble_pass_requirements() )
