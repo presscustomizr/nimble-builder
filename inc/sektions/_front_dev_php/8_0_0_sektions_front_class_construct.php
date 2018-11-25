@@ -33,10 +33,13 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'options' => [],
             'ver_ini' => NIMBLE_VERSION
         ];
+        public $rendered_levels = [];//<= stores the ids of the level rendered with ::render()
 
         public static function get_instance( $params ) {
-            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Sek_Simple_Form ) ) {
-                self::$instance = new Sek_Simple_Form( $params );
+            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Sek_Nimble_Manager ) ) {
+                self::$instance = new Sek_Nimble_Manager( $params );
+
+                // this hook is used to add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
                 do_action( 'nimble_front_classes_ready', self::$instance );
             }
             return self::$instance;
