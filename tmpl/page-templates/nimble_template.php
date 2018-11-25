@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 do_action('nimble_template_before_content_sections');
-  render_nimble_locations(
+  Nimble_Manager()->render_nimble_locations(
       array_keys( sek_get_local_locations() ),//array( 'loop_start', 'before_content', 'after_content', 'loop_end', + other custom registered locations ),
       array(
           // the location rendered even if empty.
