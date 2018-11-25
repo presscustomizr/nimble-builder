@@ -7,7 +7,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
             if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
 
-            add_action( 'wp_head', array( $this, 'sek_schedule_rendering_hooks') );
+            // Fires after 'wp' and before the 'get_header' template file is loaded.
+            add_action( 'template_redirect', array( $this, 'sek_schedule_rendering_hooks') );
 
             // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
             add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
@@ -56,6 +57,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             register_location('nimble_global_footer', array( 'is_global_location' => true, 'is_footer_location' => true ) );
         }
 
+        // @template_redirect
         // When using the default theme template, let's schedule the default hooks rendering
         // When using the Nimble template, this is done with render_content_sections_for_nimble_template();
         function sek_schedule_rendering_hooks() {
@@ -107,6 +109,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
         // hook : loop_start, loop_end, and all custom locations
+        // @return void()
         function sek_schedule_sektions_rendering( $query = null ) {
             // Check if the passed query is the main_query, bail if not
             // fixes: https://github.com/presscustomizr/nimble-builder/issues/154 2.
@@ -118,17 +121,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 return;
             }
 
-            $location = current_filter();
-            // A location can be rendered only once
-            // for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
+            $location_id = current_filter();
+            // why check if did_action( ... ) ?
+            //  => A location can be rendered only once
+            // => for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
+            // => for a custom location, it can be rendered by do_action() somewhere, and be rendered also with render_nimble_locations()
             // @see issue with Twenty Seventeen here : https://github.com/presscustomizr/nimble-builder/issues/14
-            // That's why we check if did_action( ... )
-            if ( did_action( "sek_before_location_{$location}" ) )
+            if ( did_action( "sek_before_location_{$location_id}" ) )
               return;
 
-            do_action( "sek_before_location_{$location}" );
-            $this->_render_seks_for_location( $location );
-            do_action( "sek_after_location_{$location}" );
+            do_action( "sek_before_location_{$location_id}" );
+            $this->_render_seks_for_location( $location_id );
+            do_action( "sek_after_location_{$location_id}" );
         }
 
         // hook : 'the_content'::-9999
@@ -167,17 +171,17 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
         // the $location_data can be provided. Typically when using the function render_content_sections_for_nimble_template in the Nimble page template.
-        public function _render_seks_for_location( $location = '', $location_data = array() ) {
+        public function _render_seks_for_location( $location_id = '', $location_data = array() ) {
             $all_locations = sek_get_locations();
 
-            if ( ! array_key_exists( $location, $all_locations ) ) {
-                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location . ' is not registered in sek_get_locations()');
+            if ( ! array_key_exists( $location_id, $all_locations ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location_id . ' is not registered in sek_get_locations()');
                 return;
             }
             $locationSettingValue = array();
             if ( empty( $location_data ) ) {
-                $skope_id = sek_is_global_location( $location )  ? NIMBLE_GLOBAL_SKOPE_ID : skp_build_skope_id();
-                $locationSettingValue = sek_get_skoped_seks( $skope_id, $location );
+                $skope_id = sek_is_global_location( $location_id )  ? NIMBLE_GLOBAL_SKOPE_ID : skp_build_skope_id();
+                $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );
             } else {
                 $locationSettingValue = $location_data;
             }
@@ -188,7 +192,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
                 remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
 
-                $this->render( $locationSettingValue, $location );
+                $this->render( $locationSettingValue, $location_id );
 
                 add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ),NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
                 add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
@@ -210,9 +214,98 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
 
+        /* ------------------------------------------------------------------------- *
+         * RENDERING UTILITIES USED IN NIMBLE TEMPLATES
+        /* ------------------------------------------------------------------------- */
+        // @return void()
+        // @param $locations. mixed type
+        // @param $options (array)
+        // Note that a location can be rendered only once in a given page.
+        // That's why we need to check if did_action(''), like in ::sek_schedule_sektions_rendering
+        function render_nimble_locations( $locations, $options = array() ) {
+            if ( is_string( $locations ) && ! empty( $locations ) ) {
+                $locations = array( $locations );
+            }
+            if ( ! is_array( $locations ) ) {
+                sek_error_log( __FUNCTION__ . ' error => missing or invalid locations provided');
+                return;
+            }
+
+            // Normalize the $options
+            $options = ! is_array( $options ) ? array() : $options;
+            $options = wp_parse_args( $options, array(
+                // fallback_location => the location rendered even if empty.
+                // This way, the user starts customizing with only one location for the content instead of four
+                // But if the other locations were already customized, they will be printed.
+                'fallback_location' => null, // Typically set as 'loop_start' in the nimble templates
+            ));
+
+            //$is_global = sek_is_global_location( $location_id );
+            // $skope_id = skp_get_skope_id();
+            // $skopeLocationCollection = array();
+            // $skopeSettingValue = sek_get_skoped_seks( $skope_id );
+            // if ( is_array( ) && array_key_exists('collection', search) ) {
+            //     $skopeLocationCollection = $skopeSettingValue['collection'];
+            // }
+
+            // sek_error_log( __FUNCTION__ . ' $locationSettingValue ', $locationSettingValue );
+
+            foreach( $locations as $location_id ) {
+                if ( ! is_string( $location_id ) || empty( $location_id ) ) {
+                    sek_error_log( __FUNCTION__ . ' => error => a location_id is not valid in the provided locations', $locations );
+                    continue;
+                }
+
+                // why check if did_action( ... ) ?
+                // => A location can be rendered only once
+                // => for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
+                // => for a custom location, it can be rendered by do_action() somewhere, and be rendered also with render_nimble_locations()
+                // @see issue with Twenty Seventeen here : https://github.com/presscustomizr/nimble-builder/issues/14
+                if ( did_action( "sek_before_location_{$location_id}" ) )
+                  continue;
+
+                $is_global = sek_is_global_location( $location_id );
+                $skope_id = $is_global ? NIMBLE_GLOBAL_SKOPE_ID : skp_get_skope_id();
+                $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );
+                //sek_error_log('$locationSettingValue ??? => ' . $location_id, $locationSettingValue );
+                if ( ! is_null( $options[ 'fallback_location' ]) ) {
+                    // We don't need to render the locations with no sections
+                    // But we need at least one location : let's always render loop_start.
+                    // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
+                    if ( $options[ 'fallback_location' ] === $location_id || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
+                        do_action( "sek_before_location_{$location_id}" );
+                        Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
+                        do_action( "sek_after_location_{$location_id}" );
+                    }
+                } else {
+                    do_action( "sek_before_location_{$location_id}" );
+                    Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
+                    do_action( "sek_after_location_{$location_id}" );
+                }
+
+            }//render_nimble_locations()
+        }
+
+        // DEPRECATED SINCE Nimble v1.3.0, november 2018
+        // was used in the Hueman theme before version 3.4.9
+        function render_content_sections_for_nimble_template() {
+            render_nimble_locations(
+                array_keys( \Nimble\Nimble_Manager()->default_locations ),//array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
+                array( 'fallback_location' => 'loop_start' )
+            );
+        }
 
 
 
+
+
+
+
+
+
+        /* ------------------------------------------------------------------------- *
+         *  MAIN RENDERING METHOD
+        /* ------------------------------------------------------------------------- */
         // Walk a model tree recursively and render each level with a specific template
         function render( $model = array(), $location = 'loop_start' ) {
             //sek_error_log('LEVEL MODEL IN ::RENDER()', $model );
@@ -228,6 +321,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             $id = $model['id'];
             $level = $model['level'];
+            if ( in_array( $id, Nimble_Manager()->rendered_levels ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a ' . $level . ' level id has already been rendered : ' . $id );
+                return;
+            }
+
+            // Record the rendered id now
+            Nimble_Manager()->rendered_levels[] = $id;
 
             // Cache the parent model
             // => used when calculating the width of the column to be added
@@ -236,8 +336,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             $collection = array_key_exists( 'collection', $model ) ? $model['collection'] : array();
 
+            //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id, current_filter() . ' | ' . current_action() );
+
             switch ( $level ) {
                 case 'location' :
+                    //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id , $collection );
                     //empty sektions wrapper are only printed when customizing
                     ?>
                       <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
@@ -404,6 +507,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                       </div><?php //data-sek-level="module" ?>
                     <?php
                 break;
+
+                default :
+                    sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' error => a level is invalid : ' . $level  );
+                break;
             }
 
             $this -> parent_model = $parent_model;
@@ -416,6 +523,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
 
+
+        /* ------------------------------------------------------------------------- *
+         * VARIOUS HELPERS
+        /* ------------------------------------------------------------------------- */
         /* HELPER TO PRINT THE VISIBILITY CSS CLASS IN THE LEVEL CONTAINER */
         // @return string
         private function get_level_visibility_css_class( $model ) {
@@ -436,6 +547,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             return $visibility_class;
         }
+
 
 
 
