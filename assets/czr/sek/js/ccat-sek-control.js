@@ -12,93 +12,102 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         throw new Error( 'CZRSeksPrototype => api.czr_activeSkopes' );
                   }
                   self.MAX_NUMBER_OF_COLUMNS = 12;
-                  self.SETTING_UPDATE_BUFFER = 50;
+                  self.SETTING_UPDATE_BUFFER = 10;
                   self.defaultLocalSektionSettingValue = self.getDefaultSektionSettingValue( 'local' );
                   self.localSectionsSettingId = new api.Value( {} );
                   self.registered = new api.Value([]);
 
+
                   api.bind( 'ready', function() {
-                        self.registerAndSetupDefaultPanelSectionOptions();
-                        self.localSectionsSettingId.callbacks.add( function( collectionSettingIds, previousCollectionSettingIds ) {
-                              try { self.setupSettingsToBeSaved(); } catch( er ) {
-                                    api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
-                              }
-                        });
-                        var doSkopeDependantActions = function( newSkopes, previousSkopes ) {
-                              self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
-                              self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
-                              self.generateUI({ action : 'sek-generate-global-options-ui'});
-                        };
-                        if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
-                              doSkopeDependantActions();
-                        }
-                        api.czr_activeSkopes.callbacks.add( function( newSkopes, previousSkopes ) {
-                              doSkopeDependantActions( newSkopes, previousSkopes );
-                        });
-                        self.reactToPreviewMsg();
-                        self.setupDnd();
-                        self.setupTinyMceEditor();
-                        self.schedulePrintSectionJson();
-                        self.bind( 'sek-ui-removed', function() {
-                              api.previewedDevice( 'desktop' );
-                        });
-                        api.previewedDevice.bind( function( device ) {
-                              var currentControls = _.filter( self.registered(), function( uiData ) {
-                                    return 'control' == uiData.what;
-                              });
-                              _.each( currentControls || [] , function( ctrlData ) {
-                                    api.control( ctrlData.id, function( _ctrl_ ) {
-                                          _ctrl_.container.find('[data-sek-device="' + device + '"]').each( function() {
-                                                $(this).trigger('click');
-                                          });
-                                    });
-                              });
-                        });
-                        $('#customize-notifications-area').on( 'click', '[data-sek-reset="true"]', function() {
-                              self.resetCollectionSetting();
-                        });
-                        self.bind( 'sek-ui-pre-removal', function( params ) {
-                              if ( 'control' == params.what && -1 < params.id.indexOf( 'draggable') ) {
-                                    api.control( params.id, function( _ctrl_ ) {
-                                          _ctrl_.container.find( '[draggable]' ).each( function() {
-                                                $(this).off( 'dragstart dragend' );
-                                          });
-                                    });
-                              }
-                              if ( 'control' == params.what ) {
-                                    api.control( params.id, function( _ctrl_ ) {
-                                          _ctrl_.container.find( 'select' ).each( function() {
-                                                if ( ! _.isUndefined( $(this).data('select2') ) ) {
-                                                      $(this).select2('destroy');
-                                                }
-                                          });
-                                    });
-                              }
-                        });
-                        api.bind( 'czr-new-registered', function( params ) {
-                              if ( _.isUndefined( params.origin ) ) {
-                                    throw new Error( 'czr-new-registered event => missing params.origin' );
-                              }
-                              if ( 'nimble' !== params.origin )
-                                return;
-                              if ( false !== params.track ) {
-                                    var currentlyRegistered = self.registered();
-                                    var newRegistered = $.extend( true, [], currentlyRegistered );
-                                    var duplicateCandidate = _.findWhere( newRegistered, { id : params.id } );
-                                    if ( ! _.isEmpty( duplicateCandidate ) && _.isEqual( duplicateCandidate, params ) ) {
-                                          throw new Error( 'register => duplicated element in self.registered() collection ' + params.id );
-                                    }
-                                    newRegistered.push( params );
-                                    self.registered( newRegistered );
-                              }
-                        });
-                        self.setupTopBar();//@see specific dev file
-                        if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-                              self.setupSaveUI();
-                        }
+                        self.doSektionThinksOnApiReady();
                   });//api.bind( 'ready' )
+                  api.bind( 'save-request-params', function( query ) {
+                        $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
+                  });
 
             },// initialize()
+            doSektionThinksOnApiReady : function() {
+                  var self = this;
+                  self.registerAndSetupDefaultPanelSectionOptions();
+                  self.localSectionsSettingId.callbacks.add( function( collectionSettingIds, previousCollectionSettingIds ) {
+                        try { self.setupSettingsToBeSaved(); } catch( er ) {
+                              api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
+                        }
+                        self.initializeHistoryLogWhenSettingsRegistered();
+                  });
+                  var doSkopeDependantActions = function( newSkopes, previousSkopes ) {
+                        self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
+                        self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
+                        self.generateUI({ action : 'sek-generate-global-options-ui'});
+                  };
+                  if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
+                        doSkopeDependantActions();
+                  }
+                  api.czr_activeSkopes.callbacks.add( function( newSkopes, previousSkopes ) {
+                        doSkopeDependantActions( newSkopes, previousSkopes );
+                  });
+                  self.reactToPreviewMsg();
+                  self.setupDnd();
+                  self.setupTinyMceEditor();
+                  self.schedulePrintSectionJson();
+                  self.bind( 'sek-ui-removed', function() {
+                        api.previewedDevice( 'desktop' );
+                  });
+                  api.previewedDevice.bind( function( device ) {
+                        var currentControls = _.filter( self.registered(), function( uiData ) {
+                              return 'control' == uiData.what;
+                        });
+                        _.each( currentControls || [] , function( ctrlData ) {
+                              api.control( ctrlData.id, function( _ctrl_ ) {
+                                    _ctrl_.container.find('[data-sek-device="' + device + '"]').each( function() {
+                                          $(this).trigger('click');
+                                    });
+                              });
+                        });
+                  });
+                  $('#customize-notifications-area').on( 'click', '[data-sek-reset="true"]', function() {
+                        self.resetCollectionSetting();
+                  });
+                  self.bind( 'sek-ui-pre-removal', function( params ) {
+                        if ( 'control' == params.what && -1 < params.id.indexOf( 'draggable') ) {
+                              api.control( params.id, function( _ctrl_ ) {
+                                    _ctrl_.container.find( '[draggable]' ).each( function() {
+                                          $(this).off( 'dragstart dragend' );
+                                    });
+                              });
+                        }
+                        if ( 'control' == params.what ) {
+                              api.control( params.id, function( _ctrl_ ) {
+                                    _ctrl_.container.find( 'select' ).each( function() {
+                                          if ( ! _.isUndefined( $(this).data('czrSelect2') ) ) {
+                                                $(this).czrSelect2('destroy');
+                                          }
+                                    });
+                              });
+                        }
+                  });
+                  api.bind( 'czr-new-registered', function( params ) {
+                        if ( _.isUndefined( params.origin ) ) {
+                              throw new Error( 'czr-new-registered event => missing params.origin' );
+                        }
+                        if ( 'nimble' !== params.origin )
+                          return;
+                        if ( false !== params.track ) {
+                              var currentlyRegistered = self.registered();
+                              var newRegistered = $.extend( true, [], currentlyRegistered );
+                              var duplicateCandidate = _.findWhere( newRegistered, { id : params.id } );
+                              if ( ! _.isEmpty( duplicateCandidate ) && _.isEqual( duplicateCandidate, params ) ) {
+                                    throw new Error( 'register => duplicated element in self.registered() collection ' + params.id );
+                              }
+                              newRegistered.push( params );
+                              self.registered( newRegistered );
+                        }
+                  });
+                  self.setupTopBar();//@see specific dev file
+                  if ( sektionsLocalizedData.isSavedSectionEnabled ) {
+                        self.setupSaveUI();
+                  }
+            },
             registerAndSetupDefaultPanelSectionOptions : function() {
                   var self = this;
                   var SektionPanelConstructor = api.Panel.extend({
@@ -266,21 +275,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.previewer.bind('ready', function() {
                         $(api.previewer.targetWindow().document ).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
                   });
-                  self.historyLog = new api.Value([]);
-                  self.historyLog.bind( function( newLog ) {
-                        if ( _.isEmpty( newLog ) )
-                          return;
-
-                        var newCurrentKey = _.findKey( newLog, { status : 'current'} );
-                        newCurrentKey = Number( newCurrentKey );
-                        $( '#nimble-top-bar' ).find('[data-nimble-history]').each( function() {
-                              if ( 'undo' === $(this).data('nimble-history') ) {
-                                    $(this).attr('data-nimble-state', 0 >= newCurrentKey ? 'disabled' : 'enabled');
-                              } else {
-                                    $(this).attr('data-nimble-state', newLog.length <= ( newCurrentKey + 1 ) ? 'disabled' : 'enabled');
-                              }
-                        });
-                  });
             },
             toggleTopBar : function( visible ) {
                   visible = _.isUndefined( visible ) ? true : visible;
@@ -395,7 +389,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   if( ! _.isUndefined( newSettingValue ) ) {
-                        api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue ), { navigatingHistoryLogs : true } );
+                        if ( ! _.isEmpty( newSettingValue.local ) ) {
+                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local ), { navigatingHistoryLogs : true } );
+                        }
+                        if ( ! _.isEmpty( newSettingValue.global ) ) {
+                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global ), { navigatingHistoryLogs : true } );
+                        }
                         var previewHasBeenRefreshed = false;
                         api.previewer.refresh();
                         api.previewer.trigger( 'sek-pick-content', {});
@@ -595,45 +594,67 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     origin : 'nimble'
                               });
                               api( settingData.collectionSettingId, function( sektionSetInstance ) {
-                                    if ( 'local' === localOrGlobal ) {
-                                          self.historyLog([{
-                                                status : 'current',
-                                                value : sektionSetInstance(),
-                                                action : 'initial'
-                                          }]);
-                                    }
                                     sektionSetInstance.bind( _.debounce( function( newSektionSettingValue, previousValue, params ) {
-                                          if ( 'local' === localOrGlobal && params && true !== params.navigatingHistoryLogs ) {
-                                                var newHistoryLog = [],
-                                                    historyLog = $.extend( true, [], self.historyLog() ),
-                                                    sektionToRefresh;
-
-                                                if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
-                                                      sektionToRefresh = params.in_sektion;
-                                                } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
-                                                      sektionToRefresh = params.to_sektion;
-                                                }
-
-                                                _.each( historyLog, function( log ) {
-                                                      var newStatus = 'previous';
-                                                      if ( 'future' == log.status )
-                                                        return;
-                                                      $.extend( log, { status : 'previous' } );
-                                                      newHistoryLog.push( log );
-                                                });
-                                                newHistoryLog.push({
-                                                      status : 'current',
-                                                      value : newSektionSettingValue,
-                                                      action : _.isObject( params ) ? ( params.action || '' ) : '',
-                                                      sektionToRefresh : sektionToRefresh
-                                                });
-                                                self.historyLog( newHistoryLog );
-                                          }
+                                          self.trackHistoryLog( sektionSetInstance, params );
 
                                     }, 1000 ) );
                               });//api( settingData.collectionSettingId, function( sektionSetInstance ){}
                         }//if ( ! api.has( settingData.collectionSettingId ) ) {
                   });//_.each(
+            },// SetupSettingsToBeSaved()
+            trackHistoryLog : function( sektionSetInstance, params ) {
+                  var self = this,
+                      _isGlobal = sektionSetInstance.id === self.getGlobalSectionsSettingId();
+                  if ( params && true !== params.navigatingHistoryLogs ) {
+                        var newHistoryLog = [],
+                            historyLog = $.extend( true, [], self.historyLog() ),
+                            sektionToRefresh;
+
+                        if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
+                              sektionToRefresh = params.in_sektion;
+                        } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
+                              sektionToRefresh = params.to_sektion;
+                        }
+                        _.each( historyLog, function( log ) {
+                              var newStatus = 'previous';
+                              if ( 'future' == log.status )
+                                return;
+                              $.extend( log, { status : 'previous' } );
+                              newHistoryLog.push( log );
+                        });
+                        newHistoryLog.push({
+                              status : 'current',
+                              value : _isGlobal ? { global : sektionSetInstance() } : { local : sektionSetInstance() },
+                              action : _.isObject( params ) ? ( params.action || '' ) : '',
+                              sektionToRefresh : sektionToRefresh
+                        });
+                        self.historyLog( newHistoryLog );
+                  }
+            },
+            initializeHistoryLogWhenSettingsRegistered : function() {
+                  var self = this;
+                  self.historyLog = new api.Value([{
+                        status : 'current',
+                        value : {
+                              'local' : api( self.localSectionsSettingId() )(),//<= "nimble___[skp__post_page_10]"
+                              'global' : api(  self.getGlobalSectionsSettingId() )()
+                        },
+                        action : 'initial'
+                  }]);
+                  self.historyLog.bind( function( newLog ) {
+                        if ( _.isEmpty( newLog ) )
+                          return;
+
+                        var newCurrentKey = _.findKey( newLog, { status : 'current'} );
+                        newCurrentKey = Number( newCurrentKey );
+                        $( '#nimble-top-bar' ).find('[data-nimble-history]').each( function() {
+                              if ( 'undo' === $(this).data('nimble-history') ) {
+                                    $(this).attr('data-nimble-state', 0 >= newCurrentKey ? 'disabled' : 'enabled');
+                              } else {
+                                    $(this).attr('data-nimble-state', newLog.length <= ( newCurrentKey + 1 ) ? 'disabled' : 'enabled');
+                              }
+                        });
+                  });
             },
             validateSettingValue : function( valCandidate ) {
                   if ( ! _.isObject( valCandidate ) ) {
@@ -1889,21 +1910,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _do_register_ = function() {
                         _.each( modulesRegistrationParams, function( optionData, optionType ){
                               if ( ! api.has( optionData.settingControlId ) ) {
-                                    api( optionData.settingControlId, function( _setting_ ) {
-                                          _setting_.bind( _.debounce( function( to, from, args ) {
-                                                try { self.updateAPISettingAndExecutePreviewActions({
-                                                      defaultPreviewAction : 'refresh_markup',
-                                                      uiParams : _.extend( params, { action : 'sek-set-module-value' } ),
-                                                      options_type : optionType,
-                                                      settingParams : {
-                                                            to : to,
-                                                            from : from,
-                                                            args : args
-                                                      }
-                                                }); } catch( er ) {
-                                                      api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                    var doUpdate = function( to, from, args ) {
+                                          try { self.updateAPISettingAndExecutePreviewActions({
+                                                defaultPreviewAction : 'refresh_markup',
+                                                uiParams : _.extend( params, { action : 'sek-set-module-value' } ),
+                                                options_type : optionType,
+                                                settingParams : {
+                                                      to : to,
+                                                      from : from,
+                                                      args : args
                                                 }
-                                          }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          }); } catch( er ) {
+                                                api.errare( '::generateUIforFrontModules => Error in updateAPISettingAndExecutePreviewActions', er );
+                                          }
+                                    };
+                                    api( optionData.settingControlId, function( _setting_ ) {
+                                          _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });
 
                                     var settingValueOnRegistration = $.extend( true, {}, moduleValue );
@@ -2080,21 +2102,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     return;
                               }
                               if( ! api.has( optionData.settingControlId ) ) {
-                                    api( optionData.settingControlId, function( _setting_ ) {
-                                          _setting_.bind( _.debounce( function( to, from, args ) {
-                                                try { self.updateAPISettingAndExecutePreviewActions({
-                                                      defaultPreviewAction : 'refresh_stylesheet',
-                                                      uiParams : params,
-                                                      options_type : optionType,// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-generate-level-options-ui'
-                                                      settingParams : {
-                                                            to : to,
-                                                            from : from,
-                                                            args : args
-                                                      }
-                                                }); } catch( er ) {
-                                                      api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                    var doUpdate = function( to, from, args ) {
+                                          try { self.updateAPISettingAndExecutePreviewActions({
+                                                defaultPreviewAction : 'refresh_stylesheet',
+                                                uiParams : params,
+                                                options_type : optionType,// <= this is the options sub property where we will store this setting values. @see updateAPISetting case 'sek-generate-level-options-ui'
+                                                settingParams : {
+                                                      to : to,
+                                                      from : from,
+                                                      args : args
                                                 }
-                                          }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          }); } catch( er ) {
+                                                api.errare( '::generateUIforLevelOptions => Error in updateAPISettingAndExecutePreviewActions', er );
+                                          }
+                                    };
+                                    api( optionData.settingControlId, function( _setting_ ) {
+                                          _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
                                     var initialModuleValues = levelOptionValues[ optionType ] || {};
                                     var startingModuleValue = self.getModuleStartingValue( optionData.module_type );
@@ -2231,21 +2254,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
                               if ( ! api.has( optionData.settingControlId ) ) {
-                                    api( optionData.settingControlId, function( _setting_ ) {
-                                          _setting_.bind( _.debounce( function( to, from, args ) {
-                                                try { self.updateAPISettingAndExecutePreviewActions({
-                                                      defaultPreviewAction : 'refresh',
-                                                      uiParams : params,
-                                                      options_type : optionType,
-                                                      settingParams : {
-                                                            to : to,
-                                                            from : from,
-                                                            args : args
-                                                      }
-                                                }); } catch( er ) {
-                                                      api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                    var doUpdate = function( to, from, args ) {
+                                          try { self.updateAPISettingAndExecutePreviewActions({
+                                                defaultPreviewAction : 'refresh',
+                                                uiParams : params,
+                                                options_type : optionType,
+                                                settingParams : {
+                                                      to : to,
+                                                      from : from,
+                                                      args : args
                                                 }
-                                          }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          }); } catch( er ) {
+                                                api.errare( '::generateUIforLocalSkopeOptions => Error in updateAPISettingAndExecutePreviewActions', er );
+                                          }
+                                    };
+                                    api( optionData.settingControlId, function( _setting_ ) {
+                                          _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
                                     var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
                                         currentSetValue = api( self.localSectionsSettingId() )(),
@@ -2344,22 +2368,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
                               if ( ! api.has( optionData.settingControlId ) ) {
-                                    api( optionData.settingControlId, function( _setting_ ) {
-                                          _setting_.bind( _.debounce( function( to, from, args ) {
-                                                try { self.updateAPISettingAndExecutePreviewActions({
-                                                      isGlobalOptions : true,//<= indicates that we won't update the local skope setting id
-                                                      defaultPreviewAction : 'refresh',
-                                                      uiParams : params,
-                                                      options_type : optionType,
-                                                      settingParams : {
-                                                            to : to,
-                                                            from : from,
-                                                            args : args
-                                                      }
-                                                }); } catch( er ) {
-                                                      api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
+                                    var doUpdate = function( to, from, args ) {
+                                          try { self.updateAPISettingAndExecutePreviewActions({
+                                                isGlobalOptions : true,//<= indicates that we won't update the local skope setting id
+                                                defaultPreviewAction : 'refresh',
+                                                uiParams : params,
+                                                options_type : optionType,
+                                                settingParams : {
+                                                      to : to,
+                                                      from : from,
+                                                      args : args
                                                 }
-                                          }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          }); } catch( er ) {
+                                                api.errare( '::generateUIforGlobalOptions => Error in updateAPISettingAndExecutePreviewActions', er );
+                                          }
+                                    };
+                                    api( optionData.settingControlId, function( _setting_ ) {
+                                          _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
                                     var dbValues = sektionsLocalizedData.globalOptionDBValues,
                                         startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
@@ -3159,14 +3184,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 'pending' == __updateAPISettingDeferred__.state() ) {
                               var mayBeUpdateSektionsSetting = function() {
                                     if ( _.isEqual( currentSetValue, newSetValue ) ) {
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
+                                          if ( sektionsLocalizedData.isDevMode ) {
+                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
+                                          }
                                     } else {
                                           if ( null !== self.validateSettingValue( newSetValue ) ) {
                                                 sektionSetInstance( newSetValue, params );
                                                 params.cloneId = cloneId;
                                                 __updateAPISettingDeferred__.resolve( params );
                                           } else {
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value did not pass the validation checks for action ' + params.action );
+                                                __updateAPISettingDeferred__.reject( 'Validation problem for action ' + params.action );
                                           }
                                     }
                               };//mayBeUpdateSektionsSetting()
@@ -5106,13 +5133,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
                   var _preprocessSelect2ForFontFamily = function() {
                         /*
-                        * Override select2 Results Adapter in order to select on highlight
+                        * Override czrSelect2 Results Adapter in order to select on highlight
                         * deferred needed cause the selects needs to be instantiated when this override is complete
                         * selec2.amd.require is asynchronous
                         */
                         var selectFocusResults = $.Deferred();
-                        if ( 'undefined' !== typeof $.fn.select2 && 'undefined' !== typeof $.fn.select2.amd && 'function' === typeof $.fn.select2.amd.require ) {
-                              $.fn.select2.amd.require(['select2/results', 'select2/utils'], function (Result, Utils) {
+                        if ( 'undefined' !== typeof $.fn.czrSelect2 && 'undefined' !== typeof $.fn.czrSelect2.amd && 'function' === typeof $.fn.czrSelect2.amd.require ) {
+                              $.fn.czrSelect2.amd.require(['czrSelect2/results', 'czrSelect2/utils'], function (Result, Utils) {
                                     var ResultsAdapter = function($element, options, dataAdapter) {
                                       ResultsAdapter.__super__.constructor.call(this, $element, options, dataAdapter);
                                     };
@@ -5194,20 +5221,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               $fontSelectElement.append( $optGroup );
                         });
 
-                        var _fonts_select2_params = {
+                        var _fonts_czrSelect2_params = {
                             escapeMarkup: function(m) { return m; },
                         };
                         /*
                         * Maybe use custom adapter
                         */
                         if ( customResultsAdapter ) {
-                              $.extend( _fonts_select2_params, {
+                              $.extend( _fonts_czrSelect2_params, {
                                     resultsAdapter: customResultsAdapter,
                                     closeOnSelect: false,
                               } );
                         }
-                        $fontSelectElement.select2( _fonts_select2_params );
-                        $( '.select2-selection__rendered', input.container ).css( getInlineFontStyle( input() ) );
+                        $fontSelectElement.czrSelect2( _fonts_czrSelect2_params );
+                        $( '.czrSelect2-selection__rendered', input.container ).css( getInlineFontStyle( input() ) );
 
                   };//_setupSelectForFontFamilySelector
                   var getInlineFontStyle = function( _fontFamily_ ){
@@ -5289,7 +5316,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         $( 'select[data-czrtype]', input.container )
                           .prepend( $_placeholder )
-                          .select2({
+                          .czrSelect2({
                                 templateResult: addIcon,
                                 templateSelection: addIcon,
                                 placeholder: sektionsLocalizedData.i18n['Select an icon'],

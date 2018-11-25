@@ -145,10 +145,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   var self = this;
                   var from_location, to_location, startOrder = [], newOrder = [], defaults;
                   $('[data-sek-id="' + locationId +'"]').each( function() {
+                        if ( true === $(this).data('sek-is-global-location') )
+                          return;
+
                         defaults = $.extend( true, {}, self.sortableDefaultParams );
                         $(this).sortable( _.extend( defaults, {
                               handle : '.sek-move-section',
-                              connectWith : '[data-sek-level="location"]',
+                              connectWith : '[data-sek-is-global-location="false"]',
                               placeholder: {
                                     element: function(currentItem) {
                                         return $('<div class="sortable-placeholder"><div class="sek-module-placeholder-content"><p>' + sekPreviewLocalized.i18n['Insert here'] + '</p></div></div>')[0];
@@ -191,10 +194,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                         }));
                   });
-            },
+            },//makeSektionsSortableInLocation
             makeColumnsSortableInSektion : function( sektionId ) {
                   var self = this,
                       defaults = $.extend( true, {}, self.sortableDefaultParams ),
+                      $fromLocation,
+                      is_global_from_location,
+                      $toLocation,
+                      is_global_to_location,
+                      startOrder = [],
+                      newOrder = [],
                       $sortableCandidate = $( '[data-sek-id="' + sektionId + '"]').find('.sek-sektion-inner').first(),
                       getCurrentAndNextColNumberClasses = function( args ) {
                             args = $.extend( { forTarget : true }, args || {} );
@@ -270,6 +279,20 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                         },
                         remove : function( event, ui ) {
+                              $toLocation = ui.item.closest('[data-sek-level="location"]');
+                              to_location = $toLocation.data( 'sek-id');
+                              is_global_to_location = true === $toLocation.data('sek-is-global-location');
+
+                              var _isCrossSkope = is_global_from_location !== is_global_to_location,
+                                  _isCrossLocation = to_location != from_location,
+                                  _isGlobalToGlobal = true === is_global_from_location && true === is_global_to_location;
+                              if ( _isCrossSkope || ( _isGlobalToGlobal && _isCrossLocation ) ) {
+                                    api.preview.send( 'sek-notify', {
+                                          message : sekPreviewLocalized.i18n["Moving elements between global and local sections is not allowed."]
+                                    });
+                                    return false;
+                              }
+
                               $targetSektionCandidate = ui.item.closest('[data-sek-level="section"]');
                               if ( $targetSektionCandidate.length > 0 && $targetSektionCandidate.find('.sek-sektion-inner').first().children('[data-sek-level="column"]').length > 12 ) {
                                     api.preview.send( 'sek-notify', {
@@ -281,6 +304,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                         },
                         start: function( event, ui ) {
+                              $fromLocation = ui.item.closest('[data-sek-level="location"]');
+                              from_location = $fromLocation.data( 'sek-id');
+                              is_global_from_location = true === $fromLocation.data('sek-is-global-location');
                               startOrder = [];
                               newOrder = [];
                               from_sektion = ui.item.closest('[data-sek-level="section"]').data( 'sek-id');
@@ -343,7 +369,20 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   }));
             },//self.makeColumnsSortableInSektion
             makeModulesSortableInColumn : function( columnId ) {
-                  var from_sektion, to_sektion, from_column, to_column, startOrder = [], newOrder = [], $targetSektion, $targetColumn, defaults;
+                  var from_sektion,
+                      to_sektion,
+                      from_column,
+                      to_column,
+                      startOrder = [],
+                      newOrder = [],
+                      $targetSektion,
+                      $targetColumn,
+                      defaults,
+                      $fromLocation,
+                      is_global_from_location,
+                      $toLocation,
+                      is_global_to_location;
+
                   var self = this;
                   defaults = $.extend( true, {}, self.sortableDefaultParams );
                   $( '[data-sek-id="' + columnId + '"]').find('.sek-column-inner').first().sortable( _.extend( defaults, {
@@ -355,9 +394,30 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               });
                               $( event.target ).addClass('sek-sortable-overing');
                         },
+                        remove : function( event, ui ) {
+                              $toLocation = ui.item.closest('[data-sek-level="location"]');
+                              to_location = $toLocation.data( 'sek-id');
+                              is_global_to_location = true === $toLocation.data('sek-is-global-location');
+
+                              var _isCrossSkope = is_global_from_location !== is_global_to_location,
+                                  _isCrossLocation = to_location != from_location,
+                                  _isGlobalToGlobal = true === is_global_from_location && true === is_global_to_location;
+                              if ( _isCrossSkope || ( _isGlobalToGlobal && _isCrossLocation ) ) {
+                                    api.preview.send( 'sek-notify', {
+                                          message : sekPreviewLocalized.i18n["Moving elements between global and local sections is not allowed."]
+                                    });
+                                    return false;
+                              } else {
+                                    return true;
+                              }
+                        },
                         start: function( event, ui ) {
+                              $fromLocation = ui.item.closest('[data-sek-level="location"]');
+                              from_location = $fromLocation.data( 'sek-id');
+                              is_global_from_location = true === $fromLocation.data('sek-is-global-location');
                               startOrder = [];
                               newOrder = [];
+
                               $('body').addClass( 'sek-dragging-element' );
                               from_column = ui.item.closest('[data-sek-level="column"]').data( 'sek-id');
                               from_sektion = ui.item.closest('[data-sek-level="section"]').data( 'sek-id');
@@ -1540,7 +1600,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                 }
                 $('head').append( styleMarkup );
                 if ( ! _.isEmpty( styleMarkup ) && 1 > $('head').find( _stylesheet_id_ ).length ) {
-                      this.errare( 'sek-preview => problem when printing the dynamic inline style for : '+ _stylesheet_id_ );
+                      this.errare( 'sek-preview => problem when printing the dynamic inline style for : '+ _stylesheet_id_, styleMarkup );
                 } else {
                       $('head').find( _stylesheet_id_ ).attr('sek-data-origin', 'customizer' );
                 }

@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.0
-Stable tag: 1.2.2
+Stable tag: 1.3.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -47,11 +47,23 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.2.2 =
-* fixed : function_exists( '\Nimble\ ... ) breaks in some version of php ( 5.6.38 )
-* fixed : always check if 'do_blocks' exists for retrocompatibility with WP < 5.0
+= 1.3.0 =
+* fixed : the customizer UI was not loaded on WordPress network installs
+* fixed : columns layout randomly broken
+* fixed : tinymce editor module could be not accessible in some cases
+* improved : use a namespaced version of the select2 javascript library to avoid collision with other plugins or themes using select2
+* improved : make sure the tinyMce module is always accessible
+* added : introduced a new Nimble full page template (beta) using global header and footer locations
 
 == Changelog ==
+= 1.3.0 : November 26th, 2018 =
+* fixed : the customizer UI was not loaded on WordPress network installs
+* fixed : columns layout randomly broken
+* fixed : tinymce editor module could be not accessible in some cases
+* improved : use a namespaced version of the select2 javascript library to avoid collision with other plugins or themes using select2
+* improved : make sure the tinyMce module is always accessible
+* added : introduced a new Nimble full page template (beta) using global header and footer locations
+
 = 1.2.2 : November 11th, 2018 =
 * fixed : php function_exists( '\Nimble\ ... ) breaks in some version of php ( 5.6.38 )
 * fixed : always check if 'do_blocks' exists for retrocompatibility with WP < 5.0
