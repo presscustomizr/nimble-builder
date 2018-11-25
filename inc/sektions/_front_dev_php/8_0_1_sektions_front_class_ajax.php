@@ -309,7 +309,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 // it can be empty when ajaxing a stylesheet
                 if ( ! $is_stylesheet && empty( $html ) ) {
                       // return a new WP_Error that will be intercepted in sek_get_level_content_for_injection
-                      $html = new WP_Error( 'ajax_fetch_content_error', __CLASS__ . '::' . __FUNCTION__ . ' => no content returned for sek_action : ' . $sek_action );
+                      $html = new \WP_Error( 'ajax_fetch_content_error', __CLASS__ . '::' . __FUNCTION__ . ' => no content returned for sek_action : ' . $sek_action );
                 }
                 return apply_filters( "sek_set_ajax_content", $html, $sek_action );// this is sent with wp_send_json_success( apply_filters( 'sek_content_results', $html, $sek_action ) );
             }

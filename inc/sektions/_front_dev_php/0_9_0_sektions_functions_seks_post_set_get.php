@@ -81,7 +81,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
 
     // `-1` indicates no post exists; no query necessary.
     if ( ! $post && -1 !== $post_id ) {
-        $query = new WP_Query( $sek_post_query_vars );
+        $query = new \WP_Query( $sek_post_query_vars );
         $post = $query->post;
         $post_id = $post ? $post->ID : -1;
         /*
@@ -197,13 +197,13 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
 
     if ( ! is_array( $seks_data ) ) {
         error_log( 'sek_update_sek_post => $seks_data is not an array' );
-        return new WP_Error( 'sek_update_sek_post => $seks_data is not an array');
+        return new \WP_Error( 'sek_update_sek_post => $seks_data is not an array');
     }
 
     $skope_id = $args['skope_id'];
     if ( empty( $skope_id ) ) {
         error_log( 'sek_update_sek_post => empty skope_id' );
-        return new WP_Error( 'sek_update_sek_post => empty skope_id');
+        return new \WP_Error( 'sek_update_sek_post => empty skope_id');
     }
 
     $post_title = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
@@ -382,7 +382,7 @@ function sek_get_saved_seks_post( $saved_section_id ) {
 function sek_update_saved_seks_post( $seks_data ) {
     if ( ! is_array( $seks_data ) ) {
         error_log( 'sek_update_saved_seks_post => $seks_data is not an array' );
-        return new WP_Error( 'sek_update_saved_seks_post => $seks_data is not an array');
+        return new \WP_Error( 'sek_update_saved_seks_post => $seks_data is not an array');
     }
 
     $seks_data = wp_parse_args( $seks_data, array(
