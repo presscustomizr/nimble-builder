@@ -150,64 +150,9 @@ function sek_has_global_sections() {
     return ! is_null($maybe_global_sek_post) || !!$maybe_global_sek_post;
 }
 
-//@return void()
-//@param $locations. mixed type
-//@param $options (array)
-function render_nimble_locations( $locations, $options = array() ) {
-    if ( is_string( $locations ) && ! empty( $locations ) ) {
-        $locations = array( $locations );
-    }
-    if ( ! is_array( $locations ) ) {
-        sek_error_log( __FUNCTION__ . ' error => missing or invalid locations provided');
-        return;
-    }
-
-    // Normalize the $options
-    $options = ! is_array( $options ) ? array() : $options;
-    $options = wp_parse_args( $options, array(
-        // fallback_location => the location rendered even if empty.
-        // This way, the user starts customizing with only one location for the content instead of four
-        // But if the other locations were already customized, they will be printed.
-        'fallback_location' => null, // Typically set as 'loop_start' in the nimble templates
-    ));
 
 
-    //sek_error_log( __FUNCTION__ . ' sek_get_locations() ', sek_get_locations() );
 
-    foreach( $locations as $location_id ) {
-        if ( ! is_string( $location_id ) || empty( $location_id ) ) {
-            sek_error_log( __FUNCTION__ . ' => error => a location_id is not valid in the provided locations', $locations );
-            continue;
-        }
-        $is_global = sek_is_global_location( $location_id );
-        $skope_id = $is_global ? NIMBLE_GLOBAL_SKOPE_ID : skp_get_skope_id();
-        $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );
-        if ( ! is_null( $options[ 'fallback_location' ]) ) {
-            // We don't need to render the locations with no sections
-            // But we need at least one location : let's always render loop_start.
-            // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
-            if ( $options[ 'fallback_location' ] === $location_id || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
-                do_action( "sek_before_location_{$location_id}" );
-                Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
-                do_action( "sek_after_location_{$location_id}" );
-            }
-        } else {
-            do_action( "sek_before_location_{$location_id}" );
-            Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
-            do_action( "sek_after_location_{$location_id}" );
-        }
-
-    }//render_nimble_locations()
-}
-
-// DEPRECATED SINCE Nimble v1.3.0, november 2018
-// was used in the Hueman theme before version 3.4.9
-function render_content_sections_for_nimble_template() {
-    render_nimble_locations(
-        array_keys( \Nimble\Nimble_Manager()->default_locations ),//array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
-        array( 'fallback_location' => 'loop_start' )
-    );
-}
 
 // @return void()
 /*function sek_get_module_placeholder( $placeholder_icon = 'short_text' ) {
