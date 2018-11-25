@@ -37,7 +37,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return the level model object
             getLevelModel : function( id, collection ) {
                   var self = this, _data_ = 'no_match',
-                      _walk_ = function( id, collectionSettingId, localOrGlobal, collection ) {
+                      // @param id mandatory
+                      // @param collection mandatory
+                      // @param collectionSettingId optional
+                      // @param localOrGlobal optional
+                      _walk_ = function( id, collection, collectionSettingId, localOrGlobal ) {
                             // do we have a collection ?
                             // if not, let's use the root one
                             if ( _.isUndefined( collection ) ) {
@@ -53,20 +57,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _data_ = levelData;
                                   } else {
                                         if ( _.isArray( levelData.collection ) ) {
-                                              _data_ = _walk_( id, collectionSettingId, localOrGlobal, levelData.collection );
+                                              _walk_( id, levelData.collection, collectionSettingId, localOrGlobal );
                                         }
                                   }
                             });
                             return _data_;
                       };
-                  _.each( {
-                        local : self.localSectionsSettingId(),
-                        global : self.getGlobalSectionsSettingId()
-                  }, function( collectionSettingId, localOrGlobal ) {
-                        if ( 'no_match' === _data_ ) {
-                              _walk_( id, collectionSettingId, localOrGlobal, collection );
-                        }
-                  });
+
+                  // if a collection has been provided in the signature, let's walk it.
+                  // Otherwise, let's walk the local and global ones until a match is found.
+                  if ( ! _.isEmpty( collection ) ) {
+                        _walk_( id, collection );
+                  } else {
+                        _.each( {
+                              local : self.localSectionsSettingId(),
+                              global : self.getGlobalSectionsSettingId()
+                        }, function( collectionSettingId, localOrGlobal ) {
+                              if ( 'no_match' === _data_ ) {
+                                    _walk_( id, collection, collectionSettingId, localOrGlobal );
+                              }
+                        });
+                  }
+
                   return _data_;
             },
 
@@ -124,7 +136,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             getLevelPositionInCollection : function( id, collection ) {
                   var self = this, _position_ = 'no_match',
-                  _walk_ = function( id, collectionSettingId, localOrGlobal, collection ) {
+                  // @param id mandatory
+                  // @param collection mandatory
+                  // @param collectionSettingId optional
+                  // @param localOrGlobal optional
+                  _walk_ = function( id, collection, collectionSettingId, localOrGlobal ) {
                         // do we have a collection ?
                         // if not, let's use the root one
                         if ( _.isUndefined( collection ) ) {
@@ -140,20 +156,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     _position_ = _key_;
                               } else {
                                     if ( _.isArray( levelData.collection ) ) {
-                                          _position_ = _walk_( id, collectionSettingId, localOrGlobal, levelData.collection );
+                                          _walk_( id, levelData.collection, collectionSettingId, localOrGlobal );
                                     }
                               }
                         });
                   };
 
-                  _.each( {
-                        local : self.localSectionsSettingId(),
-                        global : self.getGlobalSectionsSettingId()
-                  }, function( collectionSettingId, localOrGlobal ) {
-                        if ( 'no_match' === _position_ ) {
-                              _walk_( id, collectionSettingId, localOrGlobal, collection );
-                        }
-                  });
+                  // if a collection has been provided in the signature, let's walk it.
+                  // Otherwise, let's walk the local and global ones until a match is found.
+                  if ( ! _.isEmpty( collection ) ) {
+                        _walk_( id, collection );
+                  } else {
+                        _.each( {
+                              local : self.localSectionsSettingId(),
+                              global : self.getGlobalSectionsSettingId()
+                        }, function( collectionSettingId, localOrGlobal ) {
+                              if ( 'no_match' === _position_ ) {
+                                    _walk_( id, collectionSettingId, localOrGlobal, collection );
+                              }
+                        });
+                  }
                   return _position_;
             },
 
