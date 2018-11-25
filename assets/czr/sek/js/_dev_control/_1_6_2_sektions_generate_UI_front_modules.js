@@ -91,25 +91,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _.each( modulesRegistrationParams, function( optionData, optionType ){
                               // Make sure this setting is bound only once !
                               if ( ! api.has( optionData.settingControlId ) ) {
+                                    var doUpdate = function( to, from, args ) {
+                                          try { self.updateAPISettingAndExecutePreviewActions({
+                                                defaultPreviewAction : 'refresh_markup',
+                                                uiParams : _.extend( params, { action : 'sek-set-module-value' } ),
+                                                options_type : optionType,
+                                                settingParams : {
+                                                      to : to,
+                                                      from : from,
+                                                      args : args
+                                                }
+                                          }); } catch( er ) {
+                                                api.errare( '::generateUIforFrontModules => Error in updateAPISettingAndExecutePreviewActions', er );
+                                          }
+                                    };
+
                                     // Schedule the binding to synchronize the module setting with the main collection setting
                                     // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
                                     // They need to be kept in order to keep track of the changes in the customizer.
                                     // => that's why we check if ! api.has( ... )
                                     api( optionData.settingControlId, function( _setting_ ) {
-                                          _setting_.bind( _.debounce( function( to, from, args ) {
-                                                try { self.updateAPISettingAndExecutePreviewActions({
-                                                      defaultPreviewAction : 'refresh_markup',
-                                                      uiParams : _.extend( params, { action : 'sek-set-module-value' } ),
-                                                      options_type : optionType,
-                                                      settingParams : {
-                                                            to : to,
-                                                            from : from,
-                                                            args : args
-                                                      }
-                                                }); } catch( er ) {
-                                                      api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
-                                                }
-                                          }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });
 
                                     var settingValueOnRegistration = $.extend( true, {}, moduleValue );

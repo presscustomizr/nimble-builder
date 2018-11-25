@@ -50,26 +50,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
                               if ( ! api.has( optionData.settingControlId ) ) {
+                                    var doUpdate = function( to, from, args ) {
+                                          try { self.updateAPISettingAndExecutePreviewActions({
+                                                isGlobalOptions : true,//<= indicates that we won't update the local skope setting id
+                                                defaultPreviewAction : 'refresh',
+                                                uiParams : params,
+                                                options_type : optionType,
+                                                settingParams : {
+                                                      to : to,
+                                                      from : from,
+                                                      args : args
+                                                }
+                                          }); } catch( er ) {
+                                                api.errare( '::generateUIforGlobalOptions => Error in updateAPISettingAndExecutePreviewActions', er );
+                                          }
+                                    };
+
                                     // Schedule the binding to synchronize the options with the main collection setting
                                     // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
                                     // They need to be kept in order to keep track of the changes in the customizer.
                                     // => that's why we check if ! api.has( ... )
                                     api( optionData.settingControlId, function( _setting_ ) {
-                                          _setting_.bind( _.debounce( function( to, from, args ) {
-                                                try { self.updateAPISettingAndExecutePreviewActions({
-                                                      isGlobalOptions : true,//<= indicates that we won't update the local skope setting id
-                                                      defaultPreviewAction : 'refresh',
-                                                      uiParams : params,
-                                                      options_type : optionType,
-                                                      settingParams : {
-                                                            to : to,
-                                                            from : from,
-                                                            args : args
-                                                      }
-                                                }); } catch( er ) {
-                                                      api.errare( 'Error in updateAPISettingAndExecutePreviewActions', er );
-                                                }
-                                          }, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
+                                          _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
 
                                     // Let's add the starting values if provided when registrating the module
