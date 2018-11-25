@@ -308,6 +308,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         /* ------------------------------------------------------------------------- */
         // Walk a model tree recursively and render each level with a specific template
         function render( $model = array(), $location = 'loop_start' ) {
+            //sek_error_log('LOCATIONS IN ::render()', sek_get_locations() );
             //sek_error_log('LEVEL MODEL IN ::RENDER()', $model );
             // Is it the root level ?
             // The root level has no id and no level entry
@@ -319,13 +320,25 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 error_log( '::render() => a level model is missing the level or the id property' );
                 return;
             }
+            // The level "id" is a string not empty
             $id = $model['id'];
-            $level = $model['level'];
-            if ( in_array( $id, Nimble_Manager()->rendered_levels ) ) {
-                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a ' . $level . ' level id has already been rendered : ' . $id );
+            if ( ! is_string( $id ) || empty( $id ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a level id must be a string not empty', $model );
                 return;
             }
 
+            // The level "level" can take 4 values : location, section, column, module
+            $level_type = $model['level'];
+            if ( ! is_string( $level_type ) || empty( $level_type ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a level type must be a string not empty', $model );
+                return;
+            }
+
+            // A level id can be rendered only once by the recursive ::render method
+            if ( in_array( $id, Nimble_Manager()->rendered_levels ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a ' . $level_type . ' level id has already been rendered : ' . $id );
+                return;
+            }
             // Record the rendered id now
             Nimble_Manager()->rendered_levels[] = $id;
 
@@ -338,7 +351,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id, current_filter() . ' | ' . current_action() );
 
-            switch ( $level ) {
+            switch ( $level_type ) {
                 case 'location' :
                     //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id , $collection );
                     //empty sektions wrapper are only printed when customizing
@@ -509,7 +522,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 break;
 
                 default :
-                    sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' error => a level is invalid : ' . $level  );
+                    sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' error => a level is invalid : ' . $level_type  );
                 break;
             }
 
@@ -702,7 +715,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // @hook 'template_include'
         // @return template path
         function sek_maybe_set_local_nimble_template( $template ) {
-            //sek_error_log('sek_get_skoped_seks( skp_get_skope_id() )', sek_get_skoped_seks( skp_get_skope_id() ) );
+            //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
             $locale_template = sek_get_locale_template();
             if ( !empty( $locale_template ) ) {
                 $template = $locale_template;
