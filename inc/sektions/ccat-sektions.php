@@ -8730,9 +8730,17 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 return;
             }
             $id = $model['id'];
-            $level = $model['level'];
+            if ( ! is_string( $id ) || empty( $id ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a level id must be a string not empty', $model );
+                return;
+            }
+            $level_type = $model['level'];
+            if ( ! is_string( $level_type ) || empty( $level_type ) ) {
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a level type must be a string not empty', $model );
+                return;
+            }
             if ( in_array( $id, Nimble_Manager()->rendered_levels ) ) {
-                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a ' . $level . ' level id has already been rendered : ' . $id );
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a ' . $level_type . ' level id has already been rendered : ' . $id );
                 return;
             }
             Nimble_Manager()->rendered_levels[] = $id;
@@ -8741,7 +8749,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             $collection = array_key_exists( 'collection', $model ) ? $model['collection'] : array();
 
-            switch ( $level ) {
+            switch ( $level_type ) {
                 case 'location' :
                     ?>
                       <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
@@ -8886,7 +8894,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 break;
 
                 default :
-                    sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' error => a level is invalid : ' . $level  );
+                    sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' error => a level is invalid : ' . $level_type  );
                 break;
             }
 
@@ -9377,7 +9385,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 break;
                 case 'nimble_skope_id':
                     $user_form_composition[$field_id] = $field_data;
-                    $user_form_composition[$field_id]['value'] = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : sek_get_level_skope_id( $module_model['id'] );
+                    $skope_id = '';
+                    if ( ! skp_is_customizing() ) {
+                        $skope_id = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : sek_get_level_skope_id( $module_model['id'] );
+                    }
+                    $user_form_composition[$field_id]['value'] = $skope_id;
                 break;
                 case 'nimble_level_id':
                     $user_form_composition[$field_id] = $field_data;

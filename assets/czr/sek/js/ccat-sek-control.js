@@ -3422,7 +3422,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
             getLevelModel : function( id, collection ) {
                   var self = this, _data_ = 'no_match',
-                      _walk_ = function( id, collectionSettingId, localOrGlobal, collection ) {
+                      _walk_ = function( id, collection, collectionSettingId, localOrGlobal ) {
                             if ( _.isUndefined( collection ) ) {
                                   var currentSektionSettingValue = api( collectionSettingId )();
                                   var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
@@ -3435,20 +3435,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _data_ = levelData;
                                   } else {
                                         if ( _.isArray( levelData.collection ) ) {
-                                              _data_ = _walk_( id, collectionSettingId, localOrGlobal, levelData.collection );
+                                              _walk_( id, levelData.collection, collectionSettingId, localOrGlobal );
                                         }
                                   }
                             });
                             return _data_;
                       };
-                  _.each( {
-                        local : self.localSectionsSettingId(),
-                        global : self.getGlobalSectionsSettingId()
-                  }, function( collectionSettingId, localOrGlobal ) {
-                        if ( 'no_match' === _data_ ) {
-                              _walk_( id, collectionSettingId, localOrGlobal, collection );
-                        }
-                  });
+                  if ( ! _.isEmpty( collection ) ) {
+                        _walk_( id, collection );
+                  } else {
+                        _.each( {
+                              local : self.localSectionsSettingId(),
+                              global : self.getGlobalSectionsSettingId()
+                        }, function( collectionSettingId, localOrGlobal ) {
+                              if ( 'no_match' === _data_ ) {
+                                    _walk_( id, collection, collectionSettingId, localOrGlobal );
+                              }
+                        });
+                  }
+
                   return _data_;
             },
             isGlobalLocation : function( params ) {
@@ -3493,7 +3498,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             getLevelPositionInCollection : function( id, collection ) {
                   var self = this, _position_ = 'no_match',
-                  _walk_ = function( id, collectionSettingId, localOrGlobal, collection ) {
+                  _walk_ = function( id, collection, collectionSettingId, localOrGlobal ) {
                         if ( _.isUndefined( collection ) ) {
                               var currentSektionSettingValue = api( collectionSettingId )();
                               var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
@@ -3506,20 +3511,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     _position_ = _key_;
                               } else {
                                     if ( _.isArray( levelData.collection ) ) {
-                                          _position_ = _walk_( id, collectionSettingId, localOrGlobal, levelData.collection );
+                                          _walk_( id, levelData.collection, collectionSettingId, localOrGlobal );
                                     }
                               }
                         });
                   };
-
-                  _.each( {
-                        local : self.localSectionsSettingId(),
-                        global : self.getGlobalSectionsSettingId()
-                  }, function( collectionSettingId, localOrGlobal ) {
-                        if ( 'no_match' === _position_ ) {
-                              _walk_( id, collectionSettingId, localOrGlobal, collection );
-                        }
-                  });
+                  if ( ! _.isEmpty( collection ) ) {
+                        _walk_( id, collection );
+                  } else {
+                        _.each( {
+                              local : self.localSectionsSettingId(),
+                              global : self.getGlobalSectionsSettingId()
+                        }, function( collectionSettingId, localOrGlobal ) {
+                              if ( 'no_match' === _position_ ) {
+                                    _walk_( id, collectionSettingId, localOrGlobal, collection );
+                              }
+                        });
+                  }
                   return _position_;
             },
             getLevelProperty : function( params ) {
