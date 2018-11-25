@@ -286,17 +286,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }//render_nimble_locations()
         }
 
-        // DEPRECATED SINCE Nimble v1.3.0, november 2018
-        // was used in the Hueman theme before version 3.4.9
-        function render_content_sections_for_nimble_template() {
-            render_nimble_locations(
-                array_keys( \Nimble\Nimble_Manager()->default_locations ),//array( 'loop_start', 'before_content', 'after_content', 'loop_end'),
-                array( 'fallback_location' => 'loop_start' )
-            );
-        }
-
-
-
 
 
 
