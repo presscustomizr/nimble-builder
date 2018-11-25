@@ -1,18 +1,4 @@
 <?php
-// function register_simple_form_module() {
-//     if ( ! isset( $GLOBALS['czr_base_fmk_namespace'] ) ) {
-//         error_log( __FUNCTION__ . ' => global czr_base_fmk not set' );
-//         return;
-//     }
-
-//     $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
-// }
-
-// fired @action 'after_setup_theme'
-function sek_load_module_simple_form() {
-    new \Nimble\Sek_Simple_Form();
-}
-
 if ( ! class_exists( '\Nimble\Sek_Simple_Form' ) ) :
 class Sek_Simple_Form extends SEK_Front_Render_Css {
 
