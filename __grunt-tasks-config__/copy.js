@@ -55,7 +55,7 @@ module.exports = {
       '!assets/front/css/sek-base.css.map',
 
       // front tests php
-      '!tests.php'
+      '!dev_logs.php'
     ],
     dest: '__build__/<%= pkg.name %>/'
   },
