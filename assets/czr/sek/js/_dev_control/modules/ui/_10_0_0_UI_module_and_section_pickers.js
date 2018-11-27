@@ -34,7 +34,9 @@
       $.extend( api.czrInputMap, {
             content_type_switcher : function( input_options ) {
                   var input = this,
-                      _section_;
+                      _section_,
+                      initial_content_type;
+
                   if ( ! api.section.has( input.module.control.section() ) ) {
                         throw new Error( 'api.czrInputMap.content_type_switcher => section not registered' );
                   }
@@ -46,28 +48,28 @@
                         // handle the is-selected css class toggling
                         input.container.find('[data-sek-content-type]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        input.contentType( $(this).data( 'sek-content-type') );
+                        api.czr_sektions.currentContentPickerType( $(this).data( 'sek-content-type') );
                   });
 
-                  input.contentType = new api.Value();
-                  input.contentType.bind( function( contentType ) {
-                        input.container.find( '[data-sek-content-type="' + input.contentType() + '"]').trigger('click');
+
+                  var _do_ = function( contentType ) {
+                        input.container.find( '[data-sek-content-type="' + ( contentType || 'module' ) + '"]').trigger('click');
                         _.each( _section_.controls(), function( _control_ ) {
                               if ( ! _.isUndefined( _control_.content_type ) ) {
                                     _control_.active( contentType === _control_.content_type );
                               }
                         });
+                  };
+
+                  // Initialize
+                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
+                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value( input() );
+                  _do_( api.czr_sektions.currentContentPickerType() );
+
+                  // Schedule a reaction to changes
+                  api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
+                        _do_( contentType );
                   });
-
-                  // initialize
-                  input.contentType( input() );
-
-                  // react to content_type changes triggered by on user actions
-                  // @see api.czr_sektions.generateUIforDraggableContent()
-                  _section_.container.first().bind( 'sek-content-type-refreshed', function( evt, param ){
-                        input.contentType( param.content_type || 'section' );
-                  });
-
             }
       });
 })( wp.customize , jQuery, _ );

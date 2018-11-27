@@ -107,7 +107,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   $('.sek-add-content', '#nimble-top-bar').on( 'click', function(evt) {
                         evt.preventDefault();
-                        api.previewer.trigger( 'sek-pick-content', {});
+                        api.previewer.trigger( 'sek-pick-content', { content_type : 'section' });
                   });
                   $('.sek-nimble-doc', '#nimble-top-bar').on( 'click', function(evt) {
                         evt.preventDefault();

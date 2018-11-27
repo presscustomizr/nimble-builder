@@ -87,6 +87,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   }
 
+
                   // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
                   // Is the UI currently displayed the one that is being requested ?
                   // If so :
@@ -109,10 +110,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }, 800 );
                                     }
                               });
-                              // this event will be listened to from the "content_type_switcher" input()
-                              // @see content_type_switcher method in api.czrInputMap
-                              api.section( _control_.section() ).container.first().trigger('sek-content-type-refreshed', { content_type : params.content_type } );
                         });
+
                         return dfd;
                   }//if
 

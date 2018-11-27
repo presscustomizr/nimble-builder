@@ -484,12 +484,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             // GENERATE UI ELEMENTS
                             'sek-pick-content' : function( params ) {
+                                  // Set the active content type here
+                                  // This is used in api.czrInputMap.content_type_switcher()
+                                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
+                                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value();
+                                  api.czr_sektions.currentContentPickerType( params.content_type || 'module' );
+
                                   params = params || {};
                                   sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
-                                        content_type : params.content_type || 'section',
+                                        content_type : params.content_type || 'module',
                                         // <= the "was_triggered" param can be used to determine if we need to animate the picker control or not. @see ::generateUI() case 'sek-generate-draggable-candidates-picker-ui'
                                         // true by default, because this is the most common scenario ( when adding a section, a column ... )
                                         // but false when clicking on the + ui icon in the preview
@@ -562,7 +568,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
 
                             'sek-refresh-level' : function( params ) {
-                                  //console.log('PARAMS IN SEK REFRESH LEVEL', params );
                                   sendToPreview = true;
                                   return $.Deferred(function(_dfd_) {
                                         apiParams = {
