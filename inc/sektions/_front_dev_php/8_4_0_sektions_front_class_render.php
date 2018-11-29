@@ -815,17 +815,30 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'the_nimble_tinymce_module_content', 'do_shortcode', 11 ); // AFTER wpautop()
             add_filter( 'the_nimble_tinymce_module_content', 'capital_P_dangit', 9 );
 
+            // Hack to get the [embed] shortcode to run before wpautop()
+            // fixes Video Embed not showing when using Add Media > Insert from Url
+            // @see https://github.com/presscustomizr/nimble-builder/issues/250
+            // @see wp-includes/class-wp-embed.php
+            add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_run_shortcode' ), 8 );
+
             // @see filters in wp-includes/class-wp-embed.php
             add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_parse_content_for_video_embed') , 8 );
+        }
+
+         // fired @filter the_nimble_tinymce_module_content
+        function sek_run_shortcode( $content ) {
+            if ( array_key_exists( 'wp_embed', $GLOBALS ) && $GLOBALS['wp_embed'] instanceof \WP_Embed ) {
+                $content = $GLOBALS['wp_embed']->run_shortcode( $content );
+            }
+            return $content;
         }
 
         // fired @filter the_nimble_tinymce_module_content
         function sek_parse_content_for_video_embed( $content ) {
             if ( array_key_exists( 'wp_embed', $GLOBALS ) && $GLOBALS['wp_embed'] instanceof \WP_Embed ) {
-                return $GLOBALS['wp_embed']->autoembed( $content );
-            } else {
-                return $content;
+                $content = $GLOBALS['wp_embed']->autoembed( $content );
             }
+            return $content;
         }
     }//class
 endif;
