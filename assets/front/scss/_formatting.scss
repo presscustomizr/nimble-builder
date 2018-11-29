@@ -2,6 +2,46 @@
     word-wrap: break-word;
 }
 
+// EMBEDS
+// Fixes https://github.com/presscustomizr/nimble-builder/issues/249
+embed, iframe, object {
+    max-width: 100%;
+}
+
+// LIST FORMATTING
+// Conservative
+.#{$project-prefix}module .#{$project-prefix}module-inner {
+    ul {
+      list-style: disc;
+    }
+    ol {
+      list-style: decimal;
+      & > li {
+        &::before {
+          content: none;
+        }
+      }
+    }
+    ul, ol {
+      padding: 0;
+      line-height: 1.5;
+      @if ( true == $is_rtl ) {
+          margin: 0 1.5rem 1.5rem 0;
+      }
+      @else {
+          margin: 0 0 1.5rem 1.5rem;
+      }
+      & > li {
+        padding: 0;
+      }
+    }
+    li > ul, li > ol {
+        margin-bottom: 0;
+    }
+}
+
+
+
 // customizr like
 // .#{$project-prefix}module .#{$project-prefix}module-inner {
 //     ul, ol {
@@ -100,34 +140,3 @@
 //       }
 //     }
 // }
-
-// Conservative
-.#{$project-prefix}module .#{$project-prefix}module-inner {
-    ul {
-      list-style: disc;
-    }
-    ol {
-      list-style: decimal;
-      & > li {
-        &::before {
-          content: none;
-        }
-      }
-    }
-    ul, ol {
-      padding: 0;
-      line-height: 1.5;
-      @if ( true == $is_rtl ) {
-          margin: 0 1.5rem 1.5rem 0;
-      }
-      @else {
-          margin: 0 0 1.5rem 1.5rem;
-      }
-      & > li {
-        padding: 0;
-      }
-    }
-    li > ul, li > ol {
-        margin-bottom: 0;
-    }
-}
