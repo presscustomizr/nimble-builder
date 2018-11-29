@@ -17,14 +17,15 @@ if ( ! function_exists( 'Nimble\sek_print_tiny_mce_text_content') ) {
             echo Nimble_Manager()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
         } else {
             if ( false === sek_booleanize_checkbox_val( $value['autop'] ) ) {
-                remove_filter( 'the_content', 'wpautop');
+                remove_filter( 'the_nimble_tinymce_module_content', 'wpautop');
             }
 
             // Use our own content filter instead of $content = apply_filters( 'the_content', $tiny_mce_content );
             // because of potential third party plugins corrupting 'the_content' filter. https://github.com/presscustomizr/nimble-builder/issues/233
             $content = apply_filters( 'the_nimble_tinymce_module_content', $tiny_mce_content );
+
             if ( false === sek_booleanize_checkbox_val( $value['autop'] ) ) {
-                add_filter( 'the_content', 'wpautop');
+                add_filter( 'the_nimble_tinymce_module_content', 'wpautop');
             }
             if ( skp_is_customizing() ) {
                 printf('<div title="%3$s" data-sek-input-type="tiny_mce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
