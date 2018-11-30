@@ -21,5 +21,12 @@
     figure {
         margin: 0;
     }
+
+    // EMBEDS
+    // Fixes https://github.com/presscustomizr/nimble-builder/issues/249
+    embed, iframe, object {
+        max-width: 100%;
+    }
+
 }
 //consider to extend this with other rules from bs _reboot.scss

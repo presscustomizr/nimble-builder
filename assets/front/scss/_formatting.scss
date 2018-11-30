@@ -2,12 +2,6 @@
     word-wrap: break-word;
 }
 
-// EMBEDS
-// Fixes https://github.com/presscustomizr/nimble-builder/issues/249
-embed, iframe, object {
-    max-width: 100%;
-}
-
 // LIST FORMATTING
 // Conservative
 .#{$project-prefix}module .#{$project-prefix}module-inner {
