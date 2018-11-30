@@ -79,7 +79,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     // stop here if the ui icons block was clicked
                                     if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
                                       return;
-                                    self._send_( $el, { action : 'edit-module', level : _level , id : _id } );
+
+                                    self._send_( $el, {
+                                          action : 'edit-module',
+                                          level : _level,
+                                          id : _id
+                                    });
                               break;
                               case 'noModulesColumn' :
                                     // stop here if the ui icons block was clicked
@@ -126,6 +131,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     //self._send_( $el, { action : 'pick-content' } );
                               break;
                         }
+
+                        //console.log('CLICKED ?', clickedOn );
                   });//$('body').on('click', function( evt ) {}
 
             },//scheduleUserReactions()
@@ -133,18 +140,30 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
             _send_ : function( $el, params ) {
                   //console.log('IN _send_', $el, params );
-                  var clonedParams = $.extend( true, {}, params );
+                  var clonedParams = $.extend( true, {}, params ),
+                      syncedTinyMceInputId = '',
+                      $moduleWrapper = $el.closest('div[data-sek-level="module"]'),
+                      _module_type_ = 'module' === params.level ? $moduleWrapper.data( 'sek-module-type') : '';
+
+                  if ( 'module' === params.level ) {
+                        if ( 'czr_tiny_mce_editor_module' === _module_type_ ) {
+                              syncedTinyMceInputId = $moduleWrapper.find('div[data-sek-input-id]').length > 0 ? $moduleWrapper.find('div[data-sek-input-id]').data('sek-input-id') : '';
+                        }
+                  }
                   api.preview.send( 'sek-' + params.action, _.extend( {
                         location : params.location,
                         level : params.level,
                         id : params.id,
                         content_type : $el.data( 'sek-content-type'),
-                        module_type : 'module' == params.level ? $el.closest('div[data-sek-level="module"]').data( 'sek-module-type') : '',
+                        module_type : _module_type_,
                         in_column : $el.closest('div[data-sek-level="column"]').length > 0 ? $el.closest('div[data-sek-level="column"]').data( 'sek-id') : '',
                         in_sektion : $el.closest('div[data-sek-level="section"]').length > 0 ? $el.closest('div[data-sek-level="section"]').data( 'sek-id') : '',
                         clicked_input_type : $el.closest('div[data-sek-input-type]').length > 0 ? $el.closest('div[data-sek-input-type]').data('sek-input-type') : '',
                         clicked_input_id : $el.closest('div[data-sek-input-id]').length > 0 ? $el.closest('div[data-sek-input-id]').data('sek-input-id') : '',
-                        was_triggered : params.was_triggered
+                        was_triggered : params.was_triggered,
+                        // the syncedTinyMceInputId is used in the control::setupTinyMceEditor()
+                        // Fixes : https://github.com/presscustomizr/nimble-builder/issues/251
+                        syncedTinyMceInputId : syncedTinyMceInputId
                   }, clonedParams ) );
             }
       });//$.extend()

@@ -36,7 +36,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // This is how we can listen here to 'sek-edit-module_done'
                   // The sek-edit-module is fired when clicking on a .sek-module wrapper @see ::scheduleUiClickReactions
                   self.bind( 'sek-edit-module_done', function( params ) {
-                        if ( 'tiny_mce_editor' != params.clicked_input_type )
+                        params = _.isObject( params ) ? params : {};
+                        if ( 'tiny_mce_editor' !== params.clicked_input_type && 'czr_tiny_mce_editor_module' !== params.module_type )
+                          return;
+
+                        // @see preview::scheduleUiClickReactions()
+                        // Fixes : https://github.com/presscustomizr/nimble-builder/issues/251
+                        if ( _.isEmpty( params.syncedTinyMceInputId ) )
                           return;
 
                         var controlId = params.id;
@@ -57,7 +63,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Set a new sync input
                         api.sekEditorSynchronizedInput({
                               control_id : controlId,
-                              input_id : params.clicked_input_id
+                              input_id : params.syncedTinyMceInputId
                         });
 
                         api.sekEditorExpanded( true );
