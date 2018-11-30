@@ -60,11 +60,36 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $(this).find('a').each( function() {
                               if ( "yes" === $(this).data('sek-unlinked') )
                                 return;
-                              $(this).addClass('nimble-unclickable');
-                              $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', '#');
-                              $(this).on('click', function(evt) {
-                                    evt.preventDefault();
-                              });
+                              // Two cases :
+                              // 1- internal link ( <=> api.isLinkPreviewable(... ) = true ) : we allow navigation with shift + click
+                              // 2- extenal link => navigation is disabled.
+                              if ( api.isLinkPreviewable( $(this)[0] ) ) {
+                                    $(this).addClass('nimble-shift-clickable');
+                                    $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', '#');
+                                    $(this).hover( function() {
+                                          $(this).attr( 'title', sekPreviewLocalized.i18n['Shift-click to visit the link']);
+                                    }, function() {
+                                          $(this).removeAttr( 'title' );
+                                    });
+                                    $(this).on('click', function(evt) {
+                                          if ( ! evt.shiftKey ) {
+                                            return;
+                                          }
+                                          evt.preventDefault();
+                                          window.location.href = $(this).attr('data-nimble-href');
+                                    });
+                              } else {
+                                    $(this).addClass('nimble-unclickable');
+                                    $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', '#');
+                                    $(this).hover( function() {
+                                          $(this).attr( 'title', sekPreviewLocalized.i18n['External links are disabled when customizing']);
+                                    }, function() {
+                                          $(this).removeAttr( 'title' );
+                                    });
+                                    $(this).on('click', function(evt) {
+                                          evt.preventDefault();
+                                    });
+                              }
                         });
                   });
             },

@@ -1319,7 +1319,7 @@ html.no-js [id*=sek-slider-loader-wrapper] {
 
 /* STYLE LINKS */
 .nimble-unclickable{cursor: not-allowed !important;}
-
+.nimble-shift-clickable{cursor: alias!important;}
 
 
 /* STYLE FOR GLOBAL LOCATIONS AND SECTIONS */
