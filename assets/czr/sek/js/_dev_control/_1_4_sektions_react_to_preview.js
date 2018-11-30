@@ -484,6 +484,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             // GENERATE UI ELEMENTS
                             'sek-pick-content' : function( params ) {
+                                  params = _.isObject(params) ? params : {};
                                   // Set the active content type here
                                   // This is used in api.czrInputMap.content_type_switcher()
                                   // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
