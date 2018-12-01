@@ -746,9 +746,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // "this" is the section
             // in the content picker section, control's container have the attribute "data-sek-accordion" to selectively enable the accordion
             // @see ::generateUIforDraggableContent()
-            // @params { expand_first_module : boolean }
+            // @params { expand_first_control : boolean }
             scheduleModuleAccordion : function( params ) {
-                  params = params || { expand_first_module : true };
+                  params = params || { expand_first_control : true };
                   var _section_ = this;
                   // Attach event on click
                   $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
@@ -763,27 +763,29 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( $(this).attr( 'data-sek-accordion' ) )
                                 return;
                               $(this).attr('data-sek-expanded', "false" );
-                              $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
+                              $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 0 );
                         });
                         $control.find('.czr-items-wrapper').stop( true, true ).slideToggle({
-                              duration : 'fast',
+                              duration : 0,
                               start : function() {
                                     $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
                                     // this event 'sek-accordion-expanded', is used to defer the instantiation of the code editor
                                     // @see api.czrInputMap['code_editor']
                                     // @see https://github.com/presscustomizr/nimble-builder/issues/176
-                                    if ( "true" == $control.attr('data-sek-expanded') ) {
-                                          $control.trigger( 'sek-accordion-expanded' );
-                                    } else {
-                                          $control.trigger( 'sek-accordion-collapsed' );
-                                    }
+                                    $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
                               }
                         });
                   });
 
                   // Expand the first module if requested
-                  if ( params.expand_first_module ) {
-                        _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
+                  if ( params.expand_first_control ) {
+                        var firstControl = _.first( _section_.controls() );
+                        if ( _.isObject( firstControl ) && ! _.isEmpty( firstControl.id ) ) {
+                              api.control( firstControl.id, function( _ctrl_ ) {
+                                    _ctrl_.container.trigger( 'sek-accordion-expanded' );
+                                    _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
+                              });
+                        }
                   }
             },
 
