@@ -18,6 +18,10 @@
   margin: 0;
 }
 
+.sektion-wrapper embed, .sektion-wrapper iframe, .sektion-wrapper object {
+  max-width: 100%;
+}
+
 .sek-service-font, .sek-module-inner .sek-btn {
   font-family: sans-serif;
   letter-spacing: 1px;
@@ -933,6 +937,10 @@ button.sek-btn,
 
 .sek-simple-form-wrapper #sek-form-respond {
   padding: 20px 0;
+}
+
+[data-sek-module-type="czr_tiny_mce_editor_module"] a {
+  text-decoration: underline;
 }
 
 .sek-module-inner {

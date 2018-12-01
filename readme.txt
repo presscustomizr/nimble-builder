@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.0
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -47,15 +47,35 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.3.0 =
-* fixed : the customizer UI was not loaded on WordPress network installs
-* fixed : columns layout randomly broken
-* fixed : tinymce editor module could be not accessible in some cases
-* improved : use a namespaced version of the select2 javascript library to avoid collision with other plugins or themes using select2
-* improved : make sure the tinyMce module is always accessible
-* added : introduced a new Nimble full page template (beta) using global header and footer locations
+= 1.3.1 =
+* fixed : WP editor module, editor content not updated when clicking on the module UI hamburger menu
+* fixed : video embedded not displayed when using the WP editor module, Add Media > Insert from Url
+* fixed : use the_nimble_tinymce_module_content instead of the_content when handling the "autop" option
+* fixed : video embed iframe overflowing the module wrapper
+* fixed : impossible to move a module in a freshly created new section
+* improved : added a default underline style for links inside the WP editor module
+* improved : during drag and drop, better proximity detection + only one drop candidate highlighted a time. See support topic https://wordpress.org/support/topic/few-improvement-suggestions/
+* improved : refined the way links are handled in the preview. Two cases : 1-internal link ( <=> api.isLinkPreviewable(... ) = true ) : navigation allowed with shift + click, 2-extenal link => navigation is disabled
+* improved : performances of the customizer UI, significant speed improvements when rendering the various controls for level options
+* improved : picking content logic has been improved. The section picker is opened when adding a section ( click on + insert a new section button ), the module picker opened in all other cases
+* updated : Google font list to the latest version : https://fonts.google.com/
+* renamed "Full Nimble Builder template (beta)" to "Full Nimble Builder template (beta)"
 
 == Changelog ==
+= 1.3.1 : November 26th, 2018 =
+* fixed : WP editor module, editor content not updated when clicking on the module UI hamburger menu
+* fixed : video embedded not displayed when using the WP editor module, Add Media > Insert from Url
+* fixed : use the_nimble_tinymce_module_content instead of the_content when handling the "autop" option
+* fixed : video embed iframe overflowing the module wrapper
+* fixed : impossible to move a module in a freshly created new section
+* improved : added a default underline style for links inside the WP editor module
+* improved : during drag and drop, better proximity detection + only one drop candidate highlighted a time. See support topic https://wordpress.org/support/topic/few-improvement-suggestions/
+* improved : refined the way links are handled in the preview. Two cases : 1-internal link ( <=> api.isLinkPreviewable(... ) = true ) : navigation allowed with shift + click, 2-extenal link => navigation is disabled
+* improved : performances of the customizer UI, significant speed improvements when rendering the various controls for level options
+* updated : Google font list to the latest version : https://fonts.google.com/
+* renamed "Full Nimble Builder template (beta)" to "Full Nimble Builder template (beta)"
+* improved : picking content logic has been improved. The section picker is opened when adding a section ( click on + insert a new section button ), the module picker opened in all other cases
+
 = 1.3.0 : November 26th, 2018 =
 * fixed : the customizer UI was not loaded on WordPress network installs
 * fixed : columns layout randomly broken

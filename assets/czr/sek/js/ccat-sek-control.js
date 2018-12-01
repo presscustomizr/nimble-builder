@@ -334,7 +334,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   $('.sek-add-content', '#nimble-top-bar').on( 'click', function(evt) {
                         evt.preventDefault();
-                        api.previewer.trigger( 'sek-pick-content', {});
+                        api.previewer.trigger( 'sek-pick-content', { content_type : 'module' });
                   });
                   $('.sek-nimble-doc', '#nimble-top-bar').on( 'click', function(evt) {
                         evt.preventDefault();
@@ -833,7 +833,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     id :  params.apiParams.location
                                               });
                                         }
-                                        api.previewer.trigger( 'sek-pick-content', {});
+                                        api.previewer.trigger( 'sek-pick-content', { content_type : 'section' });
                                         api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                   }
                             },
@@ -1183,12 +1183,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   }
                             },
                             'sek-pick-content' : function( params ) {
+                                  params = _.isObject(params) ? params : {};
+                                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value();
+                                  api.czr_sektions.currentContentPickerType( params.content_type || 'module' );
+
                                   params = params || {};
                                   sendToPreview = true;
                                   apiParams = {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
-                                        content_type : params.content_type || 'section',
+                                        content_type : params.content_type || 'module',
                                         was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true,
                                         focus : _.has( params, 'focus' ) ? params.focus : true
                                   };
@@ -1761,8 +1765,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }, 800 );
                                     }
                               });
-                              api.section( _control_.section() ).container.first().trigger('sek-content-type-refreshed', { content_type : params.content_type } );
                         });
+
                         return dfd;
                   }//if
                   _do_register_ = function() {
@@ -1806,7 +1810,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 });
                                           }
 
-                                          var $title = _control_.container.find('label > .customize-control-title');
+                                          var $title = _control_.container.find('label > .customize-control-title'),
+                                              _titleContent = $title.html();
+                                          $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
                                           if ( ! _.isUndefined( optionData.icon ) ) {
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                           }
@@ -1836,7 +1842,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
                               $panelTitleEl.find('.customize-action').after( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
                         }
-                        self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
+                        self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                         self._maybeFetchSectionsFromServer();
                   });
                   return dfd;
@@ -1956,19 +1962,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     section : params.id,
                                     priority : 10,
                                     settings : { default : optionData.settingControlId }
-                              }).done( function() {
+                              }).done( function() {});
+                              api.control( optionData.settingControlId, function( _control_ ) {
                                     api.control( optionData.settingControlId ).focus({
                                           completeCallback : function() {}
                                     });
-                                    api.control( optionData.settingControlId, function( _control_ ) {
-                                          _control_.container.find('.czr-items-wrapper').hide();
-                                          var $title = _control_.container.find('label > .customize-control-title');
-                                          if ( ! _.isUndefined( optionData.icon ) ) {
-                                                $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
-                                          }
-                                          $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                          _control_.container.attr('data-sek-expanded', "false" );
-                                    });
+                                    _control_.container.find('.czr-items-wrapper').hide();
+                                    var $title = _control_.container.find('label > .customize-control-title'),
+                                        _titleContent = $title.html();
+
+                                    $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+                                    if ( ! _.isUndefined( optionData.icon ) ) {
+                                          $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
+                                    }
+                                    $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+                                    _control_.container.attr('data-sek-expanded', "false" );
                               });
                         });//each()
                   };//_do_register()
@@ -1983,15 +1991,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         title: sektionsLocalizedData.i18n['Content for'] + ' ' + moduleName,
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 1000,
-                  }).done( function() {
-                        api.section( params.id, function( _section_ ) {
-                              _section_.container.find('.accordion-section-title').first().hide();
-                              var $panelTitleEl = _section_.container.find('.customize-section-title h3');
-                              if ( 0 < $panelTitleEl.length ) {
-                                    $panelTitleEl.find('.customize-action').after( '<i class="fas fa-pencil-alt sek-level-option-icon"></i>' );
-                              }
-                              self.scheduleModuleAccordion.call( _section_ );
-                        });
+                  }).done( function() {});
+
+                  api.section( params.id, function( _section_ ) {
+                        _section_.container.find('.accordion-section-title').first().hide();
+                        var $panelTitleEl = _section_.container.find('.customize-section-title h3');
+                        if ( 0 < $panelTitleEl.length ) {
+                              $panelTitleEl.find('.customize-action').after( '<i class="fas fa-pencil-alt sek-level-option-icon"></i>' );
+                        }
+                        self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                   });
                   return dfd;
             }
@@ -2150,30 +2158,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     section : params.id,
                                     priority : 0,
                                     settings : { default : optionData.settingControlId }
-                              }).done( function() {
+                              }).done( function() {});
+                              api.control( optionData.settingControlId, function( _control_ ) {
                                     if ( true === optionData.expandAndFocusOnInit ) {
-                                          api.control( optionData.settingControlId ).focus({
+                                          _control_.focus({
                                                 completeCallback : function() {}
                                           });
                                     }
-                                    api.control( optionData.settingControlId, function( _control_ ) {
-                                          _control_.container.find('.czr-items-wrapper').hide();
-                                          var $title = _control_.container.find('label > .customize-control-title');
-                                          if ( ! _.isUndefined( optionData.icon ) ) {
-                                                $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
-                                          }
-                                          $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                          _control_.container.attr('data-sek-expanded', "false" );
-                                          if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                                $title.trigger('click');
-                                          }
-                                    });
+                                    _control_.container.find('.czr-items-wrapper').hide();
+                                    var $title = _control_.container.find('label > .customize-control-title'),
+                                        _titleContent = $title.html();
+                                    $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+                                    if ( ! _.isUndefined( optionData.icon ) ) {
+                                          $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
+                                    }
+                                    $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+                                    _control_.container.attr('data-sek-expanded', "false" );
                               });
                         });//_.each()
                   };//_do_register_()
                   if ( ! api.section.has( params.id ) ) {
                         api.section( params.id, function( _section_ ) {
-                              self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
+                              self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                         });
                   }
 
@@ -2184,15 +2190,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         title: sektionsLocalizedData.i18n['Settings for the'] + ' ' + params.level,
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 10,
-                  }).done( function() {
-                        api.section( params.id, function( _section_ ) {
-                              _do_register_();
-                              _section_.container.find('.accordion-section-title').first().hide();
-                              var $panelTitleEl = _section_.container.find('.customize-section-title h3');
-                              if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
-                                    $panelTitleEl.find('.customize-action').after( '<i class="fas fa-sliders-h sek-level-option-icon"></i>' );
-                              }
-                        });
+                  }).done( function() {});
+                  api.section( params.id, function( _section_ ) {
+                        _do_register_();
+                        _section_.container.find('.accordion-section-title').first().hide();
+                        var $panelTitleEl = _section_.container.find('.customize-section-title h3');
+                        if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
+                              $panelTitleEl.find('.customize-action').after( '<i class="fas fa-sliders-h sek-level-option-icon"></i>' );
+                        }
                   });
 
                   return dfd;
@@ -2307,7 +2312,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }).done( function() {
                                     api.control( optionData.settingControlId, function( _control_ ) {
                                           _control_.container.find('.czr-items-wrapper').hide();
-                                          var $title = _control_.container.find('label > .customize-control-title');
+                                          var $title = _control_.container.find('label > .customize-control-title'),
+                                              _titleContent = $title.html();
+                                          $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
                                           if ( ! _.isUndefined( optionData.icon ) ) {
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                           }
@@ -2422,7 +2429,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }).done( function() {
                                     api.control( optionData.settingControlId, function( _control_ ) {
                                           _control_.container.find('.czr-items-wrapper').hide();
-                                          var $title = _control_.container.find('label > .customize-control-title');
+                                          var $title = _control_.container.find('label > .customize-control-title'),
+                                              _titleContent = $title.html();
+                                          $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
                                           if ( ! _.isUndefined( optionData.icon ) ) {
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                           }
@@ -3928,7 +3937,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             },
             scheduleModuleAccordion : function( params ) {
-                  params = params || { expand_first_module : true };
+                  params = params || { expand_first_control : true };
                   var _section_ = this;
                   $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
                         evt.stopPropagation();
@@ -3941,22 +3950,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( $(this).attr( 'data-sek-accordion' ) )
                                 return;
                               $(this).attr('data-sek-expanded', "false" );
-                              $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 'fast' );
+                              $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 0 );
                         });
                         $control.find('.czr-items-wrapper').stop( true, true ).slideToggle({
-                              duration : 'fast',
+                              duration : 0,
                               start : function() {
                                     $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
-                                    if ( "true" == $control.attr('data-sek-expanded') ) {
-                                          $control.trigger( 'sek-accordion-expanded' );
-                                    } else {
-                                          $control.trigger( 'sek-accordion-collapsed' );
-                                    }
+                                    $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
                               }
                         });
                   });
-                  if ( params.expand_first_module ) {
-                        _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
+                  if ( params.expand_first_control ) {
+                        var firstControl = _.first( _section_.controls() );
+                        if ( _.isObject( firstControl ) && ! _.isEmpty( firstControl.id ) ) {
+                              api.control( firstControl.id, function( _ctrl_ ) {
+                                    _ctrl_.container.trigger( 'sek-accordion-expanded' );
+                                    _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
+                              });
+                        }
                   }
             },
             isPromise : function (fn) {
@@ -4179,17 +4190,35 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                 });//this.dropZones.each()
             },//setupNimbleDropZones()
+
+
+
+            dnd_isInTarget : function( $el, evt ) {
+                  var yPos = evt.clientY,
+                      xPos = evt.clientX,
+                      dzoneRect = $el[0].getBoundingClientRect(),
+                      isInHorizontally = xPos <= dzoneRect.right && dzoneRect.left <= xPos,
+                      isInVertically = yPos >= dzoneRect.top && dzoneRect.bottom >= yPos;
+                  return isInVertically && isInHorizontally;
+            },
             dnd_toggleDragApproachClassesToDropZones : function( evt ) {
-                  var self = this;
+
+                  var self = this,
+                      getHypotenuse = function( a, b ) {
+                            return(Math.sqrt((a * a) + (b * b)));
+                      };
+
                   this.$dropZones = this.$dropZones || this.dnd_getDropZonesElements();
                   this.$cachedDropZoneCandidates = _.isEmpty( this.$cachedDropZoneCandidates ) ? this.$dropZones.find('.sek-drop-zone') : this.$cachedDropZoneCandidates;// Will be reset on drop
+
+                  this.distanceTable = [];
 
                   this.$dropZones.find('.sek-drop-zone').each( function() {
                         var yPos = evt.clientY,
                             xPos = evt.clientX,
                             APPROACHING_DIST = 120,
                             CLOSE_DIST = 80,
-                            VERY_CLOSE_DIST = 60;
+                            VERY_CLOSE_DIST = 50;//60;
 
                         var dzoneRect = $(this)[0].getBoundingClientRect(),
                             mouseToYCenter = Math.abs( yPos - ( dzoneRect.bottom - ( dzoneRect.bottom - dzoneRect.top )/2 ) ),
@@ -4207,25 +4236,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             isInHorizontally = xPos <= dzoneRect.right && dzoneRect.left <= xPos,
                             isInVertically = yPos >= dzoneRect.top && dzoneRect.bottom >= yPos;
 
-                        if ( isInVertically && isInHorizontally ) {
-                              $(this).removeClass( 'sek-drag-is-approaching');
-                              $(this).removeClass( 'sek-drag-is-close' );
-                              $(this).removeClass( 'sek-drag-is-very-close');
-                              $(this).addClass( 'sek-drag-is-in');
-                        } else if ( ( isVeryCloseVertically || isInVertically ) && ( isVeryCloseHorizontally || isInHorizontally ) ) {
+                        self.distanceTable.push({
+                              el : $(this),
+                              dist : ( isInVertically && isInHorizontally ) ? 0 : getHypotenuse( mouseToXCenter, mouseToYCenter )
+                        });
+                        $(this).removeClass( 'sek-drag-is-in');
+
+                        if ( ( isVeryCloseVertically || isInVertically ) && ( isVeryCloseHorizontally || isInHorizontally ) ) {
                               $(this).removeClass( 'sek-drag-is-approaching');
                               $(this).removeClass( 'sek-drag-is-close' );
                               $(this).addClass( 'sek-drag-is-very-close');
-                              $(this).removeClass( 'sek-drag-is-in');
-                        } else if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
-                              $(this).removeClass( 'sek-drag-is-approaching');
-                              $(this).addClass( 'sek-drag-is-close' );
-                              $(this).removeClass( 'sek-drag-is-very-close');
-                              $(this).removeClass( 'sek-drag-is-in');
-                        } else if ( ( isApproachingVertically || isInVertically ) && ( isApproachingHorizontally || isInHorizontally ) ) {
-                              $(this).addClass( 'sek-drag-is-approaching');
-                              $(this).removeClass( 'sek-drag-is-close' );
-                              $(this).removeClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-in');
                         } else {
                               $(this).removeClass( 'sek-drag-is-approaching');
@@ -4234,6 +4254,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               $(this).removeClass( 'sek-drag-is-in');
                         }
                   });//$('.sek-drop-zones').each()
+
+
+                  var _lowerDist = _.min( _.pluck( self.distanceTable, 'dist') );
+                  self.$dropTargetCandidate = null;
+                  _.each( self.distanceTable, function( data ) {
+                        if ( _.isNull( self.$dropTargetCandidate ) && _lowerDist === data.dist ) {
+                              self.$dropTargetCandidate = data.el;
+                        }
+                  });
+                  if ( self.$dropTargetCandidate && self.$dropTargetCandidate.length > 0 && self.dnd_isInTarget( self.$dropTargetCandidate, evt ) ) {
+                        self.$dropTargetCandidate.addClass('sek-drag-is-in');
+                  }
                   self.enterOverTimer = null;
             },
             dnd_getPreDropElementContent : function( evt ) {
@@ -4499,7 +4531,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   };
                   self.bind( 'sek-edit-module_done', function( params ) {
-                        if ( 'tiny_mce_editor' != params.clicked_input_type )
+                        params = _.isObject( params ) ? params : {};
+                        if ( 'tiny_mce_editor' !== params.clicked_input_type && 'czr_tiny_mce_editor_module' !== params.module_type )
+                          return;
+                        if ( _.isEmpty( params.syncedTinyMceInputId ) )
                           return;
 
                         var controlId = params.id;
@@ -4517,7 +4552,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         api.sekEditorSynchronizedInput({
                               control_id : controlId,
-                              input_id : params.clicked_input_id
+                              input_id : params.syncedTinyMceInputId
                         });
 
                         api.sekEditorExpanded( true );
@@ -5292,7 +5327,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( api.czrInputMap, {
             fa_icon_picker : function() {
                   var input           = this,
-                      item            = input.input_parent,
                       _selected_found = false;
                   var _generateOptions = function( iconCollection ) {
                         _.each( iconCollection , function( iconClass ) {
@@ -5301,7 +5335,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     html: api.CZR_Helpers.capitalize( iconClass.substring( 7 ) )
                               };
 
-                              if ( _attributes.value == item().icon ) {
+                              if ( _attributes.value == input() ) {
                                     $.extend( _attributes, { selected : "selected" } );
                                     _selected_found = true;
                               }
@@ -5323,41 +5357,56 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               $_placeholder = $('<option>', { selected: 'selected' } );
                         }
                         $( 'select[data-czrtype]', input.container )
-                          .prepend( $_placeholder )
-                          .czrSelect2({
-                                templateResult: addIcon,
-                                templateSelection: addIcon,
-                                placeholder: sektionsLocalizedData.i18n['Select an icon'],
-                                allowClear: true
-                        });
+                            .prepend( $_placeholder )
+                            .czrSelect2({
+                                  templateResult: addIcon,
+                                  templateSelection: addIcon,
+                                  placeholder: sektionsLocalizedData.i18n['Select an icon'],
+                                  allowClear: true
+                            });
                   };//_generateOptions
 
+
                   var _getIconsCollections = function() {
-                        var dfd = $.Deferred();
-                        if ( ! _.isEmpty( input.sek_faIconCollection ) ) {
-                              dfd.resolve( input.sek_faIconCollection );
-                        } else {
-                              api.CZR_Helpers.getModuleTmpl( {
-                                    tmpl : 'icon_list',
-                                    module_type: 'fa_icon_picker_input',
-                                    module_id : input.module.id
-                              } ).done( function( _serverTmpl_ ) {
-                                    if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '[' ) {
-                                          throw new Error( 'fa_icon_picker => server list is not JSON.parse-able');
-                                    }
-                                    input.sek_faIconCollection = JSON.parse( _serverTmpl_ );
-                                    dfd.resolve( input.sek_faIconCollection );
-                              }).fail( function( _r_ ) {
-                                    dfd.reject( _r_ );
-                              });
-                        }
-                        return dfd.promise();
+                        return $.Deferred( function( _dfd_ ) {
+                              if ( ! _.isEmpty( input.sek_faIconCollection ) ) {
+                                    _dfd_.resolve( input.sek_faIconCollection );
+                              } else {
+                                    api.CZR_Helpers.getModuleTmpl( {
+                                          tmpl : 'icon_list',
+                                          module_type: 'fa_icon_picker_input',
+                                          module_id : input.module.id
+                                    } ).done( function( _serverTmpl_ ) {
+                                          if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '[' ) {
+                                                throw new Error( 'fa_icon_picker => server list is not JSON.parse-able');
+                                          }
+                                          input.sek_faIconCollection = JSON.parse( _serverTmpl_ );
+                                          _dfd_.resolve( input.sek_faIconCollection );
+                                    }).fail( function( _r_ ) {
+                                          _dfd_.reject( _r_ );
+                                    });
+                              }
+                        });
                   };//_getIconsCollections
-                  $.when( _getIconsCollections() ).done( function( iconCollection ) {
-                        _generateOptions( iconCollection );
-                  }).fail( function( _r_ ) {
-                        api.errare( 'fa_icon_picker => fail response =>', _r_ );
+                  var _do_ = function( params ) {
+                        if ( true === input.iconCollectionSet )
+                          return;
+                        $.when( _getIconsCollections() ).done( function( iconCollection ) {
+                              _generateOptions( iconCollection );
+                              if ( params && true === params.open_on_init ) {
+                                    _.delay( function() {
+                                          try{ $( 'select[data-czrtype]', input.container ).czrSelect2('open'); }catch(er) {}
+                                    }, 100 );
+                              }
+                        }).fail( function( _r_ ) {
+                              api.errare( 'fa_icon_picker => fail response =>', _r_ );
+                        });
+                        input.iconCollectionSet = true;
+                  };
+                  input.container.on('click', function() {
+                        _do_();
                   });
+                  _.delay( function() { _do_( { open_on_init : false } );}, 1000 );
 
             }
       });//$.extend( api.czrInputMap, {})
@@ -6104,7 +6153,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( api.czrInputMap, {
             content_type_switcher : function( input_options ) {
                   var input = this,
-                      _section_;
+                      _section_,
+                      initial_content_type;
+
                   if ( ! api.section.has( input.module.control.section() ) ) {
                         throw new Error( 'api.czrInputMap.content_type_switcher => section not registered' );
                   }
@@ -6113,23 +6164,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         evt.preventDefault();
                         input.container.find('[data-sek-content-type]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        input.contentType( $(this).data( 'sek-content-type') );
+                        api.czr_sektions.currentContentPickerType( $(this).data( 'sek-content-type') );
                   });
 
-                  input.contentType = new api.Value();
-                  input.contentType.bind( function( contentType ) {
-                        input.container.find( '[data-sek-content-type="' + input.contentType() + '"]').trigger('click');
+
+                  var _do_ = function( contentType ) {
+                        input.container.find( '[data-sek-content-type="' + ( contentType || 'module' ) + '"]').trigger('click');
                         _.each( _section_.controls(), function( _control_ ) {
                               if ( ! _.isUndefined( _control_.content_type ) ) {
                                     _control_.active( contentType === _control_.content_type );
                               }
                         });
+                  };
+                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value( input() );
+                  _do_( api.czr_sektions.currentContentPickerType() );
+                  api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
+                        _do_( contentType );
                   });
-                  input.contentType( input() );
-                  _section_.container.first().bind( 'sek-content-type-refreshed', function( evt, param ){
-                        input.contentType( param.content_type || 'section' );
-                  });
-
             }
       });
 })( wp.customize , jQuery, _ );
@@ -6302,7 +6353,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_anchor_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_anchor_module' )
@@ -6370,7 +6422,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_bg_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_bg_module' )
@@ -6438,7 +6491,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_border_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_border_module' )
@@ -6495,7 +6549,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_breakpoint_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_breakpoint_module' )
@@ -6559,7 +6614,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_height_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_height_module' )
@@ -6574,7 +6630,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_visibility_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_visibility_module' )
@@ -6641,7 +6698,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_width_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_width_module' )
@@ -6710,7 +6768,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_width_section', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_width_section' )
@@ -6726,7 +6785,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_spacing_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_spacing_module' )
@@ -7141,7 +7201,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_image_main_settings_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_image_main_settings_child' )
             },
       });
@@ -7214,7 +7275,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_image_borders_corners_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_image_borders_corners_child' )
             },
       });
@@ -7250,7 +7312,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_tinymce_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_tinymce_child' )
             },
       });
@@ -7262,7 +7325,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_html_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_html_module' )
             },
       });
@@ -7352,7 +7416,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   refresh_on_add_item : false,// the preview is refreshed on item add
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_featured_pages_module' )
             },
       });
@@ -7451,7 +7516,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_icon_settings_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_icon_settings_child' )
             },
       });
@@ -7513,7 +7579,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_icon_spacing_border_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_icon_spacing_border_child' )
             }
       });
@@ -7541,7 +7608,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_heading_child' )
             }
       });
@@ -7571,7 +7639,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_spacing_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_heading_spacing_child' )
             }
       });
@@ -7598,7 +7667,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_divider_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_divider_module' )
             }
       });
@@ -7610,7 +7680,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_spacer_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_spacer_module' )
             }
       });
@@ -7622,7 +7693,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_map_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_map_module' )
             }
       });
@@ -7694,7 +7766,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_quote_design_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_quote_design_child' )
             }
       });
@@ -7732,7 +7805,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_quote_quote_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_quote_quote_child' )
             }
       });
@@ -7766,7 +7840,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_quote_cite_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_quote_cite_child' )
             }
       });
@@ -7861,7 +7936,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_btn_content_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_btn_content_child' )
             }
       });
@@ -7954,7 +8030,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_btn_design_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_btn_design_child' )
             }
       });
@@ -8041,7 +8118,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_fields_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_form_fields_child' )
             }
       });
@@ -8103,7 +8181,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_design_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_form_design_child' )
             }
       });
@@ -8183,7 +8262,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_button_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_form_button_child' )
             }
       });
@@ -8208,7 +8288,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_fonts_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_form_fonts_child' )
             }
       });
@@ -8220,7 +8301,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_submission_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_simple_form_submission_child' )
             }
       });
@@ -8314,7 +8396,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_font_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_font_child' )
             }
       });

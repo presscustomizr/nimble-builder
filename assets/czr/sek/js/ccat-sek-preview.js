@@ -42,11 +42,33 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $(this).find('a').each( function() {
                               if ( "yes" === $(this).data('sek-unlinked') )
                                 return;
-                              $(this).addClass('nimble-unclickable');
-                              $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', '#');
-                              $(this).on('click', function(evt) {
-                                    evt.preventDefault();
-                              });
+                              if ( api.isLinkPreviewable( $(this)[0] ) ) {
+                                    $(this).addClass('nimble-shift-clickable');
+                                    $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', '#');
+                                    $(this).hover( function() {
+                                          $(this).attr( 'title', sekPreviewLocalized.i18n['Shift-click to visit the link']);
+                                    }, function() {
+                                          $(this).removeAttr( 'title' );
+                                    });
+                                    $(this).on('click', function(evt) {
+                                          if ( ! evt.shiftKey ) {
+                                            return;
+                                          }
+                                          evt.preventDefault();
+                                          window.location.href = $(this).attr('data-nimble-href');
+                                    });
+                              } else {
+                                    $(this).addClass('nimble-unclickable');
+                                    $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', '#');
+                                    $(this).hover( function() {
+                                          $(this).attr( 'title', sekPreviewLocalized.i18n['External links are disabled when customizing']);
+                                    }, function() {
+                                          $(this).removeAttr( 'title' );
+                                    });
+                                    $(this).on('click', function(evt) {
+                                          evt.preventDefault();
+                                    });
+                              }
                         });
                   });
             },
@@ -132,6 +154,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   });
                   $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                        $(this).find( '[data-sek-level="column"]' ).each( function() {
+                              self.makeModulesSortableInColumn( $(this).data('sek-id') );
+                        });
+                  });
+                  $( 'body').on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
@@ -946,7 +973,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               case 'moduleWrapper' :
                                     if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
                                       return;
-                                    self._send_( $el, { action : 'edit-module', level : _level , id : _id } );
+
+                                    self._send_( $el, {
+                                          action : 'edit-module',
+                                          level : _level,
+                                          id : _id
+                                    });
                               break;
                               case 'noModulesColumn' :
                                     if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
@@ -996,18 +1028,28 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
             _send_ : function( $el, params ) {
-                  var clonedParams = $.extend( true, {}, params );
+                  var clonedParams = $.extend( true, {}, params ),
+                      syncedTinyMceInputId = '',
+                      $moduleWrapper = $el.closest('div[data-sek-level="module"]'),
+                      _module_type_ = 'module' === params.level ? $moduleWrapper.data( 'sek-module-type') : '';
+
+                  if ( 'module' === params.level ) {
+                        if ( 'czr_tiny_mce_editor_module' === _module_type_ ) {
+                              syncedTinyMceInputId = $moduleWrapper.find('div[data-sek-input-id]').length > 0 ? $moduleWrapper.find('div[data-sek-input-id]').data('sek-input-id') : '';
+                        }
+                  }
                   api.preview.send( 'sek-' + params.action, _.extend( {
                         location : params.location,
                         level : params.level,
                         id : params.id,
                         content_type : $el.data( 'sek-content-type'),
-                        module_type : 'module' == params.level ? $el.closest('div[data-sek-level="module"]').data( 'sek-module-type') : '',
+                        module_type : _module_type_,
                         in_column : $el.closest('div[data-sek-level="column"]').length > 0 ? $el.closest('div[data-sek-level="column"]').data( 'sek-id') : '',
                         in_sektion : $el.closest('div[data-sek-level="section"]').length > 0 ? $el.closest('div[data-sek-level="section"]').data( 'sek-id') : '',
                         clicked_input_type : $el.closest('div[data-sek-input-type]').length > 0 ? $el.closest('div[data-sek-input-type]').data('sek-input-type') : '',
                         clicked_input_id : $el.closest('div[data-sek-input-id]').length > 0 ? $el.closest('div[data-sek-input-id]').data('sek-input-id') : '',
-                        was_triggered : params.was_triggered
+                        was_triggered : params.was_triggered,
+                        syncedTinyMceInputId : syncedTinyMceInputId
                   }, clonedParams ) );
             }
       });//$.extend()

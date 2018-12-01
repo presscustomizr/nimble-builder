@@ -2095,7 +2095,7 @@ function sek_get_select_options_for_input_id( $input_id ) {
             $options = array(
                 'default' => __('Default theme template','text_domain_to_be_replaced'),
                 'nimble_template' => __('Template with Nimble Builder content. Header and footer from the theme','text_domain_to_be_replaced'),
-                'nimble_full_tmpl_ghf' => __('Full Nimble Builder template (beta)','text_domain_to_be_replaced')
+                'nimble_full_tmpl_ghf' => __('Blank Nimble Builder template (beta)','text_domain_to_be_replaced')
             );
         break;
 
@@ -8361,6 +8361,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         'section' => __('section', 'text_domain_to_be_replaced'),
                         'section (global)' => __('section (global)', 'text_domain_to_be_replaced'),
                         'nested section' => __('nested section', 'text_domain_to_be_replaced'),
+
+                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_domain_to_be_replaced'),
+                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'text_domain_to_be_replaced'),
                     ),
                     'isDevMode' => sek_is_dev_mode(),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -8837,8 +8840,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
                             <?php
                               if ( skp_is_customizing() && empty( $collection ) ) {
-                                  $content_type = 1 === $col_number ? 'section' : 'module';
-                                  $title = 'section' === $content_type ? __('Drag and drop a section here', 'text_domain_to_be_replaced' ) : __('Drag and drop a module here', 'text_domain_to_be_replaced' );
+                                  $content_type = 'module';
+                                  $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_domain_to_be_replaced' ) : __('Drag and drop a module here', 'text_domain_to_be_replaced' );
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
@@ -9149,14 +9152,20 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'the_nimble_tinymce_module_content', 'wp_make_content_images_responsive' );
             add_filter( 'the_nimble_tinymce_module_content', 'do_shortcode', 11 ); // AFTER wpautop()
             add_filter( 'the_nimble_tinymce_module_content', 'capital_P_dangit', 9 );
+            add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_run_shortcode' ), 8 );
             add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_parse_content_for_video_embed') , 8 );
+        }
+        function sek_run_shortcode( $content ) {
+            if ( array_key_exists( 'wp_embed', $GLOBALS ) && $GLOBALS['wp_embed'] instanceof \WP_Embed ) {
+                $content = $GLOBALS['wp_embed']->run_shortcode( $content );
+            }
+            return $content;
         }
         function sek_parse_content_for_video_embed( $content ) {
             if ( array_key_exists( 'wp_embed', $GLOBALS ) && $GLOBALS['wp_embed'] instanceof \WP_Embed ) {
-                return $GLOBALS['wp_embed']->autoembed( $content );
-            } else {
-                return $content;
+                $content = $GLOBALS['wp_embed']->autoembed( $content );
             }
+            return $content;
         }
     }//class
 endif;
