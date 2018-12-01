@@ -870,6 +870,10 @@ credits : Gutenberg team @wordpress */
         -ms-transform: rotate(180deg);
             transform: rotate(180deg);
 }
+[data-sek-expanded="true"] label > .customize-control-title, [data-sek-expanded] label > .customize-control-title:hover {
+  text-decoration: underline;
+  text-underline-position: under;
+}
 
 /* STYLE FOR THE LEVEL ICON NEXT TO THE CONTROL TITLE */
 .sek-level-option-icon {
