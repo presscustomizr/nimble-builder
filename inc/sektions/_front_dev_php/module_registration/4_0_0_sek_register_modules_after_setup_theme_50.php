@@ -282,7 +282,7 @@ function sek_get_select_options_for_input_id( $input_id ) {
                 'default' => __('Default theme template','text_domain_to_be_replaced'),
                 'nimble_template' => __('Template with Nimble Builder content. Header and footer from the theme','text_domain_to_be_replaced'),
                 // nimble full tmpl with global header and footer
-                'nimble_full_tmpl_ghf' => __('Full Nimble Builder template (beta)','text_domain_to_be_replaced')
+                'nimble_full_tmpl_ghf' => __('Blank Nimble Builder template (beta)','text_domain_to_be_replaced')
             );
         break;
 
