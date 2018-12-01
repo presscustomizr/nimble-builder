@@ -870,7 +870,8 @@ credits : Gutenberg team @wordpress */
         -ms-transform: rotate(180deg);
             transform: rotate(180deg);
 }
-[data-sek-expanded="true"] label > .customize-control-title, [data-sek-expanded] label > .customize-control-title:hover {
+/* underline the control titles of the Nimble controls */
+[data-sek-expanded="true"] label > .customize-control-title .sek-ctrl-accordion-title, [data-sek-expanded] label > .customize-control-title .sek-ctrl-accordion-title:hover {
   text-decoration: underline;
   text-underline-position: under;
 }
