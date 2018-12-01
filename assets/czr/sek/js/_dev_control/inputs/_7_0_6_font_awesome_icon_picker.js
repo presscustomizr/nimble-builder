@@ -11,7 +11,6 @@
             // FONT AWESOME ICON PICKER
             fa_icon_picker : function() {
                   var input           = this,
-                      item            = input.input_parent,
                       _selected_found = false;
 
                   //generates the options
@@ -23,7 +22,7 @@
                                     html: api.CZR_Helpers.capitalize( iconClass.substring( 7 ) )
                               };
 
-                              if ( _attributes.value == item().icon ) {
+                              if ( _attributes.value == input() ) {
                                     $.extend( _attributes, { selected : "selected" } );
                                     _selected_found = true;
                               }
@@ -50,46 +49,61 @@
                         }
                         //Initialize czrSelect2
                         $( 'select[data-czrtype]', input.container )
-                          .prepend( $_placeholder )
-                          .czrSelect2({
-                                templateResult: addIcon,
-                                templateSelection: addIcon,
-                                placeholder: sektionsLocalizedData.i18n['Select an icon'],
-                                allowClear: true
-                        });
+                            .prepend( $_placeholder )
+                            .czrSelect2({
+                                  templateResult: addIcon,
+                                  templateSelection: addIcon,
+                                  placeholder: sektionsLocalizedData.i18n['Select an icon'],
+                                  allowClear: true
+                            });
                   };//_generateOptions
 
+
                   var _getIconsCollections = function() {
-                        var dfd = $.Deferred();
-                        if ( ! _.isEmpty( input.sek_faIconCollection ) ) {
-                              dfd.resolve( input.sek_faIconCollection );
-                        } else {
-                              // This utility handles a cached version of the font_list once fetched the first time
-                              // @see api.CZR_Helpers.czr_cachedTmpl
-                              api.CZR_Helpers.getModuleTmpl( {
-                                    tmpl : 'icon_list',
-                                    module_type: 'fa_icon_picker_input',
-                                    module_id : input.module.id
-                              } ).done( function( _serverTmpl_ ) {
-                                    // Ensure we have a string that's JSON.parse-able
-                                    if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '[' ) {
-                                          throw new Error( 'fa_icon_picker => server list is not JSON.parse-able');
-                                    }
-                                    input.sek_faIconCollection = JSON.parse( _serverTmpl_ );
-                                    dfd.resolve( input.sek_faIconCollection );
-                              }).fail( function( _r_ ) {
-                                    dfd.reject( _r_ );
-                              });
-                        }
-                        return dfd.promise();
+                        return $.Deferred( function( _dfd_ ) {
+                              if ( ! _.isEmpty( input.sek_faIconCollection ) ) {
+                                    _dfd_.resolve( input.sek_faIconCollection );
+                              } else {
+                                    // This utility handles a cached version of the font_list once fetched the first time
+                                    // @see api.CZR_Helpers.czr_cachedTmpl
+                                    api.CZR_Helpers.getModuleTmpl( {
+                                          tmpl : 'icon_list',
+                                          module_type: 'fa_icon_picker_input',
+                                          module_id : input.module.id
+                                    } ).done( function( _serverTmpl_ ) {
+                                          // Ensure we have a string that's JSON.parse-able
+                                          if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '[' ) {
+                                                throw new Error( 'fa_icon_picker => server list is not JSON.parse-able');
+                                          }
+                                          input.sek_faIconCollection = JSON.parse( _serverTmpl_ );
+                                          _dfd_.resolve( input.sek_faIconCollection );
+                                    }).fail( function( _r_ ) {
+                                          _dfd_.reject( _r_ );
+                                    });
+                              }
+                              //return dfd.promise();
+                        });
                   };//_getIconsCollections
 
                   // do
-                  $.when( _getIconsCollections() ).done( function( iconCollection ) {
-                        _generateOptions( iconCollection );
-                  }).fail( function( _r_ ) {
-                        api.errare( 'fa_icon_picker => fail response =>', _r_ );
+                  // Generate options and open select2
+                  input.container.on('click', function() {
+                        if ( true === input.iconCollectionSet )
+                          return;
+                        $.when( _getIconsCollections() ).done( function( iconCollection ) {
+                              _generateOptions( iconCollection );
+                              // let's open select2 after a delay ( because there's no 'ready' event with select2 )
+                              _.delay( function() {
+                                    try{ $( 'select[data-czrtype]', input.container ).czrSelect2('open'); }catch(er) {}
+                              }, 100 );
+
+
+                        }).fail( function( _r_ ) {
+                              api.errare( 'fa_icon_picker => fail response =>', _r_ );
+                        });
+                        input.iconCollectionSet = true;
                   });
+
 
             }
       });//$.extend( api.czrInputMap, {})
