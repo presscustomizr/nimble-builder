@@ -67,6 +67,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
+                  $( 'body').on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
+                        $(this).find( '[data-sek-level="column"]' ).each( function() {
+                              self.makeModulesSortableInColumn( $(this).data('sek-id') );
+                        });
+                  });
 
                   // NESTED SEKTIONS
                   // $('.sek-column-inner', '[data-sek-level="section"]').children( '[data-sek-level="section"]' ).each( function() {
