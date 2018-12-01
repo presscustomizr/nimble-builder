@@ -86,24 +86,30 @@
                   };//_getIconsCollections
 
                   // do
-                  // Generate options and open select2
-                  input.container.on('click', function() {
+                  var _do_ = function( params ) {
                         if ( true === input.iconCollectionSet )
                           return;
                         $.when( _getIconsCollections() ).done( function( iconCollection ) {
                               _generateOptions( iconCollection );
-                              // let's open select2 after a delay ( because there's no 'ready' event with select2 )
-                              _.delay( function() {
-                                    try{ $( 'select[data-czrtype]', input.container ).czrSelect2('open'); }catch(er) {}
-                              }, 100 );
-
-
+                              if ( params && true === params.open_on_init ) {
+                                    // let's open select2 after a delay ( because there's no 'ready' event with select2 )
+                                    _.delay( function() {
+                                          try{ $( 'select[data-czrtype]', input.container ).czrSelect2('open'); }catch(er) {}
+                                    }, 100 );
+                              }
                         }).fail( function( _r_ ) {
                               api.errare( 'fa_icon_picker => fail response =>', _r_ );
                         });
                         input.iconCollectionSet = true;
+                  };
+
+                  // Generate options and open select2
+                  input.container.on('click', function() {
+                        _do_();
                   });
 
+                  // schedule the iconCollectionSet after a delay
+                  _.delay( function() { _do_( { open_on_init : false } );}, 1000 );
 
             }
       });//$.extend( api.czrInputMap, {})
