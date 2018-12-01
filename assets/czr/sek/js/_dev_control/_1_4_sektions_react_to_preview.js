@@ -47,7 +47,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     id :  params.apiParams.location
                                               });
                                         }
-                                        api.previewer.trigger( 'sek-pick-content', {});
+                                        api.previewer.trigger( 'sek-pick-content', { content_type : 'section' });
                                         api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                   }
                             },
