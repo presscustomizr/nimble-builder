@@ -123,6 +123,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         'section' => __('section', 'text_domain_to_be_replaced'),
                         'section (global)' => __('section (global)', 'text_domain_to_be_replaced'),
                         'nested section' => __('nested section', 'text_domain_to_be_replaced'),
+
+                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_domain_to_be_replaced'),
+                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'text_domain_to_be_replaced'),
                     ),
                     'isDevMode' => sek_is_dev_mode(),
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
