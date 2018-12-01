@@ -225,6 +225,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+            dnd_isInTarget : function( $el, evt ) {
+                  var yPos = evt.clientY,
+                      xPos = evt.clientX,
+                      dzoneRect = $el[0].getBoundingClientRect(),
+                      isInHorizontally = xPos <= dzoneRect.right && dzoneRect.left <= xPos,
+                      isInVertically = yPos >= dzoneRect.top && dzoneRect.bottom >= yPos;
+                  return isInVertically && isInHorizontally;
+            },
 
             //-------------------------------------------------------------------------------------------------
             //-- DnD Helpers
@@ -236,16 +244,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //
             // Note : this is fired before checking if the target is eligible for drop. This way we can calculate an approach, as soon as we start hovering the 'body' ( which is part the drop selector list )
             dnd_toggleDragApproachClassesToDropZones : function( evt ) {
-                  var self = this;
+
+                  var self = this,
+                      getHypotenuse = function( a, b ) {
+                            return(Math.sqrt((a * a) + (b * b)));
+                      };
+
                   this.$dropZones = this.$dropZones || this.dnd_getDropZonesElements();
                   this.$cachedDropZoneCandidates = _.isEmpty( this.$cachedDropZoneCandidates ) ? this.$dropZones.find('.sek-drop-zone') : this.$cachedDropZoneCandidates;// Will be reset on drop
+
+                  this.distanceTable = [];
 
                   this.$dropZones.find('.sek-drop-zone').each( function() {
                         var yPos = evt.clientY,
                             xPos = evt.clientX,
                             APPROACHING_DIST = 120,
                             CLOSE_DIST = 80,
-                            VERY_CLOSE_DIST = 60;
+                            VERY_CLOSE_DIST = 50;//60;
 
                         var dzoneRect = $(this)[0].getBoundingClientRect(),
                             mouseToYCenter = Math.abs( yPos - ( dzoneRect.bottom - ( dzoneRect.bottom - dzoneRect.top )/2 ) ),
@@ -279,32 +294,42 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // html += ' | yPos : ' + yPos + ' | zoneRect.top : ' + dzoneRect.top + ' | zoneRect.bottom : ' + dzoneRect.bottom;
                         // $(this).html( '<span style="font-size:10px">' + html + '</span>');
 
+                        self.distanceTable.push({
+                              el : $(this),
+                              dist : ( isInVertically && isInHorizontally ) ? 0 : getHypotenuse( mouseToXCenter, mouseToYCenter )
+                        });
+
+
                         //var html = '';
 
-                        if ( isInVertically && isInHorizontally ) {
-                              $(this).removeClass( 'sek-drag-is-approaching');
-                              $(this).removeClass( 'sek-drag-is-close' );
-                              $(this).removeClass( 'sek-drag-is-very-close');
-                              $(this).addClass( 'sek-drag-is-in');
-                              //html += 'is IN';
-                        } else if ( ( isVeryCloseVertically || isInVertically ) && ( isVeryCloseHorizontally || isInHorizontally ) ) {
+                        // if ( isInVertically && isInHorizontally ) {
+                        //       $(this).removeClass( 'sek-drag-is-approaching');
+                        //       $(this).removeClass( 'sek-drag-is-close' );
+                        //       $(this).removeClass( 'sek-drag-is-very-close');
+                        //       $(this).addClass( 'sek-drag-is-in');
+                        //       //html += 'is IN';
+                        // }
+                        // else if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
+                        //       $(this).removeClass( 'sek-drag-is-approaching');
+                        //             $(this).addClass( 'sek-drag-is-close' );
+                        //       $(this).removeClass( 'sek-drag-is-very-close');
+                        //       $(this).removeClass( 'sek-drag-is-in');
+                        //       //html += 'is close';
+                        // } else if ( ( isApproachingVertically || isInVertically ) && ( isApproachingHorizontally || isInHorizontally ) ) {
+                        //             $(this).addClass( 'sek-drag-is-approaching');
+                        //       $(this).removeClass( 'sek-drag-is-close' );
+                        //       $(this).removeClass( 'sek-drag-is-very-close');
+                        //       $(this).removeClass( 'sek-drag-is-in');
+                        //       //html += 'is approaching';
+                        //
+                        $(this).removeClass( 'sek-drag-is-in');
+
+                        if ( ( isVeryCloseVertically || isInVertically ) && ( isVeryCloseHorizontally || isInHorizontally ) ) {
                               $(this).removeClass( 'sek-drag-is-approaching');
                               $(this).removeClass( 'sek-drag-is-close' );
                               $(this).addClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-in');
                               //html += 'is very close';
-                        } else if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
-                              $(this).removeClass( 'sek-drag-is-approaching');
-                              $(this).addClass( 'sek-drag-is-close' );
-                              $(this).removeClass( 'sek-drag-is-very-close');
-                              $(this).removeClass( 'sek-drag-is-in');
-                              //html += 'is close';
-                        } else if ( ( isApproachingVertically || isInVertically ) && ( isApproachingHorizontally || isInHorizontally ) ) {
-                              $(this).addClass( 'sek-drag-is-approaching');
-                              $(this).removeClass( 'sek-drag-is-close' );
-                              $(this).removeClass( 'sek-drag-is-very-close');
-                              $(this).removeClass( 'sek-drag-is-in');
-                              //html += 'is approaching';
                         } else {
                               $(this).removeClass( 'sek-drag-is-approaching');
                               $(this).removeClass( 'sek-drag-is-close' );
@@ -316,6 +341,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //$(this).html( '<span style="font-size:10px">' + html + '</span>');
                   });//$('.sek-drop-zones').each()
 
+
+                  var _lowerDist = _.min( _.pluck( self.distanceTable, 'dist') );
+                  self.$dropTargetCandidate = null;
+                  _.each( self.distanceTable, function( data ) {
+                        if ( _.isNull( self.$dropTargetCandidate ) && _lowerDist === data.dist ) {
+                              self.$dropTargetCandidate = data.el;
+                        }
+                  });
+                  if ( self.$dropTargetCandidate && self.$dropTargetCandidate.length > 0 && self.dnd_isInTarget( self.$dropTargetCandidate, evt ) ) {
+                        self.$dropTargetCandidate.addClass('sek-drag-is-in');
+                  }
                   // Reset the timer
                   self.enterOverTimer = null;
             },

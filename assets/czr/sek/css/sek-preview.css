@@ -817,6 +817,9 @@
  the class .sek-active-drop-zone is added when appending the pre drop elemnt
  and removed when leaving the drop element
  */
+.sek-dragging [data-sek-location="between-sections"].sek-dynamic-drop-zone {
+  height: 15px;
+}
 
 .sek-dragging .sek-dynamic-drop-zone {
   height: 5px;
@@ -849,16 +852,16 @@
   transition: all 1.5s ease;
 }
 .sek-dragging .sek-drag-is-very-close.sek-dynamic-drop-zone {
-  height: 75px;
-  -webkit-transition: all 0.65s ease;
-  -o-transition: all 0.65s ease;
-  transition: all 0.65s ease;
+  height: 55px;
+  -webkit-transition: all 1.5s ease;
+  -o-transition: all 1.5s ease;
+  transition: all 1.5s ease;
 }
 .sek-dragging .sek-drag-is-in.sek-dynamic-drop-zone {
   height: 100px;
-  -webkit-transition: all 0.45s ease;
-  -o-transition: all 0.45s ease;
-  transition: all 0.45s ease;
+  -webkit-transition: all 0.75s ease;
+  -o-transition: all 0.75s ease;
+  transition: all 0.75s ease;
 }
 .sek-dragging .sek-feed-me-seymore {
   -moz-box-shadow:    inset 0 0 30px #000000;
