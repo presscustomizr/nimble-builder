@@ -135,7 +135,8 @@
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_icon_settings_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_icon_settings_child' )
             },
       });
@@ -235,7 +236,8 @@
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_icon_spacing_border_child', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_icon_spacing_border_child' )
             }
       });

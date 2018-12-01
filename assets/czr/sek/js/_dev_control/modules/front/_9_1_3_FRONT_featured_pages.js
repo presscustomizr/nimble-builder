@@ -121,7 +121,8 @@
                   refresh_on_add_item : false,// the preview is refreshed on item add
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_featured_pages_module', 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_featured_pages_module' )
             },
       });
