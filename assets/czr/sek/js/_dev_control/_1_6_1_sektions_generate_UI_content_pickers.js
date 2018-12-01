@@ -162,7 +162,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 });
                                           }
 
-                                          var $title = _control_.container.find('label > .customize-control-title');
+                                          var $title = _control_.container.find('label > .customize-control-title'),
+                                              _titleContent = $title.html();
+                                          // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
+                                          $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+
                                           // if this level has an icon, let's prepend it to the title
                                           if ( ! _.isUndefined( optionData.icon ) ) {
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
@@ -211,7 +215,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
 
                         // Schedule the accordion behaviour
-                        self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
+                        self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
 
                         // Fetch the presetSectionCollection from the server now, so we save a few milliseconds when injecting the first preset_section
                         // it populates api.sek_presetSections

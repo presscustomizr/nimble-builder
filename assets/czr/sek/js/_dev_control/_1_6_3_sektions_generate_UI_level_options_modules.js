@@ -199,30 +199,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     section : params.id,
                                     priority : 0,
                                     settings : { default : optionData.settingControlId }
-                              }).done( function() {
+                              }).done( function() {});
+
+                              // Implement the animated arrow markup, and the initial state of the module visibility
+                              api.control( optionData.settingControlId, function( _control_ ) {
                                     if ( true === optionData.expandAndFocusOnInit ) {
-                                          api.control( optionData.settingControlId ).focus({
+                                          _control_.focus({
                                                 completeCallback : function() {}
                                           });
                                     }
 
-                                    // Implement the animated arrow markup, and the initial state of the module visibility
-                                    api.control( optionData.settingControlId, function( _control_ ) {
-                                          // Hide the item wrapper
-                                          _control_.container.find('.czr-items-wrapper').hide();
-                                          var $title = _control_.container.find('label > .customize-control-title');
-                                          // if this level has an icon, let's prepend it to the title
-                                          if ( ! _.isUndefined( optionData.icon ) ) {
-                                                $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
-                                          }
-                                          // prepend the animated arrow
-                                          $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                          // setup the initial state + initial click
-                                          _control_.container.attr('data-sek-expanded', "false" );
-                                          if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                                $title.trigger('click');
-                                          }
-                                    });
+                                    // Hide the item wrapper
+                                    _control_.container.find('.czr-items-wrapper').hide();
+                                    var $title = _control_.container.find('label > .customize-control-title'),
+                                        _titleContent = $title.html();
+                                    // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
+                                    $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+                                    // if this level has an icon, let's prepend it to the title
+                                    if ( ! _.isUndefined( optionData.icon ) ) {
+                                          $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
+                                    }
+                                    // prepend the animated arrow
+                                    $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+                                    // setup the initial state + initial click
+                                    _control_.container.attr('data-sek-expanded', "false" );
+                                    // if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
+                                    //       $title.trigger('click');
+                                    // }
                               });
                         });//_.each()
                   };//_do_register_()
@@ -232,7 +235,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( ! api.section.has( params.id ) ) {
                         api.section( params.id, function( _section_ ) {
                               // Schedule the accordion behaviour
-                              self.scheduleModuleAccordion.call( _section_, { expand_first_module : true } );
+                              self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                         });
                   }
 
@@ -245,22 +248,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         priority : 10,
                         //track : false//don't register in the self.registered()
                         //constructWith : MainSectionConstructor,
-                  }).done( function() {
-                        // - Defer the registration when the parent section gets added to the api
-                        // - Implement the module visibility
-                        api.section( params.id, function( _section_ ) {
-                              _do_register_();
-                              // don't display the clickable section title in the nimble root panel
-                              _section_.container.find('.accordion-section-title').first().hide();
+                  }).done( function() {});
 
-                              // Style the section title
-                              var $panelTitleEl = _section_.container.find('.customize-section-title h3');
+                  // - Defer the registration when the parent section gets added to the api
+                  // - Implement the module visibility
+                  api.section( params.id, function( _section_ ) {
+                        _do_register_();
+                        // don't display the clickable section title in the nimble root panel
+                        _section_.container.find('.accordion-section-title').first().hide();
 
-                              // The default title looks like this : <span class="customize-action">Customizing</span> Title
-                              if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
-                                    $panelTitleEl.find('.customize-action').after( '<i class="fas fa-sliders-h sek-level-option-icon"></i>' );
-                              }
-                        });
+                        // Style the section title
+                        var $panelTitleEl = _section_.container.find('.customize-section-title h3');
+
+                        // The default title looks like this : <span class="customize-action">Customizing</span> Title
+                        if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
+                              $panelTitleEl.find('.customize-action').after( '<i class="fas fa-sliders-h sek-level-option-icon"></i>' );
+                        }
                   });
 
                   return dfd;

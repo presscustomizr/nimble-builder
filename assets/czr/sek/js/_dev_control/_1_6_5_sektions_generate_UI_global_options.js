@@ -120,7 +120,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.control( optionData.settingControlId, function( _control_ ) {
                                           // Hide the item wrapper
                                           _control_.container.find('.czr-items-wrapper').hide();
-                                          var $title = _control_.container.find('label > .customize-control-title');
+                                          var $title = _control_.container.find('label > .customize-control-title'),
+                                              _titleContent = $title.html();
+                                          // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
+                                          $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+
                                           // if this level has an icon, let's prepend it to the title
                                           if ( ! _.isUndefined( optionData.icon ) ) {
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );

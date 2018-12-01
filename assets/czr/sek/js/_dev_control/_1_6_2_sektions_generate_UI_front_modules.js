@@ -152,7 +152,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                                     // Hide the item wrapper
                                     _control_.container.find('.czr-items-wrapper').hide();
-                                    var $title = _control_.container.find('label > .customize-control-title');
+                                    var $title = _control_.container.find('label > .customize-control-title'),
+                                        _titleContent = $title.html();
+
+                                    $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
                                     // if this level has an icon, let's prepend it to the title
                                     if ( ! _.isUndefined( optionData.icon ) ) {
                                           $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
