@@ -455,7 +455,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             <?php
                               if ( skp_is_customizing() && empty( $collection ) ) {
                                   $content_type = 1 === $col_number ? 'section' : 'module';
-                                  $title = 'section' === $content_type ? __('Drag and drop a section here', 'text_domain_to_be_replaced' ) : __('Drag and drop a module here', 'text_domain_to_be_replaced' );
+                                  $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_domain_to_be_replaced' ) : __('Drag and drop a module here', 'text_domain_to_be_replaced' );
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
