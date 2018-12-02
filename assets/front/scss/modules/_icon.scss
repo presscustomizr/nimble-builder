@@ -26,4 +26,13 @@
         width: auto;
       }
     }
+    a.sek-icon {
+      // fix : themes like Twenty Seventeen styling the link underline with a box-shadow instead of the regular "text-decoration:underline" rule
+      box-shadow: none;
+      -webkit-box-shadow: none;
+      &:hover, &:focus, &:active {
+        box-shadow: none;
+        -webkit-box-shadow: none;
+      }
+    }
 }
