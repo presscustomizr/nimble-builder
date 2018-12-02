@@ -10,6 +10,9 @@
     i {
       margin: 0 8px;
     }
+    &:hover, &:focus, &:active {
+      color: #ffffff;
+    }
   }
 }
 
