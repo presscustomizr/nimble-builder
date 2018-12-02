@@ -13,9 +13,9 @@ $design_settings = $value['design'];
 if ( ! function_exists( 'Nimble\sek_get_button_module_link' ) ) {
     function sek_get_button_module_link( $content_settings ) {
         $link = 'javascript:void(0);';
-        if ( skp_is_customizing() ) {
-            return $link;
-        }
+        // if ( skp_is_customizing() ) {
+        //     return $link;
+        // }
         if ( 'url' == $content_settings['link-to'] ) {
             if ( ! empty( $content_settings['link-pick-url'] ) && ! empty( $content_settings['link-pick-url']['id'] ) ) {
                 if ( '_custom_' == $content_settings['link-pick-url']['id']  && ! empty( $content_settings['link-custom-url'] ) ) {

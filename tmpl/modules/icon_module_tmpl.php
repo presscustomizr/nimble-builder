@@ -50,9 +50,9 @@ if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_html') ) {
 if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_link' ) ) {
     function sek_get_icon_module_icon_link( $icon_settings ) {
         $link = 'javascript:void(0);';
-        if ( skp_is_customizing() ) {
-            return $link;
-        }
+        // if ( skp_is_customizing() ) {
+        //     return $link;
+        // }
         if ( 'url' == $icon_settings['link-to'] ) {
             if ( ! empty( $icon_settings['link-pick-url'] ) && ! empty( $icon_settings['link-pick-url']['id'] ) ) {
                 if ( '_custom_' == $icon_settings['link-pick-url']['id']  && ! empty( $icon_settings['link-custom-url'] ) ) {

@@ -56,40 +56,46 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             // and on user generated events
             deactivateLinks : function( evt ) {
                   evt = evt || {};
+                  var _doSafe_ = function() {
+                          if ( "yes" === $(this).data('sek-unlinked') )
+                            return;
+                          // Several cases :
+                          // 1- internal link ( <=> api.isLinkPreviewable(... ) = true ) : we allow navigation with shift + click
+                          // 2- extenal link => navigation is disabled.
+                          // 3- server disabled links, with href attribute set to "javascript:void(0)", this case is checked isJavascriptProtocol
+                          var isJavascriptProtocol = _.isString( $(this)[0].protocol ) && -1 !== $(this)[0].protocol.indexOf('javascript');
+                          // the check on isJavascriptProtocol fixes issue https://github.com/presscustomizr/nimble-builder/issues/255
+                          if ( ! isJavascriptProtocol && api.isLinkPreviewable( $(this)[0] ) ) {
+                                $(this).addClass('nimble-shift-clickable');
+                                $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', 'javascript:void(0)');
+                                $(this).hover( function() {
+                                        $(this).attr( 'title', sekPreviewLocalized.i18n['Shift-click to visit the link']);
+                                }, function() {
+                                      $(this).removeAttr( 'title' );
+                                });
+                                $(this).on('click', function(evt) {
+                                      if ( ! evt.shiftKey ) {
+                                        return;
+                                      }
+                                      evt.preventDefault();
+                                      window.location.href = $(this).attr('data-nimble-href');
+                                });
+                          } else {
+                                $(this).addClass('nimble-unclickable');
+                                $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', 'javascript:void(0)');
+                                $(this).hover( function() {
+                                      $(this).attr( 'title', isJavascriptProtocol ? sekPreviewLocalized.i18n['Link deactivated while previewing'] : sekPreviewLocalized.i18n['External links are disabled when customizing']);
+                                }, function() {
+                                      $(this).removeAttr( 'title' );
+                                });
+                                $(this).on('click', function(evt) {
+                                      evt.preventDefault();
+                                });
+                          }
+                    };
                   $('body').find('[data-sek-level="module"]').each( function() {
-                        $(this).find('a').each( function() {
-                              if ( "yes" === $(this).data('sek-unlinked') )
-                                return;
-                              // Two cases :
-                              // 1- internal link ( <=> api.isLinkPreviewable(... ) = true ) : we allow navigation with shift + click
-                              // 2- extenal link => navigation is disabled.
-                              if ( api.isLinkPreviewable( $(this)[0] ) ) {
-                                    $(this).addClass('nimble-shift-clickable');
-                                    $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', '#');
-                                    $(this).hover( function() {
-                                          $(this).attr( 'title', sekPreviewLocalized.i18n['Shift-click to visit the link']);
-                                    }, function() {
-                                          $(this).removeAttr( 'title' );
-                                    });
-                                    $(this).on('click', function(evt) {
-                                          if ( ! evt.shiftKey ) {
-                                            return;
-                                          }
-                                          evt.preventDefault();
-                                          window.location.href = $(this).attr('data-nimble-href');
-                                    });
-                              } else {
-                                    $(this).addClass('nimble-unclickable');
-                                    $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', '#');
-                                    $(this).hover( function() {
-                                          $(this).attr( 'title', sekPreviewLocalized.i18n['External links are disabled when customizing']);
-                                    }, function() {
-                                          $(this).removeAttr( 'title' );
-                                    });
-                                    $(this).on('click', function(evt) {
-                                          evt.preventDefault();
-                                    });
-                              }
+                        $(this).find('a').each( function(){
+                              try { _doSafe_.call( $(this) ); } catch(er) { api.errare( '::deactivateLinks => error ', er ); }
                         });
                   });
             },

@@ -188,7 +188,7 @@ endif;
                 $fp_title         = esc_attr( strip_tags( $fp_title ) );
 
                 $fp_link          = esc_url( $fp[ 'page-id' ][ 'url' ] );
-                $fp_link          = ( !$fp_link || skp_is_customizing() ) ? 'javascript:void(0)' : $fp_link;
+                $fp_link          = !$fp_link ? 'javascript:void(0)' : $fp_link;
 
                 //TEXT
                 switch ( $fp[ 'content-type' ] ) {
