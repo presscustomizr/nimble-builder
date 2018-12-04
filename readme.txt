@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.0
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -47,21 +47,18 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.3.1 =
-* fixed : WP editor module, editor content not updated when clicking on the module UI hamburger menu
-* fixed : video embedded not displayed when using the WP editor module, Add Media > Insert from Url
-* fixed : use the_nimble_tinymce_module_content instead of the_content when handling the "autop" option
-* fixed : video embed iframe overflowing the module wrapper
-* fixed : impossible to move a module in a freshly created new section
-* improved : added a default underline style for links inside the WP editor module
-* improved : during drag and drop, better proximity detection + only one drop candidate highlighted a time. See support topic https://wordpress.org/support/topic/few-improvement-suggestions/
-* improved : refined the way links are handled in the preview. Two cases : 1-internal link ( <=> api.isLinkPreviewable(... ) = true ) : navigation allowed with shift + click, 2-extenal link => navigation is disabled
-* improved : performances of the customizer UI, significant speed improvements when rendering the various controls for level options
-* improved : picking content logic has been improved. The section picker is opened when adding a section ( click on + insert a new section button ), the module picker opened in all other cases
-* updated : Google font list to the latest version : https://fonts.google.com/
-* renamed "Full Nimble Builder template (beta)" to "Full Nimble Builder template (beta)"
+= 1.3.2 =
+Implemented a new way to move sections up and down. Various minor enhancements of the customizer user interface. Increased the specificity of the Nimble Builder styling for the button module.
 
 == Changelog ==
+= 1.3.2 : December 4th, 2018 =
+* fixed : button module => set a default links hover color to avoid the default theme's one to be applied
+* fixed : button module, icon module, image module, FP module => invalid pointer and title attribute when customizing
+* fixed : icon module => themes like Twenty Seventeen styling the link underline with a box-shadow instead of the regular "text-decoration:underline" rule
+* fixed : When typing fast in a number input, the last value is not taken into account
+* added : a gutenberg-like way to move sections up and down. convenient for big sections, painful to drag with the regular sortable handle
+
+
 = 1.3.1 : November 26th, 2018 =
 * fixed : WP editor module, editor content not updated when clicking on the module UI hamburger menu
 * fixed : video embedded not displayed when using the WP editor module, Add Media > Insert from Url
