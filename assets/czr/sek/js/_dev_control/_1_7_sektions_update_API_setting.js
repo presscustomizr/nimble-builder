@@ -233,7 +233,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     // UPDATE THE TARGET LOCATION
-                                    toLocationCandidate.collection =  _.isArray( toLocationCandidate.collection ) ? toLocationCandidate.collection : [];
+                                    toLocationCandidate.collection = _.isArray( toLocationCandidate.collection ) ? toLocationCandidate.collection : [];
                                     originalCollection = $.extend( true, [], toLocationCandidate.collection );
                                     reorderedCollection = [];
                                     _.each( params.newOrder, function( _id_ ) {
@@ -243,7 +243,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           } else {
                                                 sektionCandidate = self.getLevelModel( _id_, originalCollection );
                                                 if ( _.isEmpty( sektionCandidate ) || 'no_match' == sektionCandidate ) {
-                                                      throw new Error( 'updateAPISetting => move section => missing section candidate' );
+                                                      throw new Error( 'updateAPISetting => ' + params.action + ' => missing section candidate' );
                                                 }
                                                 reorderedCollection.push( sektionCandidate );
                                           }
@@ -253,7 +253,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
 
+                              // Fired on click on up / down arrows in the ( not nested ) section ui menu
+                              case 'sek-move-section-up-down' :
+                                    //api.infoLog('PARAMS in sek-move-section-up', params );
 
+                                    inLocationCandidate = self.getLevelModel( params.location, newSetValue.collection );
+
+                                    if ( _.isEmpty( inLocationCandidate ) || 'no_match' == inLocationCandidate ) {
+                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
+                                    }
+                                    inLocationCandidate.collection = _.isArray( inLocationCandidate.collection ) ? inLocationCandidate.collection : [];
+                                    originalCollection = $.extend( true, [], inLocationCandidate.collection );
+                                    reorderedCollection = $.extend( true, [], inLocationCandidate.collection );
+
+                                    var _indexInOriginal = _.findIndex( originalCollection, function( _sec_ ) {
+                                          return _sec_.id === params.id;
+                                    });
+                                    // @see https://underscorejs.org/#findIndex
+                                    if ( -1 === _indexInOriginal ) {
+                                          throw new Error( 'updateAPISetting => ' + params.action + ' => invalid index' );
+                                    }
+
+                                    // Swap up <=> down
+                                    var direction = params.direction || 'up';
+                                    reorderedCollection[ _indexInOriginal ] = originalCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ];
+                                    reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
+
+                                    inLocationCandidate.collection = reorderedCollection;
+                              break;
 
 
 
@@ -1138,7 +1165,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
                       __dfd__ = $.Deferred();
-                  //console.log('ALORS SECTION PARAMS BEFORE FETCH', sectionParams );
 
                   self._maybeFetchSectionsFromServer({
                         is_user_section : sectionParams.is_user_section,
