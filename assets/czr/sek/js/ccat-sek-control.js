@@ -12,7 +12,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         throw new Error( 'CZRSeksPrototype => api.czr_activeSkopes' );
                   }
                   self.MAX_NUMBER_OF_COLUMNS = 12;
-                  self.SETTING_UPDATE_BUFFER = 200;
+                  self.SETTING_UPDATE_BUFFER = 100;
                   self.defaultLocalSektionSettingValue = self.getDefaultSektionSettingValue( 'local' );
                   self.localSectionsSettingId = new api.Value( {} );
                   self.registered = new api.Value([]);

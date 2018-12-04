@@ -58,7 +58,6 @@ Implemented a new way to move sections up and down. Various minor enhancements o
 * fixed : When typing fast in a number input, the last value is not taken into account
 * added : a gutenberg-like way to move sections up and down. convenient for big sections, painful to drag with the regular sortable handle
 
-
 = 1.3.1 : November 26th, 2018 =
 * fixed : WP editor module, editor content not updated when clicking on the module UI hamburger menu
 * fixed : video embedded not displayed when using the WP editor module, Add Media > Insert from Url
