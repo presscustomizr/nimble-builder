@@ -31,10 +31,24 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         switch ( level ) {
                               case 'section' :
                                     //$el = $('.sektion-wrapper').find('[data-sek-id="' + id + '"]');
+                                    // Let's prepare the is_last and is_first params that we are going to send to the js template
+                                    // => this will determine which up / down arrow to display in the UI menu for moving a section
+                                    var $parentLocation = $levelEl.closest('div[data-sek-level="location"]'),
+                                        _is_last_section,
+                                        _is_first_section;
+
+                                    if ( $parentLocation.length > 0 ) {
+                                          var $sectionCollection = $parentLocation.children( 'div[data-sek-level="section"]' );
+                                          _is_last_section = $sectionCollection.length == $levelEl.index() + 1;
+                                          _is_first_section = 0 === $levelEl.index();
+                                    }
+
                                     params = _.extend( params, {
                                           is_nested : true === $(this).data('sek-is-nested'),
                                           can_have_more_columns : $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
-                                          is_global_location : true === $levelEl.closest( 'div[data-sek-level="location"]' ).data('sek-is-global-location')
+                                          is_global_location : true === $levelEl.closest( 'div[data-sek-level="location"]' ).data('sek-is-global-location'),
+                                          is_last_section_in_location : _is_last_section,
+                                          is_first_section_in_location : _is_first_section
                                     });
                               break;
                               case 'column' :

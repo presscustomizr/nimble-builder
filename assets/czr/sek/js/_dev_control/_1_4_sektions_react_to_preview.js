@@ -256,7 +256,47 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },//sek-move
 
 
+                            'sek-move-section-up' : {
+                                  callback  : function( params ) {
+                                        sendToPreview = false;
+                                        uiParams = {};
+                                        apiParams = {
+                                              action : 'sek-move-section-up-down',
+                                              direction : 'up',
+                                              id : params.id,
+                                              is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
+                                              location : params.location
+                                        };
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        api.previewer.trigger( 'sek-refresh-level', {
+                                              level : 'location',
+                                              id :  params.apiParams.location
+                                        });
+                                  }
+                            },
 
+                            'sek-move-section-down' : {
+                                  callback  : function( params ) {
+                                        sendToPreview = false;
+                                        uiParams = {};
+                                        apiParams = {
+                                              action : 'sek-move-section-up-down',
+                                              direction : 'down',
+                                              id : params.id,
+                                              is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
+                                              location : params.location
+                                        };
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        api.previewer.trigger( 'sek-refresh-level', {
+                                              level : 'location',
+                                              id :  params.apiParams.location
+                                        });
+                                  }
+                            },
 
                             // the level will be cloned and walked to replace all ids by new one
                             // then the level clone id will be send back to the preview for the ajax rendering ( this is done in updateAPISetting() promise() )
