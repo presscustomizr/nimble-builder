@@ -755,6 +755,16 @@ button.sek-btn,
   width: auto;
 }
 
+[data-sek-module-type="czr_icon_module"] a.sek-icon {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}
+
+[data-sek-module-type="czr_icon_module"] a.sek-icon:hover, [data-sek-module-type="czr_icon_module"] a.sek-icon:focus, [data-sek-module-type="czr_icon_module"] a.sek-icon:active {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}
+
 .sek-quote p {
   margin: 0 0 .5em;
   padding: 0;
@@ -874,6 +884,10 @@ button.sek-btn,
 
 .sek-module-inner .sek-btn i {
   margin: 0 8px;
+}
+
+.sek-module-inner .sek-btn:hover, .sek-module-inner .sek-btn:focus, .sek-module-inner .sek-btn:active {
+  color: #ffffff;
 }
 
 .sek-btn-inner {

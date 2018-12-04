@@ -12,7 +12,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         throw new Error( 'CZRSeksPrototype => api.czr_activeSkopes' );
                   }
                   self.MAX_NUMBER_OF_COLUMNS = 12;
-                  self.SETTING_UPDATE_BUFFER = 10;
+                  self.SETTING_UPDATE_BUFFER = 200;
                   self.defaultLocalSektionSettingValue = self.getDefaultSektionSettingValue( 'local' );
                   self.localSectionsSettingId = new api.Value( {} );
                   self.registered = new api.Value([]);
@@ -1025,6 +1025,49 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         }
                                   }
                             },//sek-move
+
+
+                            'sek-move-section-up' : {
+                                  callback  : function( params ) {
+                                        sendToPreview = false;
+                                        uiParams = {};
+                                        apiParams = {
+                                              action : 'sek-move-section-up-down',
+                                              direction : 'up',
+                                              id : params.id,
+                                              is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
+                                              location : params.location
+                                        };
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        api.previewer.trigger( 'sek-refresh-level', {
+                                              level : 'location',
+                                              id :  params.apiParams.location
+                                        });
+                                  }
+                            },
+
+                            'sek-move-section-down' : {
+                                  callback  : function( params ) {
+                                        sendToPreview = false;
+                                        uiParams = {};
+                                        apiParams = {
+                                              action : 'sek-move-section-up-down',
+                                              direction : 'down',
+                                              id : params.id,
+                                              is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
+                                              location : params.location
+                                        };
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        api.previewer.trigger( 'sek-refresh-level', {
+                                              level : 'location',
+                                              id :  params.apiParams.location
+                                        });
+                                  }
+                            },
                             'sek-duplicate' : {
                                   callback : function( params ) {
                                         sendToPreview = true;
@@ -2634,7 +2677,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 return sektion.id != params.id;
                                           });
                                     }
-                                    toLocationCandidate.collection =  _.isArray( toLocationCandidate.collection ) ? toLocationCandidate.collection : [];
+                                    toLocationCandidate.collection = _.isArray( toLocationCandidate.collection ) ? toLocationCandidate.collection : [];
                                     originalCollection = $.extend( true, [], toLocationCandidate.collection );
                                     reorderedCollection = [];
                                     _.each( params.newOrder, function( _id_ ) {
@@ -2643,13 +2686,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           } else {
                                                 sektionCandidate = self.getLevelModel( _id_, originalCollection );
                                                 if ( _.isEmpty( sektionCandidate ) || 'no_match' == sektionCandidate ) {
-                                                      throw new Error( 'updateAPISetting => move section => missing section candidate' );
+                                                      throw new Error( 'updateAPISetting => ' + params.action + ' => missing section candidate' );
                                                 }
                                                 reorderedCollection.push( sektionCandidate );
                                           }
                                     });
                                     toLocationCandidate.collection = reorderedCollection;
 
+                              break;
+                              case 'sek-move-section-up-down' :
+
+                                    inLocationCandidate = self.getLevelModel( params.location, newSetValue.collection );
+
+                                    if ( _.isEmpty( inLocationCandidate ) || 'no_match' == inLocationCandidate ) {
+                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
+                                    }
+                                    inLocationCandidate.collection = _.isArray( inLocationCandidate.collection ) ? inLocationCandidate.collection : [];
+                                    originalCollection = $.extend( true, [], inLocationCandidate.collection );
+                                    reorderedCollection = $.extend( true, [], inLocationCandidate.collection );
+
+                                    var _indexInOriginal = _.findIndex( originalCollection, function( _sec_ ) {
+                                          return _sec_.id === params.id;
+                                    });
+                                    if ( -1 === _indexInOriginal ) {
+                                          throw new Error( 'updateAPISetting => ' + params.action + ' => invalid index' );
+                                    }
+                                    var direction = params.direction || 'up';
+                                    reorderedCollection[ _indexInOriginal ] = originalCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ];
+                                    reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
+
+                                    inLocationCandidate.collection = reorderedCollection;
                               break;
                               case 'sek-add-column' :
                                     if ( _.isEmpty( params.id ) ) {
