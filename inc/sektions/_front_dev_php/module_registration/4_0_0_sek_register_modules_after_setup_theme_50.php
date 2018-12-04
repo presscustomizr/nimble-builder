@@ -31,12 +31,16 @@ function sek_register_modules() {
         'sek_local_custom_css',
         'sek_local_reset',
         'sek_local_performances',
+        'sek_local_header',
+        'sek_local_footer',
 
         // global options modules
         'sek_global_breakpoint',
         'sek_global_widths',
         //'sek_global_reset',
         'sek_global_performances',
+        'sek_global_header',
+        'sek_global_footer',
 
         // FRONT MODULES
         'czr_simple_html_module',

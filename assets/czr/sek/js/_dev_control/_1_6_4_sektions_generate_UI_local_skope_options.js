@@ -62,6 +62,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_local_reset',
                               controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
                               icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                        },
+                        local_header : {
+                              settingControlId : _id_ + '__local_header',
+                              module_type : 'sek_local_header',
+                              controlLabel : '@missi18n local header', //sektionsLocalizedData.i18n['Site wide page speed optimizations'],
+                              icon : ''//<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                        },
+                        local_footer : {
+                              settingControlId : _id_ + '__local_footer',
+                              module_type : 'sek_local_footer',
+                              controlLabel : '@missi18n local footer', //sektionsLocalizedData.i18n['Site wide page speed optimizations'],
+                              icon : ''//<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
                         }
                   });
 

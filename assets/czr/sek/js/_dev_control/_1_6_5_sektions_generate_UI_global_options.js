@@ -44,6 +44,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_global_performances',
                               controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
                               icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                        },
+                        global_header : {
+                              settingControlId : _id_ + '__header',
+                              module_type : 'sek_global_header',
+                              controlLabel : '@missi18n Site Wide Header', //sektionsLocalizedData.i18n['Site wide page speed optimizations'],
+                              icon : ''//<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                        },
+                        global_footer : {
+                              settingControlId : _id_ + '__footer',
+                              module_type : 'sek_global_footer',
+                              controlLabel : '@missi18n Site Wide footer', //sektionsLocalizedData.i18n['Site wide page speed optimizations'],
+                              icon : ''//<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
                         }
                   });
 
