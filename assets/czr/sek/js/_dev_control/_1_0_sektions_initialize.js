@@ -17,7 +17,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // _.debounce param when updating the UI setting
                   // prevent hammering server + fixes https://github.com/presscustomizr/nimble-builder/issues/244
-                  self.SETTING_UPDATE_BUFFER = 200;
+                  self.SETTING_UPDATE_BUFFER = 100;
 
                   // Define a default value for the sektion setting value, used when no server value has been sent
                   // @see php function
