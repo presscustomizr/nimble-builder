@@ -32,7 +32,7 @@ function sek_print_tiny_mce_editor_template() {
               'tinymce' => array(
                   'resize' => false,
                   'wp_autoresize_on' => false,
-                  'add_unload_trigger' => false,
+                  'add_unload_trigger' => false
               ),
           ) );
         ?>
