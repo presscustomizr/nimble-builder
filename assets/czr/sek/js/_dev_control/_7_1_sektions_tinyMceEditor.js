@@ -110,6 +110,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               var _currentModuleValue_ = _setting_(),
                                   _currentInputContent_ = ( _.isObject( _currentModuleValue_ ) && ! _.isEmpty( _currentModuleValue_[ to.input_id ] ) ) ? _currentModuleValue_[ to.input_id ] : '';
 
+                              // automatically add line breaks when setting the content
+                              // simplified version of php wpautop()
+                              // fixes https://github.com/presscustomizr/nimble-builder/issues/259
+                              _currentInputContent_ = _currentInputContent_.replace(/\r?\n/g, '<br/>');
                               try { api.sekTinyMceEditor.setContent( _currentInputContent_ ); } catch( er ) {
                                     api.errare( 'Error when setting the tiny mce editor content in setupTinyMceEditor', er );
                               }
