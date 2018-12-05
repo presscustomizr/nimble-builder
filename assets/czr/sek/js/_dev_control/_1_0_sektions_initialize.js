@@ -247,7 +247,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _mainPanel_.deferred.embedded.done( function() {
                               var $sidePanelTitleEl = _mainPanel_.container.find('h3.accordion-section-title'),
                                   $topPanelTitleEl = _mainPanel_.container.find('.panel-meta .accordion-section-title'),
-                                  logoHtml = [ '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="', sektionsLocalizedData.baseUrl, '/assets/img/nimble/nimble_horizontal.svg', '"/>' ].join('');
+                                  logoHtml = [ '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="', sektionsLocalizedData.baseUrl, '/assets/img/nimble/nimble_horizontal.svg?ver=' + sektionsLocalizedData.nimbleVersion , '"/>' ].join('');
 
                               if ( 0 < $sidePanelTitleEl.length ) {
                                     // The default title looks like this : Nimble Builder <span class="screen-reader-text">Press return or enter to open this section</span>
