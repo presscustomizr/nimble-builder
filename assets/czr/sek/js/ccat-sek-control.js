@@ -120,7 +120,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _mainPanel_.deferred.embedded.done( function() {
                               var $sidePanelTitleEl = _mainPanel_.container.find('h3.accordion-section-title'),
                                   $topPanelTitleEl = _mainPanel_.container.find('.panel-meta .accordion-section-title'),
-                                  logoHtml = [ '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="', sektionsLocalizedData.baseUrl, '/assets/img/nimble/nimble_horizontal.svg', '"/>' ].join('');
+                                  logoHtml = [ '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="', sektionsLocalizedData.baseUrl, '/assets/img/nimble/nimble_horizontal.svg?ver=' + sektionsLocalizedData.nimbleVersion , '"/>' ].join('');
 
                               if ( 0 < $sidePanelTitleEl.length ) {
                                     var $sidePanelTitleElSpan = $sidePanelTitleEl.find('span');
@@ -4645,7 +4645,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api( to.control_id, function( _setting_ ) {
                               var _currentModuleValue_ = _setting_(),
                                   _currentInputContent_ = ( _.isObject( _currentModuleValue_ ) && ! _.isEmpty( _currentModuleValue_[ to.input_id ] ) ) ? _currentModuleValue_[ to.input_id ] : '';
-
+                              _currentInputContent_ = _currentInputContent_.replace(/\r?\n/g, '<br/>');
                               try { api.sekTinyMceEditor.setContent( _currentInputContent_ ); } catch( er ) {
                                     api.errare( 'Error when setting the tiny mce editor content in setupTinyMceEditor', er );
                               }

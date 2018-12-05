@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.0
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -47,10 +47,14 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.3.2 =
-Implemented a new way to move sections up and down. Various minor enhancements of the customizer user interface. Increased the specificity of the Nimble Builder styling for the button module.
+= 1.3.3 =
+Fixed line breaks not automatically added when setting the content in the WP editor module. Updated Nimble Builder logo.
 
 == Changelog ==
+= 1.3.3 : December 5th, 2018 =
+* fixed : line breaks not automatically added when setting the content in the WP editor module
+* updated Nimble Builder logo
+
 = 1.3.2 : December 4th, 2018 =
 * fixed : button module => set a default links hover color to avoid the default theme's one to be applied
 * fixed : button module, icon module, image module, FP module => invalid pointer and title attribute when customizing
