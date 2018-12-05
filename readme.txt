@@ -13,7 +13,7 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Powerful drag and drop page builder using the native WordPress customizer.
 
 == Description ==
-The Nimble Builder is a powerful and lightweight page builder plugin for WordPress. It allows you to drag and drop pre-designed sections, or create your own sections, in live preview with the native WordPress customizer.
+The Nimble Builder is a powerful and lightweight page builder plugin for WordPress. It allows you to drag and drop pre-built sections, or create your own sections, in live preview with the native WordPress customizer. You can also start designing from a blank page, and create your header, footer, and content.
 
 == Features ==
 * Drag and drop beautiful and ready-to-use sections in any pages.
