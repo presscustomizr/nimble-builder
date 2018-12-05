@@ -715,9 +715,9 @@ function _sek_normalize_single_module_values( $raw_module_value, $module_type ) 
 
 
 
-
-
-/* HELPER FOR CHECKBOX OPTIONS */
+/* ------------------------------------------------------------------------- *
+ *  HELPER FOR CHECKBOX OPTIONS
+/* ------------------------------------------------------------------------- */
 function sek_is_checked( $val ) {
     //cast to string if array
     $val = is_array($val) ? $val[0] : $val;
@@ -744,50 +744,18 @@ function sek_booleanize_checkbox_val( $val ) {
 }
 
 
-/* VARIOUS HELPERS */
-function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
-    if ( ! $text )
-        return '';
-
-    if ( $strip_tags )
-        $text       = strip_tags( $text );
-
-    if ( ! $max_text_length )
-        return $text;
-
-    $end_substr = $text_length = strlen( $text );
-    if ( $text_length > $max_text_length ) {
-        $text      .= ' ';
-        $end_substr = strpos( $text, ' ' , $max_text_length);
-        $end_substr = ( FALSE !== $end_substr ) ? $end_substr : $max_text_length;
-        $text       = trim( substr( $text , 0 , $end_substr ) );
-    }
-
-    if ( $more && $end_substr < $text_length )
-        return $text . ' ' .$more;
-
-    return $text;
-}
 
 
 
-function sek_error_log( $title, $content = null ) {
-    if ( is_null( $content ) ) {
-        error_log( '<' . $title . '>' );
-    } else {
-        error_log( '<' . $title . '>' );
-        error_log( print_r( $content, true ) );
-        error_log( '</' . $title . '>' );
-    }
-}
-
+/* ------------------------------------------------------------------------- *
+ *   LOCAL OPTIONS HELPERS
+/* ------------------------------------------------------------------------- */
 // @return mixed null || string
 function sek_get_locale_template(){
     $path = null;
-    $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
-    $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
-    if ( ! empty( $local_options ) && ! empty( $local_options['template'] ) && ! empty( $local_options['template']['local_template'] ) && 'default' !== $local_options['template']['local_template'] ) {
-        $template_file_name = $local_options['template']['local_template'];
+    $local_template_data = sek_get_local_option_value( 'template' );
+    if ( ! empty( $local_template_data ) && ! empty( $local_template_data['local_template'] ) && 'default' !== $local_template_data['local_template'] ) {
+        $template_file_name = $local_template_data['local_template'];
         $path = apply_filters( 'nimble_get_locale_template_path', NIMBLE_BASE_PATH . '/tmpl/page-templates/' . $template_file_name . '.php', $template_file_name );
         if ( file_exists( $path ) ) {
             $template = $path;
@@ -799,9 +767,21 @@ function sek_get_locale_template(){
     return $path;
 }
 
+// @param $option_name = string
+function sek_get_local_option_value( $option_name, $skope_id = null ) {
+    // use the provided skope_id if in the signature
+    $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
+    $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
+    $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
+    return ( ! empty( $local_options ) && ! empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
+}
 
 
-
+// @param $option_name = string
+function sek_get_global_option_value( $option_name ) {
+    $options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+    return ( is_array( $options ) && ! empty( $options[ $option_name ] ) ) ? $options[ $option_name ] : null;
+}
 
 
 
@@ -811,14 +791,14 @@ function sek_get_locale_template(){
  *  BREAKPOINTS HELPER
 /* ------------------------------------------------------------------------- */
 function sek_get_global_custom_breakpoint() {
-    $options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    if ( ! is_array( $options ) || empty( $options['breakpoint'] ) || empty( $options['breakpoint']['global-custom-breakpoint'] ) )
+    $global_breakpoint_data = sek_get_global_option_value('breakpoint');
+    if ( is_null( $global_breakpoint_data ) || empty( $global_breakpoint_data['global-custom-breakpoint'] ) )
       return;
 
-    if ( empty( $options['breakpoint'][ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $options['breakpoint'][ 'use-custom-breakpoint'] ) )
+    if ( empty( $global_breakpoint_data[ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $global_breakpoint_data[ 'use-custom-breakpoint'] ) )
       return;
 
-    return intval( $options['breakpoint']['global-custom-breakpoint'] );
+    return intval( $global_breakpoint_data['global-custom-breakpoint'] );
 }
 
 // invoked when filtering 'sek_add_css_rules_for__section__options'
@@ -972,11 +952,11 @@ function sek_is_img_smartload_enabled() {
     // LOCAL OPTION
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
     // otherwise we fallback on the normal utility skp_build_skope_id()
-    $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
+    $local_performances_data = sek_get_local_option_value( 'local_performances' );
     $local_smartload = 'inherit';
-    if ( is_array( $local_options ) && !empty( $local_options['local_options']) && is_array( $local_options['local_options']) && !empty($local_options['local_options']['local_performances'] ) && is_array( $local_options['local_options']['local_performances'] ) ) {
-        if ( ! empty( $local_options['local_options']['local_performances']['local-img-smart-load'] ) && 'inherit' !== $local_options['local_options']['local_performances']['local-img-smart-load'] ) {
-              $local_smartload = 'yes' === $local_options['local_options']['local_performances']['local-img-smart-load'];
+    if ( !is_null( $local_performances_data ) && is_array( $local_performances_data ) ) {
+        if ( ! empty( $local_performances_data['local-img-smart-load'] ) && 'inherit' !== $local_performances_data['local-img-smart-load'] ) {
+              $local_smartload = 'yes' === $local_performances_data['local-img-smart-load'];
         }
     }
 
@@ -984,9 +964,9 @@ function sek_is_img_smartload_enabled() {
         $is_img_smartload_enabled = $local_smartload;
     } else {
         // GLOBAL OPTION
-        $glob_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-        if ( is_array( $glob_options ) && !empty($glob_options['performances']) && is_array( $glob_options['performances'] ) && !empty( $glob_options['performances']['global-img-smart-load'] ) ) {
-            $is_img_smartload_enabled = sek_booleanize_checkbox_val( $glob_options['performances']['global-img-smart-load'] );
+        $glob_performances_data = sek_get_global_option_value( 'performances' );
+        if ( !is_null( $glob_performances_data ) && is_array( $glob_performances_data ) && !empty( $glob_performances_data['global-img-smart-load'] ) ) {
+            $is_img_smartload_enabled = sek_booleanize_checkbox_val( $glob_performances_data['global-img-smart-load'] );
         }
     }
 
@@ -997,7 +977,9 @@ function sek_is_img_smartload_enabled() {
 }
 
 
-
+/* ------------------------------------------------------------------------- *
+ *  VERSION HELPERS
+/* ------------------------------------------------------------------------- */
 /**
 * Returns a boolean
 * check if user started to use the plugin before ( strictly < ) the requested version
@@ -1030,6 +1012,49 @@ function sek_filter_skp_get_skope_id( $skope_id, $level ) {
     return $skope_id;
 }
 
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *   VARIOUS HELPERS
+/* ------------------------------------------------------------------------- */
+function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
+    if ( ! $text )
+        return '';
+
+    if ( $strip_tags )
+        $text       = strip_tags( $text );
+
+    if ( ! $max_text_length )
+        return $text;
+
+    $end_substr = $text_length = strlen( $text );
+    if ( $text_length > $max_text_length ) {
+        $text      .= ' ';
+        $end_substr = strpos( $text, ' ' , $max_text_length);
+        $end_substr = ( FALSE !== $end_substr ) ? $end_substr : $max_text_length;
+        $text       = trim( substr( $text , 0 , $end_substr ) );
+    }
+
+    if ( $more && $end_substr < $text_length )
+        return $text . ' ' .$more;
+
+    return $text;
+}
+
+
+
+function sek_error_log( $title, $content = null ) {
+    if ( is_null( $content ) ) {
+        error_log( '<' . $title . '>' );
+    } else {
+        error_log( '<' . $title . '>' );
+        error_log( print_r( $content, true ) );
+        error_log( '</' . $title . '>' );
+    }
+}
 
 
 // DEPRECATED SINCE Nimble v1.3.0, november 2018
