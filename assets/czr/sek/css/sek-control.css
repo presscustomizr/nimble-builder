@@ -989,8 +989,32 @@ body.nimble-top-bar-visible #nimble-top-bar {
   position: absolute;
   right: 10px;
   cursor: pointer;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  /* flex-direction: column; */
+  flex: 0 0 100%;
+  max-width: 100%;
 }
-
+#nimble-top-bar .sek-nimble-doc img {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  top: 2px;
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+  -webkit-filter: gray;
+  filter: gray;
+}
+#nimble-top-bar .sek-nimble-doc:hover img {
+  -webkit-filter: none;
+  filter: none;
+  -webkit-filter: none;
+  filter: none;
+}
 
 
 /* TOP SAVE SECTION UI */
