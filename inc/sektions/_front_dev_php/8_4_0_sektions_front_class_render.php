@@ -16,9 +16,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // SCHEDULE THE ASSETS ENQUEUING
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
 
-            // USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
-            add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
-
             // SMART LOAD
             add_filter( 'nimble_parse_for_smart_load', array( $this, 'sek_maybe_process_img_for_js_smart_load') );
 
@@ -27,6 +24,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             // REGISTER HEADER AND FOOTER GLOBAL LOCATIONS
             add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
+
+            // CONTENT : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+            add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
+            // HEADER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+            add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
+            // FOOTER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+            //add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
         }//_schedule_front_rendering()
 
 
@@ -204,10 +208,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 error_log( __CLASS__ . ' :: ' . __FUNCTION__ .' => sek_get_skoped_seks() should always return an array().');
             }
         }
-
-
-
-
 
 
 
@@ -701,21 +701,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return $enqueuing_candidates;
         }
 
-
-        // @hook 'template_include'
-        // @return template path
-        function sek_maybe_set_local_nimble_template( $template ) {
-            //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
-            $locale_template = sek_get_locale_template();
-            if ( !empty( $locale_template ) ) {
-                $template = $locale_template;
-            }
-            //sek_error_log( 'TEMPLATE ? => ' . did_action('wp'), $template );
-            return $template;
-        }
-
-
-
         /* ------------------------------------------------------------------------- *
          *  SMART LOAD.
         /* ------------------------------------------------------------------------- */
@@ -840,6 +825,64 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 $content = $GLOBALS['wp_embed']->autoembed( $content );
             }
             return $content;
+        }
+
+
+
+
+
+        /* ------------------------------------------------------------------------- *
+         *  CONTENT, HEADER, FOOTER
+        /* ------------------------------------------------------------------------- */
+        // @hook 'template_include'
+        // @return template path
+        function sek_maybe_set_local_nimble_template( $template ) {
+            //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
+            $locale_template = sek_get_locale_template();
+            if ( !empty( $locale_template ) ) {
+                $template = $locale_template;
+            }
+            //sek_error_log( 'TEMPLATE ? => ' . did_action('wp'), $template );
+            return $template;
+        }
+
+
+        function sek_maybe_set_local_nimble_header( $header_name ) {
+            sek_error_log(' SOO ?? sek_get_local_option_value global_header' . skp_get_skope_id(), sek_get_global_option_value('global_header') );
+            $global_header_data = sek_get_global_option_value('global_header');
+            if ( !is_null( $global_header_data ) && is_array( $global_header_data ) && !empty( $global_header_data['global-header'] ) && 'nimble_header' === $global_header_data['global-header'] ) {
+                //sek_load_nimble_header() // <= includes a call to wp_head()
+                wp_head();
+
+                // do like in wp core get_header()
+                $templates = array();
+                $header_name = (string) $header_name;
+                if ( '' !== $header_name ) {
+                  $templates[] = "header-{$header_name}.php";
+                }
+
+                $templates[] = 'header.php';
+
+                // don't run wp_head a second time
+                remove_all_actions( 'wp_head' );
+                // capture the print and clean it.
+                ob_start();
+                // won't be re-loaded by the second call performed by WP
+                // see https://developer.wordpress.org/reference/functions/locate_template/
+                // and https://developer.wordpress.org/reference/functions/load_template/
+                locate_template( $templates, true );
+                ob_get_clean();
+            }
+        }
+
+        function sek_maybe_set_local_nimble_footer( $footer_name ) {
+            //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
+            $locale_template = sek_get_locale_template();
+            if ( !empty( $locale_template ) ) {
+                $template = $locale_template;
+            }
+            //sek_error_log( 'TEMPLATE ? => ' . did_action('wp'), $template );
+            return $template;
         }
     }//class
 endif;
