@@ -2,12 +2,14 @@
 /**
 * Plugin Name: Nimble Builder
 * Description: Powerful drag and drop page builder using the native WordPress customizer.
-* Version: 1.3.2
+* Version: 1.3.3
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://presscustomizr.com
 */
-
+if ( ! defined( 'ABSPATH' ) ) {
+  exit;
+}
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
