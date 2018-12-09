@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <a class="sek-skip-link sek-screen-reader-text" href="#nimble-page"><?php _e( 'Skip to content', 'text_domain_to_replace' ); ?></a>
       <header id="nimble-header" class="">
         <?php Nimble_Manager()->render_nimble_locations( 'nimble_global_header' ); ?>
-      </header><!-- #masthead -->
+      </header><!-- #nimble-header -->
       <div id="nimble-content" class="">
         <?php
           do_action('nimble_template_before_content_sections');
@@ -33,10 +33,10 @@ if ( ! defined( 'ABSPATH' ) ) {
           );
           do_action('nimble_template_after_content_sections');
         ?>
-      </div><!-- #content -->
+      </div><!-- #nimble-content -->
       <footer id="nimble-footer" class="">
         <?php Nimble_Manager()->render_nimble_locations('nimble_global_footer'); ?>
-      </footer><!-- #colophon -->
+      </footer><!-- #nimble-footer -->
     </div><!-- #nimble-page -->
   <?php wp_footer(); ?>
 </body>
