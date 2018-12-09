@@ -1,5 +1,4 @@
 <?php
-// nimble_full_tmpl_ghf =>  nimble full tmpl with global header and footer
 namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
   exit;
