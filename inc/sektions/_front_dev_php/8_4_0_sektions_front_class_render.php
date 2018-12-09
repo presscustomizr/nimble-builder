@@ -30,7 +30,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // HEADER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
             add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
             // FOOTER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
-            //add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
+            add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
         }//_schedule_front_rendering()
 
 
@@ -57,6 +57,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // Fired in the constructor
         function sek_register_nimble_global_locations() {
+            register_location('nimble_local_header', array( 'is_header_location' => true ) );
+            register_location('nimble_local_footer', array( 'is_footer_location' => true ) );
             register_location('nimble_global_header', array( 'is_global_location' => true, 'is_header_location' => true ) );
             register_location('nimble_global_footer', array( 'is_global_location' => true, 'is_footer_location' => true ) );
         }
@@ -571,7 +573,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 return;
             }
             $module_type = $model['module_type'];
-            $render_tmpl_path = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
+            $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' ), $module_type );
             if ( !empty( $render_tmpl_path ) ) {
                 load_template( $render_tmpl_path, false );
             } else {
@@ -846,13 +848,32 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return $template;
         }
 
-
+        // fired @filter get_header()
         function sek_maybe_set_local_nimble_header( $header_name ) {
-            sek_error_log(' SOO ?? sek_get_local_option_value global_header' . skp_get_skope_id(), sek_get_global_option_value('global_header') );
-            $global_header_data = sek_get_global_option_value('global_header');
-            if ( !is_null( $global_header_data ) && is_array( $global_header_data ) && !empty( $global_header_data['global-header'] ) && 'nimble_header' === $global_header_data['global-header'] ) {
-                //sek_load_nimble_header() // <= includes a call to wp_head()
-                wp_head();
+            //sek_error_log(' SOO ?? sek_get_local_option_value global_header' . skp_get_skope_id(), sek_get_global_option_value('global_header_footer') );
+            $local_header_footer_data = sek_get_local_option_value('local_header_footer');
+            $global_header_footer_data = sek_get_global_option_value('global_header_footer');
+            $header_template_file = '';
+            $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
+
+            $has_local_header = false;
+            $has_global_header = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
+
+            if ( $apply_local_option ) {
+                $has_local_header = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
+                $has_global_header = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
+            }
+
+            if ( $has_local_header ) {
+                $header_template_file = 'nimble_local_header_tmpl.php';
+            } else if ( $has_global_header ) {
+                $header_template_file = 'nimble_global_header_tmpl.php';
+            }
+
+            if ( ! empty( $header_template_file ) ) {
+
+                // load the Nimble template which includes a call to wp_head()
+                load_template( NIMBLE_BASE_PATH . '/tmpl/header/' . $header_template_file, false );
 
                 // do like in wp core get_header()
                 $templates = array();
@@ -875,15 +896,52 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
         }
 
+        // fired @filter get_footer()
         function sek_maybe_set_local_nimble_footer( $footer_name ) {
             //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
-            $locale_template = sek_get_locale_template();
-            if ( !empty( $locale_template ) ) {
-                $template = $locale_template;
+            $local_header_footer_data = sek_get_local_option_value('local_header_footer');
+            $global_header_footer_data = sek_get_global_option_value('global_header_footer');
+            $footer_template_file = '';
+            $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
+
+            $has_local_footer = false;
+            $has_global_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
+
+            if ( $apply_local_option ) {
+                $has_local_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
+                $has_global_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
             }
-            //sek_error_log( 'TEMPLATE ? => ' . did_action('wp'), $template );
-            return $template;
-        }
+
+            if ( $has_local_footer ) {
+                $footer_template_file = 'nimble_local_footer_tmpl.php';
+            } else if ( $has_global_footer ) {
+                $footer_template_file = 'nimble_global_footer_tmpl.php';
+            }
+
+            if ( ! empty( $footer_template_file ) ) {
+                // load the Nimble template which includes a call to wp_footer()
+                load_template( NIMBLE_BASE_PATH . '/tmpl/footer/' . $footer_template_file, false );
+
+                // do like in wp core get_footer()
+                $templates = array();
+                $name = (string) $footer_name;
+                if ( '' !== $footer_name ) {
+                    $templates[] = "footer-{$footer_name}.php";
+                }
+
+                $templates[]    = 'footer.php';
+
+                // don't run wp_footer a second time
+                remove_all_actions( 'wp_footer' );
+                // capture the print and clean it.
+                ob_start();
+                // won't be re-loaded by the second call performed by WP
+                // see https://developer.wordpress.org/reference/functions/locate_template/
+                // and https://developer.wordpress.org/reference/functions/load_template/
+                locate_template( $templates, true );
+                ob_get_clean();
+            }
+        }//sek_maybe_set_local_nimble_footer
     }//class
 endif;
 ?>
