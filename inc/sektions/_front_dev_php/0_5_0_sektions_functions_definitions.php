@@ -34,12 +34,25 @@ function sek_get_locations() {
     return apply_filters( 'sek_get_locations', Nimble_Manager()->registered_locations );
 }
 
-// @return array of "local" locations => locations in which sections are specific to a given skope id
-function sek_get_local_locations() {
+// @return array of "local" content locations => locations with the following characterictics :
+// - sections in this location are specific to a given skope id
+// - header and footer locations are excluded
+function sek_get_local_content_locations() {
     $locations = array();
     $all_locations = sek_get_locations();
     if ( is_array( $all_locations ) ) {
         foreach ( $all_locations as $loc_id => $loc_data) {
+            // Normalizes with the default model used to register a location
+            // public $default_registered_location_model = [
+            //   'priority' => 10,
+            //   'is_global_location' => false,
+            //   'is_header_location' => false,
+            //   'is_footer_location' => false
+            // ];
+            $loc_data = wp_parse_args( $loc_data, Nimble_Manager()->default_registered_location_model );
+            if ( true === $loc_data['is_header_location'] || true === $loc_data['is_footer_location'] )
+              continue;
+
             if ( ! sek_is_global_location( $loc_id ) ) {
                 $locations[$loc_id] = $loc_data;
             }
