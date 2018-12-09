@@ -26,7 +26,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
 
             // CONTENT : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
-            add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
+            add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template' ) );
+
+            // HEADER FOOTER
+            add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
             // HEADER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
             add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
             // FOOTER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
@@ -836,7 +839,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         /* ------------------------------------------------------------------------- *
          *  CONTENT, HEADER, FOOTER
         /* ------------------------------------------------------------------------- */
-        // @hook 'template_include'
+        // fired @hook 'template_include'
         // @return template path
         function sek_maybe_set_local_nimble_template( $template ) {
             //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
@@ -848,32 +851,33 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return $template;
         }
 
-        // fired @filter get_header()
-        function sek_maybe_set_local_nimble_header( $header_name ) {
-            //sek_error_log(' SOO ?? sek_get_local_option_value global_header' . skp_get_skope_id(), sek_get_global_option_value('global_header_footer') );
+
+        // fired @hook 'template_redirect'
+        // @return void()
+        // set the value of the properties
+        // has_local_header_footer
+        // has_global_header_footer
+        function sek_maybe_set_nimble_header_footer() {
+            //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
             $local_header_footer_data = sek_get_local_option_value('local_header_footer');
             $global_header_footer_data = sek_get_global_option_value('global_header_footer');
-            $header_template_file = '';
             $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
 
-            $has_local_header = false;
-            $has_global_header = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
+            $this->has_global_header_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
 
             if ( $apply_local_option ) {
-                $has_local_header = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
-                $has_global_header = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
+                $this->has_local_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
+                $this->has_global_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
             }
+        }
 
-            if ( $has_local_header ) {
-                $header_template_file = 'nimble_local_header_tmpl.php';
-            } else if ( $has_global_header ) {
-                $header_template_file = 'nimble_global_header_tmpl.php';
-            }
 
-            if ( ! empty( $header_template_file ) ) {
 
+        // fired @filter get_header()
+        function sek_maybe_set_local_nimble_header( $header_name ) {
+            if ( $this->has_local_header_footer || $this->has_global_header_footer ) {
                 // load the Nimble template which includes a call to wp_head()
-                load_template( NIMBLE_BASE_PATH . '/tmpl/header/' . $header_template_file, false );
+                load_template( NIMBLE_BASE_PATH . '/tmpl/header/nimble_header_tmpl.php', false );
 
                 // do like in wp core get_header()
                 $templates = array();
@@ -898,29 +902,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // fired @filter get_footer()
         function sek_maybe_set_local_nimble_footer( $footer_name ) {
-            //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
-            $local_header_footer_data = sek_get_local_option_value('local_header_footer');
-            $global_header_footer_data = sek_get_global_option_value('global_header_footer');
-            $footer_template_file = '';
-            $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
-
-            $has_local_footer = false;
-            $has_global_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
-
-            if ( $apply_local_option ) {
-                $has_local_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
-                $has_global_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
-            }
-
-            if ( $has_local_footer ) {
-                $footer_template_file = 'nimble_local_footer_tmpl.php';
-            } else if ( $has_global_footer ) {
-                $footer_template_file = 'nimble_global_footer_tmpl.php';
-            }
-
-            if ( ! empty( $footer_template_file ) ) {
+            if ( $this->has_local_header_footer || $this->has_global_header_footer ) {
                 // load the Nimble template which includes a call to wp_footer()
-                load_template( NIMBLE_BASE_PATH . '/tmpl/footer/' . $footer_template_file, false );
+                load_template( NIMBLE_BASE_PATH . '/tmpl/footer/nimble_footer_tmpl.php', false );
 
                 // do like in wp core get_footer()
                 $templates = array();
@@ -942,6 +926,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 ob_get_clean();
             }
         }//sek_maybe_set_local_nimble_footer
+
     }//class
 endif;
 ?>
