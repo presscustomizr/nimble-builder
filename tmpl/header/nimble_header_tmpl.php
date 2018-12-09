@@ -17,6 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div id="nimble-page" class="">
       <a class="sek-skip-link sek-screen-reader-text" href="#nimble-page"><?php _e( 'Skip to content', 'text_domain_to_replace' ); ?></a>
       <header id="nimble-header" class="">
-        <?php Nimble_Manager()->render_nimble_locations( 'nimble_local_header' ); ?>
+        <?php Nimble_Manager()->render_nimble_locations( Nimble_Manager()->has_local_header_footer ? 'nimble_local_header' :'nimble_global_header' ); ?>
       </header><!-- #nimble-header -->
       <div id="nimble-content" class="">
