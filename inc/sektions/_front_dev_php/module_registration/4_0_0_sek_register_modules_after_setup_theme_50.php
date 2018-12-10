@@ -278,14 +278,6 @@ function sek_get_select_options_for_input_id( $input_id ) {
             );
         break;
 
-        // LOCAL SKOPE OPTIONS UI
-        case 'local_template' :
-            $options = array(
-                'default' => __('Default theme template','text_domain_to_be_replaced'),
-                'nimble_template' => __('Template with Nimble Builder content. Header and footer from the theme','text_domain_to_be_replaced')
-            );
-        break;
-
         default :
             sek_error_log( __FUNCTION__ . ' => no case set for input id : '. $input_id );
         break;
