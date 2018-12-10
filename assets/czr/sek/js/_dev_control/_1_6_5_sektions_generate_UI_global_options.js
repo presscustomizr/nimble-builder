@@ -26,11 +26,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var registrationParams = {};
 
                   $.extend( registrationParams, {
+                        global_header_footer : {
+                              settingControlId : _id_ + '__header_footer',
+                              module_type : 'sek_global_header_footer',
+                              controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
+                              icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                        },
                         breakpoint : {
                               settingControlId : _id_ + '__breakpoint',
                               module_type : 'sek_global_breakpoint',
                               controlLabel : sektionsLocalizedData.i18n['Site wide breakpoint for Nimble sections'],
-                              expandAndFocusOnInit : true,
+                              expandAndFocusOnInit : false,
                               icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                         },
                         widths : {
@@ -44,12 +50,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_global_performances',
                               controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
                               icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
-                        },
-                        global_header_footer : {
-                              settingControlId : _id_ + '__header_footer',
-                              module_type : 'sek_global_header_footer',
-                              controlLabel : '@missi18n site wide header and footer', //sektionsLocalizedData.i18n['Site wide page speed optimizations'],
-                              icon : ''//<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
                         }
                   });
 

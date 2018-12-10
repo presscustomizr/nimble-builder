@@ -36,8 +36,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : _id_ + '__template',
                               module_type : 'sek_local_template',
                               controlLabel : sektionsLocalizedData.i18n['Page template'],
-                              expandAndFocusOnInit : true,
+                              expandAndFocusOnInit : false,
                               icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
+                        },
+                        local_header_footer : {
+                              settingControlId : _id_ + '__local_header_footer',
+                              module_type : 'sek_local_header_footer',
+                              controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
+                              icon : '<i class="material-icons sek-level-option-icon">web</i>'
                         },
                         widths : {
                               settingControlId : _id_ + '__widths',
@@ -62,12 +68,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_local_reset',
                               controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
                               icon : '<i class="material-icons sek-level-option-icon">cached</i>'
-                        },
-                        local_header_footer : {
-                              settingControlId : _id_ + '__local_header_footer',
-                              module_type : 'sek_local_header_footer',
-                              controlLabel : '@missi18n local header and footer', //sektionsLocalizedData.i18n['Site wide page speed optimizations'],
-                              icon : ''//<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
                         }
                   });
 
@@ -169,11 +169,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // the section '__localOptionsSection' is registered in ::initialize()
                   api.section( '__localOptionsSection', function( _section_ ) {
                         api( self.localSectionsSettingId(), function() {
+                              console.log('BEFORE DO REGISTER', self.localSectionsSettingId(), self.uiGenerationForLocalSectionsBoundOnClick );
                               _do_register_();
-                              _section_.container.on('click', '.accordion-section-title',function() {
-                                    // Generate UI for the local skope options
-                                    self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
-                              });
+                              if ( true !== self.uiGenerationForLocalSectionsBoundOnClick ) {
+                                    _section_.container.on('click', '.accordion-section-title',function() {
+                                          console.log('ALORS ???', $(this) );
+                                          // Generate UI for the local skope options
+                                          self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
+                                          self.uiGenerationForLocalSectionsBoundOnClick = true;
+                                    });
+                              }
                         });
                   });
                   return dfd;
