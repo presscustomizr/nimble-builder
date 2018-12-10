@@ -18,7 +18,7 @@ function sek_get_module_params_for_sek_global_breakpoint() {
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default global breakpoint is 768px.', 'text_domain_to_be_replaced')
+                    'notice_before_title' => __( 'This is the breakpoint under which columns are reorganized vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_domain_to_be_replaced')
                 ),
                 'global-custom-breakpoint'  => array(
                     'input_type'  => 'range_simple',

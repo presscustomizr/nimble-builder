@@ -15,8 +15,13 @@ function sek_get_module_params_for_sek_local_template() {
                     'title'       => __('Select a template', 'text_domain_to_be_replaced'),
                     'default'     => 'default',
                     'width-100'   => true,
-                    'choices'     => sek_get_select_options_for_input_id( 'local_template' ),
-                    'refresh_preview' => true
+                    'choices'     => array(
+                        'default' => __('Default theme template','text_domain_to_be_replaced'),
+                        'nimble_template' => __('Nimble Builder template','text_domain_to_be_replaced')
+                    ),
+                    'refresh_preview' => true,
+                    'notice_before_title' => __('Use the Nimble Builder template to display content created only with the Nimble Builder on this page. Your theme\'s default template will be overriden','text_domain_to_be_replaced')
+                    //'notice_after' => __('When you select the Nimble Builder template, only the Nimble sections are displayed.')
                 )
             )
         )//tmpl

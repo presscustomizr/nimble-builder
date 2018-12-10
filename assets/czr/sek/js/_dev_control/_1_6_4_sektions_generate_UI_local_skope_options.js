@@ -36,8 +36,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : _id_ + '__template',
                               module_type : 'sek_local_template',
                               controlLabel : sektionsLocalizedData.i18n['Page template'],
-                              expandAndFocusOnInit : true,
+                              expandAndFocusOnInit : false,
                               icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
+                        },
+                        local_header_footer : {
+                              settingControlId : _id_ + '__local_header_footer',
+                              module_type : 'sek_local_header_footer',
+                              controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
+                              icon : '<i class="material-icons sek-level-option-icon">web</i>'
                         },
                         widths : {
                               settingControlId : _id_ + '__widths',
@@ -123,11 +129,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     label : optionData.controlLabel,
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
-                                    section : '__localOptionsSection',
+                                    section : self.SECTION_ID_FOR_LOCAL_OPTIONS,
                                     priority : 10,
                                     settings : { default : optionData.settingControlId },
                                     //track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                               }).done( function() {
+
                                     // if ( true === optionData.expandAndFocusOnInit ) {
                                     //       api.control( optionData.settingControlId ).focus({
                                     //             completeCallback : function() {}
@@ -159,17 +166,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//_.each()
                   };//_do_register()
 
-                  // Defer the registration when the parent section gets added to the api
-                  // the section '__localOptionsSection' is registered in ::initialize()
-                  api.section( '__localOptionsSection', function( _section_ ) {
-                        api( self.localSectionsSettingId(), function() {
-                              _do_register_();
-                              _section_.container.on('click', '.accordion-section-title',function() {
-                                    // Generate UI for the local skope options
-                                    self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
-                              });
-                        });
-                  });
+                  // The parent section has already been added in ::initialize()
+                  _do_register_();
+
                   return dfd;
             }
       });//$.extend()

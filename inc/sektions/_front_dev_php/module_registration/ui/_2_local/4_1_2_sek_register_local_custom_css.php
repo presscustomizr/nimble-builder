@@ -17,7 +17,7 @@ function sek_get_module_params_for_sek_local_custom_css() {
                     'title'       => __( 'Custom css' , 'text_domain_to_be_replaced' ),
                     'default'     => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) ),
                     'code_type' => 'text/css',// 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
-                    'notice_after' => __('This CSS code will be restricted to the currently previewed page only, and not applied site wide.', 'text_domain_to_be_replaced'),
+                    'notice_before_title' => __('The CSS code added below will only be applied to the currently previewed page, not site wide.', 'text_domain_to_be_replaced'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                 )

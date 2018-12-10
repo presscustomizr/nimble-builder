@@ -31,12 +31,14 @@ function sek_register_modules() {
         'sek_local_custom_css',
         'sek_local_reset',
         'sek_local_performances',
+        'sek_local_header_footer',
 
         // global options modules
         'sek_global_breakpoint',
         'sek_global_widths',
         //'sek_global_reset',
         'sek_global_performances',
+        'sek_global_header_footer',
 
         // FRONT MODULES
         'czr_simple_html_module',
@@ -273,16 +275,6 @@ function sek_get_select_options_for_input_id( $input_id ) {
                 'double' => __('double', 'text_domain_to_be_replaced'),
                 'dotted' => __('dotted', 'text_domain_to_be_replaced'),
                 'dashed' => __('dashed', 'text_domain_to_be_replaced')
-            );
-        break;
-
-        // LOCAL SKOPE OPTIONS UI
-        case 'local_template' :
-            $options = array(
-                'default' => __('Default theme template','text_domain_to_be_replaced'),
-                'nimble_template' => __('Template with Nimble Builder content. Header and footer from the theme','text_domain_to_be_replaced'),
-                // nimble full tmpl with global header and footer
-                'nimble_full_tmpl_ghf' => __('Blank Nimble Builder template (beta)','text_domain_to_be_replaced')
             );
         break;
 

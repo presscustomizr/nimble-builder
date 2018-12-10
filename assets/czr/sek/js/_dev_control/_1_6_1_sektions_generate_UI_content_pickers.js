@@ -146,7 +146,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     label : optionData.controlLabel,
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
-                                    section : '__content_picker__',
+                                    section : self.SECTION_ID_FOR_CONTENT_PICKER,
                                     priority : optionData.priority || 10,
                                     settings : { default : optionData.settingControlId },
                                     track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
@@ -195,9 +195,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };//_do_register_
 
 
-                  // the '__content_picker__' section is registered on initialize
+                  // the self.SECTION_ID_FOR_CONTENT_PICKER section is registered on initialize
                   // @fixes https://github.com/presscustomizr/nimble-builder/issues/187
-                  api.section( '__content_picker__', function( _section_ ) {
+                  api.section( self.SECTION_ID_FOR_CONTENT_PICKER, function( _section_ ) {
                         _do_register_();
 
                         // Style the section title

@@ -45,6 +45,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             return self::$instance;
         }
         public $img_smartload_enabled = 'not_cached';
+        public $has_local_header_footer = false;//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
+        public $has_global_header_footer = false;//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>

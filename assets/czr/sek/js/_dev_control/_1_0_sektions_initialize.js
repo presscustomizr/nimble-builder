@@ -12,6 +12,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( ! _.isFunction( api.czr_activeSkopes ) ) {
                         throw new Error( 'CZRSeksPrototype => api.czr_activeSkopes' );
                   }
+                  // SECTIONS ID FOR LOCAL AND GLOBAL OPTIONS
+                  self.SECTION_ID_FOR_GLOBAL_OPTIONS = '__globalOptionsSectionId';
+                  self.SECTION_ID_FOR_LOCAL_OPTIONS = '__localOptionsSection';
+
+                  // SECTION ID FOR THE CONTENT PICKER
+                  self.SECTION_ID_FOR_CONTENT_PICKER = '__content_picker__';
+
                   // Max possible number of columns in a section
                   self.MAX_NUMBER_OF_COLUMNS = 12;
 
@@ -95,9 +102,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // + GENERATE UI FOR THE GLOBAL OPTIONS
                   var doSkopeDependantActions = function( newSkopes, previousSkopes ) {
                         self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
+
                         // Generate UI for the local skope options and the global options
-                        self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
-                        self.generateUI({ action : 'sek-generate-global-options-ui'});
+                        api.section( self.SECTION_ID_FOR_LOCAL_OPTIONS, function( _section_ ) {
+                              _section_.deferred.embedded.done( function() {
+                                    if( true === _section_.boundForLocalOptionGeneration )
+                                      return;
+                                     // Defer the UI generation when the section is expanded
+                                    _section_.boundForLocalOptionGeneration = true;
+                                    _section_.expanded.bind( function( expanded ) {
+                                          if ( true === expanded ) {
+                                                self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
+                                          }
+                                    });
+                              });
+                        });
+                        api.section( self.SECTION_ID_FOR_GLOBAL_OPTIONS, function( _section_ ) {
+                              self.generateUI({ action : 'sek-generate-global-options-ui'});
+                        });
                   };
                   // populate the setting ids now if skopes are set
                   if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
@@ -284,7 +306,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
-                        id : '__globalAndLocalOptionsSection',
+                        id : self.SECTION_ID_FOR_GLOBAL_OPTIONS,
                         title: sektionsLocalizedData.i18n['Site wide options'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 20,
@@ -298,7 +320,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _toggleActive : function(){ return true; }
                         })
                   }).done( function() {
-                        api.section( '__globalAndLocalOptionsSection', function( _section_ ) {
+                        api.section( self.SECTION_ID_FOR_GLOBAL_OPTIONS, function( _section_ ) {
                               // Style the section title
                               var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
                                   $panelTitleEl = _section_.container.find('.customize-section-title h3');
@@ -322,7 +344,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
-                        id : '__localOptionsSection',//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
+                        id : self.SECTION_ID_FOR_LOCAL_OPTIONS,//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
                         title: sektionsLocalizedData.i18n['Current page options'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 10,
@@ -336,7 +358,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _toggleActive : function(){ return true; }
                         })
                   }).done( function() {
-                        api.section( '__localOptionsSection', function( _section_ ) {
+                        api.section( self.SECTION_ID_FOR_LOCAL_OPTIONS, function( _section_ ) {
                               // Style the section title
                               var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
                                   $panelTitleEl = _section_.container.find('.customize-section-title h3');
@@ -376,7 +398,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
-                        id : '__content_picker__',
+                        id : self.SECTION_ID_FOR_CONTENT_PICKER,
                         title: sektionsLocalizedData.i18n['Content Picker'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 30,
@@ -395,7 +417,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // => we also need the local skope to be set, that's why api.czr_initialSkopeCollectionPopulated is convenient because it ensures the api.previewer is ready and we have a local skope set.
                         // @see czr-skope-base.js
                         // @fixes https://github.com/presscustomizr/nimble-builder/issues/187
-                        api.section( '__content_picker__', function( _section_ ) {
+                        api.section( self.SECTION_ID_FOR_CONTENT_PICKER, function( _section_ ) {
                               if ( 'resolved' != api.czr_initialSkopeCollectionPopulated.state() ) {
                                     api.czr_initialSkopeCollectionPopulated.done( function() {
                                           api.previewer.trigger('sek-pick-content', { focus : false });

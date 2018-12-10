@@ -20,7 +20,14 @@ function sek_get_module_params_for_sek_local_widths() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
-                    'refresh_stylesheet' => true
+                    'refresh_stylesheet' => true,
+                    'refresh_preview' => true,
+                    'notice_before_title' => sprintf( __( 'The inner and outer widths of the sections displayed in this page can be set here. It will override in the %1$s. You can also set a custom inner and outer width for each single sections.', 'text_domain_to_be_replaced'),
+                        sprintf( '<a href="%1$s">%2$s</a>',
+                            "javascript:wp.customize.section('__globalAndLocalOptionsSection', function( _s_ ){ _s_.focus(); })",
+                            __('Site wide options', 'text_domain_to_be_replaced')
+                        )
+                    ),
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
