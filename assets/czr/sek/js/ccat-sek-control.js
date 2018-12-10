@@ -11,6 +11,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( ! _.isFunction( api.czr_activeSkopes ) ) {
                         throw new Error( 'CZRSeksPrototype => api.czr_activeSkopes' );
                   }
+                  self.SECTION_ID_FOR_GLOBAL_OPTIONS = '__globalOptionsSectionId';
+                  self.SECTION_ID_FOR_LOCAL_OPTIONS = '__localOptionsSection';
+                  self.SECTION_ID_FOR_CONTENT_PICKER = '__content_picker__';
                   self.MAX_NUMBER_OF_COLUMNS = 12;
                   self.SETTING_UPDATE_BUFFER = 100;
                   self.defaultLocalSektionSettingValue = self.getDefaultSektionSettingValue( 'local' );
@@ -37,8 +40,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   var doSkopeDependantActions = function( newSkopes, previousSkopes ) {
                         self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
-                        self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
-                        self.generateUI({ action : 'sek-generate-global-options-ui'});
+                        api.section( self.SECTION_ID_FOR_LOCAL_OPTIONS, function( _section_ ) {
+                              _section_.deferred.embedded.done( function() {
+                                    if( true === _section_.boundForLocalOptionGeneration )
+                                      return;
+                                    _section_.boundForLocalOptionGeneration = true;
+                                    _section_.expanded.bind( function( expanded ) {
+                                          if ( true === expanded ) {
+                                                self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
+                                          }
+                                    });
+                              });
+                        });
+                        api.section( self.SECTION_ID_FOR_GLOBAL_OPTIONS, function( _section_ ) {
+                              self.generateUI({ action : 'sek-generate-global-options-ui'});
+                        });
                   };
                   if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
                         doSkopeDependantActions();
@@ -143,7 +159,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
-                        id : '__globalAndLocalOptionsSection',
+                        id : self.SECTION_ID_FOR_GLOBAL_OPTIONS,
                         title: sektionsLocalizedData.i18n['Site wide options'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 20,
@@ -155,7 +171,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _toggleActive : function(){ return true; }
                         })
                   }).done( function() {
-                        api.section( '__globalAndLocalOptionsSection', function( _section_ ) {
+                        api.section( self.SECTION_ID_FOR_GLOBAL_OPTIONS, function( _section_ ) {
                               var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
                                   $panelTitleEl = _section_.container.find('.customize-section-title h3');
                               if ( 0 < $sectionTitleEl.length ) {
@@ -170,7 +186,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
-                        id : '__localOptionsSection',//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
+                        id : self.SECTION_ID_FOR_LOCAL_OPTIONS,//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
                         title: sektionsLocalizedData.i18n['Current page options'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 10,
@@ -182,7 +198,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _toggleActive : function(){ return true; }
                         })
                   }).done( function() {
-                        api.section( '__localOptionsSection', function( _section_ ) {
+                        api.section( self.SECTION_ID_FOR_LOCAL_OPTIONS, function( _section_ ) {
                               var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
                                   $panelTitleEl = _section_.container.find('.customize-section-title h3');
                               if ( 0 < $sectionTitleEl.length ) {
@@ -206,7 +222,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
-                        id : '__content_picker__',
+                        id : self.SECTION_ID_FOR_CONTENT_PICKER,
                         title: sektionsLocalizedData.i18n['Content Picker'],
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 30,
@@ -218,7 +234,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _toggleActive : function(){ return true; }
                         })
                   }).done( function() {
-                        api.section( '__content_picker__', function( _section_ ) {
+                        api.section( self.SECTION_ID_FOR_CONTENT_PICKER, function( _section_ ) {
                               if ( 'resolved' != api.czr_initialSkopeCollectionPopulated.state() ) {
                                     api.czr_initialSkopeCollectionPopulated.done( function() {
                                           api.previewer.trigger('sek-pick-content', { focus : false });
@@ -1840,7 +1856,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     label : optionData.controlLabel,
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
-                                    section : '__content_picker__',
+                                    section : self.SECTION_ID_FOR_CONTENT_PICKER,
                                     priority : optionData.priority || 10,
                                     settings : { default : optionData.settingControlId },
                                     track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
@@ -1875,7 +1891,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });//_.each
                   };//_do_register_
-                  api.section( '__content_picker__', function( _section_ ) {
+                  api.section( self.SECTION_ID_FOR_CONTENT_PICKER, function( _section_ ) {
                         _do_register_();
                         var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
                             $panelTitleEl = _section_.container.find('.customize-section-title h3');
@@ -2270,8 +2286,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : _id_ + '__template',
                               module_type : 'sek_local_template',
                               controlLabel : sektionsLocalizedData.i18n['Page template'],
-                              expandAndFocusOnInit : true,
+                              expandAndFocusOnInit : false,
                               icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
+                        },
+                        local_header_footer : {
+                              settingControlId : _id_ + '__local_header_footer',
+                              module_type : 'sek_local_header_footer',
+                              controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
+                              icon : '<i class="material-icons sek-level-option-icon">web</i>'
                         },
                         widths : {
                               settingControlId : _id_ + '__widths',
@@ -2349,7 +2371,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     label : optionData.controlLabel,
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
-                                    section : '__localOptionsSection',
+                                    section : self.SECTION_ID_FOR_LOCAL_OPTIONS,
                                     priority : 10,
                                     settings : { default : optionData.settingControlId },
                               }).done( function() {
@@ -2370,14 +2392,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });//_.each()
                   };//_do_register()
-                  api.section( '__localOptionsSection', function( _section_ ) {
-                        api( self.localSectionsSettingId(), function() {
-                              _do_register_();
-                              _section_.container.on('click', '.accordion-section-title',function() {
-                                    self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
-                              });
-                        });
-                  });
+                  _do_register_();
+
                   return dfd;
             }
       });//$.extend()
@@ -2394,11 +2410,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var registrationParams = {};
 
                   $.extend( registrationParams, {
+                        global_header_footer : {
+                              settingControlId : _id_ + '__header_footer',
+                              module_type : 'sek_global_header_footer',
+                              controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
+                              icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                        },
                         breakpoint : {
                               settingControlId : _id_ + '__breakpoint',
                               module_type : 'sek_global_breakpoint',
                               controlLabel : sektionsLocalizedData.i18n['Site wide breakpoint for Nimble sections'],
-                              expandAndFocusOnInit : true,
+                              expandAndFocusOnInit : false,
                               icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                         },
                         widths : {
@@ -2465,7 +2487,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     label : optionData.controlLabel,
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
-                                    section : '__globalAndLocalOptionsSection',//registered in ::initialize()
+                                    section : self.SECTION_ID_FOR_GLOBAL_OPTIONS,//registered in ::initialize()
                                     priority : 20,
                                     settings : { default : optionData.settingControlId },
                                     track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
@@ -2487,11 +2509,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });//_.each();
                   };//do register
-                  api.section( '__globalAndLocalOptionsSection', function( _section_ ) {
-                        api( self.localSectionsSettingId(), function() {
-                              _do_register_();
-                        });
-                  });
+                  _do_register_();
+
                   return dfd;
             }
       });//$.extend()
@@ -7022,6 +7041,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+            }//initialize
+      };
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_local_header_footer : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_header_footer', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_local_header_footer' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  module.inputConstructor = api.CZRInput.extend({
+                        setupSelect : function() {
+                              api.czr_sektions.setupSelectInput.call( this );
+                        }
+                  });
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
@@ -7153,6 +7200,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_performances' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  module.inputConstructor = api.CZRInput.extend({
+                        setupSelect : function() {
+                              api.czr_sektions.setupSelectInput.call( this );
+                        }
+                  });
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+            }//initialize
+      };
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_global_header_footer : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_header_footer', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_header_footer' )
                   )
             },
       });

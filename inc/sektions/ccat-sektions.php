@@ -30,11 +30,15 @@ function sek_get_locations() {
     }
     return apply_filters( 'sek_get_locations', Nimble_Manager()->registered_locations );
 }
-function sek_get_local_locations() {
+function sek_get_local_content_locations() {
     $locations = array();
     $all_locations = sek_get_locations();
     if ( is_array( $all_locations ) ) {
         foreach ( $all_locations as $loc_id => $loc_data) {
+            $loc_data = wp_parse_args( $loc_data, Nimble_Manager()->default_registered_location_model );
+            if ( true === $loc_data['is_header_location'] || true === $loc_data['is_footer_location'] )
+              continue;
+
             if ( ! sek_is_global_location( $loc_id ) ) {
                 $locations[$loc_id] = $loc_data;
             }
@@ -476,9 +480,9 @@ function _sek_normalize_single_module_values( $raw_module_value, $module_type ) 
 
 
 
-
-
-/* HELPER FOR CHECKBOX OPTIONS */
+/* ------------------------------------------------------------------------- *
+ *  HELPER FOR CHECKBOX OPTIONS
+/* ------------------------------------------------------------------------- */
 function sek_is_checked( $val ) {
     $val = is_array($val) ? $val[0] : $val;
     return sek_booleanize_checkbox_val( $val );
@@ -504,48 +508,17 @@ function sek_booleanize_checkbox_val( $val ) {
 }
 
 
-/* VARIOUS HELPERS */
-function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
-    if ( ! $text )
-        return '';
-
-    if ( $strip_tags )
-        $text       = strip_tags( $text );
-
-    if ( ! $max_text_length )
-        return $text;
-
-    $end_substr = $text_length = strlen( $text );
-    if ( $text_length > $max_text_length ) {
-        $text      .= ' ';
-        $end_substr = strpos( $text, ' ' , $max_text_length);
-        $end_substr = ( FALSE !== $end_substr ) ? $end_substr : $max_text_length;
-        $text       = trim( substr( $text , 0 , $end_substr ) );
-    }
-
-    if ( $more && $end_substr < $text_length )
-        return $text . ' ' .$more;
-
-    return $text;
-}
 
 
 
-function sek_error_log( $title, $content = null ) {
-    if ( is_null( $content ) ) {
-        error_log( '<' . $title . '>' );
-    } else {
-        error_log( '<' . $title . '>' );
-        error_log( print_r( $content, true ) );
-        error_log( '</' . $title . '>' );
-    }
-}
+/* ------------------------------------------------------------------------- *
+ *   LOCAL OPTIONS HELPERS
+/* ------------------------------------------------------------------------- */
 function sek_get_locale_template(){
     $path = null;
-    $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
-    $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
-    if ( ! empty( $local_options ) && ! empty( $local_options['template'] ) && ! empty( $local_options['template']['local_template'] ) && 'default' !== $local_options['template']['local_template'] ) {
-        $template_file_name = $local_options['template']['local_template'];
+    $local_template_data = sek_get_local_option_value( 'template' );
+    if ( ! empty( $local_template_data ) && ! empty( $local_template_data['local_template'] ) && 'default' !== $local_template_data['local_template'] ) {
+        $template_file_name = $local_template_data['local_template'];
         $path = apply_filters( 'nimble_get_locale_template_path', NIMBLE_BASE_PATH . '/tmpl/page-templates/' . $template_file_name . '.php', $template_file_name );
         if ( file_exists( $path ) ) {
             $template = $path;
@@ -556,10 +529,16 @@ function sek_get_locale_template(){
     }
     return $path;
 }
-
-
-
-
+function sek_get_local_option_value( $option_name, $skope_id = null ) {
+    $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
+    $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
+    $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
+    return ( ! empty( $local_options ) && ! empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
+}
+function sek_get_global_option_value( $option_name ) {
+    $options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+    return ( is_array( $options ) && ! empty( $options[ $option_name ] ) ) ? $options[ $option_name ] : null;
+}
 
 
 
@@ -569,14 +548,14 @@ function sek_get_locale_template(){
  *  BREAKPOINTS HELPER
 /* ------------------------------------------------------------------------- */
 function sek_get_global_custom_breakpoint() {
-    $options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    if ( ! is_array( $options ) || empty( $options['breakpoint'] ) || empty( $options['breakpoint']['global-custom-breakpoint'] ) )
+    $global_breakpoint_data = sek_get_global_option_value('breakpoint');
+    if ( is_null( $global_breakpoint_data ) || empty( $global_breakpoint_data['global-custom-breakpoint'] ) )
       return;
 
-    if ( empty( $options['breakpoint'][ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $options['breakpoint'][ 'use-custom-breakpoint'] ) )
+    if ( empty( $global_breakpoint_data[ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $global_breakpoint_data[ 'use-custom-breakpoint'] ) )
       return;
 
-    return intval( $options['breakpoint']['global-custom-breakpoint'] );
+    return intval( $global_breakpoint_data['global-custom-breakpoint'] );
 }
 function sek_get_section_custom_breakpoint( $section ) {
     if ( ! is_array( $section ) )
@@ -709,20 +688,20 @@ function sek_is_img_smartload_enabled() {
         return Nimble_Manager()->img_smartload_enabled;
     }
     $is_img_smartload_enabled = false;
-    $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
+    $local_performances_data = sek_get_local_option_value( 'local_performances' );
     $local_smartload = 'inherit';
-    if ( is_array( $local_options ) && !empty( $local_options['local_options']) && is_array( $local_options['local_options']) && !empty($local_options['local_options']['local_performances'] ) && is_array( $local_options['local_options']['local_performances'] ) ) {
-        if ( ! empty( $local_options['local_options']['local_performances']['local-img-smart-load'] ) && 'inherit' !== $local_options['local_options']['local_performances']['local-img-smart-load'] ) {
-              $local_smartload = 'yes' === $local_options['local_options']['local_performances']['local-img-smart-load'];
+    if ( !is_null( $local_performances_data ) && is_array( $local_performances_data ) ) {
+        if ( ! empty( $local_performances_data['local-img-smart-load'] ) && 'inherit' !== $local_performances_data['local-img-smart-load'] ) {
+              $local_smartload = 'yes' === $local_performances_data['local-img-smart-load'];
         }
     }
 
     if ( 'inherit' !== $local_smartload ) {
         $is_img_smartload_enabled = $local_smartload;
     } else {
-        $glob_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-        if ( is_array( $glob_options ) && !empty($glob_options['performances']) && is_array( $glob_options['performances'] ) && !empty( $glob_options['performances']['global-img-smart-load'] ) ) {
-            $is_img_smartload_enabled = sek_booleanize_checkbox_val( $glob_options['performances']['global-img-smart-load'] );
+        $glob_performances_data = sek_get_global_option_value( 'performances' );
+        if ( !is_null( $glob_performances_data ) && is_array( $glob_performances_data ) && !empty( $glob_performances_data['global-img-smart-load'] ) ) {
+            $is_img_smartload_enabled = sek_booleanize_checkbox_val( $glob_performances_data['global-img-smart-load'] );
         }
     }
     Nimble_Manager()->img_smartload_enabled = $is_img_smartload_enabled;
@@ -731,7 +710,9 @@ function sek_is_img_smartload_enabled() {
 }
 
 
-
+/* ------------------------------------------------------------------------- *
+ *  VERSION HELPERS
+/* ------------------------------------------------------------------------- */
 /**
 * Returns a boolean
 * check if user started to use the plugin before ( strictly < ) the requested version
@@ -753,6 +734,50 @@ function sek_filter_skp_get_skope_id( $skope_id, $level ) {
         $skope_id = $_POST['local_skope_id'];
     }
     return $skope_id;
+}
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *   VARIOUS HELPERS
+/* ------------------------------------------------------------------------- */
+function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
+    if ( ! $text )
+        return '';
+
+    if ( $strip_tags )
+        $text       = strip_tags( $text );
+
+    if ( ! $max_text_length )
+        return $text;
+
+    $end_substr = $text_length = strlen( $text );
+    if ( $text_length > $max_text_length ) {
+        $text      .= ' ';
+        $end_substr = strpos( $text, ' ' , $max_text_length);
+        $end_substr = ( FALSE !== $end_substr ) ? $end_substr : $max_text_length;
+        $text       = trim( substr( $text , 0 , $end_substr ) );
+    }
+
+    if ( $more && $end_substr < $text_length )
+        return $text . ' ' .$more;
+
+    return $text;
+}
+
+
+
+function sek_error_log( $title, $content = null ) {
+    if ( is_null( $content ) ) {
+        error_log( '<' . $title . '>' );
+    } else {
+        error_log( '<' . $title . '>' );
+        error_log( print_r( $content, true ) );
+        error_log( '</' . $title . '>' );
+    }
 }
 function render_content_sections_for_nimble_template() {
     Nimble_Manager()->render_nimble_locations(
@@ -1882,9 +1907,11 @@ function sek_register_modules() {
         'sek_local_custom_css',
         'sek_local_reset',
         'sek_local_performances',
+        'sek_local_header_footer',
         'sek_global_breakpoint',
         'sek_global_widths',
         'sek_global_performances',
+        'sek_global_header_footer',
         'czr_simple_html_module',
 
         'czr_tiny_mce_editor_module',
@@ -2089,13 +2116,6 @@ function sek_get_select_options_for_input_id( $input_id ) {
                 'double' => __('double', 'text_domain_to_be_replaced'),
                 'dotted' => __('dotted', 'text_domain_to_be_replaced'),
                 'dashed' => __('dashed', 'text_domain_to_be_replaced')
-            );
-        break;
-        case 'local_template' :
-            $options = array(
-                'default' => __('Default theme template','text_domain_to_be_replaced'),
-                'nimble_template' => __('Template with Nimble Builder content. Header and footer from the theme','text_domain_to_be_replaced'),
-                'nimble_full_tmpl_ghf' => __('Blank Nimble Builder template (beta)','text_domain_to_be_replaced')
             );
         break;
 
@@ -3145,8 +3165,12 @@ function sek_get_module_params_for_sek_local_template() {
                     'title'       => __('Select a template', 'text_domain_to_be_replaced'),
                     'default'     => 'default',
                     'width-100'   => true,
-                    'choices'     => sek_get_select_options_for_input_id( 'local_template' ),
-                    'refresh_preview' => true
+                    'choices'     => array(
+                        'default' => __('Default theme template','text_domain_to_be_replaced'),
+                        'nimble_template' => __('Nimble Builder template','text_domain_to_be_replaced')
+                    ),
+                    'refresh_preview' => true,
+                    'notice_before_title' => __('Use the Nimble Builder template to display content created only with the Nimble Builder on this page. Your theme\'s default template will be overriden','text_domain_to_be_replaced')
                 )
             )
         )//tmpl
@@ -3167,7 +3191,14 @@ function sek_get_module_params_for_sek_local_widths() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
-                    'refresh_stylesheet' => true
+                    'refresh_stylesheet' => true,
+                    'refresh_preview' => true,
+                    'notice_before_title' => sprintf( __( 'The inner and outer widths of the sections displayed in this page can be set here. It will override in the %1$s. You can also set a custom inner and outer width for each single sections.', 'text_domain_to_be_replaced'),
+                        sprintf( '<a href="%1$s">%2$s</a>',
+                            "javascript:wp.customize.section('__globalAndLocalOptionsSection', function( _s_ ){ _s_.focus(); })",
+                            __('Site wide options', 'text_domain_to_be_replaced')
+                        )
+                    ),
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -3292,7 +3323,7 @@ function sek_get_module_params_for_sek_local_custom_css() {
                     'title'       => __( 'Custom css' , 'text_domain_to_be_replaced' ),
                     'default'     => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) ),
                     'code_type' => 'text/css',// 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
-                    'notice_after' => __('This CSS code will be restricted to the currently previewed page only, and not applied site wide.', 'text_domain_to_be_replaced'),
+                    'notice_before_title' => __('The CSS code added below will only be applied to the currently previewed page, not site wide.', 'text_domain_to_be_replaced'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                 )
@@ -3357,6 +3388,38 @@ function sek_get_module_params_for_sek_local_performances() {
     );
 }
 ?><?php
+function sek_get_module_params_for_sek_local_header_footer() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_local_header_footer',
+        'name' => __('Page header', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'header-footer' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Select a header and a footer for this page', 'text_domain_to_be_replaced'),
+                    'default'     => 'inherit',
+                    'choices'     => array(
+                        'inherit' => __('Inherit the site wide option', 'text_domain' ),
+                        'theme' => __('Use the active theme\'s header and footer', 'text_domain' ),
+                        'nimble_global' => __('Nimble site wide header and footer ( beta )', 'text_domain' ),
+                        'nimble_local' => __('Nimble specific header and footer for this page ( beta )', 'text_domain' )
+                    ),
+                    'refresh_preview' => true,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'notice_after' => sprintf( __( 'This option overrides the site wide header and footer options set in the %1$s for this page only.', 'text_domain_to_be_replaced'),
+                        sprintf( '<a href="%1$s">%2$s</a>',
+                            "javascript:wp.customize.section('__globalAndLocalOptionsSection', function( _s_ ){ _s_.focus(); })",
+                            __('Site wide options', 'text_domain_to_be_replaced')
+                        )
+                    ),
+                )
+            )
+        )//tmpl
+    );
+}
+?><?php
 function sek_get_module_params_for_sek_global_breakpoint() {
     return array(
         'dynamic_registration' => true,
@@ -3370,7 +3433,7 @@ function sek_get_module_params_for_sek_global_breakpoint() {
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default global breakpoint is 768px.', 'text_domain_to_be_replaced')
+                    'notice_before_title' => __( 'This is the breakpoint under which columns are reorganized vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_domain_to_be_replaced')
                 ),
                 'global-custom-breakpoint'  => array(
                     'input_type'  => 'range_simple',
@@ -3415,7 +3478,14 @@ function sek_get_module_params_for_sek_global_widths() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
-                    'refresh_stylesheet' => true
+                    'refresh_stylesheet' => true,
+                    'refresh_preview' => true,
+                    'notice_before_title' => sprintf( __( 'The inner and outer widths of your sections can be set globally here, but also overriden in the %1$s, and for each sections.', 'text_domain_to_be_replaced'),
+                        sprintf( '<a href="%1$s">%2$s</a>',
+                            "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
+                            __('Current page options', 'text_domain_to_be_replaced')
+                        )
+                    ),
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -3539,6 +3609,36 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after' => __( 'Check this option to delay the loading of non visible images. Images below the viewport will be loaded dynamically on scroll. This can boost performances by reducing the weight of long web pages designed with several images.', 'text_domain_to_be_replaced')
+                ),
+            )
+        )//tmpl
+    );
+}
+
+?><?php
+function sek_get_module_params_for_sek_global_header_footer() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_global_header_footer',
+        'name' => __('Site wide header', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'header-footer' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Select a site wide header and footer', 'text_domain_to_be_replaced'),
+                    'default'     => 'inherit',
+                    'choices'     => array(
+                        'theme' => __('Use the active theme\'s header and footer', 'text_domain' ),
+                        'nimble_global' => __('Nimble site wide header and footer ( beta )', 'text_domain' )
+                    ),
+                    'notice_before_title' => sprintf( __( 'The Nimble Builder allows you to build your own header and footer, or to use your theme\'s ones. This option can be overriden in the %1$s.', 'text_domain_to_be_replaced'),
+                        sprintf( '<a href="%1$s">%2$s</a>',
+                            "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
+                            __('Current page options', 'text_domain_to_be_replaced')
+                        )
+                    ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
                 ),
             )
         )//tmpl
@@ -7783,6 +7883,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             return self::$instance;
         }
         public $img_smartload_enabled = 'not_cached';
+        public $has_local_header_footer = false;//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
+        public $has_global_header_footer = false;//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
         function __construct( $params = array() ) {
             $this->registered_locations = $this->default_locations;
             $this -> _schedule_front_ajax_actions();
@@ -8544,10 +8646,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_action( 'template_redirect', array( $this, 'sek_schedule_rendering_hooks') );
             add_filter( 'the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_the_printed_module_assets') );
-            add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template') );
             add_filter( 'nimble_parse_for_smart_load', array( $this, 'sek_maybe_process_img_for_js_smart_load') );
             $this -> sek_setup_tiny_mce_content_filters();
             add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
+            add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template' ) );
+            add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
+            add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
+            add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
         }//_schedule_front_rendering()
         function sek_wrap_wp_content( $html ) {
             if ( ! skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) )
@@ -8564,6 +8669,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return $html;
         }
         function sek_register_nimble_global_locations() {
+            register_location('nimble_local_header', array( 'is_header_location' => true ) );
+            register_location('nimble_local_footer', array( 'is_footer_location' => true ) );
             register_location('nimble_global_header', array( 'is_global_location' => true, 'is_header_location' => true ) );
             register_location('nimble_global_footer', array( 'is_global_location' => true, 'is_footer_location' => true ) );
         }
@@ -8668,10 +8775,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 error_log( __CLASS__ . ' :: ' . __FUNCTION__ .' => sek_get_skoped_seks() should always return an array().');
             }
         }
-
-
-
-
 
 
 
@@ -8958,7 +9061,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 return;
             }
             $module_type = $model['module_type'];
-            $render_tmpl_path = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
+            $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' ), $module_type );
             if ( !empty( $render_tmpl_path ) ) {
                 load_template( $render_tmpl_path, false );
             } else {
@@ -9072,15 +9175,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }//foreach
             return $enqueuing_candidates;
         }
-        function sek_maybe_set_local_nimble_template( $template ) {
-            $locale_template = sek_get_locale_template();
-            if ( !empty( $locale_template ) ) {
-                $template = $locale_template;
-            }
-            return $template;
-        }
-
-
 
         /* ------------------------------------------------------------------------- *
          *  SMART LOAD.
@@ -9176,6 +9270,66 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             return $content;
         }
+
+
+
+
+
+        /* ------------------------------------------------------------------------- *
+         *  CONTENT, HEADER, FOOTER
+        /* ------------------------------------------------------------------------- */
+        function sek_maybe_set_local_nimble_template( $template ) {
+            $locale_template = sek_get_locale_template();
+            if ( !empty( $locale_template ) ) {
+                $template = $locale_template;
+            }
+            return $template;
+        }
+        function sek_maybe_set_nimble_header_footer() {
+            $local_header_footer_data = sek_get_local_option_value('local_header_footer');
+            $global_header_footer_data = sek_get_global_option_value('global_header_footer');
+            $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
+
+            $this->has_global_header_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
+
+            if ( $apply_local_option ) {
+                $this->has_local_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
+                $this->has_global_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
+            }
+        }
+        function sek_maybe_set_local_nimble_header( $header_name ) {
+            if ( $this->has_local_header_footer || $this->has_global_header_footer ) {
+                load_template( NIMBLE_BASE_PATH . '/tmpl/header/nimble_header_tmpl.php', false );
+                $templates = array();
+                $header_name = (string) $header_name;
+                if ( '' !== $header_name ) {
+                  $templates[] = "header-{$header_name}.php";
+                }
+
+                $templates[] = 'header.php';
+                remove_all_actions( 'wp_head' );
+                ob_start();
+                locate_template( $templates, true );
+                ob_get_clean();
+            }
+        }
+        function sek_maybe_set_local_nimble_footer( $footer_name ) {
+            if ( $this->has_local_header_footer || $this->has_global_header_footer ) {
+                load_template( NIMBLE_BASE_PATH . '/tmpl/footer/nimble_footer_tmpl.php', false );
+                $templates = array();
+                $name = (string) $footer_name;
+                if ( '' !== $footer_name ) {
+                    $templates[] = "footer-{$footer_name}.php";
+                }
+
+                $templates[]    = 'footer.php';
+                remove_all_actions( 'wp_footer' );
+                ob_start();
+                locate_template( $templates, true );
+                ob_get_clean();
+            }
+        }//sek_maybe_set_local_nimble_footer
+
     }//class
 endif;
 ?><?php

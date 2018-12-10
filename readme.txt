@@ -6,7 +6,7 @@ Tags: customizer, editor, page builder, drag and drop
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.0
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
