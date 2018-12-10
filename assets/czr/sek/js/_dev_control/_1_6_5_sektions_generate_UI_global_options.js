@@ -111,7 +111,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     label : optionData.controlLabel,
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
-                                    section : '__globalAndLocalOptionsSection',//registered in ::initialize()
+                                    section : self.SECTION_ID_FOR_GLOBAL_OPTIONS,//registered in ::initialize()
                                     priority : 20,
                                     settings : { default : optionData.settingControlId },
                                     track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
@@ -147,13 +147,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//_.each();
                   };//do register
 
-                  // Defer the registration when the parent section gets added to the api
-                  // the section '__globalAndLocalOptionsSection' is registered in ::initialize()
-                  api.section( '__globalAndLocalOptionsSection', function( _section_ ) {
-                        api( self.localSectionsSettingId(), function() {
-                              _do_register_();
-                        });
-                  });
+                  // The parent section has already been added in ::initialize()
+                  _do_register_();
+
                   return dfd;
             }
       });//$.extend()

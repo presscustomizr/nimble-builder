@@ -129,11 +129,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     label : optionData.controlLabel,
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
-                                    section : '__localOptionsSection',
+                                    section : self.SECTION_ID_FOR_LOCAL_OPTIONS,
                                     priority : 10,
                                     settings : { default : optionData.settingControlId },
                                     //track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                               }).done( function() {
+
                                     // if ( true === optionData.expandAndFocusOnInit ) {
                                     //       api.control( optionData.settingControlId ).focus({
                                     //             completeCallback : function() {}
@@ -165,22 +166,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//_.each()
                   };//_do_register()
 
-                  // Defer the registration when the parent section gets added to the api
-                  // the section '__localOptionsSection' is registered in ::initialize()
-                  api.section( '__localOptionsSection', function( _section_ ) {
-                        api( self.localSectionsSettingId(), function() {
-                              console.log('BEFORE DO REGISTER', self.localSectionsSettingId(), self.uiGenerationForLocalSectionsBoundOnClick );
-                              _do_register_();
-                              if ( true !== self.uiGenerationForLocalSectionsBoundOnClick ) {
-                                    _section_.container.on('click', '.accordion-section-title',function() {
-                                          console.log('ALORS ???', $(this) );
-                                          // Generate UI for the local skope options
-                                          self.generateUI({ action : 'sek-generate-local-skope-options-ui'});
-                                          self.uiGenerationForLocalSectionsBoundOnClick = true;
-                                    });
-                              }
-                        });
-                  });
+                  // The parent section has already been added in ::initialize()
+                  _do_register_();
+
                   return dfd;
             }
       });//$.extend()
