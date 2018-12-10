@@ -21,7 +21,12 @@ function sek_get_module_params_for_sek_global_header_footer() {
                         'nimble_global' => __('Nimble site wide header and footer ( beta )', 'text_domain' )
                     ),
                     //'refresh_preview' => true,
-                    'notice_after' => __( 'This option can be overriden in the "Current page options".', 'text_domain_to_be_replaced'),
+                    'notice_before_title' => sprintf( __( 'The Nimble Builder allows you to build your own header and footer, or to use your theme\'s ones. This option can be overriden in the %1$s.', 'text_domain_to_be_replaced'),
+                        sprintf( '<a href="%1$s">%2$s</a>',
+                            "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
+                            __('Current page options', 'text_domain_to_be_replaced')
+                        )
+                    ),
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 ),
