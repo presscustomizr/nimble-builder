@@ -57,7 +57,7 @@ function sek_get_module_params_for_czr_menu_module() {
             //     'color_css'  => '#ffffff',
             // )
         ),
-        'css_selectors' => array( '.sek-menu-module .menu-item' ),//<=@see tmpl/modules/menu_module_tmpl.php
+        'css_selectors' => array( '.sek-menu-module > li' ),//<=@see tmpl/modules/menu_module_tmpl.php
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/menu_module_tmpl.php"
     );
 }
@@ -75,11 +75,28 @@ function sek_get_module_params_for_czr_menu_content_child() {
             'item-inputs' => array(
                 'menu-id' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select a menu', 'text_domain_to_be_replaced'),
                     'default'     => 'no-link',
-                    'choices'     => sek_get_user_created_menus()
+                    'choices'     => sek_get_user_created_menus(),
+                    'notice_after' => sprintf( __( 'You can create and edit menus in the %1$s. If you just created a new menu, publish and refresh the customizer to see in the dropdown list.', 'text_domain_to_be_replaced'),
+                        sprintf( '<a href="%1$s">%2$s</a>',
+                            "javascript:wp.customize.panel('nav_menus', function( _p_ ){ _p_.focus(); })",
+                            __('menu panel', 'text_domain_to_be_replaced')
+                        )
+                    ),
                 ),
-            )
+                'h_alignment_css' => array(
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
+                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'default'     => array( 'desktop' => 'center' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'h_flex_alignment',
+                    'css_selectors' => array( '.sek-nav-collapse', '.sek-nav-wrap' ),
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                ),
+            ),
         ),
         'render_tmpl_path' => '',
     );

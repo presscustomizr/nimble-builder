@@ -146,6 +146,43 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         case 'background_color' :
             $properties_to_render['background-color'] = $value;
         break;
+        case 'h_flex_alignment' :
+            $important = false;
+            if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+                $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
+            }
+            // convert to flex
+            $flex_ready_value = array();
+            foreach( $value as $device => $val ) {
+                switch ( $val ) {
+                    case 'left' :
+                        $h_align_value = "flex-start";
+                    break;
+                    case 'center' :
+                        $h_align_value = "center";
+                    break;
+                    case 'right' :
+                        $h_align_value = "flex-end";
+                    break;
+                    default :
+                        $h_align_value = "center";
+                    break;
+                }
+                $flex_ready_value[$device] = $h_align_value;
+            }
+            $flex_ready_value = wp_parse_args( $flex_ready_value, array(
+                'desktop' => '',
+                'tablet' => '',
+                'mobile' => ''
+            ));
+
+            $rules = sek_set_mq_css_rules( array(
+                'value' => $flex_ready_value,
+                'css_property' => 'justify-content',
+                'selector' => $selector,
+                'is_important' => $important,
+            ), $rules );
+        break;
         // handles simple or by device option
         case 'h_alignment' :
             if ( is_string( $value ) ) {// <= simple

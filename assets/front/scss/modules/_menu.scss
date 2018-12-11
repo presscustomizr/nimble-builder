@@ -32,12 +32,15 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    justify-content: center;
     padding: .5rem 0;
 }
 .#{$project-prefix}nav-collapse {
     flex-basis: 100%;
     flex-grow: 1;
     align-items: center;
+    // justify-content property should be consistent with the default value in sek_get_module_params_for_czr_menu_content_child()
+    justify-content : center;
 }
 .#{$project-prefix}nav {
     display: flex;
@@ -76,7 +79,11 @@
             .#{$project-prefix}nav-wrap & {
                 text-decoration: none;
             }
+            &:hover {
+                text-decoration: underline;
+            }
         }
+
         &:not(:last-of-type) {
             border-bottom: 1px solid;
             //customizable
@@ -129,14 +136,14 @@
     padding: 0;
     vertical-align: middle;
     //align to the right (left when rtl)
-    @if ( true == $is_rtl ) {
-        margin-right: auto;
-        margin-left: -10px;
-    }
-    @else {
-        margin-left: auto;
-        margin-right: -10px;
-    }
+    // @if ( true == $is_rtl ) {
+    //     margin-right: auto;
+    //     margin-left: -10px;
+    // }
+    // @else {
+    //     margin-left: auto;
+    //     margin-right: -10px;
+    // }
     @at-root .#{$project-prefix}ham__span-wrapper {
         height: 12px;
         position: relative;
