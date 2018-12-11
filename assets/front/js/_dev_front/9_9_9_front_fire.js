@@ -315,7 +315,7 @@ jQuery( function($){
         var NAME = 'sekCollapse',
             DATA_KEY = 'sek.sekCollapse',
             EVENT_KEY = "." + DATA_KEY,
-            TRANSITION_DURATION = 600,
+            TRANSITION_DURATION = 400,
             DATA_API_KEY = '.data-api',
             Event = {
               SHOW: "show" + EVENT_KEY,
