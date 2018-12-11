@@ -302,19 +302,13 @@
   display: none;
 }
 
+/*
 .sek-collapsing {
   position: relative;
   height: 0;
   overflow: hidden;
-  transition: height 0.35s ease;
-}
-
-@media screen and (prefers-reduced-motion: reduce) {
-  .sek-collapsing {
-    transition: none;
-  }
-}
-
+  //@include transition($transition-collapse);
+}*/
 .sek-clearfix::after {
   display: block;
   clear: both;
@@ -501,17 +495,20 @@ button.sek-btn,
   flex-direction: column;
 }
 
-.sek-module .sek-module-inner .sek-nav,
-.sek-module .sek-module-inner .sek-nav ul {
-  list-style: none;
-  margin: 0 -10px;
+.sek-module .sek-module-inner .sek-nav {
+  margin-right: -10px !important;
+  margin-left: -10px !important;
 }
 
+.sek-module .sek-module-inner .sek-nav,
 .sek-module .sek-module-inner .sek-nav ul {
-  margin: 0;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .sek-module .sek-module-inner .sek-nav li {
+  list-style: none;
   margin: 0 5px;
 }
 
@@ -528,6 +525,10 @@ button.sek-btn,
   -ms-flex-pack: justify;
   justify-content: space-between;
   color: inherit;
+}
+
+.sek-nav-wrap .sek-nav li a {
+  text-decoration: none;
 }
 
 .sek-nav li:not(:last-of-type) {
@@ -582,15 +583,19 @@ button.sek-btn,
 .sek-nav-toggler {
   -webkit-appearance: none !important;
   cursor: pointer;
-  background: 0 0;
-  background-color: rgba(0, 0, 0, 0);
-  border: none;
   height: 40px;
   width: 40px;
   padding: 0;
   vertical-align: middle;
   margin-left: auto;
   margin-right: -10px;
+}
+
+.sek-nav-toggler, .sek-nav-toggler:hover, .sek-nav-toggler:focus {
+  background: 0 0;
+  background-color: rgba(0, 0, 0, 0);
+  color: black;
+  border: none;
 }
 
 .sek-ham__span-wrapper {
