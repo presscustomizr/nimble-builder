@@ -80,7 +80,9 @@
                 text-decoration: none;
             }
             &:hover {
-                text-decoration: underline;
+                .#{$project-prefix}nav__title {
+                    text-decoration: underline;
+                }
             }
         }
 
