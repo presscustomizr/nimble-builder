@@ -81,6 +81,10 @@ function sek_register_modules() {
         'czr_simple_form_fonts_child',
         'czr_simple_form_submission_child',
 
+        'czr_menu_module',
+        'czr_menu_content_child',
+        //'czr_menu_design_child',
+
         // GENERIC FRONT CHILD MODULES
         'czr_font_child'
     ] as $module_name ) {

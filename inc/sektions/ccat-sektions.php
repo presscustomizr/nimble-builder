@@ -785,6 +785,125 @@ function render_content_sections_for_nimble_template() {
         array( 'fallback_location' => 'loop_start' )
     );
 }
+
+/* ------------------------------------------------------------------------- *
+ *  Page Menu
+/* ------------------------------------------------------------------------- */
+/**
+ * Display or retrieve list of pages with optional home link.
+ * Modified copy of wp_page_menu()
+ * @return string html menu
+ */
+function sek_page_menu_fallback( $args = array() ) {
+  $defaults = array('show_home' => true, 'sort_column' => 'menu_order, post_title', 'menu_class' => 'menu', 'echo' => true, 'link_before' => '', 'link_after' => '');
+  $args = wp_parse_args( $args, $defaults );
+   $args = apply_filters( 'wp_page_menu_args', $args );
+   $menu = '';
+   $list_args = $args;
+  if ( ! empty($args['show_home']) ) {
+    if ( true === $args['show_home'] || '1' === $args['show_home'] || 1 === $args['show_home'] )
+      $text = __('Home' , 'text_domain_to_replace');
+    else
+      $text = $args['show_home'];
+    $class = '';
+    if ( is_front_page() && !is_paged() )
+      $class = 'class="current_page_item"';
+    $menu .= '<li ' . $class . '><a href="' . home_url( '/' ) . '">' . $args['link_before'] . $text . $args['link_after'] . '</a></li>';
+    if (get_option('show_on_front') == 'page') {
+      if ( !empty( $list_args['exclude'] ) ) {
+        $list_args['exclude'] .= ',';
+      } else {
+        $list_args['exclude'] = '';
+      }
+      $list_args['exclude'] .= get_option('page_on_front');
+    }
+  }
+   $list_args['echo'] = false;
+  $list_args['title_li'] = '';
+  $menu .= str_replace( array( "\r", "\n", "\t" ), '', sek_list_pages($list_args) );
+   if ( $menu )
+    $menu = '<ul class="' . esc_attr($args['menu_class']) . '">' . $menu . '</ul>';
+  if ( $args['echo'] )
+    echo $menu;
+  else
+    return $menu;
+}
+ /**
+ * Retrieve or display list of pages in list (li) format.
+ * Modified copy of wp_list_pages
+ * @return string HTML list of pages.
+ */
+function sek_list_pages( $args = '' ) {
+  $defaults = array(
+    'depth' => 0, 'show_date' => '',
+    'date_format' => get_option( 'date_format' ),
+    'child_of' => 0, 'exclude' => '',
+    'title_li' => __( 'Pages', 'text_domain_to_replace' ), 'echo' => 1,
+    'authors' => '', 'sort_column' => 'menu_order, post_title',
+    'link_before' => '', 'link_after' => '', 'walker' => '',
+  );
+   $r = wp_parse_args( $args, $defaults );
+   $output = '';
+  $current_page = 0;
+  $r['exclude'] = preg_replace( '/[^0-9,]/', '', $r['exclude'] );
+  $exclude_array = ( $r['exclude'] ) ? explode( ',', $r['exclude'] ) : array();
+   $r['exclude'] = implode( ',', apply_filters( 'wp_list_pages_excludes', $exclude_array ) );
+  $r['hierarchical'] = 0;
+  $pages = get_pages( $r );
+   if ( ! empty( $pages ) ) {
+    if ( $r['title_li'] ) {
+      $output .= '<li class="pagenav">' . $r['title_li'] . '<ul>';
+    }
+    global $wp_query;
+    if ( is_page() || is_attachment() || $wp_query->is_posts_page ) {
+      $current_page = get_queried_object_id();
+    } elseif ( is_singular() ) {
+      $queried_object = get_queried_object();
+      if ( is_post_type_hierarchical( $queried_object->post_type ) ) {
+        $current_page = $queried_object->ID;
+      }
+    }
+     $output .= sek_walk_page_tree( $pages, $r['depth'], $current_page, $r );
+     if ( $r['title_li'] ) {
+      $output .= '</ul></li>';
+    }
+  }
+   $html = apply_filters( 'wp_list_pages', $output, $r );
+   if ( $r['echo'] ) {
+    echo $html;
+  } else {
+    return $html;
+  }
+}
+ /**
+ * Retrieve HTML list content for page list.
+ *
+ * @uses Walker_Page to create HTML list content.
+ * @since 2.1.0
+ * @see Walker_Page::walk() for parameters and return description.
+ */
+function sek_walk_page_tree($pages, $depth, $current_page, $r) {
+  $walker = new \Walker_Page;
+   foreach ( (array) $pages as $page ) {
+    if ( $page->post_parent )
+      $r['pages_with_children'][ $page->post_parent ] = true;
+  }
+   $args = array($pages, $depth, $r, $current_page);
+  return call_user_func_array(array($walker, 'walk'), $args);
+}
+
+function sek_get_user_created_menus() {
+    $all_menus = get_terms( 'nav_menu', array( 'hide_empty' => true ) );
+    $user_menus = array();
+    foreach ( $all_menus as $menu_obj ) {
+        if ( is_string( $menu_obj->slug ) && !empty( $menu_obj->slug ) && !empty( $menu_obj->name ) ) {
+            $user_menus[ $menu_obj->slug ] = $menu_obj->name;
+        }
+    }
+    return array_merge(
+        array( 'nimble_page_menu' => __('Default page menu', 'text_domain_to_replace') )
+    , $user_menus );
+}
 ?><?php
 function sek_maybe_do_version_mapping() {
     if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
@@ -1947,6 +2066,9 @@ function sek_register_modules() {
         'czr_simple_form_design_child',
         'czr_simple_form_fonts_child',
         'czr_simple_form_submission_child',
+
+        'czr_menu_module',
+        'czr_menu_content_child',
         'czr_font_child'
     ] as $module_name ) {
         $fn = "Nimble\sek_get_module_params_for_{$module_name}";
@@ -6297,6 +6419,56 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
 
 ?>
 <?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER BUTTON MODULE
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_menu_module() {
+    $css_selectors = '.sek-btn';
+    $css_font_selectors = '.sek-btn';
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_menu_module',
+        'is_father' => true,
+        'children' => array(
+            'content' => 'czr_menu_content_child',
+            'font' => 'czr_font_child'
+        ),
+        'name' => __( 'Menu', 'text_domain_to_be_replaced' ),
+        'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
+        'starting_value' => array(
+        ),
+        'css_selectors' => array( '.sek-menu-module .menu-item' ),//<=@see tmpl/modules/menu_module_tmpl.php
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/menu_module_tmpl.php",
+        'front_assets' => array(
+              'czr-font-awesome' => array(
+                  'type' => 'css',
+                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
+              )
+        )
+    );
+}
+ /* ------------------------------------------------------------------------- *
+ *  BUTTON CONTENT
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_menu_content_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_menu_content_child',
+        'name' => __( 'Menu content', 'text_domain_to_be_replaced' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'menu-id' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'default'     => 'no-link',
+                    'choices'     => sek_get_user_created_menus()
+                ),
+            )
+        ),
+        'render_tmpl_path' => '',
+    );
+}
+?><?php
 /* ------------------------------------------------------------------------- *
  *  GENERIC FONT CHILD MODULE
 /* ------------------------------------------------------------------------- */

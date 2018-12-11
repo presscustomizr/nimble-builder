@@ -1,0 +1,336 @@
+@mixin dropdown-menu-base {
+    position: static;
+    float: none;
+    list-style: none;
+    border-radius: 0;
+    border:0;
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+
+    //mobile up breakpoint -> min-width:768px
+    @include media-breakpoint-up( 'md' ) {
+        position: absolute;
+        display: none;
+        top: 100%;
+        @if ( true == $is_rtl ) {
+            right: 0;
+        }
+        @else {
+            left: 0;
+        }
+        z-index: 1000;
+        min-width: 10rem;
+        max-width: 50vw;
+    }
+}
+
+
+.#{$project-prefix}nav-wrap {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: .5rem 0;
+}
+.#{$project-prefix}nav-collapse {
+    flex-basis: 100%;
+    flex-grow: 1;
+    align-items: center;
+}
+.#{$project-prefix}nav {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+
+    .#{$project-prefix}module .#{$project-prefix}module-inner & {
+        &,
+        & ul {
+            list-style: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        margin-right: -10px !important;
+        margin-left: -10px !important;
+        li {
+            list-style: none;
+            margin: 0 5px;
+            & > ul li {
+                @if ( true == $is_rtl ) {
+                    padding: 0 .9rem 0 0;
+                } @else {
+                    padding: 0 0 0 .9rem;
+                }
+            }
+        }
+    }
+
+    li {
+        a {
+            padding: .6em .8em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: inherit;
+            .#{$project-prefix}nav-wrap & {
+                text-decoration: none;
+            }
+        }
+        &:not(:last-of-type) {
+            border-bottom: 1px solid;
+            //customizable
+            border-color: rgba(49,49,49,.09);
+        }
+    }
+
+    .menu-item-has-children,
+    .page_item_has_children {
+        position: relative;
+        & > a::after {
+            content: "\f107";
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-font-smoothing: antialiased;
+            display: none;
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            @if ( true == $is_rtl ) {
+                margin-right: .25em;
+            }
+            @else {
+                margin-left: .25em;
+            }
+        }
+    }
+    & .sub-menu,
+    & .children {
+        @include dropdown-menu-base();
+    }
+}
+
+//Hueman inspired nav toggler
+.#{$project-prefix}nav-toggler {
+    -webkit-appearance: none !important;
+    cursor: pointer;
+    &, &:hover, &:focus {
+        //following 3 should be customizable
+        background: 0 0;
+        background-color: rgba(0, 0, 0, 0);
+        color: black;
+
+        border: none;
+    }
+
+    height: 40px;
+    width: 40px;
+    padding: 0;
+    vertical-align: middle;
+    //align to the right (left when rtl)
+    @if ( true == $is_rtl ) {
+        margin-right: auto;
+        margin-left: -10px;
+    }
+    @else {
+        margin-left: auto;
+        margin-right: -10px;
+    }
+    @at-root .#{$project-prefix}ham__span-wrapper {
+        height: 12px;
+        position: relative;
+        .line {
+            display: block;
+            height: 1.5px;
+            position: absolute;
+            left: 10px;
+            border-radius: 5px;
+            background-clip: padding-box;
+            transition: all ease .35s;
+            backface-visibility: hidden;
+            border-top: 1.5px solid;
+        }
+        .line-1 {
+            top: 0;
+        }
+        .line-2 {
+            top: 50%;
+        }
+        .line-3 {
+            top: 100%;
+        }
+
+        @at-root .#{$project-prefix}nav-toggler {
+            .line-1 {
+                transform: translate(-3px, 6px) rotate(45deg);
+                width: 28px;
+            }
+            .line-2 {
+                opacity: 0;
+            }
+            .line-3 {
+                transform: translate(-3px, -6px) rotate(-45deg);
+                width: 28px;
+            }
+        }
+        @at-root .#{$project-prefix}nav-toggler.#{$project-prefix}collapsed .line {
+            width: 20px;
+            transform: translate(0,0) rotate(0);
+            opacity: 1;
+        }
+        @at-root .#{$project-prefix}nav-toggler.#{$project-prefix}collapsed.hovering .line {
+            transform: translateX(-3px);
+            width: 26px;
+        }
+    }
+}
+
+.#{$project-prefix}dropdown-menu {
+    @include dropdown-menu-base();
+
+    .show > & {
+        display: block;
+    }
+
+    .#{$project-prefix}nav__title {
+        //the sidemenu and mobile menu should NOT break lines
+        word-break: break-word;// was break-all; Fixed in dec-2017 @see https://github.com/presscustomizr/customizr/issues/1339
+        white-space: normal;
+    }
+    //SNAKE
+    &.open-right {
+        left: 0;
+        right: auto;
+    }
+    @at-root &.open-right ul:not(.open-left),
+    & ul.open-right {
+        left: 100%;
+        right: auto;
+    }
+
+    &.open-left {
+        left: auto;
+        right: 0;
+    }
+    @at-root &.open-left ul:not(.open-right),
+    & ul.open-left {
+        right: 100%;
+        left: auto;
+    }
+}
+
+//mobile up breakpoint -> min-width:768px
+@include media-breakpoint-up( 'md' ) {
+    .#{$project-prefix}nav {
+        flex-direction: row;
+        .menu-item-has-children,
+        .page_item_has_children {
+            & > a::after {
+                display:inline-block;
+            }
+        }
+        & > li:not(:last-of-type) {
+            border-bottom: none;
+        }
+        & > li > a {
+            padding: 0 5px;
+        }
+    }
+    .#{$project-prefix}nav-collapse {
+        display: flex!important;
+        flex-basis: auto;
+    }
+    .#{$project-prefix}nav-toggler {
+        display: none;
+    }
+
+    .#{$project-prefix}dropdown-menu {
+
+        .#{$project-prefix}nav & li {
+            padding: 0 5px !important;
+            margin: 0;
+            a {
+                padding: .6em .8em;
+            }
+        }
+
+        // following two should be customizable...
+        background: white;
+        box-shadow: 1px 2px 2px 2px rgba(0,0,0,.15);
+
+        ul {
+            @if ( true == $is_rtl ) {
+                right: 100%;
+            }
+            @else {
+                left: 100%;
+            }
+        }
+
+        .#{$project-prefix}menu-link__row-reverse {
+            flex-direction: row-reverse !important;
+        }
+
+
+        .#{$project-prefix}nav__title {
+            word-break:  normal;
+            white-space: nowrap;
+        }
+
+        .#{$project-prefix}dropdown-submenu & {
+            top: 15px;
+        }
+
+    }
+
+    // submenu revealing fade effect
+    // lets use a trick to make this not impact on the snake
+    // basically we know that assigning a perspective to an element
+    // plus position:relative creates a new system
+    // where fixed elements behave like absolute elements relative to the parent
+    // this way the actual visual position of the dropdown will not be impacted
+    // though, as fixed element, even if overflowing the tc-page-wrap, will not
+    // make the orizontal scrollbar appear!
+    @at-root .#{$project-prefix}submenu-fade {
+        .page_item_has_children,
+        .menu-item-has-children {
+         perspective: 1000px;
+         > ul {
+           position: fixed;
+           opacity: 0;
+           visibility: hidden;
+           display: block;
+           transition: all 0.25s ease-in-out;
+           transform: translate( 0, -20px );
+         }
+
+         &:not(.show) {
+           //temporary fix for Firefox : https://github.com/presscustomizr/customizr/issues/1083
+           //the perspective thing seems to not work with this browser
+           //need further investigation
+           overflow: hidden;
+
+           //because of the fact the submenu is displayed
+           //it might still grab the the hover while fading out
+           //let's avoid this resetting its pointer-events
+           //when the li parent hasn't the show class
+           ul {
+             pointer-events: none;
+             cursor: $cursor-disabled;
+           }
+         }
+       }
+
+       li.show {
+             perspective: none;
+             > ul {
+               position: absolute;
+               visibility: visible;
+               opacity: 1;
+               transform: translate( 0, 0);
+             }
+       }
+     }
+     // end fade effect
+}

@@ -165,6 +165,27 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   color: #878787;
   max-height: 86px;
 }
+
+/* when the module icon is a font icon */
+[data-sek-content-type] .sek-module-icon.is-font-icon {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
+  max-width: 100%;
+  min-height: 70%;
+}
+[data-sek-content-type] .sek-module-icon.is-font-icon i {
+  font-size: 35px;
+}
 [data-sek-content-type] .sek-module-title {
   display: -webkit-box;
     display: -ms-flexbox;

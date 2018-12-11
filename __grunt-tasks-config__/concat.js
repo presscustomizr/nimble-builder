@@ -270,6 +270,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_8_FRONT_map.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_9_FRONT_quote.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_2_0_FRONT_button.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_2_1_FRONT_menu.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_11_FRONT_simple_form_fields.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_12_FRONT_simple_form_design.js',
@@ -366,6 +367,7 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_1_6_sek_register_button.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php',
 

@@ -878,22 +878,32 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'title' => __( 'Simple Contact Form', 'text_domain_to_be_replaced' ),
                   'icon' => 'Nimble_contact-form_icon.svg'
                 ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_menu_module',
+                  'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
+                  'font_icon' => '<i class="material-icons">menu</i>',
+                )
 
 
             );
             $i = 0;
             foreach( $content_collection as $_params) {
-                $icon_img_src = '';
+                $icon_img_html = '';
                 if ( !empty( $_params['icon'] ) ) {
                     $icon_img_src = NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' . $_params['icon'];
+                    $icon_img_html = '<img draggable="false" title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>';
+                } else if ( !empty( $_params['font_icon'] ) ) {
+                    $icon_img_html = $_params['font_icon'];
                 }
 
-                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><div class="sek-module-icon">%3$s</div><div class="sek-module-title"><div class="sek-centered-module-title">%4$s</div></div></div>',
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><div class="sek-module-icon %6$s">%3$s</div><div class="sek-module-title"><div class="sek-centered-module-title">%4$s</div></div></div>',
                       $_params['content-type'],
                       $_params['content-id'],
-                      empty( $icon_img_src ) ? '<i style="color:red">Missing Icon</i>' : '<img draggable="false" title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>',
+                      empty( $icon_img_html ) ? '<i style="color:red">Missing Icon</i>' : $icon_img_html,
                       $_params['title'],
-                      __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' )
+                      __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' ),
+                      !empty( $_params['font_icon'] ) ? 'is-font-icon' : ''
                 );
             }
           ?>

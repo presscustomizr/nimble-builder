@@ -8176,6 +8176,60 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_btn_design_child' )
             }
       });
+})( wp.customize , jQuery, _ );/* ------------------------------------------------------------------------- *
+ *  MENU CONTENT
+/* ------------------------------------------------------------------------- */
+( function ( api, $, _ ) {
+      var Constructor = {
+              initialize: function( id, options ) {
+                      var module = this;
+                      module.inputConstructor = api.CZRInput.extend({
+                            setupSelect : function() {
+                                  api.czr_sektions.setupSelectInput.call( this );
+                            }
+                      });
+                      module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
+                      api.CZRDynModule.prototype.initialize.call( module, id, options );
+               },//initialize
+              CZRButtonItemConstructor : {
+                    ready : function() {
+                          var item = this;
+                          item.inputCollection.bind( function( col ) {
+                                if( _.isEmpty( col ) )
+                                  return;
+                                try { item.setInputVisibilityDeps(); } catch( er ) {
+                                      api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                                }
+                          });//item.inputCollection.bind()
+                          api.CZRItem.prototype.ready.call( item );
+                    },
+                    setInputVisibilityDeps : function() {
+                          var item = this,
+                              module = item.module;
+                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                                this.bind( function( to ) {
+                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                                });
+                          };
+                          item.czr_Input.each( function( input ) {
+                                switch( input.id ) {
+                                }
+                          });
+                    }
+              }
+      };
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_menu_content_child : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_menu_content_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_menu_content_child' )
+            }
+      });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 ( function ( api, $, _ ) {
       var Constructor = {
