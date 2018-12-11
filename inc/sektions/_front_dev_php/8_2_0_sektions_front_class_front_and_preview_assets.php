@@ -121,7 +121,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         'Insert a new global section' => __('Insert a new global section', 'text_domain_to_be_replaced' ),
 
                         'section' => __('section', 'text_domain_to_be_replaced'),
-                        'section (global)' => __('section (global)', 'text_domain_to_be_replaced'),
+                        'header section' => __('header section', 'text_domain_to_be_replaced'),
+                        'footer section' => __('footer section', 'text_domain_to_be_replaced'),
+                        '(global)' => __('(global)', 'text_domain_to_be_replaced'),
                         'nested section' => __('nested section', 'text_domain_to_be_replaced'),
 
                         'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_domain_to_be_replaced'),
@@ -213,7 +215,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         </div>
                         <#
                           var section_title = true !== data.is_global_location ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['section (global)'];
-                          section_title = ! data.is_nested ? section_title : sekPreviewLocalized.i18n['nested section'];
+                          var section_title = ! data.is_nested ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['nested section'];
+                          if ( true === data.is_header_location ) {
+                                section_title = sekPreviewLocalized.i18n['header section'];
+                          } else if ( true === data.is_footer_location ) {
+                                section_title = sekPreviewLocalized.i18n['footer section'];
+                          }
+
+                          section_title = true !== data.is_global_location ? section_title : [ section_title, sekPreviewLocalized.i18n['(global)'] ].join(' ');
                         #>
                         <div class="sek-dyn-ui-level-type">{{section_title}}</div>
                       </div><?php // .sek-dyn-ui-location-inner ?>

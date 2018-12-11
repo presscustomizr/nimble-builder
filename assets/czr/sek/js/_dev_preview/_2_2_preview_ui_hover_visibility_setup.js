@@ -46,9 +46,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     params = _.extend( params, {
                                           is_nested : true === $(this).data('sek-is-nested'),
                                           can_have_more_columns : $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
-                                          is_global_location : true === $levelEl.closest( 'div[data-sek-level="location"]' ).data('sek-is-global-location'),
+                                          is_global_location : true === $parentLocation.data('sek-is-global-location'),
                                           is_last_section_in_location : _is_last_section,
-                                          is_first_section_in_location : _is_first_section
+                                          is_first_section_in_location : _is_first_section,
+                                          is_header_location : true === $parentLocation.data('sek-is-header-location'),
+                                          is_footer_location : true === $parentLocation.data('sek-is-footer-location')
                                     });
                               break;
                               case 'column' :
