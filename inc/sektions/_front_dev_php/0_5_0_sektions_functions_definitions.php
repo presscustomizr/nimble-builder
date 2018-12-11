@@ -1137,12 +1137,18 @@ function sek_page_menu_fallback( $args = array() ) {
  */
 function sek_list_pages( $args = '' ) {
   $defaults = array(
-    'depth' => 0, 'show_date' => '',
+    'depth' => 0,
+    'show_date' => '',
     'date_format' => get_option( 'date_format' ),
-    'child_of' => 0, 'exclude' => '',
-    'title_li' => __( 'Pages', 'text_domain_to_replace' ), 'echo' => 1,
-    'authors' => '', 'sort_column' => 'menu_order, post_title',
-    'link_before' => '', 'link_after' => '', 'walker' => '',
+    'child_of' => 0,
+    'exclude' => '',
+    'title_li' => __( 'Pages', 'text_domain_to_replace' ),
+    'echo' => 1,
+    'authors' => '',
+    'sort_column' => 'menu_order, post_title',
+    'link_before' => '',
+    'link_after' => '',
+    'walker' => ''
   );
    $r = wp_parse_args( $args, $defaults );
    $output = '';
