@@ -280,6 +280,11 @@
   cursor: -webkit-grab;
 }*/
 
+/* Default font-size */
+/* fixes https://github.com/presscustomizr/nimble-builder/issues/270 */
+.sek-section-dyn-ui, .sek-column-dyn-ui, .sek-module-dyn-ui {
+  font-size: 16px;
+}
 
 /* ADAPT THE UI ICONS SIZES WHEN COLUMNS ARE BECOMING NARROWS */
 .sek-col-8 > .sek-column-dyn-ui,
@@ -300,7 +305,8 @@
 .sek-col-16 .sek-module-dyn-ui,
 .sek-col-20 .sek-module-dyn-ui,
 .sek-col-25 .sek-module-dyn-ui {
-  font-size: 0.7rem;
+  /* was 0.7rem, fixes https://github.com/presscustomizr/nimble-builder/issues/270 */
+  font-size: 11px;
 }
 /* ADAPT THE UI HAMB MENU WHEN COLUMNS ARE BECOMING NARROWS */
 .sek-col-8 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
@@ -466,7 +472,8 @@
 }
 .sek-column-dyn-ui {
     border: 2px dotted #00b846;
-    font-size: 1rem;
+    /* was 1rem, fixes https://github.com/presscustomizr/nimble-builder/issues/270 */
+    font-size: 16px;
 }
 .sek-column-dyn-ui .dev-level-data {
   background: #0085ba;
@@ -521,7 +528,8 @@
 }
 .sek-module-dyn-ui {
     border: 2px dotted #0085ba;
-    font-size: 1rem;
+    /* was 1rem, fixes https://github.com/presscustomizr/nimble-builder/issues/270 */
+    font-size: 16px;
 }
 
 .dev-level-data {
@@ -648,7 +656,8 @@
     left: 0px;
     top: 0px;
     right: 0px;
-    font-size: 1rem;
+    /* was 1rem, fixes https://github.com/presscustomizr/nimble-builder/issues/270 */
+    font-size: 16px;
 }
 
 
@@ -681,7 +690,8 @@
 .sek-add-button-wrapper {
   text-align: center;
   width: 100%;
-  margin: 1rem 0;
+  /* was 1rem, fixes https://github.com/presscustomizr/nimble-builder/issues/270 */
+  margin: 16px 0;
   position: relative;
 }
 
@@ -768,7 +778,8 @@
 .sek-col-16 [data-sek-click-on="pick-content"],
 .sek-col-20 [data-sek-click-on="pick-content"],
 .sek-col-25 [data-sek-click-on="pick-content"] {
-  font-size: 0.9rem;
+  /* was 0.9rem, fixes https://github.com/presscustomizr/nimble-builder/issues/270 */
+  font-size: 14px;
 /*  width: 35px;
   height: 35px;
   padding-top: 11px;*/
