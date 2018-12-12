@@ -69,6 +69,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },// initialize()
 
 
+            // @ API READY
             // Fired at api.bind( 'ready', function() {})
             doSektionThinksOnApiReady : function() {
                   var self = this;
@@ -117,8 +118,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               });
                         });
+
+                        // The UI of the global option must be generated only once.
+                        // We don't want to re-generate on each skope change
+                        // fixes https://github.com/presscustomizr/nimble-builder/issues/271
                         api.section( self.SECTION_ID_FOR_GLOBAL_OPTIONS, function( _section_ ) {
+                              if ( true === _section_.nimbleGlobalOptionGenerated )
+                                return;
                               self.generateUI({ action : 'sek-generate-global-options-ui'});
+                              _section_.nimbleGlobalOptionGenerated = true;
                         });
                   };
                   // populate the setting ids now if skopes are set
