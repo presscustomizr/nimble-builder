@@ -28,9 +28,14 @@ function sek_get_module_params_for_sek_local_custom_css() {
 
 
 // add user local custom css
-add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_custom_css' );
+// this filter is declared in Sek_Dyn_CSS_Builder::get_stylesheet() with 2 parameters
+// apply_filters( 'nimble_get_dynamic_stylesheet', $css, $this->is_global_stylesheet );
+add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_custom_css', 10, 2 );
 //@filter 'nimble_get_dynamic_stylesheet'
-function sek_add_raw_local_custom_css( $css ) {
+function sek_add_raw_local_custom_css( $css, $is_global_stylesheet ) {
+    // the local custom css must be restricted to the local stylesheet
+    if ( $is_global_stylesheet )
+      return $css;
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
     // otherwise we fallback on the normal utility skp_build_skope_id()
     $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );

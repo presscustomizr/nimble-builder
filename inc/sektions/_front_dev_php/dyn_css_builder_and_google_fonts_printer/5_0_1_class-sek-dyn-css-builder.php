@@ -32,10 +32,13 @@ class Sek_Dyn_CSS_Builder {
 
     private $collection;//the collection of css rules
     private $sek_model;
+    // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
+    private $is_global_stylesheet;
     private $parent_level_model = array();
 
-    public function __construct( $sek_model = array() ) {
+    public function __construct( $sek_model = array(), $is_global_stylesheet = false ) {
         $this->sek_model  = $sek_model;
+        $this->is_global_stylesheet = $is_global_stylesheet;
         // set the css rules for columns
         /* ------------------------------------------------------------------------- *
          *  SCHEDULE CSS RULES FILTERING
@@ -303,7 +306,7 @@ class Sek_Dyn_CSS_Builder {
                 $css .= $_css;
             }
         }
-        return apply_filters( 'nimble_get_dynamic_stylesheet', $css );
+        return apply_filters( 'nimble_get_dynamic_stylesheet', $css, $this->is_global_stylesheet );
     }
 
 

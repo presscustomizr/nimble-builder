@@ -96,9 +96,15 @@ function sek_get_module_params_for_sek_local_widths() {
 //
 // Nimble implements an inheritance for both logic, determined by the css selectors, and the media query rules.
 // For example, an inner width of 85% applied for skope will win against the global one, but can be overriden by a specific inner width set at a section level.
-add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_widths_css' );
-//@filter 'nimble_get_dynamic_stylesheet'
-function sek_add_raw_local_widths_css( $css ) {
+add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_widths_css', 10, 2 );
+// @filter 'nimble_get_dynamic_stylesheet'
+// this filter is declared in Sek_Dyn_CSS_Builder::get_stylesheet() with 2 parameters
+// apply_filters( 'nimble_get_dynamic_stylesheet', $css, $this->is_global_stylesheet );
+function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
+    // the local width rules must be restricted to the local stylesheet
+    if ( $is_global_stylesheet )
+      return $css;
+
     $css = is_string( $css ) ? $css : '';
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
     // otherwise we fallback on the normal utility skp_build_skope_id()

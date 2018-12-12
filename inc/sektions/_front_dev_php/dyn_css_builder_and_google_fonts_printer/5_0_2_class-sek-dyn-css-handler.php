@@ -55,6 +55,8 @@ class Sek_Dyn_CSS_Handler {
      */
     private $skope_id;
 
+    // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
+    private $is_global_stylesheet;
 
     /**
      * the CSS
@@ -251,6 +253,8 @@ class Sek_Dyn_CSS_Handler {
         $defaults = array(
             'id'                              => 'sek-'.rand(),
             'skope_id'                        => '',
+            // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
+            'is_global_stylesheet'            => false,
             'mode'                            => self::MODE_FILE,
             'css_string_to_enqueue_or_print'  => $this->css_string_to_enqueue_or_print,
             'dep'                             => $this->dep,
@@ -298,7 +302,7 @@ class Sek_Dyn_CSS_Handler {
             $this->sek_model = sek_get_skoped_seks( $this -> skope_id );
 
             //build stylesheet
-            $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model );
+            $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $this->is_global_stylesheet );
 
             // now that the stylesheet is ready let's cache it
             $this->css_string_to_enqueue_or_print = (string)$this->builder-> get_stylesheet();
