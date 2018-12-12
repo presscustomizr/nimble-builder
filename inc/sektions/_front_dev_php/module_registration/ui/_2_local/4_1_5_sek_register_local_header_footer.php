@@ -27,7 +27,7 @@ function sek_get_module_params_for_sek_local_header_footer() {
                     'title_width' => 'width-100',
                     'notice_after' => sprintf( __( 'This option overrides the site wide header and footer options set in the %1$s for this page only.', 'text_domain_to_be_replaced'),
                         sprintf( '<a href="%1$s">%2$s</a>',
-                            "javascript:wp.customize.section('__globalAndLocalOptionsSection', function( _s_ ){ _s_.focus(); })",
+                            "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
                             __('Site wide options', 'text_domain_to_be_replaced')
                         )
                     ),
