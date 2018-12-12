@@ -170,7 +170,7 @@ function sek_write_global_custom_section_widths() {
     $width_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
 
     if ( is_string( $width_options_css ) && ! empty( $width_options_css ) ) {
-        printf('<style type="text/css" id="nimble-global-options">%1$s</style>', $width_options_css );
+        printf('<style type="text/css" id="nimble-global-widths-options">%1$s</style>', $width_options_css );
     }
 }
 ?>
