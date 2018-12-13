@@ -3,13 +3,13 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-$model = Nimble_Manager() -> model;
+$model = Nimble_Manager()->model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 //sek_error_log('MODEL ?', $model );
 $menu_content = $value['content'];
 
 //test
-$submenu_opening_effect_class = '';//sek-submenu-fade';
+$sek_nav_collapse_additional_classes = 'sek-submenu-fade sek-submenu-move';
 
 ?>
  <nav class="sek-nav-wrap">
@@ -20,7 +20,7 @@ $submenu_opening_effect_class = '';//sek-submenu-fade';
           <span class="line line-3"></span>
         </div>
     </button>
-    <div class="sek-nav-collapse sek-collapse <?php echo $submenu_opening_effect_class ?>" id="<?php echo $model['id'] ?>">
+    <div class="sek-nav-collapse sek-collapse <?php echo $sek_nav_collapse_additional_classes ?>" id="<?php echo $model['id'] ?>">
   <?php
      //error_log( print_r( get_terms( 'nav_menu', array( 'hide_empty' => true ) ), true) );
     wp_nav_menu(
