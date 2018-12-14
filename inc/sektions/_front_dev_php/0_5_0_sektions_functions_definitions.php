@@ -21,6 +21,8 @@ if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) {
     define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION );
 }
 
+
+
 /* ------------------------------------------------------------------------- *
  *  LOCATIONS UTILITIES
 /* ------------------------------------------------------------------------- */
@@ -59,6 +61,12 @@ function sek_get_local_content_locations() {
         }
     }
     return $locations;
+}
+
+// DEPRECATED IN V1.4.0.
+// Kept for retro compatibility
+function sek_get_local_locations() {
+    return sek_get_local_content_locations();
 }
 
 // @return an array of "global" locations => in which the sections are displayed site wide
@@ -315,6 +323,12 @@ function sek_get_level_skope_id( $level_id = '' ) {
 }
 
 
+/* ------------------------------------------------------------------------- *
+ *  HEADER FOOTER
+/* ------------------------------------------------------------------------- */
+function sek_page_uses_nimble_header_footer() {
+    return Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer;
+}
 
 
 

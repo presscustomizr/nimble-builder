@@ -875,7 +875,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // fired @filter get_header()
         function sek_maybe_set_local_nimble_header( $header_name ) {
-            if ( $this->has_local_header_footer || $this->has_global_header_footer ) {
+            // if Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer
+            if ( sek_page_uses_nimble_header_footer() ) {
                 // load the Nimble template which includes a call to wp_head()
                 load_template( NIMBLE_BASE_PATH . '/tmpl/header/nimble_header_tmpl.php', false );
 
@@ -902,7 +903,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // fired @filter get_footer()
         function sek_maybe_set_local_nimble_footer( $footer_name ) {
-            if ( $this->has_local_header_footer || $this->has_global_header_footer ) {
+            // if Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer
+            if ( sek_page_uses_nimble_header_footer() ) {
                 // load the Nimble template which includes a call to wp_footer()
                 load_template( NIMBLE_BASE_PATH . '/tmpl/footer/nimble_footer_tmpl.php', false );
 
