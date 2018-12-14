@@ -76,6 +76,7 @@
             align-items: center;
             justify-content: space-between;
             color: inherit;
+            overflow:hidden;
             .#{$project-prefix}nav-wrap & {
                 text-decoration: none;
             }
@@ -106,17 +107,54 @@
             text-rendering: auto;
             font-family: 'Font Awesome 5 Free';
             font-weight: 900;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            perspective: 1000px;
+            padding: 0 .45em;
+            font-size: .8em;
+            top: .1em;
+            position: relative;
+        }
+        &.show > a::after {
             @if ( true == $is_rtl ) {
-                margin-right: .25em;
+                transform: translateZ(0) rotate(180deg) !important;
+                -ms-transform: rotate(180deg)!important;
             }
             @else {
-                margin-left: .25em;
+                transform: translateZ(0) rotate(-180deg)!important;
+                -ms-transform: rotate(-180deg)!important;
             }
         }
     }
     & .sub-menu,
     & .children {
         @include dropdown-menu-base();
+    }
+}
+
+.#{$project-prefix}dropdown-submenu {
+    & > a{
+        &::after {
+            @if ( true == $is_rtl ) {
+                transform: translateZ(0) rotate(90deg);
+                -ms-transform: rotate(90deg);
+            }
+            @else {
+                transform: translateZ(0) rotate(-90deg);
+                -ms-transform: rotate(-90deg);
+            }
+        }
+        //TODO: row reverse
+        &[class*=-reverse]::after {
+            @if ( true == $is_rtl ) {
+                transform: translateZ(0) rotate(270deg);
+                -ms-transform: rotate(270deg);
+            }
+            @else {
+                transform: translateZ(0) rotate(-270deg);
+            }
+        }
     }
 }
 
@@ -227,6 +265,25 @@
         right: 100%;
         left: auto;
     }
+    li {
+        position: relative;
+        &::before {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transition-delay: 0s;
+            transition-duration: .6s;
+            transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+            transform-origin: 0 100%;
+            background-color: rgba(0, 0, 0, 0.045);
+        }
+        &:hover::before {
+            width: 100%;
+        }
+    } 
 }
 
 //mobile up breakpoint -> min-width:768px
@@ -243,7 +300,7 @@
             border-bottom: none;
         }
         & > li > a {
-            padding: 0 5px;
+            padding: 5px;
         }
     }
     .#{$project-prefix}nav-collapse {
@@ -257,10 +314,10 @@
     .#{$project-prefix}dropdown-menu {
 
         .#{$project-prefix}nav & li {
-            padding: 0 5px !important;
-            margin: 0;
+            padding: 0 10px !important;
+            margin: 0 !important;
             a {
-                padding: .6em .8em;
+                padding: 10px 12px;
             }
         }
 
@@ -290,7 +347,14 @@
         .#{$project-prefix}dropdown-submenu & {
             top: 15px;
         }
+    }
 
+    @at-root .#{$project-prefix}submenu-fade .#{$project-prefix}dropdown-menu a {
+        transition: all 0.25s ease;
+        transform: translate(0, 0);
+        &:hover {
+            transform: translate(3px, 0);
+        }
     }
 
     // submenu revealing fade effect
@@ -304,42 +368,42 @@
     @at-root .#{$project-prefix}submenu-fade {
         .page_item_has_children,
         .menu-item-has-children {
-         perspective: 1000px;
-         > ul {
-           position: fixed;
-           opacity: 0;
-           visibility: hidden;
-           display: block;
-           transition: all 0.25s ease-in-out;
-           transform: translate( 0, -20px );
-         }
+            perspective: 1000px;
+            > ul {
+                position: fixed;
+                opacity: 0;
+                visibility: hidden;
+                display: block;
+                transition: all 0.25s ease-in-out;
+                transform: translate( 0, -10px );
+            }
 
-         &:not(.show) {
-           //temporary fix for Firefox : https://github.com/presscustomizr/customizr/issues/1083
-           //the perspective thing seems to not work with this browser
-           //need further investigation
-           overflow: hidden;
+            &:not(.show) {
+                //temporary fix for Firefox : https://github.com/presscustomizr/customizr/issues/1083
+                //the perspective thing seems to not work with this browser
+                //need further investigation
+                overflow: hidden;
 
-           //because of the fact the submenu is displayed
-           //it might still grab the the hover while fading out
-           //let's avoid this resetting its pointer-events
-           //when the li parent hasn't the show class
-           ul {
-             pointer-events: none;
-             cursor: $cursor-disabled;
-           }
-         }
-       }
+                //because of the fact the submenu is displayed
+                //it might still grab the the hover while fading out
+                //let's avoid this resetting its pointer-events
+                //when the li parent hasn't the show class
+                ul {
+                    pointer-events: none;
+                    cursor: $cursor-disabled;
+                }
+            }
+        }
 
-       li.show {
-             perspective: none;
-             > ul {
-               position: absolute;
-               visibility: visible;
-               opacity: 1;
-               transform: translate( 0, 0);
-             }
-       }
+        li.show {
+            perspective: none;
+            > ul {
+                position: absolute;
+                visibility: visible;
+                opacity: 1;
+                transform: translate( 0, 0);
+            }
+        }
      }
      // end fade effect
 }
