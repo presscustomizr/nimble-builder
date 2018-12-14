@@ -9,12 +9,49 @@ function sek_maybe_do_version_mapping() {
     $global_options = is_array( $global_options ) ? $global_options : array();
     $global_options['retro_compat_mappings'] = isset( $global_options['retro_compat_mappings'] ) ? $global_options['retro_compat_mappings'] : array();
 
+    // To 1_0_4 was introduced in december 2018
+    // It's related to a modification of the skope_id when home is a static page
+    if ( ! array_key_exists( 'to_1_4_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['to_1_4_0'] ) {
+        $status_to_1_4_0 = sek_do_compat_to_1_4_0();
+        //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
+        $global_options['retro_compat_mappings']['to_1_4_0'] = 'done';
+    }
+
+    // 1_0_4_to_1_1_0 introduced in October 2018
     if ( ! array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
         $status_1_0_4_to_1_1_0 = sek_do_compat_1_0_4_to_1_1_0();
         //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
         $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] = 'done';
     }
     update_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS, $global_options );
+}
+
+////////////////////////////////////////////////////////////////
+// RETRO COMPAT => to 1.4.0
+// It's related to a modification of the skope_id when home is a static page
+// Was skp__post_page_home
+// Now is skp__post_page_{$static_home_page_id}
+// This was introduced to facilitate the compatibility of the Nimble Builder with multilanguage plugins like polylang
+// => Allows user to create a different home page for each languages
+//
+// If the current home page is not a static page, we don't have to do anything
+// If not, the sections currently saved for skope skp__post_page_home, must be moved to skope skp__post_page_{$static_home_page_id}
+// => this means that we need to update the post_id saved for option NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . 'skp__post_page_{$static_home_page_id}';
+// to the value of the one saved for option NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . 'skp__post_page_home';
+function sek_do_compat_to_1_4_0() {
+    if ( 'page' === get_option( 'show_on_front' ) ) {
+        $home_page_id = (int)get_option( 'page_on_front' );
+        if ( 0 < $home_page_id ) {
+            // get the post id storing the current sections on home
+            // @see sek_get_seks_post()
+            $current_option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . 'skp__post_page_home';
+            $post_id_storing_home_page_sections = (int)get_option( $current_option_name );
+            if ( $post_id_storing_home_page_sections > 0 ) {
+                $new_option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "skp__post_page_{$home_page_id}";
+                update_option( $new_option_name, $post_id_storing_home_page_sections );
+            }
+        }
+    }
 }
 
 
