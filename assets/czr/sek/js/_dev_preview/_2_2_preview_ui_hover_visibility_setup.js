@@ -24,9 +24,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 )
                           return;
+
+                        var levelRect = $levelEl[0].getBoundingClientRect(),
+                            levelType = $levelEl.data('sek-level');
+
+                        // Adapt the size of the UI icons and text in narrow containers
+                        $levelEl.toggleClass( 'sek-shrink-my-ui', levelRect.width && levelRect.width < ( 'section' === levelType ? 350 : ( 'column' === levelType ? 300 : 200 ) ) );
+
                         params = {
                               id : $levelEl.data('sek-id'),
-                              level : $levelEl.data('sek-level')
+                              level : levelType
                         };
                         switch ( level ) {
                               case 'section' :

@@ -287,111 +287,39 @@
 }
 
 /* ADAPT THE UI ICONS SIZES WHEN COLUMNS ARE BECOMING NARROWS */
-.sek-col-8 > .sek-column-dyn-ui,
-.sek-col-9 > .sek-column-dyn-ui,
-.sek-col-10 > .sek-column-dyn-ui,
-.sek-col-11 > .sek-column-dyn-ui,
-.sek-col-12 > .sek-column-dyn-ui,
-.sek-col-14 > .sek-column-dyn-ui,
-.sek-col-16 > .sek-column-dyn-ui,
-.sek-col-20 > .sek-column-dyn-ui,
-.sek-col-25 > .sek-column-dyn-ui,
-.sek-col-8 .sek-module-dyn-ui,
-.sek-col-9 .sek-module-dyn-ui,
-.sek-col-10 .sek-module-dyn-ui,
-.sek-col-11 .sek-module-dyn-ui,
-.sek-col-12 .sek-module-dyn-ui,
-.sek-col-14 .sek-module-dyn-ui,
-.sek-col-16 .sek-module-dyn-ui,
-.sek-col-20 .sek-module-dyn-ui,
-.sek-col-25 .sek-module-dyn-ui {
+.sek-shrink-my-ui > .sek-section-dyn-ui,
+.sek-shrink-my-ui > .sek-column-dyn-ui,
+.sek-shrink-my-ui .sek-module-dyn-ui {
   /* was 0.7rem, fixes https://github.com/presscustomizr/nimble-builder/issues/270 */
   font-size: 11px;
 }
+
 /* ADAPT THE UI HAMB MENU WHEN COLUMNS ARE BECOMING NARROWS */
-.sek-col-8 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-9 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-10 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-11 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-12 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-14 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-16 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-20 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-25 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-8 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-9 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-10 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-11 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-12 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-14 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-16 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-20 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper,
-.sek-col-25 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper {
+.sek-shrink-my-ui > .sek-section-dyn-ui .sek-ham__toggler-span-wrapper,
+.sek-shrink-my-ui > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper,
+.sek-shrink-my-ui > .sek-module-dyn-ui .sek-ham__toggler-span-wrapper {
   height: 8px;
   width: 16px;
 }
-.sek-col-8 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-9 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-10 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-11 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-12 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-14 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-16 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-20 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-25 > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-8 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-9 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-10 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-11 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-12 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-14 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-16 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-20 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper .line,
-.sek-col-25 .sek-module-dyn-ui .sek-ham__toggler-span-wrapper .line {
+
+.sek-shrink-my-ui > .sek-section-dyn-ui .sek-ham__toggler-span-wrapper .line,
+.sek-shrink-my-ui > .sek-column-dyn-ui .sek-ham__toggler-span-wrapper .line,
+.sek-shrink-my-ui .sek-module-dyn-ui .sek-ham__toggler-span-wrapper .line  {
   width: 15px;
   height: 1px;
 }
-.sek-col-8 > .sek-column-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-9 > .sek-column-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-10 > .sek-column-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-11 > .sek-column-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-12 > .sek-column-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-14 > .sek-column-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-16 > .sek-column-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-20 > .sek-column-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-25 > .sek-column-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-8 .sek-module-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-9 .sek-module-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-10 .sek-module-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-11 .sek-module-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-12 .sek-module-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-14 .sek-module-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-16 .sek-module-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-20 .sek-module-dyn-ui .sek-dyn-ui-location-type:hover .line,
-.sek-col-25 .sek-module-dyn-ui .sek-dyn-ui-location-type:hover .line {
+
+.sek-shrink-my-ui > .sek-section-dyn-ui .sek-dyn-ui-location-type:hover .line,
+.sek-shrink-my-ui > .sek-column-dyn-ui .sek-dyn-ui-location-type:hover .line,
+.sek-shrink-my-ui .sek-module-dyn-ui .sek-dyn-ui-location-type:hover .line {
   width: 16px;
   -webkit-transform: translate(-1px, 0);
     transform: translate(-1px, 0);
 }
 
-.sek-col-8 > .sek-column-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-9 > .sek-column-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-10 > .sek-column-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-11 > .sek-column-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-12 > .sek-column-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-14 > .sek-column-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-16 > .sek-column-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-20 > .sek-column-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-25 > .sek-column-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-8 .sek-module-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-9 .sek-module-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-10 .sek-module-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-11 .sek-module-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-12 .sek-module-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-14 .sek-module-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-16 .sek-module-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-20 .sek-module-dyn-ui .sek-dyn-ui-location-type,
-.sek-col-25 .sek-module-dyn-ui .sek-dyn-ui-location-type {
+.sek-shrink-my-ui > .sek-section-dyn-ui .sek-dyn-ui-location-type,
+.sek-shrink-my-ui > .sek-column-dyn-ui .sek-dyn-ui-location-type,
+.sek-shrink-my-ui .sek-module-dyn-ui .sek-dyn-ui-location-type {
   font-size: 10px;
   line-height: 11px;
 }
