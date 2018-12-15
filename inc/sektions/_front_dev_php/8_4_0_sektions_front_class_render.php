@@ -29,11 +29,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template' ) );
 
             // HEADER FOOTER
-            add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
-            // HEADER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
-            add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
-            // FOOTER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
-            add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
+            if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
+                add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
+                // HEADER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+                add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
+                // FOOTER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+                add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
+            }
         }//_schedule_front_rendering()
 
 

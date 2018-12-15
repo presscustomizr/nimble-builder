@@ -95,7 +95,8 @@ function sek_enqueue_controls_js_css() {
                     '.sek-content-preset_section-drop-zone'//between sections
                 ]),
 
-                'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true
+                'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true,
+                'isNimbleHeaderFooterEnabled' => defined( 'NIMBLE_HEADER_FOOTER_ENABLED' ) ? NIMBLE_HEADER_FOOTER_ENABLED : true
             )
         )
     );//wp_localize_script()

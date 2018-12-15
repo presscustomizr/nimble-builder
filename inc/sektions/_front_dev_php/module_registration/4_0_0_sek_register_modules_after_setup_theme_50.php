@@ -2,7 +2,7 @@
 // The base fmk is loaded @after_setup_theme:10
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
-    foreach( [
+    $modules = [
         // UI CONTENT PICKER
         'sek_content_type_switcher_module',
         'sek_module_picker_module',
@@ -81,13 +81,21 @@ function sek_register_modules() {
         'czr_simple_form_fonts_child',
         'czr_simple_form_submission_child',
 
-        'czr_menu_module',
-        'czr_menu_content_child',
-        //'czr_menu_design_child',
-
         // GENERIC FRONT CHILD MODULES
         'czr_font_child'
-    ] as $module_name ) {
+    ];
+
+    // Header and footer have been introduced in v1.4.0 but not enabled by default
+    // The module menu is on hold until "header and footer" feature is released.
+    if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
+        $modules = array_merge( $modules, [
+            'czr_menu_module',
+            'czr_menu_content_child',
+            //'czr_menu_design_child',
+        ]);
+    }
+
+    foreach( $modules as $module_name ) {
         // Was previously written "\Nimble\sek_get_module_params_for_{$module_name}";
         // But this syntax can lead to function_exists() return false even if the function exists
         // Probably due to a php version issue. Bug detected with php version 5.6.38
@@ -104,7 +112,6 @@ function sek_register_modules() {
             error_log( __FUNCTION__ . ' missing params callback fn for module ' . $module_name );
         }
     }
-
 }//sek_register_modules()
 
 

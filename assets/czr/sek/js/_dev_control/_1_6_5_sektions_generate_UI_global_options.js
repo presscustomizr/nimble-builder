@@ -25,13 +25,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Prepare the module map to register
                   var registrationParams = {};
 
+                  // Header and footer have been introduced in v1.4.0 but not enabled by default.
+                  if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+                        $.extend( registrationParams, {
+                              global_header_footer : {
+                                    settingControlId : _id_ + '__header_footer',
+                                    module_type : 'sek_global_header_footer',
+                                    controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
+                                    icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                              }
+                        });
+                  }
+
                   $.extend( registrationParams, {
-                        global_header_footer : {
-                              settingControlId : _id_ + '__header_footer',
-                              module_type : 'sek_global_header_footer',
-                              controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
-                              icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                        },
                         breakpoint : {
                               settingControlId : _id_ + '__breakpoint',
                               module_type : 'sek_global_breakpoint',

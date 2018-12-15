@@ -38,13 +38,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel : sektionsLocalizedData.i18n['Page template'],
                               expandAndFocusOnInit : false,
                               icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
-                        },
-                        local_header_footer : {
-                              settingControlId : _id_ + '__local_header_footer',
-                              module_type : 'sek_local_header_footer',
-                              controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
-                              icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                        },
+                        }
+                  });
+
+                  // Header and footer have been introduced in v1.4.0 but not enabled by default.
+                  if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+                        $.extend( registrationParams, {
+                              local_header_footer : {
+                                    settingControlId : _id_ + '__local_header_footer',
+                                    module_type : 'sek_local_header_footer',
+                                    controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
+                                    icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                              }
+                        });
+                  }
+
+                  $.extend( registrationParams, {
                         widths : {
                               settingControlId : _id_ + '__widths',
                               module_type : 'sek_local_widths',

@@ -26,7 +26,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
         <div class="sek-content-type-wrapper">
           <?php
-            $content_collection = array(
+            $content_collection = [
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_tiny_mce_editor_module',
@@ -113,12 +113,6 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-id' => 'czr_simple_form_module',
                   'title' => __( 'Simple Contact Form', 'text_domain_to_be_replaced' ),
                   'icon' => 'Nimble_contact-form_icon.svg'
-                ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_menu_module',
-                  'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
-                  'font_icon' => '<i class="material-icons">menu</i>',
                 )
                 // array(
                 //   'content-type' => 'module',
@@ -128,7 +122,20 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 // ),
 
 
-            );
+            ];
+            // Header and footer have been introduced in v1.4.0 but not enabled by default
+            // The module menu is on hold until "header and footer" feature is released.
+            if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
+                $content_collection = array_merge( $content_collection, [
+                    array(
+                      'content-type' => 'module',
+                      'content-id' => 'czr_menu_module',
+                      'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
+                      'font_icon' => '<i class="material-icons">menu</i>',
+                    )
+                ]);
+            }
+
             $i = 0;
             foreach( $content_collection as $_params) {
                 // if ( $i % 2 == 0 ) {
