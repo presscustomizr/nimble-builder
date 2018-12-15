@@ -1,7 +1,9 @@
 <?php
 // DEPRECATED SINCE v1.4.0
-// Was introduced in v1.3.2 to allow global header and footer.
-// Since v1.4.0, header and footer are handled with a separate set of options, globally ( site wide ) and locally ( on a by-page basis )
+// Was introduced in v1.3.2 to allow user creating pages from a blank canvase, with a global header and footer.
+//
+// Since v1.4.0, header and footer are handled with a separate and more flexible set of options, globally ( site wide ) and locally ( on a by-page basis )
+//
 // The template has been kept to ensure retro-compatibility with users using if before transitionning to v1.4.0
 // nimble_full_tmpl_ghf =>  nimble full tmpl with global header and footer
 namespace Nimble;

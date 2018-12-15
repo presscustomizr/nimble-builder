@@ -77,7 +77,8 @@ function sek_enqueue_controls_js_css() {
                     '.sek-content-preset_section-drop-zone'//between sections
                 ]),
 
-                'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true
+                'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true,
+                'isNimbleHeaderFooterEnabled' => defined( 'NIMBLE_HEADER_FOOTER_ENABLED' ) ? NIMBLE_HEADER_FOOTER_ENABLED : true
             )
         )
     );//wp_localize_script()
@@ -502,7 +503,7 @@ function sek_print_nimble_customizer_tmpl() {
               <span class="screen-reader-text"><?php _e('Global settings', 'text_domain'); ?></span>
             </button>
           </div>
-          <div class="sek-nimble-doc" data-doc-href="https://docs.presscustomizr.com/collection/334-nimble-builder">
+          <div class="sek-nimble-doc" data-doc-href="https://docs.presscustomizr.com/collection/334-nimble-builder?utm_source=usersite&utm_medium=link&utm_campaign=nimble-customizer-topbar">
             <div class="sek-nimble-icon"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_domain_to_replace'); ?>" title="<?php _e('Nimble online documentation', 'text_domain'); ?>"/></div>
             <span class="sek-pointer" title="<?php _e('Nimble online documentation', 'text_domain'); ?>"><?php _e('Nimble online documentation', 'text_domain'); ?></span>
             <button class="far fa-question-circle" type="button" title="<?php _e('Nimble online documentation', 'text_domain'); ?>" data-nimble-state="enabled">
@@ -790,7 +791,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
         <div class="sek-content-type-wrapper">
           <?php
-            $content_collection = array(
+            $content_collection = [
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_tiny_mce_editor_module',
@@ -877,16 +878,21 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-id' => 'czr_simple_form_module',
                   'title' => __( 'Simple Contact Form', 'text_domain_to_be_replaced' ),
                   'icon' => 'Nimble_contact-form_icon.svg'
-                ),
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_menu_module',
-                  'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
-                  'font_icon' => '<i class="material-icons">menu</i>',
                 )
 
 
-            );
+            ];
+            if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
+                $content_collection = array_merge( $content_collection, [
+                    array(
+                      'content-type' => 'module',
+                      'content-id' => 'czr_menu_module',
+                      'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
+                      'font_icon' => '<i class="material-icons">menu</i>',
+                    )
+                ]);
+            }
+
             $i = 0;
             foreach( $content_collection as $_params) {
                 $icon_img_html = '';
@@ -1266,7 +1272,7 @@ function sek_get_fa_icon_list_tmpl( $html, $requested_tmpl = '', $posted_params 
 }
 function sek_retrieve_decoded_font_awesome_icons() {
     $faicons_json_path      = NIMBLE_BASE_PATH . '/assets/faicons.json';
-    $faicons_transient_name = 'sek_font_awesome_october_2018';
+    $faicons_transient_name = 'sek_font_awesome_november_2018';
     if ( false == get_transient( $faicons_transient_name ) ) {
         if ( file_exists( $faicons_json_path ) ) {
             $faicons_raw      = @file_get_contents( $faicons_json_path );

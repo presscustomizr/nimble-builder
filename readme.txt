@@ -2,11 +2,11 @@
 Contributors: nikeo, d4z_c0nf
 Author URI: https://presscustomizr.com
 Plugin URI: https://wordpress.org/plugins/nimble-builder/
-Tags: customizer, editor, page builder, drag and drop
+Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.0.0
-Stable tag: 1.4.0-beta
+Tested up to: 5.0.1
+Stable tag: 1.4.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -47,10 +47,20 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.3.3 =
-Fixed line breaks not automatically added when setting the content in the WP editor module. Updated Nimble Builder logo.
+= 1.4.0 =
+Implemented the fundations for a header and footer customizations. Minor fixes for the dynamic stylesheet system. Updated Font Awesome to the latest version (v5.5.0). Various improvements of the customization user interface and experience : clearer explanations of what the settings are doing, dynamic resizing of the UI icons when sections and columns are too narrows.
 
 == Changelog ==
+= 1.4.0 : December 15th, 2018 =
+* fixed : use a different name for the various global inline stylesheets : breakpoint and inner/outer widths
+* fixed : when appending CSS rules by filtering 'nimble_get_dynamic_stylesheet', in Sek_Dyn_CSS_Builder::get_stylesheet, there's no way to know if we are writing a local or a global stylesheet
+* fixed : UI of the global option is being re-generated when skope changes
+* updated : Font Awesome to v5.5.0
+* improved : deprecation of skope id 'skp__post_page_home'. Now, when the home page is a static page, the Nimble options are the same as the page ones. Only the home with latests posts option has a specific set of Nimble options.
+* improved : various improvement of the UI and UX : clearer explanations of what the settings are doing, dynamic resizing of the UI icons when sections and columns are too narrows.
+* improved : deprecation of the "blank Nimble Builder template" in favor of a new set of options, fine-grained header and footer
+* added : the fundations for a header and footer customization
+
 = 1.3.3 : December 5th, 2018 =
 * fixed : line breaks not automatically added when setting the content in the WP editor module
 * updated Nimble Builder logo

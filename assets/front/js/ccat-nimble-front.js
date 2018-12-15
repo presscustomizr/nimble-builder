@@ -1605,7 +1605,7 @@ jQuery( function($){
 
                 function _addOpenClass () {
                       var $_el = $(this);
-                      var _debounced_addOpenClass = _.debounce( function() {
+                      var _debounced_addOpenClass = _utils_.debounce( function() {
                             if( 'static' == $_el.find( '.'+ClassName.DROPDOWN ).css( 'position' ) ) {
                                   return false;
                             }
@@ -1628,7 +1628,7 @@ jQuery( function($){
                 function _removeOpenClass () {
 
                       var $_el = $(this);
-                      var _debounced_removeOpenClass = _.debounce( function() {
+                      var _debounced_removeOpenClass = _utils_.debounce( function() {
                             if ( $_el.find("ul li:hover").length < 1 && ! $_el.closest('ul').find('li:hover').is( $_el ) ) {
                                   $_el.trigger( Event.HIDE )
                                       .removeClass( ClassName.SHOW)
@@ -1763,7 +1763,7 @@ jQuery( function($){
         var NAME = 'sekCollapse',
             DATA_KEY = 'sek.sekCollapse',
             EVENT_KEY = "." + DATA_KEY,
-            TRANSITION_DURATION = 600,
+            TRANSITION_DURATION = 400,
             DATA_API_KEY = '.data-api',
             Event = {
               SHOW: "show" + EVENT_KEY,
@@ -1777,11 +1777,11 @@ jQuery( function($){
               COLLAPSE: 'sek-collapse',
               COLLAPSING: 'sek-collapsing',
               COLLAPSED: 'sek-collapsed'
-            };
+            },
             Selector = {
               ACTIVES: '.show, .sek-collapsing',
               DATA_TOGGLE: '[data-sek-toggle="sek-collapse"]'
-            }
+            },
             _onSlidingCompleteResetCSS = function( $_el ) {
                   $_el   = $_el ? $_el : $(this);
                   $_el.css({
@@ -1808,7 +1808,7 @@ jQuery( function($){
                       $collapsible.stop()[ collapse ? 'slideUp' : 'slideDown' ]({
                             duration: TRANSITION_DURATION,
                             start : function() {
-                                  $collapsible.addClass(ClassName.COLLAPSING).trigger( collapse ? Event.HIDE : Event.SHOW )
+                                  $collapsible.addClass(ClassName.COLLAPSING).trigger( collapse ? Event.HIDE : Event.SHOW );
                                   if ( collapse ) {
                                       $toggler.addClass( ClassName.COLLAPSED ).attr( 'aria-expanded', 'false' );
                                   } else {
@@ -1832,7 +1832,7 @@ jQuery( function($){
                                   $collapsible.removeClass(ClassName.COLLAPSING + ' ' + removeClass).addClass( addClass ).trigger(event);
                                   _onSlidingCompleteResetCSS( $collapsible );
                             }
-                      })//end slideUp/slideDown
+                      });//end slideUp/slideDown
                 });//end each
           });//end document bind
     };

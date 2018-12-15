@@ -20,6 +20,8 @@ if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) {
     define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION );
 }
 
+
+
 /* ------------------------------------------------------------------------- *
  *  LOCATIONS UTILITIES
 /* ------------------------------------------------------------------------- */
@@ -45,6 +47,9 @@ function sek_get_local_content_locations() {
         }
     }
     return $locations;
+}
+function sek_get_local_locations() {
+    return sek_get_local_content_locations();
 }
 function sek_get_global_locations() {
     $locations = array();
@@ -236,6 +241,12 @@ function sek_get_level_skope_id( $level_id = '' ) {
 }
 
 
+/* ------------------------------------------------------------------------- *
+ *  HEADER FOOTER
+/* ------------------------------------------------------------------------- */
+function sek_page_uses_nimble_header_footer() {
+    return Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer;
+}
 
 
 
@@ -597,8 +608,11 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
 
             $recursive_data = array_merge( $local_collection, $global_collection );
         }
+
+        $font_awesome_dependant_modules = array( 'czr_button_module', 'czr_icon_module', 'czr_menu_module' );
+
         foreach ($recursive_data as $key => $value) {
-            if ( is_array( $value ) && array_key_exists('module_type', $value) && in_array($value['module_type'], array( 'czr_button_module', 'czr_icon_module' ) ) ) {
+            if ( is_array( $value ) && array_key_exists('module_type', $value) && in_array($value['module_type'], $font_awesome_dependant_modules ) ) {
                 $bool = true;
                 break;
             } else if ( is_array( $value ) ) {
@@ -835,12 +849,18 @@ function sek_page_menu_fallback( $args = array() ) {
  */
 function sek_list_pages( $args = '' ) {
   $defaults = array(
-    'depth' => 0, 'show_date' => '',
+    'depth' => 0,
+    'show_date' => '',
     'date_format' => get_option( 'date_format' ),
-    'child_of' => 0, 'exclude' => '',
-    'title_li' => __( 'Pages', 'text_domain_to_replace' ), 'echo' => 1,
-    'authors' => '', 'sort_column' => 'menu_order, post_title',
-    'link_before' => '', 'link_after' => '', 'walker' => '',
+    'child_of' => 0,
+    'exclude' => '',
+    'title_li' => __( 'Pages', 'text_domain_to_replace' ),
+    'echo' => 1,
+    'authors' => '',
+    'sort_column' => 'menu_order, post_title',
+    'link_before' => '',
+    'link_after' => '',
+    'walker' => ''
   );
    $r = wp_parse_args( $args, $defaults );
    $output = '';
@@ -911,12 +931,28 @@ function sek_maybe_do_version_mapping() {
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
     $global_options = is_array( $global_options ) ? $global_options : array();
     $global_options['retro_compat_mappings'] = isset( $global_options['retro_compat_mappings'] ) ? $global_options['retro_compat_mappings'] : array();
-
+    if ( ! array_key_exists( 'to_1_4_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['to_1_4_0'] ) {
+        $status_to_1_4_0 = sek_do_compat_to_1_4_0();
+        $global_options['retro_compat_mappings']['to_1_4_0'] = 'done';
+    }
     if ( ! array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
         $status_1_0_4_to_1_1_0 = sek_do_compat_1_0_4_to_1_1_0();
         $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] = 'done';
     }
     update_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS, $global_options );
+}
+function sek_do_compat_to_1_4_0() {
+    if ( 'page' === get_option( 'show_on_front' ) ) {
+        $home_page_id = (int)get_option( 'page_on_front' );
+        if ( 0 < $home_page_id ) {
+            $current_option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . 'skp__post_page_home';
+            $post_id_storing_home_page_sections = (int)get_option( $current_option_name );
+            if ( $post_id_storing_home_page_sections > 0 ) {
+                $new_option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "skp__post_page_{$home_page_id}";
+                update_option( $new_option_name, $post_id_storing_home_page_sections );
+            }
+        }
+    }
 }
 function sek_do_compat_1_0_4_to_1_1_0() {
     $sek_post_query_vars = array(
@@ -2003,7 +2039,7 @@ function sek_extract_numeric_value( $value ) {
 ?><?php
 add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
 function sek_register_modules() {
-    foreach( [
+    $modules = [
         'sek_content_type_switcher_module',
         'sek_module_picker_module',
 
@@ -2066,11 +2102,16 @@ function sek_register_modules() {
         'czr_simple_form_design_child',
         'czr_simple_form_fonts_child',
         'czr_simple_form_submission_child',
-
-        'czr_menu_module',
-        'czr_menu_content_child',
         'czr_font_child'
-    ] as $module_name ) {
+    ];
+    if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
+        $modules = array_merge( $modules, [
+            'czr_menu_module',
+            'czr_menu_content_child',
+        ]);
+    }
+
+    foreach( $modules as $module_name ) {
         $fn = "Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
             $params = $fn();
@@ -2083,7 +2124,6 @@ function sek_register_modules() {
             error_log( __FUNCTION__ . ' missing params callback fn for module ' . $module_name );
         }
     }
-
 }//sek_register_modules()
 function sek_get_select_options_for_input_id( $input_id ) {
     $options = array();
@@ -3317,7 +3357,7 @@ function sek_get_module_params_for_sek_local_widths() {
                     'refresh_preview' => true,
                     'notice_before_title' => sprintf( __( 'The inner and outer widths of the sections displayed in this page can be set here. It will override in the %1$s. You can also set a custom inner and outer width for each single sections.', 'text_domain_to_be_replaced'),
                         sprintf( '<a href="%1$s">%2$s</a>',
-                            "javascript:wp.customize.section('__globalAndLocalOptionsSection', function( _s_ ){ _s_.focus(); })",
+                            "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
                             __('Site wide options', 'text_domain_to_be_replaced')
                         )
                     ),
@@ -3359,8 +3399,11 @@ function sek_get_module_params_for_sek_local_widths() {
         )//tmpl
     );
 }
-add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_widths_css' );
-function sek_add_raw_local_widths_css( $css ) {
+add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_widths_css', 10, 2 );
+function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
+    if ( $is_global_stylesheet )
+      return $css;
+
     $css = is_string( $css ) ? $css : '';
     $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
 
@@ -3453,8 +3496,10 @@ function sek_get_module_params_for_sek_local_custom_css() {
         )//tmpl
     );
 }
-add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_custom_css' );
-function sek_add_raw_local_custom_css( $css ) {
+add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_local_custom_css', 10, 2 );
+function sek_add_raw_local_custom_css( $css, $is_global_stylesheet ) {
+    if ( $is_global_stylesheet )
+      return $css;
     $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
     if ( is_array( $local_options ) && !empty( $local_options['local_options']) && ! empty( $local_options['local_options']['custom_css'] ) ) {
         $options = $local_options['local_options']['custom_css'];
@@ -3532,7 +3577,7 @@ function sek_get_module_params_for_sek_local_header_footer() {
                     'title_width' => 'width-100',
                     'notice_after' => sprintf( __( 'This option overrides the site wide header and footer options set in the %1$s for this page only.', 'text_domain_to_be_replaced'),
                         sprintf( '<a href="%1$s">%2$s</a>',
-                            "javascript:wp.customize.section('__globalAndLocalOptionsSection', function( _s_ ){ _s_.focus(); })",
+                            "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
                             __('Site wide options', 'text_domain_to_be_replaced')
                         )
                     ),
@@ -3583,7 +3628,7 @@ function sek_write_global_custom_breakpoint() {
         $css .= '@media (min-width:' . $custom_breakpoint . 'px) {.sek-global-custom-breakpoint-col-8 {-ms-flex: 0 0 8.333%;flex: 0 0 8.333%;max-width: 8.333%;}.sek-global-custom-breakpoint-col-9 {-ms-flex: 0 0 9.090909%;flex: 0 0 9.090909%;max-width: 9.090909%;}.sek-global-custom-breakpoint-col-10 {-ms-flex: 0 0 10%;flex: 0 0 10%;max-width: 10%;}.sek-global-custom-breakpoint-col-11 {-ms-flex: 0 0 11.111%;flex: 0 0 11.111%;max-width: 11.111%;}.sek-global-custom-breakpoint-col-12 {-ms-flex: 0 0 12.5%;flex: 0 0 12.5%;max-width: 12.5%;}.sek-global-custom-breakpoint-col-14 {-ms-flex: 0 0 14.285%;flex: 0 0 14.285%;max-width: 14.285%;}.sek-global-custom-breakpoint-col-16 {-ms-flex: 0 0 16.666%;flex: 0 0 16.666%;max-width: 16.666%;}.sek-global-custom-breakpoint-col-20 {-ms-flex: 0 0 20%;flex: 0 0 20%;max-width: 20%;}.sek-global-custom-breakpoint-col-25 {-ms-flex: 0 0 25%;flex: 0 0 25%;max-width: 25%;}.sek-global-custom-breakpoint-col-30 {-ms-flex: 0 0 30%;flex: 0 0 30%;max-width: 30%;}.sek-global-custom-breakpoint-col-33 {-ms-flex: 0 0 33.333%;flex: 0 0 33.333%;max-width: 33.333%;}.sek-global-custom-breakpoint-col-40 {-ms-flex: 0 0 40%;flex: 0 0 40%;max-width: 40%;}.sek-global-custom-breakpoint-col-50 {-ms-flex: 0 0 50%;flex: 0 0 50%;max-width: 50%;}.sek-global-custom-breakpoint-col-60 {-ms-flex: 0 0 60%;flex: 0 0 60%;max-width: 60%;}.sek-global-custom-breakpoint-col-66 {-ms-flex: 0 0 66.666%;flex: 0 0 66.666%;max-width: 66.666%;}.sek-global-custom-breakpoint-col-70 {-ms-flex: 0 0 70%;flex: 0 0 70%;max-width: 70%;}.sek-global-custom-breakpoint-col-75 {-ms-flex: 0 0 75%;flex: 0 0 75%;max-width: 75%;}.sek-global-custom-breakpoint-col-80 {-ms-flex: 0 0 80%;flex: 0 0 80%;max-width: 80%;}.sek-global-custom-breakpoint-col-83 {-ms-flex: 0 0 83.333%;flex: 0 0 83.333%;max-width: 83.333%;}.sek-global-custom-breakpoint-col-90 {-ms-flex: 0 0 90%;flex: 0 0 90%;max-width: 90%;}.sek-global-custom-breakpoint-col-100 {-ms-flex: 0 0 100%;flex: 0 0 100%;max-width: 100%;}}';
     }
 
-    printf('<style type="text/css" id="nimble-global-options">%1$s</style>', $css );
+    printf('<style type="text/css" id="nimble-global-breakpoint-options">%1$s</style>', $css );
 }
 ?><?php
 function sek_get_module_params_for_sek_global_widths() {
@@ -3713,7 +3758,7 @@ function sek_write_global_custom_section_widths() {
     $width_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
 
     if ( is_string( $width_options_css ) && ! empty( $width_options_css ) ) {
-        printf('<style type="text/css" id="nimble-global-options">%1$s</style>', $width_options_css );
+        printf('<style type="text/css" id="nimble-global-widths-options">%1$s</style>', $width_options_css );
     }
 }
 ?><?php
@@ -6437,14 +6482,8 @@ function sek_get_module_params_for_czr_menu_module() {
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
         'starting_value' => array(
         ),
-        'css_selectors' => array( '.sek-menu-module .menu-item' ),//<=@see tmpl/modules/menu_module_tmpl.php
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/menu_module_tmpl.php",
-        'front_assets' => array(
-              'czr-font-awesome' => array(
-                  'type' => 'css',
-                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
-              )
-        )
+        'css_selectors' => array( '.sek-menu-module > li' ),//<=@see tmpl/modules/menu_module_tmpl.php
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/menu_module_tmpl.php"
     );
 }
  /* ------------------------------------------------------------------------- *
@@ -6459,11 +6498,28 @@ function sek_get_module_params_for_czr_menu_content_child() {
             'item-inputs' => array(
                 'menu-id' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select a menu', 'text_domain_to_be_replaced'),
                     'default'     => 'no-link',
-                    'choices'     => sek_get_user_created_menus()
+                    'choices'     => sek_get_user_created_menus(),
+                    'notice_after' => sprintf( __( 'You can create and edit menus in the %1$s. If you just created a new menu, publish and refresh the customizer to see in the dropdown list.', 'text_domain_to_be_replaced'),
+                        sprintf( '<a href="%1$s">%2$s</a>',
+                            "javascript:wp.customize.panel('nav_menus', function( _p_ ){ _p_.focus(); })",
+                            __('menu panel', 'text_domain_to_be_replaced')
+                        )
+                    ),
                 ),
-            )
+                'h_alignment_css' => array(
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
+                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'default'     => array( 'desktop' => 'center' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'h_flex_alignment',
+                    'css_selectors' => array( '.sek-nav-collapse', '.sek-nav-wrap' ),
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                ),
+            ),
         ),
         'render_tmpl_path' => '',
     );
@@ -6639,10 +6695,12 @@ class Sek_Dyn_CSS_Builder {
 
     private $collection;//the collection of css rules
     private $sek_model;
+    private $is_global_stylesheet;
     private $parent_level_model = array();
 
-    public function __construct( $sek_model = array() ) {
+    public function __construct( $sek_model = array(), $is_global_stylesheet = false ) {
         $this->sek_model  = $sek_model;
+        $this->is_global_stylesheet = $is_global_stylesheet;
         /* ------------------------------------------------------------------------- *
          *  SCHEDULE CSS RULES FILTERING
         /* ------------------------------------------------------------------------- */
@@ -6827,7 +6885,7 @@ class Sek_Dyn_CSS_Builder {
                 $css .= $_css;
             }
         }
-        return apply_filters( 'nimble_get_dynamic_stylesheet', $css );
+        return apply_filters( 'nimble_get_dynamic_stylesheet', $css, $this->is_global_stylesheet );
     }
     public static function sek_generate_css_stylesheet_for_a_set_of_rules( $rules ) {
         $rules_collection = array();
@@ -6976,7 +7034,7 @@ class Sek_Dyn_CSS_Handler {
      * @var string
      */
     private $skope_id;
-
+    private $is_global_stylesheet;
 
     /**
      * the CSS
@@ -7173,6 +7231,7 @@ class Sek_Dyn_CSS_Handler {
         $defaults = array(
             'id'                              => 'sek-'.rand(),
             'skope_id'                        => '',
+            'is_global_stylesheet'            => false,
             'mode'                            => self::MODE_FILE,
             'css_string_to_enqueue_or_print'  => $this->css_string_to_enqueue_or_print,
             'dep'                             => $this->dep,
@@ -7200,7 +7259,7 @@ class Sek_Dyn_CSS_Handler {
         $this->_sek_dyn_css_set_properties();
         if ( is_customize_preview() || ! $this->_sek_dyn_css_file_exists() || $this->force_rewrite || $this->customizer_save ) {
             $this->sek_model = sek_get_skoped_seks( $this -> skope_id );
-            $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model );
+            $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $this->is_global_stylesheet );
             $this->css_string_to_enqueue_or_print = (string)$this->builder-> get_stylesheet();
         }
         if ( ! $this->customizer_save ) {
@@ -7718,6 +7777,42 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         break;
         case 'background_color' :
             $properties_to_render['background-color'] = $value;
+        break;
+        case 'h_flex_alignment' :
+            $important = false;
+            if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
+                $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
+            }
+            $flex_ready_value = array();
+            foreach( $value as $device => $val ) {
+                switch ( $val ) {
+                    case 'left' :
+                        $h_align_value = "flex-start";
+                    break;
+                    case 'center' :
+                        $h_align_value = "center";
+                    break;
+                    case 'right' :
+                        $h_align_value = "flex-end";
+                    break;
+                    default :
+                        $h_align_value = "center";
+                    break;
+                }
+                $flex_ready_value[$device] = $h_align_value;
+            }
+            $flex_ready_value = wp_parse_args( $flex_ready_value, array(
+                'desktop' => '',
+                'tablet' => '',
+                'mobile' => ''
+            ));
+
+            $rules = sek_set_mq_css_rules( array(
+                'value' => $flex_ready_value,
+                'css_property' => 'justify-content',
+                'selector' => $selector,
+                'is_important' => $important,
+            ), $rules );
         break;
         case 'h_alignment' :
             if ( is_string( $value ) ) {// <= simple
@@ -8581,7 +8676,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'isDevMode' => sek_is_dev_mode(),
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
                     'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
-                    'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : ''
+                    'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : '',
+                    'skope_id' => skp_get_skope_id() //added for debugging purposes
                 )
             );
         }
@@ -8633,7 +8729,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         'Insert a new global section' => __('Insert a new global section', 'text_domain_to_be_replaced' ),
 
                         'section' => __('section', 'text_domain_to_be_replaced'),
-                        'section (global)' => __('section (global)', 'text_domain_to_be_replaced'),
+                        'header section' => __('header section', 'text_domain_to_be_replaced'),
+                        'footer section' => __('footer section', 'text_domain_to_be_replaced'),
+                        '(global)' => __('(global)', 'text_domain_to_be_replaced'),
                         'nested section' => __('nested section', 'text_domain_to_be_replaced'),
 
                         'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_domain_to_be_replaced'),
@@ -8723,7 +8821,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         </div>
                         <#
                           var section_title = true !== data.is_global_location ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['section (global)'];
-                          section_title = ! data.is_nested ? section_title : sekPreviewLocalized.i18n['nested section'];
+                          var section_title = ! data.is_nested ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['nested section'];
+                          if ( true === data.is_header_location ) {
+                                section_title = sekPreviewLocalized.i18n['header section'];
+                          } else if ( true === data.is_footer_location ) {
+                                section_title = sekPreviewLocalized.i18n['footer section'];
+                          }
+
+                          section_title = true !== data.is_global_location ? section_title : [ section_title, sekPreviewLocalized.i18n['(global)'] ].join(' ');
                         #>
                         <div class="sek-dyn-ui-level-type">{{section_title}}</div>
                       </div><?php // .sek-dyn-ui-location-inner ?>
@@ -8822,9 +8927,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $this -> sek_setup_tiny_mce_content_filters();
             add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template' ) );
-            add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
-            add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
-            add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
+            if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
+                add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
+                add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
+                add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
+            }
         }//_schedule_front_rendering()
         function sek_wrap_wp_content( $html ) {
             if ( ! skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) )
@@ -9125,7 +9232,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             <?php
                               if ( skp_is_customizing() && empty( $collection ) ) {
                                   $content_type = 'module';
-                                  $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_domain_to_be_replaced' ) : __('Drag and drop a module here', 'text_domain_to_be_replaced' );
+                                  $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_domain_to_be_replaced' ) : __('Drag and drop a block of content here', 'text_domain_to_be_replaced' );
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
@@ -9470,7 +9577,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
         }
         function sek_maybe_set_local_nimble_header( $header_name ) {
-            if ( $this->has_local_header_footer || $this->has_global_header_footer ) {
+            if ( sek_page_uses_nimble_header_footer() ) {
                 load_template( NIMBLE_BASE_PATH . '/tmpl/header/nimble_header_tmpl.php', false );
                 $templates = array();
                 $header_name = (string) $header_name;
@@ -9486,7 +9593,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
         }
         function sek_maybe_set_local_nimble_footer( $footer_name ) {
-            if ( $this->has_local_header_footer || $this->has_global_header_footer ) {
+            if ( sek_page_uses_nimble_header_footer() ) {
                 load_template( NIMBLE_BASE_PATH . '/tmpl/footer/nimble_footer_tmpl.php', false );
                 $templates = array();
                 $name = (string) $footer_name;
@@ -9512,24 +9619,24 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
         }
         function print_or_enqueue_seks_style( $skope_id = null ) {
             if ( ( ! is_null( $skope_id ) && ! empty( $skope_id ) ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-                $this->_instantiate_css_handler( $skope_id );
+                $this->_instantiate_css_handler( array( 'skope_id' => $skope_id, 'is_global_stylesheet' => NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) );
             } else {
                 $skope_id = skp_build_skope_id();
-                $this->_instantiate_css_handler( skp_build_skope_id() );
+                $this->_instantiate_css_handler( array( 'skope_id' => skp_build_skope_id() ) );
                 if ( sek_has_global_sections() ) {
-                    $this->_instantiate_css_handler( NIMBLE_GLOBAL_SKOPE_ID );
+                    $this->_instantiate_css_handler( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) );
                 }
             }
             if ( empty( $skope_id ) ) {
                 sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . ' =>the skope_id should not be empty' );
             }
         }//print_or_enqueue_seks_style
-
-
-        private function _instantiate_css_handler( $skope_id ) {
+        private function _instantiate_css_handler( $params = array() ) {
+            $params = wp_parse_args( $params, array( 'skope_id' => '', 'is_global_stylesheet' => false ) );
             new Sek_Dyn_CSS_Handler( array(
-                'id'             => $skope_id,
-                'skope_id'       => $skope_id,
+                'id'             => $params['skope_id'],
+                'skope_id'       => $params['skope_id'],
+                'is_global_stylesheet' => $params['is_global_stylesheet'],
                 'mode'           => is_customize_preview() ? Sek_Dyn_CSS_Handler::MODE_INLINE : Sek_Dyn_CSS_Handler::MODE_FILE,
                 'force_write'    => true, //<- write if the file doesn't exist
                 'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists

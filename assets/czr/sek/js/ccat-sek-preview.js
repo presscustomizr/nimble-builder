@@ -615,9 +615,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 )
                           return;
+
+                        var levelRect = $levelEl[0].getBoundingClientRect(),
+                            levelType = $levelEl.data('sek-level');
+                        $levelEl.toggleClass( 'sek-shrink-my-ui', levelRect.width && levelRect.width < ( 'section' === levelType ? 350 : ( 'column' === levelType ? 300 : 200 ) ) );
+
                         params = {
                               id : $levelEl.data('sek-id'),
-                              level : $levelEl.data('sek-level')
+                              level : levelType
                         };
                         switch ( level ) {
                               case 'section' :
@@ -634,9 +639,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     params = _.extend( params, {
                                           is_nested : true === $(this).data('sek-is-nested'),
                                           can_have_more_columns : $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
-                                          is_global_location : true === $levelEl.closest( 'div[data-sek-level="location"]' ).data('sek-is-global-location'),
+                                          is_global_location : true === $parentLocation.data('sek-is-global-location'),
                                           is_last_section_in_location : _is_last_section,
-                                          is_first_section_in_location : _is_first_section
+                                          is_first_section_in_location : _is_first_section,
+                                          is_header_location : true === $parentLocation.data('sek-is-header-location'),
+                                          is_footer_location : true === $parentLocation.data('sek-is-footer-location')
                                     });
                               break;
                               case 'column' :

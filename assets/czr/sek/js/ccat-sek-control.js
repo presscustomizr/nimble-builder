@@ -53,7 +53,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });
                         api.section( self.SECTION_ID_FOR_GLOBAL_OPTIONS, function( _section_ ) {
+                              if ( true === _section_.nimbleGlobalOptionGenerated )
+                                return;
                               self.generateUI({ action : 'sek-generate-global-options-ui'});
+                              _section_.nimbleGlobalOptionGenerated = true;
                         });
                   };
                   if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
@@ -2288,13 +2291,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel : sektionsLocalizedData.i18n['Page template'],
                               expandAndFocusOnInit : false,
                               icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
-                        },
-                        local_header_footer : {
-                              settingControlId : _id_ + '__local_header_footer',
-                              module_type : 'sek_local_header_footer',
-                              controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
-                              icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                        },
+                        }
+                  });
+                  if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+                        $.extend( registrationParams, {
+                              local_header_footer : {
+                                    settingControlId : _id_ + '__local_header_footer',
+                                    module_type : 'sek_local_header_footer',
+                                    controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
+                                    icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                              }
+                        });
+                  }
+
+                  $.extend( registrationParams, {
                         widths : {
                               settingControlId : _id_ + '__widths',
                               module_type : 'sek_local_widths',
@@ -2408,14 +2418,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return dfd;
                   }
                   var registrationParams = {};
+                  if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+                        $.extend( registrationParams, {
+                              global_header_footer : {
+                                    settingControlId : _id_ + '__header_footer',
+                                    module_type : 'sek_global_header_footer',
+                                    controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
+                                    icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                              }
+                        });
+                  }
 
                   $.extend( registrationParams, {
-                        global_header_footer : {
-                              settingControlId : _id_ + '__header_footer',
-                              module_type : 'sek_global_header_footer',
-                              controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
-                              icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                        },
                         breakpoint : {
                               settingControlId : _id_ + '__breakpoint',
                               module_type : 'sek_global_breakpoint',
