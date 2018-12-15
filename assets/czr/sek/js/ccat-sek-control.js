@@ -8241,6 +8241,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_menu_content_child', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_menu_content_child' )
             }
       });
