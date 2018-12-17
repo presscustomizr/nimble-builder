@@ -1,6 +1,6 @@
 <?php
 /**
-* Plugin Name: Nimble Builder
+* Plugin Name: Nimble Page Builder
 * Description: Powerful drag and drop page builder using the native WordPress customizer.
 * Version: 1.4.0
 * Text Domain: nimble-builder
