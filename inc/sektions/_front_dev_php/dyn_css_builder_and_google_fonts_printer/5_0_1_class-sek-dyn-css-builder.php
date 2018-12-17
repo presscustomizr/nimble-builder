@@ -404,7 +404,7 @@ class Sek_Dyn_CSS_Builder {
         if ( ! is_array( $column ) )
           return $rules;
 
-        if ( empty( $column['level'] ) || 'column' !== $column['level'] )
+        if ( empty( $column['level'] ) || 'column' !== $column['level'] || empty( $column['id'] ) )
           return $rules;
 
         $width   = empty( $column[ 'width' ] ) || !is_numeric( $column[ 'width' ] ) ? '' : $column['width'];
