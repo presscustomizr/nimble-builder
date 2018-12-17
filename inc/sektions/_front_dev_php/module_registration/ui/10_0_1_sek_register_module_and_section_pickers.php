@@ -18,10 +18,14 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'notice_after' => sprintf(
-                        __('Note : you can %1$s to replace your default theme template. Depending on your theme structure, it can allow you to display your sections in full-width mode.'),
+                        __('Note : you can %1$s to replace your default theme template. Or design your own %2$s.', 'nimble-builder'),
                         sprintf('<a href="%2$s" title="%1$s">%1$s</a>',
-                            __('use the Nimble page template', 'text-domain'),
-                            "javascript:if ( sektionsLocalizedData && sektionsLocalizedData.sektionsPanelId ) { wp.customize.panel(sektionsLocalizedData.sektionsPanelId, function( _panel_ ) { try{wp.customize.czr_sektions.rootPanelFocus(); _panel_.focus();}catch(er){} } ) }"
+                            __('use the Nimble page template', 'nimble-builder'),
+                            "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})"
+                        ),
+                        sprintf('<a href="%2$s" title="%1$s">%1$s</a>',
+                            __('header and footer', 'nimble-builder'),
+                            "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })"
                         )
                     )
                 )
