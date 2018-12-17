@@ -103,18 +103,22 @@ module.exports = function(grunt) {
             'build_customizer_css_js_php_fmk_panel_and_preview',
 
             'replace:czr_fmk_namespace_from_nimble_to_customizr',
+            'clean:czr_base_fmk_in_customizr_theme',
             'copy:czr_base_fmk_in_customizr_theme',
             'replace:czr_fmk_namespace_from_customizr_to_nimble',
 
             'replace:czr_fmk_namespace_from_nimble_to_hueman',
+            'clean:czr_base_fmk_in_hueman_theme',
             'copy:czr_base_fmk_in_hueman_theme',
             'replace:czr_fmk_namespace_from_hueman_to_nimble',
 
             'replace:czr_fmk_namespace_from_nimble_to_hueman',
+            'clean:czr_base_fmk_in_hueman_pro_addons',
             'copy:czr_base_fmk_in_hueman_pro_addons',
             'replace:czr_fmk_namespace_from_hueman_to_nimble',
 
             'replace:czr_fmk_namespace_from_nimble_to_wfc',
+            'clean:czr_base_fmk_in_wfc',
             'copy:czr_base_fmk_in_wfc',
             'replace:czr_fmk_namespace_from_wfc_to_nimble',
           ],
@@ -123,13 +127,17 @@ module.exports = function(grunt) {
             'build_skope_php_js',
 
             'replace:skope_namespace_from_nimble_to_hueman',
+            'clean:skope_in_hueman_pro_addons',
             'copy:skope_in_hueman_pro_addons',
             'replace:skope_namespace_from_hueman_to_nimble'
           ],
 
           build_and_copy : [ 'build_and_copy_czr_fmk', 'build_and_copy_skope'],
 
-          dev : [ 'clean', 'watch']
+          dev : [
+            'clean:main',//<= clean the /build folder
+            'watch'
+          ]
         },
         uglify_requested_paths : {
           src : '' || grunt.option('src'),

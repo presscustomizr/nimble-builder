@@ -3,6 +3,11 @@ module.exports = {
     force: true //This overrides this task from blocking deletion of folders outside current working dir (CWD). Use with caution.
   },
 	main : ['__build__/**/*'],
+  czr_base_fmk_in_customizr_theme : ['../../themes/customizr/core/czr-base-fmk/'],
+  czr_base_fmk_in_hueman_theme : ['../../themes/hueman/functions/czr-base-fmk/'],
+  czr_base_fmk_in_hueman_pro_addons : ['../hueman-pro-addons/inc/czr-base-fmk/'],
+  czr_base_fmk_in_wfc : ['../wordpress-font-customizer/back/czr-base-fmk/'],
+  skope_in_hueman_pro_addons: ['../hueman-pro-addons/inc/czr-skope/']
   // in_hueman_addons : [
   //   '../hueman-addons/**/*',
   //   '!../hueman-addons/build/**',
