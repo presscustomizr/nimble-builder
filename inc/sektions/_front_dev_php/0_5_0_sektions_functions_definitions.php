@@ -1043,6 +1043,27 @@ function sek_filter_skp_get_skope_id( $skope_id, $level ) {
 }
 
 
+/* ------------------------------------------------------------------------- *
+ *  HAS USER STARTED CREATING SECTIONS ?
+/* ------------------------------------------------------------------------- */
+// @return a boolean
+// Used to check if we should render the welcome notice in sek_render_welcome_notice()
+function sek_site_has_nimble_sections_created() {
+    $sek_post_query_vars = array(
+        'post_type'              => NIMBLE_CPT,
+        'post_status'            => get_post_stati(),
+        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        'posts_per_page'         => -1,
+        'no_found_rows'          => true,
+        'cache_results'          => true,
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
+        'lazy_load_term_meta'    => false,
+    );
+    $query = new \WP_Query( $sek_post_query_vars );
+    //sek_error_log('DO WE HAVE SECTIONS ?', $query );
+    return is_array( $query->posts ) && ! empty( $query->posts );
+}
 
 
 

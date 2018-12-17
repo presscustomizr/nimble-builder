@@ -46,3 +46,40 @@
 a.czr-rating-link:hover {
     color: #eea236;
 }
+
+
+/* WELCOME NOTICE */
+.nimble-welcome-notice {
+  padding: 38px;
+}
+.nimble-welcome-notice .dashicons {
+  line-height: 44px;
+}
+.nimble-welcome-icon-holder {
+  width: 550px;
+  height: 200px;
+  float: left;
+  margin: 0 38px 38px 0;
+}
+.nimble-welcome-icon {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.nimble-welcome-notice h1 {
+  font-weight: bold;
+}
+.nimble-welcome-notice h3 {
+  font-size: 16px;
+  font-weight: 500;
+}
+.nimble-link-to-doc {
+  position: relative;
+  display: inline-block;
+  width: 200px;
+  height: 46px;
+}
+.nimble-link-to-doc .nimble-doc-link-wrap {
+  position: absolute;
+  bottom: 0;
+}
