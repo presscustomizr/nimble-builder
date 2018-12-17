@@ -515,6 +515,8 @@
     -moz-background-clip: padding;
     border-radius: 5px;
     background-clip: padding-box;
+    -webkit-transition: all ease 0.2s;
+    -o-transition: all ease 0.2s;
     transition: all ease 0.2s;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -609,10 +611,41 @@
   min-height: 50px;
   margin:20px 0;
   border-radius: 5px;
+  text-align: center;
 }
-
+[data-sek-is-header-location="true"] > .sek-empty-location-placeholder, [data-sek-is-footer-location="true"] > .sek-empty-location-placeholder {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  background: #eee;
+  line-height: 45px;
+  font-size: 20px;
+}
+.sek-header-footer-location-placeholder {
+  opacity: 1;
+  -webkit-transition: opacity ease 0.4s;
+    -o-transition: opacity ease 0.4s;
+    transition: opacity ease 0.4s;
+}
+.sek-header-footer-location-placeholder .sek-nimble-icon img {
+    width: 30px;
+    height: 30px;
+    position: relative;
+    top: -2px;
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+    -webkit-filter: gray;
+    filter: gray;
+}
+.sek-empty-location-placeholder:hover .sek-nimble-icon img {
+    -webkit-filter: none;
+    filter: none;
+    -webkit-filter: none;
+    filter: none;
+}
+.sek-empty-location-placeholder:hover .sek-header-footer-location-placeholder {
+  opacity: 0.6;
+}
 .sek-empty-location-placeholder:hover {
-  border: 2px dotted #000000;
+  outline: 2px dotted #000000;
 }
 
 .sek-add-button-wrapper {
@@ -1266,7 +1299,7 @@ html.no-js [id*=sek-slider-loader-wrapper] {
 
 /* STYLE FOR GLOBAL LOCATIONS AND SECTIONS */
 [data-sek-is-global-location="true"] .sek-empty-location-placeholder:hover {
-  border: 2px dotted #ff0000;
+  outline: 2px dotted #ff0000;
 }
 [data-sek-is-global-location="true"] .sek-add-content-button-wrapper {
   border: 1px dashed #ff7878

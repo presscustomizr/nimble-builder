@@ -354,11 +354,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     ?>
                       <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
                             <?php
+                              $is_header_location = true === sek_get_registered_location_property( $id, 'is_header_location' );
+                              $is_footer_location = true === sek_get_registered_location_property( $id, 'is_footer_location' );
                               printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s>',
                                   $id,
                                   sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false'),
-                                  true === sek_get_registered_location_property( $id, 'is_header_location' ) ? 'data-sek-is-header-location="true"' : '',
-                                  true === sek_get_registered_location_property( $id, 'is_footer_location' ) ? 'data-sek-is-footer-location="true"' : ''
+                                  $is_header_location ? 'data-sek-is-header-location="true"' : '',
+                                  $is_footer_location ? 'data-sek-is-footer-location="true"' : ''
                               );
                             ?>
                             <?php
@@ -367,7 +369,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             ?>
 
                              <?php if ( empty( $collection ) ) : ?>
-                                <div class="sek-empty-location-placeholder"></div>
+                                <div class="sek-empty-location-placeholder">
+                                  <?php
+                                    if ( $is_header_location || $is_footer_location ) {
+                                        printf('<span class="sek-header-footer-location-placeholder">%1$s %2$s</span>',
+                                            sprintf( '<span class="sek-nimble-icon"><img src="%1$s"/></span>',
+                                                NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION
+                                            ),
+                                            $is_header_location ? __('Start designing the header', 'text_domain_to_be_replaced') : __('Start designing the footer', 'text_domain_to_be_replaced')
+                                        );
+                                    }
+                                  ?>
+                                </div>
                             <?php endif; ?>
                           </div><?php //class="sektion-wrapper" ?>
                       <?php endif; ?>
