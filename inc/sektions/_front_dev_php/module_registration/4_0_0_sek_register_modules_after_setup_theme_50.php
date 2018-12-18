@@ -82,7 +82,9 @@ function sek_register_modules() {
         'czr_simple_form_submission_child',
 
         // GENERIC FRONT CHILD MODULES
-        'czr_font_child'
+        'czr_font_child',
+
+        'czr_widget_area_module'
     ];
 
     // Header and footer have been introduced in v1.4.0 but not enabled by default

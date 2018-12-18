@@ -17,9 +17,8 @@ if ( ! defined( 'NIMBLE_GLOBAL_SKOPE_ID' ) ) { define( 'NIMBLE_GLOBAL_SKOPE_ID' 
 if ( ! defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
 if ( ! defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' , 'nimble_saved_sektions' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
-if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) {
-    define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION );
-}
+if ( ! defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'nimble-widget-area-' ); }
+if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) { define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION ); }
 
 
 
@@ -1258,5 +1257,30 @@ function sek_get_user_created_menus() {
     return array_merge(
         array( 'nimble_page_menu' => __('Default page menu', 'text_domain_to_replace') )
     , $user_menus );
+}
+
+
+/* ------------------------------------------------------------------------- *
+ *  Nimble Widgets Areas
+/* ------------------------------------------------------------------------- */
+// @return the list of Nimble registered widget areas
+function sek_get_registered_widget_areas() {
+    global $wp_registered_sidebars;
+    $widget_areas = array();
+    if ( is_array( $wp_registered_sidebars ) && ! empty( $wp_registered_sidebars ) ) {
+        foreach ( $wp_registered_sidebars as $registered_sb ) {
+            $id = $registered_sb['id'];
+            if ( ! sek_is_nimble_widget_id( $id ) )
+              continue;
+            $widget_areas[ $id ] = $registered_sb['name'];
+        }
+    }
+    return $widget_areas;
+}
+// @return bool
+// @ param $id string
+function sek_is_nimble_widget_id( $id ) {
+    // NIMBLE_WIDGET_PREFIX = nimble-widget-area-
+    return NIMBLE_WIDGET_PREFIX === substr( $id, 0, strlen( NIMBLE_WIDGET_PREFIX ) );
 }
 ?>

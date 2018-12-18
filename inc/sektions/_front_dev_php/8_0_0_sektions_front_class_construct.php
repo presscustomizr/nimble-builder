@@ -66,7 +66,30 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             $this -> _setup_hook_for_front_css_printing_or_enqueuing();
             // LOADS SIMPLE FORM
             $this -> _setup_simple_forms();
+            // REGISTER NIMBLE WIDGET ZONES
+            add_action( 'widgets_init', array( $this, 'sek_nimble_widgets_init' ) );
         }//__construct
+
+        // @fired @hook 'widgets_init'
+        public function sek_nimble_widgets_init() {
+            $defaults = array(
+                'name'          => '',
+                'id'            => '',
+                'description'   => '',
+                'class'         => '',
+                'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+                'after_widget'  => '</aside>',
+                'before_title'  => '<h2 class="widget-title">',
+                'after_title'   => '</h2>',
+            );
+            for ( $i=1; $i < 11; $i++ ) {
+                $args['id'] = NIMBLE_WIDGET_PREFIX . $i;//'nimble-widget-area-'
+                $args['name'] = sprintf( __('Nimble widget area #%1$s', 'text_domain_to_replace' ), $i );
+                $args['description'] = $args['name'];
+                $args = wp_parse_args( $args, $defaults );
+                register_sidebar( $args );
+            }
+        }
     }//class
 endif;
 ?>
