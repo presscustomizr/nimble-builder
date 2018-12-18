@@ -619,14 +619,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //-------------------------------------------------------------------------------------------------
             // used in the module input constructors
             // "this" is the input
-            setupSelectInput : function() {
+            setupSelectInput : function( selectOptions ) {
                   var input  = this,
                       item   = input.input_parent,
                       module = input.module,
-                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
-                      selectOptions = inputRegistrationParams.choices;
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type );
 
-                  if ( _.isEmpty( selectOptions ) ) {
+                  selectOptions = _.isUndefined( selectOptions ) ? inputRegistrationParams.choices : selectOptions;
+
+                  if ( _.isEmpty( selectOptions ) || ! _.isObject( selectOptions ) ) {
                         api.errare( 'api.czr_sektions.setupSelectInput => missing select options for input id => ' + input.id + ' in image module');
                         return;
                   } else {
