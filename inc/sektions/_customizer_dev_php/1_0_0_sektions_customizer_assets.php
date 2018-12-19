@@ -396,6 +396,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             'The header location only accepts modules and pre-built header sections' => __('The header location only accepts modules and pre-built header sections', 'text_domain_to_be_replaced'),
             'The footer location only accepts modules and pre-built footer sections' => __('The footer location only accepts modules and pre-built footer sections', 'text_domain_to_be_replaced'),
+            'You can\'t drop a header section in the footer location' => __('You can\'t drop a header section in the footer location', 'text_domain_to_be_replaced'),
+            'You can\'t drop a footer section in the header location' => __('You can\'t drop a footer section in the header location', 'text_domain_to_be_replaced'),
 
             'Sections for an introduction' => __('Sections for an introduction', 'text_domain_to_be_replaced'),
             'Sections for services and features' => __('Sections for services and features', 'text_domain_to_be_replaced'),

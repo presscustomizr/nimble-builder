@@ -412,11 +412,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       sectionHasNoModule  = $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ),
                       isHeaderLocation    = true === $dropTarget.closest('[data-sek-level="location"]').data('sek-is-header-location'),
                       isFooterLocation    = true === $dropTarget.closest('[data-sek-level="location"]').data('sek-is-footer-location'),
-                      isContentSectionCandidate = 'preset_section' === self.dndData.content_type && 'content' === self.dndData.section_type;
+                      isContentSectionCandidate = 'preset_section' === self.dndData.content_type && 'content' === self.dndData.section_type,
+                      msg;
 
-                  if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
+                  var maybePrintErrorMessage = function( msg ) {
                         if ( $('.sek-no-drop-possible-message', $dropTarget ).length < 1 ) {
-                              var msg = isHeaderLocation ? sektionsLocalizedData.i18n['The header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['The footer location only accepts modules and pre-built footer sections'];
                               $dropTarget.append([
                                     '<div class="sek-no-drop-possible-message">',
                                       '<i class="material-icons">not_interested</i>',
@@ -424,6 +424,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     '</div>'
                               ].join(''));
                         }
+                  };
+
+                  if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
+                        msg = isHeaderLocation ? sektionsLocalizedData.i18n['The header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['The footer location only accepts modules and pre-built footer sections'];
+                        maybePrintErrorMessage( msg );
+                        return false;
+                  }
+                  if ( isFooterLocation && 'preset_section' === self.dndData.content_type && 'header' === self.dndData.section_type ) {
+                        msg = sektionsLocalizedData.i18n['You can\'t drop a header section in the footer location'];
+                        maybePrintErrorMessage( msg );
+                        return false;
+                  }
+
+                  if ( isHeaderLocation && 'preset_section' === self.dndData.content_type && 'footer' === self.dndData.section_type ) {
+                        msg = sektionsLocalizedData.i18n['You can\'t drop a footer section in the header location'];
+                        maybePrintErrorMessage( msg );
                         return false;
                   }
 
