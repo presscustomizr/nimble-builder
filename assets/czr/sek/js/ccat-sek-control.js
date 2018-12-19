@@ -1795,6 +1795,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
+                        sek_header_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_header_sec_picker_module',
+                              controlLabel : sektionsLocalizedData.i18n['Header sections'],// sektionsLocalizedData.i18n['Header sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
+                        sek_footer_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_footer_sec_picker_module',
+                              controlLabel : sektionsLocalizedData.i18n['Footer sections'],// sektionsLocalizedData.i18n['Header sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         }
                   });
 
@@ -3948,14 +3966,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   selectables.eq( prevIndex ).focus();
             },
-            setupSelectInput : function() {
+            setupSelectInput : function( selectOptions ) {
                   var input  = this,
                       item   = input.input_parent,
                       module = input.module,
-                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
-                      selectOptions = inputRegistrationParams.choices;
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type );
 
-                  if ( _.isEmpty( selectOptions ) ) {
+                  selectOptions = _.isUndefined( selectOptions ) ? inputRegistrationParams.choices : selectOptions;
+
+                  if ( _.isEmpty( selectOptions ) || ! _.isObject( selectOptions ) ) {
                         api.errare( 'api.czr_sektions.setupSelectInput => missing select options for input id => ' + input.id + ' in image module');
                         return;
                   } else {
@@ -4198,6 +4217,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         evt.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
                         evt.originalEvent.dataTransfer.setData( "sek-section-type", $(this).data('sek-section-type') );
                         evt.originalEvent.dataTransfer.setData( "sek-is-user-section", $(this).data('sek-is-user-section') );
+                        self.dndData = {
+                              content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                              content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
+                              section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),
+                              is_user_section : "true" === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" )
+                        };
                         try {
                               evt.originalEvent.dataTransfer.setData( 'browserSupport', 'browserSupport' );
                               evt.originalEvent.dataTransfer.clearData( 'browserSupport' );
@@ -4213,10 +4238,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }, 10000 );
                               });
                         }
-                        self.dnd_draggedType = $(this).data('sek-content-type');
                         $(this).addClass('sek-dragged');
                         $('body').addClass('sek-dragging');
-                        api.previewer.send( 'sek-drag-start', { type : self.dnd_draggedType } );//fires the rendering of the dropzones
+                        api.previewer.send( 'sek-drag-start', { type : self.dndData.content_type } );//fires the rendering of the dropzones
                   };
 
                   var _onEnd = function( evt ) {
@@ -4260,7 +4284,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }, 100 );
                                     }
 
-                                    if ( ! self.dnd_canDrop( $(this) ) )
+                                    if ( ! self.dnd_canDrop( { targetEl : $(this), evt : evt } ) )
                                       return;
 
                                     evt.stopPropagation();
@@ -4276,7 +4300,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           case 'drop' :
                                                 this.$cachedDropZoneCandidates = null;//has been declared on enter over
 
-                                                if ( ! self.dnd_canDrop( $(this) ) )
+                                                if ( ! self.dnd_canDrop( { targetEl : $(this), evt : evt } ) )
                                                   return;
                                                 evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
                                                 self.dnd_onDrop( $(this), evt );
@@ -4372,7 +4396,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       html,
                       preDropContent;
 
-                  switch( this.dnd_draggedType ) {
+                  switch( this.dndData.content_type ) {
                         case 'module' :
                               html = sektionsLocalizedData.i18n['Insert here'];
                               if ( $target.length > 0 ) {
@@ -4397,10 +4421,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             dnd_getDropZonesElements : function() {
                   return $( api.previewer.targetWindow().document );
             },
-            dnd_canDrop : function( $dropTarget ) {
-                  var isSectionDropZone = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' ),
-                      sectionHasNoModule = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' );
-                  return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === this.dnd_draggedType && isSectionDropZone ) || ( 'module' === this.dnd_draggedType && ! isSectionDropZone ) || ( 'preset_section' === this.dnd_draggedType && sectionHasNoModule ) );
+            dnd_canDrop : function( params ) {
+                  params = _.extend( { targetEl : {}, evt : {} }, params || {} );
+                  var self = this, $dropTarget = params.targetEl;
+                  if ( ! _.isObject( $dropTarget ) || 1 > $dropTarget.length )
+                    return false;
+
+                  var isSectionDropZone   = $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' ),
+                      sectionHasNoModule  = $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ),
+                      isHeaderLocation    = true === $dropTarget.closest('[data-sek-level="location"]').data('sek-is-header-location'),
+                      isFooterLocation    = true === $dropTarget.closest('[data-sek-level="location"]').data('sek-is-footer-location'),
+                      isContentSectionCandidate = 'preset_section' === self.dndData.content_type && 'content' === self.dndData.section_type;
+
+                  if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
+                        if ( $('.sek-no-drop-possible-message', $dropTarget ).length < 1 ) {
+                              var msg = isHeaderLocation ? sektionsLocalizedData.i18n['The header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['The footer location only accepts modules and pre-built footer sections'];
+                              $dropTarget.append([
+                                    '<div class="sek-no-drop-possible-message">',
+                                      '<i class="material-icons">not_interested</i>',
+                                      msg,
+                                    '</div>'
+                              ].join(''));
+                        }
+                        return false;
+                  }
+
+                  return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === self.dndData.content_type && isSectionDropZone ) || ( 'module' === self.dndData.content_type && ! isSectionDropZone ) || ( 'preset_section' === self.dndData.content_type && sectionHasNoModule ) );
             },
             dnd_OnEnterOver : function( $dropTarget, evt ) {
                   evt.preventDefault();//@see :https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets
@@ -4434,6 +4480,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $dropTarget.find('.sek-drop-zone').removeClass('sek-drag-is-approaching');
 
                   $dropTarget.removeClass('sek-feed-me-seymore');
+
+                  $dropTarget.find('.sek-no-drop-possible-message').remove();
             },
             dnd_getPosition : function( $dropTarget, evt ) {
                   var targetRect = $dropTarget[0].getBoundingClientRect(),
@@ -6327,6 +6375,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             'sek_features_sec_picker_module',
             'sek_contact_sec_picker_module',
             'sek_column_layouts_sec_picker_module',
+            'sek_header_sec_picker_module',
+            'sek_footer_sec_picker_module'
       ], function( module_type ) {
             api.czrModuleMap[ module_type ] = {
                   crud : false,
@@ -8609,6 +8659,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   ready_on_section_expanded : false,
                   ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_font_child' )
+            }
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+( function ( api, $, _ ) {
+      var Constructor = {
+              initialize: function( id, options ) {
+                      var module = this;
+                      module.inputConstructor = api.CZRInput.extend({
+                            setupSelect : function() {
+                                  api.czr_sektions.setupSelectInput.call( this, sektionsLocalizedData.registeredWidgetZones );
+                            }
+                      });
+                      api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+              },//initialize
+      };
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_widget_area_module : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_widget_area_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_widget_area_module' )
             }
       });
 })( wp.customize , jQuery, _ );

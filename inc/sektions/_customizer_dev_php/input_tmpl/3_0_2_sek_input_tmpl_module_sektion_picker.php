@@ -268,16 +268,44 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                         ),
                     );
                 break;
+                case 'header_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'header_one',
+                            'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
+                            'thumb' => 'header_one.jpg'
+                        )
+                    );
+                break;
+                case 'footer_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'footer_one',
+                            'title' => __('simple footer with 3 columns and large bottom zone', 'text-domain' ),
+                            'thumb' => 'footer_one.jpg'
+                        )
+                    );
+                break;
             }
             foreach( $content_collection as $_params) {
-                printf('<div draggable="true" data-sek-section-type="content" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"><div class="sek-overlay"></div></div>',
+                $section_type = 'content';
+                if ( false !== strpos($_params['content-id'], 'header_') ) {
+                    $section_type = 'header';
+                } else if ( false !== strpos($_params['content-id'], 'footer_') ) {
+                    $section_type = 'footer';
+                }
+
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s" data-sek-section-type="%5$s"><div class="sek-overlay"></div></div>',
                     $_params['content-type'],
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
                         NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'],
                         isset( $_params['height'] ) ? 'height:'.$_params['height'] : ''
                     ),
-                    $_params['title']
+                    $_params['title'],
+                    $section_type
                 );
             }
           ?>

@@ -126,6 +126,36 @@ function sek_get_module_params_for_sek_column_layouts_sec_picker_module() {
     );
 }
 
+function sek_get_module_params_for_sek_header_sec_picker_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_header_sec_picker_module',
+        'name' => __('Header sections', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'header_sections' => sek_get_default_section_input_params()
+            )
+        )
+    );
+}
+function sek_get_module_params_for_sek_footer_sec_picker_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_footer_sec_picker_module',
+        'name' => __('Footer sections', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'footer_sections' => sek_get_default_section_input_params()
+            )
+        )
+    );
+}
+
+
+
+
+
+
 function sek_get_module_params_for_sek_my_sections_sec_picker_module() {
     return array(
         'dynamic_registration' => true,

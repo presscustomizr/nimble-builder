@@ -401,6 +401,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Sections for services and features' => __('Sections for services and features', 'text_domain_to_be_replaced'),
             'Contact-us sections' => __('Contact-us sections', 'text_domain_to_be_replaced'),
             'Empty sections with columns layout' => __('Empty sections with columns layout', 'text_domain_to_be_replaced'),
+            'Header sections' => __('Header sections', 'text_domain_to_be_replaced'),
+            'Footer sections' => __('Footer sections', 'text_domain_to_be_replaced'),
 
             'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
 
