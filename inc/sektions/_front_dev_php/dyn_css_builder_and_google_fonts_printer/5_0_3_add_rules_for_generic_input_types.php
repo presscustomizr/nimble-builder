@@ -428,11 +428,14 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             $unit                 = !empty( $rules_candidates['unit'] ) ? $rules_candidates['unit'] : $default_unit;
             $unit                 = 'percent' == $unit ? '%' : $unit;
 
-            $filtered_rules_candidates = array_filter( $rules_candidates, function( $k ) {
-                return 'unit' !== $k;
-            }, ARRAY_FILTER_USE_KEY );
+            $new_filtered_rules = array();
+            foreach ( $rules_candidates as $k => $v) {
+                if ( 'unit' !== $k ) {
+                    $new_filtered_rules[ $k ] = $v;
+                }
+            }
 
-            $properties_to_render = $filtered_rules_candidates;
+            $properties_to_render = $new_filtered_rules;
 
             array_walk( $properties_to_render,
                 function( &$val, $key, $unit ) {
