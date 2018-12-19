@@ -202,11 +202,14 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
             $unit                 = !empty( $rules_candidates['unit'] ) ? $rules_candidates['unit'] : $default_unit;
             $unit                 = 'percent' == $unit ? '%' : $unit;
 
-            $filtered_rules_candidates = array_filter( $rules_candidates, function( $k ) {
-                return 'unit' !== $k;
-            }, ARRAY_FILTER_USE_KEY );
+            $new_filtered_rules = array();
+            foreach ( $rules_candidates as $k => $v) {
+                if ( 'unit' !== $k ) {
+                    $new_filtered_rules[ $k ] = $v;
+                }
+            }
 
-            $_pad_marg[ $device ] = array( 'rules' => $filtered_rules_candidates );
+            $_pad_marg[ $device ] = array( 'rules' => $new_filtered_rules );
 
             array_walk( $_pad_marg[ $device ][ 'rules' ],
                 function( &$val, $key, $unit ) {
