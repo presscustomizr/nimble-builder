@@ -98,6 +98,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         evt.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
                         evt.originalEvent.dataTransfer.setData( "sek-section-type", $(this).data('sek-section-type') );
                         evt.originalEvent.dataTransfer.setData( "sek-is-user-section", $(this).data('sek-is-user-section') );
+
+                        // in addition to the dataTransfer storage, store the properties of the dragged object in a static property
+                        // => we will need it for example to access the object property when checking if "can drop"
+                        self.dndData = {
+                              content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                              content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
+                              section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),
+                              // Saved sections
+                              is_user_section : "true" === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" )
+                        };
+
                         // evt.originalEvent.dataTransfer.effectAllowed = "move";
                         // evt.originalEvent.dataTransfer.dropEffect = "move";
                         // Notify if not supported : https://caniuse.com/#feat=dragndrop
@@ -118,11 +129,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }, 10000 );
                               });
                         }
-                        // Set the dragged type property now : module or preset_section
-                        self.dnd_draggedType = $(this).data('sek-content-type');
                         $(this).addClass('sek-dragged');
                         $('body').addClass('sek-dragging');
-                        api.previewer.send( 'sek-drag-start', { type : self.dnd_draggedType } );//fires the rendering of the dropzones
+                        api.previewer.send( 'sek-drag-start', { type : self.dndData.content_type } );//fires the rendering of the dropzones
                   };
 
                   var _onEnd = function( evt ) {
@@ -175,7 +184,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $zone
                               //.on( 'dragenter dragover', sektionsLocalizedData.dropSelectors,  )
                               .on( 'dragenter dragover', sektionsLocalizedData.dropSelectors, function( evt ) {
-                                    //api.infoLog( self.enterOverTimer, self.dnd_canDrop( $(this) ) );
+                                    //api.infoLog( self.enterOverTimer, self.dnd_canDrop( { targetEl : $(this), evt : evt } ) );
                                     if ( _.isNull( self.enterOverTimer ) ) {
                                           self.enterOverTimer = true;
                                           _.delay(function() {
@@ -190,7 +199,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }, 100 );
                                     }
 
-                                    if ( ! self.dnd_canDrop( $(this) ) )
+                                    if ( ! self.dnd_canDrop( { targetEl : $(this), evt : evt } ) )
                                       return;
 
                                     evt.stopPropagation();
@@ -207,7 +216,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 // Reset the this.$cachedDropZoneCandidates now
                                                 this.$cachedDropZoneCandidates = null;//has been declared on enter over
 
-                                                if ( ! self.dnd_canDrop( $(this) ) )
+                                                if ( ! self.dnd_canDrop( { targetEl : $(this), evt : evt } ) )
                                                   return;
                                                 evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
                                                 self.dnd_onDrop( $(this), evt );
@@ -362,7 +371,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       html,
                       preDropContent;
 
-                  switch( this.dnd_draggedType ) {
+                  switch( this.dndData.content_type ) {
                         case 'module' :
                               html = sektionsLocalizedData.i18n['Insert here'];
                               if ( $target.length > 0 ) {
@@ -391,12 +400,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
             // @return boolean
+            // @paraps = { targetEl : $(this), evt : evt }
             // Note : the class "sek-content-preset_section-drop-zone" is dynamically generated in preview::schedulePanelMsgReactions() sek-drag-start case
-            dnd_canDrop : function( $dropTarget ) {
-                  //api.infoLog("$dropTarget.hasClass('sek-drop-zone') ?", $dropTarget, $dropTarget.hasClass('sek-drop-zone') );
-                  var isSectionDropZone = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' ),
-                      sectionHasNoModule = $dropTarget && $dropTarget.length > 0 && $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' );
-                  return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === this.dnd_draggedType && isSectionDropZone ) || ( 'module' === this.dnd_draggedType && ! isSectionDropZone ) || ( 'preset_section' === this.dnd_draggedType && sectionHasNoModule ) );
+            dnd_canDrop : function( params ) {
+                  params = _.extend( { targetEl : {}, evt : {} }, params || {} );
+                  var self = this, $dropTarget = params.targetEl;
+                  if ( ! _.isObject( $dropTarget ) || 1 > $dropTarget.length )
+                    return false;
+
+                  var isSectionDropZone   = $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' ),
+                      sectionHasNoModule  = $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ),
+                      isHeaderLocation    = true === $dropTarget.closest('[data-sek-level="location"]').data('sek-is-header-location'),
+                      isFooterLocation    = true === $dropTarget.closest('[data-sek-level="location"]').data('sek-is-footer-location'),
+                      isContentSectionCandidate = 'preset_section' === self.dndData.content_type && 'content' === self.dndData.section_type;
+
+                  if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
+                        if ( $('.sek-no-drop-possible-message', $dropTarget ).length < 1 ) {
+                              var msg = isHeaderLocation ? sektionsLocalizedData.i18n['The header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['The footer location only accepts modules and pre-built footer sections'];
+                              $dropTarget.append([
+                                    '<div class="sek-no-drop-possible-message">',
+                                      '<i class="material-icons">not_interested</i>',
+                                      msg,
+                                    '</div>'
+                              ].join(''));
+                        }
+                        return false;
+                  }
+
+                  return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === self.dndData.content_type && isSectionDropZone ) || ( 'module' === self.dndData.content_type && ! isSectionDropZone ) || ( 'preset_section' === self.dndData.content_type && sectionHasNoModule ) );
             },
 
             // @return void()
@@ -439,6 +470,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $dropTarget.find('.sek-drop-zone').removeClass('sek-drag-is-approaching');
 
                   $dropTarget.removeClass('sek-feed-me-seymore');
+
+                  $dropTarget.find('.sek-no-drop-possible-message').remove();
             },
 
 

@@ -394,6 +394,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_domain_to_be_replaced'),
             'Select a content type' => __('Select a content type', 'text_domain_to_be_replaced'),
 
+            'The header location only accepts modules and pre-built header sections' => __('The header location only accepts modules and pre-built header sections', 'text_domain_to_be_replaced'),
+            'The footer location only accepts modules and pre-built footer sections' => __('The footer location only accepts modules and pre-built footer sections', 'text_domain_to_be_replaced'),
+
             'Sections for an introduction' => __('Sections for an introduction', 'text_domain_to_be_replaced'),
             'Sections for services and features' => __('Sections for services and features', 'text_domain_to_be_replaced'),
             'Contact-us sections' => __('Contact-us sections', 'text_domain_to_be_replaced'),

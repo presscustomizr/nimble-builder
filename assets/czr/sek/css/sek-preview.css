@@ -764,6 +764,34 @@
   -webkit-transition: opacity, height, background 0.4s ease;
   -o-transition: opacity, height, background 0.4s ease;
   transition: opacity, height, background 0.4s ease;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  /* flex-direction: column; */
+  flex: 0 0 100%;
+  max-width: 100%;
+  text-align: center;
+}
+/* When trying to drop content in an drop zone not allowed */
+.sek-no-drop-possible-message {
+  margin: auto;
+  padding: 20px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  color: #004085;
+  background-color: #cce5ff;
+  border: 1px solid #b8daff;
+  border-radius: .25rem;
+  font-size: 16px;
+  line-height: 1.5em;
+  max-width: 80%;
 }
 
 
