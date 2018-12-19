@@ -1090,6 +1090,7 @@
     border-radius: 12px;
     color: white;
     padding: 2px;
+    width: auto;
     display: none;
 }
 [data-sek-level="section"]:hover .ui-resizable-e {
