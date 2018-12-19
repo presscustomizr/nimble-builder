@@ -438,9 +438,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         // api.previewer.send( 'sek-refresh-stylesheet', {
                                         //       location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                         // });
+
+                                        // Use the location_skope_id provided if set, otherwise generate it
+                                        var location_skope_id = params.location_skope_id;
+                                        if ( _.isUndefined( location_skope_id ) ) {
+                                              location_skope_id = true === params.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' );
+                                        }
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               //id : params.apiParams.location,
-                                              location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
+                                              location_skope_id : location_skope_id,//<= send skope id to the preview so we can use it when ajaxing
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
                                         });
 
                                         // Refresh when a section is created ( not duplicated )
