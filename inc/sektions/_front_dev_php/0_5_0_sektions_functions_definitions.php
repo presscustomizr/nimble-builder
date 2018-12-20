@@ -738,9 +738,6 @@ function _sek_normalize_single_module_values( $raw_module_value, $module_type ) 
 }
 
 
-
-
-
 /* ------------------------------------------------------------------------- *
  *  HELPER FOR CHECKBOX OPTIONS
 /* ------------------------------------------------------------------------- */
@@ -1283,4 +1280,34 @@ function sek_is_nimble_widget_id( $id ) {
     // NIMBLE_WIDGET_PREFIX = nimble-widget-area-
     return NIMBLE_WIDGET_PREFIX === substr( $id, 0, strlen( NIMBLE_WIDGET_PREFIX ) );
 }
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  Dynamic variables parsing
+/* ------------------------------------------------------------------------- */
+function sek_find_pattern_match($matches) {
+    $replace_values = array(
+      'home_url' => 'home_url'
+    );
+
+    if ( array_key_exists( $matches[1], $replace_values ) ) {
+      $dyn_content = $replace_values[$matches[1]];
+      if ( function_exists( $dyn_content ) ) {
+        return $dyn_content();//<= use call_user_func() here + handle the case when the callback is a method
+      } else if ( is_string($dyn_content) ) {
+        return $dyn_content;
+      } else {
+        return null;
+      }
+    }
+    return null;
+}
+
+function sek_parse_template_tags( $val ) {
+    //the pattern could also be '!\{\{(\w+)\}\}!', but adding \s? allows us to allow spaces around the term inside curly braces
+    //see https://stackoverflow.com/questions/959017/php-regex-templating-find-all-occurrences-of-var#comment71815465_959026
+    return is_string( $val ) ? preg_replace_callback( '!\{\{\s?(\w+)\s?\}\}!', '\Nimble\sek_find_pattern_match', $val) : $val;
+}
+add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
 ?>

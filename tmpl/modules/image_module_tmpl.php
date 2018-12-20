@@ -82,7 +82,8 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
             case 'url' :
                 if ( ! empty( $value['link-pick-url'] ) && ! empty( $value['link-pick-url']['id'] ) ) {
                     if ( '_custom_' == $value['link-pick-url']['id']  && ! empty( $value['link-custom-url'] ) ) {
-                        $link = esc_url( $value['link-custom-url'] );
+                        $custom_url = apply_filters( 'nimble_parse_template_tags', $value['link-custom-url'] );
+                        $link = esc_url( $custom_url );
                     } else if ( ! empty( $value['link-pick-url']['url'] ) ) {
                         $link = esc_url( $value['link-pick-url']['url'] );
                     }
