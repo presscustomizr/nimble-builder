@@ -12,7 +12,7 @@ $widget_area_has_at_least_one_widget = is_active_sidebar( $value['widget-area-id
 if ( ! function_exists( 'Nimble\sek_maybe_print_widget_placeholder') ) {
   function sek_maybe_print_widget_placeholder( $id ) {
       global $wp_registered_sidebars;
-      if ( ! sek_is_nimble_widget_id( $id ) ) {
+      if ( ! sek_is_nimble_widget_id( $id ) || ! array_key_exists( $id, $wp_registered_sidebars ) ) {
           $placeholder_text = __('Select a Nimble widget area and start adding widgets.', 'text_domain_to_replace');
       } else {
           $widget_area_model = $wp_registered_sidebars[ $id ];
