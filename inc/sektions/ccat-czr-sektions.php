@@ -887,31 +887,37 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'content-id' => 'czr_simple_form_module',
                   'title' => __( 'Simple Contact Form', 'text_domain_to_be_replaced' ),
                   'icon' => 'Nimble_contact-form_icon.svg'
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_widget_area_module',
+                  'title' => __( 'WordPress widget area ( coming soon )', 'text_domain_to_be_replaced' ),
+                  'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
+                  'active' => NIMBLE_HEADER_FOOTER_ENABLED
+                ),
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_menu_module',
+                  'title' => __( 'Menu ( coming soon )', 'text_domain_to_be_replaced' ),
+                  'font_icon' => '<i class="material-icons">menu</i>',
+                  'active' => NIMBLE_HEADER_FOOTER_ENABLED
                 )
 
 
             ];
-            if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
-                $content_collection = array_merge( $content_collection, [
-                    array(
-                      'content-type' => 'module',
-                      'content-id' => 'czr_widget_area_module',
-                      'title' => __( 'WordPress widget area', 'text_domain_to_be_replaced' ),
-                      'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
-                    ),
-                    array(
-                      'content-type' => 'module',
-                      'content-id' => 'czr_menu_module',
-                      'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
-                      'font_icon' => '<i class="material-icons">menu</i>'
-                    )
-
-                ]);
-            }
 
             $i = 0;
-            foreach( $content_collection as $_params) {
-                $icon_img_html = '';
+            foreach( $content_collection as $_params ) {
+                $_params = wp_parse_args( $_params, array(
+                    'content-type' => 'module',
+                    'content-id' => '',
+                    'title' => '',
+                    'icon' => '',
+                    'font_icon' => '',
+                    'active' => true
+                ));
+
+                $icon_img_html = '<i style="color:red">Missing Icon</i>';
                 if ( !empty( $_params['icon'] ) ) {
                     $icon_img_src = NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' . $_params['icon'];
                     $icon_img_html = '<img draggable="false" title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>';
@@ -919,13 +925,14 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                     $icon_img_html = $_params['font_icon'];
                 }
 
-                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><div class="sek-module-icon %6$s">%3$s</div><div class="sek-module-title"><div class="sek-centered-module-title">%4$s</div></div></div>',
+                printf('<div draggable="%7$s" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><div class="sek-module-icon %6$s">%3$s</div><div class="sek-module-title"><div class="sek-centered-module-title">%4$s</div></div></div>',
                       $_params['content-type'],
                       $_params['content-id'],
-                      empty( $icon_img_html ) ? '<i style="color:red">Missing Icon</i>' : $icon_img_html,
+                      $icon_img_html,
                       $_params['title'],
-                      __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' ),
-                      !empty( $_params['font_icon'] ) ? 'is-font-icon' : ''
+                      true === $_params['active'] ? __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' ) : __('This module is being tested and will be available very soon!', 'text_domain_to_be_replaced'),
+                      !empty( $_params['font_icon'] ) ? 'is-font-icon' : '',
+                      true === $_params['active'] ? 'true' : 'false'
                 );
             }
           ?>

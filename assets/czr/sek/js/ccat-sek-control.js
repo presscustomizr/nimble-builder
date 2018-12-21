@@ -6402,7 +6402,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             'sek_column_layouts_sec_picker_module'
       ];
       if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-            $.extend( section_modules, [ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ] );
+            section_modules = _.union( section_modules, [ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ] );
       }
       _.each( section_modules, function( module_type ) {
             api.czrModuleMap[ module_type ] = {
