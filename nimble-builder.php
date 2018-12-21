@@ -26,6 +26,8 @@ if ( !defined( 'NIMBLE_PLUGIN_FILE' ) ) { define( 'NIMBLE_PLUGIN_FILE', __FILE__
 if ( !defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ) { define ( 'NIMBLE_SAVED_SECTIONS_ENABLED', false ); }
 if ( !defined( 'NIMBLE_HEADER_FOOTER_ENABLED' ) ) { define ( 'NIMBLE_HEADER_FOOTER_ENABLED', false ); }
 
+if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_ID', 'nimble-welcome-notice-12-2018' ); }
+
 /* ------------------------------------------------------------------------- *
  *  CHECK PHP AND WP REQUIREMENTS
 /* ------------------------------------------------------------------------- */

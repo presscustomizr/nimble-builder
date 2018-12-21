@@ -3,121 +3,6 @@ namespace Nimble;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// /* ------------------------------------------------------------------------- *
-// *  WELCOME NOTICE
-// /* ------------------------------------------------------------------------- */
-/* beautify admin notice text using some defaults the_content filter callbacks */
-foreach ( array( 'wptexturize', 'convert_smilies' ) as $callback ) {
-  add_filter( 'nimble_update_notice', $callback );
-}
-add_action( 'admin_notices', '\Nimble\sek_render_welcome_notice' );
-function sek_render_welcome_notice() {
-    if ( ! current_user_can( 'customize' ) )
-      return;
-
-    $notice_id = 'nimble-welcome-notice-12-2018';
-    $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
-    $dismissed_array = array_filter( explode( ',', (string) $dismissed ) );
-
-    if ( in_array( $notice_id, $dismissed_array ) ) {
-      return;
-    }
-
-    // If the notice has not been dismissed, make sure it is still relevant to display it.
-    // If user has started created sections, we should not display it anymore => update the dismissed pointers array
-    // @see https://developer.wordpress.org/reference/functions/wp_ajax_dismiss_wp_pointer/
-    if ( sek_site_has_nimble_sections_created() ) {
-        $dismissed_array[] = $notice_id;
-        $dismissed = implode( ',', $dismissed_array );
-        update_user_meta( get_current_user_id(), 'dismissed_wp_pointers', $dismissed );
-        return;
-    }
-
-    ?>
-    <div class="nimble-welcome-notice notice notice-info is-dismissible" id="<?php echo esc_attr( $notice_id ); ?>">
-      <div class="notice-dismiss"></div>
-      <div class="nimble-welcome-icon-holder">
-        <img class="nimble-welcome-icon" src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_banner.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php esc_html_e( 'Nimble Builder', 'nimble' ); ?>" />
-      </div>
-      <h1><?php echo apply_filters( 'nimble_update_notice', __('Welcome to the Nimble Builder for WordPress :D', 'nimble' ) ); ?></h1>
-      <h3><?php _e( 'The Nimble Builder takes the native WordPress customizer to a level you\'ve never seen before.', 'nimble' ); ?></h3>
-      <h3><?php _e( 'Nimble allows you to insert content into any page and edit it in <i>real</i> live preview. The plugin automatically creates fluid layouts for your visitors using smartphones or tablets, without the need to add complex code. Nimble Builder comes with a set of carefully crafted and attractive pre-built sections.', 'nimble' ); ?></h3>
-      <?php printf( '<a href="%1$s" target="_blank" class="button button-primary button-hero"><span class="dashicons dashicons-admin-appearance"></span> %2$s</a>',
-          esc_url( add_query_arg(
-              array(
-                array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
-                'return' => urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) )
-              ),
-              admin_url( 'customize.php' )
-          ) ),
-          __( 'Start creating content in live preview', 'nimble' )
-      ); ?>
-      <div class="nimble-link-to-doc">
-        <?php printf( '<div class="nimble-doc-link-wrap">%1$s <a href="%2$s" target="_blank" class="">%3$s</a>.</div>',
-            __('Or', 'nimble'),
-            esc_url( add_query_arg(
-                array(
-                  'utm_source' => 'usersite',
-                  'utm_medium' => 'link',
-                  'utm_campaign' => 'nimble-welcome-notice'
-                ),
-                'docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin'
-            ) ),
-            __( 'read the getting started guide', 'nimble' )
-        ); ?>
-      </div>
-    </div>
-
-    <script>
-    jQuery( function( $ ) {
-      // On dismissing the notice, make a POST request to store this notice with the dismissed WP pointers so it doesn't display again.
-      $( <?php echo wp_json_encode( "#$notice_id" ); ?> ).on( 'click', '.notice-dismiss', function() {
-        $.post( ajaxurl, {
-          pointer: <?php echo wp_json_encode( $notice_id ); ?>,
-          action: 'dismiss-wp-pointer'
-        } );
-      } );
-    } );
-    </script>
-    <style type="text/css">
-      .nimble-welcome-notice {
-        padding: 38px;
-      }
-      .nimble-welcome-notice .dashicons {
-        line-height: 44px;
-      }
-      .nimble-welcome-icon-holder {
-        width: 550px;
-        height: 200px;
-        float: left;
-        margin: 0 38px 38px 0;
-      }
-      .nimble-welcome-icon {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-      .nimble-welcome-notice h1 {
-        font-weight: bold;
-      }
-      .nimble-welcome-notice h3 {
-        font-size: 16px;
-        font-weight: 500;
-      }
-      .nimble-link-to-doc {
-        position: relative;
-        display: inline-block;
-        width: 200px;
-        height: 46px;
-      }
-      .nimble-link-to-doc .nimble-doc-link-wrap {
-        position: absolute;
-        bottom: 0;
-      }
-
-    </style>
-    <?php
-  }
 
 
 // /* ------------------------------------------------------------------------- *
@@ -368,6 +253,9 @@ function sek_admin_style() {
 
 
 
+
+
+
 // /* ------------------------------------------------------------------------- *
 // *  UPDATE NOTIFICATIONS
 // /* ------------------------------------------------------------------------- */
@@ -375,7 +263,6 @@ if( ! defined( 'DISPLAY_UPDATE_NOTIFICATION' ) ) { define( 'DISPLAY_UPDATE_NOTIF
 add_action( 'admin_notices'                         , '\Nimble\sek_may_be_display_update_notice');
 // always add the ajax action
 add_action( 'wp_ajax_dismiss_nimble_update_notice'  ,  '\Nimble\sek_dismiss_update_notice_action' );
-add_action( 'admin_footer'                          ,  '\Nimble\sek_write_ajax_dismis_script' );
 // beautify admin notice text using some defaults the_content filter callbacks
 foreach ( array( 'wptexturize', 'convert_smilies', 'wpautop') as $callback ) {
   if ( function_exists( $callback ) )
@@ -389,6 +276,11 @@ foreach ( array( 'wptexturize', 'convert_smilies', 'wpautop') as $callback ) {
 function sek_may_be_display_update_notice() {
     if ( ! defined('DISPLAY_UPDATE_NOTIFICATION') || ! DISPLAY_UPDATE_NOTIFICATION )
       return;
+
+    // always wait for the welcome note to be dismissed before display
+    if ( ! sek_welcome_notice_is_dismissed() )
+      return;
+
     $last_update_notice_values  = get_option( 'nimble_last_update_notice' );
     $show_new_notice = false;
     $display_ct = 5;
@@ -472,6 +364,40 @@ function sek_may_be_display_update_notice() {
           ?>
         </p> -->
       </div>
+      <script type="text/javascript" id="nimble-dismiss-update-notice">
+        ( function($){
+          var _ajax_action = function( $_el ) {
+              var AjaxUrl = "<?php echo admin_url( 'admin-ajax.php' ); ?>",
+                  _query  = {
+                      action  : 'dismiss_nimble_update_notice',
+                      dismissUpdateNoticeNonce :  "<?php echo wp_create_nonce( 'dismiss-update-notice-nonce' ); ?>"
+                  },
+                  $ = jQuery,
+                  request = $.post( AjaxUrl, _query );
+
+              request.fail( function ( response ) {});
+              request.done( function( response ) {
+                // Check if the user is logged out.
+                if ( '0' === response )
+                  return;
+                // Check for cheaters.
+                if ( '-1' === response )
+                  return;
+
+                $_el.closest('.updated').slideToggle('fast');
+              });
+          };//end of fn
+
+          //on load
+          $( function($) {
+            $('.nimble-dismiss-update-notice').click( function( e ) {
+              e.preventDefault();
+              _ajax_action( $(this) );
+            } );
+          } );
+
+        })( jQuery );
+      </script>
       <?php
     $_html = ob_get_contents();
     if ($_html) ob_end_clean();
@@ -488,54 +414,128 @@ function sek_dismiss_update_notice_action() {
     //reset option value with new version and counter to 0
     $new_val  = array( "version" => NIMBLE_VERSION, "display_count" => 0 );
     update_option( 'nimble_last_update_notice', $new_val );
-    wp_die();
+    wp_die( 1 );
 }
 
 
 
-/**
-* hook : admin_footer
-*/
-function sek_write_ajax_dismis_script() {
+// /* ------------------------------------------------------------------------- *
+// *  WELCOME NOTICE
+// /* ------------------------------------------------------------------------- */
+/* beautify admin notice text using some defaults the_content filter callbacks */
+foreach ( array( 'wptexturize', 'convert_smilies' ) as $callback ) {
+  add_filter( 'nimble_update_notice', $callback );
+}
+
+// @return bool;
+function sek_welcome_notice_is_dismissed() {
+    $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
+    $dismissed_array = array_filter( explode( ',', (string) $dismissed ) );
+    return in_array( NIMBLE_WELCOME_NOTICE_ID, $dismissed_array );
+}
+
+add_action( 'admin_notices', '\Nimble\sek_render_welcome_notice' );
+function sek_render_welcome_notice() {
+    if ( ! current_user_can( 'customize' ) )
+      return;
+
+    if ( sek_welcome_notice_is_dismissed() )
+      return;
+
+    // If the notice has not been dismissed, make sure it is still relevant to display it.
+    // If user has started created sections, we should not display it anymore => update the dismissed pointers array
+    // @see https://developer.wordpress.org/reference/functions/wp_ajax_dismiss_wp_pointer/
+    if ( sek_site_has_nimble_sections_created() ) {
+        $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
+        $dismissed_array = array_filter( explode( ',', (string) $dismissed ) );
+        $dismissed_array[] = NIMBLE_WELCOME_NOTICE_ID;
+        $dismissed = implode( ',', $dismissed_array );
+        update_user_meta( get_current_user_id(), 'dismissed_wp_pointers', $dismissed );
+        return;
+    }
+
     ?>
-    <script type="text/javascript" id="nimble-dismiss-update-notice">
-      ( function($){
-        var _ajax_action = function( $_el ) {
-            var AjaxUrl = "<?php echo admin_url( 'admin-ajax.php' ); ?>",
-                _query  = {
-                    action  : 'dismiss_nimble_update_notice',
-                    dismissUpdateNoticeNonce :  "<?php echo wp_create_nonce( 'dismiss-update-notice-nonce' ); ?>"
-                },
-                $ = jQuery,
-                request = $.post( AjaxUrl, _query );
+    <div class="nimble-welcome-notice notice notice-info is-dismissible" id="<?php echo esc_attr( $notice_id ); ?>">
+      <div class="notice-dismiss"></div>
+      <div class="nimble-welcome-icon-holder">
+        <img class="nimble-welcome-icon" src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_banner.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php esc_html_e( 'Nimble Builder', 'nimble' ); ?>" />
+      </div>
+      <h1><?php echo apply_filters( 'nimble_update_notice', __('Welcome to the Nimble Builder for WordPress :D', 'nimble' ) ); ?></h1>
+      <h3><?php _e( 'The Nimble Builder takes the native WordPress customizer to a level you\'ve never seen before.', 'nimble' ); ?></h3>
+      <h3><?php _e( 'Nimble allows you to insert content into any page and edit it in <i>real</i> live preview. The plugin automatically creates fluid layouts for your visitors using smartphones or tablets, without the need to add complex code. Nimble Builder comes with a set of carefully crafted and attractive pre-built sections.', 'nimble' ); ?></h3>
+      <?php printf( '<a href="%1$s" target="_blank" class="button button-primary button-hero"><span class="dashicons dashicons-admin-appearance"></span> %2$s</a>',
+          esc_url( add_query_arg(
+              array(
+                array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
+                'return' => urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) )
+              ),
+              admin_url( 'customize.php' )
+          ) ),
+          __( 'Start creating content in live preview', 'nimble' )
+      ); ?>
+      <div class="nimble-link-to-doc">
+        <?php printf( '<div class="nimble-doc-link-wrap">%1$s <a href="%2$s" target="_blank" class="">%3$s</a>.</div>',
+            __('Or', 'nimble'),
+            esc_url( add_query_arg(
+                array(
+                  'utm_source' => 'usersite',
+                  'utm_medium' => 'link',
+                  'utm_campaign' => 'nimble-welcome-notice'
+                ),
+                'docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin'
+            ) ),
+            __( 'read the getting started guide', 'nimble' )
+        ); ?>
+      </div>
+    </div>
 
-            request.fail( function ( response ) {
-              console.log('response when failed : ', response);
-            });
-            request.done( function( response ) {
-              console.log('RESPONSE DONE', $_el, response);
-              // Check if the user is logged out.
-              if ( '0' === response )
-                return;
-              // Check for cheaters.
-              if ( '-1' === response )
-                return;
-
-              $_el.closest('.updated').slideToggle('fast');
-            });
-        };//end of fn
-
-        //on load
-        $( function($) {
-          $('.nimble-dismiss-update-notice').click( function( e ) {
-            e.preventDefault();
-            _ajax_action( $(this) );
-          } );
+    <script>
+    jQuery( function( $ ) {
+      // On dismissing the notice, make a POST request to store this notice with the dismissed WP pointers so it doesn't display again.
+      $( <?php echo wp_json_encode( "{#$notice_id}" ); ?> ).on( 'click', '.notice-dismiss', function() {
+        $.post( ajaxurl, {
+          pointer: <?php echo wp_json_encode( $notice_id ); ?>,
+          action: 'dismiss-wp-pointer'
         } );
-
-      } )( jQuery );
-
-
+      } );
+    } );
     </script>
+    <style type="text/css">
+      .nimble-welcome-notice {
+        padding: 38px;
+      }
+      .nimble-welcome-notice .dashicons {
+        line-height: 44px;
+      }
+      .nimble-welcome-icon-holder {
+        width: 550px;
+        height: 200px;
+        float: left;
+        margin: 0 38px 38px 0;
+      }
+      .nimble-welcome-icon {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .nimble-welcome-notice h1 {
+        font-weight: bold;
+      }
+      .nimble-welcome-notice h3 {
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .nimble-link-to-doc {
+        position: relative;
+        display: inline-block;
+        width: 200px;
+        height: 46px;
+      }
+      .nimble-link-to-doc .nimble-doc-link-wrap {
+        position: absolute;
+        bottom: 0;
+      }
+
+    </style>
     <?php
-}
+  }
