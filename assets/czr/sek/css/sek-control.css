@@ -118,9 +118,14 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
 [data-sek-content-type="preset_section"]:hover .sek-overlay {
     opacity: 0.15;
 }
-[data-sek-content-type]:hover {
+/* don't elevate inactive modules ( introduced but not yet implemented ) */
+[data-sek-content-type][draggable="true"]:hover {
   -webkit-box-shadow: 0 12px 20px rgba(0,0,0,.2);
   box-shadow: 0 12px 20px rgba(0,0,0,.2);
+}
+[data-sek-content-type][draggable="false"] {
+  background: #eee;
+  opacity: 0.8;
 }
 
 /* USER SECTIONS */
