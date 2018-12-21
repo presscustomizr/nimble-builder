@@ -15,9 +15,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             generateUIforDraggableContent : function( params, dfd ) {
                   var self = this;
                   // Prepare the module map to register
-                  var modulesRegistrationParams = {};
+                  var registrationParams = {};
 
-                  $.extend( modulesRegistrationParams, {
+                  $.extend( registrationParams, {
                         content_type_switcher : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_content_type_switcher_ui',
                               module_type : 'sek_content_type_switcher_module',
@@ -70,29 +70,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                        },
-                        sek_header_sec_picker_module : {
-                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                              module_type : 'sek_header_sec_picker_module',
-                              controlLabel : sektionsLocalizedData.i18n['Header sections'],// sektionsLocalizedData.i18n['Header sections'],
-                              content_type : 'section',
-                              expandAndFocusOnInit : false,
-                              priority : 10,
-                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                        },
-                        sek_footer_sec_picker_module : {
-                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                              module_type : 'sek_footer_sec_picker_module',
-                              controlLabel : sektionsLocalizedData.i18n['Footer sections'],// sektionsLocalizedData.i18n['Header sections'],
-                              content_type : 'section',
-                              expandAndFocusOnInit : false,
-                              priority : 10,
-                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         }
                   });
 
+                  // Header and footer have been introduced in v1.4.0 but not enabled by default
+                  // The header and footer preset sections are on hold until "header and footer" feature is released.
+                  if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+                        $.extend( registrationParams, {
+                              sek_header_sec_picker_module : {
+                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                                    module_type : 'sek_header_sec_picker_module',
+                                    controlLabel : sektionsLocalizedData.i18n['Header sections'],// sektionsLocalizedData.i18n['Header sections'],
+                                    content_type : 'section',
+                                    expandAndFocusOnInit : false,
+                                    priority : 10,
+                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                              },
+                              sek_footer_sec_picker_module : {
+                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                                    module_type : 'sek_footer_sec_picker_module',
+                                    controlLabel : sektionsLocalizedData.i18n['Footer sections'],// sektionsLocalizedData.i18n['Header sections'],
+                                    content_type : 'section',
+                                    expandAndFocusOnInit : false,
+                                    priority : 10,
+                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                              }
+                        });
+                  }
+
                   if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-                        $.extend( modulesRegistrationParams, {
+                        $.extend( registrationParams, {
                               sek_my_sections_sec_picker_module : {
                                     settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                                     module_type : 'sek_my_sections_sec_picker_module',
@@ -111,8 +118,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // If so :
                   // 1) visually remind the user that a module should be dragged
                   // 2) pass the content_type param to display the requested content_type
-                  var firstKey = _.keys( modulesRegistrationParams )[0],
-                      firstControlId = modulesRegistrationParams[firstKey].settingControlId;
+                  var firstKey = _.keys( registrationParams )[0],
+                      firstControlId = registrationParams[firstKey].settingControlId;
 
                   if ( self.isUIControlAlreadyRegistered( firstControlId ) ) {
                         api.control( firstControlId, function( _control_ ) {
@@ -136,7 +143,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // @return void()
                   _do_register_ = function() {
-                        _.each( modulesRegistrationParams, function( optionData, optionType ){
+                        _.each( registrationParams, function( optionData, optionType ){
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     // synchronize the module setting with the main collection setting
                                     api( optionData.settingControlId, function( _setting_ ) {

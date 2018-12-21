@@ -72,6 +72,10 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
 
         // @fired @hook 'widgets_init'
         public function sek_nimble_widgets_init() {
+            // Header and footer have been introduced in v1.4.0 but not enabled by default
+            // The Nimble widget areas registration is on hold until "header and footer" feature is released.
+            if ( ! NIMBLE_HEADER_FOOTER_ENABLED )
+              return;
             $defaults = array(
                 'name'          => '',
                 'id'            => '',

@@ -149,14 +149,18 @@
       //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
-      _.each([
+      var section_modules = [
             'sek_intro_sec_picker_module',
             'sek_features_sec_picker_module',
             'sek_contact_sec_picker_module',
-            'sek_column_layouts_sec_picker_module',
-            'sek_header_sec_picker_module',
-            'sek_footer_sec_picker_module'
-      ], function( module_type ) {
+            'sek_column_layouts_sec_picker_module'
+      ];
+      // Header and footer have been introduced in v1.4.0 but not enabled by default
+      // The header and footer preset sections are on hold until "header and footer" feature is released.
+      if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+            $.extend( section_modules, [ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ] );
+      }
+      _.each( section_modules, function( module_type ) {
             api.czrModuleMap[ module_type ] = {
                   //mthds : SectionPickerModuleConstructor,
                   crud : false,

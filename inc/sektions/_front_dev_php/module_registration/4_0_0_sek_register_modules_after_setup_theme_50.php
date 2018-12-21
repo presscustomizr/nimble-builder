@@ -11,8 +11,8 @@ function sek_register_modules() {
         'sek_features_sec_picker_module',
         'sek_contact_sec_picker_module',
         'sek_column_layouts_sec_picker_module',
-        'sek_header_sec_picker_module',
-        'sek_footer_sec_picker_module',
+        // 'sek_header_sec_picker_module',
+        // 'sek_footer_sec_picker_module',
 
         'sek_my_sections_sec_picker_module',
 
@@ -85,17 +85,21 @@ function sek_register_modules() {
         'czr_simple_form_submission_child',
 
         // GENERIC FRONT CHILD MODULES
-        'czr_font_child',
-
-        'czr_widget_area_module'
+        'czr_font_child'
     ];
 
     // Header and footer have been introduced in v1.4.0 but not enabled by default
-    // The module menu is on hold until "header and footer" feature is released.
+    // The module menu and the widget area module are on hold until "header and footer" feature is released.
     if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
         $modules = array_merge( $modules, [
+            // pre-built sections for header and footer
+            'sek_header_sec_picker_module',
+            'sek_footer_sec_picker_module',
+
+            // modules for header and footer
             'czr_menu_module',
             'czr_menu_content_child',
+            'czr_widget_area_module'
             //'czr_menu_design_child',
         ]);
     }
