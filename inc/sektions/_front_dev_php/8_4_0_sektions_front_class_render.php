@@ -99,7 +99,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     switch ( $location_id ) {
                         case 'loop_start' :
                         case 'loop_end' :
-                            add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
+                            // Do not add loop_start, loop_end action hooks when in a jetpack's like "infinite scroll" query
+                            // see: https://github.com/presscustomizr/nimble-builder/issues/228
+                            // the filter 'infinite_scroll_got_infinity' is documented both in jetpack's infinite module
+                            // and in Customizr-Pro/Hueman-Pro infinite scroll code. They both use the same $_GET var too.
+                            // Actually this is not needed anymore for our themes, see:
+                            // https://github.com/presscustomizr/nimble-builder/issues/228#issuecomment-449362111
+                            if ( ! ( apply_filters( 'infinite_scroll_got_infinity', isset( $_GET[ 'infinity' ] ) ) ) ) {
+                                add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
+                            }
                         break;
                         case 'before_content' :
                             add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
