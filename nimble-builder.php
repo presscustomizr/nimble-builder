@@ -2,7 +2,7 @@
 /**
 * Plugin Name: Nimble Page Builder
 * Description: Powerful drag and drop page builder using the native WordPress customizer.
-* Version: 1.4.0
+* Version: 1.4.1
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://presscustomizr.com
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "1.4.0";
+$current_version = "1.4.1";
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
 if ( !defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
@@ -26,6 +26,8 @@ if ( !defined( 'NIMBLE_PLUGIN_FILE' ) ) { define( 'NIMBLE_PLUGIN_FILE', __FILE__
 if ( !defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ) { define ( 'NIMBLE_SAVED_SECTIONS_ENABLED', false ); }
 if ( !defined( 'NIMBLE_HEADER_FOOTER_ENABLED' ) ) { define ( 'NIMBLE_HEADER_FOOTER_ENABLED', false ); }
 
+if ( !defined( 'NIMBLE_DISPLAY_UPDATE_NOTICE' ) ) { define( 'NIMBLE_DISPLAY_UPDATE_NOTICE', true ); }
+if ( !defined( 'NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION' ) ) { define( 'NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION', '1.4.1' ); }
 if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_ID', 'nimble-welcome-notice-12-2018' ); }
 
 /* ------------------------------------------------------------------------- *

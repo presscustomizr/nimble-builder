@@ -1199,8 +1199,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               action : 'sek-update-fonts',
                                               is_global_location : self.isGlobalLocation( params.apiParams )
                                         });
+                                        var location_skope_id = params.location_skope_id;
+                                        if ( _.isUndefined( location_skope_id ) ) {
+                                              location_skope_id = true === params.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' );
+                                        }
                                         api.previewer.trigger('sek-refresh-stylesheet', {
-                                              location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
+                                              location_skope_id : location_skope_id,//<= send skope id to the preview so we can use it when ajaxing
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
                                         });
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
@@ -1741,9 +1746,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( CZRSeksPrototype, {
             generateUIforDraggableContent : function( params, dfd ) {
                   var self = this;
-                  var modulesRegistrationParams = {};
+                  var registrationParams = {};
 
-                  $.extend( modulesRegistrationParams, {
+                  $.extend( registrationParams, {
                         content_type_switcher : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_content_type_switcher_ui',
                               module_type : 'sek_content_type_switcher_module',
@@ -1795,29 +1800,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                        },
-                        sek_header_sec_picker_module : {
-                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                              module_type : 'sek_header_sec_picker_module',
-                              controlLabel : sektionsLocalizedData.i18n['Header sections'],// sektionsLocalizedData.i18n['Header sections'],
-                              content_type : 'section',
-                              expandAndFocusOnInit : false,
-                              priority : 10,
-                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                        },
-                        sek_footer_sec_picker_module : {
-                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                              module_type : 'sek_footer_sec_picker_module',
-                              controlLabel : sektionsLocalizedData.i18n['Footer sections'],// sektionsLocalizedData.i18n['Header sections'],
-                              content_type : 'section',
-                              expandAndFocusOnInit : false,
-                              priority : 10,
-                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         }
                   });
+                  if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+                        $.extend( registrationParams, {
+                              sek_header_sec_picker_module : {
+                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                                    module_type : 'sek_header_sec_picker_module',
+                                    controlLabel : sektionsLocalizedData.i18n['Header sections'],// sektionsLocalizedData.i18n['Header sections'],
+                                    content_type : 'section',
+                                    expandAndFocusOnInit : false,
+                                    priority : 10,
+                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                              },
+                              sek_footer_sec_picker_module : {
+                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                                    module_type : 'sek_footer_sec_picker_module',
+                                    controlLabel : sektionsLocalizedData.i18n['Footer sections'],// sektionsLocalizedData.i18n['Header sections'],
+                                    content_type : 'section',
+                                    expandAndFocusOnInit : false,
+                                    priority : 10,
+                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                              }
+                        });
+                  }
 
                   if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-                        $.extend( modulesRegistrationParams, {
+                        $.extend( registrationParams, {
                               sek_my_sections_sec_picker_module : {
                                     settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                                     module_type : 'sek_my_sections_sec_picker_module',
@@ -1829,8 +1838,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   }
-                  var firstKey = _.keys( modulesRegistrationParams )[0],
-                      firstControlId = modulesRegistrationParams[firstKey].settingControlId;
+                  var firstKey = _.keys( registrationParams )[0],
+                      firstControlId = registrationParams[firstKey].settingControlId;
 
                   if ( self.isUIControlAlreadyRegistered( firstControlId ) ) {
                         api.control( firstControlId, function( _control_ ) {
@@ -1850,7 +1859,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return dfd;
                   }//if
                   _do_register_ = function() {
-                        _.each( modulesRegistrationParams, function( optionData, optionType ){
+                        _.each( registrationParams, function( optionData, optionType ){
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     api( optionData.settingControlId, function( _setting_ ) {
                                           _setting_.bind( function( to, from ) {
@@ -4431,11 +4440,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       sectionHasNoModule  = $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ),
                       isHeaderLocation    = true === $dropTarget.closest('[data-sek-level="location"]').data('sek-is-header-location'),
                       isFooterLocation    = true === $dropTarget.closest('[data-sek-level="location"]').data('sek-is-footer-location'),
-                      isContentSectionCandidate = 'preset_section' === self.dndData.content_type && 'content' === self.dndData.section_type;
+                      isContentSectionCandidate = 'preset_section' === self.dndData.content_type && 'content' === self.dndData.section_type,
+                      msg;
 
-                  if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
+                  var maybePrintErrorMessage = function( msg ) {
                         if ( $('.sek-no-drop-possible-message', $dropTarget ).length < 1 ) {
-                              var msg = isHeaderLocation ? sektionsLocalizedData.i18n['The header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['The footer location only accepts modules and pre-built footer sections'];
                               $dropTarget.append([
                                     '<div class="sek-no-drop-possible-message">',
                                       '<i class="material-icons">not_interested</i>',
@@ -4443,6 +4452,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     '</div>'
                               ].join(''));
                         }
+                  };
+
+                  if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
+                        msg = isHeaderLocation ? sektionsLocalizedData.i18n['The header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['The footer location only accepts modules and pre-built footer sections'];
+                        maybePrintErrorMessage( msg );
+                        return false;
+                  }
+                  if ( isFooterLocation && 'preset_section' === self.dndData.content_type && 'header' === self.dndData.section_type ) {
+                        msg = sektionsLocalizedData.i18n['You can\'t drop a header section in the footer location'];
+                        maybePrintErrorMessage( msg );
+                        return false;
+                  }
+
+                  if ( isHeaderLocation && 'preset_section' === self.dndData.content_type && 'footer' === self.dndData.section_type ) {
+                        msg = sektionsLocalizedData.i18n['You can\'t drop a footer section in the header location'];
+                        maybePrintErrorMessage( msg );
                         return false;
                   }
 
@@ -6370,14 +6395,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
       api.czrModuleMap = api.czrModuleMap || {};
-      _.each([
+      var section_modules = [
             'sek_intro_sec_picker_module',
             'sek_features_sec_picker_module',
             'sek_contact_sec_picker_module',
-            'sek_column_layouts_sec_picker_module',
-            'sek_header_sec_picker_module',
-            'sek_footer_sec_picker_module'
-      ], function( module_type ) {
+            'sek_column_layouts_sec_picker_module'
+      ];
+      if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+            $.extend( section_modules, [ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ] );
+      }
+      _.each( section_modules, function( module_type ) {
             api.czrModuleMap[ module_type ] = {
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( module_type, 'name' ),

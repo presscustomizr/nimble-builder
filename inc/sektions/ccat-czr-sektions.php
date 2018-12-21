@@ -78,7 +78,9 @@ function sek_enqueue_controls_js_css() {
                 ]),
 
                 'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true,
-                'isNimbleHeaderFooterEnabled' => defined( 'NIMBLE_HEADER_FOOTER_ENABLED' ) ? NIMBLE_HEADER_FOOTER_ENABLED : true
+                'isNimbleHeaderFooterEnabled' => defined( 'NIMBLE_HEADER_FOOTER_ENABLED' ) ? NIMBLE_HEADER_FOOTER_ENABLED : true,
+
+                'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_domain_to_be_replaced') ), sek_get_registered_widget_areas() )
             )
         )
     );//wp_localize_script()
@@ -365,10 +367,17 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_domain_to_be_replaced'),
             'Select a content type' => __('Select a content type', 'text_domain_to_be_replaced'),
 
+            'The header location only accepts modules and pre-built header sections' => __('The header location only accepts modules and pre-built header sections', 'text_domain_to_be_replaced'),
+            'The footer location only accepts modules and pre-built footer sections' => __('The footer location only accepts modules and pre-built footer sections', 'text_domain_to_be_replaced'),
+            'You can\'t drop a header section in the footer location' => __('You can\'t drop a header section in the footer location', 'text_domain_to_be_replaced'),
+            'You can\'t drop a footer section in the header location' => __('You can\'t drop a footer section in the header location', 'text_domain_to_be_replaced'),
+
             'Sections for an introduction' => __('Sections for an introduction', 'text_domain_to_be_replaced'),
             'Sections for services and features' => __('Sections for services and features', 'text_domain_to_be_replaced'),
             'Contact-us sections' => __('Contact-us sections', 'text_domain_to_be_replaced'),
             'Empty sections with columns layout' => __('Empty sections with columns layout', 'text_domain_to_be_replaced'),
+            'Header sections' => __('Header sections', 'text_domain_to_be_replaced'),
+            'Footer sections' => __('Footer sections', 'text_domain_to_be_replaced'),
 
             'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
 
@@ -886,10 +895,17 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 $content_collection = array_merge( $content_collection, [
                     array(
                       'content-type' => 'module',
+                      'content-id' => 'czr_widget_area_module',
+                      'title' => __( 'WordPress widget area', 'text_domain_to_be_replaced' ),
+                      'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
+                    ),
+                    array(
+                      'content-type' => 'module',
                       'content-id' => 'czr_menu_module',
                       'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
-                      'font_icon' => '<i class="material-icons">menu</i>',
+                      'font_icon' => '<i class="material-icons">menu</i>'
                     )
+
                 ]);
             }
 
@@ -1011,16 +1027,44 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                         ),
                     );
                 break;
+                case 'header_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'header_one',
+                            'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
+                            'thumb' => 'header_one.jpg'
+                        )
+                    );
+                break;
+                case 'footer_sections' :
+                    $content_collection = array(
+                        array(
+                            'content-type' => 'preset_section',
+                            'content-id' => 'footer_one',
+                            'title' => __('simple footer with 3 columns and large bottom zone', 'text-domain' ),
+                            'thumb' => 'footer_one.jpg'
+                        )
+                    );
+                break;
             }
             foreach( $content_collection as $_params) {
-                printf('<div draggable="true" data-sek-section-type="content" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s"><div class="sek-overlay"></div></div>',
+                $section_type = 'content';
+                if ( false !== strpos($_params['content-id'], 'header_') ) {
+                    $section_type = 'header';
+                } else if ( false !== strpos($_params['content-id'], 'footer_') ) {
+                    $section_type = 'footer';
+                }
+
+                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s" data-sek-section-type="%5$s"><div class="sek-overlay"></div></div>',
                     $_params['content-type'],
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
                         NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'],
                         isset( $_params['height'] ) ? 'height:'.$_params['height'] : ''
                     ),
-                    $_params['title']
+                    $_params['title'],
+                    $section_type
                 );
             }
           ?>

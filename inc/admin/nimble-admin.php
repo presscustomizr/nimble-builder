@@ -259,7 +259,6 @@ function sek_admin_style() {
 // /* ------------------------------------------------------------------------- *
 // *  UPDATE NOTIFICATIONS
 // /* ------------------------------------------------------------------------- */
-if( ! defined( 'DISPLAY_UPDATE_NOTIFICATION' ) ) { define( 'DISPLAY_UPDATE_NOTIFICATION', true ); }
 add_action( 'admin_notices'                         , '\Nimble\sek_may_be_display_update_notice');
 // always add the ajax action
 add_action( 'wp_ajax_dismiss_nimble_update_notice'  ,  '\Nimble\sek_dismiss_update_notice_action' );
@@ -274,7 +273,12 @@ foreach ( array( 'wptexturize', 'convert_smilies', 'wpautop') as $callback ) {
 * @hook : admin_notices
 */
 function sek_may_be_display_update_notice() {
-    if ( ! defined('DISPLAY_UPDATE_NOTIFICATION') || ! DISPLAY_UPDATE_NOTIFICATION )
+    if ( ! defined('NIMBLE_DISPLAY_UPDATE_NOTICE') || ! NIMBLE_DISPLAY_UPDATE_NOTICE )
+      return;
+
+    // bail here if the current version should not display an update notice
+    // may be useful in case of a minor update
+    if ( defined('NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION') && NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION === NIMBLE_VERSION )
       return;
 
     // always wait for the welcome note to be dismissed before display

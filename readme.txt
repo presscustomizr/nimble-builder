@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.0.1
-Stable tag: 1.4.0
+Tested up to: 5.0.2
+Stable tag: 1.4.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -47,10 +47,25 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.4.0 =
-Implemented the fundations for a header and footer customizations. Minor fixes for the dynamic stylesheet system. Updated Font Awesome to the latest version (v5.5.0). Various improvements of the customization user interface and experience : clearer explanations of what the settings are doing, dynamic resizing of the UI icons when sections and columns are too narrows.
+= 1.4.1 =
+Intermediate release before the introduction of beta features : header and footer, menu module, widget areas module. Includes various minor PHP fixes.
 
 == Changelog ==
+= 1.4.1 : December 21th, 2018 =
+* fixed : possible php notice when generating CSS rules for column width
+* fixed : replace array_filter() which expects at most 2 parameters in version oho PHP < 5.6, by a foreach loop
+* fixed : style of the column resizable handle broken in the Hueman theme
+* fixed : dynamic stylesheet not refreshed when dropping a section in a global location
+* fixed : fix loop_start and loop_end duplication in infinite-scroll loops. Could occur with JetPack, Hueman Pro and Customizr Pro.
+* added : a dismissable welcome notice when no sections has been created yet
+* added : a specific placeholder for header and footer locations, when customizing only
+* added [beta] : a widget area module
+* added [beta] : a new group of pre-built sections for header and footer
+* added : a "selectOptions" param to the signature of api.czr_sektions::setupSelectInput, allowing us to provide a set of options
+* added [beta] : implemented a parser for template tags inside double curly braces {{...}}
+* improved [beta] : modify ::dnd_canDrop with the case when user tries to drop a content header / footer section in a footer / header location => prevent + print an alert msg
+
+
 = 1.4.0 : December 15th, 2018 =
 * fixed : use a different name for the various global inline stylesheets : breakpoint and inner/outer widths
 * fixed : when appending CSS rules by filtering 'nimble_get_dynamic_stylesheet', in Sek_Dyn_CSS_Builder::get_stylesheet, there's no way to know if we are writing a local or a global stylesheet

@@ -16,9 +16,8 @@ if ( ! defined( 'NIMBLE_GLOBAL_SKOPE_ID' ) ) { define( 'NIMBLE_GLOBAL_SKOPE_ID' 
 if ( ! defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
 if ( ! defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' , 'nimble_saved_sektions' ); }
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
-if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) {
-    define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION );
-}
+if ( ! defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'nimble-widget-area-' ); }
+if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) { define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION ); }
 
 
 
@@ -488,9 +487,6 @@ function _sek_normalize_single_module_values( $raw_module_value, $module_type ) 
 }
 
 
-
-
-
 /* ------------------------------------------------------------------------- *
  *  HELPER FOR CHECKBOX OPTIONS
 /* ------------------------------------------------------------------------- */
@@ -751,6 +747,23 @@ function sek_filter_skp_get_skope_id( $skope_id, $level ) {
 }
 
 
+/* ------------------------------------------------------------------------- *
+ *  HAS USER STARTED CREATING SECTIONS ?
+/* ------------------------------------------------------------------------- */
+function sek_site_has_nimble_sections_created() {
+    $sek_post_query_vars = array(
+        'post_type'              => NIMBLE_CPT,
+        'post_status'            => get_post_stati(),
+        'posts_per_page'         => -1,
+        'no_found_rows'          => true,
+        'cache_results'          => true,
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
+        'lazy_load_term_meta'    => false,
+    );
+    $query = new \WP_Query( $sek_post_query_vars );
+    return is_array( $query->posts ) && ! empty( $query->posts );
+}
 
 
 
@@ -924,6 +937,55 @@ function sek_get_user_created_menus() {
         array( 'nimble_page_menu' => __('Default page menu', 'text_domain_to_replace') )
     , $user_menus );
 }
+
+
+/* ------------------------------------------------------------------------- *
+ *  Nimble Widgets Areas
+/* ------------------------------------------------------------------------- */
+function sek_get_registered_widget_areas() {
+    global $wp_registered_sidebars;
+    $widget_areas = array();
+    if ( is_array( $wp_registered_sidebars ) && ! empty( $wp_registered_sidebars ) ) {
+        foreach ( $wp_registered_sidebars as $registered_sb ) {
+            $id = $registered_sb['id'];
+            if ( ! sek_is_nimble_widget_id( $id ) )
+              continue;
+            $widget_areas[ $id ] = $registered_sb['name'];
+        }
+    }
+    return $widget_areas;
+}
+function sek_is_nimble_widget_id( $id ) {
+    return NIMBLE_WIDGET_PREFIX === substr( $id, 0, strlen( NIMBLE_WIDGET_PREFIX ) );
+}
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  Dynamic variables parsing
+/* ------------------------------------------------------------------------- */
+function sek_find_pattern_match($matches) {
+    $replace_values = array(
+      'home_url' => 'home_url'
+    );
+
+    if ( array_key_exists( $matches[1], $replace_values ) ) {
+      $dyn_content = $replace_values[$matches[1]];
+      if ( function_exists( $dyn_content ) ) {
+        return $dyn_content();//<= use call_user_func() here + handle the case when the callback is a method
+      } else if ( is_string($dyn_content) ) {
+        return $dyn_content;
+      } else {
+        return null;
+      }
+    }
+    return null;
+}
+
+function sek_parse_template_tags( $val ) {
+    return is_string( $val ) ? preg_replace_callback( '!\{\{\s?(\w+)\s?\}\}!', '\Nimble\sek_find_pattern_match', $val) : $val;
+}
+add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
 ?><?php
 function sek_maybe_do_version_mapping() {
     if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
@@ -1588,11 +1650,14 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
             $unit                 = !empty( $rules_candidates['unit'] ) ? $rules_candidates['unit'] : $default_unit;
             $unit                 = 'percent' == $unit ? '%' : $unit;
 
-            $filtered_rules_candidates = array_filter( $rules_candidates, function( $k ) {
-                return 'unit' !== $k;
-            }, ARRAY_FILTER_USE_KEY );
+            $new_filtered_rules = array();
+            foreach ( $rules_candidates as $k => $v) {
+                if ( 'unit' !== $k ) {
+                    $new_filtered_rules[ $k ] = $v;
+                }
+            }
 
-            $_pad_marg[ $device ] = array( 'rules' => $filtered_rules_candidates );
+            $_pad_marg[ $device ] = array( 'rules' => $new_filtered_rules );
 
             array_walk( $_pad_marg[ $device ][ 'rules' ],
                 function( &$val, $key, $unit ) {
@@ -2047,6 +2112,7 @@ function sek_register_modules() {
         'sek_features_sec_picker_module',
         'sek_contact_sec_picker_module',
         'sek_column_layouts_sec_picker_module',
+
         'sek_my_sections_sec_picker_module',
         'sek_level_bg_module',
         'sek_level_border_module',
@@ -2106,8 +2172,11 @@ function sek_register_modules() {
     ];
     if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
         $modules = array_merge( $modules, [
+            'sek_header_sec_picker_module',
+            'sek_footer_sec_picker_module',
             'czr_menu_module',
             'czr_menu_content_child',
+            'czr_widget_area_module'
         ]);
     }
 
@@ -2305,11 +2374,15 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'notice_after' => sprintf(
-                        __('Note : you can %1$s to replace your default theme template. Depending on your theme structure, it can allow you to display your sections in full-width mode.'),
+                        __('Note : you can %1$s to replace your default theme template. Or design your own %2$s.', 'nimble-builder'),
                         sprintf('<a href="%2$s" title="%1$s">%1$s</a>',
-                            __('use the Nimble page template', 'text-domain'),
-                            "javascript:if ( sektionsLocalizedData && sektionsLocalizedData.sektionsPanelId ) { wp.customize.panel(sektionsLocalizedData.sektionsPanelId, function( _panel_ ) { try{wp.customize.czr_sektions.rootPanelFocus(); _panel_.focus();}catch(er){} } ) }"
-                        )
+                            __('use the Nimble page template', 'nimble-builder'),
+                            "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})"
+                        ),
+                        NIMBLE_HEADER_FOOTER_ENABLED ? sprintf('<a href="%2$s" title="%1$s">%1$s</a>',
+                            __('header and footer', 'nimble-builder'),
+                            "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })"
+                        ) : __('header and footer', 'nimble-builder')
                     )
                 )
             )
@@ -2402,6 +2475,36 @@ function sek_get_module_params_for_sek_column_layouts_sec_picker_module() {
         )
     );
 }
+
+function sek_get_module_params_for_sek_header_sec_picker_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_header_sec_picker_module',
+        'name' => __('Header sections', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'header_sections' => sek_get_default_section_input_params()
+            )
+        )
+    );
+}
+function sek_get_module_params_for_sek_footer_sec_picker_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_footer_sec_picker_module',
+        'name' => __('Footer sections', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'footer_sections' => sek_get_default_section_input_params()
+            )
+        )
+    );
+}
+
+
+
+
+
 
 function sek_get_module_params_for_sek_my_sections_sec_picker_module() {
     return array(
@@ -6662,6 +6765,36 @@ function sek_get_module_params_for_czr_font_child() {
     );
 }
 ?><?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER WIDGET ZONE MODULE
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_widget_area_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_widget_area_module',
+        'name' => __('Widget Zone', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'widget-area-id' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Select a widget area', 'text_domain_to_be_replaced'),
+                    'default'     => 'no-link',
+                    'choices'     => array(),
+                    'refresh_preview' => true,// <= so that the partial refresh links are displayed
+                    'notice_after' => sprintf( __( 'Once you have added a widget area to a section, you can add and edit the WordPress widgets in it in the %1$s.', 'text_domain_to_be_replaced'),
+                        sprintf( '<a href="%1$s">%2$s</a>',
+                            "javascript:wp.customize.panel('widgets', function( _p_ ){ _p_.focus(); })",
+                            __('widget panel', 'text_domain_to_be_replaced')
+                        )
+                    ),
+                )
+            )
+        ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/widget_area_module_tmpl.php",
+    );
+}
+
+?><?php
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -6947,7 +7080,7 @@ class Sek_Dyn_CSS_Builder {
         if ( ! is_array( $column ) )
           return $rules;
 
-        if ( empty( $column['level'] ) || 'column' !== $column['level'] )
+        if ( empty( $column['level'] ) || 'column' !== $column['level'] || empty( $column['id'] ) )
           return $rules;
 
         $width   = empty( $column[ 'width' ] ) || !is_numeric( $column[ 'width' ] ) ? '' : $column['width'];
@@ -8046,11 +8179,14 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             $unit                 = !empty( $rules_candidates['unit'] ) ? $rules_candidates['unit'] : $default_unit;
             $unit                 = 'percent' == $unit ? '%' : $unit;
 
-            $filtered_rules_candidates = array_filter( $rules_candidates, function( $k ) {
-                return 'unit' !== $k;
-            }, ARRAY_FILTER_USE_KEY );
+            $new_filtered_rules = array();
+            foreach ( $rules_candidates as $k => $v) {
+                if ( 'unit' !== $k ) {
+                    $new_filtered_rules[ $k ] = $v;
+                }
+            }
 
-            $properties_to_render = $filtered_rules_candidates;
+            $properties_to_render = $new_filtered_rules;
 
             array_walk( $properties_to_render,
                 function( &$val, $key, $unit ) {
@@ -8161,7 +8297,29 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             $this -> _schedule_front_rendering();
             $this -> _setup_hook_for_front_css_printing_or_enqueuing();
             $this -> _setup_simple_forms();
+            add_action( 'widgets_init', array( $this, 'sek_nimble_widgets_init' ) );
         }//__construct
+        public function sek_nimble_widgets_init() {
+            if ( ! NIMBLE_HEADER_FOOTER_ENABLED )
+              return;
+            $defaults = array(
+                'name'          => '',
+                'id'            => '',
+                'description'   => '',
+                'class'         => '',
+                'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+                'after_widget'  => '</aside>',
+                'before_title'  => '<h2 class="widget-title">',
+                'after_title'   => '</h2>',
+            );
+            for ( $i=1; $i < 11; $i++ ) {
+                $args['id'] = NIMBLE_WIDGET_PREFIX . $i;//'nimble-widget-area-'
+                $args['name'] = sprintf( __('Nimble widget area #%1$s', 'text_domain_to_replace' ), $i );
+                $args['description'] = $args['name'];
+                $args = wp_parse_args( $args, $defaults );
+                register_sidebar( $args );
+            }
+        }
     }//class
 endif;
 ?><?php
@@ -8965,7 +9123,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     switch ( $location_id ) {
                         case 'loop_start' :
                         case 'loop_end' :
-                            add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
+                            if ( ! ( apply_filters( 'infinite_scroll_got_infinity', isset( $_GET[ 'infinity' ] ) ) ) ) {
+                                add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
+                            }
                         break;
                         case 'before_content' :
                             add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
@@ -9145,11 +9305,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     ?>
                       <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
                             <?php
+                              $is_header_location = true === sek_get_registered_location_property( $id, 'is_header_location' );
+                              $is_footer_location = true === sek_get_registered_location_property( $id, 'is_footer_location' );
                               printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s>',
                                   $id,
                                   sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false'),
-                                  true === sek_get_registered_location_property( $id, 'is_header_location' ) ? 'data-sek-is-header-location="true"' : '',
-                                  true === sek_get_registered_location_property( $id, 'is_footer_location' ) ? 'data-sek-is-footer-location="true"' : ''
+                                  $is_header_location ? 'data-sek-is-header-location="true"' : '',
+                                  $is_footer_location ? 'data-sek-is-footer-location="true"' : ''
                               );
                             ?>
                             <?php
@@ -9158,7 +9320,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             ?>
 
                              <?php if ( empty( $collection ) ) : ?>
-                                <div class="sek-empty-location-placeholder"></div>
+                                <div class="sek-empty-location-placeholder">
+                                  <?php
+                                    if ( $is_header_location || $is_footer_location ) {
+                                        printf('<span class="sek-header-footer-location-placeholder">%1$s %2$s</span>',
+                                            sprintf( '<span class="sek-nimble-icon"><img src="%1$s"/></span>',
+                                                NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION
+                                            ),
+                                            $is_header_location ? __('Start designing the header', 'text_domain_to_be_replaced') : __('Start designing the footer', 'text_domain_to_be_replaced')
+                                        );
+                                    }
+                                  ?>
+                                </div>
                             <?php endif; ?>
                           </div><?php //class="sektion-wrapper" ?>
                       <?php endif; ?>
