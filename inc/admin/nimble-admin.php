@@ -457,7 +457,7 @@ function sek_render_welcome_notice() {
         update_user_meta( get_current_user_id(), 'dismissed_wp_pointers', $dismissed );
         return;
     }
-
+    $notice_id = NIMBLE_WELCOME_NOTICE_ID;
     ?>
     <div class="nimble-welcome-notice notice notice-info is-dismissible" id="<?php echo esc_attr( $notice_id ); ?>">
       <div class="notice-dismiss"></div>
