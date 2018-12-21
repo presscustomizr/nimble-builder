@@ -117,16 +117,16 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_widget_area_module',
-                  'title' => __( 'WordPress widget area ( coming soon )', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'WordPress widget area', 'text_domain_to_be_replaced' ),
                   'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
-                  'active' => NIMBLE_HEADER_FOOTER_ENABLED
+                  'active' => sek_is_header_footer_enabled()
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_menu_module',
-                  'title' => __( 'Menu ( coming soon )', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
                   'font_icon' => '<i class="material-icons">menu</i>',
-                  'active' => NIMBLE_HEADER_FOOTER_ENABLED
+                  'active' => sek_is_header_footer_enabled()
                 )
                 // array(
                 //   'content-type' => 'module',
@@ -137,26 +137,6 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
 
 
             ];
-            // Header and footer have been introduced in v1.4.0 but not enabled by default
-            // The module menu and the widget area module are on hold until "header and footer" feature is released.
-            // if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
-            //     $content_collection = array_merge( $content_collection, [
-            //         array(
-            //           'content-type' => 'module',
-            //           'content-id' => 'czr_widget_area_module',
-            //           'title' => __( 'WordPress widget area', 'text_domain_to_be_replaced' ),
-            //           'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
-            //           'active' => false
-            //         ),
-            //         array(
-            //           'content-type' => 'module',
-            //           'content-id' => 'czr_menu_module',
-            //           'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
-            //           'font_icon' => '<i class="material-icons">menu</i>',
-            //           'active' => false
-            //         )
-            //     ]);
-            // }
 
             $i = 0;
             foreach( $content_collection as $_params ) {

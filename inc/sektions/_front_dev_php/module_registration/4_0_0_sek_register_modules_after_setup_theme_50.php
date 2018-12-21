@@ -91,7 +91,7 @@ function sek_register_modules() {
 
     // Header and footer have been introduced in v1.4.0 but not enabled by default
     // The module menu and the widget area module are on hold until "header and footer" feature is released.
-    if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
+    if ( sek_is_header_footer_enabled() ) {
         $modules = array_merge( $modules, [
             // pre-built sections for header and footer
             'sek_header_sec_picker_module',
