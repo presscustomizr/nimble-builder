@@ -438,6 +438,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'text_domain_to_be_replaced'),
 
             'Site wide page speed optimizations' => __( 'Site wide page speed optimizations', 'text_domain_to_be_replaced'),
+            'Beta features' => __( 'Beta features', 'text_domain_to_be_replaced'),
 
             // DEPRECATED
             'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_domain_to_be_replaced'),

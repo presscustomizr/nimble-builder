@@ -42,6 +42,7 @@ function sek_register_modules() {
         //'sek_global_reset',
         'sek_global_performances',
         'sek_global_header_footer',
+        'sek_global_beta_features',
 
         // FRONT MODULES
         'czr_simple_html_module',

@@ -56,6 +56,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_global_performances',
                               controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
                               icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                        },
+                        beta_features : {
+                              settingControlId : _id_ + '__beta_features',
+                              module_type : 'sek_global_beta_features',
+                              controlLabel : sektionsLocalizedData.i18n['Beta features'],
+                              icon : '<i class="material-icons">widgets</i>'
                         }
                   });
 
