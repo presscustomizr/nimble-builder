@@ -280,7 +280,8 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                             'content-type' => 'preset_section',
                             'content-id' => 'header_one',
                             'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
-                            'thumb' => 'header_one.jpg'
+                            'thumb' => 'header_one.jpg',
+                            'height' => '33px'
                         )
                     );
                 break;
@@ -307,7 +308,8 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     $_params['content-type'],
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
-                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'],
+                        // v1.4.2 : added the ?ver param to make sure we always display the latest shot of the section
+                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'] . '?ver=' . NIMBLE_VERSION,
                         isset( $_params['height'] ) ? 'height:'.$_params['height'] : ''
                     ),
                     $_params['title'],
