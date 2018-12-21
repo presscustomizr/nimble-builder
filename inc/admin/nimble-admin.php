@@ -428,7 +428,7 @@ function sek_dismiss_update_notice_action() {
 // /* ------------------------------------------------------------------------- */
 /* beautify admin notice text using some defaults the_content filter callbacks */
 foreach ( array( 'wptexturize', 'convert_smilies' ) as $callback ) {
-  add_filter( 'nimble_update_notice', $callback );
+    add_filter( 'nimble_update_notice', $callback );
 }
 
 // @return bool;

@@ -185,7 +185,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                       $_params['content-id'],
                       $icon_img_html,
                       $_params['title'],
-                      true === $_params['active'] ? __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' ) : __('This module is being tested and will be available very soon!', 'text_domain_to_be_replaced'),
+                      true === $_params['active'] ? __('Drag and drop the module in the previewed page.', 'text_domain_to_be_replaced' ) : __('I\'ll be available soon !', 'text_domain_to_be_replaced'),
                       !empty( $_params['font_icon'] ) ? 'is-font-icon' : '',
                       true === $_params['active'] ? 'true' : 'false'
                 );
