@@ -497,7 +497,7 @@ function sek_render_welcome_notice() {
     <script>
     jQuery( function( $ ) {
       // On dismissing the notice, make a POST request to store this notice with the dismissed WP pointers so it doesn't display again.
-      $( <?php echo wp_json_encode( "{#$notice_id}" ); ?> ).on( 'click', '.notice-dismiss', function() {
+      $( <?php echo wp_json_encode( "#$notice_id" ); ?> ).on( 'click', '.notice-dismiss', function() {
         $.post( ajaxurl, {
           pointer: <?php echo wp_json_encode( $notice_id ); ?>,
           action: 'dismiss-wp-pointer'
