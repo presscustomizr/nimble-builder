@@ -2475,6 +2475,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_global_performances',
                               controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
                               icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                        },
+                        beta_features : {
+                              settingControlId : _id_ + '__beta_features',
+                              module_type : 'sek_global_beta_features',
+                              controlLabel : sektionsLocalizedData.i18n['Beta features'],
+                              icon : '<i class="material-icons">widgets</i>'
                         }
                   });
 
@@ -7319,6 +7325,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_header_footer' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+( function ( api, $, _ ) {
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_global_beta_features : {
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_beta_features', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_beta_features' )
                   )
             },
       });

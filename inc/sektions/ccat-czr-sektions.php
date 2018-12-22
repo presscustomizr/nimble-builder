@@ -78,7 +78,7 @@ function sek_enqueue_controls_js_css() {
                 ]),
 
                 'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true,
-                'isNimbleHeaderFooterEnabled' => defined( 'NIMBLE_HEADER_FOOTER_ENABLED' ) ? NIMBLE_HEADER_FOOTER_ENABLED : true,
+                'isNimbleHeaderFooterEnabled' => sek_is_header_footer_enabled(),
 
                 'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_domain_to_be_replaced') ), sek_get_registered_widget_areas() )
             )
@@ -409,6 +409,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'text_domain_to_be_replaced'),
 
             'Site wide page speed optimizations' => __( 'Site wide page speed optimizations', 'text_domain_to_be_replaced'),
+            'Beta features' => __( 'Beta features', 'text_domain_to_be_replaced'),
             'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_domain_to_be_replaced'),
             'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_domain_to_be_replaced'),
 
@@ -512,7 +513,7 @@ function sek_print_nimble_customizer_tmpl() {
               <span class="screen-reader-text"><?php _e('Global settings', 'text_domain'); ?></span>
             </button>
           </div>
-          <div class="sek-nimble-doc" data-doc-href="https://docs.presscustomizr.com/collection/334-nimble-builder?utm_source=usersite&utm_medium=link&utm_campaign=nimble-customizer-topbar">
+          <div class="sek-nimble-doc" data-doc-href="https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-customizer-topbar">
             <div class="sek-nimble-icon"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_domain_to_replace'); ?>" title="<?php _e('Nimble online documentation', 'text_domain'); ?>"/></div>
             <span class="sek-pointer" title="<?php _e('Nimble online documentation', 'text_domain'); ?>"><?php _e('Nimble online documentation', 'text_domain'); ?></span>
             <button class="far fa-question-circle" type="button" title="<?php _e('Nimble online documentation', 'text_domain'); ?>" data-nimble-state="enabled">
@@ -891,16 +892,16 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_widget_area_module',
-                  'title' => __( 'WordPress widget area ( coming soon )', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'WordPress widget area', 'text_domain_to_be_replaced' ),
                   'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
-                  'active' => NIMBLE_HEADER_FOOTER_ENABLED
+                  'active' => sek_is_header_footer_enabled()
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_menu_module',
-                  'title' => __( 'Menu ( coming soon )', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
                   'font_icon' => '<i class="material-icons">menu</i>',
-                  'active' => NIMBLE_HEADER_FOOTER_ENABLED
+                  'active' => sek_is_header_footer_enabled()
                 )
 
 
@@ -1040,7 +1041,8 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                             'content-type' => 'preset_section',
                             'content-id' => 'header_one',
                             'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
-                            'thumb' => 'header_one.jpg'
+                            'thumb' => 'header_one.jpg',
+                            'height' => '33px'
                         )
                     );
                 break;
@@ -1067,7 +1069,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     $_params['content-type'],
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
-                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'],
+                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'] . '?ver=' . NIMBLE_VERSION,
                         isset( $_params['height'] ) ? 'height:'.$_params['height'] : ''
                     ),
                     $_params['title'],

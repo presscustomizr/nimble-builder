@@ -20,7 +20,6 @@ if ( ! defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'n
 if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) { define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION ); }
 
 
-
 /* ------------------------------------------------------------------------- *
  *  LOCATIONS UTILITIES
 /* ------------------------------------------------------------------------- */
@@ -986,6 +985,18 @@ function sek_parse_template_tags( $val ) {
     return is_string( $val ) ? preg_replace_callback( '!\{\{\s?(\w+)\s?\}\}!', '\Nimble\sek_find_pattern_match', $val) : $val;
 }
 add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
+
+
+/* ------------------------------------------------------------------------- *
+ *  Beta Features
+/* ------------------------------------------------------------------------- */
+function sek_is_header_footer_enabled() {
+    $global_beta_feature = sek_get_global_option_value( 'beta_features');
+    if ( is_array( $global_beta_feature ) && array_key_exists('beta-enabled', $global_beta_feature ) ) {
+          return (bool)$global_beta_feature['beta-enabled'];
+    }
+    return NIMBLE_HEADER_FOOTER_ENABLED;
+}
 ?><?php
 function sek_maybe_do_version_mapping() {
     if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
@@ -2133,6 +2144,7 @@ function sek_register_modules() {
         'sek_global_widths',
         'sek_global_performances',
         'sek_global_header_footer',
+        'sek_global_beta_features',
         'czr_simple_html_module',
 
         'czr_tiny_mce_editor_module',
@@ -2170,7 +2182,7 @@ function sek_register_modules() {
         'czr_simple_form_submission_child',
         'czr_font_child'
     ];
-    if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
+    if ( sek_is_header_footer_enabled() ) {
         $modules = array_merge( $modules, [
             'sek_header_sec_picker_module',
             'sek_footer_sec_picker_module',
@@ -2379,7 +2391,7 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
                             __('use the Nimble page template', 'nimble-builder'),
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})"
                         ),
-                        NIMBLE_HEADER_FOOTER_ENABLED ? sprintf('<a href="%2$s" title="%1$s">%1$s</a>',
+                        sek_is_header_footer_enabled() ? sprintf('<a href="%2$s" title="%1$s">%1$s</a>',
                             __('header and footer', 'nimble-builder'),
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })"
                         ) : __('header and footer', 'nimble-builder')
@@ -3909,6 +3921,28 @@ function sek_get_module_params_for_sek_global_header_footer() {
                     ),
                     'width-100'   => true,
                     'title_width' => 'width-100'
+                ),
+            )
+        )//tmpl
+    );
+}
+
+?><?php
+function sek_get_module_params_for_sek_global_beta_features() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_global_beta_features',
+        'name' => __('Beta features', 'text_domain_to_be_replaced'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'beta-enabled' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Enable beta features', 'text_domain_to_be_replaced'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_before_title' => __( 'Check this option to try the upcoming features of the Nimble Builder. Available beta features as of December 2018 : header and footer customization, menu module, widget area module.', 'text_domain_to_be_replaced'),
+                    'notice_after' => __( 'Be sure to refresh the customizer before you start using the beta features.', 'text_domain_to_be_replaced')
                 ),
             )
         )//tmpl
@@ -8300,7 +8334,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             add_action( 'widgets_init', array( $this, 'sek_nimble_widgets_init' ) );
         }//__construct
         public function sek_nimble_widgets_init() {
-            if ( ! NIMBLE_HEADER_FOOTER_ENABLED )
+            if ( ! sek_is_header_footer_enabled() )
               return;
             $defaults = array(
                 'name'          => '',
@@ -9085,7 +9119,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $this -> sek_setup_tiny_mce_content_filters();
             add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template' ) );
-            if ( NIMBLE_HEADER_FOOTER_ENABLED ) {
+            if ( sek_is_header_footer_enabled() ) {
                 add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
                 add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
                 add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
