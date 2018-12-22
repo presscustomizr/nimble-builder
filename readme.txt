@@ -13,10 +13,19 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Powerful drag and drop page builder using the native WordPress customizer.
 
 == Description ==
-The Nimble Builder is a powerful and lightweight page builder plugin for WordPress. It allows you to drag and drop pre-built sections, or create your own sections, in live preview with the native WordPress customizer. You can also start designing from a blank page, and create your header, footer, and content.
+= What is the Nimble Page Builder ? =
+The Nimble Builder is a powerful and easy to use page builder plugin. It takes the native WordPress customizer to a level you've never seen before.
 
-== Features ==
-* Drag and drop beautiful and ready-to-use sections in any pages.
+Nimble allows you to drag and drop content modules, or pre-built section templates, into any context of your site, including search results or 404 pages. You can edit your sections in real time from the live customizer, and then publish when you are happy of the result, or save for later.
+
+You can also start designing from a blank page, and create your header, footer, and custom content.
+
+The plugin automatically creates fluid and responsive sections for a pixel-perfect rendering on smartphones and tablets, without the need to add complex code.
+
+= Features =
+* Drag and drop carefully crafted pre-designed sections into any pages.
+* Content modules: classic text editor, image, column layouts, contact form, button, icons, map, html code, and more.
+* Add image background to your sections, and activate a parallax effect.
 * Easily create responsive column layouts.
 * Create content, style, move / duplicate / remove elements in live preview.
 * Embed shortcodes from other plugins, and see the result in live preview.
@@ -25,7 +34,7 @@ The Nimble Builder is a powerful and lightweight page builder plugin for WordPre
 * Works in any WordPress contexts : home, pages, posts, custom post types, archives, author pages, search page, ...
 
 == Documentation ==
-You'll find an online knowledge base for the Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder).
+You'll find an online knowledge base for the Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page).
 
 == Screenshots ==
 1. Creating a page with 3 sections
@@ -47,11 +56,15 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.4.1 =
-Intermediate release before the introduction of beta features : header and footer, menu module, widget areas module. Includes various minor PHP fixes.
+= 1.4.2 =
+Introduction of beta features : header and footer customization, menu module, widget area module. Added a new global option to try the beta features.
 
 == Changelog ==
-= 1.4.1 : December 21th, 2018 =
+= 1.4.2 : December 22nd, 2018 =
+* added : a new global option to try the beta features
+* improved : header_one pre-build section
+
+= 1.4.1 : December 21st, 2018 =
 * fixed : possible php notice when generating CSS rules for column width
 * fixed : replace array_filter() which expects at most 2 parameters in version oho PHP < 5.6, by a foreach loop
 * fixed : style of the column resizable handle broken in the Hueman theme
@@ -64,7 +77,6 @@ Intermediate release before the introduction of beta features : header and foote
 * added : a "selectOptions" param to the signature of api.czr_sektions::setupSelectInput, allowing us to provide a set of options
 * added [beta] : implemented a parser for template tags inside double curly braces {{...}}
 * improved [beta] : modify ::dnd_canDrop with the case when user tries to drop a content header / footer section in a footer / header location => prevent + print an alert msg
-
 
 = 1.4.0 : December 15th, 2018 =
 * fixed : use a different name for the various global inline stylesheets : breakpoint and inner/outer widths
