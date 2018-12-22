@@ -344,7 +344,7 @@ function sek_may_be_display_update_notice() {
         <?php
           printf( '<h4>%1$s <a class="" href="%2$s" title="%3$s" target="_blank">%3$s &raquo;</a></h4>',
               '',//__( "Let us introduce the new features we've been working on.", 'text_domain_to_be_replaced'),
-              "http://presscustomizr.com/release-note-for-the-nimble-builder-version-1-4-0/",
+              "https://presscustomizr.com/release-note-for-the-nimble-builder-version-1-4-2/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-update-notice",
               __( "Read the detailled release notes" , 'text_domain_to_be_replaced' )
               // ! NIMBLE_IS_PRO ? sprintf( '<p style="position: absolute;right: 7px;top: 4px;"><a class="button button-primary upgrade-to-pro" href="%1$s" title="%2$s" target="_blank">%2$s &raquo;</a></p>',
               //   esc_url('presscustomizr.com/hueman-pro?ref=a'),
