@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.0.2
-Stable tag: 1.4.2
+Tested up to: 5.0.3
+Stable tag: 1.4.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,10 +56,14 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.4.2 =
-Introduction of beta features : header and footer customization, menu module, widget area module. Added a new global option to try the beta features.
+= 1.4.3 =
+Fixed a PHP warning when using an rgba color for an icon, a button or in a form. Improved support for Firefox.
 
 == Changelog ==
+= 1.4.3 : January 16th, 2019 =
+* fixed : a PHP warning when using an rgba color for an icon, a button or in a form
+* improved : support for Firefox.
+
 = 1.4.2 : December 22nd, 2018 =
 * added : a new global option to try the beta features
 * improved : header_one pre-build section

@@ -1788,8 +1788,7 @@ function sek_darken_rgb( $rgb, $percent, $array = false, $make_prop_value = fals
  */
 function sek_lighten_rgb($rgb, $percent, $array = false, $make_prop_value = false ) {
     $hsl      = sek_rgb2hsl( $rgb, true );
-
-    $light_hsl = sek_lighten_hsl( $light_hsl, $percent );
+    $light_hsl = sek_lighten_hsl( $hsl, $percent );
 
     return sek_hsl2rgb( $light_hsl, $array, $make_prop_value );
 }
@@ -1927,7 +1926,7 @@ function sek_rgba2rgb_a( $rgba ) {
     $rgba = is_array( $rgba) ? $rgba : array( $rgba );
     return array(
         array_slice( $rgba, 0, 3 ),
-        $rgba[4]
+        isset( $rgba[3] ) ? $rgba[3] : 1
     );
 }
 /*
@@ -1943,11 +1942,10 @@ function sek_rgb2hsl( $rgb, $array = false ) {
     $rgb       = count( $rgb ) < 3 ? array_pad( $rgb, 3, 255 ) : $rgb;
 
     $deltas    = array();
-
     $RGB       = array(
-        'R'   => ( $rgb[0] / 255 ),
-        'G'   => ( $rgb[1] / 255 ),
-        'B'   => ( $rgb[2] / 255 )
+        'R'   => is_numeric($rgb[0]) ? ( $rgb[0] / 255 ) : 1,
+        'G'   => is_numeric($rgb[1]) ? ( $rgb[0] / 255 ) : 1,
+        'B'   => is_numeric($rgb[2]) ? ( $rgb[0] / 255 ) : 1,
     );
 
 
@@ -2387,11 +2385,11 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
                     'title_width' => 'width-100',
                     'notice_after' => sprintf(
                         __('Note : you can %1$s to replace your default theme template. Or design your own %2$s.', 'nimble-builder'),
-                        sprintf('<a href="%2$s" title="%1$s">%1$s</a>',
+                        sprintf('<a href="#" onclick="%2$s" title="%1$s">%1$s</a>',
                             __('use the Nimble page template', 'nimble-builder'),
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})"
                         ),
-                        sek_is_header_footer_enabled() ? sprintf('<a href="%2$s" title="%1$s">%1$s</a>',
+                        sek_is_header_footer_enabled() ? sprintf('<a href="#" onclick="%2$s" title="%1$s">%1$s</a>',
                             __('header and footer', 'nimble-builder'),
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })"
                         ) : __('header and footer', 'nimble-builder')
@@ -3471,7 +3469,7 @@ function sek_get_module_params_for_sek_local_widths() {
                     'refresh_stylesheet' => true,
                     'refresh_preview' => true,
                     'notice_before_title' => sprintf( __( 'The inner and outer widths of the sections displayed in this page can be set here. It will override in the %1$s. You can also set a custom inner and outer width for each single sections.', 'text_domain_to_be_replaced'),
-                        sprintf( '<a href="%1$s">%2$s</a>',
+                        sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
                             __('Site wide options', 'text_domain_to_be_replaced')
                         )
@@ -3691,7 +3689,7 @@ function sek_get_module_params_for_sek_local_header_footer() {
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'notice_after' => sprintf( __( 'This option overrides the site wide header and footer options set in the %1$s for this page only.', 'text_domain_to_be_replaced'),
-                        sprintf( '<a href="%1$s">%2$s</a>',
+                        sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
                             __('Site wide options', 'text_domain_to_be_replaced')
                         )
@@ -3763,7 +3761,7 @@ function sek_get_module_params_for_sek_global_widths() {
                     'refresh_stylesheet' => true,
                     'refresh_preview' => true,
                     'notice_before_title' => sprintf( __( 'The inner and outer widths of your sections can be set globally here, but also overriden in the %1$s, and for each sections.', 'text_domain_to_be_replaced'),
-                        sprintf( '<a href="%1$s">%2$s</a>',
+                        sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
                             __('Current page options', 'text_domain_to_be_replaced')
                         )
@@ -3914,7 +3912,7 @@ function sek_get_module_params_for_sek_global_header_footer() {
                         'nimble_global' => __('Nimble site wide header and footer ( beta )', 'text_domain' )
                     ),
                     'notice_before_title' => sprintf( __( 'The Nimble Builder allows you to build your own header and footer, or to use your theme\'s ones. This option can be overriden in the %1$s.', 'text_domain_to_be_replaced'),
-                        sprintf( '<a href="%1$s">%2$s</a>',
+                        sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
                             __('Current page options', 'text_domain_to_be_replaced')
                         )
@@ -6639,7 +6637,7 @@ function sek_get_module_params_for_czr_menu_content_child() {
                     'default'     => 'no-link',
                     'choices'     => sek_get_user_created_menus(),
                     'notice_after' => sprintf( __( 'You can create and edit menus in the %1$s. If you just created a new menu, publish and refresh the customizer to see in the dropdown list.', 'text_domain_to_be_replaced'),
-                        sprintf( '<a href="%1$s">%2$s</a>',
+                        sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.panel('nav_menus', function( _p_ ){ _p_.focus(); })",
                             __('menu panel', 'text_domain_to_be_replaced')
                         )
@@ -6816,7 +6814,7 @@ function sek_get_module_params_for_czr_widget_area_module() {
                     'choices'     => array(),
                     'refresh_preview' => true,// <= so that the partial refresh links are displayed
                     'notice_after' => sprintf( __( 'Once you have added a widget area to a section, you can add and edit the WordPress widgets in it in the %1$s.', 'text_domain_to_be_replaced'),
-                        sprintf( '<a href="%1$s">%2$s</a>',
+                        sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.panel('widgets', function( _p_ ){ _p_.focus(); })",
                             __('widget panel', 'text_domain_to_be_replaced')
                         )
