@@ -43,7 +43,7 @@ function sek_get_module_params_for_czr_widget_area_module() {
                     'choices'     => array(),
                     'refresh_preview' => true,// <= so that the partial refresh links are displayed
                     'notice_after' => sprintf( __( 'Once you have added a widget area to a section, you can add and edit the WordPress widgets in it in the %1$s.', 'text_domain_to_be_replaced'),
-                        sprintf( '<a href="%1$s">%2$s</a>',
+                        sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.panel('widgets', function( _p_ ){ _p_.focus(); })",
                             __('widget panel', 'text_domain_to_be_replaced')
                         )
