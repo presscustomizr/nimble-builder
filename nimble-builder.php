@@ -27,7 +27,7 @@ if ( !defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ) { define ( 'NIMBLE_SAVED_SECT
 if ( !defined( 'NIMBLE_HEADER_FOOTER_ENABLED' ) ) { define ( 'NIMBLE_HEADER_FOOTER_ENABLED', false ); }
 
 if ( !defined( 'NIMBLE_DISPLAY_UPDATE_NOTICE' ) ) { define( 'NIMBLE_DISPLAY_UPDATE_NOTICE', true ); }
-if ( !defined( 'NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION' ) ) { define( 'NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION', '1.4.1' ); }
+if ( !defined( 'NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION' ) ) { define( 'NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION', '1.4.3' ); }
 if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_ID', 'nimble-welcome-notice-12-2018' ); }
 
 /* ------------------------------------------------------------------------- *
