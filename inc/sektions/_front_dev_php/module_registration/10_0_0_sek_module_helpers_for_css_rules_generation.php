@@ -378,8 +378,7 @@ function sek_darken_rgb( $rgb, $percent, $array = false, $make_prop_value = fals
  */
 function sek_lighten_rgb($rgb, $percent, $array = false, $make_prop_value = false ) {
     $hsl      = sek_rgb2hsl( $rgb, true );
-
-    $light_hsl = sek_lighten_hsl( $light_hsl, $percent );
+    $light_hsl = sek_lighten_hsl( $hsl, $percent );
 
     return sek_hsl2rgb( $light_hsl, $array, $make_prop_value );
 }
@@ -519,7 +518,8 @@ function sek_rgba2rgb_a( $rgba ) {
     $rgba = is_array( $rgba) ? $rgba : array( $rgba );
     return array(
         array_slice( $rgba, 0, 3 ),
-        $rgba[4]
+        // https://github.com/presscustomizr/nimble-builder/issues/303
+        isset( $rgba[3] ) ? $rgba[3] : 1
     );
 }
 /*
@@ -536,10 +536,11 @@ function sek_rgb2hsl( $rgb, $array = false ) {
 
     $deltas    = array();
 
+    // check if numeric following https://github.com/presscustomizr/nimble-builder/issues/303
     $RGB       = array(
-        'R'   => ( $rgb[0] / 255 ),
-        'G'   => ( $rgb[1] / 255 ),
-        'B'   => ( $rgb[2] / 255 )
+        'R'   => is_numeric($rgb[0]) ? ( $rgb[0] / 255 ) : 1,
+        'G'   => is_numeric($rgb[1]) ? ( $rgb[0] / 255 ) : 1,
+        'B'   => is_numeric($rgb[2]) ? ( $rgb[0] / 255 ) : 1,
     );
 
 
