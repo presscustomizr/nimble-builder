@@ -93,6 +93,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $levelEl = $(this);
                         if ( $levelEl.children('.sek-dyn-ui-wrapper').length < 1 )
                           return;
+                        // when PHP constant NIMBLE_IS_PREVIEW_UI_DEBUG_MODE is true, the levels UI in the preview are not being auto removed, so we can inspect the markup and CSS
+                        if ( sekPreviewLocalized.isPreviewUIDebugMode )
+                          return;
+
                         //stores the status of 200 ms fading out. => will let us know if we can print again when moving the mouse fast back and forth between two levels.
                         $levelEl.data( 'UIisFadingOut', true );//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
 

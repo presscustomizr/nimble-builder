@@ -132,6 +132,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         'Link deactivated while previewing' => __('Link deactivated while previewing', 'text_domain_to_be_replaced')
                     ),
                     'isDevMode' => sek_is_dev_mode(),
+                    'isPreviewUIDebugMode' => isset( $_GET['preview_ui_debug'] ) || NIMBLE_IS_PREVIEW_UI_DEBUG_MODE,
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
 
