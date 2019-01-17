@@ -678,6 +678,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $levelEl = $(this);
                         if ( $levelEl.children('.sek-dyn-ui-wrapper').length < 1 )
                           return;
+                        if ( sekPreviewLocalized.isPreviewUIDebugMode )
+                          return;
                         $levelEl.data( 'UIisFadingOut', true );//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
 
                         $levelEl.children('.sek-dyn-ui-wrapper').stop( true, true ).fadeOut( {
