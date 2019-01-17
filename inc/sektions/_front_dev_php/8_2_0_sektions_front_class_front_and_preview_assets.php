@@ -213,7 +213,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>">
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
-                          <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
+                          <div class="sek-ham__toggler-spn-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
                         </div>
                         <#
                           var section_title = true !== data.is_global_location ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['section (global)'];
@@ -258,7 +258,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                       <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
-                          <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
+                          <div class="sek-ham__toggler-spn-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
                         </div>
                         <div class="sek-dyn-ui-level-type"><?php _e( 'column', 'text_domain' ); ?></div>
                       </div><?php // .sek-dyn-ui-location-inner ?>
@@ -283,7 +283,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
-                          <div class="sek-ham__toggler-span-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
+                          <div class="sek-ham__toggler-spn-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
                         </div>
                         <div class="sek-dyn-ui-level-type">{{module_name}}</div>
                       </div>
