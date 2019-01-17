@@ -539,8 +539,8 @@ function sek_rgb2hsl( $rgb, $array = false ) {
     // check if numeric following https://github.com/presscustomizr/nimble-builder/issues/303
     $RGB       = array(
         'R'   => is_numeric($rgb[0]) ? ( $rgb[0] / 255 ) : 1,
-        'G'   => is_numeric($rgb[1]) ? ( $rgb[0] / 255 ) : 1,
-        'B'   => is_numeric($rgb[2]) ? ( $rgb[0] / 255 ) : 1,
+        'G'   => is_numeric($rgb[1]) ? ( $rgb[1] / 255 ) : 1,
+        'B'   => is_numeric($rgb[2]) ? ( $rgb[2] / 255 ) : 1,
     );
 
 
