@@ -20,7 +20,7 @@ function render_test_logs( $query = null ) {
 
       <div>
         <h2>GLOBAL OPTIONS</h2>
-        <pre style="font-size: 0.6em;overflow:visible;">
+        <pre style="font-size: 11px;overflow:visible;">
           <?php print_r( get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS )  ); ?>
         </pre>
       </div>
@@ -28,21 +28,21 @@ function render_test_logs( $query = null ) {
 
       <div>
         <h2>GLOBAL SEKTIONS</h2>
-        <pre style="font-size: 0.6em;overflow:visible;">
+        <pre style="font-size: 11px;overflow:visible;">
           <?php print_r( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID )  ); ?>
         </pre>
       </div>
 
       <div>
         <h2>LOCAL SEKTIONS</h2>
-        <pre style="font-size: 0.6em;overflow:visible;">
+        <pre style="font-size: 11px;overflow:visible;">
           <?php print_r( sek_get_skoped_seks( $skope_id )  ); ?>
         </pre>
       </div>
 
       <div>
         <h2>REGISTERED LOCATIONS</h2>
-        <pre style="font-size: 0.6em;overflow:visible;">
+        <pre style="font-size: 11px;overflow:visible;">
           <?php print_r( sek_get_locations()  ); ?>
         </pre>
       </div>
