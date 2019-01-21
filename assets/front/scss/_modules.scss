@@ -21,3 +21,13 @@
     padding: 0;
   }
 }
+
+body .sek-module-inner {
+  // fix for https://github.com/presscustomizr/nimble-builder/issues/319
+  h1, h2, h3, h4, h5, h6 {
+    &:before {
+      content: none;
+      background: none;
+    }
+  }
+}
