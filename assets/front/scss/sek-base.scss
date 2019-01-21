@@ -18,6 +18,7 @@
 /* make sure that the location level occupies 100% of the width */
 [data-sek-level="location"] {
   clear: both;
+  font-size: 16px;//reset the base font-size. we can't use 1rem there because too far from the <html> tag, the base font has already been defined by the theme.
 }
 
 /* To make vertical alignment possible in sections */
