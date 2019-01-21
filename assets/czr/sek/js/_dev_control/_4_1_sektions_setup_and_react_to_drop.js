@@ -778,7 +778,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       is_user_section : true === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" ),
                   // });
                   this.bind( 'sek-content-dropped', function( params ) {
-                        api.infoLog('sek-content-dropped', params );
+                        //api.infoLog('sek-content-dropped', params );
                         try { _do_( params ); } catch( er ) {
                               api.errare( 'error when reactToDrop', er );
                         }
