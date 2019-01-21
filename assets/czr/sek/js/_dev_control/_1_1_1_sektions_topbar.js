@@ -87,7 +87,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   $('#customize-preview').after( $( _tmpl ) );
 
-                  // CTRL + Z / CTRL + Y EVENTS
+                  // UNDO / REDO ON CTRL + Z / CTRL + Y EVENTS
                   $(document).keydown( function( evt ) {
                         if ( evt.ctrlKey && _.contains( [89, 90], evt.keyCode ) ) {
                               try { self.navigateHistory( 90 === evt.keyCode ? 'undo' : 'redo'); } catch( er ) {
