@@ -78,6 +78,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   var self = this;
 
+                  // RENDER
                   try {
                         _tmpl =  wp.template( 'nimble-top-bar' )( {} );
                   } catch( er ) {
@@ -86,6 +87,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   $('#customize-preview').after( $( _tmpl ) );
 
+                  // CTRL + Z / CTRL + Y EVENTS
+                  $(document).keydown( function( evt ) {
+                        if ( evt.ctrlKey && _.contains( [89, 90], evt.keyCode ) ) {
+                              try { self.navigateHistory( 90 === evt.keyCode ? 'undo' : 'redo'); } catch( er ) {
+                                    api.errare( 'Error when firing self.navigateHistory', er );
+                              }
+                        }
+                  });
+
+
+                  // CLICK EVENT
                   // Attach click events
                   $('[data-nimble-history]', '#nimble-top-bar').on( 'click', function(evt) {
                         try { self.navigateHistory( $(this).data( 'nimble-history') ); } catch( er ) {
