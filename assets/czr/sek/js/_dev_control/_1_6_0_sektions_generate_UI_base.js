@@ -363,10 +363,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         if ( isEqualToDefault( _val, inputDefaultValue ) ) {
                               return;
+                        // When the value is a string of an object, no need to write an empty value
+                        } else if ( ( _.isString( _val ) || _.isObject( _val ) ) && _.isEmpty( _val ) ) {
+                              return;
                         } else {
                               itemNormalized[ input_id ] = _val;
                         }
                   });
+
 
                   // SANITIZE
                   _.each( itemNormalized, function( _val, input_id ) {
