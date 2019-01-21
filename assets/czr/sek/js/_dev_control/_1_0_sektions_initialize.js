@@ -51,6 +51,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.registered = new api.Value([]);
 
 
+                  // Stores the preview target for double click insertion
+                  // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
+                  self.lastClickedTargetInPreview = new api.Value();
+                  self.lastClickedTargetInPreview.bind( function( to, from ) {
+                        // reset after a delay
+                        clearTimeout( $(window).data('_preview_target_timer_') );
+                        $(window).data('_preview_target_timer_', setTimeout(function() {
+                              self.lastClickedTargetInPreview( {} );
+                        }, 10000 ) );
+                  });
+
+
                   api.bind( 'ready', function() {
                         self.doSektionThinksOnApiReady();
                   });//api.bind( 'ready' )

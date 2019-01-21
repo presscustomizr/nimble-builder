@@ -51,7 +51,7 @@ function sek_get_module_params_for_sek_module_picker_module() {
             'item-inputs' => array(
                 'module_id' => array(
                     'input_type'  => 'module_picker',
-                    'title'       => __('Drag and drop modules in the previewed page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Drag and drop or double-click on a module to insert it in your chosen target element in the previewed page', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 )
@@ -67,7 +67,7 @@ function sek_get_module_params_for_sek_module_picker_module() {
 function sek_get_default_section_input_params() {
     return array(
         'input_type'  => 'section_picker',
-        'title'       => __('Drag and drop sections in the previewed page', 'text_domain_to_be_replaced'),
+        'title'       => __('Drag and drop or double-click on a section to insert it in your chosen target element in the previewed page', 'text_domain_to_be_replaced'),
         'width-100'   => true,
         'title_width' => 'width-100'
     );

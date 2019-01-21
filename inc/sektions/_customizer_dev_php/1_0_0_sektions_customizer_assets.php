@@ -454,12 +454,15 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'column' => __('column', 'text_domain_to_be_replaced'),
             'module' => __('module', 'text_domain_to_be_replaced'),
 
-            'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
-
             // DRAG n DROP
+            'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
+            'You first need to click on a target ( with a + icon ) in the preview.' => __('You first need to click on a target ( with a + icon ) in the preview.', 'text_domain_to_be_replaced'),
             'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
             'Insert in a new section' => __('Insert in a new section', 'text_domain_to_be_replaced'),
             'Insert a new section here' => __('Insert a new section here', 'text_domain_to_be_replaced'),
+
+            // DOUBLE CLICK INSERTION
+
 
             // MODULES
             'Select a font family' => __('Select a font family', 'text_domain_to_be_replaced'),

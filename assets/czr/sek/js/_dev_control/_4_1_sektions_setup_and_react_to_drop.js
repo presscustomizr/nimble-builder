@@ -133,17 +133,70 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $('body').addClass('sek-dragging');
                         api.previewer.send( 'sek-drag-start', { type : self.dndData.content_type } );//fires the rendering of the dropzones
                   };
-
+                  // $(this) is the dragged element
                   var _onEnd = function( evt ) {
                         $('body').removeClass('sek-dragging');
                         $(this).removeClass('sek-dragged');
                         api.previewer.send( 'sek-drag-stop' );
                   };
+                  // $(this) is the double clicked element
+                  var _onDoubleClick = function( evt ) {
+                        var _targetCandidate = self.lastClickedTargetInPreview();// { id : "__nimble__fb2ab3e47472" }
+                        var $dropTarget;
+                        if ( ! _.isEmpty( _targetCandidate ) && _targetCandidate.id ) {
+                              $dropTarget = self.dnd_getDropZonesElements().find('[data-sek-id="' + _targetCandidate.id + '"]').find('.sek-module-drop-zone-for-first-module').first();
+                        } else {
+                              _doubleClickTargetMissingNotif();
+                        }
+
+                        if ( $dropTarget && $dropTarget.length > 0 ) {
+                              // "Emulate" a drop action
+                              // @see ::dnd_onDrop()
+                              api.czr_sektions.trigger( 'sek-content-dropped', {
+                                    drop_target_element : $dropTarget,
+                                    location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
+                                    // when inserted between modules
+                                    before_module : $dropTarget.data('drop-zone-before-module-or-nested-section'),
+                                    after_module : $dropTarget.data('drop-zone-after-module-or-nested-section'),
+
+                                    // When inserted between sections
+                                    before_section : $dropTarget.data('drop-zone-before-section'),
+                                    after_section : $dropTarget.data('drop-zone-after-section'),
+
+                                    content_type : $(this).data('sek-content-type'),
+                                    content_id : $(this).data('sek-content-id'),
+
+                                    section_type : $(this).data('sek-section-type'),
+                                    // Saved sections
+                                    is_user_section : "true" === $(this).data('sek-is-user-section')
+                              });
+                              // And reset the preview target
+                              self.lastClickedTargetInPreview({});
+                        } else {
+                              _doubleClickTargetMissingNotif();
+                              api.errare( 'Double click insertion => the target zone was not found');
+                        }
+                  };//_onDoubleClick()
+                  var _doubleClickTargetMissingNotif = function() {
+                        api.notifications.add( new api.Notification( 'missing-injection-target', {
+                              type: 'info',
+                              message: sektionsLocalizedData.i18n['You first need to click on a target ( with a + icon ) in the preview.'],
+                              dismissible: true
+                        } ) );
+                        // Removed if not dismissed after a moment
+                        _.delay( function() {
+                              api.notifications.remove( 'missing-injection-target' );
+                        }, 30000 );
+                  };
 
                   // Schedule
-                  $draggableWrapper.find( '[draggable]' ).each( function() {
-                        $(this).on( 'dragstart', function( evt ) { _onStart.call( $(this), evt ); })
-                              .on( 'dragend', function( evt ) { _onEnd.call( $(this), evt ); });
+                  $draggableWrapper.find( '[draggable="true"]' ).each( function() {
+                        $(this)
+                              .on( 'dragstart', function( evt ) { _onStart.call( $(this), evt ); })
+                              .on( 'dragend', function( evt ) { _onEnd.call( $(this), evt ); })
+                              // double click insertion
+                              // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
+                              .dblclick( function( evt ) { _onDoubleClick.call( $(this), evt ); });
                   });
             },//setupNimbleZones()
 
@@ -725,7 +778,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       is_user_section : true === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" ),
                   // });
                   this.bind( 'sek-content-dropped', function( params ) {
-                        //api.infoLog('sek-content-dropped', params );
+                        api.infoLog('sek-content-dropped', params );
                         try { _do_( params ); } catch( er ) {
                               api.errare( 'error when reactToDrop', er );
                         }

@@ -47,7 +47,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     id :  params.apiParams.location
                                               });
                                         }
-                                        api.previewer.trigger( 'sek-pick-content', { content_type : 'section' });
+                                        api.previewer.trigger( 'sek-pick-content', {
+                                              // the "id" param is added to set the target for double click insertion
+                                              // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
+                                              id : params.apiParams ? params.apiParams.id : '',
+                                              content_type : 'section'
+                                        });
                                         api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                   }
                             },
@@ -537,6 +542,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
                                   api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value();
                                   api.czr_sektions.currentContentPickerType( params.content_type || 'module' );
+
+                                  // Set the last clicked target element id now => will be used for double click insertion of module / section
+                                  if ( _.isObject( params ) && params.id ) {
+                                        // self reset after a moment.
+                                        // @see CZRSeksPrototype::initialize
+                                        // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
+                                        self.lastClickedTargetInPreview( { id : params.id } );
+                                  }
 
                                   params = params || {};
                                   sendToPreview = true;
