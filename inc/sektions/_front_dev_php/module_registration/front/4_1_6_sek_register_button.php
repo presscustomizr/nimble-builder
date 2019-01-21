@@ -82,6 +82,14 @@ function sek_get_module_params_for_czr_btn_content_child() {
                     'default'            => '',
                     'width-100'         => true,
                 ),
+                'btn_text_on_hover' => array(
+                    'input_type'         => 'text',
+                    'title'              => __( 'Button text on mouse hover', 'text_domain_to_be_replaced' ),
+                    'default'            => '',
+                    'width-100'         => true,
+                    'title_width' => 'width-100',
+                    'notice_after'       => __( 'Not previewable when customizing.', 'text_domain_to_be_replaced')
+                ),
                 'link-to' => array(
                     'input_type'  => 'select',
                     'title'       => __('Link to', 'text_domain_to_be_replaced'),
