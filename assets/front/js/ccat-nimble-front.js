@@ -1549,7 +1549,7 @@ jQuery( function($){
           );
 
     };
-    $('body').on( 'click', '.menu .menu-item [href^="#"]', function( evt ){
+    $('body').find('.sek-menu-module, .menu, .nav' ).on( 'click', '.menu-item [href^="#"]', function( evt ){
           evt.preventDefault();
           var anchorCandidate = $(this).attr('href');
           anchorCandidate = 'string' === typeof( anchorCandidate ) ? anchorCandidate.replace('#','') : '';
