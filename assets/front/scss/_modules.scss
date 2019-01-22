@@ -1,3 +1,4 @@
+@import "modules/heading";
 @import "modules/menu";
 @import "modules/featured_pages";
 @import "modules/image";
@@ -11,7 +12,7 @@
 
 // Normalize styling for modules
 // Make sure that some basic html tags like Hx and p have a correct default line-height and spacing
-.sek-module-inner {
+.#{$project-prefix}module-inner {
   line-height: 1.5em;
   h1, h2, h3, h4, h5, h6, p {
     line-height: 1.5em;
@@ -22,8 +23,9 @@
   }
 }
 
-body .sek-module-inner {
-  // fix for https://github.com/presscustomizr/nimble-builder/issues/319
+// fix for https://github.com/presscustomizr/nimble-builder/issues/319
+// => Twenty nineteen theme heading styling, adding a border ::before Hx
+body .#{$project-prefix}module-inner {
   h1, h2, h3, h4, h5, h6 {
     &:before {
       content: none;
