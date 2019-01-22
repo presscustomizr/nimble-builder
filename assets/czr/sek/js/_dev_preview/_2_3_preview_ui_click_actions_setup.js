@@ -7,6 +7,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   var self = this;
 
                   $('body').on('click', function( evt ) {
+                        // First clean any currently highlighted target drop zone
+                        // implemented for double-click insertion https://github.com/presscustomizr/nimble-builder/issues/317
+                        api.preview.send( 'sek-clean-target-drop-zone' );
 
                         var clickedOn = '',
                             $el = $(evt.target),

@@ -392,12 +392,31 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             // FOCUS
                             // Sent from the panel when duplicating a section level for example
                             'sek-animate-to-level' : function( params ) {
-                                  var $elToFocusOn = $('div[data-sek-id="' + params.id + '"]' );
+                                  var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
                                   if ( $elToFocusOn.length > 0 ) {
                                         $('html, body').animate({
                                               scrollTop : $elToFocusOn.offset().top - 100
                                         }, 'slow');
                                   }
+                            },
+
+
+                            // DOUBLE CLICK INSERTION => HIGHLIGHTED TARGET
+                            // implemented for double-click insertion
+                            // https://github.com/presscustomizr/nimble-builder/issues/317
+                            'sek-set-double-click-target' : function( params ) {
+                                  // First clean any other highlighted target
+                                  $('.sek-target-for-double-click-insertion').removeClass('sek-target-for-double-click-insertion');
+
+                                  if ( _.isObject( params ) && params.id ) {
+                                        var $elToHighlight = $('[data-sek-id="' + params.id + '"]' );
+                                        if( 1 === $elToHighlight.length ) {
+                                              $elToHighlight.addClass('sek-target-for-double-click-insertion');
+                                        }
+                                  }
+                            },
+                            'sek-reset-double-click-target' : function( params ) {
+                                  $('.sek-target-for-double-click-insertion').removeClass('sek-target-for-double-click-insertion');
                             }
 
                       };//msgCollection

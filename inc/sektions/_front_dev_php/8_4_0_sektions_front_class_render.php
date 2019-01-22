@@ -489,6 +489,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
                                       <i data-sek-click-on="pick-content" data-sek-content-type="<?php echo $content_type; ?>" class="material-icons sek-click-on" title="<?php echo $title; ?>">add_circle_outline</i>
+                                      <span class="sek-injection-instructions"><?php _e('Drag and drop or double-click the content that you want to insert here.', 'text_domain_to_rep'); ?></span>
                                     </div>
                                   </div>
                                   <?php

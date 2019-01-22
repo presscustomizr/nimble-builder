@@ -51,18 +51,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.registered = new api.Value([]);
 
 
-                  // Stores the preview target for double click insertion
-                  // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
-                  self.lastClickedTargetInPreview = new api.Value();
-                  self.lastClickedTargetInPreview.bind( function( to, from ) {
-                        // reset after a delay
-                        clearTimeout( $(window).data('_preview_target_timer_') );
-                        $(window).data('_preview_target_timer_', setTimeout(function() {
-                              self.lastClickedTargetInPreview( {} );
-                        }, 10000 ) );
-                  });
-
-
                   api.bind( 'ready', function() {
                         self.doSektionThinksOnApiReady();
                   });//api.bind( 'ready' )
@@ -261,7 +249,51 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( sektionsLocalizedData.isSavedSectionEnabled ) {
                         self.setupSaveUI();
                   }
-            },
+
+
+                  // SETUP DOUBLE CLICK INSERTION THINGS
+                  // Stores the preview target for double click insertion
+                  // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
+                  self.lastClickedTargetInPreview = new api.Value();
+                  self.lastClickedTargetInPreview.bind( function( to, from ) {
+                        // to and from are formed this way : { id : "__nimble__fb2ab3e47472" }
+                        // @see 'sek-pick-content' event in ::reactToPreviewMsg()
+
+                        // Send the level id of the current double-click insertion target
+                        // => this will be used to style the level id container with a pulse animation
+                        if ( _.isObject( to ) && to.id ) {
+                              api.previewer.send( 'sek-set-double-click-target', to );
+                        } else {
+                              // Tell the preview to clean the target highlight effect
+                              api.previewer.send( 'sek-reset-double-click-target' );
+                        }
+
+                        // reset after a delay
+                        clearTimeout( $(window).data('_preview_target_timer_') );
+                        $(window).data('_preview_target_timer_', setTimeout(function() {
+                              // Reset the click target
+                              self.lastClickedTargetInPreview( {} );
+                              // Tell the preview to clean the target highlight effect
+                              api.previewer.send( 'sek-reset-double-click-target' );
+                        }, 200000 ) );
+                  });
+
+                  // React to the preview to clean any currently highlighted drop zone
+                  // This event is triggered on all click in the preview iframe
+                  // @see preview::scheduleUiClickReactions()
+                  api.previewer.bind( 'sek-clean-target-drop-zone', function() {
+                        // Reset the click target
+                        self.lastClickedTargetInPreview({});
+                  });
+
+                  // Clean the current target when hitting escape
+                  $(document).keydown(function( evt ) {
+                        // ESCAPE key pressed
+                        if ( evt && 27 === evt.keyCode ) {
+                            self.lastClickedTargetInPreview({});
+                        }
+                  });
+            },//doSektionThinksOnApiReady
 
 
 

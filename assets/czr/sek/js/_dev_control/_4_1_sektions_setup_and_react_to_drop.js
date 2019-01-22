@@ -41,9 +41,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.bind( 'sek-refresh-dragzones', function( params ) {
                         // Detecting HTML5 Drag And Drop support in javascript
                         // https://stackoverflow.com/questions/2856262/detecting-html5-drag-and-drop-support-in-javascript#2856275
-                        if ( 'draggable' in document.createElement('span') ) {
-                              self.setupNimbleDragZones( params.input_container );//<= module or section picker
-                        } else {
+                        if (  true !== 'draggable' in document.createElement('span') ) {
                               api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                     api.notifications.add( new api.Notification( 'drag-drop-support', {
                                           type: 'error',
@@ -56,7 +54,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           api.notifications.remove( 'drag-drop-support' );
                                     }, 10000 );
                               });
+
                         }
+
+                        self.setupNimbleDragZones( params.input_container );//<= module or section picker
                   });
 
                   // on previewer refresh
@@ -94,6 +95,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //api.infoLog('instantiate', type );
                   // $(this) is the dragged element
                   var _onStart = function( evt ) {
+                        // Reset the preview target
+                        // implemented for double-click insertion https://github.com/presscustomizr/nimble-builder/issues/317
+                        self.lastClickedTargetInPreview({});
+
                         evt.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
                         evt.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
                         evt.originalEvent.dataTransfer.setData( "sek-section-type", $(this).data('sek-section-type') );

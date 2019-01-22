@@ -747,10 +747,6 @@
 }
 
 
-/* Hide the + during a drag phase */
-.sek-dragging .sek-module-drop-zone-for-first-module [data-sek-click-on="pick-content"] {
-  display: none;
-}
 /*.sek-module-drop-zone-for-first-module [data-sek-click-on="pick-content"]:hover {
   font-size: 27px;
 }*/
@@ -812,6 +808,15 @@
 .sek-active-drop-zone.sek-dynamic-drop-zone {
   height: auto!important;
   min-height : 50px;
+}
+
+/* DRAG PHASE */
+/* Hide the + icon and the injection instruction during a drag phase */
+.sek-dragging .sek-module-drop-zone-for-first-module [data-sek-click-on="pick-content"] {
+  display: none;
+}
+.sek-dragging .sek-drop-zone .sek-injection-instructions {
+  display: none!important;
 }
 /*
  the class .sek-active-drop-zone is added when appending the pre drop elemnt
@@ -1055,6 +1060,7 @@
 
 /* SORTABLE */
 .sortable-placeholder {
+  /*animation: sortable-placeholder-pulse 2s infinite;*/
   max-width: 100%;
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
@@ -1080,10 +1086,18 @@
   overflow: hidden;
   z-index: 10;
 }
+/*
+@keyframes sortable-placeholder-pulse {
+  0% {background-color: #00A2D7;}
+  50% {background-color: #79DEFF;}
+  100% {background-color: #00A2D7;}
+}*/
+
 /* class in-new-sektion is added dynamically when entering / overing the target */
 .in-new-sektion.sortable-placeholder{
   background: #72777c;
 }
+
 
 /* class .sek-moving-section is toggled on sortable start/stop */
 .sek-moving-section [data-sek-level="location"] {
@@ -1356,4 +1370,42 @@ html.no-js [id*=sek-slider-loader-wrapper] {
 }
 [data-sek-is-header-location="true"] {
   margin-top:0;
+}
+
+
+
+
+
+/* DOUBLE CLICK CONTENT INJECTION => HIGHLIGHT OF THE TARGET + REVEAL INSTRUCTIONS + HIDE + BUTTON */
+/*implemented for double-click insertion
+https://github.com/presscustomizr/nimble-builder/issues/317 */
+@keyframes sek-target-highlight {
+  0% {background-color: #0085ba;}
+  50% {background-color: #00A0D2;}
+  100% {background-color: #0085ba;}
+  /*0% {background-color: #eee;}
+  50% {background-color: #b4b3b3;}
+  100% {background-color: #eee;}*/
+}
+.sek-target-for-double-click-insertion .sek-drop-zone {
+  /*height : 20px;*/
+  animation: sek-target-highlight 3s infinite;
+  background-color: #eee;
+}
+.sek-injection-instructions {
+  display: none;
+  font-size: 13px;
+  line-height: 1.5em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  color: #ffffff;
+  padding: 4px;
+}
+.sek-shrink-my-ui .sek-injection-instructions {
+  font-size: 10px;
+}
+.sek-target-for-double-click-insertion .sek-drop-zone .sek-injection-instructions {
+  display: inline-block;
+}
+.sek-target-for-double-click-insertion .sek-drop-zone [data-sek-click-on="pick-content"]{
+  display: none;
 }
