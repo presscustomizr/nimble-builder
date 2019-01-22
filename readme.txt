@@ -1,6 +1,6 @@
 === Nimble Page Builder ===
 Contributors: nikeo, d4z_c0nf
-Author URI: https://presscustomizr.com
+Author URI: https://nimblebuilder.com
 Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
@@ -14,7 +14,7 @@ Powerful drag and drop page builder using the native WordPress customizer.
 
 == Description ==
 = What is the Nimble Page Builder ? =
-The Nimble Builder is a powerful and easy to use page builder plugin. It takes the native WordPress customizer to a level you've never seen before.
+The **[Nimble Page Builder](https://nimblebuilder.com/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** is a powerful and easy to use page builder plugin. It takes the native WordPress customizer to a level you've never seen before.
 
 Nimble allows you to drag and drop content modules, or pre-built section templates, into any context of your site, including search results or 404 pages. You can edit your sections in real time from the live customizer, and then publish when you are happy of the result, or save for later.
 

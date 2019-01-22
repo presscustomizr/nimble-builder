@@ -5,7 +5,7 @@
 * Version: 1.4.4
 * Text Domain: nimble-builder
 * Author: Press Customizr
-* Author URI: https://presscustomizr.com
+* Author URI: https://nimblebuilder.com/?utm_source=wp-plugins&utm_medium=wp-dashboard&utm_campaign=author-uri
 */
 if ( ! defined( 'ABSPATH' ) ) {
   exit;
