@@ -275,7 +275,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.lastClickedTargetInPreview( {} );
                               // Tell the preview to clean the target highlight effect
                               api.previewer.send( 'sek-reset-double-click-target' );
-                        }, 200000 ) );
+                        }, 20000 ) );
                   });
 
                   // React to the preview to clean any currently highlighted drop zone
