@@ -25,7 +25,7 @@ if ( ! function_exists( 'Nimble\sek_print_html_content') ) {
         }
     }
 }
-// print the module content if not empty
+// print the module content
 if ( array_key_exists( 'html_content', $value ) ) {
     sek_print_html_content( $value['html_content'], 'html_content' );
 }

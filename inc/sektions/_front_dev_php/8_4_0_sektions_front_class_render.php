@@ -630,6 +630,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                   $ph = '<i class="material-icons">image</i>';
                 break;
             }
+            switch( $input_id ) {
+                case 'html_content' :
+                  $ph = skp_is_customizing() ? sprintf('<pre>%1$s<br/>%2$s</pre>', __('Html code goes here', 'text-domain'), '<div class="">' . __('Click to edit', 'here') ) .'</div>' : '';
+                break;
+            }
             if ( skp_is_customizing() ) {
                 return sprintf('<div class="sek-module-placeholder" title="%4$s" data-sek-input-type="%1$s" data-sek-input-id="%2$s">%3$s</div>', $input_type, $input_id, $ph, __('Click to edit', 'here') );
             } else {
