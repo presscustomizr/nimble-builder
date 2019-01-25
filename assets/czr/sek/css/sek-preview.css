@@ -1333,7 +1333,14 @@ html.no-js [id*=sek-slider-loader-wrapper] {
 
 
 /* PLACEHOLDER STYLE FOR TINYMCE MODULE */
-.sek-tiny-mce-module-placeholder-text { padding:10px;border: 1px dotted;background: rgba(0, 0, 0, 0.35); color: #fff;}
+.sek-tiny-mce-module-placeholder-text {
+  padding:10px;
+  border: 1px dotted;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size:1rem;
+  line-height: 1.5rem;
+}
 
 /* STYLE LINKS */
 .nimble-unclickable{cursor: not-allowed !important;}
