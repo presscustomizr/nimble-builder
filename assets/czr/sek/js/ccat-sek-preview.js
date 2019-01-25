@@ -927,6 +927,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   var self = this;
 
                   $('body').on('click', function( evt ) {
+                        api.preview.send( 'sek-clean-target-drop-zone' );
 
                         var clickedOn = '',
                             $el = $(evt.target),
@@ -1380,12 +1381,25 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   $('.sek-dynamic-drop-zone').remove();
                             },
                             'sek-animate-to-level' : function( params ) {
-                                  var $elToFocusOn = $('div[data-sek-id="' + params.id + '"]' );
+                                  var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
                                   if ( $elToFocusOn.length > 0 ) {
                                         $('html, body').animate({
                                               scrollTop : $elToFocusOn.offset().top - 100
                                         }, 'slow');
                                   }
+                            },
+                            'sek-set-double-click-target' : function( params ) {
+                                  $('.sek-target-for-double-click-insertion').removeClass('sek-target-for-double-click-insertion');
+
+                                  if ( _.isObject( params ) && params.id ) {
+                                        var $elToHighlight = $('[data-sek-id="' + params.id + '"]' );
+                                        if( 1 === $elToHighlight.length ) {
+                                              $elToHighlight.addClass('sek-target-for-double-click-insertion');
+                                        }
+                                  }
+                            },
+                            'sek-reset-double-click-target' : function( params ) {
+                                  $('.sek-target-for-double-click-insertion').removeClass('sek-target-for-double-click-insertion');
                             }
 
                       };//msgCollection

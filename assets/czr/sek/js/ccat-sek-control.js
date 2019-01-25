@@ -58,7 +58,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.generateUI({ action : 'sek-generate-global-options-ui'});
                               _section_.nimbleGlobalOptionGenerated = true;
                         });
-                  };
+                        api.trigger('nimble-ready-for-current-skope');
+                  };//doSkopeDependantActions()
                   if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
                         doSkopeDependantActions();
                   }
@@ -126,7 +127,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( sektionsLocalizedData.isSavedSectionEnabled ) {
                         self.setupSaveUI();
                   }
-            },
+                  self.lastClickedTargetInPreview = new api.Value();
+                  self.lastClickedTargetInPreview.bind( function( to, from ) {
+                        if ( _.isObject( to ) && to.id ) {
+                              api.previewer.send( 'sek-set-double-click-target', to );
+                        } else {
+                              api.previewer.send( 'sek-reset-double-click-target' );
+                        }
+                        clearTimeout( $(window).data('_preview_target_timer_') );
+                        $(window).data('_preview_target_timer_', setTimeout(function() {
+                              self.lastClickedTargetInPreview( {} );
+                              api.previewer.send( 'sek-reset-double-click-target' );
+                        }, 20000 ) );
+                  });
+                  api.previewer.bind( 'sek-clean-target-drop-zone', function() {
+                        self.lastClickedTargetInPreview({});
+                  });
+                  $(document).keydown(function( evt ) {
+                        if ( evt && 27 === evt.keyCode ) {
+                            self.lastClickedTargetInPreview({});
+                        }
+                  });
+            },//doSektionThinksOnApiReady
             registerAndSetupDefaultPanelSectionOptions : function() {
                   var self = this;
                   var SektionPanelConstructor = api.Panel.extend({
@@ -273,6 +295,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( CZRSeksPrototype, {
             setupTopBar : function() {
                   var self = this;
+                  self.topBarId = '#nimble-top-bar';
                   self.topBarVisible = new api.Value( false );
                   self.topBarVisible.bind( function( visible ){
                         self.toggleTopBar( visible );
@@ -328,11 +351,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             },
             renderAndSetupTopBarTmpl : function( params ) {
-                  if ( $( '#nimble-top-bar' ).length > 0 )
-                    return $( '#nimble-top-bar' );
-
                   var self = this;
-
+                  if ( $( self.topBarId ).length > 0 )
+                    return $( self.topBarId );
                   try {
                         _tmpl =  wp.template( 'nimble-top-bar' )( {} );
                   } catch( er ) {
@@ -340,26 +361,63 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return false;
                   }
                   $('#customize-preview').after( $( _tmpl ) );
-                  $('[data-nimble-history]', '#nimble-top-bar').on( 'click', function(evt) {
+                  $(document).keydown( function( evt ) {
+                        if ( evt.ctrlKey && _.contains( [89, 90], evt.keyCode ) ) {
+                              try { self.navigateHistory( 90 === evt.keyCode ? 'undo' : 'redo'); } catch( er ) {
+                                    api.errare( 'Error when firing self.navigateHistory', er );
+                              }
+                        }
+                  });
+                  $('[data-nimble-history]', self.topBarId).on( 'click', function(evt) {
                         try { self.navigateHistory( $(this).data( 'nimble-history') ); } catch( er ) {
                               api.errare( 'Error when firing self.navigateHistory', er );
                         }
                   });
-                  $('.sek-settings', '#nimble-top-bar').on( 'click', function(evt) {
+                  $('.sek-settings', self.topBarId).on( 'click', function(evt) {
                         api.panel( sektionsLocalizedData.sektionsPanelId, function( _panel_ ) {
                               self.rootPanelFocus();
                               _panel_.focus();
                         });
                   });
-                  $('.sek-add-content', '#nimble-top-bar').on( 'click', function(evt) {
+                  $('.sek-add-content', self.topBarId).on( 'click', function(evt) {
                         evt.preventDefault();
                         api.previewer.trigger( 'sek-pick-content', { content_type : 'module' });
                   });
-                  $('.sek-nimble-doc', '#nimble-top-bar').on( 'click', function(evt) {
+                  $('.sek-nimble-doc', self.topBarId).on( 'click', function(evt) {
                         evt.preventDefault();
                         window.open($(this).data('doc-href'), '_blank');
                   });
-                  return $( '#nimble-top-bar' );
+                  var maybePrintNotificationForUsageOfNimbleTemplate = function( templateSettingValue ) {
+                        if ( $(self.topBarId).length < 1 )
+                          return;
+                        if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
+                              $(self.topBarId).find('.sek-notifications').html([
+                                    '<span class="fas fa-info-circle"></span>',
+                                    sektionsLocalizedData.i18n['This page uses a custom template.']
+                              ].join(' '));
+                        } else {
+                              $(self.topBarId).find('.sek-notifications').html('');
+                        }
+                  };
+
+                  var initOnSkopeReady = function() {
+                        api( self.localSectionsSettingId(), function( _localSectionsSetting_ ) {
+                              var localSectionsValue = _localSectionsSetting_(),
+                                  initialLocalTemplateValue = ( _.isObject( localSectionsValue ) && localSectionsValue.local_options && localSectionsValue.local_options.template ) ? localSectionsValue.local_options.template : null;
+                              maybePrintNotificationForUsageOfNimbleTemplate( initialLocalTemplateValue );
+                        });
+                        api( self.getLocalSkopeOptionId() + '__template', function( _set_ ) {
+                              _set_.bind( function( to, from ) {
+                                    maybePrintNotificationForUsageOfNimbleTemplate( to );
+                              });
+                        });
+                  };
+                  initOnSkopeReady();
+                  api.bind('nimble-ready-for-current-skope', function() {
+                        initOnSkopeReady();
+                  });
+
+                  return $( self.topBarId );
             },
 
 
@@ -852,7 +910,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     id :  params.apiParams.location
                                               });
                                         }
-                                        api.previewer.trigger( 'sek-pick-content', { content_type : 'section' });
+                                        api.previewer.trigger( 'sek-pick-content', {
+                                              id : params.apiParams ? params.apiParams.id : '',
+                                              content_type : 'section'
+                                        });
                                         api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                   }
                             },
@@ -1253,6 +1314,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   params = _.isObject(params) ? params : {};
                                   api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value();
                                   api.czr_sektions.currentContentPickerType( params.content_type || 'module' );
+                                  if ( _.isObject( params ) && params.id ) {
+                                        self.lastClickedTargetInPreview( { id : params.id } );
+                                  }
 
                                   params = params || {};
                                   sendToPreview = true;
@@ -1678,6 +1742,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         }
                         if ( isEqualToDefault( _val, inputDefaultValue ) ) {
+                              return;
+                        } else if ( ( _.isString( _val ) || _.isObject( _val ) ) && _.isEmpty( _val ) ) {
                               return;
                         } else {
                               itemNormalized[ input_id ] = _val;
@@ -4197,9 +4263,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             setupDnd : function() {
                   var self = this;
                   self.bind( 'sek-refresh-dragzones', function( params ) {
-                        if ( 'draggable' in document.createElement('span') ) {
-                              self.setupNimbleDragZones( params.input_container );//<= module or section picker
-                        } else {
+                        if (  true !== 'draggable' in document.createElement('span') ) {
                               api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                     api.notifications.add( new api.Notification( 'drag-drop-support', {
                                           type: 'error',
@@ -4210,7 +4274,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           api.notifications.remove( 'drag-drop-support' );
                                     }, 10000 );
                               });
+
                         }
+
+                        self.setupNimbleDragZones( params.input_container );//<= module or section picker
                   });
                   api.previewer.bind( 'ready', function() {
                         try { self.setupNimbleDropZones();//<= module or section picker
@@ -4228,6 +4295,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             setupNimbleDragZones : function( $draggableWrapper ) {
                   var self = this;
                   var _onStart = function( evt ) {
+                        self.lastClickedTargetInPreview({});
+
                         evt.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
                         evt.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
                         evt.originalEvent.dataTransfer.setData( "sek-section-type", $(this).data('sek-section-type') );
@@ -4257,15 +4326,56 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $('body').addClass('sek-dragging');
                         api.previewer.send( 'sek-drag-start', { type : self.dndData.content_type } );//fires the rendering of the dropzones
                   };
-
                   var _onEnd = function( evt ) {
                         $('body').removeClass('sek-dragging');
                         $(this).removeClass('sek-dragged');
                         api.previewer.send( 'sek-drag-stop' );
                   };
-                  $draggableWrapper.find( '[draggable]' ).each( function() {
-                        $(this).on( 'dragstart', function( evt ) { _onStart.call( $(this), evt ); })
-                              .on( 'dragend', function( evt ) { _onEnd.call( $(this), evt ); });
+                  var _onDoubleClick = function( evt ) {
+                        var _targetCandidate = self.lastClickedTargetInPreview();// { id : "__nimble__fb2ab3e47472" }
+                        var $dropTarget;
+                        if ( ! _.isEmpty( _targetCandidate ) && _targetCandidate.id ) {
+                              $dropTarget = self.dnd_getDropZonesElements().find('[data-sek-id="' + _targetCandidate.id + '"]').find('.sek-module-drop-zone-for-first-module').first();
+                        } else {
+                              _doubleClickTargetMissingNotif();
+                        }
+
+                        if ( $dropTarget && $dropTarget.length > 0 ) {
+                              api.czr_sektions.trigger( 'sek-content-dropped', {
+                                    drop_target_element : $dropTarget,
+                                    location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
+                                    before_module : $dropTarget.data('drop-zone-before-module-or-nested-section'),
+                                    after_module : $dropTarget.data('drop-zone-after-module-or-nested-section'),
+                                    before_section : $dropTarget.data('drop-zone-before-section'),
+                                    after_section : $dropTarget.data('drop-zone-after-section'),
+
+                                    content_type : $(this).data('sek-content-type'),
+                                    content_id : $(this).data('sek-content-id'),
+
+                                    section_type : $(this).data('sek-section-type'),
+                                    is_user_section : "true" === $(this).data('sek-is-user-section')
+                              });
+                              self.lastClickedTargetInPreview({});
+                        } else {
+                              _doubleClickTargetMissingNotif();
+                              api.errare( 'Double click insertion => the target zone was not found');
+                        }
+                  };//_onDoubleClick()
+                  var _doubleClickTargetMissingNotif = function() {
+                        api.notifications.add( new api.Notification( 'missing-injection-target', {
+                              type: 'info',
+                              message: sektionsLocalizedData.i18n['You first need to click on a target ( with a + icon ) in the preview.'],
+                              dismissible: true
+                        } ) );
+                        _.delay( function() {
+                              api.notifications.remove( 'missing-injection-target' );
+                        }, 30000 );
+                  };
+                  $draggableWrapper.find( '[draggable="true"]' ).each( function() {
+                        $(this)
+                              .on( 'dragstart', function( evt ) { _onStart.call( $(this), evt ); })
+                              .on( 'dragend', function( evt ) { _onEnd.call( $(this), evt ); })
+                              .dblclick( function( evt ) { _onDoubleClick.call( $(this), evt ); });
                   });
             },//setupNimbleZones()
             setupNimbleDropZones : function() {
@@ -7437,7 +7547,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return input();
                                                 }); } catch( er ) {
-                                                      api.errare( 'Button module => error in setInputVisibilityDeps', er );
+                                                      api.errare( 'Image module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'use_custom_title_attr' :
+                                          _.each( [ 'heading_title' ] , function( _inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                }); } catch( er ) {
+                                                      api.errare( 'Image module => error in setInputVisibilityDeps', er );
                                                 }
                                           });
                                     break;
@@ -7841,11 +7960,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
  *  HEADING MAIN CHILD
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
-      var HeadingModuleConstructor  = {
+      var Constructor  = {
             initialize: function( id, options ) {
                   var module = this;
                   module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
+                  module.bind( 'set_default_content_picker_options', function( params ) {
+                        params.defaultContentPickerOption.defaultOption = {
+                              'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                              'type'       : '',
+                              'type_label' : '',
+                              'object'     : '',
+                              'id'         : '_custom_',
+                              'url'        : ''
+                        };
+                        return params;
+                  });
             },//initialize
 
             CZRHeadingInputMths: {
@@ -7853,11 +7984,64 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.czr_sektions.setupSelectInput.call( this );
                   }
             },//CZRHeadingsInputMths
-      };//HeadingModuleConstructor
+            CZRItemConstructor : {
+                  ready : function() {
+                        var item = this;
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              this.bind( function( to ) {
+                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              });
+                        };
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'link-to' :
+                                          _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'link-custom-url' :
+                                                                  bool = input() && '_custom_' == item.czr_Input('link-pick-url')().id;
+                                                            break;
+                                                            case 'link-pick-url' :
+                                                                  bool = input();
+                                                            break;
+                                                            case 'link-target' :
+                                                                  bool = input();
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                }); } catch( er ) {
+                                                      api.errare( 'Heading module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'link-pick-url' :
+                                          scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                                return '_custom_' == input().id && true === item.czr_Input('link-to')();
+                                          });
+                                    break;
+                              }
+                        });
+                  }//setInputVisibilityDeps
+            },//CZRItemConstructor
+      };//Constructor
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_heading_child : {
-                  mthds : HeadingModuleConstructor,
+                  mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_child', 'name' ),
                   has_mod_opt : false,
@@ -7872,7 +8056,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
  *  HEADING SPACING
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
-      var HeadingModuleConstructor  = {
+      var Constructor  = {
             initialize: function( id, options ) {
                   var module = this;
                   module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
@@ -7884,11 +8068,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.czr_sektions.setupSelectInput.call( this );
                   }
             },//CZRHeadingsInputMths
-      };//HeadingModuleConstructor
+      };//Constructor
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_heading_spacing_child : {
-                  mthds : HeadingModuleConstructor,
+                  mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_spacing_child', 'name' ),
                   has_mod_opt : false,

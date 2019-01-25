@@ -472,6 +472,40 @@ button.sek-btn,
   background: transparent;
 }
 
+.sek-module-inner h1, .sek-module-inner h2, .sek-module-inner h3, .sek-module-inner h4, .sek-module-inner h5, .sek-module-inner h6 {
+  font-weight: 400;
+  line-height: 1.5em;
+}
+
+.sek-module-inner h1 {
+  font-size: 2.48em;
+}
+
+.sek-module-inner h2 {
+  font-size: 2.07em;
+}
+
+.sek-module-inner h3 {
+  font-size: 1.73em;
+}
+
+.sek-module-inner h4 {
+  font-size: 1.44em;
+}
+
+.sek-module-inner h5 {
+  font-size: 1.2em;
+}
+
+.sek-module-inner h6 {
+  font-size: 1em;
+}
+
+.sek-heading > a {
+  color: inherit;
+  font-size: inherit;
+}
+
 .sek-nav-wrap {
   position: relative;
   display: -ms-flexbox;
@@ -1144,7 +1178,7 @@ button.sek-btn,
   color: inherit;
 }
 
-[data-sek-module-type="czr_icon_module"] .box-shadow i {
+[data-sek-module-type="czr_icon_module"] .box-shadow .sek-icon-wrapper {
   box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0;
 }
 
@@ -1154,7 +1188,9 @@ button.sek-btn,
 }
 
 [data-sek-module-type="czr_icon_module"] .sek-icon .fas, [data-sek-module-type="czr_icon_module"] .sek-icon .far, [data-sek-module-type="czr_icon_module"] .sek-icon .fab {
-  width: auto;
+  width: 1em;
+  height: 1em;
+  text-align: center;
 }
 
 [data-sek-module-type="czr_icon_module"] a.sek-icon {
@@ -1165,6 +1201,10 @@ button.sek-btn,
 [data-sek-module-type="czr_icon_module"] a.sek-icon:hover, [data-sek-module-type="czr_icon_module"] a.sek-icon:focus, [data-sek-module-type="czr_icon_module"] a.sek-icon:active {
   box-shadow: none;
   -webkit-box-shadow: none;
+}
+
+[data-sek-module-type="czr_icon_module"] .sek-icon-wrapper {
+  display: inline-block;
 }
 
 .sek-quote p {
@@ -1372,9 +1412,28 @@ button.sek-btn,
   padding: 0;
 }
 
+.sek-module-inner a {
+  text-decoration: none;
+  box-shadow: none;
+}
+
+.sek-module-inner img {
+  height: auto;
+  max-width: 100%;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-module-inner h3:before, body .sek-module-inner h4:before, body .sek-module-inner h5:before, body .sek-module-inner h6:before {
+  content: none;
+  background: none;
+}
+
 /* make sure that the location level occupies 100% of the width */
 [data-sek-level="location"] {
   clear: both;
+  font-size: 16px;
 }
 
 /* To make vertical alignment possible in sections */

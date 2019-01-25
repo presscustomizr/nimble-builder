@@ -2413,7 +2413,7 @@ function sek_get_module_params_for_sek_module_picker_module() {
             'item-inputs' => array(
                 'module_id' => array(
                     'input_type'  => 'module_picker',
-                    'title'       => __('Drag and drop modules in the previewed page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Drag and drop or double-click on a module to insert it in your chosen target element in the previewed page', 'text_domain_to_be_replaced'),
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 )
@@ -2429,7 +2429,7 @@ function sek_get_module_params_for_sek_module_picker_module() {
 function sek_get_default_section_input_params() {
     return array(
         'input_type'  => 'section_picker',
-        'title'       => __('Drag and drop sections in the previewed page', 'text_domain_to_be_replaced'),
+        'title'       => __('Drag and drop or double-click on a section to insert it in your chosen target element in the previewed page', 'text_domain_to_be_replaced'),
         'width-100'   => true,
         'title_width' => 'width-100'
     );
@@ -3957,15 +3957,11 @@ function sek_get_module_params_for_czr_simple_html_module() {
         'module_type' => 'czr_simple_html_module',
         'name' => __( 'Html Content', 'text_domain_to_be_replaced' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_html_module',
-        'starting_value' => array(
-            'html_content' => sprintf('<pre>%1$s</pre>', __('html code goes here', 'text-domain') )
-        ),
         'tmpl' => array(
             'item-inputs' => array(
                 'html_content' => array(
                     'input_type'  => 'code_editor',
-                    'title'       => __( 'HTML Content' , 'text_domain_to_be_replaced' ),
-                    'default'     => sprintf('<pre>%1$s</pre>', __('html code goes here', 'text-domain') )
+                    'title'       => __( 'HTML Content' , 'text_domain_to_be_replaced' )
                 )
             )
         ),
@@ -4131,6 +4127,21 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'css_identifier' => 'h_alignment',
                     'title_width' => 'width-100',
                     'width-100'   => true,
+                ),
+                'use_custom_title_attr' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Set the text displayed when the mouse is held over', 'text_domain_to_be_replaced'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('If not specified, Nimble will use by order of priority the caption, the description, and the image title. Those properties can be edited for each image in the media library.')
+                ),
+                'heading_title' => array(
+                    'input_type'         => 'text',
+                    'title' => __('Custom text displayed on mouse hover', 'text_domain_to' ),
+                    'default'            => '',
+                    'title_width' => 'width-100',
+                    'width-100'         => true
                 ),
                 'use_custom_width' => array(
                     'input_type'  => 'gutencheck',
@@ -4439,6 +4450,38 @@ function sek_get_module_params_for_czr_heading_child() {
                     'title_width' => 'width-100',
                     'width-100'   => true,
                 ),
+                'heading_title' => array(
+                    'input_type'         => 'text',
+                    'title' => __('Display a text when the mouse is held over', 'text_domain_to' ),
+                    'default'            => '',
+                    'title_width' => 'width-100',
+                    'width-100'         => true,
+                    'notice_after' => __('Not previewable during customization', 'text_domain_to')
+                ),
+                'link-to' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Turn into a link', 'text_domain_to_be_replaced'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'link-pick-url' => array(
+                    'input_type'  => 'content_picker',
+                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'default'     => array()
+                ),
+                'link-custom-url' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'default'     => ''
+                ),
+                'link-target' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                )
             )
         ),
         'render_tmpl_path' =>'',
@@ -4635,7 +4678,7 @@ function sek_get_module_params_for_czr_icon_module() {
                 'color_hover' => '#969696'
             )
         ),
-        'css_selectors' => array( '.sek-icon i' ),
+        'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/icon_module_tmpl.php",
         'front_assets' => array(
               'czr-font-awesome' => array(
@@ -4658,7 +4701,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_settings_child',
         'name' => __( 'Icon settings', 'text_domain_to_be_replaced' ),
-        'css_selectors' => array( '.sek-icon i' ),
+        'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'icon' => array(
@@ -4758,7 +4801,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_spacing_border_child',
         'name' => __( 'Icon options for background, spacing, border, shadow', 'text_domain_to_be_replaced' ),
-        'css_selectors' => array( '.sek-icon i' ),
+        'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'spacing_css'     => array(
@@ -4769,7 +4812,6 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'spacing_with_device_switcher',
-                    'css_selectors'=> '.sek-icon i'
                 ),
                 'bg_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
@@ -4780,7 +4822,6 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'background_color',
-                    'css_selectors'=> '.sek-icon i'
                 ),
                 'border-type' => array(
                     'input_type'  => 'select',
@@ -4802,7 +4843,6 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'refresh_stylesheet' => true,
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'css_selectors'=> '.sek-icon i'
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
@@ -4815,7 +4855,6 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'border_radius',
-                    'css_selectors'=> '.sek-icon i'
                 ),
                 'use_box_shadow' => array(
                     'input_type'  => 'gutencheck',
@@ -4876,7 +4915,7 @@ function sek_add_css_rules_for_icon_front_module( $rules, $complete_modul_model 
             $rules,
             $border_settings,
             $border_type,
-            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-icon i'
+            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-icon-wrapper'
         );
     }
 
@@ -5444,6 +5483,14 @@ function sek_get_module_params_for_czr_btn_content_child() {
                     'title'              => __( 'Button text', 'text_domain_to_be_replaced' ),
                     'default'            => '',
                     'width-100'         => true,
+                ),
+                'btn_text_on_hover' => array(
+                    'input_type'         => 'text',
+                    'title'              => __( 'Button text on mouse hover', 'text_domain_to_be_replaced' ),
+                    'default'            => '',
+                    'width-100'         => true,
+                    'title_width' => 'width-100',
+                    'notice_after'       => __( 'Not previewable when customizing.', 'text_domain_to_be_replaced')
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',
@@ -6682,7 +6729,6 @@ function sek_get_module_params_for_czr_font_child() {
                 'font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
-                    'default'     => array( 'desktop' => '16px' ),
                     'min' => 0,
                     'max' => 100,
                     'title_width' => 'width-100',
@@ -9443,6 +9489,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
                                       <i data-sek-click-on="pick-content" data-sek-content-type="<?php echo $content_type; ?>" class="material-icons sek-click-on" title="<?php echo $title; ?>">add_circle_outline</i>
+                                      <span class="sek-injection-instructions"><?php _e('Drag and drop or double-click the content that you want to insert here.', 'text_domain_to_rep'); ?></span>
                                     </div>
                                   </div>
                                   <?php
@@ -9565,6 +9612,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 break;
                 case 'upload' :
                   $ph = '<i class="material-icons">image</i>';
+                break;
+            }
+            switch( $input_id ) {
+                case 'html_content' :
+                  $ph = skp_is_customizing() ? sprintf('<pre>%1$s<br/>%2$s</pre>', __('Html code goes here', 'text-domain'), __('Click to edit', 'here') ) : '';
                 break;
             }
             if ( skp_is_customizing() ) {
