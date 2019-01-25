@@ -97,6 +97,21 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'title_width' => 'width-100',
                     'width-100'   => true,
                 ),
+                'use_custom_title_attr' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Set the text displayed when the mouse is held over', 'text_domain_to_be_replaced'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('If not specified, Nimble will use by order of priority the caption, the description, and the image title. Those properties can be edited for each image in the media library.')
+                ),
+                'heading_title' => array(
+                    'input_type'         => 'text',
+                    'title' => __('Custom text displayed on mouse hover', 'text_domain_to' ),
+                    'default'            => '',
+                    'title_width' => 'width-100',
+                    'width-100'         => true
+                ),
                 'use_custom_width' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __( 'Custom image width', 'text_domain_to_be_replaced' ),

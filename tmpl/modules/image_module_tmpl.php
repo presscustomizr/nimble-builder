@@ -58,8 +58,9 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
                 $caption = $img_post->post_excerpt;
                 $description = $img_post->post_content;
                 $img_title = $img_post->post_title;
-
-                if ( !empty( $caption ) ) {
+                if ( false !== sek_booleanize_checkbox_val( $value['use_custom_title_attr']) ) {
+                    $title = esc_html( $value['heading_title'] );
+                } elseif ( !empty( $caption ) ) {
                     $title = $caption;
                 } else if ( !empty( $description ) ) {
                     $title = $description;
