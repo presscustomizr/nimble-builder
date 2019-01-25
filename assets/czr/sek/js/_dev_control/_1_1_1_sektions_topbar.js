@@ -6,6 +6,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // fired in ::initialize(), at api.bind( 'ready', function() {})
             setupTopBar : function() {
                   var self = this;
+                  self.topBarId = '#nimble-top-bar';
                   self.topBarVisible = new api.Value( false );
                   self.topBarVisible.bind( function( visible ){
                         self.toggleTopBar( visible );
@@ -73,10 +74,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             //@param = { }
             renderAndSetupTopBarTmpl : function( params ) {
-                  if ( $( '#nimble-top-bar' ).length > 0 )
-                    return $( '#nimble-top-bar' );
-
                   var self = this;
+                  // CHECK IF ALREADY RENDERED
+                  if ( $( self.topBarId ).length > 0 )
+                    return $( self.topBarId );
 
                   // RENDER
                   try {
@@ -99,12 +100,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // CLICK EVENT
                   // Attach click events
-                  $('[data-nimble-history]', '#nimble-top-bar').on( 'click', function(evt) {
+                  $('[data-nimble-history]', self.topBarId).on( 'click', function(evt) {
                         try { self.navigateHistory( $(this).data( 'nimble-history') ); } catch( er ) {
                               api.errare( 'Error when firing self.navigateHistory', er );
                         }
                   });
-                  $('.sek-settings', '#nimble-top-bar').on( 'click', function(evt) {
+                  $('.sek-settings', self.topBarId).on( 'click', function(evt) {
                         // Focus on the Nimble panel
                         api.panel( sektionsLocalizedData.sektionsPanelId, function( _panel_ ) {
                               self.rootPanelFocus();
@@ -117,15 +118,58 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       });
                         // });
                   });
-                  $('.sek-add-content', '#nimble-top-bar').on( 'click', function(evt) {
+                  $('.sek-add-content', self.topBarId).on( 'click', function(evt) {
                         evt.preventDefault();
                         api.previewer.trigger( 'sek-pick-content', { content_type : 'module' });
                   });
-                  $('.sek-nimble-doc', '#nimble-top-bar').on( 'click', function(evt) {
+                  $('.sek-nimble-doc', self.topBarId).on( 'click', function(evt) {
                         evt.preventDefault();
                         window.open($(this).data('doc-href'), '_blank');
                   });
-                  return $( '#nimble-top-bar' );
+
+
+                  // NOTIFICATION WHE USING CUSTOM TEMPLATE
+                  // implemented for https://github.com/presscustomizr/nimble-builder/issues/304
+                  var maybePrintNotificationForUsageOfNimbleTemplate = function( templateSettingValue ) {
+                        if ( $(self.topBarId).length < 1 )
+                          return;
+                        if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
+                              $(self.topBarId).find('.sek-notifications').html([
+                                    '<span class="fas fa-info-circle"></span>',
+                                    sektionsLocalizedData.i18n['This page uses a custom template.']
+                              ].join(' '));
+                        } else {
+                              $(self.topBarId).find('.sek-notifications').html('');
+                        }
+                  };
+
+                  var initOnSkopeReady = function() {
+                        // Schedule notification rendering on init
+                        // @see ::generateUIforLocalSkopeOptions()
+                        api( self.localSectionsSettingId(), function( _localSectionsSetting_ ) {
+                              var localSectionsValue = _localSectionsSetting_(),
+                                  initialLocalTemplateValue = ( _.isObject( localSectionsValue ) && localSectionsValue.local_options && localSectionsValue.local_options.template ) ? localSectionsValue.local_options.template : null;
+                              // on init
+                              maybePrintNotificationForUsageOfNimbleTemplate( initialLocalTemplateValue );
+                        });
+
+                        // React to template changes
+                        api( self.getLocalSkopeOptionId() + '__template', function( _set_ ) {
+                              _set_.bind( function( to, from ) {
+                                    maybePrintNotificationForUsageOfNimbleTemplate( to );
+                              });
+                        });
+                  };
+
+                  // fire now
+                  initOnSkopeReady();
+                  // and on skope change, when user navigates through the previewed pages
+                  // 'nimble-ready-for-current-skope' declared in ::initialize()
+                  api.bind('nimble-ready-for-current-skope', function() {
+                        initOnSkopeReady();
+                  });
+
+                  return $( self.topBarId );
             },
 
 

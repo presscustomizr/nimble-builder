@@ -1041,6 +1041,11 @@ body.nimble-top-bar-visible #nimble-top-bar {
   -webkit-filter: none;
   filter: none;
 }
+#nimble-top-bar .sek-notifications {
+  max-width: 300px;
+  overflow: hidden;
+}
+
 
 
 /* TOP SAVE SECTION UI */

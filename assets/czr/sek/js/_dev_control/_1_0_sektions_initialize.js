@@ -128,7 +128,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.generateUI({ action : 'sek-generate-global-options-ui'});
                               _section_.nimbleGlobalOptionGenerated = true;
                         });
-                  };
+
+                        // This event has been introduced when implementing https://github.com/presscustomizr/nimble-builder/issues/304
+                        api.trigger('nimble-ready-for-current-skope');
+                  };//doSkopeDependantActions()
+
                   // populate the setting ids now if skopes are set
                   if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
                         doSkopeDependantActions();
