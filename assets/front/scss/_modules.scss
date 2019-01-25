@@ -26,6 +26,15 @@
     -webkit-box-shadow: none;
     box-shadow: none;
   }
+  img {
+    height: auto;
+    max-width: 100%;
+    border: none;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
 }
 
 // fix for https://github.com/presscustomizr/nimble-builder/issues/319
