@@ -21,6 +21,11 @@
     margin: 0 0 1em;
     padding: 0;
   }
+  a {
+    text-decoration: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
 }
 
 // fix for https://github.com/presscustomizr/nimble-builder/issues/319
