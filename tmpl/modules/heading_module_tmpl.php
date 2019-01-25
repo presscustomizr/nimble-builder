@@ -11,7 +11,7 @@ $value = $value['main_settings'];
 // Utility to print the text content generated with tinyMce
 // should be wrapped in a specific selector when customizing,
 //  => so we can listen to user click actions and open the editor on for each separate tiny_mce_editor input
-if ( ! function_exists( __NAMESPACE__ . '\sek_print_text_heading_content' ) ) {
+if ( ! function_exists( 'Nimble\sek_print_text_heading_content' ) ) {
     function sek_print_text_heading_content( $heading_content, $input_id, $module_model, $echo = false ) {
         if ( empty( $heading_content ) ) {
             $to_print = Nimble_Manager()->sek_get_input_placeholder_content( 'text', $input_id );
@@ -31,7 +31,7 @@ if ( ! function_exists( __NAMESPACE__ . '\sek_print_text_heading_content' ) ) {
     }
 }
 
-if ( ! function_exists('sek_get_heading_module_link') ) {
+if ( ! function_exists( 'Nimble\sek_get_heading_module_link') ) {
     function sek_get_heading_module_link( $value ) {
         $link = 'javascript:void(0);';
         // if ( skp_is_customizing() ) {
