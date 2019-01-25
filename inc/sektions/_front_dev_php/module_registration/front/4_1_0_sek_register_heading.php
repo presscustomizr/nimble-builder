@@ -67,6 +67,38 @@ function sek_get_module_params_for_czr_heading_child() {
                     'title_width' => 'width-100',
                     'width-100'   => true,
                 ),
+                'heading_title' => array(
+                    'input_type'         => 'text',
+                    'title' => __('Display a text when the mouse is held over', 'text_domain_to' ),
+                    'default'            => '',
+                    'title_width' => 'width-100',
+                    'width-100'         => true,
+                    'notice_after' => __('Not previewable during customization', 'text_domain_to')
+                ),
+                'link-to' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Turn into a link', 'text_domain_to_be_replaced'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'link-pick-url' => array(
+                    'input_type'  => 'content_picker',
+                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'default'     => array()
+                ),
+                'link-custom-url' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'default'     => ''
+                ),
+                'link-target' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                )
             )
         ),
         'render_tmpl_path' =>'',

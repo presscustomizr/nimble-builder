@@ -12,3 +12,10 @@
     h5 {font-size: 1.2em;}
     h6 {font-size: 1em;}
 }
+// introduced when implementing https://github.com/presscustomizr/nimble-builder/issues/322
+.#{$project-prefix}heading {
+    > a {
+        color: inherit;
+        font-size: inherit;
+    }
+}

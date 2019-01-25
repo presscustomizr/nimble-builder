@@ -31,12 +31,45 @@ if ( ! function_exists( __NAMESPACE__ . '\sek_print_text_heading_content' ) ) {
     }
 }
 
+if ( ! function_exists('sek_get_heading_module_link') ) {
+    function sek_get_heading_module_link( $value ) {
+        $link = 'javascript:void(0);';
+        // if ( skp_is_customizing() ) {
+        //     return $link;
+        // }
+        if ( true === sek_booleanize_checkbox_val( $value['link-to'] ) ) {
+            if ( ! empty( $value['link-pick-url'] ) && ! empty( $value['link-pick-url']['id'] ) ) {
+                if ( '_custom_' == $value['link-pick-url']['id']  && ! empty( $value['link-custom-url'] ) ) {
+                    $custom_url = apply_filters( 'nimble_parse_template_tags', $value['link-custom-url'] );
+                    $link = esc_url( $custom_url );
+                } else if ( ! empty( $value['link-pick-url']['url'] ) ) {
+                    $link = esc_url( $value['link-pick-url']['url'] );
+                }
+            }
+        }
+        return $link;
+    }
+}
+
 // print the module content if not empty
 if ( array_key_exists('heading_text', $value ) ) {
     $tag = empty( $value[ 'heading_tag' ] ) ? 'h1' : $value[ 'heading_tag' ];
+    if ( false === sek_booleanize_checkbox_val( $value['link-to'] ) ) {
+        printf( '<%1$s %3$s class="sek-heading">%2$s</%1$s>',
+            $tag,
+            sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model ),
+            !empty( $value['heading_title'] ) ? 'title="' . esc_html( $value['heading_title'] ) . '"' : ''
+        );
+    } else {
+        printf( '<%1$s %3$s class="sek-heading">%2$s</%1$s>',
+            $tag,
+            sprintf('<a href="%1$s" %2$s>%3$s</a>',
+                sek_get_heading_module_link( $value  ),
+                true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
+                sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model )
+            ),
+            !empty( $value['heading_title'] ) ? 'title="' . esc_html( $value['heading_title'] ) . '"' : ''
+        );
+    }
 
-    printf( '<%1$s class="sek-heading">%2$s</%1$s>',
-        $tag,
-        sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model )
-    );
 }
