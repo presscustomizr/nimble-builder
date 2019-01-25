@@ -632,7 +632,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
             switch( $input_id ) {
                 case 'html_content' :
-                  $ph = skp_is_customizing() ? sprintf('<pre>%1$s<br/>%2$s</pre>', __('Html code goes here', 'text-domain'), '<div class="">' . __('Click to edit', 'here') ) .'</div>' : '';
+                  $ph = skp_is_customizing() ? sprintf('<pre>%1$s<br/>%2$s</pre>', __('Html code goes here', 'text-domain'), __('Click to edit', 'here') ) : '';
                 break;
             }
             if ( skp_is_customizing() ) {
