@@ -14,7 +14,7 @@ $value = $value['main_settings'];
 if ( ! function_exists( __NAMESPACE__ . '\sek_print_text_heading_content' ) ) {
     function sek_print_text_heading_content( $heading_content, $input_id, $module_model, $echo = false ) {
         if ( empty( $heading_content ) ) {
-            $to_print = Nimble_Manager()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
+            $to_print = Nimble_Manager()->sek_get_input_placeholder_content( 'text', $input_id );
         } else {
             if ( skp_is_customizing() ) {
                 $to_print = sprintf('<div title="%3$s" data-sek-input-type="textarea" data-sek-input-id="%1$s">%2$s</div>', $input_id, $heading_content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
