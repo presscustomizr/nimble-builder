@@ -46,7 +46,7 @@ function sek_get_module_params_for_czr_icon_module() {
         ),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'css_selectors' => array( '.sek-icon i' ),
+        'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/icon_module_tmpl.php",
         'front_assets' => array(
               'czr-font-awesome' => array(
@@ -83,7 +83,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
         //     'use_box_shadow' => 1,
         //     'push_effect' => 1
         // ),
-        'css_selectors' => array( '.sek-icon i' ),
+        'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'icon' => array(
@@ -197,7 +197,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
         //     'use_box_shadow' => 1,
         //     'push_effect' => 1
         // ),
-        'css_selectors' => array( '.sek-icon i' ),
+        'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'spacing_css'     => array(
@@ -208,7 +208,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'spacing_with_device_switcher',
-                    'css_selectors'=> '.sek-icon i'
+                    // 'css_selectors'=> '.sek-icon i'
                 ),
                 'bg_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
@@ -219,7 +219,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'background_color',
-                    'css_selectors'=> '.sek-icon i'
+                    // 'css_selectors'=> '.sek-icon i'
                 ),
                 'border-type' => array(
                     'input_type'  => 'select',
@@ -241,7 +241,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'refresh_stylesheet' => true,
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'css_selectors'=> '.sek-icon i'
+                    // 'css_selectors'=> '.sek-icon i'
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
@@ -254,7 +254,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'border_radius',
-                    'css_selectors'=> '.sek-icon i'
+                    // 'css_selectors'=> '.sek-icon i'
                 ),
                 'use_box_shadow' => array(
                     'input_type'  => 'gutencheck',
@@ -325,7 +325,7 @@ function sek_add_css_rules_for_icon_front_module( $rules, $complete_modul_model 
             $rules,
             $border_settings,
             $border_type,
-            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-icon i'
+            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-icon-wrapper'
         );
     }
 

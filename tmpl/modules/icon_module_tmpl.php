@@ -35,7 +35,7 @@ if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_html') ) {
         $spacing_border = $value['spacing_border'];
 
         if ( ! empty( $icon_settings['icon'] ) ) {
-            $html = sprintf( '<i class="%1$s"></i>', $icon_settings[ 'icon' ] );
+            $html = sprintf( '<div class="sek-icon-wrapper"><i class="%1$s"></i></div>', $icon_settings[ 'icon' ] );
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
