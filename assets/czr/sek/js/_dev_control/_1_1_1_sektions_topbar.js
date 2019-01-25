@@ -128,7 +128,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
 
-                  // NOTIFICATION WHE USING CUSTOM TEMPLATE
+                  // NOTIFICATION WHEN USING CUSTOM TEMPLATE
                   // implemented for https://github.com/presscustomizr/nimble-builder/issues/304
                   var maybePrintNotificationForUsageOfNimbleTemplate = function( templateSettingValue ) {
                         if ( $(self.topBarId).length < 1 )
@@ -154,6 +154,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
 
                         // React to template changes
+                        // @see ::generateUIforLocalSkopeOptions() for the declaration of self.getLocalSkopeOptionId() + '__template'
                         api( self.getLocalSkopeOptionId() + '__template', function( _set_ ) {
                               _set_.bind( function( to, from ) {
                                     maybePrintNotificationForUsageOfNimbleTemplate( to );
