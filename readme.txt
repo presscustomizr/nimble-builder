@@ -6,7 +6,7 @@ Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.3
-Stable tag: 1.4.5-beta
+Stable tag: 1.4.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,10 +56,29 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.4.4 =
-Fixed a PHP warning when using an rgba color for an icon, a button or in a form. Improved compatibility with the Customizr theme.
+= 1.4.5 =
+Sections and modules can now be inserted with a double-click. Added minor new options to modules : button, icon, images, heading.
 
 == Changelog ==
+= 1.4.5 : January 26th, 2019 =
+* fixed : Dynamic CSS : the font-size input should not have a default value
+* fixed : when the value is a string of an object, no need to write an empty value
+* fixed : Twenty nineteen theme heading styling, adding a border ::before Hx
+* fixed : wrong selectors for the scrolling animation of the menu anchor
+* fixed : [html module] removed the potentially misleading placeholder pre tag.
+* improved : [button module] a title attribute can be displayed on hover
+* improved : added a set of default CSS rules for headings in order to be less dependant of the theme style
+* improved : reset the base font-size at location level. Ensure a consistent size in em for child nodes. Break the inheritance from the theme rules
+* improved : during customization added support for undo / redo with keyboard combination ctrl + z/y
+* improved : default CSS rules for links and images
+* improved : allow modules and pre-built sections to be inserted by double-clicking on module / section icon
+* improved : when a template is used indicate it in the customization topbar
+* improved : help users created real round icon borders
+* added : page building support for Internet Explorer by allowing double-click insertion
+* added : [heading module] a link option
+* added : a title attribute option to the heading module
+* added : [image module] an option to set a title attribute
+
 = 1.4.4 : January 17th, 2019 =
 * fixed : another PHP warning when using an rgba color for an icon, a button or in a form
 * improved : compatibility with the Customizr theme
