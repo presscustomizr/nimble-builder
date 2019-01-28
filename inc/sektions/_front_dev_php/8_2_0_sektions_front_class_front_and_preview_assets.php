@@ -119,6 +119,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
 
                         'Insert a new section' => __('Insert a new section', 'text_domain_to_be_replaced' ),
+                        '@location' => __('@location', 'text_domain_to_be'),
                         'Insert a new global section' => __('Insert a new global section', 'text_domain_to_be_replaced' ),
 
                         'section' => __('section', 'text_domain_to_be_replaced'),
@@ -160,11 +161,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                   <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                     <div class="sek-add-content-button-wrapper">
                      <# var hook_location = '', btn_title = true !== data.is_global_location ? sekPreviewLocalized.i18n['Insert a new section'] : sekPreviewLocalized.i18n['Insert a new global section'], addContentBtnWidth = true !== data.is_global_location ? '83px' : '113px' #>
-                      <?php if ( sek_is_dev_mode() ) : ?>
-                          <# if ( data.location ) {
-                              hook_location = '( @hook : ' + data.location + ')';
-                          } #>
-                      <?php endif; ?>
+                      <# if ( data.location ) {
+                          hook_location = ['(' , sekPreviewLocalized.i18n['@location'] , ':"',data.location , '")'].join('');
+                      } #>
                       <button title="{{btn_title}} {{hook_location}}" data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:{{addContentBtnWidth}};">
                         <span class="sek-click-on-button-icon sek-click-on">+</span><span class="action-button-text">{{btn_title}}</span>
                       </button>
