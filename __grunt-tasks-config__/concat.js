@@ -281,7 +281,9 @@ module.exports = {
 
       // CHILD MODULES
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_0_FRONT_font_child.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_1_FRONT_widget_area.js'
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_1_FRONT_widget_area.js',
+
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_2_FRONT_nimble_special_image.js'
     ],
     dest: '<%= paths.czr_assets %>sek/js/ccat-sek-control.js',
   },
@@ -374,6 +376,8 @@ module.exports = {
 
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_2_1_sek_register_widget_area.php',
+
+      '<%= paths.sektions %>_front_dev_php/module_registration/front/4_3_0_sek_register_nimble_special_image.php',
 
       // DYN CSS
       '<%= paths.sektions %>_front_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_1_class-sek-dyn-css-builder.php',
