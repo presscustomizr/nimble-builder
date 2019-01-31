@@ -301,6 +301,10 @@ class Sek_Dyn_CSS_Handler {
         if ( is_customize_preview() || ! $this->_sek_dyn_css_file_exists() || $this->force_rewrite || $this->customizer_save ) {
             $this->sek_model = sek_get_skoped_seks( $this -> skope_id );
 
+            // The fallback hook must be set to wp_head, because when no stylesheet is available on front the hook property might be empty
+            // fixes https://github.com/presscustomizr/nimble-builder/issues/328
+            $this->hook = 'wp_head';
+
             //build stylesheet
             $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $this->is_global_stylesheet );
 
