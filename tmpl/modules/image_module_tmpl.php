@@ -91,6 +91,7 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
                 }
             break;
             case 'img-file' :
+            case 'img-lightbox' :
                 if ( is_int( $value['img'] ) ) {
                     $link = wp_get_attachment_url( $value['img'] );
                 }
@@ -109,9 +110,10 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
 if ( 'no-link' === $main_settings['link-to'] ) {
     echo sek_get_img_module_img_html( $main_settings );
 } else {
-    printf('<a href="%1$s" %2$s>%3$s</a>',
+    printf('<a class="%4$s" href="%1$s" %2$s>%3$s</a>',
         sek_get_img_module_img_link( $main_settings ),
         true === sek_booleanize_checkbox_val( $main_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-        sek_get_img_module_img_html( $main_settings )
+        sek_get_img_module_img_html( $main_settings ),
+        'sek-link-to-'.$main_settings['link-to'] // sek-link-to-img-lightbox
     );
 }

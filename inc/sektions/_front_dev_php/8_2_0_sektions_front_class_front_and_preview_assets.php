@@ -56,6 +56,26 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     $media = 'all'
                 );
             }
+
+            // Magnific Popup is loaded when needed only
+            if ( ! skp_is_customizing() && sek_front_needs_magnific_popup() ) {
+                wp_enqueue_style(
+                    'czr-magnific-popup',
+                    NIMBLE_BASE_URL . '/assets/front/css/libs/magnific-popup.min.css',
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    $media = 'all'
+                );
+                wp_enqueue_script(
+                    'sek-magnific-popups',
+                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
+                    //array( 'jquery', 'underscore'),
+                    // october 2018 => underscore is concatenated in the main front js file.
+                    array( 'jquery'),
+                    NIMBLE_ASSETS_VERSION,
+                    true
+                );
+            }
             wp_localize_script(
                 'sek-main-js',
                 'sekFrontLocalized',

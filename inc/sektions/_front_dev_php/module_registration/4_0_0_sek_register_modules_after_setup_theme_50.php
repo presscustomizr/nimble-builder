@@ -131,15 +131,6 @@ function sek_register_modules() {
 function sek_get_select_options_for_input_id( $input_id ) {
     $options = array();
     switch( $input_id ) {
-        // IMAGE MODULE
-        case 'img-link-to' :
-            $options = array(
-                'no-link' => __('No link', 'text_domain_to_be_replaced' ),
-                'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
-                'img-file' => __('Image file', 'text_domain_to_be_replaced' ),
-                'img-page' =>__('Image page', 'text_domain_to_be_replaced' )
-            );
-        break;
         case 'img_hover_effect' :
             $options = array(
                 'none' => __('No effect', 'text_domain_to_be_replaced' ),
