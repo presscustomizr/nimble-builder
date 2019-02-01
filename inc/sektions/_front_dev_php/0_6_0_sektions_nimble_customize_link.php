@@ -6,6 +6,8 @@ function sek_add_customize_link() {
     if ( ! current_user_can( 'customize' ) )
       return;
 
+    $return_customize_url = '';
+    $customize_url = '';
     if ( is_admin() ) {
         if ( !is_admin_bar_showing() )
             return;
@@ -29,6 +31,8 @@ function sek_add_customize_link() {
         }
     }
 
+    if ( empty( $customize_url ) )
+      return;
     $customize_url = add_query_arg(
         array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
         $customize_url
@@ -36,11 +40,11 @@ function sek_add_customize_link() {
 
     $wp_admin_bar->add_menu( array(
       'id'     => 'nimble_customize',
-      'title'  => sprintf( '<span style="padding-left: 15px;" class="sek-nimble-icon"><img style="width:28px;position:absolute;top: 2px;" src="%1$s" alt="%2$s" title="%3$s"/><span style="padding-left:30px">%4$s</span></span>',
+      'title'  => sprintf( '<span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%4$s</span></span>',
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
           __('Nimble Builder','text_domain_to_replace'),
-          __('Nimble online documentation', 'text_domain'),
-          __( 'Customize with Nimble', 'text_domain' )
+          __('Add sections in live preview with the Nimble Builder', 'text_domain'),
+          __( 'Nimble Builder', 'text_domain' )
       ),
       'href'   => $customize_url,
       'meta'   => array(
@@ -96,8 +100,6 @@ function sek_get_customize_url_when_is_admin( $return_customize_url ) {
     }
     if ( ! empty( $customize_url ) ) {
         $customize_url = add_query_arg( 'url', urlencode( $customize_url ), $return_customize_url );
-    } else {
-        $customize_url = $return_customize_url;
     }
     return $customize_url;
 }
