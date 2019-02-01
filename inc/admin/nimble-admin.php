@@ -543,4 +543,4 @@ function sek_render_welcome_notice() {
 
     </style>
     <?php
-  }
+}

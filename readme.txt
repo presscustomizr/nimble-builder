@@ -6,7 +6,7 @@ Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.3
-Stable tag: 1.4.5
+Stable tag: 1.4.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,10 +56,14 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.4.5 =
-Sections and modules can now be inserted with a double-click. Added minor new options to modules : button, icon, images, heading.
+= 1.4.6 =
+Implemented a simple lightbox option for the image module. Fixed a dynamic stylesheet issue, when printed inline.
 
 == Changelog ==
+= 1.4.6 =
+* fixed : when no stylesheet file has been generated on front, the fallback hook to print the inline stylesheet is not defined.
+* added : [Image module] implement a simple lightbox option
+
 = 1.4.5 : January 26th, 2019 =
 * fixed : Dynamic CSS : the font-size input should not have a default value
 * fixed : when the value is a string of an object, no need to write an empty value

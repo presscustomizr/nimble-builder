@@ -1504,6 +1504,36 @@
           });
       };
 })( jQuery, window );/* ------------------------------------------------------------------------- *
+ *  LIGHT BOX WITH MAGNIFIC POPUP
+/* ------------------------------------------------------------------------- */
+jQuery(function($){
+      $('[data-sek-module-type="czr_image_module"]').each( function() {
+            $linkCandidate = $(this).find('.sek-link-to-img-lightbox');
+            if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
+              return;
+            try { $linkCandidate.magnificPopup({
+                type: 'image',
+                closeOnContentClick: true,
+                closeBtnInside: true,
+                fixedContentPos: true,
+                mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
+                image: {
+                  verticalFit: true
+                },
+                zoom: {
+                  enabled: true,
+                  duration: 300 // don't foget to change the duration also in CSS
+                }
+            }); } catch( er ) {
+                  if ( typeof window.console.log === 'function' ) {
+                        console.log( er );
+                  }
+            }
+      });
+});
+
+
+/* ------------------------------------------------------------------------- *
  *  SMARTLOAD
 /* ------------------------------------------------------------------------- */
 jQuery(function($){

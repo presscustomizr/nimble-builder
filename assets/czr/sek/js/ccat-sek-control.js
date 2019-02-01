@@ -7519,7 +7519,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   bool = 'url' === input();
                                                             break;
                                                             case 'link-target' :
-                                                                  bool = 'no-link' !== input();
+                                                                  bool = ! _.contains( [ 'no-link', 'img-lightbox' ], input() );
                                                             break;
                                                       }
                                                       return bool;

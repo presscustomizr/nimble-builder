@@ -617,7 +617,29 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
     }
     return $bool;
 }
+function sek_front_needs_magnific_popup( $bool = '_not_set_', $recursive_data = null ) {
+    if ( '_not_set_' === $bool ) {
+        if ( is_null( $recursive_data ) ) {
+            $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+            $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+            $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+            $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
 
+            $recursive_data = array_merge( $local_collection, $global_collection );
+        }
+        foreach ($recursive_data as $key => $value) {
+            if ( is_string( $value ) && 'img-lightbox' === $value ) {
+                $bool = true;
+                break;
+            } else if ( '_not_set_' === $bool ) {
+                if ( is_array( $value ) ) {
+                    $bool = sek_front_needs_magnific_popup( $bool, $value );
+                }
+            }
+        }
+    }
+    return true === $bool;
+}
 
 
 
@@ -996,6 +1018,106 @@ function sek_is_header_footer_enabled() {
           return (bool)$global_beta_feature['beta-enabled'];
     }
     return NIMBLE_HEADER_FOOTER_ENABLED;
+}
+?><?php
+add_action( 'admin_bar_menu', '\Nimble\sek_add_customize_link', 1000 );
+function sek_add_customize_link() {
+    global $wp_admin_bar;
+    if ( ! current_user_can( 'customize' ) )
+      return;
+
+    $return_customize_url = '';
+    $customize_url = '';
+    if ( is_admin() ) {
+        if ( !is_admin_bar_showing() )
+            return;
+
+        $return_customize_url = add_query_arg( 'return', urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) ), wp_customize_url() );
+        $customize_url = sek_get_customize_url_when_is_admin( $return_customize_url );
+    } else {
+        if ( is_customize_preview() && $wp_customize->changeset_post_id() && ! current_user_can( get_post_type_object( 'customize_changeset' )->cap->edit_post, $wp_customize->changeset_post_id() ) ) {
+          return;
+        }
+
+        $current_url = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        if ( is_customize_preview() && $wp_customize->changeset_uuid() ) {
+            $current_url = remove_query_arg( 'customize_changeset_uuid', $current_url );
+        }
+
+        $customize_url = add_query_arg( 'url', urlencode( $current_url ), wp_customize_url() );
+        if ( is_customize_preview() ) {
+            $customize_url = add_query_arg( array( 'changeset_uuid' => $wp_customize->changeset_uuid() ), $customize_url );
+        }
+    }
+
+    if ( empty( $customize_url ) )
+      return;
+    $customize_url = add_query_arg(
+        array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
+        $customize_url
+    );
+
+    $wp_admin_bar->add_menu( array(
+      'id'     => 'nimble_customize',
+      'title'  => sprintf( '<span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%4$s</span></span>',
+          NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
+          __('Nimble Builder','text_domain_to_replace'),
+          __('Add sections in live preview with the Nimble Builder', 'text_domain'),
+          __( 'Nimble Builder', 'text_domain' )
+      ),
+      'href'   => $customize_url,
+      'meta'   => array(
+        'class' => 'hide-if-no-customize',
+      ),
+    ) );
+}//sek_add_customize_link
+function sek_get_customize_url_when_is_admin( $return_customize_url ) {
+    global $tag, $user_id;
+
+    $customize_url = '';
+
+    $current_screen = get_current_screen();
+    $post = get_post();
+
+    if ( 'post' == $current_screen->base
+        && 'add' != $current_screen->action
+        && ( $post_type_object = get_post_type_object( $post->post_type ) )
+        && current_user_can( 'read_post', $post->ID )
+        && ( $post_type_object->public )
+        && ( $post_type_object->show_in_admin_bar ) )
+    {
+        if ( 'draft' == $post->post_status ) {
+            $preview_link = get_preview_post_link( $post );
+            $customize_url = esc_url( $preview_link );
+        } else {
+            $customize_url = get_permalink( $post->ID );
+        }
+    } elseif ( 'edit' == $current_screen->base
+        && ( $post_type_object = get_post_type_object( $current_screen->post_type ) )
+        && ( $post_type_object->public )
+        && ( $post_type_object->show_in_admin_bar )
+        && ( get_post_type_archive_link( $post_type_object->name ) )
+        && ! ( 'post' === $post_type_object->name && 'posts' === get_option( 'show_on_front' ) ) )
+    {
+        $customize_url = get_post_type_archive_link( $current_screen->post_type );
+    } elseif ( 'term' == $current_screen->base
+        && isset( $tag ) && is_object( $tag ) && ! is_wp_error( $tag )
+        && ( $tax = get_taxonomy( $tag->taxonomy ) )
+        && $tax->public )
+    {
+        $customize_url = get_term_link( $tag );
+    } elseif ( 'user-edit' == $current_screen->base
+        && isset( $user_id )
+        && ( $user_object = get_userdata( $user_id ) )
+        && $user_object->exists()
+        && $view_link = get_author_posts_url( $user_object->ID ) )
+    {
+        $customize_url = $view_link;
+    }
+    if ( ! empty( $customize_url ) ) {
+        $customize_url = add_query_arg( 'url', urlencode( $customize_url ), $return_customize_url );
+    }
+    return $customize_url;
 }
 ?><?php
 function sek_maybe_do_version_mapping() {
@@ -2207,14 +2329,6 @@ function sek_register_modules() {
 function sek_get_select_options_for_input_id( $input_id ) {
     $options = array();
     switch( $input_id ) {
-        case 'img-link-to' :
-            $options = array(
-                'no-link' => __('No link', 'text_domain_to_be_replaced' ),
-                'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
-                'img-file' => __('Image file', 'text_domain_to_be_replaced' ),
-                'img-page' =>__('Image page', 'text_domain_to_be_replaced' )
-            );
-        break;
         case 'img_hover_effect' :
             $options = array(
                 'none' => __('No effect', 'text_domain_to_be_replaced' ),
@@ -4093,13 +4207,23 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'input_type'  => 'select',
                     'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
                     'default'     => 'large',
-                    'choices'     => sek_get_select_options_for_input_id( 'img-size' )
+                    'choices'     => sek_get_select_options_for_input_id( 'img-size' ),
+                    'notice_before' => __('Select a size for this image among those generated by WordPress.', 'text_domain_to_be_replaced' )
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'title'       => __('Schedule an action on click or tap', 'text_domain_to_be_replaced'),
                     'default'     => 'no-link',
-                    'choices'     => sek_get_select_options_for_input_id( 'img-link-to' )
+                    'choices'     => array(
+                        'no-link' => __('No click action', 'text_domain_to_be_replaced' ),
+                        'img-lightbox' =>__('Lightbox : enlarge the image, and dim out the rest of the content', 'text_domain_to_be_replaced' ),
+                        'url' => __('Link to site content or custom url', 'text_domain_to_be_replaced' ),
+                        'img-file' => __('Link to image file', 'text_domain_to_be_replaced' ),
+                        'img-page' =>__('Link to image page', 'text_domain_to_be_replaced' )
+                    ),
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'notice_after' => __('Note that some click actions are disabled during customization.', 'text_domain_to_be_replaced' ),
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
@@ -7470,6 +7594,9 @@ class Sek_Dyn_CSS_Handler {
         $this->_sek_dyn_css_set_properties();
         if ( is_customize_preview() || ! $this->_sek_dyn_css_file_exists() || $this->force_rewrite || $this->customizer_save ) {
             $this->sek_model = sek_get_skoped_seks( $this -> skope_id );
+            if ( !is_customize_preview() && !$this->_sek_dyn_css_file_exists() ) {
+                $this->hook = 'wp_head';
+            }
             $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $this->is_global_stylesheet );
             $this->css_string_to_enqueue_or_print = (string)$this->builder-> get_stylesheet();
         }
@@ -8903,6 +9030,22 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     array(),
                     NIMBLE_ASSETS_VERSION,
                     $media = 'all'
+                );
+            }
+            if ( ! skp_is_customizing() && sek_front_needs_magnific_popup() ) {
+                wp_enqueue_style(
+                    'czr-magnific-popup',
+                    NIMBLE_BASE_URL . '/assets/front/css/libs/magnific-popup.min.css',
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    $media = 'all'
+                );
+                wp_enqueue_script(
+                    'sek-magnific-popups',
+                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
+                    array( 'jquery'),
+                    NIMBLE_ASSETS_VERSION,
+                    true
                 );
             }
             wp_localize_script(

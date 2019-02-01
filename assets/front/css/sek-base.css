@@ -1089,6 +1089,11 @@ button.sek-btn,
   box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0;
 }
 
+/* image module transitions for better animations when effects are used */
+[data-sek-module-type="czr_image_module"] figure img {
+  transition: all 0.2s ease-out;
+}
+
 .sek-hover-effect-opacity img:hover {
   opacity: .7;
 }
@@ -1563,5 +1568,35 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
   word-wrap: break-word;
 }
 
-/* </inspired by Twenty Seventeed WP theme> */
+/* </inspired by Twenty Seventeen WP theme> */
+/* Nimble btn in admin top bar */
+#wpadminbar .sek-nimble-icon {
+  padding-left: 15px;
+  display: inline-block;
+}
+
+#wpadminbar .sek-nimble-icon img {
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+  -webkit-filter: gray;
+  filter: gray;
+  transition: all 0.3s ease-in-out;
+}
+
+#wpadminbar .sek-nimble-icon:hover img {
+  -webkit-filter: none;
+  filter: none;
+  -webkit-filter: none;
+  filter: none;
+}
+
+#wpadminbar .sek-nimble-icon img {
+  width: 28px;
+  position: absolute;
+  top: 2px;
+}
+
+#wpadminbar .sek-nimble-icon .sek-nimble-admin-bar-title {
+  padding-left: 30px;
+}
 /*# sourceMappingURL=sek-base.css.map */
