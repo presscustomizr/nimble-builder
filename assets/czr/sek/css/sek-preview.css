@@ -62,13 +62,6 @@
 }
 
 /* MODULES SPECIFICS WHEN CUSTOMIZING */
-/* image module transitions when customizing */
-[data-sek-module-type="czr_image_module"] figure img {
-  -webkit-transition: all 0.2s ease-out;
-  -o-transition: all 0.2s ease-out;
-  transition: all 0.2s ease-out;
-}
-
 /* TinyMce block outline */
 .sek-module [data-sek-input-type="tiny_mce_editor"]:hover {
   outline: 1px solid #1d85bb;
