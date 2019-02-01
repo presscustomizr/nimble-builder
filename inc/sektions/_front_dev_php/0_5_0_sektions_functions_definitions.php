@@ -899,7 +899,7 @@ function sek_front_needs_magnific_popup( $bool = '_not_set_', $recursive_data = 
         }
         foreach ($recursive_data as $key => $value) {
             // @see sek_get_module_params_for_czr_image_main_settings_child
-            if (  is_string( $value ) && 'img-lightbox' === $value ) {
+            if ( is_string( $value ) && 'img-lightbox' === $value ) {
                 $bool = true;
                 break;
             } else if ( '_not_set_' === $bool ) {
