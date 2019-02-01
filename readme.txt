@@ -60,7 +60,7 @@ The Nimble builder works with any WordPress theme. If you experience any problem
 Implemented a simple lightbox option for the image module. Fixed a dynamic stylesheet issue, when printed inline.
 
 == Changelog ==
-= 1.4.6 =
+= 1.4.6 : February 1st, 2019=
 * fixed : when no stylesheet file has been generated on front, the fallback hook to print the inline stylesheet is not defined.
 * added : [Image module] implement a simple lightbox option
 

@@ -27,7 +27,7 @@ if ( !defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ) { define ( 'NIMBLE_SAVED_SECT
 if ( !defined( 'NIMBLE_HEADER_FOOTER_ENABLED' ) ) { define ( 'NIMBLE_HEADER_FOOTER_ENABLED', false ); }
 
 if ( !defined( 'NIMBLE_DISPLAY_UPDATE_NOTICE' ) ) { define( 'NIMBLE_DISPLAY_UPDATE_NOTICE', true ); }
-if ( !defined( 'NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION' ) ) { define( 'NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION', '1.4.5' ); }
+if ( !defined( 'NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION' ) ) { define( 'NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION', '1.4.6' ); }
 if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_ID', 'nimble-welcome-notice-12-2018' ); }
 // when NIMBLE_IS_PREVIEW_UI_DEBUG_MODE or $_GET['preview_ui_debug'] is true, the levels UI in the preview are not being auto removed, so we can inspect the markup and CSS
 if ( !defined( 'NIMBLE_IS_PREVIEW_UI_DEBUG_MODE' ) ) { define ( 'NIMBLE_IS_PREVIEW_UI_DEBUG_MODE', false ); }
