@@ -617,8 +617,8 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
     }
     return $bool;
 }
-function sek_front_needs_magnific_popup( $bool = '_not_set_', $recursive_data = null ) {
-    if ( '_not_set_' === $bool ) {
+function sek_front_needs_magnific_popup( $bool = false, $recursive_data = null ) {
+    if ( !$bool ) {
         if ( is_null( $recursive_data ) ) {
             $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
             $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
@@ -627,14 +627,14 @@ function sek_front_needs_magnific_popup( $bool = '_not_set_', $recursive_data = 
 
             $recursive_data = array_merge( $local_collection, $global_collection );
         }
+
         foreach ($recursive_data as $key => $value) {
             if ( is_string( $value ) && 'img-lightbox' === $value ) {
                 $bool = true;
                 break;
-            } else if ( '_not_set_' === $bool ) {
-                if ( is_array( $value ) ) {
-                    $bool = sek_front_needs_magnific_popup( $bool, $value );
-                }
+            }
+            if ( is_array( $value ) ) {
+                $bool = sek_front_needs_magnific_popup( $bool, $value );
             }
         }
     }
