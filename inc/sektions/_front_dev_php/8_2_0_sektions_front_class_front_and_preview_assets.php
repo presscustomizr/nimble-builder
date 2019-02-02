@@ -69,8 +69,6 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 wp_enqueue_script(
                     'sek-magnific-popups',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
-                    //array( 'jquery', 'underscore'),
-                    // october 2018 => underscore is concatenated in the main front js file.
                     array( 'jquery'),
                     NIMBLE_ASSETS_VERSION,
                     true

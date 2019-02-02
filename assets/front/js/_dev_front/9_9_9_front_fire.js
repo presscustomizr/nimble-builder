@@ -7,6 +7,8 @@ jQuery(function($){
             // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
             if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
               return;
+            if ( 'function' !== typeof( $.fn.magnificPopup ) )
+              return;
             try { $linkCandidate.magnificPopup({
                 type: 'image',
                 closeOnContentClick: true,
