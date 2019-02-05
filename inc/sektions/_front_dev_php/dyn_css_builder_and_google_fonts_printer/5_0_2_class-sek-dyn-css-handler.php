@@ -14,7 +14,7 @@ class Sek_Dyn_CSS_Handler {
      *
      * @access public
      */
-    const CSS_BASE_DIR = 'sek_css';
+    const CSS_BASE_DIR = NIMBLE_CSS_FOLDER_NAME;
 
     /**
      * Functioning mode constant
