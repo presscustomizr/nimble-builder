@@ -8919,4 +8919,111 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_widget_area_module' )
             }
       });
+})( wp.customize , jQuery, _ );/* ------------------------------------------------------------------------- *
+ *  NIMBLE SPECIAL IMAGE MAIN SETTINGS
+/* ------------------------------------------------------------------------- */
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  module.inputConstructor = api.CZRInput.extend({
+                        setupSelect : function() {
+                              api.czr_sektions.setupSelectInput.call( this );
+                        }
+                  });
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+                  module.bind( 'set_default_content_picker_options', function( params ) {
+                        params.defaultContentPickerOption.defaultOption = {
+                              'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                              'type'       : '',
+                              'type_label' : '',
+                              'object'     : '',
+                              'id'         : '_custom_',
+                              'url'        : ''
+                        };
+                        return params;
+                  });
+            },//initialize
+            CZRItemConstructor : {
+                  ready : function() {
+                        var item = this;
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
+                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              this.bind( function( to ) {
+                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                              });
+                        };
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'img' :
+                                          scheduleVisibilityOfInputId.call( input, 'img-size', function() {
+                                                return ! _.isEmpty( input()+'' ) && _.isNumber( input() );
+                                          });
+                                    break;
+                                    case 'link-to' :
+                                          _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'link-custom-url' :
+                                                                  bool = 'url' === input() && '_custom_' == item.czr_Input('link-pick-url')().id;
+                                                            break;
+                                                            case 'link-pick-url' :
+                                                                  bool = 'url' === input();
+                                                            break;
+                                                            case 'link-target' :
+                                                                  bool = 'no-link' !== input();
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                }); } catch( er ) {
+                                                      api.errare( 'Image module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'link-pick-url' :
+                                          scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                                return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
+                                          });
+                                    break;
+                                    case 'use_custom_title_attr' :
+                                          _.each( [ 'heading_title' ] , function( _inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                }); } catch( er ) {
+                                                      api.errare( 'Image module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                              }
+                        });
+                  }
+            },//CZRItemConstructor
+
+      };//Constructor
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_special_img_main_settings_child : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_special_img_main_settings_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_special_img_main_settings_child' )
+            },
+      });
 })( wp.customize , jQuery, _ );
