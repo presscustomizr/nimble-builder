@@ -20,7 +20,9 @@ $main_settings = $value['main_settings'];
 
 if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
     function sek_get_img_module_img_html( $value ) {
-        $visual_effect_class = 'round'; //or nothing to have square
+        // 'round' => rounded shape
+        // 'expanded' => already expaded
+        $visual_effect_class = array( 'round' );
 
         $html = '';
         if ( is_int( $value['img'] ) ) {
@@ -79,7 +81,7 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
             );
         }
         // Would be great if this would be able to parse also the background-url inline style and move it into the data-sek-lazy-bg attribute
-        return apply_filters( 'nimble_parse_for_smart_load', sprintf('<figure class="sek-nimble-image-wrapper %1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) ) );
+        return apply_filters( 'nimble_parse_for_smart_load', sprintf('<figure class="sek-nimble-image-wrapper %1$s" title="%3$s">%2$s</figure>', implode( ' ', $visual_effect_class), $html, esc_html( $title ) ) );
     }
 }
 

@@ -14,6 +14,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
 }
 
 .#{$project-prefix}nimble-image-mask {
@@ -40,6 +42,8 @@
         transition: all .3s ease;
         -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
+        .#{$project-prefix}nimble-image-wrapper.expanded &,
+        .#{$project-prefix}nimble-image-wrapper.hover &,
         .#{$project-prefix}nimble-image-wrapper:hover & {
             transform: scale(1.4);
         }
