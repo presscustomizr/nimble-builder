@@ -1572,7 +1572,6 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
 /* </inspired by Twenty Seventeen WP theme> */
 /* Nimble btn in admin top bar */
 #wpadminbar .sek-nimble-icon {
-  padding-left: 15px;
   display: inline-block;
 }
 
