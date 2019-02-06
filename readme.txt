@@ -6,7 +6,7 @@ Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.3
-Stable tag: 1.4.7
+Stable tag: 1.4.8-alpha
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
