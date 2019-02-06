@@ -2301,7 +2301,10 @@ function sek_register_modules() {
         'czr_simple_form_design_child',
         'czr_simple_form_fonts_child',
         'czr_simple_form_submission_child',
-        'czr_font_child'
+        'czr_font_child',
+
+        'czr_special_img_module',
+        'czr_special_img_main_settings_child'
     ];
     if ( sek_is_header_footer_enabled() ) {
         $modules = array_merge( $modules, [
@@ -6997,6 +7000,96 @@ function sek_get_module_params_for_czr_widget_area_module() {
     );
 }
 
+?><?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER NIMBLE IMAGE MODULE
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_special_img_module() {
+    $css_selectors = '.sek-module-inner img';
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_special_img_module',
+        'is_father' => true,
+        'children' => array(
+            'main_settings'   => 'czr_special_img_main_settings_child',
+        ),
+        'name' => __('Nimble Image', 'text_domain_to_be_replaced'),
+        'starting_value' => array(
+            'main_settings' => array(
+                'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
+            )
+        ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/special_img_module_tmpl.php"
+    );
+}
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  MAIN SETTINGS
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_special_img_main_settings_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_special_img_main_settings_child',
+        'name' => __( 'Image main settings', 'text_domain_to_be_replaced' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'img' => array(
+                    'input_type'  => 'upload',
+                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
+                    'default'     => ''
+                ),
+                'img-size' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
+                    'default'     => 'large',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-size' )
+                ),
+                'link-to' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'default'     => 'no-link',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-link-to' )
+                ),
+                'link-pick-url' => array(
+                    'input_type'  => 'content_picker',
+                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'default'     => array()
+                ),
+                'link-custom-url' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'default'     => ''
+                ),
+                'link-target' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'use_custom_title_attr' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Set the text displayed when the mouse is held over', 'text_domain_to_be_replaced'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('If not specified, Nimble will use by order of priority the caption, the description, and the image title. Those properties can be edited for each image in the media library.')
+                ),
+                'heading_title' => array(
+                    'input_type'         => 'text',
+                    'title' => __('Custom text displayed on mouse hover', 'text_domain_to' ),
+                    'default'            => '',
+                    'title_width' => 'width-100',
+                    'width-100'         => true
+                ),
+            )
+        ),
+        'render_tmpl_path' => '',
+    );
+}
 ?><?php
 if ( ! defined( 'ABSPATH' ) ) {
     exit;

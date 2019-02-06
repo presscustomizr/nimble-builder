@@ -1,0 +1,59 @@
+.#{$project-prefix}nimble-image-wrapper {
+    max-width: 100%;
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+    display: block;
+    background-position: center center;
+    background-size: cover;
+    &::before {
+        content: '';
+        display: block;
+        padding-top: 100%;
+    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.#{$project-prefix}nimble-image-mask {
+    position: absolute;
+    border-color: #fff;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &::before {
+        position: absolute;
+        width: 63%;
+        padding-bottom: 63%;
+        content: '';
+        z-index: 1;
+        border: 150vw solid;
+        border-color: inherit;
+        box-sizing: content-box;
+        transition: all .3s ease;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        .#{$project-prefix}nimble-image-wrapper:hover & {
+            transform: scale(1.4);
+        }
+    }
+    .#{$project-prefix}nimble-image-wrapper.round &::before {
+        border-radius: 50%;
+    }
+}
+
+.#{$project-prefix}nimble-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-position: center center;
+    background-size: cover;
+    z-index: 0;
+}

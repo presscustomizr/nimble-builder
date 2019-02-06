@@ -904,6 +904,13 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
                   'font_icon' => '<i class="material-icons">menu</i>',
                   'active' => sek_is_header_footer_enabled()
+                ),
+
+                array(
+                  'content-type' => 'module',
+                  'content-id' => 'czr_special_img_module',
+                  'title' => __( 'Nimble Image', 'text_domain_to_be_replaced' ),
+                  'font_icon' => '<i class="material-icons">all_out</i>'
                 )
 
 
