@@ -20,23 +20,20 @@ $main_settings = $value['main_settings'];
 
 if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
     function sek_get_img_module_img_html( $value ) {
-        $visual_effect_class = '';
-        //visual effect classes
-        // if ( true === sek_booleanize_checkbox_val( $value['use_box_shadow'] ) ) {
-        //     $visual_effect_class = ' box-shadow';
-        // }
-        // if ( 'none' !== $value['img_hover_effect']) {
-        //     $visual_effect_class .= " sek-hover-effect-" . $value['img_hover_effect'];
-        // }
+        $visual_effect_class = 'round'; //or nothing to have square
 
         $html = '';
         if ( is_int( $value['img'] ) ) {
-            $html = wp_get_attachment_image( $value['img'], empty( $value['img-size'] ) ? 'large' : $value['img-size']);
-        } else if ( ! empty( $value['img'] ) && is_string( $value['img'] ) ) {
-            // the default img is excluded from the smart loading parsing @see nimble_regex_callback()
-            // => this is needed because this image has no specific dimensions set. And therefore can create false javascript computations of other element's distance to top on page load.
-            // in particular when calculting if is_visible() to decide if we smart load.
-            $html = sprintf( '<img alt="default img" data-sek-smartload="false" src="%1$s"/>', esc_url(  $value['img'] )  );
+            $img_src = wp_get_attachment_image_src( $value['img'], empty( $value['img-size'] ) ? 'large' : $value['img-size']);
+        }
+        if ( ! empty( $img_src ) && isset( $img_src[0] ) ) {
+            $img_url = $img_src[0];
+        } else {
+            $img_url = $value['img'];
+        }
+
+        if ( ! empty( $img_url ) && is_string( $img_url ) ) {
+            $html = sprintf( '<div class="sek-nimble-image" style="background-image:url(%1$s)"></div>', esc_url($img_url ) );
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
@@ -69,7 +66,20 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
                 }
             }
         }
-        return apply_filters( 'nimble_parse_for_smart_load', sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) ) );
+
+        if ( 'no-link' === $value['link-to'] ) {
+            $html = sprintf('<div class="sek-nimble-image-mask"></div>%1$s',
+                $html
+            );
+        } else {
+            $html = sprintf('<a href="%1$s" class="sek-nimble-image-mask" %2$s></a>%3$s',
+                sek_get_img_module_img_link( $value ),
+                true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
+                $html
+            );
+        }
+        // Would be great if this would be able to parse also the background-url inline style and move it into the data-sek-lazy-bg attribute
+        return apply_filters( 'nimble_parse_for_smart_load', sprintf('<figure class="sek-nimble-image-wrapper %1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) ) );
     }
 }
 
@@ -106,12 +116,4 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
 }
 
 // Print
-if ( 'no-link' === $main_settings['link-to'] ) {
-    echo sek_get_img_module_img_html( $main_settings );
-} else {
-    printf('<a href="%1$s" %2$s>%3$s</a>',
-        sek_get_img_module_img_link( $main_settings ),
-        true === sek_booleanize_checkbox_val( $main_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-        sek_get_img_module_img_html( $main_settings )
-    );
-}
+echo sek_get_img_module_img_html( $main_settings );
