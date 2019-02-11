@@ -35,7 +35,10 @@ function sek_versionning() {
 // /* ------------------------------------------------------------------------- */
 add_action('admin_menu', '\Nimble\sek_plugin_menu');
 function sek_plugin_menu() {
-	add_plugins_page(__( 'System infos', 'text_domain' ), __( 'System infos', 'text_domain' ), 'read', 'nimble-builder', '\Nimble\sek_plugin_page');
+    if ( ! current_user_can( 'update_plugins' ) )
+      return;
+    // system infos should be displayed to users with admin capabilities only
+	  add_plugins_page(__( 'System infos', 'text_domain' ), __( 'System infos', 'text_domain' ), 'read', 'nimble-builder', '\Nimble\sek_plugin_page');
 }
 
 function sek_plugin_page() {
