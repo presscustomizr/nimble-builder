@@ -20,6 +20,14 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
         ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'css_selectors' => array(
+            // this list is limited to the most commonly used tags in the editor.
+            // note that Hx headings have a default style set in _heading.scss
+            'p',
+            '.sek-module-inner p',
+            '.sek-module-inner a',
+            '.sek-module-inner li'
+          ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/tinymce_editor_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
