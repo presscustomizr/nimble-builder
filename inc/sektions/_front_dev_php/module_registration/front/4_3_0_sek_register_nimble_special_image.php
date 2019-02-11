@@ -66,7 +66,7 @@ function sek_get_module_params_for_czr_special_img_main_settings_child() {
                     'input_type'  => 'select',
                     'title'       => __('Link to', 'text_domain_to_be_replaced'),
                     'default'     => 'no-link',
-                    'choices'     => sek_get_select_options_for_input_id( 'img-link-to' )
+                    'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
