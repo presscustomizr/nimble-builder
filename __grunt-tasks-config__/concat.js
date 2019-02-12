@@ -15,6 +15,7 @@ module.exports = {
       '<%= paths.czr_assets %>fmk/js/base-fmk/lib/stepper.min.js',
       '<%= paths.czr_assets %>fmk/js/base-fmk/lib/czrSelect2.min.js',
       '<%= paths.czr_assets %>fmk/js/base-fmk/lib/rangeslider.min.js',
+      '<%= paths.czr_assets %>fmk/js/base-fmk/lib/czr-alpha-colorpicker.min.js',
 
 
       //BASE : BEFORE API READY

@@ -35,19 +35,6 @@ function sek_enqueue_controls_js_css() {
         $in_footer = true
     );
 
-    wp_enqueue_script(
-        'czr-color-picker',
-        //dev / debug mode mode?
-        sprintf(
-            '%1$s/assets/czr/sek/js/libs/%2$s' ,
-            NIMBLE_BASE_URL,
-            sek_is_dev_mode() ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
-        ),
-        array( 'jquery' ),
-        NIMBLE_ASSETS_VERSION,
-        $in_footer = true
-    );
-
     wp_localize_script(
         'czr-sektions',
         'sektionsLocalizedData',
