@@ -86,10 +86,7 @@ function sek_register_modules() {
         'czr_simple_form_submission_child',
 
         // GENERIC FRONT CHILD MODULES
-        'czr_font_child',
-
-        'czr_special_img_module',
-        'czr_special_img_main_settings_child'
+        'czr_font_child'
     ];
 
     // Header and footer have been introduced in v1.4.0 but not enabled by default
@@ -107,6 +104,13 @@ function sek_register_modules() {
             //'czr_menu_design_child',
         ]);
     }
+
+    // if ( sek_is_pro() ) {
+    //     $modules = array_merge( $modules, [
+    //         'czr_special_img_module',
+    //         'czr_special_img_main_settings_child'
+    //     ]);
+    // }
 
     foreach( $modules as $module_name ) {
         // Was previously written "\Nimble\sek_get_module_params_for_{$module_name}";
