@@ -1353,4 +1353,9 @@ function sek_is_header_footer_enabled() {
     }
     return NIMBLE_HEADER_FOOTER_ENABLED;
 }
+
+
+function sek_is_pro() {
+    return sek_is_dev_mode();
+}
 ?>
