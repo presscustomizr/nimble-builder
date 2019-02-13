@@ -393,8 +393,6 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Header sections' => __('Header sections', 'text_domain_to_be_replaced'),
             'Footer sections' => __('Footer sections', 'text_domain_to_be_replaced'),
 
-            'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
-
             'Module' => __('Module', 'text_domain_to_be_replaced'),
             'Content for' => __('Content for', 'text_domain_to_be_replaced'),
             'Customize the options for module :' => __('Customize the options for module :', 'text_domain_to_be_replaced'),
