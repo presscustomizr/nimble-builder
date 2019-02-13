@@ -30,18 +30,6 @@ function sek_enqueue_controls_js_css() {
         $in_footer = true
     );
 
-    wp_enqueue_script(
-        'czr-color-picker',
-        sprintf(
-            '%1$s/assets/czr/sek/js/libs/%2$s' ,
-            NIMBLE_BASE_URL,
-            sek_is_dev_mode() ? 'czr-color-picker.js' : 'czr-color-picker.min.js'
-        ),
-        array( 'jquery' ),
-        NIMBLE_ASSETS_VERSION,
-        $in_footer = true
-    );
-
     wp_localize_script(
         'czr-sektions',
         'sektionsLocalizedData',
@@ -378,8 +366,6 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Empty sections with columns layout' => __('Empty sections with columns layout', 'text_domain_to_be_replaced'),
             'Header sections' => __('Header sections', 'text_domain_to_be_replaced'),
             'Footer sections' => __('Footer sections', 'text_domain_to_be_replaced'),
-
-            'Drag and drop a module in one of the possible locations of the previewed page.' => __( 'Drag and drop a module in one of the possible locations of the previewed page.', 'text_domain_to_be_replaced' ),
 
             'Module' => __('Module', 'text_domain_to_be_replaced'),
             'Content for' => __('Content for', 'text_domain_to_be_replaced'),
@@ -905,13 +891,6 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                   'font_icon' => '<i class="material-icons">menu</i>',
                   'active' => sek_is_header_footer_enabled()
                 ),
-
-                array(
-                  'content-type' => 'module',
-                  'content-id' => 'czr_special_img_module',
-                  'title' => __( 'Nimble Image', 'text_domain_to_be_replaced' ),
-                  'font_icon' => '<i class="material-icons">all_out</i>'
-                )
 
 
             ];
