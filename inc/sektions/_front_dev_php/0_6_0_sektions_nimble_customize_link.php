@@ -15,6 +15,7 @@ function sek_add_customize_link() {
         $return_customize_url = add_query_arg( 'return', urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) ), wp_customize_url() );
         $customize_url = sek_get_customize_url_when_is_admin( $return_customize_url );
     } else {
+        global $wp_customize;
         // Don't show if the user cannot edit a given customize_changeset post currently being previewed.
         if ( is_customize_preview() && $wp_customize->changeset_post_id() && ! current_user_can( get_post_type_object( 'customize_changeset' )->cap->edit_post, $wp_customize->changeset_post_id() ) ) {
           return;
