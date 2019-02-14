@@ -1021,9 +1021,18 @@ function sek_is_header_footer_enabled() {
     return NIMBLE_HEADER_FOOTER_ENABLED;
 }
 
-
+/* ------------------------------------------------------------------------- *
+ *  PRO
+/* ------------------------------------------------------------------------- */
 function sek_is_pro() {
     return sek_is_dev_mode();
+}
+
+/* ------------------------------------------------------------------------- *
+ *  OTHER HELPERS
+/* ------------------------------------------------------------------------- */
+function sek_is_customize_previewing_a_changeset_post() {
+    return !( defined('DOING_AJAX') && DOING_AJAX ) && is_customize_preview() && !isset( $_REQUEST['customize_messenger_channel']);
 }
 ?><?php
 add_action( 'admin_bar_menu', '\Nimble\sek_add_customize_link', 1000 );
@@ -1041,6 +1050,7 @@ function sek_add_customize_link() {
         $return_customize_url = add_query_arg( 'return', urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) ), wp_customize_url() );
         $customize_url = sek_get_customize_url_when_is_admin( $return_customize_url );
     } else {
+        global $wp_customize;
         if ( is_customize_preview() && $wp_customize->changeset_post_id() && ! current_user_can( get_post_type_object( 'customize_changeset' )->cap->edit_post, $wp_customize->changeset_post_id() ) ) {
           return;
         }
@@ -4119,11 +4129,11 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
             )
         ),
         'css_selectors' => array(
+            '.sek-module-inner',
             'p',
-            '.sek-module-inner p',
-            '.sek-module-inner a',
-            '.sek-module-inner li'
-          ),
+            'a',
+            'li'
+        ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/tinymce_editor_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
@@ -9073,6 +9083,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             );
         }
         function sek_schedule_customize_preview_assets() {
+            if ( sek_is_customize_previewing_a_changeset_post() )
+              return;
             add_action( 'wp_footer', array( $this, 'sek_print_ui_tmpl' ) );
 
             wp_enqueue_style(
@@ -9551,8 +9563,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               $this -> parent_model = $model;
                               foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
                             ?>
-
-                             <?php if ( empty( $collection ) ) : ?>
+                            <?php
+                            ?>
+                            <?php if ( empty( $collection ) && !sek_is_customize_previewing_a_changeset_post() ) : ?>
                                 <div class="sek-empty-location-placeholder">
                                   <?php
                                     if ( $is_header_location || $is_footer_location ) {
@@ -9636,7 +9649,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         ?>
                         <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
                             <?php
-                              if ( skp_is_customizing() && empty( $collection ) ) {
+                              if ( skp_is_customizing() && !sek_is_customize_previewing_a_changeset_post() && empty( $collection ) ) {
                                   $content_type = 'module';
                                   $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_domain_to_be_replaced' ) : __('Drag and drop a block of content here', 'text_domain_to_be_replaced' );
                                   ?>
