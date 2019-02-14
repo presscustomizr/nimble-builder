@@ -1354,8 +1354,23 @@ function sek_is_header_footer_enabled() {
     return NIMBLE_HEADER_FOOTER_ENABLED;
 }
 
-
+/* ------------------------------------------------------------------------- *
+ *  PRO
+/* ------------------------------------------------------------------------- */
 function sek_is_pro() {
     return sek_is_dev_mode();
+}
+
+/* ------------------------------------------------------------------------- *
+ *  OTHER HELPERS
+/* ------------------------------------------------------------------------- */
+// @return a bool
+// typically when
+// previewing a changeset on front with a link generated in the publish menu of the customizer
+// looking like : mysite.com/?customize_changeset_uuid=67862e7f-427c-4183-b3f7-62eb86f79899
+// in this case the $_REQUEST super global, doesn't include a customize_messenger_channel paral
+// added when fixing https://github.com/presscustomizr/nimble-builder/issues/351
+function sek_is_customize_previewing_a_changeset_post() {
+    return !( defined('DOING_AJAX') && DOING_AJAX ) && is_customize_preview() && !isset( $_REQUEST['customize_messenger_channel']);
 }
 ?>

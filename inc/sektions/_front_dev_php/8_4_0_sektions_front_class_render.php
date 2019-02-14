@@ -375,8 +375,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               $this -> parent_model = $model;
                               foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
                             ?>
-
-                             <?php if ( empty( $collection ) ) : ?>
+                            <?php
+                              // empty global locations placeholders are only printed when customizing But not previewing a changeset post
+                              // since https://github.com/presscustomizr/nimble-builder/issues/351
+                            ?>
+                            <?php if ( empty( $collection ) && !sek_is_customize_previewing_a_changeset_post() ) : ?>
                                 <div class="sek-empty-location-placeholder">
                                   <?php
                                     if ( $is_header_location || $is_footer_location ) {
@@ -481,7 +484,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         ?>
                         <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
                             <?php
-                              if ( skp_is_customizing() && empty( $collection ) ) {
+                              // the drop zone is inserted when customizing but not when previewing a changeset post
+                              // since https://github.com/presscustomizr/nimble-builder/issues/351
+                              if ( skp_is_customizing() && !sek_is_customize_previewing_a_changeset_post() && empty( $collection ) ) {
                                   //$content_type = 1 === $col_number ? 'section' : 'module';
                                   $content_type = 'module';
                                   $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_domain_to_be_replaced' ) : __('Drag and drop a block of content here', 'text_domain_to_be_replaced' );

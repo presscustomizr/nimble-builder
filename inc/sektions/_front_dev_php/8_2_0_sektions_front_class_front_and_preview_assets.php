@@ -88,9 +88,15 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             );
         }
 
+
         // enqueue / print customize preview assets
         // hook : 'customize_preview_init'
         function sek_schedule_customize_preview_assets() {
+            // we don't need those assets when previewing a customize changeset
+            // added when fixing https://github.com/presscustomizr/nimble-builder/issues/351
+            if ( sek_is_customize_previewing_a_changeset_post() )
+              return;
+
             // Load preview ui js tmpl
             add_action( 'wp_footer', array( $this, 'sek_print_ui_tmpl' ) );
 
