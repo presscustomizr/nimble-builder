@@ -28,8 +28,10 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 $skope_id = skp_build_skope_id();
                 // LOCAL SECTIONS STYLESHEET
                 $this->_instantiate_css_handler( array( 'skope_id' => skp_build_skope_id() ) );
+                // GLOBAL SECTIONS STYLESHEET
+                // always printed when customizing
+                // otherwise, printed if !is_null( sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID ) )
                 if ( sek_has_global_sections() ) {
-                    // GLOBAL SECTIONS STYLESHEET
                     $this->_instantiate_css_handler( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) );
                 }
             }
