@@ -58,7 +58,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
                  wp_send_json_error( array(
                     'code' => 'invalid_nonce',
-                    'message' => __( 'sek_ajax_save_section => check_ajax_referer() failed.' ),
+                    'message' => __( 'sek_get_preset_sektions => check_ajax_referer() failed.' ),
                 ) );
             }
             if ( ! is_user_logged_in() ) {
@@ -318,6 +318,13 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
 
 
+
+
+
+
+
+
+
         /////////////////////////////////////////////////////////////////
         // hook : wp_ajax_sek_import_attachment
         function sek_ajax_import_attachemnt() {
@@ -427,6 +434,17 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_success( $new_attachment );
             }
         }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
