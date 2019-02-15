@@ -330,6 +330,7 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/0_6_0_sektions_nimble_customize_link.php',
       '<%= paths.sektions %>_front_dev_php/0_7_0_sektions_retro_compatibilities.php',
       '<%= paths.sektions %>_front_dev_php/0_9_0_sektions_functions_seks_post_set_get.php',
+      '<%= paths.sektions %>_front_dev_php/0_9_1_sektions_functions_saved_sektions.php',
 
       // MODULE REGISTRATION
       '<%= paths.sektions %>_front_dev_php/module_registration/10_0_0_sek_module_helpers_for_css_rules_generation.php',
