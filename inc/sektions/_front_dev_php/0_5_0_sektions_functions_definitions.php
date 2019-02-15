@@ -1331,7 +1331,7 @@ function sek_find_pattern_match($matches) {
     }
     return null;
 }
-
+// fired @filter 'nimble_parse_template_tags'
 function sek_parse_template_tags( $val ) {
     //the pattern could also be '!\{\{(\w+)\}\}!', but adding \s? allows us to allow spaces around the term inside curly braces
     //see https://stackoverflow.com/questions/959017/php-regex-templating-find-all-occurrences-of-var#comment71815465_959026
