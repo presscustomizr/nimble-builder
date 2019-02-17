@@ -65,7 +65,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'min' => 0,
                     'max' => 100,
                     // 'unit' => '%',
-                    'default'  => '40',
+                    'default'  => '60',
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'notice_after' => __('Customize the magnitude of the visual effect when scrolling.', 'text_domain_to_be_replaced'),
