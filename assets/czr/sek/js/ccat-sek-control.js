@@ -6693,12 +6693,73 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
+                                    case 'bg-image' :
+                                          _.each( [ 'bg-attachment', 'bg-scale', 'bg-repeat', 'bg-apply-overlay', 'bg-color-overlay', 'bg-opacity-overlay', 'bg-parallax', 'bg-parallax-force' ] , function( _inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'bg-color-overlay' :
+                                                            case 'bg-opacity-overlay' :
+                                                                  bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-apply-overlay')() );
+                                                            break;
+                                                            case 'bg-parallax-force' :
+                                                                  bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-parallax')() );
+                                                            break;
+                                                            case 'bg-scale' :
+                                                            case 'bg-repeat' :
+                                                                  bool = ! _.isEmpty( input() + '' ) && !api.CZR_Helpers.isChecked( item.czr_Input('bg-parallax')() );
+                                                            break;
+                                                            default :
+                                                                  bool = ! _.isEmpty( input() + '' );
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
                                     case 'bg-apply-overlay' :
                                           _.each( [ 'bg-color-overlay', 'bg-opacity-overlay' ] , function(_inputId_ ) {
                                                 try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && api.CZR_Helpers.isChecked( input() );
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'bg-parallax' :
+                                          _.each( [ 'bg-parallax-force', 'bg-scale', 'bg-repeat'] , function(_inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'bg-parallax-force' :
+                                                                  bool = ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && api.CZR_Helpers.isChecked( input() );
+                                                            break;
+                                                            case 'bg-repeat' :
+                                                            case 'bg-scale' :
+                                                                  bool = ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && ! api.CZR_Helpers.isChecked( input() );
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                          input.bind( function( to ) {
+                                                if ( api.CZR_Helpers.isChecked( input() ) ) {
+                                                      if ( api.CZR_Helpers.isChecked( item.czr_Input('bg-attachment')()) ) {
+                                                            item.czr_Input('bg-attachment').container.find('input[type=checkbox]').trigger('click');
+                                                      }
+                                                }
+                                          });
+                                    break;
+                                    case 'bg-attachment' :
+                                          input.bind( function( to ) {
+                                                if ( api.CZR_Helpers.isChecked( input() ) ) {
+                                                      if ( api.CZR_Helpers.isChecked( item.czr_Input('bg-parallax')()) ) {
+                                                            item.czr_Input('bg-parallax').container.find('input[type=checkbox]').trigger('click');
+                                                      }
                                                 }
                                           });
                                     break;

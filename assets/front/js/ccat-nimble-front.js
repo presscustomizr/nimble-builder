@@ -1403,7 +1403,7 @@
                   }
             });
       };
-})( jQuery, window );
+})( jQuery, window );// global sekFrontLocalized
 /* ===================================================
  * jquery.fn.parallaxBg v1.0.0
  * Created in October 2018.
@@ -1413,9 +1413,7 @@
 (function ( $, window ) {
       var pluginName = 'parallaxBg',
           defaults = {
-                parallaxRatio : 0.5,
-                parallaxDirection : 1,
-                parallaxOverflowHidden : true,
+                parallaxForce : 40,
                 oncustom : [],//list of event here
                 matchMedia : 'only screen and (max-width: 800px)'
           };
@@ -1433,33 +1431,68 @@
       };
       Plugin.prototype.init = function () {
             var self = this;
-            this.$_document   = $(document);
             this.$_window     = $(window);
             this.doingAnimation = false;
-            _utils_.bindAll( this, 'maybeParallaxMe', 'parallaxMe' );
-            $(window).scroll( function(_evt) { self.maybeParallaxMe(); } );
-            $(window).resize( _utils_.debounce( function(_evt) { self.maybeParallaxMe(); }, 100 ) );
-            self.maybeParallaxMe();
+            this.isVisible = false;
+            this.isBefore = false;//the element is before the scroll point
+            this.isAfter = true;// the element is after the scroll point
+            if ( 'number' !== typeof( self.options.parallaxForce ) || self.options.parallaxForce < 0 ) {
+                  if ( sekFrontLocalized.isDevMode ) {
+                        console.log('parallaxBg => the provided parallaxForce is invalid => ' + self.options.parallaxForce );
+                  }
+                  self.options.parallaxForce = this._defaults.parallaxForce;
+            }
+            if ( self.options.parallaxForce > 100 ) {
+                  self.options.parallaxForce = 100;
+            }
+            this.$_window.scroll( function(_evt) { self.maybeParallaxMe(); } );
+            this.$_window.resize( _utils_.debounce( function(_evt) {
+                  self.maybeParallaxMe();
+            }, 100 ) );
+            this.checkIfIsVisibleAndCacheProperties();
+            this.setTopPositionAndBackgroundSize();
       };
+      Plugin.prototype.setTopPositionAndBackgroundSize = function() {
+            var self = this,
+                $element       = this.element,
+                elemHeight = $element.outerHeight(),
+                winHeight = this.$_window.height(),
+                offsetTop = $element.offset().top,
+                scrollTop = this.$_window.scrollTop(),
+                percentOfPage = 100;
+            if ( this.isVisible ) {
+                  percentOfPage = ( offsetTop - scrollTop ) / winHeight;
+            } else if ( this.isBefore ) {
+                  percentOfPage = 1;
+            } else if ( this.isAfter ) {
+                  percentOfPage = - 1;
+            }
 
-      Plugin.prototype._is_visible = function( _evt ) {
-          var $element       = this.element,
-              wt = $(window).scrollTop(),
-              wb = wt + $(window).height(),
-              it  = $element.offset().top,
-              ib  = it + $element.outerHeight(),
-              threshold = 0;
-          if ( _evt && 'scroll' == _evt.type && this.options.load_all_images_on_first_scroll )
-            return true;
+            var maxBGYMove = this.options.parallaxForce > 0 ? winHeight * ( 100 - this.options.parallaxForce ) / 100 : winHeight,
+                bgPositionY = Math.round( percentOfPage *  maxBGYMove );
 
-          return ib >= wt - threshold && it <= wb + threshold;
+            this.element.css({
+                  'background-position-y' : [
+                        'calc(50% ',
+                        bgPositionY > 0 ? '+ ' : '- ',
+                        Math.abs( bgPositionY ) + 'px)'
+                  ].join('')
+            });
       };
-      /*
-      * In order to handle a smooth scroll
-      */
+      Plugin.prototype.checkIfIsVisibleAndCacheProperties = function( _evt ) {
+          var $element = this.element,
+              scrollTop = this.$_window.scrollTop(),
+              wb = scrollTop + this.$_window.height(),
+              offsetTop  = $element.offset().top,
+              ib  = offsetTop + $element.outerHeight();
+          this.isVisible = ib >= scrollTop && offsetTop <= wb;
+          this.isBefore = offsetTop > wb ;//the element is before the scroll point
+          this.isAfter = ib < scrollTop;// the element is after the scroll point
+          return this.isVisible;
+      };
       Plugin.prototype.maybeParallaxMe = function() {
             var self = this;
-            if ( ! this._is_visible() )
+            if ( ! this.checkIfIsVisibleAndCacheProperties() )
               return;
             if ( _utils_.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
                   this.element.css({'background-position-y' : '', 'background-attachment' : '' });
@@ -1469,31 +1502,10 @@
             if ( ! this.doingAnimation ) {
                   this.doingAnimation = true;
                   window.requestAnimationFrame(function() {
-                        self.parallaxMe();
+                        self.setTopPositionAndBackgroundSize();
                         self.doingAnimation = false;
                   });
             }
-      };
-      Plugin.prototype.setTopPosition = function( _top_ ) {
-            _top_ = _top_ || 0;
-            this.element.css({
-                  'background-position-y' : ( -1 * _top_ ) + 'px',
-                  'background-attachment' : 'fixed',
-            });
-      };
-
-      Plugin.prototype.parallaxMe = function() {
-            /*
-            if ( ! ( this.element.hasClass( 'is-selected' ) || this.element.parent( '.is-selected' ).length ) )
-              return;
-            */
-            var $element       = this.element;
-            var ratio = this.options.parallaxRatio,
-                parallaxDirection = this.options.parallaxDirection,
-                ElementDistanceToTop  = $element.offset().top,
-                value = ratio * parallaxDirection * ( this.$_document.scrollTop() - ElementDistanceToTop );
-
-            this.setTopPosition( parallaxDirection * value );
       };
       $.fn[pluginName] = function ( options ) {
           return this.each(function () {
@@ -1503,7 +1515,8 @@
               }
           });
       };
-})( jQuery, window );/* ------------------------------------------------------------------------- *
+})( jQuery, window );// global sekFrontLocalized
+/* ------------------------------------------------------------------------- *
  *  LIGHT BOX WITH MAGNIFIC POPUP
 /* ------------------------------------------------------------------------- */
 jQuery(function($){
@@ -1553,12 +1566,16 @@ jQuery(function($){
  *  BG PARALLAX
 /* ------------------------------------------------------------------------- */
 jQuery(function($){
-      $('[data-sek-bg-parallax="true"]').parallaxBg();
+      $('[data-sek-bg-parallax="true"]').each( function() {
+            $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
+      });
       $('body').on('sek-level-refreshed sek-section-added', function( evt ){
-            if ( "true" === $(this).attr( 'data-sek-bg-parallax' ) ) {
-                  $(this).parallaxBg();
+            if ( "true" === $(this).data('sek-bg-parallax') ) {
+                  $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
             } else {
-                  $(this).find('[data-sek-bg-parallax="true"]').parallaxBg();
+                  $(this).find('[data-sek-bg-parallax="true"]').each( function() {
+                        $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
+                  });
             }
       });
 });

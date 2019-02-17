@@ -50,8 +50,6 @@
                   self.options.parallaxForce = 100;
             }
 
-            console.log('PARALLAX RATIO ?', self.options.parallaxForce );
-
             //the scroll event gets throttled with the requestAnimationFrame
             this.$_window.scroll( function(_evt) { self.maybeParallaxMe(); } );
             //debounced resize event
@@ -114,7 +112,6 @@
       // a throttle is implemented with window.requestAnimationFrame
       Plugin.prototype.maybeParallaxMe = function() {
             var self = this;
-            //console.log('IS VISIBLE ?', this.checkIfIsVisibleAndCacheProperties() );
             if ( ! this.checkIfIsVisibleAndCacheProperties() )
               return;
 

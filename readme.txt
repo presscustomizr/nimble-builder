@@ -6,7 +6,7 @@ Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.0.3
-Stable tag: 1.4.9
+Stable tag: 1.4.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,10 +56,13 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.4.9 =
-Various improvements of the front-end preview of a draft customize-changeset.
+= 1.4.10 =
+Various improvements of the background options for section, columns and modules. Now the force of the parallax effect can be set.
 
 == Changelog ==
+= 1.4.10 : February 17th, 2019 =
+* improved : Various improvements of the background options for section, columns and modules. Now the force of the parallax effect can be set.
+
 = 1.4.9 : February 14th, 2019 =
 * fixed : PHP error when previewing a customize changeset
 * fixed : CSS selectors wrongly implemented for the WP editor module

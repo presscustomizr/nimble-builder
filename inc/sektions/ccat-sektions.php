@@ -1003,7 +1003,6 @@ function sek_find_pattern_match($matches) {
     }
     return null;
 }
-
 function sek_parse_template_tags( $val ) {
     return is_string( $val ) ? preg_replace_callback( '!\{\{\s?(\w+)\s?\}\}!', '\Nimble\sek_find_pattern_match', $val) : $val;
 }
@@ -1541,15 +1540,7 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
     return get_post( $r );
 }
 
-
-
-
-
-
-
-
-
-
+?><?php
 /* ------------------------------------------------------------------------- *
  *  SAVED SEKTIONS
 /* ------------------------------------------------------------------------- */
@@ -2463,16 +2454,16 @@ function sek_get_select_options_for_input_id( $input_id ) {
         break;
         case 'width-type' :
             $options = array(
-                'default' => __('default', 'text_domain_to_be_replaced'),
+                'default' => __('Default', 'text_domain_to_be_replaced'),
                 'custom' => __('Custom', 'text_domain_to_be_replaced' )
             );
         break;
         case 'bg-scale' :
             $options = array(
-                'default' => __('default', 'text_domain_to_be_replaced'),
-                'auto' => __('auto', 'text_domain_to_be_replaced'),
-                'cover' => __('scale to fill', 'text_domain_to_be_replaced'),
-                'contain' => __('fit', 'text_domain_to_be_replaced'),
+                'default' => __('Default', 'text_domain_to_be_replaced'),
+                'auto' => __('Automatic', 'text_domain_to_be_replaced'),
+                'cover' => __('Scale to fill', 'text_domain_to_be_replaced'),
+                'contain' => __('Fit', 'text_domain_to_be_replaced'),
             );
         break;
         case 'bg-position' :
@@ -2676,6 +2667,13 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'input_type'  => 'upload',
                     'title'       => __('Image', 'text_domain_to_be_replaced'),
                     'default'     => '',
+                    'notice_after' => sprintf( __('To ensure better performances, use optimized images for your backgrounds. You can also enable the lazy loading option in the %1$s.', 'text_domain_to_be_replaced'),
+                      sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
+                          "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
+                          __('site wide options', 'text_domain_to_be_replaced')
+                      )
+                    ),
+                    'refresh_markup' => true
                 ),
                 'bg-position' => array(
                     'input_type'  => 'bgPositionWithDeviceSwitcher',
@@ -2686,14 +2684,45 @@ function sek_get_module_params_for_sek_level_bg_module() {
                 'bg-attachment' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Fixed background', 'text_domain_to_be_replaced'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => true,
                     'default'     => 0
                 ),
                 'bg-parallax' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Parallax effect on scroll', 'text_domain_to_be_replaced'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
                     'default'     => 0,
                     'notice_after' => __('When enabled, the background image moves slower than the page elements on scroll. This effect is not enabled on mobile devices.', 'text_domain_to_be_replaced'),
                     'refresh_markup' => true,
+                ),
+                'bg-parallax-force' => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __('Parallax force (in percents)', 'text_domain_to_be_replaced'),
+                    'orientation' => 'horizontal',
+                    'min' => 0,
+                    'max' => 100,
+                    'default'  => '40',
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'notice_after' => __('Customize the magnitude of the visual effect when scrolling.', 'text_domain_to_be_replaced'),
+                    'refresh_markup' => true
+                ),
+                'bg-repeat' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Repeat', 'text_domain_to_be_replaced'),
+                    'default'     => 'no-repeat',
+                    'choices'     => array(
+                        'default' => __('Default', 'text_dom'),
+                        'no-repeat' => __('No repeat', 'text_dom'),
+                        'repeat' => __('Repeat', 'text_dom'),
+                        'repeat-x' => __('Repeat x', 'text_dom'),
+                        'repeat-y' => __('Repeat y', 'text_dom'),
+                        'round' => __('Round', 'text_dom'),
+                        'space' => __('Space', 'text_dom'),
+                    )
                 ),
                 'bg-scale' => array(
                     'input_type'  => 'select',
@@ -2756,7 +2785,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
         if ( ! sek_is_img_smartload_enabled() ) {
             $background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
         }
-        if ( ! empty( $bg_options[ 'bg-position'] ) ) {
+        if ( ! empty( $bg_options[ 'bg-position'] ) && 'center' != $bg_options[ 'bg-position'] ) {
             $pos_map = array(
                 'top_left'    => '0% 0%',
                 'top'         => '50% 0%',
@@ -2769,7 +2798,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
                 'bottom_right'=> '100% 100%'
             );
             if ( is_string( $bg_options[ 'bg-position'] ) ) {
-                $raw_pos                    = $bg_options[ 'bg-position'];
+                $raw_pos = $bg_options[ 'bg-position'];
                 $background_properties[ 'background-position' ] = array_key_exists($raw_pos, $pos_map) ? $pos_map[ $raw_pos ] : $pos_map[ 'center' ];
             } else if ( is_array( $bg_options[ 'bg-position'] ) ) {
                 $mapped_bg_options = array();
@@ -2788,17 +2817,19 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
                 ), $rules );
             }
         }
-        if ( ! empty( $bg_options[ 'bg-scale'] ) && 'default' != $bg_options[ 'bg-scale'] ) {
-            $background_properties[ 'background-size' ] = $bg_options[ 'bg-scale'];
+        if ( ! empty( $bg_options['bg-scale'] ) && 'default' != $bg_options['bg-scale'] && 'cover' != $bg_options['bg-scale'] ) {
+            $background_properties['background-size'] = $bg_options['bg-scale'];
         }
-        $background_properties[ 'background-repeat' ] = 'no-repeat';
-        if ( ! empty( $bg_options[ 'bg-attachment'] ) && sek_is_checked( $bg_options[ 'bg-attachment'] ) ) {
-            $background_properties[ 'background-attachment' ] = 'fixed';
+        if ( ! empty( $bg_options['bg-repeat'] ) && 'default' != $bg_options['bg-repeat'] ) {
+            $background_properties['background-repeat'] = $bg_options['bg-repeat'];
+        }
+        if ( ! empty( $bg_options['bg-attachment'] ) && sek_is_checked( $bg_options['bg-attachment'] ) ) {
+            $background_properties['background-attachment'] = 'fixed';
         }
 
     }
-    if ( ! empty( $bg_options[ 'bg-color' ] ) ) {
-        $background_properties[ 'background-color' ] = $bg_options[ 'bg-color' ];
+    if ( ! empty( $bg_options['bg-color'] ) ) {
+        $background_properties['background-color'] = $bg_options[ 'bg-color' ];
     }
     if ( ! empty( $background_properties ) ) {
         $background_css_rules = '';
@@ -3601,7 +3632,7 @@ function sek_get_module_params_for_sek_local_widths() {
                     'notice_before_title' => sprintf( __( 'The inner and outer widths of the sections displayed in this page can be set here. It will override in the %1$s. You can also set a custom inner and outer width for each single sections.', 'text_domain_to_be_replaced'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
-                            __('Site wide options', 'text_domain_to_be_replaced')
+                            __('site wide options', 'text_domain_to_be_replaced')
                         )
                     ),
                 ),
@@ -3821,7 +3852,7 @@ function sek_get_module_params_for_sek_local_header_footer() {
                     'notice_after' => sprintf( __( 'This option overrides the site wide header and footer options set in the %1$s for this page only.', 'text_domain_to_be_replaced'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
-                            __('Site wide options', 'text_domain_to_be_replaced')
+                            __('site wide options', 'text_domain_to_be_replaced')
                         )
                     ),
                 )
@@ -3893,7 +3924,7 @@ function sek_get_module_params_for_sek_global_widths() {
                     'notice_before_title' => sprintf( __( 'The inner and outer widths of your sections can be set globally here, but also overriden in the %1$s, and for each sections.', 'text_domain_to_be_replaced'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
-                            __('Current page options', 'text_domain_to_be_replaced')
+                            __('current page options', 'text_domain_to_be_replaced')
                         )
                     ),
                 ),
@@ -4044,7 +4075,7 @@ function sek_get_module_params_for_sek_global_header_footer() {
                     'notice_before_title' => sprintf( __( 'The Nimble Builder allows you to build your own header and footer, or to use your theme\'s ones. This option can be overriden in the %1$s.', 'text_domain_to_be_replaced'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
-                            __('Current page options', 'text_domain_to_be_replaced')
+                            __('current page options', 'text_domain_to_be_replaced')
                         )
                     ),
                     'width-100'   => true,
@@ -8519,7 +8550,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             $this->registered_locations = $this->default_locations;
             $this -> _schedule_front_ajax_actions();
             $this -> _schedule_img_import_ajax_actions();
-            $this -> _schedule_section_saving_ajax_actions();
+            if ( defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) && NIMBLE_SAVED_SECTIONS_ENABLED ) {
+                $this -> _schedule_section_saving_ajax_actions();
+            }
             $this -> _schedule_front_and_preview_assets_printing();
             $this -> _schedule_front_rendering();
             $this -> _setup_hook_for_front_css_printing_or_enqueuing();
@@ -8589,7 +8622,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
                  wp_send_json_error( array(
                     'code' => 'invalid_nonce',
-                    'message' => __( 'sek_ajax_save_section => check_ajax_referer() failed.' ),
+                    'message' => __( 'sek_get_preset_sektions => check_ajax_referer() failed.' ),
                 ) );
             }
             if ( ! is_user_logged_in() ) {
@@ -9885,7 +9918,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         /* ------------------------------------------------------------------------- */
         function sek_maybe_add_bg_attributes( $model ) {
             $attributes = '';
-            $bg_url = '';
+            $bg_url_for_lazy_load = '';
             $parallax_enabled = false;
             $width = '';
             $height = '';
@@ -9893,10 +9926,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
+                    $attributes .= 'data-sek-has-bg="true"';
                     if ( sek_is_img_smartload_enabled() ) {
-                        $bg_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
+                        $bg_url_for_lazy_load = wp_get_attachment_url( $bg_options[ 'bg-image'] );
                     }
-                    $parallax_enabled = !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
+                    $fixed_bg_enabled = !empty( $bg_options['bg-attachment'] ) && sek_booleanize_checkbox_val( $bg_options['bg-attachment'] );
+                    $parallax_enabled = !$fixed_bg_enabled && !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
                     if ( $parallax_enabled ) {
                         $image = wp_get_attachment_image_src( $bg_options[ 'bg-image'], 'full' );
                         if ( $image ) {
@@ -9906,11 +9941,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
-            if ( ! empty( $bg_url ) ) {
-                $attributes = sprintf('data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url );
+            if ( ! empty( $bg_url_for_lazy_load ) ) {
+                $attributes .= sprintf('%1$s data-sek-lazy-bg="true" data-sek-src="%2$s"', $attributes, $bg_url_for_lazy_load );
             }
             if ( $parallax_enabled ) {
-                $attributes .= sprintf('%1$s data-sek-bg-parallax="true" data-bg-width="%2$s" data-bg-height="%3$s"', $attributes, $width, $height );
+                $attributes .= sprintf('%1$s data-sek-bg-parallax="true" data-bg-width="%2$s" data-bg-height="%3$s" data-sek-parallax-force="%4$s"',
+                    $attributes,
+                    $width,
+                    $height,
+                    array_key_exists('bg-parallax-force', $bg_options) ? $bg_options['bg-parallax-force'] : '40'
+                );
             }
             return $attributes;
         }
