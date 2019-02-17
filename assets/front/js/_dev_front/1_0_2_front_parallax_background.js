@@ -1,4 +1,4 @@
-
+// global sekFrontLocalized
 /* ===================================================
  * jquery.fn.parallaxBg v1.0.0
  * Created in October 2018.
@@ -9,9 +9,7 @@
       //defaults
       var pluginName = 'parallaxBg',
           defaults = {
-                parallaxRatio : 0.5,
-                parallaxDirection : 1,
-                parallaxOverflowHidden : true,
+                parallaxForce : 40,
                 oncustom : [],//list of event here
                 matchMedia : 'only screen and (max-width: 800px)'
           };
@@ -34,47 +32,95 @@
       Plugin.prototype.init = function () {
             var self = this;
             //cache some element
-            this.$_document   = $(document);
             this.$_window     = $(window);
             this.doingAnimation = false;
+            this.isVisible = false;
+            this.isBefore = false;//the element is before the scroll point
+            this.isAfter = true;// the element is after the scroll point
 
-            //this.initWaypoints();
-            //this.stageParallaxElements();
-            _utils_.bindAll( this, 'maybeParallaxMe', 'parallaxMe' );
+            // normalize the parallax ratio
+            // must be a number 0 > ratio > 100
+            if ( 'number' !== typeof( self.options.parallaxForce ) || self.options.parallaxForce < 0 ) {
+                  if ( sekFrontLocalized.isDevMode ) {
+                        console.log('parallaxBg => the provided parallaxForce is invalid => ' + self.options.parallaxForce );
+                  }
+                  self.options.parallaxForce = this._defaults.parallaxForce;
+            }
+            if ( self.options.parallaxForce > 100 ) {
+                  self.options.parallaxForce = 100;
+            }
+
+            console.log('PARALLAX RATIO ?', self.options.parallaxForce );
+
             //the scroll event gets throttled with the requestAnimationFrame
-            $(window).scroll( function(_evt) { self.maybeParallaxMe(); } );
+            this.$_window.scroll( function(_evt) { self.maybeParallaxMe(); } );
             //debounced resize event
-            $(window).resize( _utils_.debounce( function(_evt) { self.maybeParallaxMe(); }, 100 ) );
+            this.$_window.resize( _utils_.debounce( function(_evt) {
+                  self.maybeParallaxMe();
+            }, 100 ) );
+
             //on load
-            self.maybeParallaxMe();
+            this.checkIfIsVisibleAndCacheProperties();
+            this.setTopPositionAndBackgroundSize();
       };
 
-      Plugin.prototype._is_visible = function( _evt ) {
-          var $element       = this.element,
-              wt = $(window).scrollTop(),
-              wb = wt + $(window).height(),
-              it  = $element.offset().top,
-              ib  = it + $element.outerHeight(),
-              threshold = 0;
+      //@see https://www.paulirish.com/2012/why-moving-elements-with-translate-is-better-than-posabs-topleft/
+      Plugin.prototype.setTopPositionAndBackgroundSize = function() {
+            var self = this,
+                $element       = this.element,
+                elemHeight = $element.outerHeight(),
+                winHeight = this.$_window.height(),
+                offsetTop = $element.offset().top,
+                scrollTop = this.$_window.scrollTop(),
+                percentOfPage = 100;
 
-          //force all images to visible if first scroll option enabled
-          if ( _evt && 'scroll' == _evt.type && this.options.load_all_images_on_first_scroll )
-            return true;
+            // the percentOfPage can vary from -1 to 1
+            if ( this.isVisible ) {
+                  //percentOfPage = currentDistanceToMiddleScreen / maxDistanceToMiddleScreen;
+                  percentOfPage = ( offsetTop - scrollTop ) / winHeight;
+            } else if ( this.isBefore ) {
+                  percentOfPage = 1;
+            } else if ( this.isAfter ) {
+                  percentOfPage = - 1;
+            }
 
-          return ib >= wt - threshold && it <= wb + threshold;
+            var maxBGYMove = this.options.parallaxForce > 0 ? winHeight * ( 100 - this.options.parallaxForce ) / 100 : winHeight,
+                bgPositionY = Math.round( percentOfPage *  maxBGYMove );
+
+            this.element.css({
+                  'background-position-y' : [
+                        'calc(50% ',
+                        bgPositionY > 0 ? '+ ' : '- ',
+                        Math.abs( bgPositionY ) + 'px)'
+                  ].join('')
+            });
       };
-      /*
-      * In order to handle a smooth scroll
-      */
+
+      // When the image enters the viewport ?
+      Plugin.prototype.checkIfIsVisibleAndCacheProperties = function( _evt ) {
+          var $element = this.element,
+              scrollTop = this.$_window.scrollTop(),
+              wb = scrollTop + this.$_window.height(),
+              offsetTop  = $element.offset().top,
+              ib  = offsetTop + $element.outerHeight();
+
+          // Cache now
+          this.isVisible = ib >= scrollTop && offsetTop <= wb;
+          this.isBefore = offsetTop > wb ;//the element is before the scroll point
+          this.isAfter = ib < scrollTop;// the element is after the scroll point
+          return this.isVisible;
+      };
+
+      // a throttle is implemented with window.requestAnimationFrame
       Plugin.prototype.maybeParallaxMe = function() {
             var self = this;
-            if ( ! this._is_visible() )
+            //console.log('IS VISIBLE ?', this.checkIfIsVisibleAndCacheProperties() );
+            if ( ! this.checkIfIsVisibleAndCacheProperties() )
               return;
 
             //options.matchMedia is set to 'only screen and (max-width: 768px)' by default
             //if a match is found, then reset the top position
             if ( _utils_.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
-                  //return this.setTopPosition();
                   this.element.css({'background-position-y' : '', 'background-attachment' : '' });
                   return;
             }
@@ -82,38 +128,10 @@
             if ( ! this.doingAnimation ) {
                   this.doingAnimation = true;
                   window.requestAnimationFrame(function() {
-                        self.parallaxMe();
+                        self.setTopPositionAndBackgroundSize();
                         self.doingAnimation = false;
                   });
             }
-      };
-
-      //@see https://www.paulirish.com/2012/why-moving-elements-with-translate-is-better-than-posabs-topleft/
-      Plugin.prototype.setTopPosition = function( _top_ ) {
-            _top_ = _top_ || 0;
-            this.element.css({
-                  // 'transform' : 'translate3d(0px, ' + _top_  + 'px, .01px)',
-                  // '-webkit-transform' : 'translate3d(0px, ' + _top_  + 'px, .01px)'
-                  'background-position-y' : ( -1 * _top_ ) + 'px',
-                  'background-attachment' : 'fixed',
-                  //'background-size' : 'auto ' + this.element.outerHeight() + 'px'
-                  //top: _top_
-            });
-      };
-
-      Plugin.prototype.parallaxMe = function() {
-            //parallax only the current slide if in slider context?
-            /*
-            if ( ! ( this.element.hasClass( 'is-selected' ) || this.element.parent( '.is-selected' ).length ) )
-              return;
-            */
-            var $element       = this.element;
-            var ratio = this.options.parallaxRatio,
-                parallaxDirection = this.options.parallaxDirection,
-                ElementDistanceToTop  = $element.offset().top,
-                value = ratio * parallaxDirection * ( this.$_document.scrollTop() - ElementDistanceToTop );
-
-            this.setTopPosition( parallaxDirection * value );
       };
 
       // prevents against multiple instantiations

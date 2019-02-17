@@ -751,7 +751,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
         function sek_maybe_add_bg_attributes( $model ) {
             $attributes = '';
-            $bg_url = '';
+            $bg_url_for_lazy_load = '';
             $parallax_enabled = false;
             $width = '';
             $height = '';
@@ -759,10 +759,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
+                    $attributes .= 'data-sek-has-bg="true"';
                     if ( sek_is_img_smartload_enabled() ) {
-                        $bg_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
+                        $bg_url_for_lazy_load = wp_get_attachment_url( $bg_options[ 'bg-image'] );
                     }
-                    $parallax_enabled = !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
+                    // When the fixed background is ckecked, it wins against parallax
+                    $fixed_bg_enabled = !empty( $bg_options['bg-attachment'] ) && sek_booleanize_checkbox_val( $bg_options['bg-attachment'] );
+                    $parallax_enabled = !$fixed_bg_enabled && !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
                     if ( $parallax_enabled ) {
                         $image = wp_get_attachment_image_src( $bg_options[ 'bg-image'], 'full' );
                         if ( $image ) {
@@ -772,11 +775,17 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
-            if ( ! empty( $bg_url ) ) {
-                $attributes = sprintf('data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url );
+            if ( ! empty( $bg_url_for_lazy_load ) ) {
+                $attributes .= sprintf('%1$s data-sek-lazy-bg="true" data-sek-src="%2$s"', $attributes, $bg_url_for_lazy_load );
             }
             if ( $parallax_enabled ) {
-                $attributes .= sprintf('%1$s data-sek-bg-parallax="true" data-bg-width="%2$s" data-bg-height="%3$s"', $attributes, $width, $height );
+                $attributes .= sprintf('%1$s data-sek-bg-parallax="true" data-bg-width="%2$s" data-bg-height="%3$s" data-sek-parallax-force="%4$s"',
+                    $attributes,
+                    $width,
+                    $height,
+                    array_key_exists('bg-parallax-force', $bg_options) ? $bg_options['bg-parallax-force'] : '40'
+                    //!empty( $bg_options['bg-parallax-force'] ) ? $bg_options['bg-parallax-force'] : '40'
+                );
             }
             return $attributes;
         }

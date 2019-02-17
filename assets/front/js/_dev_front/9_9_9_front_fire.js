@@ -1,3 +1,4 @@
+// global sekFrontLocalized
 /* ------------------------------------------------------------------------- *
  *  LIGHT BOX WITH MAGNIFIC POPUP
 /* ------------------------------------------------------------------------- */
@@ -49,16 +50,20 @@ jQuery(function($){
  *  BG PARALLAX
 /* ------------------------------------------------------------------------- */
 jQuery(function($){
-      $('[data-sek-bg-parallax="true"]').parallaxBg();
+      $('[data-sek-bg-parallax="true"]').each( function() {
+            $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
+      });
       // When previewing, react to level refresh
       // This can occur to any level. We listen to the bubbling event on 'body' tag
       // and salmon up to maybe instantiate any missing candidate
       // Example : when a preset_section is injected
       $('body').on('sek-level-refreshed sek-section-added', function( evt ){
-            if ( "true" === $(this).attr( 'data-sek-bg-parallax' ) ) {
-                  $(this).parallaxBg();
+            if ( "true" === $(this).data('sek-bg-parallax') ) {
+                  $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
             } else {
-                  $(this).find('[data-sek-bg-parallax="true"]').parallaxBg();
+                  $(this).find('[data-sek-bg-parallax="true"]').each( function() {
+                        $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
+                  });
             }
       });
 });

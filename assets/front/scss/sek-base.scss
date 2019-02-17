@@ -193,3 +193,26 @@
 #wpadminbar .sek-nimble-icon .sek-nimble-admin-bar-title {
   padding-left:30px
 }
+
+
+// LEVEL BACKGROUND
+[data-sek-has-bg="true"] {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+[data-sek-level="location"] [data-sek-bg-parallax="true"] {
+  //background-repeat: repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+// https://stackoverflow.com/questions/15789026/smoothing-the-parallax-scrolling-of-a-background-image
+// ensure that Nimble sets its own transition rules, prevents any bg rules from third party theme or plugin to be applied
+[data-sek-level="location"] [data-sek-level] {
+  webkit-transition: 0s linear;
+  -o-transition: 0s linear;
+  transition: 0s linear;
+  -webkit-transition-property: background-position;
+  -o-transition-property: background-position;
+  transition-property: background-position;
+}

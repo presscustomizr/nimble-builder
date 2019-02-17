@@ -23,6 +23,13 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'input_type'  => 'upload',
                     'title'       => __('Image', 'text_domain_to_be_replaced'),
                     'default'     => '',
+                    'notice_after' => sprintf( __('To ensure better performances, use optimized images for your backgrounds. You can also enable the lazy loading option in the %1$s.', 'text_domain_to_be_replaced'),
+                      sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
+                          "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
+                          __('site wide options', 'text_domain_to_be_replaced')
+                      )
+                    ),
+                    'refresh_markup' => true
                 ),
                 'bg-position' => array(
                     'input_type'  => 'bgPositionWithDeviceSwitcher',
@@ -37,19 +44,47 @@ function sek_get_module_params_for_sek_level_bg_module() {
                 'bg-attachment' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Fixed background', 'text_domain_to_be_replaced'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => true,
                     'default'     => 0
                 ),
                 'bg-parallax' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Parallax effect on scroll', 'text_domain_to_be_replaced'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
                     'default'     => 0,
                     'notice_after' => __('When enabled, the background image moves slower than the page elements on scroll. This effect is not enabled on mobile devices.', 'text_domain_to_be_replaced'),
                     'refresh_markup' => true,
                 ),
-                // 'bg-repeat' => array(
-                //     'input_type'  => 'select',
-                //     'title'       => __('repeat', 'text_domain_to_be_replaced')
-                // ),
+                'bg-parallax-force' => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __('Parallax force (in percents)', 'text_domain_to_be_replaced'),
+                    'orientation' => 'horizontal',
+                    'min' => 0,
+                    'max' => 100,
+                    // 'unit' => '%',
+                    'default'  => '40',
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'notice_after' => __('Customize the magnitude of the visual effect when scrolling.', 'text_domain_to_be_replaced'),
+                    'refresh_markup' => true
+                ),
+                'bg-repeat' => array(
+                    'input_type'  => 'select',
+                    'title'       => __('Repeat', 'text_domain_to_be_replaced'),
+                    'default'     => 'no-repeat',
+                    'choices'     => array(
+                        'default' => __('Default', 'text_dom'),
+                        'no-repeat' => __('No repeat', 'text_dom'),
+                        'repeat' => __('Repeat', 'text_dom'),
+                        'repeat-x' => __('Repeat x', 'text_dom'),
+                        'repeat-y' => __('Repeat y', 'text_dom'),
+                        'round' => __('Round', 'text_dom'),
+                        'space' => __('Space', 'text_dom'),
+                    )
+                ),
                 'bg-scale' => array(
                     'input_type'  => 'select',
                     'title'       => __('Scale', 'text_domain_to_be_replaced'),
@@ -138,7 +173,8 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
         }
 
         // Img Bg Position
-        if ( ! empty( $bg_options[ 'bg-position'] ) ) {
+        // 'center' is the default value. the CSS rule is declared in assets/front/scss/sek-base.scss
+        if ( ! empty( $bg_options[ 'bg-position'] ) && 'center' != $bg_options[ 'bg-position'] ) {
             $pos_map = array(
                 'top_left'    => '0% 0%',
                 'top'         => '50% 0%',
@@ -152,7 +188,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
             );
             // Retro-compat for old bg-position option without device switcher
             if ( is_string( $bg_options[ 'bg-position'] ) ) {
-                $raw_pos                    = $bg_options[ 'bg-position'];
+                $raw_pos = $bg_options[ 'bg-position'];
                 $background_properties[ 'background-position' ] = array_key_exists($raw_pos, $pos_map) ? $pos_map[ $raw_pos ] : $pos_map[ 'center' ];
             } else if ( is_array( $bg_options[ 'bg-position'] ) ) {
                 $mapped_bg_options = array();
@@ -173,25 +209,29 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
             }
         }
 
-        //background size
-        if ( ! empty( $bg_options[ 'bg-scale'] ) && 'default' != $bg_options[ 'bg-scale'] ) {
+        // background size
+        // 'cover' is the default value. the CSS rule is declared in assets/front/scss/sek-base.scss
+        if ( ! empty( $bg_options['bg-scale'] ) && 'default' != $bg_options['bg-scale'] && 'cover' != $bg_options['bg-scale'] ) {
             //When specifying a background-size value, it must immediately follow the background-position value.
-            $background_properties[ 'background-size' ] = $bg_options[ 'bg-scale'];
+            $background_properties['background-size'] = $bg_options['bg-scale'];
         }
 
-        //add no-repeat by default?
-        $background_properties[ 'background-repeat' ] = 'no-repeat';
+        // add no-repeat by default?
+        // 'no-repeat' is the default value. the CSS rule is declared in assets/front/scss/sek-base.scss
+        if ( ! empty( $bg_options['bg-repeat'] ) && 'default' != $bg_options['bg-repeat'] ) {
+            $background_properties['background-repeat'] = $bg_options['bg-repeat'];
+        }
 
         // write the bg-attachment rule only if true <=> set to "fixed"
-        if ( ! empty( $bg_options[ 'bg-attachment'] ) && sek_is_checked( $bg_options[ 'bg-attachment'] ) ) {
-            $background_properties[ 'background-attachment' ] = 'fixed';
+        if ( ! empty( $bg_options['bg-attachment'] ) && sek_is_checked( $bg_options['bg-attachment'] ) ) {
+            $background_properties['background-attachment'] = 'fixed';
         }
 
     }
 
     //background color (needs validation: we need a sanitize hex or rgba color)
-    if ( ! empty( $bg_options[ 'bg-color' ] ) ) {
-        $background_properties[ 'background-color' ] = $bg_options[ 'bg-color' ];
+    if ( ! empty( $bg_options['bg-color'] ) ) {
+        $background_properties['background-color'] = $bg_options[ 'bg-color' ];
     }
 
 

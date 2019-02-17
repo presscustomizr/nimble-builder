@@ -1667,4 +1667,21 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
 #wpadminbar .sek-nimble-icon .sek-nimble-admin-bar-title {
   padding-left: 30px;
 }
+
+[data-sek-has-bg="true"] {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+
+[data-sek-level="location"] [data-sek-bg-parallax="true"] {
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+[data-sek-level="location"] [data-sek-level] {
+  webkit-transition: 0s linear;
+  transition: 0s linear;
+  transition-property: background-position;
+}
 /*# sourceMappingURL=sek-base.css.map */
