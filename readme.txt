@@ -57,11 +57,11 @@ The Nimble builder works with any WordPress theme. If you experience any problem
 
 == Upgrade Notice ==
 = 1.4.10 =
-Various improvements of the background options for section, columns and modules. Now the force of the parallax effect can be set.
+Various improvements of the background options for section, columns and modules. New option to set the force of the parallax effect.
 
 == Changelog ==
 = 1.4.10 : February 17th, 2019 =
-* improved : Various improvements of the background options for section, columns and modules. Now the force of the parallax effect can be set.
+* improved : various improvements of the background options for sections, columns and modules. New option to set the force of the parallax effect.
 
 = 1.4.9 : February 14th, 2019 =
 * fixed : PHP error when previewing a customize changeset
