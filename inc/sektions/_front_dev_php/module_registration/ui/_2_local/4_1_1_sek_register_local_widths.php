@@ -25,7 +25,7 @@ function sek_get_module_params_for_sek_local_widths() {
                     'notice_before_title' => sprintf( __( 'The inner and outer widths of the sections displayed in this page can be set here. It will override in the %1$s. You can also set a custom inner and outer width for each single sections.', 'text_domain_to_be_replaced'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
-                            __('Site wide options', 'text_domain_to_be_replaced')
+                            __('site wide options', 'text_domain_to_be_replaced')
                         )
                     ),
                 ),

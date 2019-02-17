@@ -24,7 +24,7 @@ function sek_get_module_params_for_sek_global_widths() {
                     'notice_before_title' => sprintf( __( 'The inner and outer widths of your sections can be set globally here, but also overriden in the %1$s, and for each sections.', 'text_domain_to_be_replaced'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
-                            __('Current page options', 'text_domain_to_be_replaced')
+                            __('current page options', 'text_domain_to_be_replaced')
                         )
                     ),
                 ),

@@ -270,16 +270,16 @@ function sek_get_select_options_for_input_id( $input_id ) {
         break;
         case 'width-type' :
             $options = array(
-                'default' => __('default', 'text_domain_to_be_replaced'),
+                'default' => __('Default', 'text_domain_to_be_replaced'),
                 'custom' => __('Custom', 'text_domain_to_be_replaced' )
             );
         break;
         case 'bg-scale' :
             $options = array(
-                'default' => __('default', 'text_domain_to_be_replaced'),
-                'auto' => __('auto', 'text_domain_to_be_replaced'),
-                'cover' => __('scale to fill', 'text_domain_to_be_replaced'),
-                'contain' => __('fit', 'text_domain_to_be_replaced'),
+                'default' => __('Default', 'text_domain_to_be_replaced'),
+                'auto' => __('Automatic', 'text_domain_to_be_replaced'),
+                'cover' => __('Scale to fill', 'text_domain_to_be_replaced'),
+                'contain' => __('Fit', 'text_domain_to_be_replaced'),
             );
         break;
         case 'bg-position' :
