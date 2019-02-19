@@ -69,6 +69,17 @@ function sek_get_module_params_for_czr_map_module() {
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'height'
                 ),
+                'lazyload' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Lazy load', 'text_domain_to_be_replaced'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
+                        __( 'With the lazy load option enabled, Nimble loads the map when it becomes visible while scrolling. This improves your page load performances.', 'text_dom'),
+                        __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
+                    ),
+                )
             )
         ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/map_module_tmpl.php",

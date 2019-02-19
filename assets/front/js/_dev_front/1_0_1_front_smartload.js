@@ -19,6 +19,8 @@
  *
  * Requires requestAnimationFrame polyfill:
  * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+ *
+ * Feb 2019 : added support for iframe lazyloading for https://github.com/presscustomizr/nimble-builder/issues/361
  * =================================================== */
 (function ( $, window ) {
       //defaults
@@ -35,7 +37,7 @@
           //with intersecting cointainers:
           //- to avoid race conditions
           //- to avoid multi processing in general
-          skipImgClass = 'smartload-skip';
+          skipLazyLoadClass = 'smartload-skip';
 
 
       function Plugin( element, options ) {
@@ -43,9 +45,9 @@
             this.options = $.extend( {}, defaults, options) ;
             //add .smartload-skip to the excludeImg
             if ( _utils_.isArray( this.options.excludeImg ) ) {
-                  this.options.excludeImg.push( '.'+skipImgClass );
+                  this.options.excludeImg.push( '.'+skipLazyLoadClass );
             } else {
-                  this.options.excludeImg = [ '.'+skipImgClass ];
+                  this.options.excludeImg = [ '.'+skipLazyLoadClass ];
             }
 
             this._defaults = defaults;
@@ -57,25 +59,28 @@
       //can access this.element and this.option
       Plugin.prototype.init = function () {
             var self        = this,
-                $_ImgOrBackgroundElements   = $( '[data-sek-src]:not('+ this.options.excludeImg.join() +')' , this.element );
+                $_ImgOrDivOrIFrameElements  = $( '[data-sek-src]:not('+ this.options.excludeImg.join() +'), [data-sek-iframe-src]' , this.element );
 
             this.increment  = 1;//used to wait a little bit after the first user scroll actions to trigger the timer
             this.timer      = 0;
 
-            $_ImgOrBackgroundElements
+            $_ImgOrDivOrIFrameElements
                   //avoid intersecting containers to parse the same images
-                  .addClass( skipImgClass )
-                  //attach action to the load event
-                  .bind( 'sek_load_img', {}, function() {
-                        self._load_img(this);
-                  });
+                  .addClass( skipLazyLoadClass )
+                  .bind( 'sek_load_img', {}, function() { self._load_img(this); })
+                  .bind( 'sek_load_iframe', {}, function() { self._load_iframe(this); });
 
             //the scroll event gets throttled with the requestAnimationFrame
-            $(window).scroll( function( _evt ) { self._better_scroll_event_handler( $_ImgOrBackgroundElements, _evt ); } );
+            $(window).scroll( function( _evt ) {
+                  self._better_scroll_event_handler( $_ImgOrDivOrIFrameElements, _evt );
+            });
             //debounced resize event
-            $(window).resize( _utils_.debounce( function( _evt ) { self._maybe_trigger_load( $_ImgOrBackgroundElements, _evt ); }, 100 ) );
+            $(window).resize( _utils_.debounce( function( _evt ) {
+                  self._maybe_trigger_load( $_ImgOrDivOrIFrameElements, _evt );
+            }, 100 ) );
             //on load
-            this._maybe_trigger_load( $_ImgOrBackgroundElements );
+            this._maybe_trigger_load( $_ImgOrDivOrIFrameElements);
+
       };
 
 
@@ -85,12 +90,12 @@
       * @return : void
       * scroll event performance enhancer => avoid browser stack if too much scrolls
       */
-      Plugin.prototype._better_scroll_event_handler = function( $_ImgOrBackgroundElements , _evt ) {
+      Plugin.prototype._better_scroll_event_handler = function( $_Elements , _evt ) {
             var self = this;
             if ( ! this.doingAnimation ) {
                   this.doingAnimation = true;
                   window.requestAnimationFrame(function() {
-                        self._maybe_trigger_load( $_ImgOrBackgroundElements , _evt );
+                        self._maybe_trigger_load( $_Elements , _evt );
                         self.doingAnimation = false;
                   });
             }
@@ -102,13 +107,17 @@
       * @param : current event
       * @return : void
       */
-      Plugin.prototype._maybe_trigger_load = function( $_ImgOrBackgroundElements , _evt ) {
+      Plugin.prototype._maybe_trigger_load = function( $_Elements , _evt ) {
             var self = this,
                 //get the visible images list
-                _visible_list = $_ImgOrBackgroundElements.filter( function( ind, _el ) { return self._is_visible( _el ,  _evt ); } );
-            //trigger sek_load_img event for visible images
+                _visible_list = $_Elements.filter( function( ind, _el ) { return self._is_visible( _el ,  _evt ); } );
+
             _visible_list.map( function( ind, _el ) {
-                  $(_el).trigger( 'sek_load_img' );
+                  if ( 'IFRAME' === $(_el).prop("tagName") ) {
+                        $(_el).trigger( 'sek_load_iframe' );
+                  } else {
+                        $(_el).trigger( 'sek_load_img' );
+                  }
             });
       };
 
@@ -145,7 +154,7 @@
             // If not visible, we can't determine the offset().top because of https://github.com/presscustomizr/nimble-builder/issues/363
             // So let's sniff up in the DOM to find the first visible sibling or container
             var $el_candidate = sniffFirstVisiblePrevElement( $(element) );
-            if ( $el_candidate.length < 1 )
+            if ( !$el_candidate || $el_candidate.length < 1 )
               return false;
 
             var wt = $(window).scrollTop(),
@@ -212,6 +221,31 @@
                   $jQueryImgToLoad.load();
             }
             $_el.removeClass('lazy-loading');
+      };
+
+
+      /*
+      * @param single iframe el object
+      * @return void
+      */
+      Plugin.prototype._load_iframe = function( _el_ ) {
+            var $_el    = $(_el_),
+                self = this;
+
+            //$_el.addClass('lazy-loading');
+            $_el.unbind('sek_load_iframe');
+
+            $_el.attr( 'src', function() {
+                  var src = $(this).attr('data-sek-iframe-src');
+                  $(this).removeAttr('data-sek-iframe-src');
+                  $_el.data('sek-lazy-loaded', true );
+                  $_el.trigger('smartload');
+                  if ( ! $_el.hasClass('sek-lazy-loaded') ) {
+                        $_el.addClass('sek-lazy-loaded');
+                  }
+                  return src;
+            });
+            //$_el.removeClass('lazy-loading');
       };
 
 

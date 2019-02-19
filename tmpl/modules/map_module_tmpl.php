@@ -16,7 +16,8 @@ if ( 0 === absint( $value['zoom'] ) ) {
 }
 
 printf(
-    '<div class="sek-embed"><iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=%s&amp;t=m&amp;z=%d&amp;output=embed&amp;iwloc=near" aria-label="%s"></iframe></div>',
+    '<div class="sek-embed"><iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" %s="https://maps.google.com/maps?q=%s&amp;t=m&amp;z=%d&amp;output=embed&amp;iwloc=near" aria-label="%s"></iframe></div>',
+    ( !skp_is_customizing() && true === sek_booleanize_checkbox_val( $value['lazyload'] ) ) ?  'data-sek-iframe-src' : 'src',
     rawurlencode( $value['address'] ),
     absint( $value['zoom'] ),
     esc_attr( $value['address'] )
