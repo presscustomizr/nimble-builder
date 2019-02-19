@@ -118,13 +118,41 @@
       * @param : current event
       * @return bool
       * helper to check if an image is the visible ( viewport + custom option threshold)
+      * Note that this helper is not able to determine the visibility of elements set to display:none;
       */
       Plugin.prototype._is_visible = function( element, _evt ) {
-            var $element       = $(element),
-                wt = $(window).scrollTop(),
+            var sniffFirstVisiblePrevElement = function( $el ) {
+                  if ( $el.length > 0 && $el.is('visible') )
+                    return $el;
+                  var $prev = $el.prev();
+                  // if there's a previous sibling and this sibling is visible, use it
+                  if ( $prev.length > 0 && $prev.is(':visible') ) {
+                      return $prev;
+                  }
+                  // if there's a previous sibling but it's not visible, let's try the next previous sibling
+                  if ( $prev.length > 0 && !$prev.is('visible') ) {
+                      return sniffFirstVisiblePrevElement( $prev );
+                  }
+                  // if no previous sibling visible, let's go up the parent level
+                  var $parent = $el.parent();
+                  if ( $parent.length > 0 ) {
+                      return sniffFirstVisiblePrevElement( $parent );
+                  }
+                  // we don't have siblings or parent
+                  return null;
+            };
+
+            // Is the candidate visible ? <= not display:none
+            // If not visible, we can't determine the offset().top because of https://github.com/presscustomizr/nimble-builder/issues/363
+            // So let's sniff up in the DOM to find the first visible sibling or container
+            var $el_candidate = sniffFirstVisiblePrevElement( $(element) );
+            if ( $el_candidate.length < 1 )
+              return false;
+
+            var wt = $(window).scrollTop(),
                 wb = wt + $(window).height(),
-                it  = $element.offset().top,
-                ib  = it + $element.height(),
+                it  = $el_candidate.offset().top,
+                ib  = it + $el_candidate.height(),
                 th = this.options.threshold;
 
             //force all images to visible if first scroll option enabled
