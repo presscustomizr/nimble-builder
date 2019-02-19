@@ -118,11 +118,10 @@
       * @param : current event
       * @return bool
       * helper to check if an image is the visible ( viewport + custom option threshold)
-      * Note that this helper is not able to determine the visibility of elements set to display:none;
       */
       Plugin.prototype._is_visible = function( element, _evt ) {
             var sniffFirstVisiblePrevElement = function( $el ) {
-                  if ( $el.length > 0 && $el.is('visible') )
+                  if ( $el.length > 0 && $el.is(':visible') )
                     return $el;
                   var $prev = $el.prev();
                   // if there's a previous sibling and this sibling is visible, use it
@@ -130,7 +129,7 @@
                       return $prev;
                   }
                   // if there's a previous sibling but it's not visible, let's try the next previous sibling
-                  if ( $prev.length > 0 && !$prev.is('visible') ) {
+                  if ( $prev.length > 0 && !$prev.is(':visible') ) {
                       return sniffFirstVisiblePrevElement( $prev );
                   }
                   // if no previous sibling visible, let's go up the parent level
