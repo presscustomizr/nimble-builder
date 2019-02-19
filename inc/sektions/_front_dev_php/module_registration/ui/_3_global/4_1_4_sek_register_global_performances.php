@@ -18,7 +18,10 @@ function sek_get_module_params_for_sek_global_performances() {
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => __( 'Check this option to delay the loading of non visible images. Images below the viewport will be loaded dynamically on scroll. This can boost performances by reducing the weight of long web pages designed with several images.', 'text_domain_to_be_replaced')
+                    'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
+                        __( 'Check this option to delay the loading of non visible images. Images below the window will be dynamically loaded when scrolling. This can improve performance by reducing the weight of long web pages including multiple images.', 'text_dom'),
+                        __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
+                    )
                 ),
             )
         )//tmpl
