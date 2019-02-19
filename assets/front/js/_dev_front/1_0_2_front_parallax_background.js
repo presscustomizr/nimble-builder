@@ -94,10 +94,16 @@
             });
       };
 
-      // When the image enters the viewport ?
+      // When does the image enter the viewport ?
       Plugin.prototype.checkIfIsVisibleAndCacheProperties = function( _evt ) {
-          var $element = this.element,
-              scrollTop = this.$_window.scrollTop(),
+          var $element = this.element;
+          // bail if the level is display:none;
+          // because $.offset() won't work
+          // see because of https://github.com/presscustomizr/nimble-builder/issues/363
+          if ( ! $element.is(':visible') )
+              return false;
+
+          var scrollTop = this.$_window.scrollTop(),
               wb = scrollTop + this.$_window.height(),
               offsetTop  = $element.offset().top,
               ib  = offsetTop + $element.outerHeight();
