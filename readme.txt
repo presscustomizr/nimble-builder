@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.0.3
-Stable tag: 1.4.10
+Tested up to: 5.1.0
+Stable tag: 1.4.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,10 +56,15 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.4.10 =
-Various improvements of the background options for section, columns and modules. New option to set the force of the parallax effect.
+= 1.4.11 =
+Nimble Builder is ready for WP version 5.1. Implemented a lazy-loading option for the Google Map module, enabled by default. Various improvements of the lazy-loading feature for backgrounds.
 
 == Changelog ==
+= 1.4.11 : February 19th, 2019 =
+* fixed : hidden blocks were lazy-loaded on load because of a incorrect offset top value
+* fixed : don't run parallax on hidden blocks
+* improved : [Google Map Module] Load the js code when module visible
+
 = 1.4.10 : February 17th, 2019 =
 * improved : various improvements of the background options for sections, columns and modules. New option to set the force of the parallax effect.
 

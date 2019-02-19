@@ -1256,6 +1256,8 @@
  *
  * Requires requestAnimationFrame polyfill:
  * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+ *
+ * Feb 2019 : added support for iframe lazyloading for https://github.com/presscustomizr/nimble-builder/issues/361
  * =================================================== */
 (function ( $, window ) {
       var pluginName = 'nimbleLazyLoad',
@@ -1267,16 +1269,16 @@
                 delaySmartLoadEvent : 0,
 
           },
-          skipImgClass = 'smartload-skip';
+          skipLazyLoadClass = 'smartload-skip';
 
 
       function Plugin( element, options ) {
             this.element = element;
             this.options = $.extend( {}, defaults, options) ;
             if ( _utils_.isArray( this.options.excludeImg ) ) {
-                  this.options.excludeImg.push( '.'+skipImgClass );
+                  this.options.excludeImg.push( '.'+skipLazyLoadClass );
             } else {
-                  this.options.excludeImg = [ '.'+skipImgClass ];
+                  this.options.excludeImg = [ '.'+skipLazyLoadClass ];
             }
 
             this._defaults = defaults;
@@ -1285,19 +1287,23 @@
       }
       Plugin.prototype.init = function () {
             var self        = this,
-                $_ImgOrBackgroundElements   = $( '[data-sek-src]:not('+ this.options.excludeImg.join() +')' , this.element );
+                $_ImgOrDivOrIFrameElements  = $( '[data-sek-src]:not('+ this.options.excludeImg.join() +'), [data-sek-iframe-src]' , this.element );
 
             this.increment  = 1;//used to wait a little bit after the first user scroll actions to trigger the timer
             this.timer      = 0;
 
-            $_ImgOrBackgroundElements
-                  .addClass( skipImgClass )
-                  .bind( 'sek_load_img', {}, function() {
-                        self._load_img(this);
-                  });
-            $(window).scroll( function( _evt ) { self._better_scroll_event_handler( $_ImgOrBackgroundElements, _evt ); } );
-            $(window).resize( _utils_.debounce( function( _evt ) { self._maybe_trigger_load( $_ImgOrBackgroundElements, _evt ); }, 100 ) );
-            this._maybe_trigger_load( $_ImgOrBackgroundElements );
+            $_ImgOrDivOrIFrameElements
+                  .addClass( skipLazyLoadClass )
+                  .bind( 'sek_load_img', {}, function() { self._load_img(this); })
+                  .bind( 'sek_load_iframe', {}, function() { self._load_iframe(this); });
+            $(window).scroll( function( _evt ) {
+                  self._better_scroll_event_handler( $_ImgOrDivOrIFrameElements, _evt );
+            });
+            $(window).resize( _utils_.debounce( function( _evt ) {
+                  self._maybe_trigger_load( $_ImgOrDivOrIFrameElements, _evt );
+            }, 100 ) );
+            this._maybe_trigger_load( $_ImgOrDivOrIFrameElements);
+
       };
 
 
@@ -1307,12 +1313,12 @@
       * @return : void
       * scroll event performance enhancer => avoid browser stack if too much scrolls
       */
-      Plugin.prototype._better_scroll_event_handler = function( $_ImgOrBackgroundElements , _evt ) {
+      Plugin.prototype._better_scroll_event_handler = function( $_Elements , _evt ) {
             var self = this;
             if ( ! this.doingAnimation ) {
                   this.doingAnimation = true;
                   window.requestAnimationFrame(function() {
-                        self._maybe_trigger_load( $_ImgOrBackgroundElements , _evt );
+                        self._maybe_trigger_load( $_Elements , _evt );
                         self.doingAnimation = false;
                   });
             }
@@ -1324,11 +1330,16 @@
       * @param : current event
       * @return : void
       */
-      Plugin.prototype._maybe_trigger_load = function( $_ImgOrBackgroundElements , _evt ) {
+      Plugin.prototype._maybe_trigger_load = function( $_Elements , _evt ) {
             var self = this,
-                _visible_list = $_ImgOrBackgroundElements.filter( function( ind, _el ) { return self._is_visible( _el ,  _evt ); } );
+                _visible_list = $_Elements.filter( function( ind, _el ) { return self._is_visible( _el ,  _evt ); } );
+
             _visible_list.map( function( ind, _el ) {
-                  $(_el).trigger( 'sek_load_img' );
+                  if ( 'IFRAME' === $(_el).prop("tagName") ) {
+                        $(_el).trigger( 'sek_load_iframe' );
+                  } else {
+                        $(_el).trigger( 'sek_load_img' );
+                  }
             });
       };
 
@@ -1340,11 +1351,30 @@
       * helper to check if an image is the visible ( viewport + custom option threshold)
       */
       Plugin.prototype._is_visible = function( element, _evt ) {
-            var $element       = $(element),
-                wt = $(window).scrollTop(),
+            var sniffFirstVisiblePrevElement = function( $el ) {
+                  if ( $el.length > 0 && $el.is(':visible') )
+                    return $el;
+                  var $prev = $el.prev();
+                  if ( $prev.length > 0 && $prev.is(':visible') ) {
+                      return $prev;
+                  }
+                  if ( $prev.length > 0 && !$prev.is(':visible') ) {
+                      return sniffFirstVisiblePrevElement( $prev );
+                  }
+                  var $parent = $el.parent();
+                  if ( $parent.length > 0 ) {
+                      return sniffFirstVisiblePrevElement( $parent );
+                  }
+                  return null;
+            };
+            var $el_candidate = sniffFirstVisiblePrevElement( $(element) );
+            if ( !$el_candidate || $el_candidate.length < 1 )
+              return false;
+
+            var wt = $(window).scrollTop(),
                 wb = wt + $(window).height(),
-                it  = $element.offset().top,
-                ib  = it + $element.height(),
+                it  = $el_candidate.offset().top,
+                ib  = it + $el_candidate.height(),
                 th = this.options.threshold;
             if ( _evt && 'scroll' == _evt.type && this.options.load_all_images_on_first_scroll )
               return true;
@@ -1394,6 +1424,28 @@
                   $jQueryImgToLoad.load();
             }
             $_el.removeClass('lazy-loading');
+      };
+
+
+      /*
+      * @param single iframe el object
+      * @return void
+      */
+      Plugin.prototype._load_iframe = function( _el_ ) {
+            var $_el    = $(_el_),
+                self = this;
+            $_el.unbind('sek_load_iframe');
+
+            $_el.attr( 'src', function() {
+                  var src = $(this).attr('data-sek-iframe-src');
+                  $(this).removeAttr('data-sek-iframe-src');
+                  $_el.data('sek-lazy-loaded', true );
+                  $_el.trigger('smartload');
+                  if ( ! $_el.hasClass('sek-lazy-loaded') ) {
+                        $_el.addClass('sek-lazy-loaded');
+                  }
+                  return src;
+            });
       };
       $.fn[pluginName] = function ( options ) {
             return this.each(function () {
@@ -1480,8 +1532,11 @@
             });
       };
       Plugin.prototype.checkIfIsVisibleAndCacheProperties = function( _evt ) {
-          var $element = this.element,
-              scrollTop = this.$_window.scrollTop(),
+          var $element = this.element;
+          if ( ! $element.is(':visible') )
+              return false;
+
+          var scrollTop = this.$_window.scrollTop(),
               wb = scrollTop + this.$_window.height(),
               offsetTop  = $element.offset().top,
               ib  = offsetTop + $element.outerHeight();

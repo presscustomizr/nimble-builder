@@ -3820,7 +3820,10 @@ function sek_get_module_params_for_sek_local_performances() {
                         'yes' => __('Load images on scroll ( optimized )', 'text_domain' ),
                         'no'  => __('Load all images on page load ( not optimized )', 'text_domain' )
                     ),
-                    'notice_after' => __( 'When you select "Load images on scroll", images below the viewport are loaded dynamically on scroll. This can boost performances by reducing the weight of long web pages designed with several images.', 'text_domain_to_be_replaced'),
+                    'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
+                        __( 'When you select "Load images on scroll", images below the window are loaded dynamically when scrolling. This can improve performance by reducing the weight of long web pages including multiple images.', 'text_dom'),
+                        __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
+                    ),
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 )
@@ -4049,7 +4052,10 @@ function sek_get_module_params_for_sek_global_performances() {
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => __( 'Check this option to delay the loading of non visible images. Images below the viewport will be loaded dynamically on scroll. This can boost performances by reducing the weight of long web pages designed with several images.', 'text_domain_to_be_replaced')
+                    'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
+                        __( 'Check this option to delay the loading of non visible images. Images below the window will be dynamically loaded when scrolling. This can improve performance by reducing the weight of long web pages including multiple images.', 'text_dom'),
+                        __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
+                    )
                 ),
             )
         )//tmpl
@@ -5142,6 +5148,17 @@ function sek_get_module_params_for_czr_map_module() {
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'height'
                 ),
+                'lazyload' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Lazy load', 'text_domain_to_be_replaced'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
+                        __( 'With the lazy load option enabled, Nimble loads the map when it becomes visible while scrolling. This improves your page load performances.', 'text_dom'),
+                        __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
+                    ),
+                )
             )
         ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/map_module_tmpl.php",
