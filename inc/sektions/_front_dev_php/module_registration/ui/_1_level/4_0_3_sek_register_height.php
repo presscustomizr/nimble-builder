@@ -26,6 +26,18 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'default'     => array( 'desktop' => '50%' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
+                    'notice_before' => 'Note that when using a custom height, the inner content can be larger than the parent container, in particular on mobile devices. To prevent this problem, preview your page with the device switcher icons. You can also activate the overflow hidden option below.'
+                ),
+                // implemented to fix https://github.com/presscustomizr/nimble-builder/issues/365
+                'overflow_hidden' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Overflow hidden', 'text_domain_to_be_replaced'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'notice_after' => __('Hide the content when it is too big to fit in its parent container.', 'text_domain_to_be_replaced')
                 ),
                 'v_alignment' => array(
                     'input_type'  => 'verticalAlignWithDeviceSwitcher',
@@ -33,7 +45,7 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'v_alignment',
+                    //'css_identifier' => 'v_alignment',
                     'title_width' => 'width-100',
                     'width-100'   => true,
                 )
@@ -55,6 +67,7 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
 
     $height_options = is_array( $options[ 'height' ] ) ? $options[ 'height' ] : array();
 
+    // VERTICAL ALIGNMENT
     if ( ! empty( $height_options[ 'v_alignment' ] ) ) {
         if ( ! is_array( $height_options[ 'v_alignment' ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
@@ -116,6 +129,16 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
                 'selector' => $selector
             ), $rules );
         }
+    }
+
+    // OVERFLOW HIDDEN
+    // implemented to fix https://github.com/presscustomizr/nimble-builder/issues/365
+    if ( ! empty( $height_options[ 'overflow_hidden' ] ) && sek_booleanize_checkbox_val( $height_options[ 'overflow_hidden' ] ) ) {
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$level['id'].'"]',
+            'css_rules' => 'overflow:hidden',
+            'mq' =>null
+        );
     }
     //error_log( print_r($rules, true) );
     return $rules;

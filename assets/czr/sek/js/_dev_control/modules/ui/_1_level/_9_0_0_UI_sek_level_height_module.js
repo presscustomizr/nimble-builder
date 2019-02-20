@@ -56,8 +56,12 @@
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'height-type' :
-                                          scheduleVisibilityOfInputId.call( input, 'custom-height', function() {
-                                                return 'custom' === input();
+                                          _.each( [ 'custom-height', 'overflow_hidden' ] , function(_inputId_ ) {
+                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'custom' === input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
                                           });
                                     break;
                               }
