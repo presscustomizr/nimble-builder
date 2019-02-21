@@ -326,6 +326,8 @@ function sek_get_level_skope_id( $level_id = '' ) {
  *  HEADER FOOTER
 /* ------------------------------------------------------------------------- */
 function sek_page_uses_nimble_header_footer() {
+    // cache the properties if not done yet
+    Nimble_Manager()->sek_maybe_set_nimble_header_footer();
     return Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer;
 }
 
@@ -479,13 +481,13 @@ function sek_get_default_module_model( $module_type = '' ) {
 //     'pre-item' => array(
 //         'social-icon' => array(
 //             'input_type'  => 'select',
-//             'title'       => __('Select an icon', 'text_domain_to_be_replaced')
+//             'title'       => __('Select an icon', 'text_doma')
 //         ),
 //     ),
 //     'mod-opt' => array(
 //         'social-size' => array(
 //             'input_type'  => 'number',
-//             'title'       => __('Size in px', 'text_domain_to_be_replaced'),
+//             'title'       => __('Size in px', 'text_doma'),
 //             'step'        => 1,
 //             'min'         => 5,
 //             'transport' => 'postMessage'
@@ -495,16 +497,16 @@ function sek_get_default_module_model( $module_type = '' ) {
 //         'item-inputs' => array(
                 // 'tabs' => array(
                 //     array(
-                //         'title' => __('Content', 'text_domain_to_be_replaced'),
+                //         'title' => __('Content', 'text_doma'),
                 //         //'attributes' => 'data-sek-device="desktop"',
                 //         'inputs' => array(
                 //             'content' => array(
                 //                 'input_type'  => 'tiny_mce_editor',
-                //                 'title'       => __('Content', 'text_domain_to_be_replaced')
+                //                 'title'       => __('Content', 'text_doma')
                 //             ),
                 //             'h_alignment_css' => array(
                 //                 'input_type'  => 'h_text_alignment',
-                //                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                //                 'title'       => __('Alignment', 'text_doma'),
                 //                 'default'     => is_rtl() ? 'right' : 'left',
                 //                 'refresh_markup' => false,
                 //                 'refresh_stylesheet' => true
@@ -621,13 +623,13 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 //     'pre-item' => array(
 //         'social-icon' => array(
 //             'input_type'  => 'select',
-//             'title'       => __('Select an icon', 'text_domain_to_be_replaced')
+//             'title'       => __('Select an icon', 'text_doma')
 //         ),
 //     ),
 //     'mod-opt' => array(
 //         'social-size' => array(
 //             'input_type'  => 'number',
-//             'title'       => __('Size in px', 'text_domain_to_be_replaced'),
+//             'title'       => __('Size in px', 'text_doma'),
 //             'step'        => 1,
 //             'min'         => 5,
 //             'transport' => 'postMessage'
@@ -637,16 +639,16 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 //         'item-inputs' => array(
                 // 'tabs' => array(
                 //     array(
-                //         'title' => __('Content', 'text_domain_to_be_replaced'),
+                //         'title' => __('Content', 'text_doma'),
                 //         //'attributes' => 'data-sek-device="desktop"',
                 //         'inputs' => array(
                 //             'content' => array(
                 //                 'input_type'  => 'tiny_mce_editor',
-                //                 'title'       => __('Content', 'text_domain_to_be_replaced')
+                //                 'title'       => __('Content', 'text_doma')
                 //             ),
                 //             'h_alignment_css' => array(
                 //                 'input_type'  => 'h_text_alignment',
-                //                 'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                //                 'title'       => __('Alignment', 'text_doma'),
                 //                 'default'     => is_rtl() ? 'right' : 'left',
                 //                 'refresh_markup' => false,
                 //                 'refresh_stylesheet' => true
@@ -790,23 +792,42 @@ function sek_get_locale_template(){
     return $path;
 }
 
+
 // @param $option_name = string
+// 'nimble_front_classes_ready' is fired when Nimble_Manager() is instanciated
 function sek_get_local_option_value( $option_name, $skope_id = null ) {
-    // use the provided skope_id if in the signature
-    $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
-    $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
-    $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
+    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->local_options ) {
+        $local_options = Nimble_Manager()->local_options;
+    } else {
+        // use the provided skope_id if in the signature
+        $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
+        $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
+        $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
+        // Cache only after 'wp' && 'nimble_front_classes_ready'
+        if ( did_action('nimble_front_classes_ready') && did_action('wp') ) {
+            Nimble_Manager()->local_options = $local_options;
+        }
+    }
+
     return ( ! empty( $local_options ) && ! empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
 }
 
 
 // @param $option_name = string
+// 'nimble_front_classes_ready' is fired when Nimble_Manager() is instanciated
 function sek_get_global_option_value( $option_name ) {
-    $options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    return ( is_array( $options ) && ! empty( $options[ $option_name ] ) ) ? $options[ $option_name ] : null;
+    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->global_nimble_options ) {
+        $global_nimble_options = Nimble_Manager()->global_nimble_options;
+    } else {
+        $global_nimble_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+        // cache when nimble is ready
+        // this hook is fired when Nimble_Manager() is instanciated
+        if ( did_action('nimble_front_classes_ready') ) {
+            Nimble_Manager()->global_nimble_options = $global_nimble_options;
+        }
+    }
+    return ( is_array( $global_nimble_options ) && ! empty( $global_nimble_options[ $option_name ] ) ) ? $global_nimble_options[ $option_name ] : null;
 }
-
-
 
 
 
@@ -853,7 +874,7 @@ function sek_get_section_custom_breakpoint( $section ) {
 
 
 /* ------------------------------------------------------------------------- *
- *  FONT AWESOME HELPER
+ *  FRONT ASSET SNIFFERS
 /* ------------------------------------------------------------------------- */
 // @return bool
 // some modules uses font awesome :
@@ -883,6 +904,30 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
     return $bool;
 }
 
+// @return bool
+// used to print reCaptcha js for the form module
+function sek_front_sections_include_a_form( $bool = false, $recursive_data = null ) {
+    if ( !$bool ) {
+        if ( is_null( $recursive_data ) ) {
+            $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+            $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+            $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+            $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+
+            $recursive_data = array_merge( $local_collection, $global_collection );
+        }
+
+        foreach ($recursive_data as $key => $value) {
+            if ( is_array( $value ) && array_key_exists('module_type', $value) && 'czr_simple_form_module' === $value['module_type'] ) {
+                $bool = true;
+                break;
+            } else if ( is_array( $value ) ) {
+                $bool = sek_front_sections_include_a_form( $bool, $value );
+            }
+        }
+    }
+    return $bool;
+}
 
 // @return bool
 // Fired in 'wp_enqueue_scripts'
@@ -926,7 +971,7 @@ function sek_get_img_sizes() {
 
     $sizes = array();
     $to_return = array(
-        'original' => __('Original image dimensions', 'text_domain_to_be_replaced')
+        'original' => __('Original image dimensions', 'text_doma')
     );
 
     foreach ( get_intermediate_image_sizes() as $_size ) {
@@ -1029,6 +1074,36 @@ function sek_is_img_smartload_enabled() {
 
     return Nimble_Manager()->img_smartload_enabled;
 }
+
+
+/* ------------------------------------------------------------------------- *
+ *  reCAPTCHA HELPER
+/* ------------------------------------------------------------------------- */
+// @return boolean
+// reCaptcha is enabled globally
+// deactivated when customizing
+function sek_is_recaptcha_enabled() {
+    if ( skp_is_customizing() )
+      return false;
+
+    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->recaptcha_enabled ) {
+        return Nimble_Manager()->recaptcha_enabled;
+    }
+    $recaptcha_enabled = false;
+
+    $glob_recaptcha_opts = sek_get_global_option_value( 'recaptcha' );
+
+    if ( !is_null( $glob_recaptcha_opts ) && is_array( $glob_recaptcha_opts ) && !empty( $glob_recaptcha_opts['enable'] ) ) {
+        $recaptcha_enabled = sek_booleanize_checkbox_val( $glob_recaptcha_opts['enable'] ) && !empty( $glob_recaptcha_opts['public_key'] ) && !empty($glob_recaptcha_opts['private_key'] );
+    }
+
+    // CACHE
+    Nimble_Manager()->recaptcha_enabled = $recaptcha_enabled;
+
+    return Nimble_Manager()->recaptcha_enabled;
+}
+
+
 
 
 /* ------------------------------------------------------------------------- *

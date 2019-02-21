@@ -26,12 +26,16 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                 'public_key' => array(
                     'input_type'  => 'text',
                     'title'       => __('Public reCAPTCHA key', 'text_doma'),
-                    'default'     => ''
+                    'default'     => '',
+                    'refresh_preview' => false,
+                    'refresh_markup' => false
                 ),
                 'private_key' => array(
                     'input_type'  => 'text',
                     'title'       => __('Private reCAPTCHA key', 'text_doma'),
-                    'default'     => ''
+                    'default'     => '',
+                    'refresh_preview' => false,
+                    'refresh_markup' => false
                 ),
             )
         )//tmpl

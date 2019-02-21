@@ -44,9 +44,17 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             }
             return self::$instance;
         }
+
+        // store the local and global options
+        public $local_options = '_not_cached_yet_';
+        public $global_nimble_options = '_not_cached_yet_';
+
         public $img_smartload_enabled = 'not_cached';
+
         public $has_local_header_footer = '_not_cached_yet_';//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
         public $has_global_header_footer = '_not_cached_yet_';//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
+
+        public $recaptcha_enabled = '_not_cached_yet_';//enabled in the global options
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>

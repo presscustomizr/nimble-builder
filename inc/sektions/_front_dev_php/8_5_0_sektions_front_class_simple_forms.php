@@ -11,12 +11,17 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     function _setup_simple_forms() {
         //Hooks
         add_action( 'parse_request', array( $this, 'simple_form_parse_request' ), 20 );
+        add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_recaptcha_scripts' ), 0 );
         // Note : form input need to be prefixed to avoid a collision with reserved WordPress input
         // @see : https://stackoverflow.com/questions/15685020/wordpress-form-submission-and-the-404-error-page#16636051
         $this->form_composition = array(
             'nimble_simple_cf'              => array(
                 'type'            => 'hidden',
                 'value'           => 'nimble_simple_cf'
+            ),
+            'nimble_recaptcha_resp'   => array(
+                'type'            => 'hidden',
+                'value'           => ''
             ),
             'nimble_skope_id'     => array(
                 'type'            => 'hidden',
@@ -27,24 +32,24 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 'value'           => ''
             ),
             'nimble_name' => array(
-                'label'            => __( 'Name', 'text_domain_to_be_replaced' ),
+                'label'            => __( 'Name', 'text_doma' ),
                 'required'         => true,
                 'type'             => 'text',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_email' => array(
-                'label'            => __( 'Email', 'text_domain_to_be_replaced' ),
+                'label'            => __( 'Email', 'text_doma' ),
                 'required'         => true,
                 'type'             => 'email',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_subject' => array(
-                'label'            => __( 'Subject', 'text_domain_to_be_replaced' ),
+                'label'            => __( 'Subject', 'text_doma' ),
                 'type'             => 'text',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_message' => array(
-                'label'            => __( 'Message', 'text_domain_to_be_replaced' ),
+                'label'            => __( 'Message', 'text_doma' ),
                 'required'         => true,
                 'additional_attrs' => array( 'rows' => "10", 'cols' => "50" ),
                 'type'             => 'textarea',
@@ -52,7 +57,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             ),
             'nimble_submit' => array(
                 'type'             => 'submit',
-                'value'            => __( 'Submit', 'text_domain_to_be_replaced' ),
+                'value'            => __( 'Submit', 'text_doma' ),
                 'additional_attrs' => array( 'class' => 'sek-btn' ),
                 'wrapper_tag'      => 'div',
                 'wrapper_class'    => array( 'sek-form-field', 'sek-form-btn-wrapper' )
@@ -63,50 +68,111 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
 
     //@hook: parse_request
     function simple_form_parse_request() {
-        if ( isset( $_POST['nimble_simple_cf'] ) ) {
-            // get the module options
-            // we are before 'wp', so let's use the posted skope_id and level_id to get our $module_user_values
-            $module_model = array();
-            if ( isset( $_POST['nimble_skope_id'] ) && '_skope_not_set_' !== $_POST['nimble_skope_id'] ) {
-                $local_sektions = sek_get_skoped_seks( $_POST['nimble_skope_id'] );
-                if ( is_array( $local_sektions ) && !empty( $local_sektions ) ) {
-                $sektion_collection = array_key_exists('collection', $local_sektions) ? $local_sektions['collection'] : array();
-                }
-                if ( is_array($sektion_collection) && ! empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
-                    $module_model = sek_get_level_model($_POST['nimble_level_id'], $sektion_collection );
-                    $module_model = sek_normalize_module_value_with_defaults( $module_model );
-                }
-            } else {
-                sek_error_log( __FUNCTION__ . ' => skope_id problem');
-                return;
+        if ( ! isset( $_POST['nimble_simple_cf'] ) )
+          return;
+
+        // get the module options
+        // we are before 'wp', so let's use the posted skope_id and level_id to get our $module_user_values
+        $module_model = array();
+        if ( isset( $_POST['nimble_skope_id'] ) && '_skope_not_set_' !== $_POST['nimble_skope_id'] ) {
+            $local_sektions = sek_get_skoped_seks( $_POST['nimble_skope_id'] );
+            if ( is_array( $local_sektions ) && !empty( $local_sektions ) ) {
+            $sektion_collection = array_key_exists('collection', $local_sektions) ? $local_sektions['collection'] : array();
             }
-
-            if ( empty( $module_model ) ) {
-                sek_error_log( __FUNCTION__ . ' => invalid module model');
-                return;
+            if ( is_array($sektion_collection) && ! empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
+                $module_model = sek_get_level_model($_POST['nimble_level_id'], $sektion_collection );
+                $module_model = sek_normalize_module_value_with_defaults( $module_model );
             }
-
-            //update the form with the posted values
-            foreach ( $this->form_composition as $name => $field ) {
-                $form_composition[ $name ]                = $field;
-                if ( isset( $_POST[ $name ] ) ) {
-                    $form_composition[ $name ][ 'value' ] = $_POST[ $name ];
-                }
-            }
-            //set the form composition according to the user's options
-            $form_composition = $this->_set_form_composition( $form_composition, $module_model );
-            //generate fields
-            $this->fields = $this->simple_form_generate_fields( $form_composition );
-            //generate form
-            $this->form   = $this->simple_form_generate_form( $this->fields );
-
-            //mailer
-            $this->mailer = new Sek_Mailer( $this-> form );
-
-            $this->mailer->maybe_send( $form_composition, $module_model );
+        } else {
+            sek_error_log( __FUNCTION__ . ' => skope_id problem');
+            return;
         }
+
+        if ( empty( $module_model ) ) {
+            sek_error_log( __FUNCTION__ . ' => invalid module model');
+            return;
+        }
+
+        //update the form with the posted values
+        foreach ( $this->form_composition as $name => $field ) {
+            $form_composition[ $name ]                = $field;
+            if ( isset( $_POST[ $name ] ) ) {
+                $form_composition[ $name ][ 'value' ] = $_POST[ $name ];
+            }
+        }
+        //set the form composition according to the user's options
+        $form_composition = $this->_set_form_composition( $form_composition, $module_model );
+        //generate fields
+        $this->fields = $this->simple_form_generate_fields( $form_composition );
+        //generate form
+        $this->form   = $this->simple_form_generate_form( $this->fields );
+
+        //mailer
+        $this->mailer = new Sek_Mailer( $this->form );
+        $this->mailer->maybe_send( $form_composition, $module_model );
     }
 
+    // Fired @hook wp_enqueue_scripts
+    // @return void()
+    function maybe_enqueue_recaptcha_scripts() {
+        // enabled if
+        // - not customizing
+        // - global 'recaptcha' options has the following values
+        //    - enabled === true
+        //    - public_key entered
+        //    - private_key entered
+        if ( !sek_is_recaptcha_enabled() )
+          return;
+        // does the current page include a form in a local or global location ?
+        if ( !sek_front_sections_include_a_form() )
+          return;
+
+        $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
+        $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
+
+        $url = add_query_arg(
+            array( 'render' => esc_attr( $global_recaptcha_opts['public_key'] ) ),
+            'https://www.google.com/recaptcha/api.js'
+        );
+
+        wp_enqueue_script( 'google-recaptcha', $url, array(), '3.0', true );
+        add_action('wp_footer', array( $this, 'print_recaptcha_inline_js'), 100 );
+    }
+
+    // @hook wp_footer
+    // printed only when sek_is_recaptcha_enabled()
+    // AND
+    // sek_front_sections_include_a_form()
+    function print_recaptcha_inline_js() {
+        ?>
+            <script type="text/javascript" id="nimble-inline-recaptcha">
+              !( function( grecaptcha, sitekey ) {
+                  var recaptcha = {
+                      execute: function() {
+                          grecaptcha.execute(
+                              sitekey,
+                              // see https://developers.google.com/recaptcha/docs/v3#actions
+                              { action: ( window.sekFrontLocalized && sekFrontLocalized.skope_id ) ? sekFrontLocalized.skope_id.replace( 'skp__' , 'nimble_form__' ) : 'nimble_builder_form' }
+                          ).then( function( token ) {
+                              var forms = document.getElementsByTagName( 'form' );
+                              for ( var i = 0; i < forms.length; i++ ) {
+                                  var fields = forms[ i ].getElementsByTagName( 'input' );
+                                  for ( var j = 0; j < fields.length; j++ ) {
+                                      var field = fields[ j ];
+                                      if ( 'nimble_recaptcha_resp' === field.getAttribute( 'name' ) ) {
+                                          field.setAttribute( 'value', token );
+                                          break;
+                                      }
+                                  }
+                              }
+                          } );
+                      }
+                  };
+                  grecaptcha.ready( recaptcha.execute );
+              })( grecaptcha, sekFrontLocalized.recaptcha_public_key );
+            </script>
+        <?php
+    }
 
 
     //Rendering
@@ -229,6 +295,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 case 'nimble_level_id':
                     $user_form_composition[$field_id] = $field_data;
                     $user_form_composition[$field_id]['value'] = $module_model['id'];
+                break;
+                case 'nimble_recaptcha_resp' :
+                    if ( sek_is_recaptcha_enabled() ) {
+                        $user_form_composition[$field_id] = $field_data;
+                    }
                 break;
                 default:
                     $user_form_composition[$field_id] = $field_data;
@@ -419,7 +490,7 @@ class Sek_Field {
         if ( $label ) {
             if ( true == $this->input->get_data( 'required' ) ) {
                 $label .= ' *';
-                //$label .= ' ' . esc_html__( '(required)', 'text_domain_to_be_replaced' );
+                //$label .= ' ' . esc_html__( '(required)', 'text_doma' );
             }
             $label = sprintf( '%1$s<label for="%2$s">%3$s</label>%4$s',
                 $this->data[ 'before_label' ],
@@ -705,7 +776,7 @@ class Sek_Input_Submit extends Sek_Input_Basic {
 
         $args[ 'type' ]   = 'submit';
         $args             = wp_parse_args($args, [
-            'value' => esc_html__( 'Contact', 'text_domain_to_be_replaced' ),
+            'value' => esc_html__( 'Contact', 'text_doma' ),
         ]);
 
         parent::__construct( $args );
@@ -779,23 +850,75 @@ class Sek_Mailer {
     private $status;
     private $messages;
     private $invalid_field = false;
+    private $recaptcha_data;//will store array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
 
     public function __construct( Sek_Form $form ) {
         $this-> form = $form;
 
         $this->messages = array(
             //status          => message
-            'not_sent'        => __( 'Message was not sent. Try Again.', 'text_domain_to_be_replaced'),
-            'sent'            => __( 'Thanks! Your message has been sent.', 'text_domain_to_be_replaced'),
-            'aborted'         => __( 'Please supply correct information.', 'text_domain_to_be_replaced'), //<-todo too much generic
+            'not_sent'        => __( 'Message was not sent. Try Again.', 'text_doma'),
+            'sent'            => __( 'Thanks! Your message has been sent.', 'text_doma'),
+            'aborted'         => __( 'Please supply correct information.', 'text_doma'), //<-todo too much generic
+            'recaptcha_fail'  => __( 'Google ReCaptcha validation failed', 'text_doma')
         );
-
         $this->status = 'init';
+
+        // Validate reCAPTCHA if submitted
+        // When sek_is_recaptcha_enabled(), the hidden input 'nimble_recaptcha_resp' is rendered with a value set to a token remotely fetched with a js script
+        // @see print_recaptcha_inline_js
+        // on submission, we get the posted token value, and validate it with a remote http request to the google api
+        if ( isset( $_POST['nimble_recaptcha_resp'] ) ) {
+            if ( ! $this->validate_recaptcha( $_POST['nimble_recaptcha_resp'] ) ) {
+                $this->status = 'recaptcha_fail';
+                if ( sek_is_dev_mode() ) {
+                    sek_error_log('reCAPTCHA failure', $this->recaptcha_data );
+                }
+            }
+        }
     }
 
+    //@return bool
+    private function validate_recaptcha( $recaptcha_token ) {
+        $is_valid = false;
+        $endpoint = 'https://www.google.com/recaptcha/api/siteverify';
+        $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
+        $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
+        // the user did not enter the key yet.
+        // let's validate
+        if ( empty($global_recaptcha_opts['private_key']) )
+          return true;
 
+        //$public = $global_recaptcha_opts['public_key'];
+        $request = array(
+            'body' => array(
+                'secret' => $global_recaptcha_opts['private_key'],
+                'response' => $recaptcha_token
+            ),
+        );
+
+        // cache the recaptcha_data
+        $this->recaptcha_data = array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
+        $this->recaptcha_data['response'] = $response = wp_remote_post( esc_url_raw( $endpoint ), $request );
+        if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
+            return $is_valid;
+        }
+        $response_body = wp_remote_retrieve_body( $response );
+        $response_body = json_decode( $response_body, true );
+
+        // see https://developers.google.com/recaptcha/docs/v3#score
+        $score = isset( $response_body['score'] ) ? $response_body['score'] : 0;
+        $threshold = apply_filters( 'nimble_recaptcha_human_treshold', 0.5 );
+        $is_valid = $is_human = $threshold < $score;
+        return $is_valid;
+    }
 
     public function maybe_send( $form_composition, $module_model ) {
+        // the captcha validation has been made on Sek_Mailer instantiation
+        if ( 'recaptcha_fail' === $this->status ) {
+            return;
+        }
+
         //sek_error_log('$form_composition', $form_composition );
         //sek_error_log('$module_model', $module_model );
         $invalid_field = $this->form->has_invalid_field();
@@ -824,26 +947,26 @@ class Sek_Mailer {
         if ( array_key_exists( 'nimble_subject' , $form_composition ) ) {
             $subject = $this->form->get_field('nimble_subject')->get_input()->get_value();
         } else {
-            $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_domain_to_be_replaced' ), get_bloginfo( 'name' ) );
+            $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_doma' ), get_bloginfo( 'name' ) );
         }
 
 
 
-        // $sender_website = sprintf( __( 'Website: %1$s %2$s', 'text_domain_to_be_replaced' ),
+        // $sender_website = sprintf( __( 'Website: %1$s %2$s', 'text_doma' ),
         //     $this->form->get_field('website')->get_input()->get_value(),
         //     $allow_html ? '<br><br><br>': "\r\n\r\n\r\n"
         // );
 
         // the sender's email is written in the email's header reply-to field.
         // But it is also written inside the message body following this issue, https://github.com/presscustomizr/nimble-builder/issues/218
-        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'text_domain_to_be_replaced'), $sender_name, $sender_email );//$sender_website;
-        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'text_domain_to_be_replaced'), $subject );
+        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'text_doma'), $sender_name, $sender_email );//$sender_website;
+        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'text_doma'), $subject );
         $after_message  = '';
 
         if ( array_key_exists( 'email_footer', $submission_options ) ) {
             $email_footer = $submission_options['email_footer'];
         } else {
-            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_domain_to_be_replaced' ),
+            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
                 get_bloginfo( 'name' ),
                 get_site_url( 'url' )
             );
@@ -852,7 +975,7 @@ class Sek_Mailer {
         $body           = sprintf( '%1$s%2$s%3$s%4$s%5$s',
                             $before_message,
                             sprintf( '<br><br>%1$s: <br>%2$s',
-                                __('Message body', 'text_domain_to_be_replaced'),
+                                __('Message body', 'text_doma'),
                                 //$allow_html ? '<br><br>': "\r\n\r\n",
                                 $this->form->get_field('nimble_message')->get_input()->get_value()
                             ),
@@ -949,23 +1072,23 @@ endif;
 function simple_form_mail_template() {
     $template = array(
         'subject' =>
-            sprintf( __( '%1$s: new contact request', 'text_domain_to_be_replaced' ),
+            sprintf( __( '%1$s: new contact request', 'text_doma' ),
                 get_bloginfo( 'name' )
             ),
         'sender' => sprintf( '[your-name] <%s>', simple_form_from_email() ),
         'body' =>
             /* translators: %s: [your-name] <[your-email]> */
-            sprintf( __( 'From: %s', 'text_domain_to_be_replaced' ),
+            sprintf( __( 'From: %s', 'text_doma' ),
                 '[your-name] <[your-email]>' ) . "\n"
             /* translators: %s: [your-subject] */
-            . sprintf( __( 'Subject: %s', 'text_domain_to_be_replaced' ),
+            . sprintf( __( 'Subject: %s', 'text_doma' ),
                 '[your-subject]' ) . "\n\n"
-            . __( 'Message Body:', 'text_domain_to_be_replaced' )
+            . __( 'Message Body:', 'text_doma' )
                 . "\n" . '[your-message]' . "\n\n"
             . '-- ' . "\n"
             /* translators: 1: blog name, 2: blog URL */
             . sprintf(
-                __( 'This e-mail was sent from a contact form on %1$s (%2$s)', 'text_domain_to_be_replaced' ),
+                __( 'This e-mail was sent from a contact form on %1$s (%2$s)', 'text_doma' ),
                 get_bloginfo( 'name' ),
                 get_bloginfo( 'url' ) ),
         'recipient' => get_option( 'admin_email' ),

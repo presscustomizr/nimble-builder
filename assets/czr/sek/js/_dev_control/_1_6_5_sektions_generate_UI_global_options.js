@@ -57,6 +57,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
                               icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
                         },
+                        recaptcha : {
+                              settingControlId : _id_ + '__recaptcha',
+                              module_type : 'sek_global_recaptcha',
+                              controlLabel : sektionsLocalizedData.i18n['Protect your contact forms with Google reCAPTCHA'],
+                              icon : '<i class="material-icons">security</i>'
+                        },
                         beta_features : {
                               settingControlId : _id_ + '__beta_features',
                               module_type : 'sek_global_beta_features',
