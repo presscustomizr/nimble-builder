@@ -51,15 +51,15 @@ function nimble_pass_requirements(){
 }
 
 function nimble_display_min_php_message() {
-    nimble_display_min_requirement_notice( __( 'PHP', 'text_domain_to_be_replaced' ), NIMBLE_MIN_PHP_VERSION );
+    nimble_display_min_requirement_notice( __( 'PHP', 'text_doma' ), NIMBLE_MIN_PHP_VERSION );
 }
 function nimble_display_min_wp_message() {
-    nimble_display_min_requirement_notice( __( 'WordPress', 'text_domain_to_be_replaced' ), NIMBLE_MIN_WP_VERSION );
+    nimble_display_min_requirement_notice( __( 'WordPress', 'text_doma' ), NIMBLE_MIN_WP_VERSION );
 }
 function nimble_display_min_requirement_notice( $requires_what, $requires_what_version ) {
     printf( '<div class="error"><p>%1$s</p></div>',
-        sprintf( __( 'The <strong>%1$s</strong> plugin requires at least %2$s version %3$s.', 'text_domain_to_be_replaced' ),
-            __('Nimble Builder', 'text_domain_to_be_replaced'),
+        sprintf( __( 'The <strong>%1$s</strong> plugin requires at least %2$s version %3$s.', 'text_doma' ),
+            __('Nimble Builder', 'text_doma'),
             $requires_what,
             $requires_what_version
         )
