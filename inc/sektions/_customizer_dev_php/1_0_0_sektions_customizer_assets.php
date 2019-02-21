@@ -401,7 +401,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Background settings for the' => __('Background settings for the', 'text_doma'),
             'Borders settings for the' => __('Borders settings for the', 'text_doma'),
             'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_doma'),
-            'Height settings for the' => __('Height settings for the', 'text_doma'),
+            'Height and vertical alignment for the' => __('Height and vertical alignment for the', 'text_doma'),
             'Width settings for the' => __('Width settings for the', 'text_doma'),
             'Set a custom anchor for the' => __('Set a custom anchor for the', 'text_doma'),
             'Device visibility settings for the' => __('Device visibility settings for the', 'text_doma'),

@@ -61,7 +61,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         height : {
                               settingControlId : params.id + '__height_options',
                               module_type : 'sek_level_height_module',
-                              controlLabel : sektionsLocalizedData.i18n['Height settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              controlLabel : sektionsLocalizedData.i18n['Height and vertical alignment for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                               icon : '<i class="fas fa-ruler-vertical sek-level-option-icon"></i>'
                         },
                   });
