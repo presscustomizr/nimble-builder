@@ -209,7 +209,7 @@
 // https://stackoverflow.com/questions/15789026/smoothing-the-parallax-scrolling-of-a-background-image
 // ensure that Nimble sets its own transition rules, prevents any bg rules from third party theme or plugin to be applied
 [data-sek-level="location"] [data-sek-level] {
-  webkit-transition: 0s linear;
+  -webkit-transition: 0s linear;
   -o-transition: 0s linear;
   transition: 0s linear;
   -webkit-transition-property: background-position;
