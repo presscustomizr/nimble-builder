@@ -489,7 +489,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
 // Example of a *_flag_important input:
 // 'quote___flag_important'       => array(
 //     'input_type'  => 'gutencheck',
-//     'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+//     'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
 //     'default'     => 0,
 //     'refresh_markup' => false,
 //     'refresh_stylesheet' => true,

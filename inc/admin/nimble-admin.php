@@ -373,34 +373,34 @@ function sek_may_be_display_update_notice() {
 			<div class="updated czr-update-notice" style="position:relative;">
 				<?php
 					printf('<h3>%1$s %2$s %3$s %4$s :D</h3>',
-							__( "Thanks, you successfully upgraded", 'text_domain_to_be_replaced'),
+							__( "Thanks, you successfully upgraded", 'text_doma'),
 							'Nimble Builder',
-							__( "to version", 'text_domain_to_be_replaced'),
+							__( "to version", 'text_doma'),
 							NIMBLE_VERSION
 					);
 				?>
 				<?php
 					printf( '<h4>%1$s <a class="" href="%2$s" title="%3$s" target="_blank">%3$s &raquo;</a></h4>',
-							'',//__( "Let us introduce the new features we've been working on.", 'text_domain_to_be_replaced'),
+							'',//__( "Let us introduce the new features we've been working on.", 'text_doma'),
 							"https://presscustomizr.com/release-note-for-the-nimble-builder-version-1-4-2/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-update-notice",
-							__( "Read the detailled release notes" , 'text_domain_to_be_replaced' )
+							__( "Read the detailled release notes" , 'text_doma' )
 							// ! NIMBLE_IS_PRO ? sprintf( '<p style="position: absolute;right: 7px;top: 4px;"><a class="button button-primary upgrade-to-pro" href="%1$s" title="%2$s" target="_blank">%2$s &raquo;</a></p>',
 							//   esc_url('presscustomizr.com/hueman-pro?ref=a'),
-							//   __( "Upgrade to Hueman Pro", 'text_domain_to_be_replaced' )
+							//   __( "Upgrade to Hueman Pro", 'text_doma' )
 							// ) : ''
 					);
 				?>
 				<p style="text-align:right;position: absolute;font-size: 1.1em;<?php echo is_rtl()? 'left' : 'right';?>: 7px;bottom: -6px;">
 				<?php printf('<a href="#" title="%1$s" class="nimble-dismiss-update-notice"> ( %1$s <strong>X</strong> ) </a>',
-						__('close' , 'text_domain_to_be_replaced')
+						__('close' , 'text_doma')
 					);
 				?>
 				</p>
 				<!-- <p>
 					<?php
 					// printf(
-					//   __( 'If you like %1$s please leave us a %2$s rating. A huge thanks in advance!', 'text_domain_to_be_replaced' ),
-					//   sprintf( '<strong>%s</strong>', esc_html__( 'the Nimble Builder', 'text_domain_to_be_replaced' ) ),
+					//   __( 'If you like %1$s please leave us a %2$s rating. A huge thanks in advance!', 'text_doma' ),
+					//   sprintf( '<strong>%s</strong>', esc_html__( 'the Nimble Builder', 'text_doma' ) ),
 					//   sprintf( '<a href="%1$s" target="_blank" class="czr-rating-link">&#9733;&#9733;&#9733;&#9733;&#9733;</a>', esc_url( 'wordpress.org/support/plugin/nimble-builder/reviews/?filter=5#new-post') )
 					// );
 					?>

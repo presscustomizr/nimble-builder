@@ -12,7 +12,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
             'main_settings'   => 'czr_tinymce_child',
             'font_settings' => 'czr_font_child'
         ),
-        'name' => __('Text Editor', 'text_domain_to_be_replaced'),
+        'name' => __('Text Editor', 'text_doma'),
         'starting_value' => array(
             'main_settings' => array(
                 'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
@@ -43,19 +43,19 @@ function sek_get_module_params_for_czr_tinymce_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_tinymce_child',
-        'name' => __('Content', 'text_domain_to_be_replaced'),
+        'name' => __('Content', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'content' => array(
                     'input_type'  => 'tiny_mce_editor',
-                    'title'       => __('Content', 'text_domain_to_be_replaced'),
+                    'title'       => __('Content', 'text_doma'),
                     'default'     => ''
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Alignment', 'text_doma'),
                     'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -65,7 +65,7 @@ function sek_get_module_params_for_czr_tinymce_child() {
                 ),
                 'autop' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Automatically convert text into paragraph', 'text_domain_to_be_replaced'),
+                    'title'       => __('Automatically convert text into paragraph', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',

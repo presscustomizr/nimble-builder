@@ -4,20 +4,20 @@ function sek_get_module_params_for_sek_level_width_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_width_module',
-        'name' => __('Width options', 'text_domain_to_be_replaced'),
+        'name' => __('Width options', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'width-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Width : 100% or custom', 'text_domain_to_be_replaced'),
+                    'title'       => __('Width : 100% or custom', 'text_doma'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'width-type' )
                 ),
                 'custom-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Custom width', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom width', 'text_doma'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '100%' ),
@@ -26,7 +26,7 @@ function sek_get_module_params_for_sek_level_width_module() {
                 ),
                 'h_alignment' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Horizontal alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Horizontal alignment', 'text_doma'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,

@@ -6,10 +6,10 @@ function sek_get_module_params_for_czr_font_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_font_child',
-        'name' => __( 'Text settings : font, color, size, ...', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Text settings : font, color, size, ...', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_domain_to_be_replaced'),
+        //     'button_text' => __('Click me','text_doma'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -24,7 +24,7 @@ function sek_get_module_params_for_czr_font_child() {
             'item-inputs' => array(
                 'font_family_css' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __('Font family', 'text_domain_to_be_replaced'),
+                    'title'       => __('Font family', 'text_doma'),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -33,7 +33,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),
                 'font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font size', 'text_doma' ),
                     // the default value is commented to fix https://github.com/presscustomizr/nimble-builder/issues/313
                     // => as a consequence, when a module uses the font child module, the default font-size rule must be defined in the module SCSS file.
                     //'default'     => array( 'desktop' => '16px' ),
@@ -47,7 +47,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//16,//"14px",
                 'line_height_css'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Line height', 'text_doma' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -59,7 +59,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//24,//"20px",
                 'color_css'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Text color', 'text_domain_to_be_replaced'),
+                    'title'       => __('Text color', 'text_doma'),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -68,7 +68,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//"#000000",
                 'color_hover_css'     => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced'),
+                    'title'       => __('Text color on mouse over', 'text_doma'),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -78,7 +78,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//"#000000",
                 'font_weight_css'     => array(
                     'input_type'  => 'select',
-                    'title'       => __('Font weight', 'text_domain_to_be_replaced'),
+                    'title'       => __('Font weight', 'text_doma'),
                     'default'     => 400,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -87,7 +87,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//null,
                 'font_style_css'      => array(
                     'input_type'  => 'select',
-                    'title'       => __('Font style', 'text_domain_to_be_replaced'),
+                    'title'       => __('Font style', 'text_doma'),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -96,7 +96,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//null,
                 'text_decoration_css' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Text decoration', 'text_domain_to_be_replaced'),
+                    'title'       => __('Text decoration', 'text_doma'),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -105,7 +105,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//null,
                 'text_transform_css'  => array(
                     'input_type'  => 'select',
-                    'title'       => __('Text transform', 'text_domain_to_be_replaced'),
+                    'title'       => __('Text transform', 'text_doma'),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -115,7 +115,7 @@ function sek_get_module_params_for_czr_font_child() {
 
                 'letter_spacing_css'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Letter spacing', 'text_doma' ),
                     'default'     => 0,
                     'min'         => 0,
                     'step'        => 1,
@@ -127,7 +127,7 @@ function sek_get_module_params_for_czr_font_child() {
                 // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                 'fonts___flag_important'  => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Apply the style options in priority (uses !important).', 'text_domain_to_be_replaced'),
+                    'title'       => __('Apply the style options in priority (uses !important).', 'text_doma'),
                     'default'     => 0,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,

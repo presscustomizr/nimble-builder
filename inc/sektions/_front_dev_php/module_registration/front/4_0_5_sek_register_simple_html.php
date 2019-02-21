@@ -30,13 +30,13 @@ function sek_get_module_params_for_czr_simple_html_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_html_module',
-        'name' => __( 'Html Content', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Html Content', 'text_doma' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_html_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'html_content' => array(
                     'input_type'  => 'code_editor',
-                    'title'       => __( 'HTML Content' , 'text_domain_to_be_replaced' )
+                    'title'       => __( 'HTML Content' , 'text_doma' )
                     //'code_type' => 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
                 )
             )

@@ -81,7 +81,7 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     }
                 }
             }
-            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
+            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
             return $setting_data;
         }
 
@@ -104,7 +104,7 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     }
                 }
             }
-            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_domain_to_be_replaced' ), $setting_data );
+            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
             if ( true !== $validated ) {
                 if ( is_wp_error( $validated ) ) {
                     $validation_msg = $validation_msg->get_error_message();

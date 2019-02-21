@@ -4,9 +4,9 @@ function sek_get_module_params_for_sek_local_custom_css() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_custom_css',
-        'name' => __('Custom CSS for the sections of the current page', 'text_domain_to_be_replaced'),
+        'name' => __('Custom CSS for the sections of the current page', 'text_doma'),
         // 'starting_value' => array(
-        //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) )
+        //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -14,10 +14,10 @@ function sek_get_module_params_for_sek_local_custom_css() {
             'item-inputs' => array(
                 'local_custom_css' => array(
                     'input_type'  => 'code_editor',
-                    'title'       => __( 'Custom css' , 'text_domain_to_be_replaced' ),
-                    'default'     => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) ),
+                    'title'       => __( 'Custom css' , 'text_doma' ),
+                    'default'     => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) ),
                     'code_type' => 'text/css',// 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
-                    'notice_before_title' => __('The CSS code added below will only be applied to the currently previewed page, not site wide.', 'text_domain_to_be_replaced'),
+                    'notice_before_title' => __('The CSS code added below will only be applied to the currently previewed page, not site wide.', 'text_doma'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                 )

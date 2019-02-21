@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_performances() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_performances',
-        'name' => __('Site wide performance options', 'text_domain_to_be_replaced'),
+        'name' => __('Site wide performance options', 'text_doma'),
         // 'starting_value' => array(
 
         // ),
@@ -14,7 +14,7 @@ function sek_get_module_params_for_sek_global_performances() {
             'item-inputs' => array(
                 'global-img-smart-load' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Load images on scroll', 'text_domain_to_be_replaced'),
+                    'title'       => __('Load images on scroll', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',

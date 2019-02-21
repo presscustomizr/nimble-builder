@@ -5,8 +5,8 @@
 // SAVED SEKTIONS POST TYPE
 register_post_type( 'nimble_saved_seks' , array(
     'labels' => array(
-      'name'          => __( 'Nimble saved sections', 'text_domain_to_be_replaced' ),
-      'singular_name' => __( 'Nimble saved sections', 'text_domain_to_be_replaced' ),
+      'name'          => __( 'Nimble saved sections', 'text_doma' ),
+      'singular_name' => __( 'Nimble saved sections', 'text_doma' ),
     ),
     'public'           => false,
     'hierarchical'     => false,

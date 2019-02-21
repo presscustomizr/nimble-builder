@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_breakpoint() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_breakpoint',
-        'name' => __('Site wide breakpoint options', 'text_domain_to_be_replaced'),
+        'name' => __('Site wide breakpoint options', 'text_doma'),
         // 'starting_value' => array(
 
         // ),
@@ -14,15 +14,15 @@ function sek_get_module_params_for_sek_global_breakpoint() {
             'item-inputs' => array(
                 'use-custom-breakpoint' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Use a global custom breakpoint for the vertical reorganization of columns', 'text_domain_to_be_replaced'),
+                    'title'       => __('Use a global custom breakpoint for the vertical reorganization of columns', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_before_title' => __( 'This is the breakpoint under which columns are reorganized vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_domain_to_be_replaced')
+                    'notice_before_title' => __( 'This is the breakpoint under which columns are reorganized vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_doma')
                 ),
                 'global-custom-breakpoint'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Define a custom breakpoint in pixels', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Define a custom breakpoint in pixels', 'text_doma' ),
                     'default'     => 768,
                     'min'         => 1,
                     'max'         => 2000,

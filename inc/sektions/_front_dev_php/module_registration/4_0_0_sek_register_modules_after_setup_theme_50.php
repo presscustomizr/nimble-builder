@@ -42,6 +42,7 @@ function sek_register_modules() {
         //'sek_global_reset',
         'sek_global_performances',
         'sek_global_header_footer',
+        'sek_global_recaptcha',
         'sek_global_beta_features',
 
         // FRONT MODULES
@@ -140,15 +141,15 @@ function sek_get_select_options_for_input_id( $input_id ) {
     switch( $input_id ) {
         case 'img_hover_effect' :
             $options = array(
-                'none' => __('No effect', 'text_domain_to_be_replaced' ),
-                'opacity' => __('Opacity', 'text_domain_to_be_replaced' ),
-                'zoom-out' => __('Zoom out', 'text_domain_to_be_replaced' ),
-                'zoom-in' => __('Zoom in', 'text_domain_to_be_replaced' ),
-                'move-up' =>__('Move up', 'text_domain_to_be_replaced' ),
-                'move-down' =>__('Move down', 'text_domain_to_be_replaced' ),
-                'blur' =>__('Blur', 'text_domain_to_be_replaced' ),
-                'grayscale' =>__('Grayscale', 'text_domain_to_be_replaced' ),
-                'reverse-grayscale' =>__('Reverse grayscale', 'text_domain_to_be_replaced' )
+                'none' => __('No effect', 'text_doma' ),
+                'opacity' => __('Opacity', 'text_doma' ),
+                'zoom-out' => __('Zoom out', 'text_doma' ),
+                'zoom-in' => __('Zoom in', 'text_doma' ),
+                'move-up' =>__('Move up', 'text_doma' ),
+                'move-down' =>__('Move down', 'text_doma' ),
+                'blur' =>__('Blur', 'text_doma' ),
+                'grayscale' =>__('Grayscale', 'text_doma' ),
+                'reverse-grayscale' =>__('Reverse grayscale', 'text_doma' )
             );
         break;
         case 'img-size' :
@@ -158,24 +159,24 @@ function sek_get_select_options_for_input_id( $input_id ) {
         // ALL MODULES
         case 'link-to' :
             $options = array(
-                'no-link' => __('No link', 'text_domain_to_be_replaced' ),
-                'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
+                'no-link' => __('No link', 'text_doma' ),
+                'url' => __('Site content or custom url', 'text_doma' ),
             );
         break;
 
         // FEATURED PAGE MODULE
         case 'img-type' :
             $options = array(
-                'none' => __( 'No image', 'text_domain_to_be_replaced' ),
-                'featured' => __( 'Use the page featured image', 'text_domain_to_be_replaced' ),
-                'custom' => __( 'Use a custom image', 'text_domain_to_be_replaced' ),
+                'none' => __( 'No image', 'text_doma' ),
+                'featured' => __( 'Use the page featured image', 'text_doma' ),
+                'custom' => __( 'Use a custom image', 'text_doma' ),
             );
         break;
         case 'content-type' :
             $options = array(
-                'none' => __( 'No text', 'text_domain_to_be_replaced' ),
-                'page-excerpt' => __( 'Use the page excerpt', 'text_domain_to_be_replaced' ),
-                'custom' => __( 'Use a custom text', 'text_domain_to_be_replaced' ),
+                'none' => __( 'No text', 'text_doma' ),
+                'page-excerpt' => __( 'Use the page excerpt', 'text_doma' ),
+                'custom' => __( 'Use a custom text', 'text_doma' ),
             );
         break;
 
@@ -183,22 +184,22 @@ function sek_get_select_options_for_input_id( $input_id ) {
         case 'heading_tag':
             $options = array(
                 /* Not totally sure these should be localized as they strictly refer to html tags */
-                'h1' => __('H1', 'text_domain_to_be_replaced' ),
-                'h2' => __('H2', 'text_domain_to_be_replaced' ),
-                'h3' => __('H3', 'text_domain_to_be_replaced' ),
-                'h4' => __('H4', 'text_domain_to_be_replaced' ),
-                'h5' => __('H5', 'text_domain_to_be_replaced' ),
-                'h6' => __('H6', 'text_domain_to_be_replaced' ),
+                'h1' => __('H1', 'text_doma' ),
+                'h2' => __('H2', 'text_doma' ),
+                'h3' => __('H3', 'text_doma' ),
+                'h4' => __('H4', 'text_doma' ),
+                'h5' => __('H5', 'text_doma' ),
+                'h6' => __('H6', 'text_doma' ),
             );
         break;
 
         // CSS MODIFIERS INPUT ID
         case 'font_weight_css' :
             $options = array(
-                'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
-                'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
-                'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
-                'lighter'   => __( 'lighter', 'text_domain_to_be_replaced' ),
+                'normal'  => __( 'normal', 'text_doma' ),
+                'bold'    => __( 'bold', 'text_doma' ),
+                'bolder'  => __( 'bolder', 'text_doma' ),
+                'lighter'   => __( 'lighter', 'text_doma' ),
                 100     => 100,
                 200     => 200,
                 300     => 300,
@@ -212,88 +213,88 @@ function sek_get_select_options_for_input_id( $input_id ) {
         break;
         case 'font_style_css' :
             $options = array(
-                'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
-                'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
-                'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
+                'inherit'   => __( 'inherit', 'text_doma' ),
+                'italic'  => __( 'italic', 'text_doma' ),
+                'normal'  => __( 'normal', 'text_doma' ),
+                'oblique' => __( 'oblique', 'text_doma' )
             );
         break;
         case 'text_decoration_css'  :
             $options = array(
-                'none'      => __( 'none', 'text_domain_to_be_replaced' ),
-                'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
-                'overline'    => __( 'overline', 'text_domain_to_be_replaced' ),
-                'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
+                'none'      => __( 'none', 'text_doma' ),
+                'inherit'   => __( 'inherit', 'text_doma' ),
+                'line-through' => __( 'line-through', 'text_doma' ),
+                'overline'    => __( 'overline', 'text_doma' ),
+                'underline'   => __( 'underline', 'text_doma' )
             );
         break;
         case 'text_transform_css' :
             $options = array(
-                'none'      => __( 'none', 'text_domain_to_be_replaced' ),
-                'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
-                'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
-                'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
+                'none'      => __( 'none', 'text_doma' ),
+                'inherit'   => __( 'inherit', 'text_doma' ),
+                'capitalize'  => __( 'capitalize', 'text_doma' ),
+                'uppercase'   => __( 'uppercase', 'text_doma' ),
+                'lowercase'   => __( 'lowercase', 'text_doma' )
             );
         break;
 
         // SPACING MODULE
         case 'css_unit' :
             $options = array(
-                'px' => __('Pixels', 'text_domain_to_be_replaced' ),
-                'em' => __('Em', 'text_domain_to_be_replaced'),
-                'percent' => __('Percents', 'text_domain_to_be_replaced' )
+                'px' => __('Pixels', 'text_doma' ),
+                'em' => __('Em', 'text_doma'),
+                'percent' => __('Percents', 'text_doma' )
             );
         break;
 
         //QUOTE MODULE
         case 'quote_design' :
             $options = array(
-                'none' => __( 'Text only', 'text_domain_to_be_replaced' ),
-                'border-before' => __( 'Side Border', 'text_domain_to_be_replaced' ),
-                'quote-icon-before' => __( 'Quote Icon', 'text_domain_to_be_replaced' ),
+                'none' => __( 'Text only', 'text_doma' ),
+                'border-before' => __( 'Side Border', 'text_doma' ),
+                'quote-icon-before' => __( 'Quote Icon', 'text_doma' ),
             );
         break;
 
         // LEVELS UI : LAYOUT BACKGROUND BORDER HEIGHT WIDTH
         case 'boxed-wide' :
             $options = array(
-                'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
-                'fullwidth' => __('Full Width', 'text_domain_to_be_replaced')
+                'boxed' => __('Boxed', 'text_doma'),
+                'fullwidth' => __('Full Width', 'text_doma')
             );
         break;
         case 'height-type' :
             $options = array(
-                'auto' => __('Adapt to content', 'text_domain_to_be_replaced'),
-                'custom' => __('Custom', 'text_domain_to_be_replaced' )
+                'auto' => __('Adapt to content', 'text_doma'),
+                'custom' => __('Custom', 'text_doma' )
             );
         break;
         case 'width-type' :
             $options = array(
-                'default' => __('Default', 'text_domain_to_be_replaced'),
-                'custom' => __('Custom', 'text_domain_to_be_replaced' )
+                'default' => __('Default', 'text_doma'),
+                'custom' => __('Custom', 'text_doma' )
             );
         break;
         case 'bg-scale' :
             $options = array(
-                'default' => __('Default', 'text_domain_to_be_replaced'),
-                'auto' => __('Automatic', 'text_domain_to_be_replaced'),
-                'cover' => __('Scale to fill', 'text_domain_to_be_replaced'),
-                'contain' => __('Fit', 'text_domain_to_be_replaced'),
+                'default' => __('Default', 'text_doma'),
+                'auto' => __('Automatic', 'text_doma'),
+                'cover' => __('Scale to fill', 'text_doma'),
+                'contain' => __('Fit', 'text_doma'),
             );
         break;
         case 'bg-position' :
             $options = array(
-                'default' => __('default', 'text_domain_to_be_replaced'),
+                'default' => __('default', 'text_doma'),
             );
         break;
         case 'border-type' :
             $options = array(
-                'none' => __('none', 'text_domain_to_be_replaced'),
-                'solid' => __('solid', 'text_domain_to_be_replaced'),
-                'double' => __('double', 'text_domain_to_be_replaced'),
-                'dotted' => __('dotted', 'text_domain_to_be_replaced'),
-                'dashed' => __('dashed', 'text_domain_to_be_replaced')
+                'none' => __('none', 'text_doma'),
+                'solid' => __('solid', 'text_doma'),
+                'double' => __('double', 'text_doma'),
+                'dotted' => __('dotted', 'text_doma'),
+                'dashed' => __('dashed', 'text_doma')
             );
         break;
 

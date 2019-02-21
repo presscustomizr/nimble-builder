@@ -74,6 +74,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     true
                 );
             }
+
+            // Google reCAPTCHA
+            $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
+            $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
+
             wp_localize_script(
                 'sek-main-js',
                 'sekFrontLocalized',
@@ -83,7 +88,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
                     'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
                     'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : '',
-                    'skope_id' => skp_get_skope_id() //added for debugging purposes
+                    'skope_id' => skp_get_skope_id(), //added for debugging purposes
+                    'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : ''
                 )
             );
         }
@@ -136,25 +142,25 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 'sekPreviewLocalized',
                 array(
                     'i18n' => array(
-                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
-                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'text_domain_to_be_replaced'),
-                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
-                        'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
+                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_doma'),
+                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'text_doma'),
+                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
+                        'Insert here' => __('Insert here', 'text_doma'),
                         'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
 
-                        'Insert a new section' => __('Insert a new section', 'text_domain_to_be_replaced' ),
+                        'Insert a new section' => __('Insert a new section', 'text_doma' ),
                         '@location' => __('@location', 'text_domain_to_be'),
-                        'Insert a new global section' => __('Insert a new global section', 'text_domain_to_be_replaced' ),
+                        'Insert a new global section' => __('Insert a new global section', 'text_doma' ),
 
-                        'section' => __('section', 'text_domain_to_be_replaced'),
-                        'header section' => __('header section', 'text_domain_to_be_replaced'),
-                        'footer section' => __('footer section', 'text_domain_to_be_replaced'),
-                        '(global)' => __('(global)', 'text_domain_to_be_replaced'),
-                        'nested section' => __('nested section', 'text_domain_to_be_replaced'),
+                        'section' => __('section', 'text_doma'),
+                        'header section' => __('header section', 'text_doma'),
+                        'footer section' => __('footer section', 'text_doma'),
+                        '(global)' => __('(global)', 'text_doma'),
+                        'nested section' => __('nested section', 'text_doma'),
 
-                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_domain_to_be_replaced'),
-                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'text_domain_to_be_replaced'),
-                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'text_domain_to_be_replaced')
+                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_doma'),
+                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'text_doma'),
+                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'text_doma')
                     ),
                     'isDevMode' => sek_is_dev_mode(),
                     'isPreviewUIDebugMode' => isset( $_GET['preview_ui_debug'] ) || NIMBLE_IS_PREVIEW_UI_DEBUG_MODE,

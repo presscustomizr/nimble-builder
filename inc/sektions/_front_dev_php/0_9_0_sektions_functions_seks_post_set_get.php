@@ -2,8 +2,8 @@
 // SEKTION POST
 register_post_type( NIMBLE_CPT , array(
     'labels' => array(
-      'name'          => __( 'Nimble sections', 'text_domain_to_be_replaced' ),
-      'singular_name' => __( 'Nimble sections', 'text_domain_to_be_replaced' ),
+      'name'          => __( 'Nimble sections', 'text_doma' ),
+      'singular_name' => __( 'Nimble sections', 'text_doma' ),
     ),
     'public'           => false,
     'hierarchical'     => false,

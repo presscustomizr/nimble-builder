@@ -5,14 +5,14 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_breakpoint_module',
-        'name' => __('Set a custom breakpoint', 'text_domain_to_be_replaced'),
+        'name' => __('Set a custom breakpoint', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                   'use-custom-breakpoint' => array(
                       'input_type'  => 'gutencheck',
-                      'title'       => __('Use a custom breakpoint for the vertical reorganization of columns', 'text_domain_to_be_replaced'),
+                      'title'       => __('Use a custom breakpoint for the vertical reorganization of columns', 'text_doma'),
                       'default'     => 0,
                       'title_width' => 'width-80',
                       'input_width' => 'width-20',
@@ -21,7 +21,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                   ),
                   'custom-breakpoint'  => array(
                       'input_type'  => 'range_simple',
-                      'title'       => __( 'Define a custom breakpoint in pixels', 'text_domain_to_be_replaced' ),
+                      'title'       => __( 'Define a custom breakpoint in pixels', 'text_doma' ),
                       'default'     => $global_custom_breakpoint > 0 ? $global_custom_breakpoint : 768,
                       'min'         => 1,
                       'max'         => 2000,
@@ -31,11 +31,11 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                       //'css_identifier' => 'letter_spacing',
                       'width-100'   => true,
                       'title_width' => 'width-100',
-                      'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default breakpoint is 768px.', 'text_domain_to_be_replaced')
+                      'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default breakpoint is 768px.', 'text_doma')
                   ),//0,
                   'reverse-col-at-breakpoint' => array(
                       'input_type'  => 'gutencheck',
-                      'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'text_domain_to_be_replaced'),
+                      'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'text_doma'),
                       'default'     => 0,
                       'title_width' => 'width-80',
                       'input_width' => 'width-20',

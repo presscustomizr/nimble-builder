@@ -13,7 +13,7 @@ function sek_get_module_params_for_czr_heading_module() {
             'font_settings' => 'czr_font_child',
             'spacing' => 'czr_heading_spacing_child'
         ),
-        'name' => __('Heading', 'text_domain_to_be_replaced'),
+        'name' => __('Heading', 'text_doma'),
         'starting_value' => array(
             'main_settings' => array(
                 'heading_text' => 'This is a heading.',
@@ -38,28 +38,28 @@ function sek_get_module_params_for_czr_heading_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_heading_child',
-        'name' => __('Content', 'text_domain_to_be_replaced'),
+        'name' => __('Content', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'heading_text' => array(
                     'input_type'         => 'text',
-                    'title'              => __( 'Heading text', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Heading text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
+                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
 
                 ),
                 'heading_tag' => array(
                     'input_type'         => 'select',
-                    'title'              => __( 'Heading tag', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Heading tag', 'text_doma' ),
                     'default'            => 'h1',
                     'choices'            => sek_get_select_options_for_input_id( 'heading_tag' )
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Alignment', 'text_doma'),
                     'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -77,24 +77,24 @@ function sek_get_module_params_for_czr_heading_child() {
                 ),
                 'link-to' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Turn into a link', 'text_domain_to_be_replaced'),
+                    'title'       => __('Turn into a link', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link url', 'text_doma'),
                     'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom link url', 'text_doma'),
                     'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -114,14 +114,14 @@ function sek_get_module_params_for_czr_heading_spacing_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_heading_spacing_child',
-        'name' => __('Spacing', 'text_domain_to_be_replaced'),
+        'name' => __('Spacing', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'spacing_css'     => array(
                     'input_type'  => 'spacingWithDeviceSwitcher',
-                    'title'       => __( 'Margin and padding', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Margin and padding', 'text_doma' ),
                     'default'     => array( 'desktop' => array() ),
                     'width-100'   => true,
                     'title_width' => 'width-100',

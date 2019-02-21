@@ -8,7 +8,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
         'dynamic_registration' => true,
         'module_type' => 'czr_featured_pages_module',
         'is_crud' => true,
-        'name' => __('Featured Pages', 'text_domain_to_be_replaced'),
+        'name' => __('Featured Pages', 'text_doma'),
         // 'starting_value' => array(
         //     'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
         // ),
@@ -18,11 +18,11 @@ function sek_get_module_params_for_czr_featured_pages_module() {
             'pre-item' => array(
                 // 'page-id' => array(
                 //     'input_type'  => 'content_picker',
-                //     'title'       => __('Pick a page', 'text_domain_to_be_replaced')
+                //     'title'       => __('Pick a page', 'text_doma')
                 // ),
                 'img-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Display an image', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display an image', 'text_doma'),
                     'default'     => 'featured',
                     'choices'     => sek_get_select_options_for_input_id( 'img-type' )
                 ),
@@ -30,59 +30,59 @@ function sek_get_module_params_for_czr_featured_pages_module() {
             // 'mod-opt' => array(
             //     // 'page-id' => array(
             //     //     'input_type'  => 'content_picker',
-            //     //     'title'       => __('Pick a page', 'text_domain_to_be_replaced')
+            //     //     'title'       => __('Pick a page', 'text_doma')
             //     // ),
             //     'mod_opt_test' => array(
             //         'input_type'  => 'select',
-            //         'title'       => __('Display an image', 'text_domain_to_be_replaced'),
+            //         'title'       => __('Display an image', 'text_doma'),
             //         'default'     => 'featured'
             //     ),
             // ),
             'item-inputs' => array(
                 'page-id' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Pick a page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Pick a page', 'text_doma'),
                     'default'     => ''
                 ),
                 'img-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Display an image', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display an image', 'text_doma'),
                     'default'     => 'featured',
                     'choices'     => sek_get_select_options_for_input_id( 'img-type' )
                 ),
                 'img-id' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
+                    'title'       => __('Pick an image', 'text_doma'),
                     'default'     => ''
                 ),
                 'img-size' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select the image size', 'text_doma'),
                     'default'     => 'large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
                 'content-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Display a text', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display a text', 'text_doma'),
                     'default'     => 'page-excerpt',
                     'choices'     => sek_get_select_options_for_input_id( 'content-type' )
                 ),
                 'content-custom-text' => array(
                     'input_type'  => 'tiny_mce_editor',
-                    'title'       => __('Custom text content', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom text content', 'text_doma'),
                     'default'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
                 ),
                 'btn-display' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Display a call to action button', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display a call to action button', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'btn-custom-text' => array(
                     'input_type'  => 'tiny_mce_editor',
-                    'title'       => __('Custom button text', 'text_domain_to_be_replaced'),
-                    'default'     => __('Read More', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom button text', 'text_doma'),
+                    'default'     => __('Read More', 'text_doma'),
                 )
             )
         ),

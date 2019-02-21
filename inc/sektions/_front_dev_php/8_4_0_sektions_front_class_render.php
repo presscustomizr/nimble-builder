@@ -127,7 +127,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
 
-        // hook : loop_start, loop_end, and all custom locations
+        // hook : loop_start, loop_end, and all custom locations like __before_main_wrapper, __after_header or __before_footer in the Customizr theme.
         // @return void()
         function sek_schedule_sektions_rendering( $query = null ) {
             // Check if the passed query is the main_query, bail if not
@@ -387,7 +387,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                             sprintf( '<span class="sek-nimble-icon"><img src="%1$s"/></span>',
                                                 NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION
                                             ),
-                                            $is_header_location ? __('Start designing the header', 'text_domain_to_be_replaced') : __('Start designing the footer', 'text_domain_to_be_replaced')
+                                            $is_header_location ? __('Start designing the header', 'text_doma') : __('Start designing the footer', 'text_doma')
                                         );
                                     }
                                   ?>
@@ -489,7 +489,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               if ( skp_is_customizing() && !sek_is_customize_previewing_a_changeset_post() && empty( $collection ) ) {
                                   //$content_type = 1 === $col_number ? 'section' : 'module';
                                   $content_type = 'module';
-                                  $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_domain_to_be_replaced' ) : __('Drag and drop a block of content here', 'text_domain_to_be_replaced' );
+                                  $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_doma' ) : __('Drag and drop a block of content here', 'text_doma' );
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
@@ -901,16 +901,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // has_local_header_footer
         // has_global_header_footer
         function sek_maybe_set_nimble_header_footer() {
-            //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
-            $local_header_footer_data = sek_get_local_option_value('local_header_footer');
-            $global_header_footer_data = sek_get_global_option_value('global_header_footer');
-            $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
+            if ( '_not_cached_yet_' === $this->has_local_header_footer || '_not_cached_yet_' === $this->has_global_header_footer ) {
+                //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
+                $local_header_footer_data = sek_get_local_option_value('local_header_footer');
+                $global_header_footer_data = sek_get_global_option_value('global_header_footer');
+                $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
 
-            $this->has_global_header_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
+                $this->has_global_header_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
 
-            if ( $apply_local_option ) {
-                $this->has_local_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
-                $this->has_global_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
+                if ( $apply_local_option ) {
+                    $this->has_local_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
+                    $this->has_global_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
+                }
             }
         }
 

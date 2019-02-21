@@ -96,9 +96,9 @@ function sek_get_gfonts( $what = null ) {
   //$subsets = array();
 
   // $subsets['all-subsets'] = sprintf( '%1$s ( %2$s %3$s )',
-  //   __( 'All languages' , 'text_domain_to_be_replaced' ),
+  //   __( 'All languages' , 'text_doma' ),
   //   count($gfonts_decoded['items']) + count( $this -> get_cfonts() ),
-  //   __('fonts' , 'text_domain_to_be_replaced' )
+  //   __('fonts' , 'text_doma' )
   // );
 
   foreach ( $gfonts_decoded['items'] as $font ) {
@@ -122,7 +122,7 @@ function sek_get_gfonts( $what = null ) {
   //   $subsets[$subset] = sprintf('%1$s ( %2$s %3$s )',
   //     $subset,
   //     $font_number,
-  //     __('fonts' , 'text_domain_to_be_replaced' )
+  //     __('fonts' , 'text_doma' )
   //   );
   // }
 

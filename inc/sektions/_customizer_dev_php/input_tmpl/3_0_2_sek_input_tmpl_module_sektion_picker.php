@@ -30,101 +30,101 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_tiny_mce_editor_module',
-                  'title' => __( 'WordPress Editor', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'WordPress Editor', 'text_doma' ),
                   'icon' => 'Nimble_rich-text-editor_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_image_module',
-                  'title' => __( 'Image', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Image', 'text_doma' ),
                   'icon' => 'Nimble__image_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_heading_module',
-                  'title' => __( 'Heading', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Heading', 'text_doma' ),
                   'icon' => 'Nimble__heading_icon.svg'
                 ),
 
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_icon_module',
-                  'title' => __( 'Icon', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Icon', 'text_doma' ),
                   'icon' => 'Nimble__icon_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_button_module',
-                  'title' => __( 'Button', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Button', 'text_doma' ),
                   'icon' => 'Nimble_button_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_map_module',
-                  'title' => __( 'Map', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Map', 'text_doma' ),
                   'icon' => 'Nimble_map_icon.svg'
                 ),
 
                 array(
                   'content-type' => 'preset_section',
                   'content-id' => 'two_columns',
-                  'title' => __( 'Two Columns', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Two Columns', 'text_doma' ),
                   'icon' => 'Nimble_2-columns_icon.svg'
                 ),
                 array(
                   'content-type' => 'preset_section',
                   'content-id' => 'three_columns',
-                  'title' => __( 'Three Columns', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Three Columns', 'text_doma' ),
                   'icon' => 'Nimble_3-columns_icon.svg'
                 ),
                 array(
                   'content-type' => 'preset_section',
                   'content-id' => 'four_columns',
-                  'title' => __( 'Four Columns', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Four Columns', 'text_doma' ),
                   'icon' => 'Nimble_4-columns_icon.svg'
                 ),
 
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_simple_html_module',
-                  'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Html Content', 'text_doma' ),
                   'icon' => 'Nimble_html_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_quote_module',
-                  'title' => __( 'Quote', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Quote', 'text_doma' ),
                   'icon' => 'Nimble_quote_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_spacer_module',
-                  'title' => __( 'Spacer', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Spacer', 'text_doma' ),
                   'icon' => 'Nimble__spacer_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_divider_module',
-                  'title' => __( 'Divider', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Divider', 'text_doma' ),
                   'icon' => 'Nimble__divider_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_simple_form_module',
-                  'title' => __( 'Simple Contact Form', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Simple Contact Form', 'text_doma' ),
                   'icon' => 'Nimble_contact-form_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_widget_area_module',
-                  'title' => __( 'WordPress widget area', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'WordPress widget area', 'text_doma' ),
                   'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
                   'active' => sek_is_header_footer_enabled()
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_menu_module',
-                  'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Menu', 'text_doma' ),
                   'font_icon' => '<i class="material-icons">menu</i>',
                   'active' => sek_is_header_footer_enabled()
                 ),
@@ -132,14 +132,14 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 // array(
                 //   'content-type' => 'module',
                 //   'content-id' => 'czr_special_img_module',
-                //   'title' => __( 'Nimble Image', 'text_domain_to_be_replaced' ),
+                //   'title' => __( 'Nimble Image', 'text_doma' ),
                 //   'font_icon' => '<i class="material-icons">all_out</i>',
                 //   'active' => sek_is_pro()
                 // )
                 // array(
                 //   'content-type' => 'module',
                 //   'content-id' => 'czr_featured_pages_module',
-                //   'title' => __( 'Featured pages',  'text_domain_to_be_replaced' ),
+                //   'title' => __( 'Featured pages',  'text_doma' ),
                 //   'icon' => 'Nimble__featured_icon.svg'
                 // ),
 
@@ -173,7 +173,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                       $_params['content-id'],
                       $icon_img_html,
                       $_params['title'],
-                      true === $_params['active'] ? __('Drag and drop or double-click to insert in your chosen target element.', 'text_domain_to_be_replaced' ) : __('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_domain_to_be_replaced'),
+                      true === $_params['active'] ? __('Drag and drop or double-click to insert in your chosen target element.', 'text_doma' ) : __('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'),
                       !empty( $_params['font_icon'] ) ? 'is-font-icon' : '',
                       true === $_params['active'] ? 'true' : 'false'
                 );

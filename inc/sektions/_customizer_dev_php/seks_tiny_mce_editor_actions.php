@@ -15,7 +15,7 @@ function sek_print_tiny_mce_editor_template() {
 
     ?>
       <div id="czr-customize-content_editor-pane">
-        <div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="<?php _e( 'Hide Editor', 'text_domain_to_be_replaced' ); ?>"></i>&nbsp;<span><?php _e( 'Hide Editor', 'text_domain_to_be_replaced');?></span></div>
+        <div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="<?php _e( 'Hide Editor', 'text_doma' ); ?>"></i>&nbsp;<span><?php _e( 'Hide Editor', 'text_doma');?></span></div>
         <div id="czr-customize-content_editor-dragbar" title="<?php _e('Resize the editor', 'text_domain'); ?>">
           <span class="screen-reader-text"><?php _e( 'Resize the editor', 'nimble-builder' ); ?></span>
           <i class="czr-resize-handle fas fa-arrows-alt-v"></i>

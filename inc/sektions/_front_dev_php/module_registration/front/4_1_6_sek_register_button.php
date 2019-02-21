@@ -38,11 +38,11 @@ function sek_get_module_params_for_czr_button_module() {
             'design' => 'czr_btn_design_child',
             'font' => 'czr_font_child'
         ),
-        'name' => __( 'Button', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Button', 'text_doma' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
         'starting_value' => array(
             'content' => array(
-                'button_text' => __('Click me','text_domain_to_be_replaced'),
+                'button_text' => __('Click me','text_doma'),
             ),
             'design' => array(
                 'bg_color_css' => '#020202',
@@ -71,56 +71,56 @@ function sek_get_module_params_for_czr_btn_content_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_btn_content_child',
-        'name' => __( 'Button content', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Button content', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
             'item-inputs' => array(
                 'button_text' => array(
                     'input_type'         => 'text',
-                    'title'              => __( 'Button text', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Button text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
                 ),
                 'btn_text_on_hover' => array(
                     'input_type'         => 'text',
-                    'title'              => __( 'Button text on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Button text on mouse hover', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
                     'title_width' => 'width-100',
-                    'notice_after'       => __( 'Not previewable when customizing.', 'text_domain_to_be_replaced')
+                    'notice_after'       => __( 'Not previewable when customizing.', 'text_doma')
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link to', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link url', 'text_doma'),
                     'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom link url', 'text_doma'),
                     'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'icon' => array(
                     'input_type'  => 'fa_icon_picker',
-                    'title'       => __( 'Icon next to the button text', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Icon next to the button text', 'text_doma' ),
                     //'default'     => 'no-link'
                 ),
                 'icon-side' => array(
                     'input_type'  => 'buttons_choice',
-                    'title'       => __("Icon's position", 'text_domain_to_be_replaced'),
+                    'title'       => __("Icon's position", 'text_doma'),
                     'default'     => 'left',
                     'choices'     => array( 'left' => __('Left', 'text-domain'), 'right' => __('Right', 'text-domain') )
                 ),
@@ -140,14 +140,14 @@ function sek_get_module_params_for_czr_btn_design_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_btn_design_child',
-        'name' => __( 'Button design', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Button design', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
             'item-inputs' => array(
                 'bg_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Background color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Background color', 'text_doma' ),
                     'width-100'   => true,
                     'default'    => '#020202',
                     'refresh_markup' => false,
@@ -157,7 +157,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'use_custom_bg_color_on_hover' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Set a custom background color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Set a custom background color on mouse hover', 'text_doma' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
@@ -166,7 +166,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'bg_color_hover' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Background color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Background color on mouse hover', 'text_doma' ),
                     'width-100'   => true,
                     'default'    => '',
                     'refresh_markup' => false,
@@ -176,7 +176,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'border-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Border', 'text_domain_to_be_replaced'),
+                    'title'       => __('Border', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_markup' => false,
@@ -184,7 +184,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                    'title'       => __('Borders', 'text_doma'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -198,7 +198,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Rounded corners', 'text_doma' ),
                     'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -211,7 +211,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Button alignment', 'text_doma' ),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
@@ -222,7 +222,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'spacing_css'        => array(
                     'input_type'         => 'spacing',
-                    'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Spacing', 'text_doma' ),
                     'default'            => array(
                         'padding-top'    => .5,
                         'padding-bottom' => .5,
@@ -238,14 +238,14 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'use_box_shadow' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'push_effect' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Push visual effect', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Push visual effect', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',

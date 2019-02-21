@@ -36,15 +36,15 @@ function sek_get_module_params_for_czr_quote_module() {
             'cite_content' => 'czr_quote_cite_child',
             'design' => 'czr_quote_design_child'
         ),
-        'name' => __('Quote', 'text_domain_to_be_replaced' ),
+        'name' => __('Quote', 'text_doma' ),
         'sanitize_callback' => __NAMESPACE__ . '\sanitize_callback__czr_quote_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'starting_value' => array(
             'quote_content' => array(
-                'quote_text'  => __('Hey, careful, man, there\'s a beverage here!','text_domain_to_be_replaced'),
+                'quote_text'  => __('Hey, careful, man, there\'s a beverage here!','text_doma'),
             ),
             'cite_content' => array(
-                'cite_text'   => sprintf( __('The Dude in %1s', 'text_domain_to_be_replaced'), '<a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>' ),
+                'cite_text'   => sprintf( __('The Dude in %1s', 'text_doma'), '<a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>' ),
                 'cite_font_style_css' => 'italic',
             ),
             'design' => array(
@@ -77,21 +77,21 @@ function sek_get_module_params_for_czr_quote_quote_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_quote_child',
-        'name' => __( 'Quote content', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Quote content', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
             'item-inputs' => array(
                 'quote_text' => array(
                     'input_type'         => 'textarea',
-                    'title'              => __( 'Quote text', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Quote text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
+                    'notice_before'      => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_doma'),
                 ),
                 'quote_font_family_css' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font family', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -101,7 +101,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),
                 'quote_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font size', 'text_doma' ),
                     'default'     => array( 'desktop' => '16px' ),
                     'min' => 0,
                     'max' => 100,
@@ -114,7 +114,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//16,//"14px",
                 'quote_line_height_css'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Line height', 'text_doma' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -127,7 +127,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//24,//"20px",
                 'quote_color_css'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text color', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -137,7 +137,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//"#000000",
                 'quote_color_hover_css'     => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text color on mouse over', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -148,7 +148,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//"#000000",
                 'quote_font_weight_css'     => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font weight', 'text_doma' ),
                     'default'     => 400,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -158,7 +158,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_font_style_css'      => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font style', 'text_doma' ),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -168,7 +168,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_text_decoration_css' => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text decoration', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -178,7 +178,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_text_transform_css'  => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text transform', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -188,7 +188,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_letter_spacing_css'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Letter spacing', 'text_doma' ),
                     'default'     => 0,
                     'min'         => 0,
                     'step'        => 1,
@@ -201,7 +201,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                 'quote___flag_important'       => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                     'default'     => 0,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -241,21 +241,21 @@ function sek_get_module_params_for_czr_quote_cite_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_cite_child',
-        'name' => __( 'Cite content', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Cite content', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
             'item-inputs' => array(
                 'cite_text' => array(
                     'input_type'         => 'textarea',
-                    'title'              => __( 'Cite text', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Cite text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
+                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
                 ),
                 'cite_font_family_css' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font family', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -265,7 +265,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),
                 'cite_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font size', 'text_doma' ),
                     'default'     => array( 'desktop' => '13px' ),
                     'min' => 0,
                     'max' => 100,
@@ -278,7 +278,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//16,//"14px",
                 'cite_line_height_css'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Line height', 'text_doma' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -291,7 +291,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//24,//"20px",
                 'cite_color_css'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text color', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -301,7 +301,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//"#000000",
                 'cite_color_hover_css'     => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text color on mouse over', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -312,7 +312,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//"#000000",
                 'cite_font_weight_css'     => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font weight', 'text_doma' ),
                     'default'     => 'normal',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -322,7 +322,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_font_style_css'      => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font style', 'text_doma' ),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -332,7 +332,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_text_decoration_css' => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text decoration', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -342,7 +342,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_text_transform_css'  => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text transform', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -352,7 +352,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_letter_spacing_css'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Letter spacing', 'text_doma' ),
                     'default'     => 0,
                     'min'         => 0,
                     'step'        => 1,
@@ -365,7 +365,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                 'cite___flag_important'       => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                     'default'     => 0,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -410,20 +410,20 @@ function sek_get_module_params_for_czr_quote_design_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_design_child',
-        'name' => __( 'Design', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Design', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
             'item-inputs' => array(
                 'quote_design' => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Design', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Design', 'text_doma' ),
                     'default'     => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'quote_design' )
                 ),
                 'border_width_css' => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Border weight', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Border weight', 'text_doma' ),
                     'min' => 1,
                     'max' => 80,
                     'default' => '5px',
@@ -435,7 +435,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 ),
                 'border_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Border Color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Border Color', 'text_doma' ),
                     'width-100'   => true,
                     'default'     => '',
                     'refresh_markup' => false,
@@ -445,7 +445,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 ),
                 'icon_size_css' => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Icon Size', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Icon Size', 'text_doma' ),
                     'default'     => '32px',
                     'min' => 0,
                     'max' => 100,
@@ -457,7 +457,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 ),
                 'icon_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Icon Color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Icon Color', 'text_doma' ),
                     'width-100'   => true,
                     'default'     => '#ccc',
                     'refresh_markup' => false,

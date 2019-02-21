@@ -7,14 +7,14 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_content_type_switcher_module',
-        'name' => __('Content type', 'text_domain_to_be_replaced'),
+        'name' => __('Content type', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'content_type' => array(
                     'input_type'  => 'content_type_switcher',
-                    'title'       => '',//__('Which type of content would you like to drop in your page ?', 'text_domain_to_be_replaced'),
+                    'title'       => '',//__('Which type of content would you like to drop in your page ?', 'text_doma'),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'notice_after' => sprintf(
@@ -44,14 +44,14 @@ function sek_get_module_params_for_sek_module_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_module_picker_module',
-        'name' => __('Content Picker', 'text_domain_to_be_replaced'),
+        'name' => __('Content Picker', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'module_id' => array(
                     'input_type'  => 'module_picker',
-                    'title'       => __('Drag-and-drop or double-click a module to insert it into a drop zone of the preview page.', 'text_domain_to_be_replaced'),
+                    'title'       => __('Drag-and-drop or double-click a module to insert it into a drop zone of the preview page.', 'text_doma'),
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 )
@@ -67,7 +67,7 @@ function sek_get_module_params_for_sek_module_picker_module() {
 function sek_get_default_section_input_params() {
     return array(
         'input_type'  => 'section_picker',
-        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_domain_to_be_replaced'),
+        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
         'width-100'   => true,
         'title_width' => 'width-100'
     );
@@ -80,7 +80,7 @@ function sek_get_module_params_for_sek_intro_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_intro_sec_picker_module',
-        'name' => __('Sections for an introduction', 'text_domain_to_be_replaced'),
+        'name' => __('Sections for an introduction', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'intro_sections' => sek_get_default_section_input_params()
@@ -92,7 +92,7 @@ function sek_get_module_params_for_sek_features_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_features_sec_picker_module',
-        'name' => __('Sections for services and features', 'text_domain_to_be_replaced'),
+        'name' => __('Sections for services and features', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'features_sections' => sek_get_default_section_input_params()
@@ -105,7 +105,7 @@ function sek_get_module_params_for_sek_contact_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_contact_sec_picker_module',
-        'name' => __('Contact-us sections', 'text_domain_to_be_replaced'),
+        'name' => __('Contact-us sections', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'contact_sections' => sek_get_default_section_input_params()
@@ -118,7 +118,7 @@ function sek_get_module_params_for_sek_column_layouts_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_column_layouts_sec_picker_module',
-        'name' => __('Empty sections with columns layout', 'text_domain_to_be_replaced'),
+        'name' => __('Empty sections with columns layout', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'layout_sections' => sek_get_default_section_input_params()
@@ -131,7 +131,7 @@ function sek_get_module_params_for_sek_header_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_header_sec_picker_module',
-        'name' => __('Header sections', 'text_domain_to_be_replaced'),
+        'name' => __('Header sections', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'header_sections' => sek_get_default_section_input_params()
@@ -143,7 +143,7 @@ function sek_get_module_params_for_sek_footer_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_footer_sec_picker_module',
-        'name' => __('Footer sections', 'text_domain_to_be_replaced'),
+        'name' => __('Footer sections', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'footer_sections' => sek_get_default_section_input_params()
@@ -161,7 +161,7 @@ function sek_get_module_params_for_sek_my_sections_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_my_sections_sec_picker_module',
-        'name' => __('My sections', 'text_domain_to_be_replaced'),
+        'name' => __('My sections', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'my_sections' => sek_get_default_section_input_params()

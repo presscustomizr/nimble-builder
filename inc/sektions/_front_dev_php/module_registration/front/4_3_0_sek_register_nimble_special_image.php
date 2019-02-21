@@ -13,7 +13,7 @@ function sek_get_module_params_for_czr_special_img_module() {
             'main_settings'   => 'czr_special_img_main_settings_child',
             // ??
         ),
-        'name' => __('Nimble Image', 'text_domain_to_be_replaced'),
+        'name' => __('Nimble Image', 'text_doma'),
         'starting_value' => array(
             'main_settings' => array(
                 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
@@ -35,10 +35,10 @@ function sek_get_module_params_for_czr_special_img_main_settings_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_special_img_main_settings_child',
-        'name' => __( 'Image main settings', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Image main settings', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_domain_to_be_replaced'),
+        //     'button_text' => __('Click me','text_doma'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -53,41 +53,41 @@ function sek_get_module_params_for_czr_special_img_main_settings_child() {
             'item-inputs' => array(
                 'img' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
+                    'title'       => __('Pick an image', 'text_doma'),
                     'default'     => ''
                 ),
                 'img-size' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select the image size', 'text_doma'),
                     'default'     => 'large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link to', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link url', 'text_doma'),
                     'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom link url', 'text_doma'),
                     'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 // 'h_alignment_css' => array(
                 //     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                //     'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                //     'title'       => __('Alignment', 'text_doma'),
                 //     'default'     => array( 'desktop' => 'center' ),
                 //     'refresh_markup' => false,
                 //     'refresh_stylesheet' => true,
@@ -97,7 +97,7 @@ function sek_get_module_params_for_czr_special_img_main_settings_child() {
                 // ),
                 'use_custom_title_attr' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Set the text displayed when the mouse is held over', 'text_domain_to_be_replaced'),
+                    'title'       => __('Set the text displayed when the mouse is held over', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -112,13 +112,13 @@ function sek_get_module_params_for_czr_special_img_main_settings_child() {
                 ),
                 // 'use_custom_width' => array(
                 //     'input_type'  => 'gutencheck',
-                //     'title'       => __( 'Custom image width', 'text_domain_to_be_replaced' ),
+                //     'title'       => __( 'Custom image width', 'text_doma' ),
                 //     'default'     => 0,
                 //     'refresh_stylesheet' => true
                 // ),
                 // 'custom_width' => array(
                 //     'input_type'  => 'range_with_unit_picker_device_switcher',
-                //     'title'       => __('Width', 'text_domain_to_be_replaced'),
+                //     'title'       => __('Width', 'text_doma'),
                 //     'min' => 1,
                 //     'max' => 100,
                 //     //'unit' => '%',
@@ -131,12 +131,12 @@ function sek_get_module_params_for_czr_special_img_main_settings_child() {
                 // ),
                 // 'use_box_shadow' => array(
                 //     'input_type'  => 'gutencheck',
-                //     'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
+                //     'title'       => __( 'Apply a shadow', 'text_doma' ),
                 //     'default'     => 0,
                 // ),
                 // 'img_hover_effect' => array(
                 //     'input_type'  => 'select',
-                //     'title'       => __('Mouse over effect', 'text_domain_to_be_replaced'),
+                //     'title'       => __('Mouse over effect', 'text_doma'),
                 //     'default'     => 'none',
                 //     'choices'     => sek_get_select_options_for_input_id( 'img_hover_effect' )
                 // )

@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_bg_module',
-        'name' => __('Background', 'text_domain_to_be_replaced'),
+        'name' => __('Background', 'text_doma'),
         // 'starting_value' => array(
         //     'bg-color-overlay'  => '#000000',
         //     'bg-opacity-overlay' => '40'
@@ -15,35 +15,35 @@ function sek_get_module_params_for_sek_level_bg_module() {
             'item-inputs' => array(
                 'bg-color' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Background color', 'text_domain_to_be_replaced'),
+                    'title'       => __('Background color', 'text_doma'),
                     'width-100'   => true,
                     'default'     => '',
                 ),
                 'bg-image' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Image', 'text_domain_to_be_replaced'),
+                    'title'       => __('Image', 'text_doma'),
                     'default'     => '',
-                    'notice_after' => sprintf( __('To ensure better performances, use optimized images for your backgrounds. You can also enable the lazy loading option in the %1$s.', 'text_domain_to_be_replaced'),
+                    'notice_after' => sprintf( __('To ensure better performances, use optimized images for your backgrounds. You can also enable the lazy loading option in the %1$s.', 'text_doma'),
                       sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                           "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
-                          __('site wide options', 'text_domain_to_be_replaced')
+                          __('site wide options', 'text_doma')
                       )
                     ),
                     'refresh_markup' => true
                 ),
                 'bg-position' => array(
                     'input_type'  => 'bgPositionWithDeviceSwitcher',
-                    'title'       => __('Image position', 'text_domain_to_be_replaced'),
+                    'title'       => __('Image position', 'text_doma'),
                     'default'     => array( 'desktop' => 'center' ),
                     'title_width' => 'width-100',
                 ),
                 // 'bg-parallax' => array(
                 //     'input_type'  => 'gutencheck',
-                //     'title'       => __('Parallax scrolling', 'text_domain_to_be_replaced')
+                //     'title'       => __('Parallax scrolling', 'text_doma')
                 // ),
                 'bg-attachment' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Fixed background', 'text_domain_to_be_replaced'),
+                    'title'       => __('Fixed background', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => true,
@@ -51,16 +51,16 @@ function sek_get_module_params_for_sek_level_bg_module() {
                 ),
                 'bg-parallax' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Parallax effect on scroll', 'text_domain_to_be_replaced'),
+                    'title'       => __('Parallax effect on scroll', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'default'     => 0,
-                    'notice_after' => __('When enabled, the background image moves slower than the page elements on scroll. This effect is not enabled on mobile devices.', 'text_domain_to_be_replaced'),
+                    'notice_after' => __('When enabled, the background image moves slower than the page elements on scroll. This effect is not enabled on mobile devices.', 'text_doma'),
                     'refresh_markup' => true,
                 ),
                 'bg-parallax-force' => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __('Parallax force (in percents)', 'text_domain_to_be_replaced'),
+                    'title'       => __('Parallax force (in percents)', 'text_doma'),
                     'orientation' => 'horizontal',
                     'min' => 0,
                     'max' => 100,
@@ -68,12 +68,12 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'default'  => '60',
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'notice_after' => __('Customize the magnitude of the visual effect when scrolling.', 'text_domain_to_be_replaced'),
+                    'notice_after' => __('Customize the magnitude of the visual effect when scrolling.', 'text_doma'),
                     'refresh_markup' => true
                 ),
                 'bg-repeat' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Repeat', 'text_domain_to_be_replaced'),
+                    'title'       => __('Repeat', 'text_doma'),
                     'default'     => 'no-repeat',
                     'choices'     => array(
                         'default' => __('Default', 'text_dom'),
@@ -87,31 +87,31 @@ function sek_get_module_params_for_sek_level_bg_module() {
                 ),
                 'bg-scale' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Scale', 'text_domain_to_be_replaced'),
+                    'title'       => __('Scale', 'text_doma'),
                     'default'     => 'cover',
                     'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
                 ),
                 // 'bg-video' => array(
                 //     'input_type'  => 'text',
-                //     'title'       => __('Video', 'text_domain_to_be_replaced'),
+                //     'title'       => __('Video', 'text_doma'),
                 //     'default'     => ''
                 // ),
                 'bg-apply-overlay' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Apply a background overlay', 'text_domain_to_be_replaced'),
+                    'title'       => __('Apply a background overlay', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'default'     => 0
                 ),
                 'bg-color-overlay' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Overlay Color', 'text_domain_to_be_replaced'),
+                    'title'       => __('Overlay Color', 'text_doma'),
                     'width-100'   => true,
                     'default'     => '#000000'
                 ),
                 'bg-opacity-overlay' => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __('Opacity (in percents)', 'text_domain_to_be_replaced'),
+                    'title'       => __('Opacity (in percents)', 'text_doma'),
                     'orientation' => 'horizontal',
                     'min' => 0,
                     'max' => 100,

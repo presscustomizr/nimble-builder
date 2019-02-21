@@ -38,11 +38,11 @@ function sek_get_module_params_for_czr_menu_module() {
             //'design' => 'czr_menu_design_child',
             'font' => 'czr_font_child'
         ),
-        'name' => __( 'Menu', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Menu', 'text_doma' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
         'starting_value' => array(
             // 'content' => array(
-            //     'button_text' => __('Click me','text_domain_to_be_replaced'),
+            //     'button_text' => __('Click me','text_doma'),
             // ),
             // 'design' => array(
             //     'bg_color_css' => '#020202',
@@ -68,26 +68,26 @@ function sek_get_module_params_for_czr_menu_content_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_menu_content_child',
-        'name' => __( 'Menu content', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Menu content', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
             'item-inputs' => array(
                 'menu-id' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select a menu', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select a menu', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_user_created_menus(),
-                    'notice_after' => sprintf( __( 'You can create and edit menus in the %1$s. If you just created a new menu, publish and refresh the customizer to see in the dropdown list.', 'text_domain_to_be_replaced'),
+                    'notice_after' => sprintf( __( 'You can create and edit menus in the %1$s. If you just created a new menu, publish and refresh the customizer to see in the dropdown list.', 'text_doma'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.panel('nav_menus', function( _p_ ){ _p_.focus(); })",
-                            __('menu panel', 'text_domain_to_be_replaced')
+                            __('menu panel', 'text_doma')
                         )
                     ),
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Alignment', 'text_doma'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
