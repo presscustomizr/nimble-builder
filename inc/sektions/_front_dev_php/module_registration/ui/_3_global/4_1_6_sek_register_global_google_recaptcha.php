@@ -39,10 +39,11 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                 ),
                 'badge' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Display a Google reCAPTCHA badge before the submit button', 'text_doma'),
-                    'default'     => 1,
+                    'title'       => __('Display the reCAPTCHA badge at the bottom of your page', 'text_doma'),
+                    'default'     => 0,
                     'title_width' => 'width-80',
-                    'input_width' => 'width-20'
+                    'input_width' => 'width-20',
+                    'notice_after'       => __( 'The badge is not previewable when customizing.', 'text_doma')
                 )
             )
         )//tmpl

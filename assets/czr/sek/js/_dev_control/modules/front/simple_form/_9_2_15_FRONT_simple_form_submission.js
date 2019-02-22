@@ -11,7 +11,7 @@
                         }
                   });
                   //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+                  // module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                   // run the parent initialize
                   // Note : must be always invoked always after the input / item class extension
@@ -23,45 +23,45 @@
             //////////////////////////////////////////////////////////
             /// ITEM CONSTRUCTOR
             //////////////////////////////////////////
-            CZRItemConstructor : {
-                  //overrides the parent ready
-                  ready : function() {
-                        var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
-                        item.inputCollection.bind( function( col ) {
-                              if( _.isEmpty( col ) )
-                                return;
-                              try { item.setInputVisibilityDeps(); } catch( er ) {
-                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
-                              }
-                        });//item.inputCollection.bind()
+            // CZRItemConstructor : {
+            //       //overrides the parent ready
+            //       ready : function() {
+            //             var item = this;
+            //             //wait for the input collection to be populated,
+            //             //and then set the input visibility dependencies
+            //             item.inputCollection.bind( function( col ) {
+            //                   if( _.isEmpty( col ) )
+            //                     return;
+            //                   try { item.setInputVisibilityDeps(); } catch( er ) {
+            //                         api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+            //                   }
+            //             });//item.inputCollection.bind()
 
-                        //fire the parent
-                        api.CZRItem.prototype.ready.call( item );
-                  },
+            //             //fire the parent
+            //             api.CZRItem.prototype.ready.call( item );
+            //       },
 
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
-                  setInputVisibilityDeps : function() {
-                        var item = this,
-                            module = item.module;
-                        //Internal item dependencies
-                        item.czr_Input.each( function( input ) {
-                              switch( input.id ) {
-                                    case 'recaptcha_enabled' :
-                                          _.each( [ 'recaptcha_badge' ] , function( _inputId_ ) {
-                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return 'inherit' === input();
-                                                }); } catch( er ) {
-                                                      api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
-                              }
-                        });
-                  }
-            }
+            //       //Fired when the input collection is populated
+            //       //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+            //       setInputVisibilityDeps : function() {
+            //             var item = this,
+            //                 module = item.module;
+            //             //Internal item dependencies
+            //             item.czr_Input.each( function( input ) {
+            //                   switch( input.id ) {
+            //                         case 'recaptcha_enabled' :
+            //                               _.each( [ 'recaptcha_badge' ] , function( _inputId_ ) {
+            //                                     try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+            //                                           return 'inherit' === input();
+            //                                     }); } catch( er ) {
+            //                                           api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
+            //                                     }
+            //                               });
+            //                         break;
+            //                   }
+            //             });
+            //       }
+            // }
       };
       //provides a description of each module
       //=> will determine :

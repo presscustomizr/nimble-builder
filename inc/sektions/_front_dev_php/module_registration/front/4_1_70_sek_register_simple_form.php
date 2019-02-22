@@ -955,7 +955,7 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'default' => 'inherit',
                     'choices'     => array(
                         'inherit' => __('Inherit the global option', 'text_doma'),
-                        'disabled' => __('Disabled', 'text_doma')
+                        'disabled' => __('Disable', 'text_doma')
                     ),
                     'refresh_preview'  => false,
                     'notice_after' => sprintf( __('The Nimble Builder can activate the %1$s service to protect your forms against spam. You need to %2$s.'),
@@ -965,19 +965,6 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                             __('activate it in the global settings', 'text_doma')
                         )
                     )
-                ),
-                'recaptcha_badge' => array(
-                    'input_type'  => 'select',
-                    'title'       => __('Display a Google reCAPTCHA badge before the submit button', 'text_doma'),
-                    'title_width' => 'width-100',
-                    'width-100'   => true,
-                    'default' => 'inherit',
-                    'choices'     => array(
-                        'inherit' => __('Inherit the global option', 'text_doma'),
-                        'disabled' => __('Disabled', 'text_doma')
-                    ),
-                    'refresh_preview'  => false,
-                    'refresh_markup' => true
                 )
             )
         ),

@@ -61,13 +61,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : _id_ + '__recaptcha',
                               module_type : 'sek_global_recaptcha',
                               controlLabel : sektionsLocalizedData.i18n['Protect your contact forms with Google reCAPTCHA'],
-                              icon : '<i class="material-icons">security</i>'
+                              icon : '<i class="material-icons sek-level-option-icon">security</i>'
                         },
                         beta_features : {
                               settingControlId : _id_ + '__beta_features',
                               module_type : 'sek_global_beta_features',
                               controlLabel : sektionsLocalizedData.i18n['Beta features'],
-                              icon : '<i class="material-icons">widgets</i>'
+                              icon : '<i class="material-icons sek-level-option-icon">widgets</i>'
                         }
                   });
 

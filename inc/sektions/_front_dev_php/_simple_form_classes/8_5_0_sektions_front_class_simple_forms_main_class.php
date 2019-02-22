@@ -12,6 +12,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //Hooks
         add_action( 'parse_request', array( $this, 'simple_form_parse_request' ), 20 );
         add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_recaptcha_scripts' ), 0 );
+        add_action( 'body_class', array( $this, 'set_the_recaptcha_badge_visibility_class') );
+
         // Note : form input need to be prefixed to avoid a collision with reserved WordPress input
         // @see : https://stackoverflow.com/questions/15685020/wordpress-form-submission-and-the-404-error-page#16636051
         $this->form_composition = array(
@@ -121,10 +123,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //    - enabled === true
         //    - public_key entered
         //    - private_key entered
-        if ( !sek_is_recaptcha_globally_enabled() )
-          return;
-        // does the current page include a form in a local or global location ?
-        if ( !sek_front_sections_include_a_form() )
+        // - the current page does not include a form in a local or global location
+        if ( skp_is_customizing() || !sek_is_recaptcha_globally_enabled() || !sek_front_sections_include_a_form() )
           return;
 
         // @todo, we don't handle the case when reCaptcha is globally enabled but disabled for a particular form.
@@ -176,10 +176,20 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         <?php
     }
 
+    // @hook body_class
+    public function set_the_recaptcha_badge_visibility_class( $classes ) {
+        // Shall we print the badge ?
+        if ( ! sek_is_recaptcha_badge_globally_displayed() ) {
+            $classes[] = 'sek-hide-rc-badge';
+        }
+        return $classes;
+    }
 
-    //Rendering
-    //@return string
-    //@param module_options is the module level "value" property. @see tmpl/modules/simple_form_module_tmpl.php
+
+    // Rendering
+    // Invoked from the tmpl
+    // @return string
+    // @param module_options is the module level "value" property. @see tmpl/modules/simple_form_module_tmpl.php
     function get_simple_form_html( $module_model ) {
         $html         = '';
         //set the form composition according to the user's options
@@ -304,7 +314,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 // 1) reCAPTCHA enabled in the global options AND properly setup with non empty keys
                 // 2) reCAPTCHA enabled for this particular form
                 case 'nimble_recaptcha_resp' :
-                    if ( sek_is_recaptcha_globally_enabled() && true === sek_booleanize_checkbox_val( $form_submission_options['recaptcha_enabled'] ) ) {
+                    if ( ! skp_is_customizing() && sek_is_recaptcha_globally_enabled() && 'disabled' !== $form_submission_options['recaptcha_enabled'] ) {
                         $user_form_composition[$field_id] = $field_data;
                     }
                 break;
