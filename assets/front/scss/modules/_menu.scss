@@ -34,6 +34,9 @@
     justify-content: space-between;
     justify-content: center;
     padding: .5rem 0;
+    .#{$project-prefix}mobile-menu & {
+        padding: 0;
+    }
 }
 .#{$project-prefix}nav-collapse {
     flex-basis: 100%;

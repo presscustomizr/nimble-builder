@@ -448,20 +448,22 @@ jQuery( function($){
 
     $( document ).on( 'ready', function() {
             $( '[data-sek-module-type="czr_menu_module"]' ).each( function() {
-                  var $_desktop_menu = $( '.sek-nav-collapse', this ),
-                      $_mobile_menu  = $_desktop_menu.clone(true),
-                      //create a new id for the mobile menu that will used by the button toggler too
-                      _new_id        = $_desktop_menu.attr('id') + '-mobile';
+                  var $_mobile_menu_module  = $(this).clone(true),
+                      //create a new id for the mobile menu nav collapse that will used by the button toggler too
+                      _new_id        = $( '.sek-nav-collapse', this ).attr('id') + '-mobile';
 
-                  $_mobile_menu.
-                        // add styling classes
-                        addClass( 'sek-col-base sek-mobile-menu' ).
-                        // assign the new id
-                        attr( 'id', _new_id ).
+                  $_mobile_menu_module
                         /// place the mobile menu at the end of this sektion inner
-                        appendTo( $(this).closest( '.sek-sektion-inner' ) );
+                        .appendTo( $(this).closest( '.sek-sektion-inner' ) )
+                        //wrap in a convenient div for styling and targeting
+                        .wrap( '<div class="sek-col-base sek-mobile-menu" id="'+_new_id+'-wrapper"></div>');
 
-                  //upldate the toggler button so that will now refer to the "cloned" mobile menu
+                  // assign the new id to the mobile nav collapse
+                  $( '.sek-nav-collapse', '#'+_new_id+'-wrapper' ).attr( 'id', _new_id );
+                  // remove the duplicate button
+                  $( '.sek-nav-toggler', '#'+_new_id+'-wrapper' ).detach();
+
+                  //update the toggler button so that will now refer to the "cloned" mobile menu
                   $( '.sek-nav-toggler', this ).data( 'target', '#' + _new_id )
                                                .attr( 'aria-controls', _new_id );
             });
