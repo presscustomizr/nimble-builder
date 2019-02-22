@@ -328,7 +328,7 @@ function sek_get_level_skope_id( $level_id = '' ) {
 function sek_page_uses_nimble_header_footer() {
     // cache the properties if not done yet
     Nimble_Manager()->sek_maybe_set_nimble_header_footer();
-    return Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer;
+    return true === Nimble_Manager()->has_local_header_footer || true === Nimble_Manager()->has_global_header_footer;
 }
 
 
