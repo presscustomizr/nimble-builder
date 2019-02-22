@@ -804,7 +804,8 @@ function sek_get_local_option_value( $option_name, $skope_id = null ) {
         $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
         $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
         // Cache only after 'wp' && 'nimble_front_classes_ready'
-        if ( did_action('nimble_front_classes_ready') && did_action('wp') ) {
+        // never cache when doing ajax
+        if ( did_action('nimble_front_classes_ready') && did_action('wp') && defined( 'DOING_AJAX') && true !== DOING_AJAX ) {
             Nimble_Manager()->local_options = $local_options;
         }
     }
@@ -822,7 +823,8 @@ function sek_get_global_option_value( $option_name ) {
         $global_nimble_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
         // cache when nimble is ready
         // this hook is fired when Nimble_Manager() is instanciated
-        if ( did_action('nimble_front_classes_ready') ) {
+        // never cache when doing ajax
+        if ( did_action('nimble_front_classes_ready') && defined( 'DOING_AJAX') && true !== DOING_AJAX ) {
             Nimble_Manager()->global_nimble_options = $global_nimble_options;
         }
     }
@@ -1083,9 +1085,6 @@ function sek_is_img_smartload_enabled() {
 // reCaptcha is enabled globally
 // deactivated when customizing
 function sek_is_recaptcha_globally_enabled() {
-    if ( skp_is_customizing() )
-      return false;
-
     if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->recaptcha_enabled ) {
         return Nimble_Manager()->recaptcha_enabled;
     }
@@ -1097,10 +1096,12 @@ function sek_is_recaptcha_globally_enabled() {
         $recaptcha_enabled = sek_booleanize_checkbox_val( $glob_recaptcha_opts['enable'] ) && !empty( $glob_recaptcha_opts['public_key'] ) && !empty($glob_recaptcha_opts['private_key'] );
     }
 
-    // CACHE
-    Nimble_Manager()->recaptcha_enabled = $recaptcha_enabled;
+    // CACHE when not doing ajax
+    if ( !defined( 'DOING_AJAX') || true !== DOING_AJAX ) {
+        Nimble_Manager()->recaptcha_enabled = $recaptcha_enabled;
+    }
 
-    return Nimble_Manager()->recaptcha_enabled;
+    return $recaptcha_enabled;
 }
 
 // @return boolean
@@ -1110,18 +1111,20 @@ function sek_is_recaptcha_badge_globally_displayed() {
     if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->recaptcha_badge_displayed ) {
         return Nimble_Manager()->recaptcha_badge_displayed;
     }
-    $badge_displayed = false;
+    $display_badge = false;//disabled by default @see sek_get_module_params_for_sek_global_recaptcha()
 
     $glob_recaptcha_opts = sek_get_global_option_value( 'recaptcha' );
 
     if ( !is_null( $glob_recaptcha_opts ) && is_array( $glob_recaptcha_opts ) && !empty( $glob_recaptcha_opts['badge'] ) ) {
-        $badge_displayed = sek_booleanize_checkbox_val( $glob_recaptcha_opts['badge'] ) && sek_is_recaptcha_globally_enabled();
+        $display_badge = sek_booleanize_checkbox_val( $glob_recaptcha_opts['badge'] ) && sek_is_recaptcha_globally_enabled();
     }
 
-    // CACHE
-    Nimble_Manager()->recaptcha_badge_displayed = $badge_displayed;
+    // CACHE when not doing ajax
+    if ( !defined( 'DOING_AJAX') || true !== DOING_AJAX ) {
+        Nimble_Manager()->recaptcha_badge_displayed = $display_badge;
+    }
 
-    return Nimble_Manager()->recaptcha_badge_displayed;
+    return $display_badge;
 }
 
 
