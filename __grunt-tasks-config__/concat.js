@@ -397,7 +397,12 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/8_2_0_sektions_front_class_front_and_preview_assets.php',
       '<%= paths.sektions %>_front_dev_php/8_4_0_sektions_front_class_render.php',
       '<%= paths.sektions %>_front_dev_php/8_4_1_sektions_front_class_render_css.php',
-      '<%= paths.sektions %>_front_dev_php/8_5_0_sektions_front_class_simple_forms.php',
+
+      '<%= paths.sektions %>_front_dev_php/_simple_form_classes/8_5_0_sektions_front_class_simple_forms_main_class.php',
+      '<%= paths.sektions %>_front_dev_php/_simple_form_classes/8_5_1_sektions_front_class_simple_forms_form_and_field.php',
+      '<%= paths.sektions %>_front_dev_php/_simple_form_classes/8_5_2_sektions_front_class_simple_forms_inputs.php',
+      '<%= paths.sektions %>_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php',
+
       '<%= paths.sektions %>_front_dev_php/8_9_0_sektions_front_class_instantiate.php'
     ],
     dest: '<%= paths.sektions %>ccat-sektions.php',
