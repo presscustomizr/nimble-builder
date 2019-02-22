@@ -444,4 +444,26 @@ jQuery( function($){
                 $('[data-target=#'+$(this).attr('id')+']').removeClass( 'hovering' );
                 $(window).trigger('scroll');
           });
+
+
+    $( document ).on( 'ready', function() {
+            $( '[data-sek-module-type="czr_menu_module"]' ).each( function() {
+                  var $_desktop_menu = $( '.sek-nav-collapse', this ),
+                      $_mobile_menu  = $_desktop_menu.clone(true),
+                      //create a new id for the mobile menu that will used by the button toggler too
+                      _new_id        = $_desktop_menu.attr('id') + '-mobile';
+
+                  $_mobile_menu.
+                        // add styling classes
+                        addClass( 'sek-col-base sek-mobile-menu' ).
+                        // assign the new id
+                        attr( 'id', _new_id ).
+                        /// place the mobile menu at the end of this sektion inner
+                        appendTo( $(this).closest( '.sek-sektion-inner' ) );
+
+                  //upldate the toggler button so that will now refer to the "cloned" mobile menu
+                  $( '.sek-nav-toggler', this ).data( 'target', '#' + _new_id )
+                                               .attr( 'aria-controls', _new_id );
+            });
+    });
 });

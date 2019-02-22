@@ -308,6 +308,9 @@
         display: flex!important;
         flex-basis: auto;
     }
+    .#{$project-prefix}mobile-menu {
+        display: none!important;
+    }
     .#{$project-prefix}nav-toggler {
         display: none;
     }
