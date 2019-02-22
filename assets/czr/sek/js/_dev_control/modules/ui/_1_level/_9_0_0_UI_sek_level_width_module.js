@@ -43,23 +43,15 @@
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        // input controller instance == this
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              //Fire on init
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              //React on change
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
+
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'width-type' :
-                                          scheduleVisibilityOfInputId.call( input, 'custom-width', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'custom-width', function() {
                                                 return 'custom' === input();
                                           });
-                                          scheduleVisibilityOfInputId.call( input, 'h_alignment', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'h_alignment', function() {
                                                 return 'custom' === input();
                                           });
                                     break;

@@ -897,6 +897,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getDefaultSektionSettingValue => the skope should be set to local or global');
                   }
                   return 'global' === localOrGlobal ? sektionsLocalizedData.defaultGlobalSektionSettingValue : sektionsLocalizedData.defaultLocalSektionSettingValue;
+            },
+
+            // @return void()
+            // input controller instance == this
+            scheduleVisibilityOfInputId : function( controlledInputId, visibilityCallBack ) {
+                  var item = this.input_parent;
+                  if ( !_.isFunction(visibilityCallBack) || _.isEmpty(controlledInputId) ) {
+                        throw new Error('::scheduleVisibilityOfInputId => error when firing for input id : ' + this.id );
+                  }
+                  //Fire on init
+                  item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                  //React on change
+                  this.bind( function( to ) {
+                        item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                  });
             }
 
       });//$.extend()

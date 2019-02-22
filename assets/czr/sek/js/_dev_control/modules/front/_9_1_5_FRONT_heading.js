@@ -72,21 +72,13 @@
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        // input controller instance == this
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              //Fire on init
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              //React on change
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
+
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'link-to' :
                                           _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'link-custom-url' :
@@ -106,7 +98,7 @@
                                           });
                                     break;
                                     case 'link-pick-url' :
-                                          scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                 return '_custom_' == input().id && true === item.czr_Input('link-to')();
                                           });
                                     break;

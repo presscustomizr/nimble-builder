@@ -54,28 +54,20 @@
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          // input controller instance == this
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                //Fire on init
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                //React on change
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
+
                           //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'quote_design' :
                                             _.each( [ 'border_width_css', 'border_color_css' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return 'border-before' == input();
                                                   }); } catch( er ) {
                                                         api.errare( 'Quote module => error in setInputVisibilityDeps', er );
                                                   }
                                             });
                                             _.each( [ 'icon_color_css', 'icon_size_css' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return 'quote-icon-before' == input();
                                                   }); } catch( er ) {
                                                         api.errare( 'Quote module => error in setInputVisibilityDeps', er );

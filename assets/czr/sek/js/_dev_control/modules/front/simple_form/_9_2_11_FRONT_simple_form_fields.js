@@ -49,21 +49,13 @@
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          // input controller instance == this
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                //Fire on init
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                //React on change
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
+
                           //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'show_name_field' :
                                             _.each( [ 'name_field_label', 'name_field_required' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
@@ -72,7 +64,7 @@
                                       break;
                                       case 'show_subject_field' :
                                             _.each( [ 'subject_field_label', 'subject_field_required' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
@@ -81,7 +73,7 @@
                                       break;
                                       case 'show_message_field' :
                                             _.each( [ 'message_field_label', 'message_field_required' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
@@ -89,7 +81,7 @@
                                             });
                                       break;
                                       case 'link-pick-url' :
-                                            try { scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                            try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                   return input();
                                             }); } catch( er ) {
                                                   api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );

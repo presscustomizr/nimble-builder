@@ -49,22 +49,12 @@
                         var item = this,
                             module = item.module;
 
-                        // input controller instance == this
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              //Fire on init
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              //React on change
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
-
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'img-type' :
                                           _.each( [ 'img-id', 'img-size' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'img-id' :
@@ -82,7 +72,7 @@
                                     break;
                                     case 'content-type' :
                                           _.each( [ 'content-custom-text' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'custom' === input();
                                                 }); } catch( er ) {
                                                       api.errare( 'Featured pages module => error in setInputVisibilityDeps', er );
@@ -91,7 +81,7 @@
                                     break;
                                     case 'btn-display' :
                                           _.each( [ 'btn-custom-text' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return input();
                                                 }); } catch( er ) {
                                                       api.errare( 'Featured pages module => error in setInputVisibilityDeps', er );

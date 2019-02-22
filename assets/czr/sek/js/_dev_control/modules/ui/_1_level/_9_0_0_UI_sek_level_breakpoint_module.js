@@ -43,20 +43,11 @@
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        // input controller instance == this
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              //Fire on init
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              //React on change
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-breakpoint' :
-                                          scheduleVisibilityOfInputId.call( input, 'custom-breakpoint', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'custom-breakpoint', function() {
                                                 return input();
                                           });
                                     break;

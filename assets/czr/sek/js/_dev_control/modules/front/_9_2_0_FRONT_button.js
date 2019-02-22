@@ -66,21 +66,13 @@
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          // input controller instance == this
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                //Fire on init
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                //React on change
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
+
                           //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'link-to' :
                                             _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         var bool = false;
                                                         switch( _inputId_ ) {
                                                               case 'link-custom-url' :
@@ -97,12 +89,12 @@
                                             });
                                       break;
                                       case 'link-pick-url' :
-                                            scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                            api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                   return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
                                             });
                                       break;
                                       case 'icon' :
-                                            scheduleVisibilityOfInputId.call( input, 'icon-side', function() {
+                                            api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'icon-side', function() {
                                                   return !_.isEmpty( input() );
                                             });
                                       break;
@@ -210,7 +202,7 @@
                                 switch( input.id ) {
                                       case 'use_custom_bg_color_on_hover' :
                                             _.each( [ 'bg_color_hover' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( 'Button module => error in setInputVisibilityDeps', er );
@@ -219,7 +211,7 @@
                                       break;
                                       case 'border-type' :
                                           _.each( [ 'borders' ] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'none' !== input();
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
@@ -228,7 +220,7 @@
                                       break;
                                       case 'use_box_shadow' :
                                             _.each( [ 'push_effect' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( 'Button module => error in setInputVisibilityDeps', er );
