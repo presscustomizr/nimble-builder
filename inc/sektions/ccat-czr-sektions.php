@@ -68,7 +68,7 @@ function sek_enqueue_controls_js_css() {
                 'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true,
                 'isNimbleHeaderFooterEnabled' => sek_is_header_footer_enabled(),
 
-                'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_domain_to_be_replaced') ), sek_get_registered_widget_areas() )
+                'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() )
             )
         )
     );//wp_localize_script()
@@ -338,92 +338,93 @@ add_filter( 'nimble-sek-localized-customizer-control-params', '\Nimble\nimble_ad
 function nimble_add_i18n_localized_control_params( $params ) {
     return array_merge( $params, array(
         'i18n' => array(
-            'Sections' => __( 'Sections', 'text_domain_to_be_replaced'),
+            'Sections' => __( 'Sections', 'text_doma'),
 
-            'Nimble Builder' => __('Nimble Builder', 'text_domain_to_be_replaced'),
+            'Nimble Builder' => __('Nimble Builder', 'text_doma'),
 
-            "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_domain_to_be_replaced'),
-            "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
-            "A section must have at least one column." => __( "A section must have at least one column.", 'text_domain_to_be_replaced'),
+            "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_doma'),
+            "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_doma'),
+            "A section must have at least one column." => __( "A section must have at least one column.", 'text_doma'),
 
-            'If this problem locks the Nimble builder, you might try to reset the sections for this page.' => __('If this problem locks the Nimble builder, you might try to reset the sections for this page.', 'text_domain_to_be_replaced'),
-            'Reset' => __('Reset', 'text_domain_to_be_replaced'),
-            'Reset complete' => __('Reset complete', 'text_domain_to_be_replaced'),
-            'Drag and drop content' => __('Drag and drop content', 'text_domain_to_be_replaced'),
-            'Content Picker' => __('Content Picker', 'text_domain_to_be_replaced'),
-            'Pick a module' => __('Pick a module', 'text_domain_to_be_replaced'),
-            'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_domain_to_be_replaced'),
-            'Select a content type' => __('Select a content type', 'text_domain_to_be_replaced'),
+            'If this problem locks the Nimble builder, you might try to reset the sections for this page.' => __('If this problem locks the Nimble builder, you might try to reset the sections for this page.', 'text_doma'),
+            'Reset' => __('Reset', 'text_doma'),
+            'Reset complete' => __('Reset complete', 'text_doma'),
+            'Drag and drop content' => __('Drag and drop content', 'text_doma'),
+            'Content Picker' => __('Content Picker', 'text_doma'),
+            'Pick a module' => __('Pick a module', 'text_doma'),
+            'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_doma'),
+            'Select a content type' => __('Select a content type', 'text_doma'),
 
-            'The header location only accepts modules and pre-built header sections' => __('The header location only accepts modules and pre-built header sections', 'text_domain_to_be_replaced'),
-            'The footer location only accepts modules and pre-built footer sections' => __('The footer location only accepts modules and pre-built footer sections', 'text_domain_to_be_replaced'),
-            'You can\'t drop a header section in the footer location' => __('You can\'t drop a header section in the footer location', 'text_domain_to_be_replaced'),
-            'You can\'t drop a footer section in the header location' => __('You can\'t drop a footer section in the header location', 'text_domain_to_be_replaced'),
+            'The header location only accepts modules and pre-built header sections' => __('The header location only accepts modules and pre-built header sections', 'text_doma'),
+            'The footer location only accepts modules and pre-built footer sections' => __('The footer location only accepts modules and pre-built footer sections', 'text_doma'),
+            'You can\'t drop a header section in the footer location' => __('You can\'t drop a header section in the footer location', 'text_doma'),
+            'You can\'t drop a footer section in the header location' => __('You can\'t drop a footer section in the header location', 'text_doma'),
 
-            'Sections for an introduction' => __('Sections for an introduction', 'text_domain_to_be_replaced'),
-            'Sections for services and features' => __('Sections for services and features', 'text_domain_to_be_replaced'),
-            'Contact-us sections' => __('Contact-us sections', 'text_domain_to_be_replaced'),
-            'Empty sections with columns layout' => __('Empty sections with columns layout', 'text_domain_to_be_replaced'),
-            'Header sections' => __('Header sections', 'text_domain_to_be_replaced'),
-            'Footer sections' => __('Footer sections', 'text_domain_to_be_replaced'),
+            'Sections for an introduction' => __('Sections for an introduction', 'text_doma'),
+            'Sections for services and features' => __('Sections for services and features', 'text_doma'),
+            'Contact-us sections' => __('Contact-us sections', 'text_doma'),
+            'Empty sections with columns layout' => __('Empty sections with columns layout', 'text_doma'),
+            'Header sections' => __('Header sections', 'text_doma'),
+            'Footer sections' => __('Footer sections', 'text_doma'),
 
-            'Module' => __('Module', 'text_domain_to_be_replaced'),
-            'Content for' => __('Content for', 'text_domain_to_be_replaced'),
-            'Customize the options for module :' => __('Customize the options for module :', 'text_domain_to_be_replaced'),
+            'Module' => __('Module', 'text_doma'),
+            'Content for' => __('Content for', 'text_doma'),
+            'Customize the options for module :' => __('Customize the options for module :', 'text_doma'),
 
-            'Layout settings for the' => __('Layout settings for the', 'text_domain_to_be_replaced'),
-            'Background settings for the' => __('Background settings for the', 'text_domain_to_be_replaced'),
-            'Borders settings for the' => __('Borders settings for the', 'text_domain_to_be_replaced'),
-            'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_domain_to_be_replaced'),
-            'Height settings for the' => __('Height settings for the', 'text_domain_to_be_replaced'),
-            'Width settings for the' => __('Width settings for the', 'text_domain_to_be_replaced'),
-            'Set a custom anchor for the' => __('Set a custom anchor for the', 'text_domain_to_be_replaced'),
-            'Device visibility settings for the' => __('Device visibility settings for the', 'text_domain_to_be_replaced'),
-            'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_domain_to_be_replaced'),
+            'Layout settings for the' => __('Layout settings for the', 'text_doma'),
+            'Background settings for the' => __('Background settings for the', 'text_doma'),
+            'Borders settings for the' => __('Borders settings for the', 'text_doma'),
+            'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_doma'),
+            'Height and vertical alignment for the' => __('Height and vertical alignment for the', 'text_doma'),
+            'Width settings for the' => __('Width settings for the', 'text_doma'),
+            'Set a custom anchor for the' => __('Set a custom anchor for the', 'text_doma'),
+            'Device visibility settings for the' => __('Device visibility settings for the', 'text_doma'),
+            'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_doma'),
 
-            'Settings for the' => __('Settings for the', 'text_domain_to_be_replaced'),//section / column / module
-            'Current page options' => __( 'Current page options', 'text_domain_to_be_replaced'),
-            'Page template' => __( 'Page template', 'text_domain_to_be_replaced'),
-            'This page uses a custom template.' => __( 'This page uses a custom template.', 'text_domain_to_be_replaced'),
-            'Page header and footer' => __( 'Page header and footer', 'text_domain_to_be_replaced'),
-            'Inner and outer widths' => __( 'Inner and outer widths', 'text_domain_to_be_replaced'),
-            'Custom CSS' => __( 'Custom CSS', 'text_domain_to_be_replaced'),
-            'Remove the sections in this page' => __( 'Remove the sections in this page', 'text_domain_to_be_replaced'),
-            'Page speed optimizations' => __( 'Page speed optimizations', 'text_domain_to_be_replaced'),
+            'Settings for the' => __('Settings for the', 'text_doma'),//section / column / module
+            'Current page options' => __( 'Current page options', 'text_doma'),
+            'Page template' => __( 'Page template', 'text_doma'),
+            'This page uses a custom template.' => __( 'This page uses a custom template.', 'text_doma'),
+            'Page header and footer' => __( 'Page header and footer', 'text_doma'),
+            'Inner and outer widths' => __( 'Inner and outer widths', 'text_doma'),
+            'Custom CSS' => __( 'Custom CSS', 'text_doma'),
+            'Remove the sections in this page' => __( 'Remove the sections in this page', 'text_doma'),
+            'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
 
-            'Site wide header and footer' => __( 'Site wide header and footer', 'text_domain_to_be_replaced'),
-            'Site wide breakpoint for Nimble sections' => __( 'Site wide breakpoint for Nimble sections', 'text_domain_to_be_replaced'),
-            'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'text_domain_to_be_replaced'),
+            'Site wide header and footer' => __( 'Site wide header and footer', 'text_doma'),
+            'Site wide breakpoint for Nimble sections' => __( 'Site wide breakpoint for Nimble sections', 'text_doma'),
+            'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'text_doma'),
 
-            'Site wide page speed optimizations' => __( 'Site wide page speed optimizations', 'text_domain_to_be_replaced'),
-            'Beta features' => __( 'Beta features', 'text_domain_to_be_replaced'),
-            'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_domain_to_be_replaced'),
-            'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_domain_to_be_replaced'),
+            'Site wide page speed optimizations' => __( 'Site wide page speed optimizations', 'text_doma'),
+            'Beta features' => __( 'Beta features', 'text_doma'),
+            'Protect your contact forms with Google reCAPTCHA' => __( 'Protect your contact forms with Google reCAPTCHA', 'text_doma'),
+            'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_doma'),
+            'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_doma'),
 
-            'Site wide options' => __( 'Site wide options', 'text_domain_to_be_replaced'),
-            'location' => __('location', 'text_domain_to_be_replaced'),
-            'section' => __('section', 'text_domain_to_be_replaced'),
-            'column' => __('column', 'text_domain_to_be_replaced'),
-            'module' => __('module', 'text_domain_to_be_replaced'),
-            'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_domain_to_be_replaced'),
-            'You first need to click on a target ( with a + icon ) in the preview.' => __('You first need to click on a target ( with a + icon ) in the preview.', 'text_domain_to_be_replaced'),
-            'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
-            'Insert in a new section' => __('Insert in a new section', 'text_domain_to_be_replaced'),
-            'Insert a new section here' => __('Insert a new section here', 'text_domain_to_be_replaced'),
-            'Select a font family' => __('Select a font family', 'text_domain_to_be_replaced'),
-            'Web Safe Fonts' => __('Web Safe Fonts', 'text_domain_to_be_replaced'),
-            'Google Fonts' => __('Google Fonts', 'text_domain_to_be_replaced'),
+            'Site wide options' => __( 'Site wide options', 'text_doma'),
+            'location' => __('location', 'text_doma'),
+            'section' => __('section', 'text_doma'),
+            'column' => __('column', 'text_doma'),
+            'module' => __('module', 'text_doma'),
+            'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_doma'),
+            'You first need to click on a target ( with a + icon ) in the preview.' => __('You first need to click on a target ( with a + icon ) in the preview.', 'text_doma'),
+            'Insert here' => __('Insert here', 'text_doma'),
+            'Insert in a new section' => __('Insert in a new section', 'text_doma'),
+            'Insert a new section here' => __('Insert a new section here', 'text_doma'),
+            'Select a font family' => __('Select a font family', 'text_doma'),
+            'Web Safe Fonts' => __('Web Safe Fonts', 'text_doma'),
+            'Google Fonts' => __('Google Fonts', 'text_doma'),
 
-            'Set a custom url' => __('Set a custom url', 'text_domain_to_be_replaced'),
+            'Set a custom url' => __('Set a custom url', 'text_doma'),
 
-            'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
+            'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
 
-            'Select an icon'     => __( 'Select an icon', 'text_domain_to_be_replaced' ),
-            'codeEditorSingular'   => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_domain_to_be_replaced' ),
-            'codeEditorPlural'     => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_domain_to_be_replaced' ),
-            'Settings on desktops' => __('Settings on desktops', 'text_domain_to_be_replaced'),
-            'Settings on tablets' => __('Settings on tablets', 'text_domain_to_be_replaced'),
-            'Settings on mobiles' => __('Settings on mobiles', 'text_domain_to_be_replaced')
+            'Select an icon'     => __( 'Select an icon', 'text_doma' ),
+            'codeEditorSingular'   => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_doma' ),
+            'codeEditorPlural'     => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_doma' ),
+            'Settings on desktops' => __('Settings on desktops', 'text_doma'),
+            'Settings on tablets' => __('Settings on tablets', 'text_doma'),
+            'Settings on mobiles' => __('Settings on mobiles', 'text_doma')
 
         )//array()
     )//array()
@@ -515,11 +516,11 @@ function sek_print_nimble_customizer_tmpl() {
       <div id="nimble-top-save-ui" class="czr-preview-notification">
           <input id="sek-saved-section-id" type="hidden" value="">
           <div class="sek-section-title">
-              <label for="sek-saved-section-title" class="customize-control-title"><?php _e('Section title', 'text_domain_to_be_replaced'); ?></label>
+              <label for="sek-saved-section-title" class="customize-control-title"><?php _e('Section title', 'text_doma'); ?></label>
               <input id="sek-saved-section-title" type="text" value="">
           </div>
           <div class="sek-section-description">
-              <label for="sek-saved-section-description" class="customize-control-title"><?php _e('Section description', 'text_domain_to_be_replaced'); ?></label>
+              <label for="sek-saved-section-description" class="customize-control-title"><?php _e('Section description', 'text_doma'); ?></label>
               <textarea id="sek-saved-section-description" type="text" value=""></textarea>
           </div>
           <div class="sek-section-save">
@@ -658,7 +659,7 @@ function sek_print_tiny_mce_editor_template() {
 
     ?>
       <div id="czr-customize-content_editor-pane">
-        <div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="<?php _e( 'Hide Editor', 'text_domain_to_be_replaced' ); ?>"></i>&nbsp;<span><?php _e( 'Hide Editor', 'text_domain_to_be_replaced');?></span></div>
+        <div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="<?php _e( 'Hide Editor', 'text_doma' ); ?>"></i>&nbsp;<span><?php _e( 'Hide Editor', 'text_doma');?></span></div>
         <div id="czr-customize-content_editor-dragbar" title="<?php _e('Resize the editor', 'text_domain'); ?>">
           <span class="screen-reader-text"><?php _e( 'Resize the editor', 'nimble-builder' ); ?></span>
           <i class="czr-resize-handle fas fa-arrows-alt-v"></i>
@@ -793,101 +794,101 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_tiny_mce_editor_module',
-                  'title' => __( 'WordPress Editor', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'WordPress Editor', 'text_doma' ),
                   'icon' => 'Nimble_rich-text-editor_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_image_module',
-                  'title' => __( 'Image', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Image', 'text_doma' ),
                   'icon' => 'Nimble__image_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_heading_module',
-                  'title' => __( 'Heading', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Heading', 'text_doma' ),
                   'icon' => 'Nimble__heading_icon.svg'
                 ),
 
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_icon_module',
-                  'title' => __( 'Icon', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Icon', 'text_doma' ),
                   'icon' => 'Nimble__icon_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_button_module',
-                  'title' => __( 'Button', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Button', 'text_doma' ),
                   'icon' => 'Nimble_button_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_map_module',
-                  'title' => __( 'Map', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Map', 'text_doma' ),
                   'icon' => 'Nimble_map_icon.svg'
                 ),
 
                 array(
                   'content-type' => 'preset_section',
                   'content-id' => 'two_columns',
-                  'title' => __( 'Two Columns', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Two Columns', 'text_doma' ),
                   'icon' => 'Nimble_2-columns_icon.svg'
                 ),
                 array(
                   'content-type' => 'preset_section',
                   'content-id' => 'three_columns',
-                  'title' => __( 'Three Columns', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Three Columns', 'text_doma' ),
                   'icon' => 'Nimble_3-columns_icon.svg'
                 ),
                 array(
                   'content-type' => 'preset_section',
                   'content-id' => 'four_columns',
-                  'title' => __( 'Four Columns', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Four Columns', 'text_doma' ),
                   'icon' => 'Nimble_4-columns_icon.svg'
                 ),
 
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_simple_html_module',
-                  'title' => __( 'Html Content', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Html Content', 'text_doma' ),
                   'icon' => 'Nimble_html_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_quote_module',
-                  'title' => __( 'Quote', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Quote', 'text_doma' ),
                   'icon' => 'Nimble_quote_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_spacer_module',
-                  'title' => __( 'Spacer', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Spacer', 'text_doma' ),
                   'icon' => 'Nimble__spacer_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_divider_module',
-                  'title' => __( 'Divider', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Divider', 'text_doma' ),
                   'icon' => 'Nimble__divider_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_simple_form_module',
-                  'title' => __( 'Simple Contact Form', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Simple Contact Form', 'text_doma' ),
                   'icon' => 'Nimble_contact-form_icon.svg'
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_widget_area_module',
-                  'title' => __( 'WordPress widget area', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'WordPress widget area', 'text_doma' ),
                   'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
                   'active' => sek_is_header_footer_enabled()
                 ),
                 array(
                   'content-type' => 'module',
                   'content-id' => 'czr_menu_module',
-                  'title' => __( 'Menu', 'text_domain_to_be_replaced' ),
+                  'title' => __( 'Menu', 'text_doma' ),
                   'font_icon' => '<i class="material-icons">menu</i>',
                   'active' => sek_is_header_footer_enabled()
                 ),
@@ -919,7 +920,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                       $_params['content-id'],
                       $icon_img_html,
                       $_params['title'],
-                      true === $_params['active'] ? __('Drag and drop or double-click to insert in your chosen target element.', 'text_domain_to_be_replaced' ) : __('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_domain_to_be_replaced'),
+                      true === $_params['active'] ? __('Drag and drop or double-click to insert in your chosen target element.', 'text_doma' ) : __('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'),
                       !empty( $_params['font_icon'] ) ? 'is-font-icon' : '',
                       true === $_params['active'] ? 'true' : 'false'
                 );
@@ -1141,7 +1142,7 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
           <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
                 <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_domain');?>" data-sek-unit="%"><?php _e('%', 'text_domain');?></button></div>
         </div>
-        <div class="reset-spacing-wrap"><span class="sek-do-reset"><?php _e('Reset all spacing', 'text_domain_to_be_replaced' ); ?></span></div>
+        <div class="reset-spacing-wrap"><span class="sek-do-reset"><?php _e('Reset all spacing', 'text_doma' ); ?></span></div>
 
     </div><?php // sek-spacing-wrapper ?>
     <?php

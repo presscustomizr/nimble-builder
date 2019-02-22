@@ -2207,7 +2207,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         height : {
                               settingControlId : params.id + '__height_options',
                               module_type : 'sek_level_height_module',
-                              controlLabel : sektionsLocalizedData.i18n['Height settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              controlLabel : sektionsLocalizedData.i18n['Height and vertical alignment for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                               icon : '<i class="fas fa-ruler-vertical sek-level-option-icon"></i>'
                         },
                   });
@@ -2542,11 +2542,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
                               icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
                         },
+                        recaptcha : {
+                              settingControlId : _id_ + '__recaptcha',
+                              module_type : 'sek_global_recaptcha',
+                              controlLabel : sektionsLocalizedData.i18n['Protect your contact forms with Google reCAPTCHA'],
+                              icon : '<i class="material-icons sek-level-option-icon">security</i>'
+                        },
                         beta_features : {
                               settingControlId : _id_ + '__beta_features',
                               module_type : 'sek_global_beta_features',
                               controlLabel : sektionsLocalizedData.i18n['Beta features'],
-                              icon : '<i class="material-icons">widgets</i>'
+                              icon : '<i class="material-icons sek-level-option-icon">widgets</i>'
                         }
                   });
 
@@ -4247,6 +4253,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getDefaultSektionSettingValue => the skope should be set to local or global');
                   }
                   return 'global' === localOrGlobal ? sektionsLocalizedData.defaultGlobalSektionSettingValue : sektionsLocalizedData.defaultLocalSektionSettingValue;
+            },
+            scheduleVisibilityOfInputId : function( controlledInputId, visibilityCallBack ) {
+                  var item = this.input_parent;
+                  if ( !_.isFunction(visibilityCallBack) || _.isEmpty(controlledInputId) ) {
+                        throw new Error('::scheduleVisibilityOfInputId => error when firing for input id : ' + this.id );
+                  }
+                  item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                  this.bind( function( to ) {
+                        item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
+                  });
             }
 
       });//$.extend()
@@ -6685,17 +6701,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'bg-image' :
                                           _.each( [ 'bg-attachment', 'bg-scale', 'bg-repeat', 'bg-apply-overlay', 'bg-color-overlay', 'bg-opacity-overlay', 'bg-parallax', 'bg-parallax-force' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'bg-color-overlay' :
@@ -6721,7 +6731,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     break;
                                     case 'bg-apply-overlay' :
                                           _.each( [ 'bg-color-overlay', 'bg-opacity-overlay' ] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && api.CZR_Helpers.isChecked( input() );
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
@@ -6730,7 +6740,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     break;
                                     case 'bg-parallax' :
                                           _.each( [ 'bg-parallax-force', 'bg-scale', 'bg-repeat'] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'bg-parallax-force' :
@@ -6815,17 +6825,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'border-type' :
                                           _.each( [ 'borders' ] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'none' !== input();
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
@@ -6877,16 +6881,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-breakpoint' :
-                                          scheduleVisibilityOfInputId.call( input, 'custom-breakpoint', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'custom-breakpoint', function() {
                                                 return input();
                                           });
                                     break;
@@ -6942,17 +6940,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'height-type' :
-                                          scheduleVisibilityOfInputId.call( input, 'custom-height', function() {
-                                                return 'custom' === input();
+                                          _.each( [ 'custom-height', 'overflow_hidden' ] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'custom' === input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
                                           });
                                     break;
                               }
@@ -7023,19 +7019,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'width-type' :
-                                          scheduleVisibilityOfInputId.call( input, 'custom-width', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'custom-width', function() {
                                                 return 'custom' === input();
                                           });
-                                          scheduleVisibilityOfInputId.call( input, 'h_alignment', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'h_alignment', function() {
                                                 return 'custom' === input();
                                           });
                                     break;
@@ -7091,21 +7081,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-outer-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
                                                 return input();
                                           });
                                     break;
                                     case 'use-custom-inner-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
                                                 return input();
                                           });
                                     break;
@@ -7204,21 +7188,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-outer-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
                                                 return input();
                                           });
                                     break;
                                     case 'use-custom-inner-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
                                                 return input();
                                           });
                                     break;
@@ -7357,16 +7335,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-breakpoint' :
-                                          scheduleVisibilityOfInputId.call( input, 'global-custom-breakpoint', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'global-custom-breakpoint', function() {
                                                 return input();
                                           });
                                     break;
@@ -7419,21 +7391,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-outer-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'outer-section-width', function() {
                                                 return input();
                                           });
                                     break;
                                     case 'use-custom-inner-width' :
-                                          scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'inner-section-width', function() {
                                                 return input();
                                           });
                                     break;
@@ -7501,6 +7467,61 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 ( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+            },//initialize
+
+            CZRItemConstructor : {
+                  ready : function() {
+                        var item = this;
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'enable' :
+                                          _.each( [ 'public_key', 'private_key', 'badge' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                              }
+                        });
+                  }
+            }//CZRItemConstructor
+      };
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_global_recaptcha : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_recaptcha', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_recaptcha' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+( function ( api, $, _ ) {
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_global_beta_features : {
@@ -7555,22 +7576,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'img' :
-                                          scheduleVisibilityOfInputId.call( input, 'img-size', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'img-size', function() {
                                                 return ! _.isEmpty( input()+'' ) && _.isNumber( input() );
                                           });
                                     break;
                                     case 'link-to' :
                                           _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'link-custom-url' :
@@ -7590,13 +7605,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     break;
                                     case 'link-pick-url' :
-                                          scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                 return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
                                           });
                                     break;
                                     case 'border-type' :
                                           _.each( [ 'borders' ] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'none' !== input();
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
@@ -7605,7 +7620,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     break;
                                     case 'use_custom_width' :
                                           _.each( [ 'custom_width' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return input();
                                                 }); } catch( er ) {
                                                       api.errare( 'Image module => error in setInputVisibilityDeps', er );
@@ -7614,7 +7629,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     break;
                                     case 'use_custom_title_attr' :
                                           _.each( [ 'heading_title' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return input();
                                                 }); } catch( er ) {
                                                       api.errare( 'Image module => error in setInputVisibilityDeps', er );
@@ -7688,7 +7703,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               switch( input.id ) {
                                     case 'border-type' :
                                           _.each( [ 'borders' ] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'none' !== input();
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
@@ -7791,17 +7806,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'img-type' :
                                           _.each( [ 'img-id', 'img-size' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'img-id' :
@@ -7819,7 +7828,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     break;
                                     case 'content-type' :
                                           _.each( [ 'content-custom-text' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'custom' === input();
                                                 }); } catch( er ) {
                                                       api.errare( 'Featured pages module => error in setInputVisibilityDeps', er );
@@ -7828,7 +7837,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     break;
                                     case 'btn-display' :
                                           _.each( [ 'btn-custom-text' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return input();
                                                 }); } catch( er ) {
                                                       api.errare( 'Featured pages module => error in setInputVisibilityDeps', er );
@@ -7896,17 +7905,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'link-to' :
                                             _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         var bool = false;
                                                         switch( _inputId_ ) {
                                                               case 'link-custom-url' :
@@ -7923,13 +7926,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             });
                                       break;
                                       case 'link-pick-url' :
-                                            scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                            api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                   return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
                                             });
                                       break;
                                       case 'use_custom_color_on_hover' :
                                             _.each( [ 'color_hover' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
@@ -7993,7 +7996,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               switch( input.id ) {
                                     case 'border-type' :
                                           _.each( [ 'borders' ] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'none' !== input();
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
@@ -8060,17 +8063,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              this.bind( function( to ) {
-                                    item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              });
-                        };
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'link-to' :
                                           _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'link-custom-url' :
@@ -8090,7 +8087,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     break;
                                     case 'link-pick-url' :
-                                          scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                 return '_custom_' == input().id && true === item.czr_Input('link-to')();
                                           });
                                     break;
@@ -8228,24 +8225,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'quote_design' :
                                             _.each( [ 'border_width_css', 'border_color_css' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return 'border-before' == input();
                                                   }); } catch( er ) {
                                                         api.errare( 'Quote module => error in setInputVisibilityDeps', er );
                                                   }
                                             });
                                             _.each( [ 'icon_color_css', 'icon_size_css' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return 'quote-icon-before' == input();
                                                   }); } catch( er ) {
                                                         api.errare( 'Quote module => error in setInputVisibilityDeps', er );
@@ -8386,17 +8377,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'link-to' :
                                             _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         var bool = false;
                                                         switch( _inputId_ ) {
                                                               case 'link-custom-url' :
@@ -8413,12 +8398,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             });
                                       break;
                                       case 'link-pick-url' :
-                                            scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                            api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                   return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
                                             });
                                       break;
                                       case 'icon' :
-                                            scheduleVisibilityOfInputId.call( input, 'icon-side', function() {
+                                            api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'icon-side', function() {
                                                   return !_.isEmpty( input() );
                                             });
                                       break;
@@ -8491,7 +8476,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 switch( input.id ) {
                                       case 'use_custom_bg_color_on_hover' :
                                             _.each( [ 'bg_color_hover' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( 'Button module => error in setInputVisibilityDeps', er );
@@ -8500,7 +8485,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       break;
                                       case 'border-type' :
                                           _.each( [ 'borders' ] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'none' !== input();
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
@@ -8509,7 +8494,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       break;
                                       case 'use_box_shadow' :
                                             _.each( [ 'push_effect' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( 'Button module => error in setInputVisibilityDeps', er );
@@ -8563,12 +8548,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                 }
@@ -8617,17 +8596,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'show_name_field' :
                                             _.each( [ 'name_field_label', 'name_field_required' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
@@ -8636,7 +8609,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       break;
                                       case 'show_subject_field' :
                                             _.each( [ 'subject_field_label', 'subject_field_required' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
@@ -8645,7 +8618,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       break;
                                       case 'show_message_field' :
                                             _.each( [ 'message_field_label', 'message_field_required' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
@@ -8653,7 +8626,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             });
                                       break;
                                       case 'link-pick-url' :
-                                            try { scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                            try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                   return input();
                                             }); } catch( er ) {
                                                   api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
@@ -8705,17 +8678,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                     case 'border-type' :
                                           _.each( [ 'borders' ] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'none' !== input();
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
@@ -8768,17 +8735,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'use_custom_bg_color_on_hover' :
                                             _.each( [ 'bg_color_hover' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
@@ -8787,7 +8748,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       break;
                                       case 'border-type' :
                                           _.each( [ 'borders' ] , function(_inputId_ ) {
-                                                try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'none' !== input();
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
@@ -8796,7 +8757,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       break;
                                       case 'use_box_shadow' :
                                             _.each( [ 'push_effect' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
@@ -8848,9 +8809,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 ( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+                  module.inputConstructor = api.CZRInput.extend({
+                        setupSelect : function() {
+                              api.czr_sektions.setupSelectInput.call( this );
+                        }
+                  });
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+            },//initialize
+      };
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_simple_form_submission_child: {
+                  mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_submission_child', 'name' ),
                   has_mod_opt : false,
@@ -8888,17 +8862,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                this.bind( function( to ) {
-                                      item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                });
-                          };
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'use_custom_bg_color_on_hover' :
                                             _.each( [ 'bg_color_hover' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( 'Button module => error in setInputVisibilityDeps', er );
@@ -8907,7 +8875,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       break;
                                       case 'use_box_shadow' :
                                             _.each( [ 'push_effect' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         return input();
                                                   }); } catch( er ) {
                                                         api.errare( 'Button module => error in setInputVisibilityDeps', er );
@@ -8916,7 +8884,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       break;
                                       case 'link-to' :
                                             _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
-                                                  try { scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         var bool = false;
                                                         switch( _inputId_ ) {
                                                               case 'link-custom-url' :
@@ -8933,7 +8901,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             });
                                       break;
                                       case 'link-pick-url' :
-                                            scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                            api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                   return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
                                             });
                                       break;

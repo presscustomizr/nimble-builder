@@ -1160,6 +1160,10 @@ button.sek-btn,
   align-items: center;
   -ms-flex-pack: center;
   justify-content: center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
 }
 
 .sek-nimble-image-wrapper::before {
@@ -1199,6 +1203,8 @@ button.sek-btn,
   backface-visibility: hidden;
 }
 
+.sek-nimble-image-wrapper.expanded .sek-nimble-image-mask::before,
+.sek-nimble-image-wrapper.hover .sek-nimble-image-mask::before,
 .sek-nimble-image-wrapper:hover .sek-nimble-image-mask::before {
   -webkit-transform: scale(1.4);
   transform: scale(1.4);
@@ -1470,6 +1476,10 @@ button.sek-btn,
   padding: 20px 0;
 }
 
+.sek-hide-rc-badge .grecaptcha-badge {
+  display: none;
+}
+
 [data-sek-module-type="czr_tiny_mce_editor_module"] a {
   text-decoration: underline;
 }
@@ -1681,7 +1691,6 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
 }
 
 [data-sek-level="location"] [data-sek-level] {
-  webkit-transition: 0s linear;
   transition: 0s linear;
   transition-property: background-position;
 }

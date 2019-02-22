@@ -244,6 +244,7 @@ function sek_get_level_skope_id( $level_id = '' ) {
  *  HEADER FOOTER
 /* ------------------------------------------------------------------------- */
 function sek_page_uses_nimble_header_footer() {
+    Nimble_Manager()->sek_maybe_set_nimble_header_footer();
     return Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer;
 }
 
@@ -537,17 +538,30 @@ function sek_get_locale_template(){
     return $path;
 }
 function sek_get_local_option_value( $option_name, $skope_id = null ) {
-    $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
-    $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
-    $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
+    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->local_options ) {
+        $local_options = Nimble_Manager()->local_options;
+    } else {
+        $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
+        $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
+        $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
+        if ( did_action('nimble_front_classes_ready') && did_action('wp') && defined( 'DOING_AJAX') && true !== DOING_AJAX ) {
+            Nimble_Manager()->local_options = $local_options;
+        }
+    }
+
     return ( ! empty( $local_options ) && ! empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
 }
 function sek_get_global_option_value( $option_name ) {
-    $options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    return ( is_array( $options ) && ! empty( $options[ $option_name ] ) ) ? $options[ $option_name ] : null;
+    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->global_nimble_options ) {
+        $global_nimble_options = Nimble_Manager()->global_nimble_options;
+    } else {
+        $global_nimble_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+        if ( did_action('nimble_front_classes_ready') && defined( 'DOING_AJAX') && true !== DOING_AJAX ) {
+            Nimble_Manager()->global_nimble_options = $global_nimble_options;
+        }
+    }
+    return ( is_array( $global_nimble_options ) && ! empty( $global_nimble_options[ $option_name ] ) ) ? $global_nimble_options[ $option_name ] : null;
 }
-
-
 
 
 
@@ -592,7 +606,7 @@ function sek_get_section_custom_breakpoint( $section ) {
 
 
 /* ------------------------------------------------------------------------- *
- *  FONT AWESOME HELPER
+ *  FRONT ASSET SNIFFERS
 /* ------------------------------------------------------------------------- */
 function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
     if ( !$bool ) {
@@ -613,6 +627,28 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
                 break;
             } else if ( is_array( $value ) ) {
                 $bool = sek_front_needs_font_awesome( $bool, $value );
+            }
+        }
+    }
+    return $bool;
+}
+function sek_front_sections_include_a_form( $bool = false, $recursive_data = null ) {
+    if ( !$bool ) {
+        if ( is_null( $recursive_data ) ) {
+            $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+            $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+            $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+            $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+
+            $recursive_data = array_merge( $local_collection, $global_collection );
+        }
+
+        foreach ($recursive_data as $key => $value) {
+            if ( is_array( $value ) && array_key_exists('module_type', $value) && 'czr_simple_form_module' === $value['module_type'] ) {
+                $bool = true;
+                break;
+            } else if ( is_array( $value ) ) {
+                $bool = sek_front_sections_include_a_form( $bool, $value );
             }
         }
     }
@@ -653,7 +689,7 @@ function sek_get_img_sizes() {
 
     $sizes = array();
     $to_return = array(
-        'original' => __('Original image dimensions', 'text_domain_to_be_replaced')
+        'original' => __('Original image dimensions', 'text_doma')
     );
 
     foreach ( get_intermediate_image_sizes() as $_size ) {
@@ -739,6 +775,45 @@ function sek_is_img_smartload_enabled() {
     Nimble_Manager()->img_smartload_enabled = $is_img_smartload_enabled;
 
     return Nimble_Manager()->img_smartload_enabled;
+}
+
+
+/* ------------------------------------------------------------------------- *
+ *  reCAPTCHA HELPER
+/* ------------------------------------------------------------------------- */
+function sek_is_recaptcha_globally_enabled() {
+    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->recaptcha_enabled ) {
+        return Nimble_Manager()->recaptcha_enabled;
+    }
+    $recaptcha_enabled = false;
+
+    $glob_recaptcha_opts = sek_get_global_option_value( 'recaptcha' );
+
+    if ( !is_null( $glob_recaptcha_opts ) && is_array( $glob_recaptcha_opts ) && !empty( $glob_recaptcha_opts['enable'] ) ) {
+        $recaptcha_enabled = sek_booleanize_checkbox_val( $glob_recaptcha_opts['enable'] ) && !empty( $glob_recaptcha_opts['public_key'] ) && !empty($glob_recaptcha_opts['private_key'] );
+    }
+    if ( !defined( 'DOING_AJAX') || true !== DOING_AJAX ) {
+        Nimble_Manager()->recaptcha_enabled = $recaptcha_enabled;
+    }
+
+    return $recaptcha_enabled;
+}
+function sek_is_recaptcha_badge_globally_displayed() {
+    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->recaptcha_badge_displayed ) {
+        return Nimble_Manager()->recaptcha_badge_displayed;
+    }
+    $display_badge = false;//disabled by default @see sek_get_module_params_for_sek_global_recaptcha()
+
+    $glob_recaptcha_opts = sek_get_global_option_value( 'recaptcha' );
+
+    if ( !is_null( $glob_recaptcha_opts ) && is_array( $glob_recaptcha_opts ) && !empty( $glob_recaptcha_opts['badge'] ) ) {
+        $display_badge = sek_booleanize_checkbox_val( $glob_recaptcha_opts['badge'] ) && sek_is_recaptcha_globally_enabled();
+    }
+    if ( !defined( 'DOING_AJAX') || true !== DOING_AJAX ) {
+        Nimble_Manager()->recaptcha_badge_displayed = $display_badge;
+    }
+
+    return $display_badge;
 }
 
 
@@ -1322,8 +1397,8 @@ function sek_map_compat_1_0_4_to_1_1_0_do_level_spacing_mapping( $old_user_data 
 ?><?php
 register_post_type( NIMBLE_CPT , array(
     'labels' => array(
-      'name'          => __( 'Nimble sections', 'text_domain_to_be_replaced' ),
-      'singular_name' => __( 'Nimble sections', 'text_domain_to_be_replaced' ),
+      'name'          => __( 'Nimble sections', 'text_doma' ),
+      'singular_name' => __( 'Nimble sections', 'text_doma' ),
     ),
     'public'           => false,
     'hierarchical'     => false,
@@ -1546,8 +1621,8 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
 /* ------------------------------------------------------------------------- */
 register_post_type( 'nimble_saved_seks' , array(
     'labels' => array(
-      'name'          => __( 'Nimble saved sections', 'text_domain_to_be_replaced' ),
-      'singular_name' => __( 'Nimble saved sections', 'text_domain_to_be_replaced' ),
+      'name'          => __( 'Nimble saved sections', 'text_doma' ),
+      'singular_name' => __( 'Nimble saved sections', 'text_doma' ),
     ),
     'public'           => false,
     'hierarchical'     => false,
@@ -2271,6 +2346,7 @@ function sek_register_modules() {
         'sek_global_widths',
         'sek_global_performances',
         'sek_global_header_footer',
+        'sek_global_recaptcha',
         'sek_global_beta_features',
         'czr_simple_html_module',
 
@@ -2338,15 +2414,15 @@ function sek_get_select_options_for_input_id( $input_id ) {
     switch( $input_id ) {
         case 'img_hover_effect' :
             $options = array(
-                'none' => __('No effect', 'text_domain_to_be_replaced' ),
-                'opacity' => __('Opacity', 'text_domain_to_be_replaced' ),
-                'zoom-out' => __('Zoom out', 'text_domain_to_be_replaced' ),
-                'zoom-in' => __('Zoom in', 'text_domain_to_be_replaced' ),
-                'move-up' =>__('Move up', 'text_domain_to_be_replaced' ),
-                'move-down' =>__('Move down', 'text_domain_to_be_replaced' ),
-                'blur' =>__('Blur', 'text_domain_to_be_replaced' ),
-                'grayscale' =>__('Grayscale', 'text_domain_to_be_replaced' ),
-                'reverse-grayscale' =>__('Reverse grayscale', 'text_domain_to_be_replaced' )
+                'none' => __('No effect', 'text_doma' ),
+                'opacity' => __('Opacity', 'text_doma' ),
+                'zoom-out' => __('Zoom out', 'text_doma' ),
+                'zoom-in' => __('Zoom in', 'text_doma' ),
+                'move-up' =>__('Move up', 'text_doma' ),
+                'move-down' =>__('Move down', 'text_doma' ),
+                'blur' =>__('Blur', 'text_doma' ),
+                'grayscale' =>__('Grayscale', 'text_doma' ),
+                'reverse-grayscale' =>__('Reverse grayscale', 'text_doma' )
             );
         break;
         case 'img-size' :
@@ -2354,41 +2430,41 @@ function sek_get_select_options_for_input_id( $input_id ) {
         break;
         case 'link-to' :
             $options = array(
-                'no-link' => __('No link', 'text_domain_to_be_replaced' ),
-                'url' => __('Site content or custom url', 'text_domain_to_be_replaced' ),
+                'no-link' => __('No link', 'text_doma' ),
+                'url' => __('Site content or custom url', 'text_doma' ),
             );
         break;
         case 'img-type' :
             $options = array(
-                'none' => __( 'No image', 'text_domain_to_be_replaced' ),
-                'featured' => __( 'Use the page featured image', 'text_domain_to_be_replaced' ),
-                'custom' => __( 'Use a custom image', 'text_domain_to_be_replaced' ),
+                'none' => __( 'No image', 'text_doma' ),
+                'featured' => __( 'Use the page featured image', 'text_doma' ),
+                'custom' => __( 'Use a custom image', 'text_doma' ),
             );
         break;
         case 'content-type' :
             $options = array(
-                'none' => __( 'No text', 'text_domain_to_be_replaced' ),
-                'page-excerpt' => __( 'Use the page excerpt', 'text_domain_to_be_replaced' ),
-                'custom' => __( 'Use a custom text', 'text_domain_to_be_replaced' ),
+                'none' => __( 'No text', 'text_doma' ),
+                'page-excerpt' => __( 'Use the page excerpt', 'text_doma' ),
+                'custom' => __( 'Use a custom text', 'text_doma' ),
             );
         break;
         case 'heading_tag':
             $options = array(
                 /* Not totally sure these should be localized as they strictly refer to html tags */
-                'h1' => __('H1', 'text_domain_to_be_replaced' ),
-                'h2' => __('H2', 'text_domain_to_be_replaced' ),
-                'h3' => __('H3', 'text_domain_to_be_replaced' ),
-                'h4' => __('H4', 'text_domain_to_be_replaced' ),
-                'h5' => __('H5', 'text_domain_to_be_replaced' ),
-                'h6' => __('H6', 'text_domain_to_be_replaced' ),
+                'h1' => __('H1', 'text_doma' ),
+                'h2' => __('H2', 'text_doma' ),
+                'h3' => __('H3', 'text_doma' ),
+                'h4' => __('H4', 'text_doma' ),
+                'h5' => __('H5', 'text_doma' ),
+                'h6' => __('H6', 'text_doma' ),
             );
         break;
         case 'font_weight_css' :
             $options = array(
-                'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
-                'bold'    => __( 'bold', 'text_domain_to_be_replaced' ),
-                'bolder'  => __( 'bolder', 'text_domain_to_be_replaced' ),
-                'lighter'   => __( 'lighter', 'text_domain_to_be_replaced' ),
+                'normal'  => __( 'normal', 'text_doma' ),
+                'bold'    => __( 'bold', 'text_doma' ),
+                'bolder'  => __( 'bolder', 'text_doma' ),
+                'lighter'   => __( 'lighter', 'text_doma' ),
                 100     => 100,
                 200     => 200,
                 300     => 300,
@@ -2402,82 +2478,82 @@ function sek_get_select_options_for_input_id( $input_id ) {
         break;
         case 'font_style_css' :
             $options = array(
-                'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                'italic'  => __( 'italic', 'text_domain_to_be_replaced' ),
-                'normal'  => __( 'normal', 'text_domain_to_be_replaced' ),
-                'oblique' => __( 'oblique', 'text_domain_to_be_replaced' )
+                'inherit'   => __( 'inherit', 'text_doma' ),
+                'italic'  => __( 'italic', 'text_doma' ),
+                'normal'  => __( 'normal', 'text_doma' ),
+                'oblique' => __( 'oblique', 'text_doma' )
             );
         break;
         case 'text_decoration_css'  :
             $options = array(
-                'none'      => __( 'none', 'text_domain_to_be_replaced' ),
-                'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                'line-through' => __( 'line-through', 'text_domain_to_be_replaced' ),
-                'overline'    => __( 'overline', 'text_domain_to_be_replaced' ),
-                'underline'   => __( 'underline', 'text_domain_to_be_replaced' )
+                'none'      => __( 'none', 'text_doma' ),
+                'inherit'   => __( 'inherit', 'text_doma' ),
+                'line-through' => __( 'line-through', 'text_doma' ),
+                'overline'    => __( 'overline', 'text_doma' ),
+                'underline'   => __( 'underline', 'text_doma' )
             );
         break;
         case 'text_transform_css' :
             $options = array(
-                'none'      => __( 'none', 'text_domain_to_be_replaced' ),
-                'inherit'   => __( 'inherit', 'text_domain_to_be_replaced' ),
-                'capitalize'  => __( 'capitalize', 'text_domain_to_be_replaced' ),
-                'uppercase'   => __( 'uppercase', 'text_domain_to_be_replaced' ),
-                'lowercase'   => __( 'lowercase', 'text_domain_to_be_replaced' )
+                'none'      => __( 'none', 'text_doma' ),
+                'inherit'   => __( 'inherit', 'text_doma' ),
+                'capitalize'  => __( 'capitalize', 'text_doma' ),
+                'uppercase'   => __( 'uppercase', 'text_doma' ),
+                'lowercase'   => __( 'lowercase', 'text_doma' )
             );
         break;
         case 'css_unit' :
             $options = array(
-                'px' => __('Pixels', 'text_domain_to_be_replaced' ),
-                'em' => __('Em', 'text_domain_to_be_replaced'),
-                'percent' => __('Percents', 'text_domain_to_be_replaced' )
+                'px' => __('Pixels', 'text_doma' ),
+                'em' => __('Em', 'text_doma'),
+                'percent' => __('Percents', 'text_doma' )
             );
         break;
         case 'quote_design' :
             $options = array(
-                'none' => __( 'Text only', 'text_domain_to_be_replaced' ),
-                'border-before' => __( 'Side Border', 'text_domain_to_be_replaced' ),
-                'quote-icon-before' => __( 'Quote Icon', 'text_domain_to_be_replaced' ),
+                'none' => __( 'Text only', 'text_doma' ),
+                'border-before' => __( 'Side Border', 'text_doma' ),
+                'quote-icon-before' => __( 'Quote Icon', 'text_doma' ),
             );
         break;
         case 'boxed-wide' :
             $options = array(
-                'boxed' => __('Boxed', 'text_domain_to_be_replaced'),
-                'fullwidth' => __('Full Width', 'text_domain_to_be_replaced')
+                'boxed' => __('Boxed', 'text_doma'),
+                'fullwidth' => __('Full Width', 'text_doma')
             );
         break;
         case 'height-type' :
             $options = array(
-                'auto' => __('Adapt to content', 'text_domain_to_be_replaced'),
-                'custom' => __('Custom', 'text_domain_to_be_replaced' )
+                'auto' => __('Adapt to content', 'text_doma'),
+                'custom' => __('Custom', 'text_doma' )
             );
         break;
         case 'width-type' :
             $options = array(
-                'default' => __('Default', 'text_domain_to_be_replaced'),
-                'custom' => __('Custom', 'text_domain_to_be_replaced' )
+                'default' => __('Default', 'text_doma'),
+                'custom' => __('Custom', 'text_doma' )
             );
         break;
         case 'bg-scale' :
             $options = array(
-                'default' => __('Default', 'text_domain_to_be_replaced'),
-                'auto' => __('Automatic', 'text_domain_to_be_replaced'),
-                'cover' => __('Scale to fill', 'text_domain_to_be_replaced'),
-                'contain' => __('Fit', 'text_domain_to_be_replaced'),
+                'default' => __('Default', 'text_doma'),
+                'auto' => __('Automatic', 'text_doma'),
+                'cover' => __('Scale to fill', 'text_doma'),
+                'contain' => __('Fit', 'text_doma'),
             );
         break;
         case 'bg-position' :
             $options = array(
-                'default' => __('default', 'text_domain_to_be_replaced'),
+                'default' => __('default', 'text_doma'),
             );
         break;
         case 'border-type' :
             $options = array(
-                'none' => __('none', 'text_domain_to_be_replaced'),
-                'solid' => __('solid', 'text_domain_to_be_replaced'),
-                'double' => __('double', 'text_domain_to_be_replaced'),
-                'dotted' => __('dotted', 'text_domain_to_be_replaced'),
-                'dashed' => __('dashed', 'text_domain_to_be_replaced')
+                'none' => __('none', 'text_doma'),
+                'solid' => __('solid', 'text_doma'),
+                'double' => __('double', 'text_doma'),
+                'dotted' => __('dotted', 'text_doma'),
+                'dashed' => __('dashed', 'text_doma')
             );
         break;
 
@@ -2496,12 +2572,12 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_content_type_switcher_module',
-        'name' => __('Content type', 'text_domain_to_be_replaced'),
+        'name' => __('Content type', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'content_type' => array(
                     'input_type'  => 'content_type_switcher',
-                    'title'       => '',//__('Which type of content would you like to drop in your page ?', 'text_domain_to_be_replaced'),
+                    'title'       => '',//__('Which type of content would you like to drop in your page ?', 'text_doma'),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'notice_after' => sprintf(
@@ -2529,12 +2605,12 @@ function sek_get_module_params_for_sek_module_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_module_picker_module',
-        'name' => __('Content Picker', 'text_domain_to_be_replaced'),
+        'name' => __('Content Picker', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'module_id' => array(
                     'input_type'  => 'module_picker',
-                    'title'       => __('Drag-and-drop or double-click a module to insert it into a drop zone of the preview page.', 'text_domain_to_be_replaced'),
+                    'title'       => __('Drag-and-drop or double-click a module to insert it into a drop zone of the preview page.', 'text_doma'),
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 )
@@ -2550,7 +2626,7 @@ function sek_get_module_params_for_sek_module_picker_module() {
 function sek_get_default_section_input_params() {
     return array(
         'input_type'  => 'section_picker',
-        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_domain_to_be_replaced'),
+        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
         'width-100'   => true,
         'title_width' => 'width-100'
     );
@@ -2560,7 +2636,7 @@ function sek_get_module_params_for_sek_intro_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_intro_sec_picker_module',
-        'name' => __('Sections for an introduction', 'text_domain_to_be_replaced'),
+        'name' => __('Sections for an introduction', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'intro_sections' => sek_get_default_section_input_params()
@@ -2572,7 +2648,7 @@ function sek_get_module_params_for_sek_features_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_features_sec_picker_module',
-        'name' => __('Sections for services and features', 'text_domain_to_be_replaced'),
+        'name' => __('Sections for services and features', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'features_sections' => sek_get_default_section_input_params()
@@ -2585,7 +2661,7 @@ function sek_get_module_params_for_sek_contact_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_contact_sec_picker_module',
-        'name' => __('Contact-us sections', 'text_domain_to_be_replaced'),
+        'name' => __('Contact-us sections', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'contact_sections' => sek_get_default_section_input_params()
@@ -2598,7 +2674,7 @@ function sek_get_module_params_for_sek_column_layouts_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_column_layouts_sec_picker_module',
-        'name' => __('Empty sections with columns layout', 'text_domain_to_be_replaced'),
+        'name' => __('Empty sections with columns layout', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'layout_sections' => sek_get_default_section_input_params()
@@ -2611,7 +2687,7 @@ function sek_get_module_params_for_sek_header_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_header_sec_picker_module',
-        'name' => __('Header sections', 'text_domain_to_be_replaced'),
+        'name' => __('Header sections', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'header_sections' => sek_get_default_section_input_params()
@@ -2623,7 +2699,7 @@ function sek_get_module_params_for_sek_footer_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_footer_sec_picker_module',
-        'name' => __('Footer sections', 'text_domain_to_be_replaced'),
+        'name' => __('Footer sections', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'footer_sections' => sek_get_default_section_input_params()
@@ -2641,7 +2717,7 @@ function sek_get_module_params_for_sek_my_sections_sec_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_my_sections_sec_picker_module',
-        'name' => __('My sections', 'text_domain_to_be_replaced'),
+        'name' => __('My sections', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'my_sections' => sek_get_default_section_input_params()
@@ -2654,36 +2730,36 @@ function sek_get_module_params_for_sek_level_bg_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_bg_module',
-        'name' => __('Background', 'text_domain_to_be_replaced'),
+        'name' => __('Background', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'bg-color' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Background color', 'text_domain_to_be_replaced'),
+                    'title'       => __('Background color', 'text_doma'),
                     'width-100'   => true,
                     'default'     => '',
                 ),
                 'bg-image' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Image', 'text_domain_to_be_replaced'),
+                    'title'       => __('Image', 'text_doma'),
                     'default'     => '',
-                    'notice_after' => sprintf( __('To ensure better performances, use optimized images for your backgrounds. You can also enable the lazy loading option in the %1$s.', 'text_domain_to_be_replaced'),
+                    'notice_after' => sprintf( __('To ensure better performances, use optimized images for your backgrounds. You can also enable the lazy loading option in the %1$s.', 'text_doma'),
                       sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                           "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
-                          __('site wide options', 'text_domain_to_be_replaced')
+                          __('site wide options', 'text_doma')
                       )
                     ),
                     'refresh_markup' => true
                 ),
                 'bg-position' => array(
                     'input_type'  => 'bgPositionWithDeviceSwitcher',
-                    'title'       => __('Image position', 'text_domain_to_be_replaced'),
+                    'title'       => __('Image position', 'text_doma'),
                     'default'     => array( 'desktop' => 'center' ),
                     'title_width' => 'width-100',
                 ),
                 'bg-attachment' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Fixed background', 'text_domain_to_be_replaced'),
+                    'title'       => __('Fixed background', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => true,
@@ -2691,28 +2767,28 @@ function sek_get_module_params_for_sek_level_bg_module() {
                 ),
                 'bg-parallax' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Parallax effect on scroll', 'text_domain_to_be_replaced'),
+                    'title'       => __('Parallax effect on scroll', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'default'     => 0,
-                    'notice_after' => __('When enabled, the background image moves slower than the page elements on scroll. This effect is not enabled on mobile devices.', 'text_domain_to_be_replaced'),
+                    'notice_after' => __('When enabled, the background image moves slower than the page elements on scroll. This effect is not enabled on mobile devices.', 'text_doma'),
                     'refresh_markup' => true,
                 ),
                 'bg-parallax-force' => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __('Parallax force (in percents)', 'text_domain_to_be_replaced'),
+                    'title'       => __('Parallax force (in percents)', 'text_doma'),
                     'orientation' => 'horizontal',
                     'min' => 0,
                     'max' => 100,
                     'default'  => '60',
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'notice_after' => __('Customize the magnitude of the visual effect when scrolling.', 'text_domain_to_be_replaced'),
+                    'notice_after' => __('Customize the magnitude of the visual effect when scrolling.', 'text_doma'),
                     'refresh_markup' => true
                 ),
                 'bg-repeat' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Repeat', 'text_domain_to_be_replaced'),
+                    'title'       => __('Repeat', 'text_doma'),
                     'default'     => 'no-repeat',
                     'choices'     => array(
                         'default' => __('Default', 'text_dom'),
@@ -2726,26 +2802,26 @@ function sek_get_module_params_for_sek_level_bg_module() {
                 ),
                 'bg-scale' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Scale', 'text_domain_to_be_replaced'),
+                    'title'       => __('Scale', 'text_doma'),
                     'default'     => 'cover',
                     'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
                 ),
                 'bg-apply-overlay' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Apply a background overlay', 'text_domain_to_be_replaced'),
+                    'title'       => __('Apply a background overlay', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'default'     => 0
                 ),
                 'bg-color-overlay' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Overlay Color', 'text_domain_to_be_replaced'),
+                    'title'       => __('Overlay Color', 'text_doma'),
                     'width-100'   => true,
                     'default'     => '#000000'
                 ),
                 'bg-opacity-overlay' => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __('Opacity (in percents)', 'text_domain_to_be_replaced'),
+                    'title'       => __('Opacity (in percents)', 'text_doma'),
                     'orientation' => 'horizontal',
                     'min' => 0,
                     'max' => 100,
@@ -2884,7 +2960,7 @@ function sek_get_module_params_for_sek_level_border_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_border_module',
-        'name' => __('Borders', 'text_domain_to_be_replaced'),
+        'name' => __('Borders', 'text_doma'),
         'starting_value' => array(
             'borders' => array(
                 '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
@@ -2894,13 +2970,13 @@ function sek_get_module_params_for_sek_level_border_module() {
             'item-inputs' => array(
                 'border-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Border shape', 'text_domain_to_be_replaced'),
+                    'title'       => __('Border shape', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' )
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                    'title'       => __('Borders', 'text_doma'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -2911,7 +2987,7 @@ function sek_get_module_params_for_sek_level_border_module() {
                 ),
                 'border-radius'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Rounded corners', 'text_doma' ),
                     'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -2920,7 +2996,7 @@ function sek_get_module_params_for_sek_level_border_module() {
                 ),
                 'shadow' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Apply a shadow', 'text_domain_to_be_replaced'),
+                    'title'       => __('Apply a shadow', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'default' => 0
@@ -2993,7 +3069,7 @@ function sek_get_module_params_for_sek_level_height_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_height_module',
-        'name' => __('Height options', 'text_domain_to_be_replaced'),
+        'name' => __('Height options', 'text_doma'),
         'starting_value' => array(
             'custom-height'  => array( 'desktop' => '50%' ),
         ),
@@ -3001,26 +3077,36 @@ function sek_get_module_params_for_sek_level_height_module() {
             'item-inputs' => array(
                 'height-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Height : auto or custom', 'text_domain_to_be_replaced'),
+                    'title'       => __('Height : auto or custom', 'text_doma'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'height-type' )
                 ),
                 'custom-height' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Custom height', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom height', 'text_doma'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '50%' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
+                    'notice_before' => 'Note that when using a custom height, the inner content can be larger than the parent container, in particular on mobile devices. To prevent this problem, preview your page with the device switcher icons. You can also activate the overflow hidden option below.'
+                ),
+                'overflow_hidden' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Overflow hidden', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'notice_after' => __('Hide the content when it is too big to fit in its parent container.', 'text_doma')
                 ),
                 'v_alignment' => array(
                     'input_type'  => 'verticalAlignWithDeviceSwitcher',
-                    'title'       => __('Inner vertical alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Inner vertical alignment', 'text_doma'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'css_identifier' => 'v_alignment',
                     'title_width' => 'width-100',
                     'width-100'   => true,
                 )
@@ -3041,7 +3127,6 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
       return $rules;
 
     $height_options = is_array( $options[ 'height' ] ) ? $options[ 'height' ] : array();
-
     if ( ! empty( $height_options[ 'v_alignment' ] ) ) {
         if ( ! is_array( $height_options[ 'v_alignment' ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
@@ -3102,6 +3187,13 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             ), $rules );
         }
     }
+    if ( ! empty( $height_options[ 'overflow_hidden' ] ) && sek_booleanize_checkbox_val( $height_options[ 'overflow_hidden' ] ) ) {
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$level['id'].'"]',
+            'css_rules' => 'overflow:hidden',
+            'mq' =>null
+        );
+    }
     return $rules;
 }
 
@@ -3113,13 +3205,13 @@ function sek_get_module_params_for_sek_level_spacing_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_spacing_module',
-        'name' => __('Spacing options', 'text_domain_to_be_replaced'),
+        'name' => __('Spacing options', 'text_doma'),
 
         'tmpl' => array(
             'item-inputs' => array(
                 'pad_marg' => array(
                     'input_type'  => 'spacingWithDeviceSwitcher',
-                    'title'       => __('Set padding and margin', 'text_domain_to_be_replaced'),
+                    'title'       => __('Set padding and margin', 'text_doma'),
                     'title_width' => 'width-100',
                     'width-100'   => true,
                     'default'     => array( 'desktop' => array() ),
@@ -3211,18 +3303,18 @@ function sek_get_module_params_for_sek_level_width_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_width_module',
-        'name' => __('Width options', 'text_domain_to_be_replaced'),
+        'name' => __('Width options', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'width-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Width : 100% or custom', 'text_domain_to_be_replaced'),
+                    'title'       => __('Width : 100% or custom', 'text_doma'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'width-type' )
                 ),
                 'custom-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Custom width', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom width', 'text_doma'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '100%' ),
@@ -3231,7 +3323,7 @@ function sek_get_module_params_for_sek_level_width_module() {
                 ),
                 'h_alignment' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Horizontal alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Horizontal alignment', 'text_doma'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -3325,12 +3417,12 @@ function sek_get_module_params_for_sek_level_width_section() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_width_section',
-        'name' => __('Width options', 'text_domain_to_be_replaced'),
+        'name' => __('Width options', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-outer-width' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Define a custom outer width for this section', 'text_domain_to_be_replaced'),
+                    'title'       => __('Define a custom outer width for this section', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3339,7 +3431,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Outer section width', 'text_domain_to_be_replaced'),
+                    'title'       => __('Outer section width', 'text_doma'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '100%' ),
@@ -3348,7 +3440,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                 ),
                 'use-custom-inner-width' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Define a custom inner width for this section', 'text_domain_to_be_replaced'),
+                    'title'       => __('Define a custom inner width for this section', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3357,7 +3449,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                 ),
                 'inner-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Inner section width', 'text_domain_to_be_replaced'),
+                    'title'       => __('Inner section width', 'text_doma'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '100%' ),
@@ -3450,12 +3542,12 @@ function sek_get_module_params_for_sek_level_anchor_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_anchor_module',
-        'name' => __('Set a custom anchor', 'text_domain_to_be_replaced'),
+        'name' => __('Set a custom anchor', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'custom_anchor' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom anchor', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom anchor', 'text_doma'),
                     'default'     => '',
                     'notice_after' => __('Note : white spaces, numbers and special characters are not allowed when setting an anchor.')
                 ),
@@ -3469,12 +3561,12 @@ function sek_get_module_params_for_sek_level_visibility_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_visibility_module',
-        'name' => __('Set visibility on devices', 'text_domain_to_be_replaced'),
+        'name' => __('Set visibility on devices', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'desktops' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">desktop_mac</i> %1$s', __('Visible on desktop devices', 'text_domain_to_be_replaced') ),
+                    'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">desktop_mac</i> %1$s', __('Visible on desktop devices', 'text_doma') ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3483,7 +3575,7 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                 ),
                 'tablets' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">tablet_mac</i> %1$s', __('Visible on tablet devices', 'text_domain_to_be_replaced') ),
+                    'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">tablet_mac</i> %1$s', __('Visible on tablet devices', 'text_doma') ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3492,7 +3584,7 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                 ),
                 'mobiles' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">phone_iphone</i> %1$s', __('Visible on mobile devices', 'text_domain_to_be_replaced') ),
+                    'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">phone_iphone</i> %1$s', __('Visible on mobile devices', 'text_doma') ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3511,12 +3603,12 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_breakpoint_module',
-        'name' => __('Set a custom breakpoint', 'text_domain_to_be_replaced'),
+        'name' => __('Set a custom breakpoint', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                   'use-custom-breakpoint' => array(
                       'input_type'  => 'gutencheck',
-                      'title'       => __('Use a custom breakpoint for the vertical reorganization of columns', 'text_domain_to_be_replaced'),
+                      'title'       => __('Use a custom breakpoint for the vertical reorganization of columns', 'text_doma'),
                       'default'     => 0,
                       'title_width' => 'width-80',
                       'input_width' => 'width-20',
@@ -3525,7 +3617,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                   ),
                   'custom-breakpoint'  => array(
                       'input_type'  => 'range_simple',
-                      'title'       => __( 'Define a custom breakpoint in pixels', 'text_domain_to_be_replaced' ),
+                      'title'       => __( 'Define a custom breakpoint in pixels', 'text_doma' ),
                       'default'     => $global_custom_breakpoint > 0 ? $global_custom_breakpoint : 768,
                       'min'         => 1,
                       'max'         => 2000,
@@ -3534,11 +3626,11 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                       'refresh_stylesheet' => true,
                       'width-100'   => true,
                       'title_width' => 'width-100',
-                      'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default breakpoint is 768px.', 'text_domain_to_be_replaced')
+                      'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default breakpoint is 768px.', 'text_doma')
                   ),//0,
                   'reverse-col-at-breakpoint' => array(
                       'input_type'  => 'gutencheck',
-                      'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'text_domain_to_be_replaced'),
+                      'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'text_doma'),
                       'default'     => 0,
                       'title_width' => 'width-80',
                       'input_width' => 'width-20',
@@ -3592,21 +3684,21 @@ function sek_get_module_params_for_sek_local_template() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_template',
-        'name' => __('Template for the current page', 'text_domain_to_be_replaced'),
+        'name' => __('Template for the current page', 'text_doma'),
         'starting_value' => array(),
         'tmpl' => array(
             'item-inputs' => array(
                 'local_template' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select a template', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select a template', 'text_doma'),
                     'default'     => 'default',
                     'width-100'   => true,
                     'choices'     => array(
-                        'default' => __('Default theme template','text_domain_to_be_replaced'),
-                        'nimble_template' => __('Nimble Builder template','text_domain_to_be_replaced')
+                        'default' => __('Default theme template','text_doma'),
+                        'nimble_template' => __('Nimble Builder template','text_doma')
                     ),
                     'refresh_preview' => true,
-                    'notice_before_title' => __('Use the Nimble Builder template to display content created only with the Nimble Builder on this page. Your theme\'s default template will be overriden','text_domain_to_be_replaced')
+                    'notice_before_title' => __('Use the Nimble Builder template to display content created only with the Nimble Builder on this page. Your theme\'s default template will be overriden','text_doma')
                 )
             )
         )//tmpl
@@ -3617,28 +3709,28 @@ function sek_get_module_params_for_sek_local_widths() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_widths',
-        'name' => __('Width settings of the sections in the current page', 'text_domain_to_be_replaced'),
+        'name' => __('Width settings of the sections in the current page', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-outer-width' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Define a custom outer width for the sections of this page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Define a custom outer width for the sections of this page', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'refresh_preview' => true,
-                    'notice_before_title' => sprintf( __( 'The inner and outer widths of the sections displayed in this page can be set here. It will override in the %1$s. You can also set a custom inner and outer width for each single sections.', 'text_domain_to_be_replaced'),
+                    'notice_before_title' => sprintf( __( 'The inner and outer widths of the sections displayed in this page can be set here. It will override in the %1$s. You can also set a custom inner and outer width for each single sections.', 'text_doma'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
-                            __('site wide options', 'text_domain_to_be_replaced')
+                            __('site wide options', 'text_doma')
                         )
                     ),
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Outer sections width', 'text_domain_to_be_replaced'),
+                    'title'       => __('Outer sections width', 'text_doma'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '100%' ),
@@ -3650,7 +3742,7 @@ function sek_get_module_params_for_sek_local_widths() {
                 ),
                 'use-custom-inner-width' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Define a custom inner width for the sections of this page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Define a custom inner width for the sections of this page', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3659,7 +3751,7 @@ function sek_get_module_params_for_sek_local_widths() {
                 ),
                 'inner-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Inner sections width', 'text_domain_to_be_replaced'),
+                    'title'       => __('Inner sections width', 'text_doma'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '100%' ),
@@ -3754,15 +3846,15 @@ function sek_get_module_params_for_sek_local_custom_css() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_custom_css',
-        'name' => __('Custom CSS for the sections of the current page', 'text_domain_to_be_replaced'),
+        'name' => __('Custom CSS for the sections of the current page', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'local_custom_css' => array(
                     'input_type'  => 'code_editor',
-                    'title'       => __( 'Custom css' , 'text_domain_to_be_replaced' ),
-                    'default'     => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_domain_to_be_replaced' ) ),
+                    'title'       => __( 'Custom css' , 'text_doma' ),
+                    'default'     => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) ),
                     'code_type' => 'text/css',// 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
-                    'notice_before_title' => __('The CSS code added below will only be applied to the currently previewed page, not site wide.', 'text_domain_to_be_replaced'),
+                    'notice_before_title' => __('The CSS code added below will only be applied to the currently previewed page, not site wide.', 'text_doma'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                 )
@@ -3788,14 +3880,14 @@ function sek_get_module_params_for_sek_local_reset() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_reset',
-        'name' => __('Reset the sections of the current page', 'text_domain_to_be_replaced'),
+        'name' => __('Reset the sections of the current page', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'reset_local' => array(
                     'input_type'  => 'reset_button',
-                    'title'       => __( 'Remove the Nimble sections in the current page' , 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Remove the Nimble sections in the current page' , 'text_doma' ),
                     'scope'       => 'local',
-                    'notice_after' => __('This will reset the sections created for the currently previewed page only. All other sections in other contexts will be preserved.', 'text_domain_to_be_replaced'),
+                    'notice_after' => __('This will reset the sections created for the currently previewed page only. All other sections in other contexts will be preserved.', 'text_doma'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                 )
@@ -3808,12 +3900,12 @@ function sek_get_module_params_for_sek_local_performances() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_performances',
-        'name' => __('Performance optimizations', 'text_domain_to_be_replaced'),
+        'name' => __('Performance optimizations', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'local-img-smart-load' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select how you want to load the images in the sections of this page.', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select how you want to load the images in the sections of this page.', 'text_doma'),
                     'default'     => 'inherit',
                     'choices'     => array(
                         'inherit' => __('Inherit the site wide option', 'text_domain' ),
@@ -3836,12 +3928,12 @@ function sek_get_module_params_for_sek_local_header_footer() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_header_footer',
-        'name' => __('Page header', 'text_domain_to_be_replaced'),
+        'name' => __('Page header', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'header-footer' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select a header and a footer for this page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select a header and a footer for this page', 'text_doma'),
                     'default'     => 'inherit',
                     'choices'     => array(
                         'inherit' => __('Inherit the site wide option', 'text_domain' ),
@@ -3852,10 +3944,10 @@ function sek_get_module_params_for_sek_local_header_footer() {
                     'refresh_preview' => true,
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'notice_after' => sprintf( __( 'This option overrides the site wide header and footer options set in the %1$s for this page only.', 'text_domain_to_be_replaced'),
+                    'notice_after' => sprintf( __( 'This option overrides the site wide header and footer options set in the %1$s for this page only.', 'text_doma'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
-                            __('site wide options', 'text_domain_to_be_replaced')
+                            __('site wide options', 'text_doma')
                         )
                     ),
                 )
@@ -3868,20 +3960,20 @@ function sek_get_module_params_for_sek_global_breakpoint() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_breakpoint',
-        'name' => __('Site wide breakpoint options', 'text_domain_to_be_replaced'),
+        'name' => __('Site wide breakpoint options', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-breakpoint' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Use a global custom breakpoint for the vertical reorganization of columns', 'text_domain_to_be_replaced'),
+                    'title'       => __('Use a global custom breakpoint for the vertical reorganization of columns', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_before_title' => __( 'This is the breakpoint under which columns are reorganized vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_domain_to_be_replaced')
+                    'notice_before_title' => __( 'This is the breakpoint under which columns are reorganized vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_doma')
                 ),
                 'global-custom-breakpoint'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Define a custom breakpoint in pixels', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Define a custom breakpoint in pixels', 'text_doma' ),
                     'default'     => 768,
                     'min'         => 1,
                     'max'         => 2000,
@@ -3912,28 +4004,28 @@ function sek_get_module_params_for_sek_global_widths() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_widths',
-        'name' => __('Site wide width options', 'text_domain_to_be_replaced'),
+        'name' => __('Site wide width options', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-outer-width' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Define a custom outer width for the sections site wide', 'text_domain_to_be_replaced'),
+                    'title'       => __('Define a custom outer width for the sections site wide', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'refresh_preview' => true,
-                    'notice_before_title' => sprintf( __( 'The inner and outer widths of your sections can be set globally here, but also overriden in the %1$s, and for each sections.', 'text_domain_to_be_replaced'),
+                    'notice_before_title' => sprintf( __( 'The inner and outer widths of your sections can be set globally here, but also overriden in the %1$s, and for each sections.', 'text_doma'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
-                            __('current page options', 'text_domain_to_be_replaced')
+                            __('current page options', 'text_doma')
                         )
                     ),
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Outer sections width', 'text_domain_to_be_replaced'),
+                    'title'       => __('Outer sections width', 'text_doma'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '100%' ),
@@ -3943,7 +4035,7 @@ function sek_get_module_params_for_sek_global_widths() {
                 ),
                 'use-custom-inner-width' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Define a custom inner width for the sections site wide', 'text_domain_to_be_replaced'),
+                    'title'       => __('Define a custom inner width for the sections site wide', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3952,7 +4044,7 @@ function sek_get_module_params_for_sek_global_widths() {
                 ),
                 'inner-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Inner sections width', 'text_domain_to_be_replaced'),
+                    'title'       => __('Inner sections width', 'text_doma'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '100%' ),
@@ -4043,12 +4135,12 @@ function sek_get_module_params_for_sek_global_performances() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_performances',
-        'name' => __('Site wide performance options', 'text_domain_to_be_replaced'),
+        'name' => __('Site wide performance options', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'global-img-smart-load' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Load images on scroll', 'text_domain_to_be_replaced'),
+                    'title'       => __('Load images on scroll', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -4067,21 +4159,21 @@ function sek_get_module_params_for_sek_global_header_footer() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_header_footer',
-        'name' => __('Site wide header', 'text_domain_to_be_replaced'),
+        'name' => __('Site wide header', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'header-footer' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select a site wide header and footer', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select a site wide header and footer', 'text_doma'),
                     'default'     => 'inherit',
                     'choices'     => array(
                         'theme' => __('Use the active theme\'s header and footer', 'text_domain' ),
                         'nimble_global' => __('Nimble site wide header and footer ( beta )', 'text_domain' )
                     ),
-                    'notice_before_title' => sprintf( __( 'The Nimble Builder allows you to build your own header and footer, or to use your theme\'s ones. This option can be overriden in the %1$s.', 'text_domain_to_be_replaced'),
+                    'notice_before_title' => sprintf( __( 'The Nimble Builder allows you to build your own header and footer, or to use your theme\'s ones. This option can be overriden in the %1$s.', 'text_doma'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
-                            __('current page options', 'text_domain_to_be_replaced')
+                            __('current page options', 'text_doma')
                         )
                     ),
                     'width-100'   => true,
@@ -4093,21 +4185,67 @@ function sek_get_module_params_for_sek_global_header_footer() {
 }
 
 ?><?php
+function sek_get_module_params_for_sek_global_recaptcha() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_global_recaptcha',
+        'name' => __('Protect your contact forms with Google reCAPTCHA', 'text_doma'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'enable' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Activate Google reCAPTCHA on your forms', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => sprintf( __('The Nimble Builder can activate the %1$s service to protect your forms against spam. You need to %2$s.'),
+                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'text_doma') ),
+                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://www.google.com/recaptcha/admin#list', __('get your domain API keys from Google', 'text_doma') )
+                    )
+                ),
+                'public_key' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Public key', 'text_doma'),
+                    'default'     => '',
+                    'refresh_preview' => false,
+                    'refresh_markup' => false
+                ),
+                'private_key' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Private key', 'text_doma'),
+                    'default'     => '',
+                    'refresh_preview' => false,
+                    'refresh_markup' => false
+                ),
+                'badge' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display the reCAPTCHA badge at the bottom of your page', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after'       => __( 'The badge is not previewable when customizing.', 'text_doma')
+                )
+            )
+        )//tmpl
+    );
+}
+
+?><?php
 function sek_get_module_params_for_sek_global_beta_features() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_beta_features',
-        'name' => __('Beta features', 'text_domain_to_be_replaced'),
+        'name' => __('Beta features', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'beta-enabled' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Enable beta features', 'text_domain_to_be_replaced'),
+                    'title'       => __('Enable beta features', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_before_title' => __( 'Check this option to try the upcoming features of the Nimble Builder. Available beta features as of December 2018 : header and footer customization, menu module, widget area module.', 'text_domain_to_be_replaced'),
-                    'notice_after' => __( 'Be sure to refresh the customizer before you start using the beta features.', 'text_domain_to_be_replaced')
+                    'notice_before_title' => __( 'Check this option to try the upcoming features of the Nimble Builder. Available beta features as of December 2018 : header and footer customization, menu module, widget area module.', 'text_doma'),
+                    'notice_after' => __( 'Be sure to refresh the customizer before you start using the beta features.', 'text_doma')
                 ),
             )
         )//tmpl
@@ -4122,13 +4260,13 @@ function sek_get_module_params_for_czr_simple_html_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_html_module',
-        'name' => __( 'Html Content', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Html Content', 'text_doma' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_html_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'html_content' => array(
                     'input_type'  => 'code_editor',
-                    'title'       => __( 'HTML Content' , 'text_domain_to_be_replaced' )
+                    'title'       => __( 'HTML Content' , 'text_doma' )
                 )
             )
         ),
@@ -4159,7 +4297,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
             'main_settings'   => 'czr_tinymce_child',
             'font_settings' => 'czr_font_child'
         ),
-        'name' => __('Text Editor', 'text_domain_to_be_replaced'),
+        'name' => __('Text Editor', 'text_doma'),
         'starting_value' => array(
             'main_settings' => array(
                 'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
@@ -4185,17 +4323,17 @@ function sek_get_module_params_for_czr_tinymce_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_tinymce_child',
-        'name' => __('Content', 'text_domain_to_be_replaced'),
+        'name' => __('Content', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'content' => array(
                     'input_type'  => 'tiny_mce_editor',
-                    'title'       => __('Content', 'text_domain_to_be_replaced'),
+                    'title'       => __('Content', 'text_doma'),
                     'default'     => ''
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Alignment', 'text_doma'),
                     'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -4205,7 +4343,7 @@ function sek_get_module_params_for_czr_tinymce_child() {
                 ),
                 'autop' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Automatically convert text into paragraph', 'text_domain_to_be_replaced'),
+                    'title'       => __('Automatically convert text into paragraph', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -4232,7 +4370,7 @@ function sek_get_module_params_for_czr_image_module() {
             'main_settings'   => 'czr_image_main_settings_child',
             'borders_corners' => 'czr_image_borders_corners_child'
         ),
-        'name' => __('Image', 'text_domain_to_be_replaced'),
+        'name' => __('Image', 'text_doma'),
         'starting_value' => array(
             'main_settings' => array(
                 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png',
@@ -4254,56 +4392,56 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_image_main_settings_child',
-        'name' => __( 'Image main settings', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Image main settings', 'text_doma' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'img' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
+                    'title'       => __('Pick an image', 'text_doma'),
                     'default'     => ''
                 ),
                 'img-size' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select the image size', 'text_doma'),
                     'default'     => 'large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' ),
-                    'notice_before' => __('Select a size for this image among those generated by WordPress.', 'text_domain_to_be_replaced' )
+                    'notice_before' => __('Select a size for this image among those generated by WordPress.', 'text_doma' )
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Schedule an action on click or tap', 'text_domain_to_be_replaced'),
+                    'title'       => __('Schedule an action on click or tap', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => array(
-                        'no-link' => __('No click action', 'text_domain_to_be_replaced' ),
-                        'img-lightbox' =>__('Lightbox : enlarge the image, and dim out the rest of the content', 'text_domain_to_be_replaced' ),
-                        'url' => __('Link to site content or custom url', 'text_domain_to_be_replaced' ),
-                        'img-file' => __('Link to image file', 'text_domain_to_be_replaced' ),
-                        'img-page' =>__('Link to image page', 'text_domain_to_be_replaced' )
+                        'no-link' => __('No click action', 'text_doma' ),
+                        'img-lightbox' =>__('Lightbox : enlarge the image, and dim out the rest of the content', 'text_doma' ),
+                        'url' => __('Link to site content or custom url', 'text_doma' ),
+                        'img-file' => __('Link to image file', 'text_doma' ),
+                        'img-page' =>__('Link to image page', 'text_doma' )
                     ),
                     'title_width' => 'width-100',
                     'width-100'   => true,
-                    'notice_after' => __('Note that some click actions are disabled during customization.', 'text_domain_to_be_replaced' ),
+                    'notice_after' => __('Note that some click actions are disabled during customization.', 'text_doma' ),
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link url', 'text_doma'),
                     'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom link url', 'text_doma'),
                     'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Alignment', 'text_doma'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -4313,7 +4451,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                 ),
                 'use_custom_title_attr' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Set the text displayed when the mouse is held over', 'text_domain_to_be_replaced'),
+                    'title'       => __('Set the text displayed when the mouse is held over', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -4328,13 +4466,13 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                 ),
                 'use_custom_width' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Custom image width', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Custom image width', 'text_doma' ),
                     'default'     => 0,
                     'refresh_stylesheet' => true
                 ),
                 'custom_width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Width', 'text_domain_to_be_replaced'),
+                    'title'       => __('Width', 'text_doma'),
                     'min' => 1,
                     'max' => 100,
                     'default'     => array( 'desktop' => '100%' ),
@@ -4346,12 +4484,12 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                 ),
                 'use_box_shadow' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 0,
                 ),
                 'img_hover_effect' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Mouse over effect', 'text_domain_to_be_replaced'),
+                    'title'       => __('Mouse over effect', 'text_doma'),
                     'default'     => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'img_hover_effect' )
                 )
@@ -4374,12 +4512,12 @@ function sek_get_module_params_for_czr_image_borders_corners_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_image_borders_corners_child',
-        'name' => __( 'Borders and corners', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Borders and corners', 'text_doma' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'border-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Border', 'text_domain_to_be_replaced'),
+                    'title'       => __('Border', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_markup' => false,
@@ -4387,7 +4525,7 @@ function sek_get_module_params_for_czr_image_borders_corners_child() {
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                    'title'       => __('Borders', 'text_doma'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -4401,7 +4539,7 @@ function sek_get_module_params_for_czr_image_borders_corners_child() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Rounded corners', 'text_doma' ),
                     'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -4507,12 +4645,12 @@ function sek_get_module_params_for_czr_featured_pages_module() {
         'dynamic_registration' => true,
         'module_type' => 'czr_featured_pages_module',
         'is_crud' => true,
-        'name' => __('Featured Pages', 'text_domain_to_be_replaced'),
+        'name' => __('Featured Pages', 'text_doma'),
         'tmpl' => array(
             'pre-item' => array(
                 'img-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Display an image', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display an image', 'text_doma'),
                     'default'     => 'featured',
                     'choices'     => sek_get_select_options_for_input_id( 'img-type' )
                 ),
@@ -4520,48 +4658,48 @@ function sek_get_module_params_for_czr_featured_pages_module() {
             'item-inputs' => array(
                 'page-id' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Pick a page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Pick a page', 'text_doma'),
                     'default'     => ''
                 ),
                 'img-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Display an image', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display an image', 'text_doma'),
                     'default'     => 'featured',
                     'choices'     => sek_get_select_options_for_input_id( 'img-type' )
                 ),
                 'img-id' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_domain_to_be_replaced'),
+                    'title'       => __('Pick an image', 'text_doma'),
                     'default'     => ''
                 ),
                 'img-size' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select the image size', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select the image size', 'text_doma'),
                     'default'     => 'large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
                 'content-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Display a text', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display a text', 'text_doma'),
                     'default'     => 'page-excerpt',
                     'choices'     => sek_get_select_options_for_input_id( 'content-type' )
                 ),
                 'content-custom-text' => array(
                     'input_type'  => 'tiny_mce_editor',
-                    'title'       => __('Custom text content', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom text content', 'text_doma'),
                     'default'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
                 ),
                 'btn-display' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Display a call to action button', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display a call to action button', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'btn-custom-text' => array(
                     'input_type'  => 'tiny_mce_editor',
-                    'title'       => __('Custom button text', 'text_domain_to_be_replaced'),
-                    'default'     => __('Read More', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom button text', 'text_doma'),
+                    'default'     => __('Read More', 'text_doma'),
                 )
             )
         ),
@@ -4584,7 +4722,7 @@ function sek_get_module_params_for_czr_heading_module() {
             'font_settings' => 'czr_font_child',
             'spacing' => 'czr_heading_spacing_child'
         ),
-        'name' => __('Heading', 'text_domain_to_be_replaced'),
+        'name' => __('Heading', 'text_doma'),
         'starting_value' => array(
             'main_settings' => array(
                 'heading_text' => 'This is a heading.',
@@ -4606,26 +4744,26 @@ function sek_get_module_params_for_czr_heading_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_heading_child',
-        'name' => __('Content', 'text_domain_to_be_replaced'),
+        'name' => __('Content', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'heading_text' => array(
                     'input_type'         => 'text',
-                    'title'              => __( 'Heading text', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Heading text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
+                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
 
                 ),
                 'heading_tag' => array(
                     'input_type'         => 'select',
-                    'title'              => __( 'Heading tag', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Heading tag', 'text_doma' ),
                     'default'            => 'h1',
                     'choices'            => sek_get_select_options_for_input_id( 'heading_tag' )
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Alignment', 'text_doma'),
                     'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -4643,24 +4781,24 @@ function sek_get_module_params_for_czr_heading_child() {
                 ),
                 'link-to' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Turn into a link', 'text_domain_to_be_replaced'),
+                    'title'       => __('Turn into a link', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link url', 'text_doma'),
                     'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom link url', 'text_doma'),
                     'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -4679,12 +4817,12 @@ function sek_get_module_params_for_czr_heading_spacing_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_heading_spacing_child',
-        'name' => __('Spacing', 'text_domain_to_be_replaced'),
+        'name' => __('Spacing', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'spacing_css'     => array(
                     'input_type'  => 'spacingWithDeviceSwitcher',
-                    'title'       => __( 'Margin and padding', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Margin and padding', 'text_doma' ),
                     'default'     => array( 'desktop' => array() ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -4724,7 +4862,7 @@ function sek_get_module_params_for_czr_spacer_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_spacer_module',
-        'name' => __('Spacer', 'text_domain_to_be_replaced'),
+        'name' => __('Spacer', 'text_doma'),
         'css_selectors' => array( '.sek-module-inner > *' ),
         'tmpl' => array(
             'item-inputs' => array(
@@ -4733,7 +4871,7 @@ function sek_get_module_params_for_czr_spacer_module() {
                     'min'         => 0,
                     'max'         => 100,
                     'step'        => 1,
-                    'title'       => __('Space', 'text_domain_to_be_replaced'),
+                    'title'       => __('Space', 'text_doma'),
                     'default'     => array( 'desktop' => '20px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -4755,13 +4893,13 @@ function sek_get_module_params_for_czr_divider_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_divider_module',
-        'name' => __('Divider', 'text_domain_to_be_replaced'),
+        'name' => __('Divider', 'text_doma'),
         'css_selectors' => array( '.sek-divider' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'border_top_width_css' => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __('Weight', 'text_domain_to_be_replaced'),
+                    'title'       => __('Weight', 'text_doma'),
                     'min' => 1,
                     'max' => 50,
                     'default' => '1px',
@@ -4772,7 +4910,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'border_top_style_css' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Style', 'text_domain_to_be_replaced'),
+                    'title'       => __('Style', 'text_doma'),
                     'default' => 'solid',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -4781,7 +4919,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'border_top_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Color', 'text_domain_to_be_replaced'),
+                    'title'       => __('Color', 'text_doma'),
                     'width-100'   => true,
                     'default'    => '#5a5a5a',
                     'refresh_markup' => false,
@@ -4790,7 +4928,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'width_css' => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __('Width', 'text_domain_to_be_replaced'),
+                    'title'       => __('Width', 'text_doma'),
                     'min' => 1,
                     'max' => 100,
                     'default' => '100%',
@@ -4801,7 +4939,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Rounded corners', 'text_doma' ),
                     'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -4813,7 +4951,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Alignment', 'text_doma'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -4824,7 +4962,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'v_spacing_css' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Space before and after', 'text_domain_to_be_replaced'),
+                    'title'       => __('Space before and after', 'text_doma'),
                     'min'         => 1,
                     'max'         => 100,
                     'default'     => array( 'desktop' => '15px' ),
@@ -4852,7 +4990,7 @@ function sek_get_module_params_for_czr_icon_module() {
             'icon_settings' => 'czr_icon_settings_child',
             'spacing_border' => 'czr_icon_spacing_border_child'
         ),
-        'name' => __('Icon', 'text_domain_to_be_replaced'),
+        'name' => __('Icon', 'text_doma'),
         'starting_value' => array(
             'icon_settings' => array(
                 'icon' =>  'far fa-star',
@@ -4883,40 +5021,40 @@ function sek_get_module_params_for_czr_icon_settings_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_settings_child',
-        'name' => __( 'Icon settings', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Icon settings', 'text_doma' ),
         'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'icon' => array(
                     'input_type'  => 'fa_icon_picker',
-                    'title'       => __('Select an Icon', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select an Icon', 'text_doma'),
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link to', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link url', 'text_doma'),
                     'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom link url', 'text_doma'),
                     'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'font_size_css' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Size', 'text_domain_to_be_replaced'),
+                    'title'       => __('Size', 'text_doma'),
                     'default'     => array( 'desktop' => '16px' ),
                     'min' => 0,
                     'max' => 100,
@@ -4928,7 +5066,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Alignment', 'text_doma'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -4939,7 +5077,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                 ),
                 'color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Color', 'text_domain_to_be_replaced'),
+                    'title'       => __('Color', 'text_doma'),
                     'width-100'   => true,
                     'default'    => '#707070',
                     'refresh_markup' => false,
@@ -4948,7 +5086,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                 ),
                 'use_custom_color_on_hover' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Set a custom icon color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Set a custom icon color on mouse hover', 'text_doma' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
@@ -4957,7 +5095,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                 ),
                 'color_hover' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Hover color', 'text_domain_to_be_replaced'),
+                    'title'       => __('Hover color', 'text_doma'),
                     'width-100'   => true,
                     'default'    => '#969696',
                     'refresh_markup' => false,
@@ -4983,13 +5121,13 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_spacing_border_child',
-        'name' => __( 'Icon options for background, spacing, border, shadow', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Icon options for background, spacing, border, shadow', 'text_doma' ),
         'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'spacing_css'     => array(
                     'input_type'  => 'spacingWithDeviceSwitcher',
-                    'title'       => __( 'Spacing', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Spacing', 'text_doma' ),
                     'default'     => array( 'desktop' => array() ),
                     'width-100'   => true,
                     'refresh_markup'     => false,
@@ -4998,7 +5136,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                 ),
                 'bg_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Background color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Background color', 'text_doma' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'default'    => '',
@@ -5008,7 +5146,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                 ),
                 'border-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Border', 'text_domain_to_be_replaced'),
+                    'title'       => __('Border', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_markup' => false,
@@ -5016,7 +5154,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                    'title'       => __('Borders', 'text_doma'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -5029,7 +5167,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Rounded corners', 'text_doma' ),
                     'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -5041,7 +5179,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                 ),
                 'use_box_shadow' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 0,
                 ),
             )
@@ -5112,7 +5250,7 @@ function sek_get_module_params_for_czr_map_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_map_module',
-        'name' => __('Map', 'text_domain_to_be_replaced'),
+        'name' => __('Map', 'text_doma'),
         'starting_value' => array(
             'address'       => 'Nice, France',
             'zoom'          => 10,
@@ -5122,13 +5260,13 @@ function sek_get_module_params_for_czr_map_module() {
             'item-inputs' => array(
                 'address' => array(
                     'input_type'  => 'text',
-                    'title'       => __( 'Address', 'text_domain_to_be_replaced'),
+                    'title'       => __( 'Address', 'text_doma'),
                     'width-100'   => true,
                     'default'    => '',
                 ),
                 'zoom' => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Zoom', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Zoom', 'text_doma' ),
                     'min' => 1,
                     'max' => 20,
                     'unit' => '',
@@ -5137,7 +5275,7 @@ function sek_get_module_params_for_czr_map_module() {
                 ),
                 'height_css' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Height', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Height', 'text_doma' ),
                     'min' => 1,
                     'max' => 600,
                     'default'     => array( 'desktop' => '200px' ),
@@ -5150,7 +5288,7 @@ function sek_get_module_params_for_czr_map_module() {
                 ),
                 'lazyload' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Lazy load', 'text_domain_to_be_replaced'),
+                    'title'       => __('Lazy load', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -5178,14 +5316,14 @@ function sek_get_module_params_for_czr_quote_module() {
             'cite_content' => 'czr_quote_cite_child',
             'design' => 'czr_quote_design_child'
         ),
-        'name' => __('Quote', 'text_domain_to_be_replaced' ),
+        'name' => __('Quote', 'text_doma' ),
         'sanitize_callback' => __NAMESPACE__ . '\sanitize_callback__czr_quote_module',
         'starting_value' => array(
             'quote_content' => array(
-                'quote_text'  => __('Hey, careful, man, there\'s a beverage here!','text_domain_to_be_replaced'),
+                'quote_text'  => __('Hey, careful, man, there\'s a beverage here!','text_doma'),
             ),
             'cite_content' => array(
-                'cite_text'   => sprintf( __('The Dude in %1s', 'text_domain_to_be_replaced'), '<a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>' ),
+                'cite_text'   => sprintf( __('The Dude in %1s', 'text_doma'), '<a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>' ),
                 'cite_font_style_css' => 'italic',
             ),
             'design' => array(
@@ -5218,19 +5356,19 @@ function sek_get_module_params_for_czr_quote_quote_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_quote_child',
-        'name' => __( 'Quote content', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Quote content', 'text_doma' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'quote_text' => array(
                     'input_type'         => 'textarea',
-                    'title'              => __( 'Quote text', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Quote text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
+                    'notice_before'      => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_doma'),
                 ),
                 'quote_font_family_css' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font family', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5240,7 +5378,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),
                 'quote_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font size', 'text_doma' ),
                     'default'     => array( 'desktop' => '16px' ),
                     'min' => 0,
                     'max' => 100,
@@ -5253,7 +5391,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//16,//"14px",
                 'quote_line_height_css'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Line height', 'text_doma' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -5266,7 +5404,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//24,//"20px",
                 'quote_color_css'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text color', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5276,7 +5414,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//"#000000",
                 'quote_color_hover_css'     => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text color on mouse over', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5287,7 +5425,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//"#000000",
                 'quote_font_weight_css'     => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font weight', 'text_doma' ),
                     'default'     => 400,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5297,7 +5435,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_font_style_css'      => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font style', 'text_doma' ),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5307,7 +5445,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_text_decoration_css' => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text decoration', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5317,7 +5455,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_text_transform_css'  => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text transform', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5327,7 +5465,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_letter_spacing_css'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Letter spacing', 'text_doma' ),
                     'default'     => 0,
                     'min'         => 0,
                     'step'        => 1,
@@ -5339,7 +5477,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//0,
                 'quote___flag_important'       => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                     'default'     => 0,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5376,19 +5514,19 @@ function sek_get_module_params_for_czr_quote_cite_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_cite_child',
-        'name' => __( 'Cite content', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Cite content', 'text_doma' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'cite_text' => array(
                     'input_type'         => 'textarea',
-                    'title'              => __( 'Cite text', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Cite text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_domain_to_be_replaced'),
+                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
                 ),
                 'cite_font_family_css' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font family', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5398,7 +5536,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),
                 'cite_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font size', 'text_doma' ),
                     'default'     => array( 'desktop' => '13px' ),
                     'min' => 0,
                     'max' => 100,
@@ -5411,7 +5549,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//16,//"14px",
                 'cite_line_height_css'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Line height', 'text_doma' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -5424,7 +5562,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//24,//"20px",
                 'cite_color_css'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text color', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5434,7 +5572,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//"#000000",
                 'cite_color_hover_css'     => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text color on mouse over', 'text_doma' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5445,7 +5583,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//"#000000",
                 'cite_font_weight_css'     => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font weight', 'text_doma' ),
                     'default'     => 'normal',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5455,7 +5593,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_font_style_css'      => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font style', 'text_doma' ),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5465,7 +5603,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_text_decoration_css' => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text decoration', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5475,7 +5613,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_text_transform_css'  => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Text transform', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5485,7 +5623,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_letter_spacing_css'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Letter spacing', 'text_doma' ),
                     'default'     => 0,
                     'min'         => 0,
                     'step'        => 1,
@@ -5497,7 +5635,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//0,
                 'cite___flag_important'       => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                     'default'     => 0,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -5539,18 +5677,18 @@ function sek_get_module_params_for_czr_quote_design_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_design_child',
-        'name' => __( 'Design', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Design', 'text_doma' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'quote_design' => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Design', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Design', 'text_doma' ),
                     'default'     => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'quote_design' )
                 ),
                 'border_width_css' => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Border weight', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Border weight', 'text_doma' ),
                     'min' => 1,
                     'max' => 80,
                     'default' => '5px',
@@ -5562,7 +5700,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 ),
                 'border_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Border Color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Border Color', 'text_doma' ),
                     'width-100'   => true,
                     'default'     => '',
                     'refresh_markup' => false,
@@ -5572,7 +5710,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 ),
                 'icon_size_css' => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Icon Size', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Icon Size', 'text_doma' ),
                     'default'     => '32px',
                     'min' => 0,
                     'max' => 100,
@@ -5584,7 +5722,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 ),
                 'icon_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Icon Color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Icon Color', 'text_doma' ),
                     'width-100'   => true,
                     'default'     => '#ccc',
                     'refresh_markup' => false,
@@ -5636,11 +5774,11 @@ function sek_get_module_params_for_czr_button_module() {
             'design' => 'czr_btn_design_child',
             'font' => 'czr_font_child'
         ),
-        'name' => __( 'Button', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Button', 'text_doma' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
         'starting_value' => array(
             'content' => array(
-                'button_text' => __('Click me','text_domain_to_be_replaced'),
+                'button_text' => __('Click me','text_doma'),
             ),
             'design' => array(
                 'bg_color_css' => '#020202',
@@ -5669,53 +5807,53 @@ function sek_get_module_params_for_czr_btn_content_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_btn_content_child',
-        'name' => __( 'Button content', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Button content', 'text_doma' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'button_text' => array(
                     'input_type'         => 'text',
-                    'title'              => __( 'Button text', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Button text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
                 ),
                 'btn_text_on_hover' => array(
                     'input_type'         => 'text',
-                    'title'              => __( 'Button text on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Button text on mouse hover', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
                     'title_width' => 'width-100',
-                    'notice_after'       => __( 'Not previewable when customizing.', 'text_domain_to_be_replaced')
+                    'notice_after'       => __( 'Not previewable when customizing.', 'text_doma')
                 ),
                 'link-to' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Link to', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link to', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Link url', 'text_doma'),
                     'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_domain_to_be_replaced'),
+                    'title'       => __('Custom link url', 'text_doma'),
                     'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Open link in a new page', 'text_domain_to_be_replaced'),
+                    'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'icon' => array(
                     'input_type'  => 'fa_icon_picker',
-                    'title'       => __( 'Icon next to the button text', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Icon next to the button text', 'text_doma' ),
                 ),
                 'icon-side' => array(
                     'input_type'  => 'buttons_choice',
-                    'title'       => __("Icon's position", 'text_domain_to_be_replaced'),
+                    'title'       => __("Icon's position", 'text_doma'),
                     'default'     => 'left',
                     'choices'     => array( 'left' => __('Left', 'text-domain'), 'right' => __('Right', 'text-domain') )
                 ),
@@ -5735,12 +5873,12 @@ function sek_get_module_params_for_czr_btn_design_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_btn_design_child',
-        'name' => __( 'Button design', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Button design', 'text_doma' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'bg_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Background color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Background color', 'text_doma' ),
                     'width-100'   => true,
                     'default'    => '#020202',
                     'refresh_markup' => false,
@@ -5749,7 +5887,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'use_custom_bg_color_on_hover' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Set a custom background color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Set a custom background color on mouse hover', 'text_doma' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
@@ -5758,7 +5896,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'bg_color_hover' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Background color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Background color on mouse hover', 'text_doma' ),
                     'width-100'   => true,
                     'default'    => '',
                     'refresh_markup' => false,
@@ -5766,7 +5904,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'border-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Border', 'text_domain_to_be_replaced'),
+                    'title'       => __('Border', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_markup' => false,
@@ -5774,7 +5912,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                    'title'       => __('Borders', 'text_doma'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -5788,7 +5926,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Rounded corners', 'text_doma' ),
                     'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -5800,7 +5938,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'              => __( 'Button alignment', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Button alignment', 'text_doma' ),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
@@ -5811,7 +5949,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'spacing_css'        => array(
                     'input_type'         => 'spacing',
-                    'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Spacing', 'text_doma' ),
                     'default'            => array(
                         'padding-top'    => .5,
                         'padding-bottom' => .5,
@@ -5827,14 +5965,14 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'use_box_shadow' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'push_effect' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Push visual effect', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Push visual effect', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -5928,7 +6066,7 @@ function sek_get_module_params_for_czr_simple_form_module() {
             'form_fonts'    => 'czr_simple_form_fonts_child',
             'form_submission'    => 'czr_simple_form_submission_child'
         ),
-        'name' => __( 'Simple Form', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Simple Form', 'text_doma' ),
         'starting_value' => array(
             'fields_design' => array(
                 'border' => array(
@@ -5949,7 +6087,7 @@ function sek_get_module_params_for_czr_simple_form_module() {
                 'btn_color_css' => '#ffffff'
             ),
             'form_submission' => array(
-                'email_footer' => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_domain_to_be_replaced' ),
+                'email_footer' => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
                     get_bloginfo( 'name' ),
                     get_site_url( 'url' )
                 )
@@ -5979,13 +6117,13 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_fields_child',
-        'name' => __( 'Form fields and button labels', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form fields and button labels', 'text_doma' ),
         'css_selectors' => array( '.sek-module-inner' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'show_name_field' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Display name field', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display name field', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -5993,12 +6131,12 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'name_field_label' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Name field label', 'text_domain_to_be_replaced'),
+                    'title'       => __('Name field label', 'text_doma'),
                     'default'     => __('Name', 'translate')
                 ),
                 'name_field_required' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Name field is required', 'text_domain_to_be_replaced'),
+                    'title'       => __('Name field is required', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -6006,7 +6144,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
 
                 'show_subject_field' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Display subject field', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display subject field', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -6014,12 +6152,12 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'subject_field_label' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Subject field label', 'text_domain_to_be_replaced'),
+                    'title'       => __('Subject field label', 'text_doma'),
                     'default'     => __('Subject', 'translate')
                 ),
                 'subject_field_required' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Subject field is required', 'text_domain_to_be_replaced'),
+                    'title'       => __('Subject field is required', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -6027,7 +6165,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
 
                 'show_message_field' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Display message field', 'text_domain_to_be_replaced'),
+                    'title'       => __('Display message field', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -6035,12 +6173,12 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'message_field_label' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Message field label', 'text_domain_to_be_replaced'),
+                    'title'       => __('Message field label', 'text_doma'),
                     'default'     => __('Message', 'translate')
                 ),
                 'message_field_required' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Message field is required', 'text_domain_to_be_replaced'),
+                    'title'       => __('Message field is required', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -6049,14 +6187,14 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'email_field_label' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Email field label', 'text_domain_to_be_replaced'),
+                    'title'       => __('Email field label', 'text_doma'),
                     'default'     => __('Email', 'translate')
                 ),
 
                 'button_text' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Button text', 'text_domain_to_be_replaced'),
+                    'title'       => __('Button text', 'text_doma'),
                     'default'     => __('Submit', 'translate')
                 ),
             )
@@ -6079,13 +6217,13 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_design_child',
-        'name' => __( 'Form fields design', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form fields design', 'text_doma' ),
         'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'bg_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Fields background color', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Fields background color', 'text_doma' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'default'    => '',
@@ -6096,14 +6234,14 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                 ),
                 'border-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Fields border shape', 'text_domain_to_be_replaced'),
+                    'title'       => __('Fields border shape', 'text_doma'),
                     'default' => 'solid',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_stylesheet' => true
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders options', 'text_domain_to_be_replaced'),
+                    'title'       => __('Borders options', 'text_doma'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -6117,7 +6255,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Fields rounded corners', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Fields rounded corners', 'text_doma' ),
                     'default'     => '3px',
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -6130,12 +6268,12 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                 ),
                 'use_inset_shadow' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Apply an inset shadow', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Apply an inset shadow', 'text_doma' ),
                     'default'     => 1,
                 ),
                 'use_outset_shadow' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Apply an outset shadow', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Apply an outset shadow', 'text_doma' ),
                     'default'     => 0,
                 )
             )
@@ -6155,13 +6293,13 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_button_child',
-        'name' => __( 'Form button design', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form button design', 'text_doma' ),
         'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'bg_color_css' => array(
                       'input_type'  => 'wp_color_alpha',
-                      'title'       => __( 'Background color', 'text_domain_to_be_replaced' ),
+                      'title'       => __( 'Background color', 'text_doma' ),
                       'width-100'   => true,
                       'default'    => '',
                       'refresh_markup' => false,
@@ -6171,7 +6309,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'use_custom_bg_color_on_hover' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Set a custom background color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Set a custom background color on mouse hover', 'text_doma' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
@@ -6180,7 +6318,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'bg_color_hover' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Background color on mouse hover', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Background color on mouse hover', 'text_doma' ),
                     'width-100'   => true,
                     'default'    => '',
                     'refresh_markup' => false,
@@ -6189,7 +6327,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'border-type' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Border', 'text_domain_to_be_replaced'),
+                    'title'       => __('Border', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_markup' => false,
@@ -6197,7 +6335,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders', 'text_domain_to_be_replaced'),
+                    'title'       => __('Borders', 'text_doma'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -6211,7 +6349,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Rounded corners', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Rounded corners', 'text_doma' ),
                     'default'     => '2px',
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -6223,7 +6361,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __( 'Button alignment', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Button alignment', 'text_doma' ),
                     'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
@@ -6234,7 +6372,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'spacing_css'        => array(
                     'input_type'         => 'spacing',
-                    'title'              => __( 'Spacing', 'text_domain_to_be_replaced' ),
+                    'title'              => __( 'Spacing', 'text_doma' ),
                     'default'            => array(
                         'margin-top'     => .5,
                         'padding-top'    => .5,
@@ -6251,14 +6389,14 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'use_box_shadow' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Apply a shadow', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'push_effect' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __( 'Push visual effect', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Push visual effect', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -6290,17 +6428,17 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_fonts_child',
-        'name' => __( 'Form texts options : fonts, colors, ...', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form texts options : fonts, colors, ...', 'text_doma' ),
         'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'tabs' => array(
                     array(
-                        'title' => __( 'Fields labels', 'text_domain_to_be_replaced' ),
+                        'title' => __( 'Fields labels', 'text_doma' ),
                         'inputs' => array(
                             'fl_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font family', 'text_doma' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6312,7 +6450,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '16px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font size', 'text_doma' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -6323,7 +6461,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//16,//"14px",
                             'fl_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Line height', 'text_doma' ),
                                 'default'     => '1.5em',
                                 'min' => 0,
                                 'max' => 10,
@@ -6336,7 +6474,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//24,//"20px",
                             'fl_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text color', 'text_doma' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6346,7 +6484,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'fl_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6357,7 +6495,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'fl_font_weight_css'     => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font weight', 'text_doma' ),
                                 'default'     => 400,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6367,7 +6505,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'fl_font_style_css'      => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font style', 'text_doma' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6377,7 +6515,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'fl_text_decoration_css' => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text decoration', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6387,7 +6525,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'fl_text_transform_css'  => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text transform', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6397,7 +6535,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'fl_letter_spacing_css'  => array(
                                 'input_type'  => 'range_simple',
-                                'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Letter spacing', 'text_doma' ),
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
@@ -6409,7 +6547,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//0,
                             'fl___flag_important'       => array(
                                 'input_type'  => 'gutencheck',
-                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6431,11 +6569,11 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                         )
                     ),
                     array(
-                        'title' => __( 'Field Text', 'text_domain_to_be_replaced' ),
+                        'title' => __( 'Field Text', 'text_doma' ),
                         'inputs' => array(
                             'ft_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font family', 'text_doma' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6447,7 +6585,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '16px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font size', 'text_doma' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -6458,7 +6596,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//16,//"14px",
                             'ft_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Line height', 'text_doma' ),
                                 'default'     => '1.5em',
                                 'min' => 0,
                                 'max' => 10,
@@ -6471,7 +6609,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//24,//"20px",
                             'ft_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text color', 'text_doma' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6481,7 +6619,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'ft_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6492,7 +6630,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'ft_font_weight_css'     => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font weight', 'text_doma' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6502,7 +6640,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'ft_font_style_css'      => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font style', 'text_doma' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6512,7 +6650,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'ft_text_decoration_css' => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text decoration', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6522,7 +6660,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'ft_text_transform_css'  => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text transform', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6532,7 +6670,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'ft_letter_spacing_css'  => array(
                                 'input_type'  => 'range_simple',
-                                'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Letter spacing', 'text_doma' ),
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
@@ -6544,7 +6682,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//0,
                             'ft___flag_important'       => array(
                                 'input_type'  => 'gutencheck',
-                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6566,11 +6704,11 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                         ),//inputs
                     ),//tab
                     array(
-                        'title' => __( 'Button', 'text_domain_to_be_replaced' ),
+                        'title' => __( 'Button', 'text_doma' ),
                         'inputs' => array(
                             'btn_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font family', 'text_doma' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6582,7 +6720,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '16px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font size', 'text_doma' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -6593,7 +6731,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//16,//"14px",
                             'line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Line height', 'text_doma' ),
                                 'default'     => '1.5em',
                                 'min' => 0,
                                 'max' => 10,
@@ -6606,7 +6744,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//24,//"20px",
                             'btn_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text color', 'text_doma' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6616,7 +6754,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'btn_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6627,7 +6765,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'btn_font_weight_css'     => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Font weight', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font weight', 'text_doma' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6637,7 +6775,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'btn_font_style_css'      => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Font style', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Font style', 'text_doma' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6647,7 +6785,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'btn_text_decoration_css' => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Text decoration', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text decoration', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6657,7 +6795,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'btn_text_transform_css'  => array(
                                 'input_type'  => 'select',
-                                'title'       => __( 'Text transform', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Text transform', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6667,7 +6805,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'btn_letter_spacing_css'  => array(
                                 'input_type'  => 'range_simple',
-                                'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Letter spacing', 'text_doma' ),
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
@@ -6679,7 +6817,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//0,
                             'btn___flag_important'       => array(
                                 'input_type'  => 'gutencheck',
-                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_domain_to_be_replaced' ),
+                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -6717,50 +6855,72 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_submission_child',
-        'name' => __( 'Form submission options', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Form submission options', 'text_doma' ),
         'css_selectors' => array( '.sek-module-inner .sek-simple-form-wrapper' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'recipients' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Email recipient', 'text_domain_to_be_replaced'),
+                    'title'       => __('Email recipient', 'text_doma'),
                     'default'     => get_option( 'admin_email' ),
                     'refresh_preview'  => false
                 ),
                 'success_message' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __( 'Success message on submission' , 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Success message on submission' , 'text_doma' ),
                     'title_width' => 'width-100',
-                    'default'     => __( 'Thanks! Your message has been sent.', 'text_domain_to_be_replaced'),
+                    'default'     => __( 'Thanks! Your message has been sent.', 'text_doma'),
                     'refresh_preview'  => false
                 ),
                 'error_message' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __( 'Error message on submission' , 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Error message on submission' , 'text_doma' ),
                     'title_width' => 'width-100',
-                    'default'     => __( 'Invalid form submission : some fields have not been entered properly.', 'text_domain_to_be_replaced'),
+                    'default'     => __( 'Invalid form submission : some fields have not been entered properly.', 'text_doma'),
                     'refresh_preview'  => false
                 ),
                 'failure_message' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __( 'Failure message on submission' , 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Failure message on submission' , 'text_doma' ),
                     'title_width' => 'width-100',
-                    'default'     => __( 'Your message was not sent. Try Again.', 'text_domain_to_be_replaced'),
+                    'default'     => __( 'Your message was not sent. Try Again.', 'text_doma'),
                     'refresh_preview'  => false
                 ),
                 'email_footer' => array(
                     'input_type'  => 'code_editor',
-                    'title'       => __( 'Email footer' , 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Email footer' , 'text_doma' ),
                     'notice_before' => __('Html code is allowed', 'text-domain'),
-                    'default'     => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_domain_to_be_replaced' ),
+                    'default'     => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
                         get_bloginfo( 'name' ),
                         get_site_url( 'url' )
                     ),
                     'refresh_preview'  => false
+                ),
+                'recaptcha_enabled' => array(
+                    'input_type'  => 'select',
+                    'title'       => sprintf( '%s %s',
+                        '<i class="material-icons">security</i>',
+                        __('Spam protection with Google reCAPTCHA', 'text_doma')
+                    ),
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'default' => 'inherit',
+                    'choices'     => array(
+                        'inherit' => __('Inherit the global option', 'text_doma'),
+                        'disabled' => __('Disable', 'text_doma')
+                    ),
+                    'refresh_preview'  => false,
+                    'notice_after' => sprintf( __('The Nimble Builder can activate the %1$s service to protect your forms against spam. You need to %2$s.'),
+                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'text_doma') ),
+                        sprintf('<a href="#" onclick="%1$s">%2$s</a>',
+                            "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
+                            __('activate it in the global settings', 'text_doma')
+                        )
+                    )
                 )
             )
         ),
@@ -6854,7 +7014,7 @@ function sek_get_module_params_for_czr_menu_module() {
             'content' => 'czr_menu_content_child',
             'font' => 'czr_font_child'
         ),
-        'name' => __( 'Menu', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Menu', 'text_doma' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
         'starting_value' => array(
         ),
@@ -6869,24 +7029,24 @@ function sek_get_module_params_for_czr_menu_content_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_menu_content_child',
-        'name' => __( 'Menu content', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Menu content', 'text_doma' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'menu-id' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select a menu', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select a menu', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_user_created_menus(),
-                    'notice_after' => sprintf( __( 'You can create and edit menus in the %1$s. If you just created a new menu, publish and refresh the customizer to see in the dropdown list.', 'text_domain_to_be_replaced'),
+                    'notice_after' => sprintf( __( 'You can create and edit menus in the %1$s. If you just created a new menu, publish and refresh the customizer to see in the dropdown list.', 'text_doma'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.panel('nav_menus', function( _p_ ){ _p_.focus(); })",
-                            __('menu panel', 'text_domain_to_be_replaced')
+                            __('menu panel', 'text_doma')
                         )
                     ),
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_domain_to_be_replaced'),
+                    'title'       => __('Alignment', 'text_doma'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -6908,12 +7068,12 @@ function sek_get_module_params_for_czr_font_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_font_child',
-        'name' => __( 'Text settings : font, color, size, ...', 'text_domain_to_be_replaced' ),
+        'name' => __( 'Text settings : font, color, size, ...', 'text_doma' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'font_family_css' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __('Font family', 'text_domain_to_be_replaced'),
+                    'title'       => __('Font family', 'text_doma'),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -6922,7 +7082,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),
                 'font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Font size', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Font size', 'text_doma' ),
                     'min' => 0,
                     'max' => 100,
                     'title_width' => 'width-100',
@@ -6933,7 +7093,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//16,//"14px",
                 'line_height_css'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Line height', 'text_doma' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -6945,7 +7105,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//24,//"20px",
                 'color_css'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Text color', 'text_domain_to_be_replaced'),
+                    'title'       => __('Text color', 'text_doma'),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -6954,7 +7114,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//"#000000",
                 'color_hover_css'     => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Text color on mouse over', 'text_domain_to_be_replaced'),
+                    'title'       => __('Text color on mouse over', 'text_doma'),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -6964,7 +7124,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//"#000000",
                 'font_weight_css'     => array(
                     'input_type'  => 'select',
-                    'title'       => __('Font weight', 'text_domain_to_be_replaced'),
+                    'title'       => __('Font weight', 'text_doma'),
                     'default'     => 400,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -6973,7 +7133,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//null,
                 'font_style_css'      => array(
                     'input_type'  => 'select',
-                    'title'       => __('Font style', 'text_domain_to_be_replaced'),
+                    'title'       => __('Font style', 'text_doma'),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -6982,7 +7142,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//null,
                 'text_decoration_css' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Text decoration', 'text_domain_to_be_replaced'),
+                    'title'       => __('Text decoration', 'text_doma'),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -6991,7 +7151,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//null,
                 'text_transform_css'  => array(
                     'input_type'  => 'select',
-                    'title'       => __('Text transform', 'text_domain_to_be_replaced'),
+                    'title'       => __('Text transform', 'text_doma'),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -7001,7 +7161,7 @@ function sek_get_module_params_for_czr_font_child() {
 
                 'letter_spacing_css'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Letter spacing', 'text_domain_to_be_replaced' ),
+                    'title'       => __( 'Letter spacing', 'text_doma' ),
                     'default'     => 0,
                     'min'         => 0,
                     'step'        => 1,
@@ -7012,7 +7172,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//0,
                 'fonts___flag_important'  => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Apply the style options in priority (uses !important).', 'text_domain_to_be_replaced'),
+                    'title'       => __('Apply the style options in priority (uses !important).', 'text_doma'),
                     'default'     => 0,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -7044,19 +7204,19 @@ function sek_get_module_params_for_czr_widget_area_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_widget_area_module',
-        'name' => __('Widget Zone', 'text_domain_to_be_replaced'),
+        'name' => __('Widget Zone', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'widget-area-id' => array(
                     'input_type'  => 'select',
-                    'title'       => __('Select a widget area', 'text_domain_to_be_replaced'),
+                    'title'       => __('Select a widget area', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => array(),
                     'refresh_preview' => true,// <= so that the partial refresh links are displayed
-                    'notice_after' => sprintf( __( 'Once you have added a widget area to a section, you can add and edit the WordPress widgets in it in the %1$s.', 'text_domain_to_be_replaced'),
+                    'notice_after' => sprintf( __( 'Once you have added a widget area to a section, you can add and edit the WordPress widgets in it in the %1$s.', 'text_doma'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.panel('widgets', function( _p_ ){ _p_.focus(); })",
-                            __('widget panel', 'text_domain_to_be_replaced')
+                            __('widget panel', 'text_doma')
                         )
                     ),
                 )
@@ -8560,9 +8720,16 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             }
             return self::$instance;
         }
+        public $local_options = '_not_cached_yet_';
+        public $global_nimble_options = '_not_cached_yet_';
+
         public $img_smartload_enabled = 'not_cached';
-        public $has_local_header_footer = false;//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
-        public $has_global_header_footer = false;//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
+
+        public $has_local_header_footer = '_not_cached_yet_';//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
+        public $has_global_header_footer = '_not_cached_yet_';//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
+
+        public $recaptcha_enabled = '_not_cached_yet_';//enabled in the global options
+        public $recaptcha_badge_displayed = '_not_cached_yet_';//enabled in the global options
         function __construct( $params = array() ) {
             $this->registered_locations = $this->default_locations;
             $this -> _schedule_front_ajax_actions();
@@ -9120,6 +9287,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     true
                 );
             }
+            $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
+            $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
+
             wp_localize_script(
                 'sek-main-js',
                 'sekFrontLocalized',
@@ -9128,7 +9298,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
                     'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
                     'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : '',
-                    'skope_id' => skp_get_skope_id() //added for debugging purposes
+                    'skope_id' => skp_get_skope_id(), //added for debugging purposes
+                    'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : ''
                 )
             );
         }
@@ -9172,25 +9343,25 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 'sekPreviewLocalized',
                 array(
                     'i18n' => array(
-                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_domain_to_be_replaced'),
-                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'text_domain_to_be_replaced'),
-                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_domain_to_be_replaced'),
-                        'Insert here' => __('Insert here', 'text_domain_to_be_replaced'),
+                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_doma'),
+                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'text_doma'),
+                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
+                        'Insert here' => __('Insert here', 'text_doma'),
                         'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
 
-                        'Insert a new section' => __('Insert a new section', 'text_domain_to_be_replaced' ),
+                        'Insert a new section' => __('Insert a new section', 'text_doma' ),
                         '@location' => __('@location', 'text_domain_to_be'),
-                        'Insert a new global section' => __('Insert a new global section', 'text_domain_to_be_replaced' ),
+                        'Insert a new global section' => __('Insert a new global section', 'text_doma' ),
 
-                        'section' => __('section', 'text_domain_to_be_replaced'),
-                        'header section' => __('header section', 'text_domain_to_be_replaced'),
-                        'footer section' => __('footer section', 'text_domain_to_be_replaced'),
-                        '(global)' => __('(global)', 'text_domain_to_be_replaced'),
-                        'nested section' => __('nested section', 'text_domain_to_be_replaced'),
+                        'section' => __('section', 'text_doma'),
+                        'header section' => __('header section', 'text_doma'),
+                        'footer section' => __('footer section', 'text_doma'),
+                        '(global)' => __('(global)', 'text_doma'),
+                        'nested section' => __('nested section', 'text_doma'),
 
-                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_domain_to_be_replaced'),
-                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'text_domain_to_be_replaced'),
-                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'text_domain_to_be_replaced')
+                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_doma'),
+                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'text_doma'),
+                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'text_doma')
                     ),
                     'isDevMode' => sek_is_dev_mode(),
                     'isPreviewUIDebugMode' => isset( $_GET['preview_ui_debug'] ) || NIMBLE_IS_PREVIEW_UI_DEBUG_MODE,
@@ -9623,7 +9794,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                             sprintf( '<span class="sek-nimble-icon"><img src="%1$s"/></span>',
                                                 NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION
                                             ),
-                                            $is_header_location ? __('Start designing the header', 'text_domain_to_be_replaced') : __('Start designing the footer', 'text_domain_to_be_replaced')
+                                            $is_header_location ? __('Start designing the header', 'text_doma') : __('Start designing the footer', 'text_doma')
                                         );
                                     }
                                   ?>
@@ -9701,7 +9872,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             <?php
                               if ( skp_is_customizing() && !sek_is_customize_previewing_a_changeset_post() && empty( $collection ) ) {
                                   $content_type = 'module';
-                                  $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_domain_to_be_replaced' ) : __('Drag and drop a block of content here', 'text_domain_to_be_replaced' );
+                                  $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_doma' ) : __('Drag and drop a block of content here', 'text_doma' );
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
@@ -10047,15 +10218,17 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return $template;
         }
         function sek_maybe_set_nimble_header_footer() {
-            $local_header_footer_data = sek_get_local_option_value('local_header_footer');
-            $global_header_footer_data = sek_get_global_option_value('global_header_footer');
-            $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
+            if ( '_not_cached_yet_' === $this->has_local_header_footer || '_not_cached_yet_' === $this->has_global_header_footer ) {
+                $local_header_footer_data = sek_get_local_option_value('local_header_footer');
+                $global_header_footer_data = sek_get_global_option_value('global_header_footer');
+                $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
 
-            $this->has_global_header_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
+                $this->has_global_header_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
 
-            if ( $apply_local_option ) {
-                $this->has_local_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
-                $this->has_global_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
+                if ( $apply_local_option ) {
+                    $this->has_local_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
+                    $this->has_global_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
+                }
             }
         }
         function sek_maybe_set_local_nimble_header( $header_name ) {
@@ -10141,10 +10314,16 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
 
     function _setup_simple_forms() {
         add_action( 'parse_request', array( $this, 'simple_form_parse_request' ), 20 );
+        add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_recaptcha_scripts' ), 0 );
+        add_action( 'body_class', array( $this, 'set_the_recaptcha_badge_visibility_class') );
         $this->form_composition = array(
             'nimble_simple_cf'              => array(
                 'type'            => 'hidden',
                 'value'           => 'nimble_simple_cf'
+            ),
+            'nimble_recaptcha_resp'   => array(
+                'type'            => 'hidden',
+                'value'           => ''
             ),
             'nimble_skope_id'     => array(
                 'type'            => 'hidden',
@@ -10155,24 +10334,24 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 'value'           => ''
             ),
             'nimble_name' => array(
-                'label'            => __( 'Name', 'text_domain_to_be_replaced' ),
+                'label'            => __( 'Name', 'text_doma' ),
                 'required'         => true,
                 'type'             => 'text',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_email' => array(
-                'label'            => __( 'Email', 'text_domain_to_be_replaced' ),
+                'label'            => __( 'Email', 'text_doma' ),
                 'required'         => true,
                 'type'             => 'email',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_subject' => array(
-                'label'            => __( 'Subject', 'text_domain_to_be_replaced' ),
+                'label'            => __( 'Subject', 'text_doma' ),
                 'type'             => 'text',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_message' => array(
-                'label'            => __( 'Message', 'text_domain_to_be_replaced' ),
+                'label'            => __( 'Message', 'text_doma' ),
                 'required'         => true,
                 'additional_attrs' => array( 'rows' => "10", 'cols' => "50" ),
                 'type'             => 'textarea',
@@ -10180,7 +10359,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             ),
             'nimble_submit' => array(
                 'type'             => 'submit',
-                'value'            => __( 'Submit', 'text_domain_to_be_replaced' ),
+                'value'            => __( 'Submit', 'text_doma' ),
                 'additional_attrs' => array( 'class' => 'sek-btn' ),
                 'wrapper_tag'      => 'div',
                 'wrapper_class'    => array( 'sek-form-field', 'sek-form-btn-wrapper' )
@@ -10188,39 +10367,88 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         );
     }//_setup_simple_forms
     function simple_form_parse_request() {
-        if ( isset( $_POST['nimble_simple_cf'] ) ) {
-            $module_model = array();
-            if ( isset( $_POST['nimble_skope_id'] ) && '_skope_not_set_' !== $_POST['nimble_skope_id'] ) {
-                $local_sektions = sek_get_skoped_seks( $_POST['nimble_skope_id'] );
-                if ( is_array( $local_sektions ) && !empty( $local_sektions ) ) {
-                $sektion_collection = array_key_exists('collection', $local_sektions) ? $local_sektions['collection'] : array();
-                }
-                if ( is_array($sektion_collection) && ! empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
-                    $module_model = sek_get_level_model($_POST['nimble_level_id'], $sektion_collection );
-                    $module_model = sek_normalize_module_value_with_defaults( $module_model );
-                }
-            } else {
-                sek_error_log( __FUNCTION__ . ' => skope_id problem');
-                return;
+        if ( ! isset( $_POST['nimble_simple_cf'] ) )
+          return;
+        $module_model = array();
+        if ( isset( $_POST['nimble_skope_id'] ) && '_skope_not_set_' !== $_POST['nimble_skope_id'] ) {
+            $local_sektions = sek_get_skoped_seks( $_POST['nimble_skope_id'] );
+            if ( is_array( $local_sektions ) && !empty( $local_sektions ) ) {
+            $sektion_collection = array_key_exists('collection', $local_sektions) ? $local_sektions['collection'] : array();
             }
-
-            if ( empty( $module_model ) ) {
-                sek_error_log( __FUNCTION__ . ' => invalid module model');
-                return;
+            if ( is_array($sektion_collection) && ! empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
+                $module_model = sek_get_level_model($_POST['nimble_level_id'], $sektion_collection );
+                $module_model = sek_normalize_module_value_with_defaults( $module_model );
             }
-            foreach ( $this->form_composition as $name => $field ) {
-                $form_composition[ $name ]                = $field;
-                if ( isset( $_POST[ $name ] ) ) {
-                    $form_composition[ $name ][ 'value' ] = $_POST[ $name ];
-                }
-            }
-            $form_composition = $this->_set_form_composition( $form_composition, $module_model );
-            $this->fields = $this->simple_form_generate_fields( $form_composition );
-            $this->form   = $this->simple_form_generate_form( $this->fields );
-            $this->mailer = new Sek_Mailer( $this-> form );
-
-            $this->mailer->maybe_send( $form_composition, $module_model );
+        } else {
+            sek_error_log( __FUNCTION__ . ' => skope_id problem');
+            return;
         }
+
+        if ( empty( $module_model ) ) {
+            sek_error_log( __FUNCTION__ . ' => invalid module model');
+            return;
+        }
+        foreach ( $this->form_composition as $name => $field ) {
+            $form_composition[ $name ]                = $field;
+            if ( isset( $_POST[ $name ] ) ) {
+                $form_composition[ $name ][ 'value' ] = $_POST[ $name ];
+            }
+        }
+        $form_composition = $this->_set_form_composition( $form_composition, $module_model );
+        $this->fields = $this->simple_form_generate_fields( $form_composition );
+        $this->form   = $this->simple_form_generate_form( $this->fields );
+        $this->mailer = new Sek_Mailer( $this->form );
+        $this->mailer->maybe_send( $form_composition, $module_model );
+    }
+    function maybe_enqueue_recaptcha_scripts() {
+        if ( skp_is_customizing() || !sek_is_recaptcha_globally_enabled() || !sek_front_sections_include_a_form() )
+          return;
+
+        $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
+        $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
+
+        $url = add_query_arg(
+            array( 'render' => esc_attr( $global_recaptcha_opts['public_key'] ) ),
+            'https://www.google.com/recaptcha/api.js'
+        );
+
+        wp_enqueue_script( 'google-recaptcha', $url, array(), '3.0', true );
+        add_action('wp_footer', array( $this, 'print_recaptcha_inline_js'), 100 );
+    }
+    function print_recaptcha_inline_js() {
+        ?>
+            <script type="text/javascript" id="nimble-inline-recaptcha">
+              !( function( grecaptcha, sitekey ) {
+                  var recaptcha = {
+                      execute: function() {
+                          grecaptcha.execute(
+                              sitekey,
+                              { action: ( window.sekFrontLocalized && sekFrontLocalized.skope_id ) ? sekFrontLocalized.skope_id.replace( 'skp__' , 'nimble_form__' ) : 'nimble_builder_form' }
+                          ).then( function( token ) {
+                              var forms = document.getElementsByTagName( 'form' );
+                              for ( var i = 0; i < forms.length; i++ ) {
+                                  var fields = forms[ i ].getElementsByTagName( 'input' );
+                                  for ( var j = 0; j < fields.length; j++ ) {
+                                      var field = fields[ j ];
+                                      if ( 'nimble_recaptcha_resp' === field.getAttribute( 'name' ) ) {
+                                          field.setAttribute( 'value', token );
+                                          break;
+                                      }
+                                  }
+                              }
+                          } );
+                      }
+                  };
+                  grecaptcha.ready( recaptcha.execute );
+              })( grecaptcha, sekFrontLocalized.recaptcha_public_key );
+            </script>
+        <?php
+    }
+    public function set_the_recaptcha_badge_visibility_class( $classes ) {
+        if ( ! sek_is_recaptcha_badge_globally_displayed() ) {
+            $classes[] = 'sek-hide-rc-badge';
+        }
+        return $classes;
     }
     function get_simple_form_html( $module_model ) {
         $html         = '';
@@ -10274,6 +10502,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         $module_user_values = array_key_exists( 'value', $module_model ) ? $module_model['value'] : array();
         $form_fields_options = empty( $module_user_values['form_fields'] ) ? array() : $module_user_values['form_fields'];
         $form_button_options = empty( $module_user_values['form_button'] ) ? array() : $module_user_values['form_button'];
+        $form_submission_options = empty( $module_user_values['form_submission'] ) ? array() : $module_user_values['form_submission'];
+
         foreach ( $form_composition as $field_id => $field_data ) {
             switch ( $field_id ) {
                 case 'nimble_name':
@@ -10325,6 +10555,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     $user_form_composition[$field_id] = $field_data;
                     $user_form_composition[$field_id]['value'] = $module_model['id'];
                 break;
+                case 'nimble_recaptcha_resp' :
+                    if ( ! skp_is_customizing() && sek_is_recaptcha_globally_enabled() && 'disabled' !== $form_submission_options['recaptcha_enabled'] ) {
+                        $user_form_composition[$field_id] = $field_data;
+                    }
+                break;
                 default:
                     $user_form_composition[$field_id] = $field_data;
                 break;
@@ -10359,16 +10594,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
 }//Sek_Simple_Form
 endif;
 
-
-
-
-
-
-
-
-
-
-
+?><?php
 /*
 *
 * Form class definition
@@ -10532,26 +10758,7 @@ class Sek_Field {
 }
 endif;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+?><?php
 /*
 *
 * Input objects definition
@@ -10759,7 +10966,6 @@ class Sek_Input_URL extends Sek_Input_Basic {
         parent::__construct( $args );
     }
 
-
     public function sanitize($value) {
         return esc_url_raw( $value );
     }
@@ -10775,10 +10981,9 @@ if ( ! class_exists( '\Nimble\Sek_Input_Submit' ) ) :
 class Sek_Input_Submit extends Sek_Input_Basic {
     public function __construct($args) {
         $args             = is_array( $args ) ? $args : array();
-
         $args[ 'type' ]   = 'submit';
         $args             = wp_parse_args($args, [
-            'value' => esc_html__( 'Contact', 'text_domain_to_be_replaced' ),
+            'value' => esc_html__( 'Contact', 'text_doma' ),
         ]);
 
         parent::__construct( $args );
@@ -10819,28 +11024,7 @@ class Sek_Input_Textarea extends Sek_Input_Abstract {
     }
 }
 endif;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+?><?php
 /*
 *
 * Mailer class definition
@@ -10852,22 +11036,57 @@ class Sek_Mailer {
     private $status;
     private $messages;
     private $invalid_field = false;
+    private $recaptcha_data;//will store array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
 
     public function __construct( Sek_Form $form ) {
         $this-> form = $form;
 
         $this->messages = array(
-            'not_sent'        => __( 'Message was not sent. Try Again.', 'text_domain_to_be_replaced'),
-            'sent'            => __( 'Thanks! Your message has been sent.', 'text_domain_to_be_replaced'),
-            'aborted'         => __( 'Please supply correct information.', 'text_domain_to_be_replaced'), //<-todo too much generic
+            'not_sent'        => __( 'Message was not sent. Try Again.', 'text_doma'),
+            'sent'            => __( 'Thanks! Your message has been sent.', 'text_doma'),
+            'aborted'         => __( 'Please supply correct information.', 'text_doma'), //<-todo too much generic
+            'recaptcha_fail'  => __( 'Google ReCaptcha validation failed', 'text_doma')
         );
-
         $this->status = 'init';
+        if ( isset( $_POST['nimble_recaptcha_resp'] ) ) {
+            if ( ! $this->validate_recaptcha( $_POST['nimble_recaptcha_resp'] ) ) {
+                $this->status = 'recaptcha_fail';
+                if ( sek_is_dev_mode() ) {
+                    sek_error_log('reCAPTCHA failure', $this->recaptcha_data );
+                }
+            }
+        }
+    }
+    private function validate_recaptcha( $recaptcha_token ) {
+        $is_valid = false;
+        $endpoint = 'https://www.google.com/recaptcha/api/siteverify';
+        $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
+        $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
+        if ( empty($global_recaptcha_opts['private_key']) )
+          return true;
+        $request = array(
+            'body' => array(
+                'secret' => $global_recaptcha_opts['private_key'],
+                'response' => $recaptcha_token
+            ),
+        );
+        $this->recaptcha_data = array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
+        $this->recaptcha_data['response'] = $response = wp_remote_post( esc_url_raw( $endpoint ), $request );
+        if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
+            return $is_valid;
+        }
+        $response_body = wp_remote_retrieve_body( $response );
+        $response_body = json_decode( $response_body, true );
+        $score = isset( $response_body['score'] ) ? $response_body['score'] : 0;
+        $threshold = apply_filters( 'nimble_recaptcha_human_treshold', 0.5 );
+        $is_valid = $is_human = $threshold < $score;
+        return $is_valid;
     }
 
-
-
     public function maybe_send( $form_composition, $module_model ) {
+        if ( 'recaptcha_fail' === $this->status ) {
+            return;
+        }
         $invalid_field = $this->form->has_invalid_field();
         if ( false !== $invalid_field ) {
             $this->status = 'aborted';
@@ -10891,16 +11110,16 @@ class Sek_Mailer {
         if ( array_key_exists( 'nimble_subject' , $form_composition ) ) {
             $subject = $this->form->get_field('nimble_subject')->get_input()->get_value();
         } else {
-            $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_domain_to_be_replaced' ), get_bloginfo( 'name' ) );
+            $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_doma' ), get_bloginfo( 'name' ) );
         }
-        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'text_domain_to_be_replaced'), $sender_name, $sender_email );//$sender_website;
-        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'text_domain_to_be_replaced'), $subject );
+        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'text_doma'), $sender_name, $sender_email );//$sender_website;
+        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'text_doma'), $subject );
         $after_message  = '';
 
         if ( array_key_exists( 'email_footer', $submission_options ) ) {
             $email_footer = $submission_options['email_footer'];
         } else {
-            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_domain_to_be_replaced' ),
+            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
                 get_bloginfo( 'name' ),
                 get_site_url( 'url' )
             );
@@ -10909,7 +11128,7 @@ class Sek_Mailer {
         $body           = sprintf( '%1$s%2$s%3$s%4$s%5$s',
                             $before_message,
                             sprintf( '<br><br>%1$s: <br>%2$s',
-                                __('Message body', 'text_domain_to_be_replaced'),
+                                __('Message body', 'text_doma'),
                                 $this->form->get_field('nimble_message')->get_input()->get_value()
                             ),
                             $after_message,
@@ -10961,12 +11180,6 @@ class Sek_Mailer {
         }
         return $submission_message;
     }
-
-
-
-    /*
-    * inspired from wpcf7
-    */
     private function get_from_email() {
         $admin_email = get_option( 'admin_email' );
         $sitename    = strtolower( $_SERVER['SERVER_NAME'] );
@@ -10987,40 +11200,26 @@ class Sek_Mailer {
     }
 }//Sek_Mailer
 endif;
-
-
-
-
-
-
-
-
-
-
-
-/*
-* inspired by wpcf7
-*/
-function simple_form_mail_template() {
+function sek_simple_form_mail_template() {
     $template = array(
         'subject' =>
-            sprintf( __( '%1$s: new contact request', 'text_domain_to_be_replaced' ),
+            sprintf( __( '%1$s: new contact request', 'text_doma' ),
                 get_bloginfo( 'name' )
             ),
         'sender' => sprintf( '[your-name] <%s>', simple_form_from_email() ),
         'body' =>
             /* translators: %s: [your-name] <[your-email]> */
-            sprintf( __( 'From: %s', 'text_domain_to_be_replaced' ),
+            sprintf( __( 'From: %s', 'text_doma' ),
                 '[your-name] <[your-email]>' ) . "\n"
             /* translators: %s: [your-subject] */
-            . sprintf( __( 'Subject: %s', 'text_domain_to_be_replaced' ),
+            . sprintf( __( 'Subject: %s', 'text_doma' ),
                 '[your-subject]' ) . "\n\n"
-            . __( 'Message Body:', 'text_domain_to_be_replaced' )
+            . __( 'Message Body:', 'text_doma' )
                 . "\n" . '[your-message]' . "\n\n"
             . '-- ' . "\n"
             /* translators: 1: blog name, 2: blog URL */
             . sprintf(
-                __( 'This e-mail was sent from a contact form on %1$s (%2$s)', 'text_domain_to_be_replaced' ),
+                __( 'This e-mail was sent from a contact form on %1$s (%2$s)', 'text_doma' ),
                 get_bloginfo( 'name' ),
                 get_bloginfo( 'url' ) ),
         'recipient' => get_option( 'admin_email' ),
