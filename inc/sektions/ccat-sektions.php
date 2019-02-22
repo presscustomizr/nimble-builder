@@ -10608,7 +10608,7 @@ class Sek_Form {
     public function __construct( $args = array() ) {
         $this->fields        = array();
         $this->attributes    = wp_parse_args( $args, array(
-            'action' => get_the_permalink(),
+            'action' => '',
             'method' => 'post'
         ) );
     }
