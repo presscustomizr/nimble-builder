@@ -46,7 +46,7 @@
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'enable' :
-                                          _.each( [ 'public_key', 'private_key' ] , function( _inputId_ ) {
+                                          _.each( [ 'public_key', 'private_key', 'badge' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return input();
                                                 }); } catch( er ) {

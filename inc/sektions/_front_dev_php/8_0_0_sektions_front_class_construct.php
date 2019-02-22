@@ -55,6 +55,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $has_global_header_footer = '_not_cached_yet_';//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
 
         public $recaptcha_enabled = '_not_cached_yet_';//enabled in the global options
+        public $recaptcha_badge_displayed = '_not_cached_yet_';//enabled in the global options
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>

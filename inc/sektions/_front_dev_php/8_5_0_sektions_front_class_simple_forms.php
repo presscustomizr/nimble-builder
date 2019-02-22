@@ -121,11 +121,13 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //    - enabled === true
         //    - public_key entered
         //    - private_key entered
-        if ( !sek_is_recaptcha_enabled() )
+        if ( !sek_is_recaptcha_globally_enabled() )
           return;
         // does the current page include a form in a local or global location ?
         if ( !sek_front_sections_include_a_form() )
           return;
+
+        // @todo, we don't handle the case when reCaptcha is globally enabled but disabled for a particular form.
 
         $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
         $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
@@ -140,7 +142,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     }
 
     // @hook wp_footer
-    // printed only when sek_is_recaptcha_enabled()
+    // printed only when sek_is_recaptcha_globally_enabled()
     // AND
     // sek_front_sections_include_a_form()
     function print_recaptcha_inline_js() {
@@ -237,6 +239,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //sek_error_log( '$module_model', $module_model );
         $form_fields_options = empty( $module_user_values['form_fields'] ) ? array() : $module_user_values['form_fields'];
         $form_button_options = empty( $module_user_values['form_button'] ) ? array() : $module_user_values['form_button'];
+        $form_submission_options = empty( $module_user_values['form_submission'] ) ? array() : $module_user_values['form_submission'];
+
         foreach ( $form_composition as $field_id => $field_data ) {
             //sek_error_log( '$field_data', $field_data );
             switch ( $field_id ) {
@@ -296,8 +300,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     $user_form_composition[$field_id] = $field_data;
                     $user_form_composition[$field_id]['value'] = $module_model['id'];
                 break;
+                // print the recaptcha input field if
+                // 1) reCAPTCHA enabled in the global options AND properly setup with non empty keys
+                // 2) reCAPTCHA enabled for this particular form
                 case 'nimble_recaptcha_resp' :
-                    if ( sek_is_recaptcha_enabled() ) {
+                    if ( sek_is_recaptcha_globally_enabled() && true === sek_booleanize_checkbox_val( $form_submission_options['recaptcha_enabled'] ) ) {
                         $user_form_composition[$field_id] = $field_data;
                     }
                 break;
@@ -757,7 +764,6 @@ class Sek_Input_URL extends Sek_Input_Basic {
         parent::__construct( $args );
     }
 
-
     public function sanitize($value) {
         return esc_url_raw( $value );
     }
@@ -773,7 +779,6 @@ if ( ! class_exists( '\Nimble\Sek_Input_Submit' ) ) :
 class Sek_Input_Submit extends Sek_Input_Basic {
     public function __construct($args) {
         $args             = is_array( $args ) ? $args : array();
-
         $args[ 'type' ]   = 'submit';
         $args             = wp_parse_args($args, [
             'value' => esc_html__( 'Contact', 'text_doma' ),
@@ -865,7 +870,7 @@ class Sek_Mailer {
         $this->status = 'init';
 
         // Validate reCAPTCHA if submitted
-        // When sek_is_recaptcha_enabled(), the hidden input 'nimble_recaptcha_resp' is rendered with a value set to a token remotely fetched with a js script
+        // When sek_is_recaptcha_globally_enabled(), the hidden input 'nimble_recaptcha_resp' is rendered with a value set to a token remotely fetched with a js script
         // @see print_recaptcha_inline_js
         // on submission, we get the posted token value, and validate it with a remote http request to the google api
         if ( isset( $_POST['nimble_recaptcha_resp'] ) ) {

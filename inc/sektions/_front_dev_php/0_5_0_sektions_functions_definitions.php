@@ -1082,7 +1082,7 @@ function sek_is_img_smartload_enabled() {
 // @return boolean
 // reCaptcha is enabled globally
 // deactivated when customizing
-function sek_is_recaptcha_enabled() {
+function sek_is_recaptcha_globally_enabled() {
     if ( skp_is_customizing() )
       return false;
 
@@ -1103,7 +1103,26 @@ function sek_is_recaptcha_enabled() {
     return Nimble_Manager()->recaptcha_enabled;
 }
 
+// @return boolean
+// reCaptcha is enabled globally
+// deactivated when customizing
+function sek_is_recaptcha_badge_globally_displayed() {
+    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->recaptcha_badge_displayed ) {
+        return Nimble_Manager()->recaptcha_badge_displayed;
+    }
+    $badge_displayed = false;
 
+    $glob_recaptcha_opts = sek_get_global_option_value( 'recaptcha' );
+
+    if ( !is_null( $glob_recaptcha_opts ) && is_array( $glob_recaptcha_opts ) && !empty( $glob_recaptcha_opts['badge'] ) ) {
+        $badge_displayed = sek_booleanize_checkbox_val( $glob_recaptcha_opts['badge'] ) && sek_is_recaptcha_globally_enabled();
+    }
+
+    // CACHE
+    Nimble_Manager()->recaptcha_badge_displayed = $badge_displayed;
+
+    return Nimble_Manager()->recaptcha_badge_displayed;
+}
 
 
 /* ------------------------------------------------------------------------- *

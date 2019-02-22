@@ -18,25 +18,32 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => sprintf( __('The Nimble Builder can setup the %1$s service to protect your forms against spam. You need to %2$s'),
-                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://developers.google.com/recaptcha/', __('Google reCAPTCHA', 'text_doma') ),
+                    'notice_after' => sprintf( __('The Nimble Builder can activate the %1$s service to protect your forms against spam. You need to %2$s.'),
+                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'text_doma') ),
                         sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://www.google.com/recaptcha/admin#list', __('get your domain API keys from Google', 'text_doma') )
                     )
                 ),
                 'public_key' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Public reCAPTCHA key', 'text_doma'),
+                    'title'       => __('Public key', 'text_doma'),
                     'default'     => '',
                     'refresh_preview' => false,
                     'refresh_markup' => false
                 ),
                 'private_key' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Private reCAPTCHA key', 'text_doma'),
+                    'title'       => __('Private key', 'text_doma'),
                     'default'     => '',
                     'refresh_preview' => false,
                     'refresh_markup' => false
                 ),
+                'badge' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display a Google reCAPTCHA badge before the submit button', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                )
             )
         )//tmpl
     );
