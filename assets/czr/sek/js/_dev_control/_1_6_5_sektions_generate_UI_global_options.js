@@ -24,52 +24,72 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Prepare the module map to register
                   var registrationParams = {};
-
-                  // Header and footer have been introduced in v1.4.0 but not enabled by default.
-                  if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                        $.extend( registrationParams, {
-                              global_header_footer : {
-                                    settingControlId : _id_ + '__header_footer',
-                                    module_type : 'sek_global_header_footer',
-                                    controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
-                                    icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                              }
-                        });
+                  if ( _.isUndefined( sektionsLocalizedData.globalOptionsMap ) || ! _.isObject( sektionsLocalizedData.globalOptionsMap ) ) {
+                        api.errare( '::generateUIforGlobalOptions => missing or invalid globalOptionsMap');
+                        return dfd;
                   }
 
-                  $.extend( registrationParams, {
-                        breakpoint : {
-                              settingControlId : _id_ + '__breakpoint',
-                              module_type : 'sek_global_breakpoint',
-                              controlLabel : sektionsLocalizedData.i18n['Site wide breakpoint for Nimble sections'],
-                              expandAndFocusOnInit : false,
-                              icon : '<i class="material-icons sek-level-option-icon">devices</i>'
-                        },
-                        widths : {
-                              settingControlId : _id_ + '__widths',
-                              module_type : 'sek_global_widths',
-                              controlLabel : sektionsLocalizedData.i18n['Site wide inner and outer sections widths'],
-                              icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
-                        },
-                        performances : {
-                              settingControlId : _id_ + '__performances',
-                              module_type : 'sek_global_performances',
-                              controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
-                              icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
-                        },
-                        recaptcha : {
-                              settingControlId : _id_ + '__recaptcha',
-                              module_type : 'sek_global_recaptcha',
-                              controlLabel : sektionsLocalizedData.i18n['Protect your contact forms with Google reCAPTCHA'],
-                              icon : '<i class="material-icons sek-level-option-icon">security</i>'
-                        },
-                        beta_features : {
-                              settingControlId : _id_ + '__beta_features',
-                              module_type : 'sek_global_beta_features',
-                              controlLabel : sektionsLocalizedData.i18n['Beta features'],
-                              icon : '<i class="material-icons sek-level-option-icon">widgets</i>'
-                        }
-                  });
+                  // Populate the registration params
+                  _.each( sektionsLocalizedData.globalOptionsMap, function( mod_type, opt_name ) {
+                        switch( opt_name ) {
+                              // Header and footer have been introduced in v1.4.0 but not enabled by default.
+                              case 'global_header_footer':
+                                    if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+                                          registrationParams[ opt_name ] = {
+                                                settingControlId : _id_ + '__header_footer',
+                                                module_type : mod_type,
+                                                controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
+                                                icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                                          };
+                                    }
+                              break;
+                              case 'breakpoint' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__breakpoint',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site wide breakpoint for Nimble sections'],
+                                          expandAndFocusOnInit : false,
+                                          icon : '<i class="material-icons sek-level-option-icon">devices</i>'
+                                    };
+                              break;
+                              case 'widths' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__widths',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site wide inner and outer sections widths'],
+                                          icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
+                                    };
+                              break;
+                              case 'performances' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__performances',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
+                                          icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                                    };
+                              break;
+                              case 'recaptcha' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__recaptcha',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Protect your contact forms with Google reCAPTCHA'],
+                                          icon : '<i class="material-icons sek-level-option-icon">security</i>'
+                                    };
+                              break;
+                              case 'beta_features' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__beta_features',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Beta features'],
+                                          icon : '<i class="material-icons sek-level-option-icon">widgets</i>'
+                                    };
+                              break;
+                              default :
+                                    api.errare('::generateUIforGlobalOptions => an option group could not be registered => ' + mod_type, opt_name );
+                              break;
+                        }//switch
+                  });//_.each
+
 
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){

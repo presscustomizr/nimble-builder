@@ -85,7 +85,10 @@ function sek_enqueue_controls_js_css() {
                 'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true,
                 'isNimbleHeaderFooterEnabled' => sek_is_header_footer_enabled(),
 
-                'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() )
+                'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() ),
+
+                'globalOptionsMap' => Nimble_Manager()->global_options_map,
+                'localOptionsMap' => Nimble_Manager()->local_options_map
             )
         )
     );//wp_localize_script()

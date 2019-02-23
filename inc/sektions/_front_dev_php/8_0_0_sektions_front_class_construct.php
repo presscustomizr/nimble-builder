@@ -57,6 +57,27 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $recaptcha_enabled = '_not_cached_yet_';//enabled in the global options
         public $recaptcha_badge_displayed = '_not_cached_yet_';//enabled in the global options
 
+        // option key as saved in db => module_type
+        // is used in _1_6_5_sektions_generate_UI_global_options.js and when normalizing the global option in sek_normalize_global_options_with_defaults()
+        public $global_options_map = [
+            'global_header_footer' => 'sek_global_header_footer',
+            'breakpoint' => 'sek_global_breakpoint',
+            'widths' => 'sek_global_widths',
+            'performances' => 'sek_global_performances',
+            'recaptcha' => 'sek_global_recaptcha',
+            'beta_features' => 'sek_global_beta_features'
+        ];
+        // option key as saved in db => module_type
+        // is used in _1_6_4_sektions_generate_UI_local_skope_options.js and when normalizing the global option in sek_normalize_global_options_with_defaults()
+        public $local_options_map = [
+            'template' => 'sek_local_template',
+            'local_header_footer' => 'sek_local_header_footer',
+            'widths' => 'sek_local_widths',
+            'custom_css' => 'sek_local_custom_css',
+            'local_performances' => 'sek_local_performances',
+            'local_reset' => 'sek_local_reset'
+        ];
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {

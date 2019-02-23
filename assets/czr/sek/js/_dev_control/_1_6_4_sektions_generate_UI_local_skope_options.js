@@ -31,54 +31,72 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Prepare the module map to register
                   var registrationParams = {};
-                  $.extend( registrationParams, {
-                        template : {
-                              settingControlId : _id_ + '__template',
-                              module_type : 'sek_local_template',
-                              controlLabel : sektionsLocalizedData.i18n['Page template'],
-                              expandAndFocusOnInit : false,
-                              icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
-                        }
-                  });
-
-                  // Header and footer have been introduced in v1.4.0 but not enabled by default.
-                  if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                        $.extend( registrationParams, {
-                              local_header_footer : {
-                                    settingControlId : _id_ + '__local_header_footer',
-                                    module_type : 'sek_local_header_footer',
-                                    controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
-                                    icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                              }
-                        });
+                  if ( _.isUndefined( sektionsLocalizedData.localOptionsMap ) || ! _.isObject( sektionsLocalizedData.localOptionsMap ) ) {
+                        api.errare( '::generateUIforGlobalOptions => missing or invalid localOptionsMap');
+                        return dfd;
                   }
 
-                  $.extend( registrationParams, {
-                        widths : {
-                              settingControlId : _id_ + '__widths',
-                              module_type : 'sek_local_widths',
-                              controlLabel : sektionsLocalizedData.i18n['Inner and outer widths'],
-                              icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
-                        },
-                        custom_css : {
-                              settingControlId : _id_ + '__custom_css',
-                              module_type : 'sek_local_custom_css',
-                              controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
-                              icon : '<i class="material-icons sek-level-option-icon">code</i>'
-                        },
-                        local_performances : {
-                              settingControlId : _id_ + '__local_performances',
-                              module_type : 'sek_local_performances',
-                              controlLabel : sektionsLocalizedData.i18n['Page speed optimizations'],
-                              icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
-                        },
-                        local_reset : {
-                              settingControlId : _id_ + '__local_reset',
-                              module_type : 'sek_local_reset',
-                              controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
-                              icon : '<i class="material-icons sek-level-option-icon">cached</i>'
-                        }
-                  });
+                  // Populate the registration params
+                  _.each( sektionsLocalizedData.localOptionsMap, function( mod_type, opt_name ) {
+                        switch( opt_name ) {
+                              case 'template' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__template',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Page template'],
+                                          expandAndFocusOnInit : false,
+                                          icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
+                                    };
+                              break;
+                              // Header and footer have been introduced in v1.4.0 but not enabled by default.
+                              case 'local_header_footer':
+                                    if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+                                          registrationParams[ opt_name ] = {
+                                                settingControlId : _id_ + '__local_header_footer',
+                                                module_type : mod_type,
+                                                controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
+                                                icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                                          };
+                                    }
+                              break;
+                              case 'widths' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__widths',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Inner and outer widths'],
+                                          icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
+                                    };
+                              break;
+                              case 'custom_css' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__custom_css',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
+                                          icon : '<i class="material-icons sek-level-option-icon">code</i>'
+                                    };
+                              break;
+                              case 'local_performances' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__local_performances',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Page speed optimizations'],
+                                          icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                                    };
+                              break;
+                              case 'local_reset' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__local_reset',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
+                                          icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                                    };
+                              break;
+                              default :
+                                    api.errare('::generateUIforLocalOptions => an option group could not be registered => ' + mod_type, opt_name );
+                              break;
+                        }//switch
+                  });//_.each
+
 
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
