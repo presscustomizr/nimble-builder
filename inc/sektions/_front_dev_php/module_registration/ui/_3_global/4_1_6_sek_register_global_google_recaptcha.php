@@ -14,7 +14,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
             'item-inputs' => array(
                 'enable' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Activate Google reCAPTCHA on your forms', 'text_doma'),
+                    'title'       => sprintf( '<img height="20" width="20" src="%1$s"/> %2$s', NIMBLE_BASE_URL . '/assets/img/recaptcha_32.png', __('Activate Google reCAPTCHA on your forms', 'text_doma') ),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -39,12 +39,21 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                 ),
                 'badge' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Display the reCAPTCHA badge at the bottom of your page', 'text_doma'),
+                    'title'       => __('Show the reCAPTCHA badge at the bottom of your page', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after'       => __( 'The badge is not previewable when customizing.', 'text_doma')
-                )
+                ),
+                'failure_message' => array(
+                    'input_type'  => 'text',
+                    'width-100'         => true,
+                    'title'       => __( 'Failure message' , 'text_doma' ),
+                    'title_width' => 'width-100',
+                    'default'     => __( 'Google ReCaptcha validation failed. This form only accepts messages from humans.', 'text_doma'),
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false
+                ),
             )
         )//tmpl
     );
