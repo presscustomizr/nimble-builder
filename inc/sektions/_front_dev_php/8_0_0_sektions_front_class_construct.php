@@ -59,7 +59,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
 
         // option key as saved in db => module_type
         // is used in _1_6_5_sektions_generate_UI_global_options.js and when normalizing the global option in sek_normalize_global_options_with_defaults()
-        public $global_options_map = [
+        public static $global_options_map = [
             'global_header_footer' => 'sek_global_header_footer',
             'breakpoint' => 'sek_global_breakpoint',
             'widths' => 'sek_global_widths',
@@ -69,7 +69,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         ];
         // option key as saved in db => module_type
         // is used in _1_6_4_sektions_generate_UI_local_skope_options.js and when normalizing the global option in sek_normalize_global_options_with_defaults()
-        public $local_options_map = [
+        public static $local_options_map = [
             'template' => 'sek_local_template',
             'local_header_footer' => 'sek_local_header_footer',
             'widths' => 'sek_local_widths',

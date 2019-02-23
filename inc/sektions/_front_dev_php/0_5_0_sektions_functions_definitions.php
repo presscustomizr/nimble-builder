@@ -156,7 +156,7 @@ function sek_get_default_location_model( $skope_id = null ) {
 //@return string
 function sek_get_seks_setting_id( $skope_id = '' ) {
   if ( empty( $skope_id ) ) {
-      error_log( 'sek_get_seks_setting_id => empty skope id or location => collection setting id impossible to build' );
+      sek_error_log( 'sek_get_seks_setting_id => empty skope id or location => collection setting id impossible to build' );
   }
   return NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "[{$skope_id}]";
 }
@@ -341,7 +341,7 @@ function sek_get_registered_module_type_property( $module_type, $property = '' )
     // registered modules
     $registered_modules = CZR_Fmk_Base() -> registered_modules;
     if ( ! array_key_exists( $module_type, $registered_modules ) ) {
-        error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
+        sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
         return;
     }
     if ( array_key_exists( $property , $registered_modules[ $module_type ] ) ) {
@@ -435,32 +435,32 @@ function sek_get_default_module_model( $module_type = '' ) {
     if ( ! empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
-        $registered_modules = CZR_Fmk_Base() -> registered_modules;
-        if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+        $registered_modules = CZR_Fmk_Base()->registered_modules;
+        if ( ! array( $registered_modules ) || !CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+            sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $default;
         }
 
         // Is this module a father ?
         if ( !empty( $registered_modules[ $module_type ]['is_father'] ) && true === $registered_modules[ $module_type ]['is_father'] ) {
             if ( empty( $registered_modules[ $module_type ][ 'children' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
                 return $default;
             }
             if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
                 return $default;
             }
             foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $mod_type ) {
                 if ( empty( $registered_modules[ $mod_type ][ 'tmpl' ] ) ) {
-                    error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the father default model.' );
+                    sek_error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the father default model.' );
                     continue;
                 }
                 $default[$opt_group] = _sek_build_default_model( $registered_modules[ $mod_type ][ 'tmpl' ] );
             }
         } else {
             if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
                 return $default;
             }
             // Build
@@ -563,7 +563,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
         $registered_modules = CZR_Fmk_Base() -> registered_modules;
         // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+            sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $input_list;
         }
 
@@ -571,17 +571,17 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
         // Is this module a father ?
         if ( !empty( $registered_modules[ $module_type ]['is_father'] ) && true === $registered_modules[ $module_type ]['is_father'] ) {
             if ( empty( $registered_modules[ $module_type ][ 'children' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
                 return $input_list;
             }
             if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
                 return $input_list;
             }
             $temp = array();
             foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $mod_type ) {
                 if ( empty( $registered_modules[ $mod_type ][ 'tmpl' ] ) ) {
-                    error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the master input_list.' );
+                    sek_error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the master input_list.' );
                     continue;
                 }
                 // $temp[$opt_group] = _sek_build_input_list( $registered_modules[ $mod_type ][ 'tmpl' ] );
@@ -591,7 +591,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
             }
         } else {
             if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the input_list.' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the input_list.' );
                 return $input_list;
             }
             // Build
@@ -602,7 +602,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 
 
         // if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
-        //     error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the input_list.' );
+        //     sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the input_list.' );
         //     return $input_list;
         // }
 
@@ -694,6 +694,9 @@ function _sek_build_input_list( $module_tmpl_data, $input_list = null ) {
 // @return array() $normalized_model
 function sek_normalize_module_value_with_defaults( $raw_module_model ) {
     $normalized_model = $raw_module_model;
+    if ( empty( $normalized_model['module_type'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing module type', $normalized_model );
+    }
     $module_type = $normalized_model['module_type'];
     $is_father = sek_get_registered_module_type_property( $module_type, 'is_father' );
 
@@ -704,11 +707,11 @@ function sek_normalize_module_value_with_defaults( $raw_module_model ) {
     if ( $is_father ) {
         $children = sek_get_registered_module_type_property( $module_type, 'children' );
         if ( empty( $children ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+            sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
             return $default;
         }
         if ( ! is_array( $children ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+            sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
             return $default;
         }
         foreach ( $children as $opt_group => $mod_type ) {
@@ -738,6 +741,8 @@ function _sek_normalize_single_module_values( $raw_module_value, $module_type ) 
 
     return $module_values;
 }
+
+
 
 
 /* ------------------------------------------------------------------------- *
@@ -795,8 +800,12 @@ function sek_get_locale_template(){
 
 // @param $option_name = string
 // 'nimble_front_classes_ready' is fired when Nimble_Manager() is instanciated
-function sek_get_local_option_value( $option_name, $skope_id = null ) {
-    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->local_options ) {
+function sek_get_local_option_value( $option_name = '', $skope_id = null ) {
+    if ( empty($option_name) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name' );
+        return array();
+    }
+    if ( !skp_is_customizing() && did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->local_options ) {
         $local_options = Nimble_Manager()->local_options;
     } else {
         // use the provided skope_id if in the signature
@@ -805,30 +814,102 @@ function sek_get_local_option_value( $option_name, $skope_id = null ) {
         $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
         // Cache only after 'wp' && 'nimble_front_classes_ready'
         // never cache when doing ajax
-        if ( did_action('nimble_front_classes_ready') && did_action('wp') && defined( 'DOING_AJAX') && true !== DOING_AJAX ) {
+        if ( did_action('nimble_front_classes_ready') && did_action('wp') && !defined('DOING_AJAX') )  {
             Nimble_Manager()->local_options = $local_options;
         }
     }
-
-    return ( ! empty( $local_options ) && ! empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
+    // maybe normalizes with default values
+    $values = ( ! empty( $local_options ) && ! empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
+    if ( did_action('nimble_front_classes_ready') ) {
+        $values = sek_normalize_local_options_with_defaults( $option_name, $values );
+    }
+    return $values;
 }
 
 
+// @return array() $normalized_values
+// @see _1_6_4_sektions_generate_UI_local_skope_options.js
+function sek_normalize_local_options_with_defaults( $option_name, $raw_module_values ) {
+    if ( empty($option_name) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name' );
+        return array();
+    }
+    $normalized_values = ( !empty($raw_module_values) && is_array( $raw_module_values ) ) ? $raw_module_values : array();
+    // map the option key as saved in db ( @see _1_6_4_sektions_generate_UI_local_skope_options.js ) and the module type
+    $local_option_map = SEK_Front_Construct::$local_options_map;
+
+    if ( !array_key_exists($option_name, $local_option_map) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name', $option_name );
+        return $raw_module_values;
+    } else {
+        $module_type = $local_option_map[$option_name];
+    }
+
+    // normalize with the defaults
+    if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+        $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+    }
+    return $normalized_values;
+}
+
+
+/* ------------------------------------------------------------------------- *
+ *  GLOBAL OPTIONS HELPERS
+/* ------------------------------------------------------------------------- */
 // @param $option_name = string
 // 'nimble_front_classes_ready' is fired when Nimble_Manager() is instanciated
-function sek_get_global_option_value( $option_name ) {
-    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->global_nimble_options ) {
+function sek_get_global_option_value( $option_name = '' ) {
+    if ( empty($option_name) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name' );
+        return array();
+    }
+    if ( !skp_is_customizing() && did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->global_nimble_options ) {
         $global_nimble_options = Nimble_Manager()->global_nimble_options;
     } else {
         $global_nimble_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+        //sek_error_log(' SOOO OPTIONS ?', $global_nimble_options );
         // cache when nimble is ready
         // this hook is fired when Nimble_Manager() is instanciated
         // never cache when doing ajax
-        if ( did_action('nimble_front_classes_ready') && defined( 'DOING_AJAX') && true !== DOING_AJAX ) {
+        if ( did_action('nimble_front_classes_ready') && !defined('DOING_AJAX') ) {
             Nimble_Manager()->global_nimble_options = $global_nimble_options;
         }
     }
-    return ( is_array( $global_nimble_options ) && ! empty( $global_nimble_options[ $option_name ] ) ) ? $global_nimble_options[ $option_name ] : null;
+    // maybe normalizes with default values
+    $values = ( is_array( $global_nimble_options ) && !empty( $global_nimble_options[ $option_name ] ) ) ? $global_nimble_options[ $option_name ] : null;
+    if ( did_action('nimble_front_classes_ready') ) {
+        $values = sek_normalize_global_options_with_defaults( $option_name, $values );
+    }
+    return $values;
+}
+
+
+
+// @see _1_6_5_sektions_generate_UI_global_options.js
+// @return array() $normalized_values
+function sek_normalize_global_options_with_defaults( $option_name, $raw_module_values ) {
+    if ( empty($option_name) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name' );
+        return array();
+    }
+    $normalized_values = ( !empty($raw_module_values) && is_array( $raw_module_values ) ) ? $raw_module_values : array();
+    // map the option key as saved in db ( @see _1_6_5_sektions_generate_UI_global_options.js ) and the module type
+    $global_option_map = SEK_Front_Construct::$global_options_map;
+
+    //sek_error_log('SEK_Front_Construct::$global_options_map', SEK_Front_Construct::$global_options_map );
+
+    if ( !array_key_exists($option_name, $global_option_map) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name', $option_name );
+        return $raw_module_values;
+    } else {
+        $module_type = $global_option_map[$option_name];
+    }
+
+    // normalize with the defaults
+    if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+        $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+    }
+    return $normalized_values;
 }
 
 
@@ -1219,6 +1300,8 @@ function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true )
 
 
 function sek_error_log( $title, $content = null ) {
+    if ( ! sek_is_dev_mode() )
+      return;
     if ( is_null( $content ) ) {
         error_log( '<' . $title . '>' );
     } else {

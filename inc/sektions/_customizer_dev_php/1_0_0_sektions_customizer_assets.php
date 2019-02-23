@@ -87,8 +87,8 @@ function sek_enqueue_controls_js_css() {
 
                 'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() ),
 
-                'globalOptionsMap' => Nimble_Manager()->global_options_map,
-                'localOptionsMap' => Nimble_Manager()->local_options_map
+                'globalOptionsMap' => SEK_Front_Construct::$global_options_map,
+                'localOptionsMap' => SEK_Front_Construct::$local_options_map
             )
         )
     );//wp_localize_script()
