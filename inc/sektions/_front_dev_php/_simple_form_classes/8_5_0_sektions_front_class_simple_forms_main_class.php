@@ -179,6 +179,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     // @hook body_class
     public function set_the_recaptcha_badge_visibility_class( $classes ) {
         // Shall we print the badge ?
+        // @todo : we don't handle the case when recaptcha badge is globally displayed but
+        // the current page has disabled recaptcha
         if ( ! sek_is_recaptcha_badge_globally_displayed() ) {
             $classes[] = 'sek-hide-rc-badge';
         }
@@ -225,9 +227,24 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                       });
                   </script>
                 <?php
-                printf( '<span class="sek-form-message">%1$s</span>', $this->mailer->get_message( $status_code, $module_model ) );
-            }
 
+                $message = $this->mailer->get_message( $status_code, $module_model );
+                if ( !empty($message) ) {
+                    $class = 'sek-mail-failure';
+                    switch( $this->mailer->get_status() ) {
+                          case 'sent' :
+                              $class = 'sek-mail-success';
+                          break;
+                          case 'not_sent' :
+                              $class = '';
+                          break;
+                          case 'aborted' :
+                              $class = 'sek-mail-aborted';
+                          break;
+                    }
+                    printf( '<div class="sek-form-message %1$s">%2$s</div>', $class, $message );
+                }
+            }
             if ( $echo_form ) {
                 echo $form;
             }

@@ -908,7 +908,8 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'width-100'         => true,
                     'title'       => __('Email recipient', 'text_doma'),
                     'default'     => get_option( 'admin_email' ),
-                    'refresh_preview'  => false
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false
                 ),
                 'success_message' => array(
                     'input_type'  => 'text',
@@ -916,7 +917,9 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'title'       => __( 'Success message on submission' , 'text_doma' ),
                     'title_width' => 'width-100',
                     'default'     => __( 'Thanks! Your message has been sent.', 'text_doma'),
-                    'refresh_preview'  => false
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false,
+                    'notice_before' => __('Tip : replace the default messages with a blank space to not show anything.')
                 ),
                 'error_message' => array(
                     'input_type'  => 'text',
@@ -924,7 +927,8 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'title'       => __( 'Error message on submission' , 'text_doma' ),
                     'title_width' => 'width-100',
                     'default'     => __( 'Invalid form submission : some fields have not been entered properly.', 'text_doma'),
-                    'refresh_preview'  => false
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false
                 ),
                 'failure_message' => array(
                     'input_type'  => 'text',
@@ -932,7 +936,8 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'title'       => __( 'Failure message on submission' , 'text_doma' ),
                     'title_width' => 'width-100',
                     'default'     => __( 'Your message was not sent. Try Again.', 'text_doma'),
-                    'refresh_preview'  => false
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false
                 ),
                 'email_footer' => array(
                     'input_type'  => 'code_editor',
@@ -942,7 +947,8 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                         get_bloginfo( 'name' ),
                         get_site_url( 'url' )
                     ),
-                    'refresh_preview'  => false
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false
                 ),
                 'recaptcha_enabled' => array(
                     'input_type'  => 'select',
@@ -958,6 +964,7 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                         'disabled' => __('Disable', 'text_doma')
                     ),
                     'refresh_preview'  => false,
+                    'refresh_markup' => false,
                     'notice_after' => sprintf( __('The Nimble Builder can activate the %1$s service to protect your forms against spam. You need to %2$s.'),
                         sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'text_doma') ),
                         sprintf('<a href="#" onclick="%1$s">%2$s</a>',

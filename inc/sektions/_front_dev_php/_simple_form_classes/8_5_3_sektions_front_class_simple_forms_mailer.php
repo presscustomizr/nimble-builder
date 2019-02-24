@@ -10,17 +10,16 @@ class Sek_Mailer {
     private $status;
     private $messages;
     private $invalid_field = false;
-    private $recaptcha_data;//will store array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
+    public $recaptcha_errors = '_no_error_';//will store array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
 
     public function __construct( Sek_Form $form ) {
         $this-> form = $form;
 
         $this->messages = array(
             //status          => message
-            'not_sent'        => __( 'Message was not sent. Try Again.', 'text_doma'),
-            'sent'            => __( 'Thanks! Your message has been sent.', 'text_doma'),
-            'aborted'         => __( 'Please supply correct information.', 'text_doma'), //<-todo too much generic
-            'recaptcha_fail'  => __( 'Google ReCaptcha validation failed', 'text_doma')
+            //'not_sent'        => __( 'Message was not sent. Try Again.', 'text_doma'),
+            //'sent'            => __( 'Thanks! Your message has been sent.', 'text_doma'),
+            'aborted'         => __( 'Please supply correct information.', 'text_doma') //<-todo too much generic
         );
         $this->status = 'init';
 
@@ -29,14 +28,15 @@ class Sek_Mailer {
         // @see print_recaptcha_inline_js
         // on submission, we get the posted token value, and validate it with a remote http request to the google api
         if ( isset( $_POST['nimble_recaptcha_resp'] ) ) {
-            if ( ! $this->validate_recaptcha( $_POST['nimble_recaptcha_resp'] ) ) {
+            if ( !$this->validate_recaptcha( $_POST['nimble_recaptcha_resp'] ) ) {
                 $this->status = 'recaptcha_fail';
                 if ( sek_is_dev_mode() ) {
-                    sek_error_log('reCAPTCHA failure', $this->recaptcha_data );
+                    sek_error_log('reCAPTCHA failure', $this->recaptcha_errors );
                 }
             }
         }
     }
+
 
     //@return bool
     private function validate_recaptcha( $recaptcha_token ) {
@@ -57,19 +57,47 @@ class Sek_Mailer {
             ),
         );
 
-        // cache the recaptcha_data
-        $this->recaptcha_data = array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
-        $this->recaptcha_data['response'] = $response = wp_remote_post( esc_url_raw( $endpoint ), $request );
+        // cache the recaptcha_errors
+        $response = wp_remote_post( esc_url_raw( $endpoint ), $request );
+        if ( is_array( $response ) ) {
+            $maybe_recaptcha_errors = wp_remote_retrieve_body( $response );
+            $maybe_recaptcha_errors = json_decode( $maybe_recaptcha_errors );
+            $maybe_recaptcha_errors = is_object($maybe_recaptcha_errors) ? (array)$maybe_recaptcha_errors : $maybe_recaptcha_errors;
+            if ( is_array( $maybe_recaptcha_errors ) && isset( $maybe_recaptcha_errors['error-codes'] ) && is_array( $maybe_recaptcha_errors['error-codes'] ) ) {
+                $this->recaptcha_errors = implode(', ', $maybe_recaptcha_errors['error-codes'] );
+            }
+
+        }
+
+        //sek_error_log('reCAPTCHA response ?', $response );
+        // There
         if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
+            $this->recaptcha_errors = sprintf( __('There was a problem when performing the reCAPTCHA http request.') );
             return $is_valid;
         }
-        $response_body = wp_remote_retrieve_body( $response );
-        $response_body = json_decode( $response_body, true );
 
-        // see https://developers.google.com/recaptcha/docs/v3#score
-        $score = isset( $response_body['score'] ) ? $response_body['score'] : 0;
-        $threshold = apply_filters( 'nimble_recaptcha_human_treshold', 0.5 );
-        $is_valid = $is_human = $threshold < $score;
+        // At this point, we can check the score if there not already an error messages, like a re-submission problem for example
+        if ( '_no_error_' === $this->recaptcha_errors ) {
+            $response_body = wp_remote_retrieve_body( $response );
+            $response_body = json_decode( $response_body, true );
+
+            // see https://developers.google.com/recaptcha/docs/v3#score
+            $score = isset( $response_body['score'] ) ? $response_body['score'] : 0;
+
+            // get the user defined threshold
+            // must be normalized to be 0 >= threshold >= 1
+            $user_score_threshold = array_key_exists('score', $global_recaptcha_opts) ? $global_recaptcha_opts['score'] : 0.5;
+            $user_score_threshold = !is_numeric( $user_score_threshold ) ? 0.5 : $user_score_threshold;
+            $user_score_threshold = $user_score_threshold > 1 ? 1 : $user_score_threshold;
+            $user_score_threshold = $user_score_threshold < 0 ? 0 : $user_score_threshold;
+            $user_score_threshold = apply_filters( 'nimble_recaptcha_score_treshold', $user_score_threshold );
+
+            $is_valid = $is_human = $user_score_threshold < $score;
+            if ( !$is_valid ) {
+                $this->recaptcha_errors = sprintf( __('Google reCAPTCHA returned a score of %s, which is lower than your threshold of %s.', 'text_dom' ), $score, $user_score_threshold );
+            }
+        }
+
         return $is_valid;
     }
 
@@ -167,25 +195,39 @@ class Sek_Mailer {
         $submission_options = empty( $module_user_values['form_submission'] ) ? array() : $module_user_values['form_submission'];
 
         $submission_message = isset( $this->messages[ $status ] ) ? $this->messages[ $status ] : '';
+
+        // the check with strlen( preg_replace('/\s+/' ... ) allow user to "hack" the custom submission message with a blank space
+        // because if the field is empty it will fallback on the default value
         switch( $status ) {
             case 'not_sent' :
-                if ( array_key_exists( 'failure_message', $submission_options ) && !empty( $submission_options['failure_message'] ) ) {
+                if ( array_key_exists( 'failure_message', $submission_options ) && !empty( $submission_options['failure_message'] ) && 0 < strlen( preg_replace('/\s+/', '', $submission_options['failure_message'] ) ) ) {
                     $submission_message = $submission_options['failure_message'];
                 }
             break;
             case 'sent' :
-                if ( array_key_exists( 'success_message', $submission_options ) && !empty( $submission_options['success_message'] ) ) {
+                if ( array_key_exists( 'success_message', $submission_options ) && !empty( $submission_options['success_message'] ) && 0 < strlen( preg_replace('/\s+/', '', $submission_options['success_message'] ) ) ) {
                     $submission_message = $submission_options['success_message'];
                 }
             break;
             case 'aborted' :
-                if ( array_key_exists( 'error_message', $submission_options ) && !empty( $submission_options['error_message'] ) ) {
+                if ( array_key_exists( 'error_message', $submission_options ) && !empty( $submission_options['error_message'] ) && 0 < strlen( preg_replace('/\s+/', '', $submission_options['error_message'] ) ) ) {
                     $submission_message = $submission_options['error_message'];
                 }
                 if ( false !== $this->invalid_field ) {
-                    $submission_message = sprintf( __( '%1$s The following field is not well formed : <strong>%2$s</strong>.', 'text-domain' ), $submission_message, $this->invalid_field );
+                    $submission_message = sprintf( __( '%1$s : <strong>%2$s</strong>.', 'text-domain' ), $submission_message, $this->invalid_field );
                 }
             break;
+            case 'recaptcha_fail' :
+                $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
+                $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
+                if ( true === sek_booleanize_checkbox_val($global_recaptcha_opts['show_failure_message']) ) {
+                    $submission_message = !empty($global_recaptcha_opts['failure_message']) ? $global_recaptcha_opts['failure_message'] : '';
+                }
+            break;
+        }
+
+        if ( '_no_error_' !== $this->recaptcha_errors && current_user_can( 'customize' ) ) {
+              $submission_message .= sprintf( '<br/>%s : <i>%s</i>', __('reCAPTCHA problem (only visible by a logged in administrator )', 'text_doma'), $this->recaptcha_errors );
         }
         return $submission_message;
     }

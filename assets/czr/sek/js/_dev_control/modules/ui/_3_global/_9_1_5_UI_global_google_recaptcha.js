@@ -46,9 +46,27 @@
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'enable' :
-                                          _.each( [ 'public_key', 'private_key', 'badge', 'failure_message' ] , function( _inputId_ ) {
+                                          _.each( [ 'public_key', 'private_key', 'badge', 'show_failure_message', 'failure_message', 'score' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return input();
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'failure_message' :
+                                                                  bool = input() && item.czr_Input('show_failure_message')();
+                                                            break;
+                                                            default :
+                                                                  bool = input();
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                }); } catch( er ) {
+                                                      api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'show_failure_message' :
+                                          _.each( [ 'failure_message' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input() && item.czr_Input('enable')();
                                                 }); } catch( er ) {
                                                       api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
                                                 }
