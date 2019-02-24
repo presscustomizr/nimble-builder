@@ -6,7 +6,7 @@ Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.0
-Stable tag: 1.4.12
+Stable tag: 1.4.13
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,10 +56,14 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.4.12 =
-Nimble Builder is ready for WordPress version 5.1. In this version, we've added a Google reCAPTCHA optional protection for your Nimble forms.
+= 1.4.13 =
+New option to customize the acceptable score returned by Google reCAPTCHA in the form module.
 
 == Changelog ==
+= 1.4.13 : February 24th, 2019 =
+* fixed : wrong check when deciding between local and global for header and footer
+* added : New option to customize the acceptable score returned by Google reCAPTCHA in the form module.
+
 = 1.4.12 : February 22nd, 2019 =
 * fixed : a level content could overlay its parent when its height was custom
 * fixed : make sure registered locations in the Customizr theme are always rendered when using the Nimble template and / or the Nimble header and footer

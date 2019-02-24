@@ -68,7 +68,10 @@ function sek_enqueue_controls_js_css() {
                 'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true,
                 'isNimbleHeaderFooterEnabled' => sek_is_header_footer_enabled(),
 
-                'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() )
+                'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() ),
+
+                'globalOptionsMap' => SEK_Front_Construct::$global_options_map,
+                'localOptionsMap' => SEK_Front_Construct::$local_options_map
             )
         )
     );//wp_localize_script()
@@ -1705,7 +1708,7 @@ function sek_set_input_tmpl___reset_button( $input_id, $input_data ) {
       ?>
       <div class="sek-button-choice-wrapper">
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-        <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="%1$s" data-sek-reset-scope="<?php echo $input_data['scope']; ?>"><?php _e('Reset', 'text-domain'); ?></button>
+        <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Reset', 'text-domain'); ?>" data-sek-reset-scope="<?php echo $input_data['scope']; ?>"><?php _e('Reset', 'text-domain'); ?></button>
       </div>
   <?php
 }

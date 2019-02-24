@@ -120,7 +120,7 @@ function sek_get_default_location_model( $skope_id = null ) {
 }
 function sek_get_seks_setting_id( $skope_id = '' ) {
   if ( empty( $skope_id ) ) {
-      error_log( 'sek_get_seks_setting_id => empty skope id or location => collection setting id impossible to build' );
+      sek_error_log( 'sek_get_seks_setting_id => empty skope id or location => collection setting id impossible to build' );
   }
   return NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "[{$skope_id}]";
 }
@@ -245,7 +245,7 @@ function sek_get_level_skope_id( $level_id = '' ) {
 /* ------------------------------------------------------------------------- */
 function sek_page_uses_nimble_header_footer() {
     Nimble_Manager()->sek_maybe_set_nimble_header_footer();
-    return Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer;
+    return true === Nimble_Manager()->has_local_header_footer || true === Nimble_Manager()->has_global_header_footer;
 }
 
 
@@ -256,7 +256,7 @@ function sek_page_uses_nimble_header_footer() {
 function sek_get_registered_module_type_property( $module_type, $property = '' ) {
     $registered_modules = CZR_Fmk_Base() -> registered_modules;
     if ( ! array_key_exists( $module_type, $registered_modules ) ) {
-        error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
+        sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
         return;
     }
     if ( array_key_exists( $property , $registered_modules[ $module_type ] ) ) {
@@ -311,30 +311,30 @@ function sek_get_default_module_model( $module_type = '' ) {
     if ( ! empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
-        $registered_modules = CZR_Fmk_Base() -> registered_modules;
-        if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+        $registered_modules = CZR_Fmk_Base()->registered_modules;
+        if ( ! array( $registered_modules ) || !CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+            sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $default;
         }
         if ( !empty( $registered_modules[ $module_type ]['is_father'] ) && true === $registered_modules[ $module_type ]['is_father'] ) {
             if ( empty( $registered_modules[ $module_type ][ 'children' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
                 return $default;
             }
             if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
                 return $default;
             }
             foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $mod_type ) {
                 if ( empty( $registered_modules[ $mod_type ][ 'tmpl' ] ) ) {
-                    error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the father default model.' );
+                    sek_error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the father default model.' );
                     continue;
                 }
                 $default[$opt_group] = _sek_build_default_model( $registered_modules[ $mod_type ][ 'tmpl' ] );
             }
         } else {
             if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
                 return $default;
             }
             $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
@@ -383,22 +383,22 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
     } else {
         $registered_modules = CZR_Fmk_Base() -> registered_modules;
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
+            sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $input_list;
         }
         if ( !empty( $registered_modules[ $module_type ]['is_father'] ) && true === $registered_modules[ $module_type ]['is_father'] ) {
             if ( empty( $registered_modules[ $module_type ][ 'children' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
                 return $input_list;
             }
             if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
                 return $input_list;
             }
             $temp = array();
             foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $mod_type ) {
                 if ( empty( $registered_modules[ $mod_type ][ 'tmpl' ] ) ) {
-                    error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the master input_list.' );
+                    sek_error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the master input_list.' );
                     continue;
                 }
 
@@ -406,7 +406,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
             }
         } else {
             if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
-                error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the input_list.' );
+                sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the input_list.' );
                 return $input_list;
             }
             $input_list = _sek_build_input_list( $registered_modules[ $module_type ][ 'tmpl' ] );
@@ -449,6 +449,9 @@ function _sek_build_input_list( $module_tmpl_data, $input_list = null ) {
 /* ------------------------------------------------------------------------- */
 function sek_normalize_module_value_with_defaults( $raw_module_model ) {
     $normalized_model = $raw_module_model;
+    if ( empty( $normalized_model['module_type'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing module type', $normalized_model );
+    }
     $module_type = $normalized_model['module_type'];
     $is_father = sek_get_registered_module_type_property( $module_type, 'is_father' );
 
@@ -457,11 +460,11 @@ function sek_normalize_module_value_with_defaults( $raw_module_model ) {
     if ( $is_father ) {
         $children = sek_get_registered_module_type_property( $module_type, 'children' );
         if ( empty( $children ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
+            sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
             return $default;
         }
         if ( ! is_array( $children ) ) {
-            error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
+            sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
             return $default;
         }
         foreach ( $children as $opt_group => $mod_type ) {
@@ -486,6 +489,8 @@ function _sek_normalize_single_module_values( $raw_module_value, $module_type ) 
 
     return $module_values;
 }
+
+
 
 
 /* ------------------------------------------------------------------------- *
@@ -537,30 +542,88 @@ function sek_get_locale_template(){
     }
     return $path;
 }
-function sek_get_local_option_value( $option_name, $skope_id = null ) {
-    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->local_options ) {
+function sek_get_local_option_value( $option_name = '', $skope_id = null ) {
+    if ( empty($option_name) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name' );
+        return array();
+    }
+    if ( !skp_is_customizing() && did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->local_options ) {
         $local_options = Nimble_Manager()->local_options;
     } else {
         $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
         $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
         $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
-        if ( did_action('nimble_front_classes_ready') && did_action('wp') && defined( 'DOING_AJAX') && true !== DOING_AJAX ) {
+        if ( did_action('nimble_front_classes_ready') && did_action('wp') && !defined('DOING_AJAX') )  {
             Nimble_Manager()->local_options = $local_options;
         }
     }
-
-    return ( ! empty( $local_options ) && ! empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
+    $values = ( ! empty( $local_options ) && ! empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
+    if ( did_action('nimble_front_classes_ready') ) {
+        $values = sek_normalize_local_options_with_defaults( $option_name, $values );
+    }
+    return $values;
 }
-function sek_get_global_option_value( $option_name ) {
-    if ( did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->global_nimble_options ) {
+function sek_normalize_local_options_with_defaults( $option_name, $raw_module_values ) {
+    if ( empty($option_name) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name' );
+        return array();
+    }
+    $normalized_values = ( !empty($raw_module_values) && is_array( $raw_module_values ) ) ? $raw_module_values : array();
+    $local_option_map = SEK_Front_Construct::$local_options_map;
+
+    if ( !array_key_exists($option_name, $local_option_map) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name', $option_name );
+        return $raw_module_values;
+    } else {
+        $module_type = $local_option_map[$option_name];
+    }
+    if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+        $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+    }
+    return $normalized_values;
+}
+
+
+/* ------------------------------------------------------------------------- *
+ *  GLOBAL OPTIONS HELPERS
+/* ------------------------------------------------------------------------- */
+function sek_get_global_option_value( $option_name = '' ) {
+    if ( empty($option_name) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name' );
+        return array();
+    }
+    if ( !skp_is_customizing() && did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->global_nimble_options ) {
         $global_nimble_options = Nimble_Manager()->global_nimble_options;
     } else {
         $global_nimble_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-        if ( did_action('nimble_front_classes_ready') && defined( 'DOING_AJAX') && true !== DOING_AJAX ) {
+        if ( did_action('nimble_front_classes_ready') && !defined('DOING_AJAX') ) {
             Nimble_Manager()->global_nimble_options = $global_nimble_options;
         }
     }
-    return ( is_array( $global_nimble_options ) && ! empty( $global_nimble_options[ $option_name ] ) ) ? $global_nimble_options[ $option_name ] : null;
+    $values = ( is_array( $global_nimble_options ) && !empty( $global_nimble_options[ $option_name ] ) ) ? $global_nimble_options[ $option_name ] : null;
+    if ( did_action('nimble_front_classes_ready') ) {
+        $values = sek_normalize_global_options_with_defaults( $option_name, $values );
+    }
+    return $values;
+}
+function sek_normalize_global_options_with_defaults( $option_name, $raw_module_values ) {
+    if ( empty($option_name) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name' );
+        return array();
+    }
+    $normalized_values = ( !empty($raw_module_values) && is_array( $raw_module_values ) ) ? $raw_module_values : array();
+    $global_option_map = SEK_Front_Construct::$global_options_map;
+
+    if ( !array_key_exists($option_name, $global_option_map) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name', $option_name );
+        return $raw_module_values;
+    } else {
+        $module_type = $global_option_map[$option_name];
+    }
+    if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+        $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+    }
+    return $normalized_values;
 }
 
 
@@ -895,6 +958,8 @@ function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true )
 
 
 function sek_error_log( $title, $content = null ) {
+    if ( ! sek_is_dev_mode() )
+      return;
     if ( is_null( $content ) ) {
         error_log( '<' . $title . '>' );
     } else {
@@ -4194,32 +4259,62 @@ function sek_get_module_params_for_sek_global_recaptcha() {
             'item-inputs' => array(
                 'enable' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Activate Google reCAPTCHA on your forms', 'text_doma'),
+                    'title'       => sprintf( '<img height="20" width="20" src="%1$s"/> %2$s', NIMBLE_BASE_URL . '/assets/img/recaptcha_32.png', __('Activate Google reCAPTCHA on your forms', 'text_doma') ),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => sprintf( __('The Nimble Builder can activate the %1$s service to protect your forms against spam. You need to %2$s.'),
+                    'notice_after' => sprintf( __('The Nimble Builder can activate the %1$s service to protect your forms against spambots. You need to %2$s.'),
                         sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'text_doma') ),
                         sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://www.google.com/recaptcha/admin#list', __('get your domain API keys from Google', 'text_doma') )
                     )
                 ),
                 'public_key' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Public key', 'text_doma'),
+                    'title'       => __('Site key', 'text_doma'),
                     'default'     => '',
                     'refresh_preview' => false,
                     'refresh_markup' => false
                 ),
                 'private_key' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Private key', 'text_doma'),
+                    'title'       => __('Secret key', 'text_doma'),
                     'default'     => '',
                     'refresh_preview' => false,
                     'refresh_markup' => false
                 ),
+                'score'  => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __( 'Score threshold', 'text_doma' ),
+                    'default'     => 0.5,
+                    'min'         => 0,
+                    'max'         => 1,
+                    'step'        => 0.05,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'width-100'   => true,
+                    'notice_after'  => __( 'reCAPTCHA returns a score from 0 to 1 on each submission. 1 is very likely a good interaction, 0 is very likely a bot. A form submission that scores lower than your threshold will be considered as done by a robot, and aborted.', 'text_doma'),
+                    'refresh_preview' => false,
+                    'refresh_markup' => false
+                ),//0,
+                'show_failure_message' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __( 'Show a failure message', 'text_doma' ),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'failure_message' => array(
+                    'input_type'  => 'text',
+                    'width-100'         => true,
+                    'title'       => __( 'Failure message' , 'text_doma' ),
+                    'title_width' => 'width-100',
+                    'default'     => __( 'Google ReCAPTCHA validation failed. This form only accepts messages from humans.', 'text_doma'),
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false
+                ),
                 'badge' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Display the reCAPTCHA badge at the bottom of your page', 'text_doma'),
+                    'title'       => __('Show the reCAPTCHA badge at the bottom of your page', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -6864,7 +6959,8 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'width-100'         => true,
                     'title'       => __('Email recipient', 'text_doma'),
                     'default'     => get_option( 'admin_email' ),
-                    'refresh_preview'  => false
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false
                 ),
                 'success_message' => array(
                     'input_type'  => 'text',
@@ -6872,7 +6968,9 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'title'       => __( 'Success message on submission' , 'text_doma' ),
                     'title_width' => 'width-100',
                     'default'     => __( 'Thanks! Your message has been sent.', 'text_doma'),
-                    'refresh_preview'  => false
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false,
+                    'notice_before' => __('Tip : replace the default messages with a blank space to not show anything.')
                 ),
                 'error_message' => array(
                     'input_type'  => 'text',
@@ -6880,7 +6978,8 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'title'       => __( 'Error message on submission' , 'text_doma' ),
                     'title_width' => 'width-100',
                     'default'     => __( 'Invalid form submission : some fields have not been entered properly.', 'text_doma'),
-                    'refresh_preview'  => false
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false
                 ),
                 'failure_message' => array(
                     'input_type'  => 'text',
@@ -6888,7 +6987,8 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'title'       => __( 'Failure message on submission' , 'text_doma' ),
                     'title_width' => 'width-100',
                     'default'     => __( 'Your message was not sent. Try Again.', 'text_doma'),
-                    'refresh_preview'  => false
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false
                 ),
                 'email_footer' => array(
                     'input_type'  => 'code_editor',
@@ -6898,7 +6998,8 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                         get_bloginfo( 'name' ),
                         get_site_url( 'url' )
                     ),
-                    'refresh_preview'  => false
+                    'refresh_preview'  => false,
+                    'refresh_markup' => false
                 ),
                 'recaptcha_enabled' => array(
                     'input_type'  => 'select',
@@ -6914,6 +7015,7 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                         'disabled' => __('Disable', 'text_doma')
                     ),
                     'refresh_preview'  => false,
+                    'refresh_markup' => false,
                     'notice_after' => sprintf( __('The Nimble Builder can activate the %1$s service to protect your forms against spam. You need to %2$s.'),
                         sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'text_doma') ),
                         sprintf('<a href="#" onclick="%1$s">%2$s</a>',
@@ -8730,6 +8832,22 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
 
         public $recaptcha_enabled = '_not_cached_yet_';//enabled in the global options
         public $recaptcha_badge_displayed = '_not_cached_yet_';//enabled in the global options
+        public static $global_options_map = [
+            'global_header_footer' => 'sek_global_header_footer',
+            'breakpoint' => 'sek_global_breakpoint',
+            'widths' => 'sek_global_widths',
+            'performances' => 'sek_global_performances',
+            'recaptcha' => 'sek_global_recaptcha',
+            'beta_features' => 'sek_global_beta_features'
+        ];
+        public static $local_options_map = [
+            'template' => 'sek_local_template',
+            'local_header_footer' => 'sek_local_header_footer',
+            'widths' => 'sek_local_widths',
+            'custom_css' => 'sek_local_custom_css',
+            'local_performances' => 'sek_local_performances',
+            'local_reset' => 'sek_local_reset'
+        ];
         function __construct( $params = array() ) {
             $this->registered_locations = $this->default_locations;
             $this -> _schedule_front_ajax_actions();
@@ -10481,9 +10599,24 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                       });
                   </script>
                 <?php
-                printf( '<span class="sek-form-message">%1$s</span>', $this->mailer->get_message( $status_code, $module_model ) );
-            }
 
+                $message = $this->mailer->get_message( $status_code, $module_model );
+                if ( !empty($message) ) {
+                    $class = 'sek-mail-failure';
+                    switch( $this->mailer->get_status() ) {
+                          case 'sent' :
+                              $class = 'sek-mail-success';
+                          break;
+                          case 'not_sent' :
+                              $class = '';
+                          break;
+                          case 'aborted' :
+                              $class = 'sek-mail-aborted';
+                          break;
+                    }
+                    printf( '<div class="sek-form-message %1$s">%2$s</div>', $class, $message );
+                }
+            }
             if ( $echo_form ) {
                 echo $form;
             }
@@ -11036,23 +11169,20 @@ class Sek_Mailer {
     private $status;
     private $messages;
     private $invalid_field = false;
-    private $recaptcha_data;//will store array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
+    public $recaptcha_errors = '_no_error_';//will store array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
 
     public function __construct( Sek_Form $form ) {
         $this-> form = $form;
 
         $this->messages = array(
-            'not_sent'        => __( 'Message was not sent. Try Again.', 'text_doma'),
-            'sent'            => __( 'Thanks! Your message has been sent.', 'text_doma'),
-            'aborted'         => __( 'Please supply correct information.', 'text_doma'), //<-todo too much generic
-            'recaptcha_fail'  => __( 'Google ReCaptcha validation failed', 'text_doma')
+            'aborted'         => __( 'Please supply correct information.', 'text_doma') //<-todo too much generic
         );
         $this->status = 'init';
         if ( isset( $_POST['nimble_recaptcha_resp'] ) ) {
-            if ( ! $this->validate_recaptcha( $_POST['nimble_recaptcha_resp'] ) ) {
+            if ( !$this->validate_recaptcha( $_POST['nimble_recaptcha_resp'] ) ) {
                 $this->status = 'recaptcha_fail';
                 if ( sek_is_dev_mode() ) {
-                    sek_error_log('reCAPTCHA failure', $this->recaptcha_data );
+                    sek_error_log('reCAPTCHA failure', $this->recaptcha_errors );
                 }
             }
         }
@@ -11070,16 +11200,36 @@ class Sek_Mailer {
                 'response' => $recaptcha_token
             ),
         );
-        $this->recaptcha_data = array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
-        $this->recaptcha_data['response'] = $response = wp_remote_post( esc_url_raw( $endpoint ), $request );
+        $response = wp_remote_post( esc_url_raw( $endpoint ), $request );
+        if ( is_array( $response ) ) {
+            $maybe_recaptcha_errors = wp_remote_retrieve_body( $response );
+            $maybe_recaptcha_errors = json_decode( $maybe_recaptcha_errors );
+            $maybe_recaptcha_errors = is_object($maybe_recaptcha_errors) ? (array)$maybe_recaptcha_errors : $maybe_recaptcha_errors;
+            if ( is_array( $maybe_recaptcha_errors ) && isset( $maybe_recaptcha_errors['error-codes'] ) && is_array( $maybe_recaptcha_errors['error-codes'] ) ) {
+                $this->recaptcha_errors = implode(', ', $maybe_recaptcha_errors['error-codes'] );
+            }
+
+        }
         if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
+            $this->recaptcha_errors = sprintf( __('There was a problem when performing the reCAPTCHA http request.') );
             return $is_valid;
         }
-        $response_body = wp_remote_retrieve_body( $response );
-        $response_body = json_decode( $response_body, true );
-        $score = isset( $response_body['score'] ) ? $response_body['score'] : 0;
-        $threshold = apply_filters( 'nimble_recaptcha_human_treshold', 0.5 );
-        $is_valid = $is_human = $threshold < $score;
+        if ( '_no_error_' === $this->recaptcha_errors ) {
+            $response_body = wp_remote_retrieve_body( $response );
+            $response_body = json_decode( $response_body, true );
+            $score = isset( $response_body['score'] ) ? $response_body['score'] : 0;
+            $user_score_threshold = array_key_exists('score', $global_recaptcha_opts) ? $global_recaptcha_opts['score'] : 0.5;
+            $user_score_threshold = !is_numeric( $user_score_threshold ) ? 0.5 : $user_score_threshold;
+            $user_score_threshold = $user_score_threshold > 1 ? 1 : $user_score_threshold;
+            $user_score_threshold = $user_score_threshold < 0 ? 0 : $user_score_threshold;
+            $user_score_threshold = apply_filters( 'nimble_recaptcha_score_treshold', $user_score_threshold );
+
+            $is_valid = $is_human = $user_score_threshold < $score;
+            if ( !$is_valid ) {
+                $this->recaptcha_errors = sprintf( __('Google reCAPTCHA returned a score of %s, which is lower than your threshold of %s.', 'text_dom' ), $score, $user_score_threshold );
+            }
+        }
+
         return $is_valid;
     }
 
@@ -11160,23 +11310,34 @@ class Sek_Mailer {
         $submission_message = isset( $this->messages[ $status ] ) ? $this->messages[ $status ] : '';
         switch( $status ) {
             case 'not_sent' :
-                if ( array_key_exists( 'failure_message', $submission_options ) && !empty( $submission_options['failure_message'] ) ) {
+                if ( array_key_exists( 'failure_message', $submission_options ) && !empty( $submission_options['failure_message'] ) && 0 < strlen( preg_replace('/\s+/', '', $submission_options['failure_message'] ) ) ) {
                     $submission_message = $submission_options['failure_message'];
                 }
             break;
             case 'sent' :
-                if ( array_key_exists( 'success_message', $submission_options ) && !empty( $submission_options['success_message'] ) ) {
+                if ( array_key_exists( 'success_message', $submission_options ) && !empty( $submission_options['success_message'] ) && 0 < strlen( preg_replace('/\s+/', '', $submission_options['success_message'] ) ) ) {
                     $submission_message = $submission_options['success_message'];
                 }
             break;
             case 'aborted' :
-                if ( array_key_exists( 'error_message', $submission_options ) && !empty( $submission_options['error_message'] ) ) {
+                if ( array_key_exists( 'error_message', $submission_options ) && !empty( $submission_options['error_message'] ) && 0 < strlen( preg_replace('/\s+/', '', $submission_options['error_message'] ) ) ) {
                     $submission_message = $submission_options['error_message'];
                 }
                 if ( false !== $this->invalid_field ) {
-                    $submission_message = sprintf( __( '%1$s The following field is not well formed : <strong>%2$s</strong>.', 'text-domain' ), $submission_message, $this->invalid_field );
+                    $submission_message = sprintf( __( '%1$s : <strong>%2$s</strong>.', 'text-domain' ), $submission_message, $this->invalid_field );
                 }
             break;
+            case 'recaptcha_fail' :
+                $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
+                $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
+                if ( true === sek_booleanize_checkbox_val($global_recaptcha_opts['show_failure_message']) ) {
+                    $submission_message = !empty($global_recaptcha_opts['failure_message']) ? $global_recaptcha_opts['failure_message'] : '';
+                }
+            break;
+        }
+
+        if ( '_no_error_' !== $this->recaptcha_errors && current_user_can( 'customize' ) ) {
+              $submission_message .= sprintf( '<br/>%s : <i>%s</i>', __('reCAPTCHA problem (only visible by a logged in administrator )', 'text_doma'), $this->recaptcha_errors );
         }
         return $submission_message;
     }
