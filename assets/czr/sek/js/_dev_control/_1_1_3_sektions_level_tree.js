@@ -7,7 +7,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this;
                   self.levelTree = new api.Value([]);
                   self.levelTree.bind( function( _collection ) {
-                        console.log('Level Tree changed => ', _collection);
+                        //console.log('Level Tree changed => ', _collection);
                         // Refresh when the collection is being modified from the tree
                         if ( self.levelTreeExpanded() ) {
                               self.renderOrRefreshTree();
@@ -20,6 +20,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.levelTreeExpanded.bind( function(expanded) {
                         $('body').toggleClass( 'sek-level-tree-expanded', expanded );
                         if ( expanded ) {
+                              // Set the level tree now
+                              self.setLevelTreeValue();
+
                               // Make sure we the tree is set first
                               if ( _.isEmpty( self.levelTree() ) ) {
                                     api.previewer.trigger('sek-notify', {
@@ -54,9 +57,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // - bind the local and global settings so that they refresh the level tree when changed
                         self.localSectionsSettingId.callbacks.add( function() {
                               // Set the initial levelTreeValue when settings are registered
-                              api.when( self.getGlobalSectionsSettingId(), self.localSectionsSettingId(), function( _global_, _local_ ) {
-                                    self.setLevelTreeValue();
-                              });
+                              // api.when( self.getGlobalSectionsSettingId(), self.localSectionsSettingId(), function( _global_, _local_ ) {
+                              //       self.setLevelTreeValue();
+                              // });
 
                               // Bind the global and local settings if not bound yet
                               _.each( [ self.getGlobalSectionsSettingId(), self.localSectionsSettingId() ], function( setId ){
@@ -99,6 +102,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
+
+            // @return boolean
+            hasLocalHeaderFooter : function() {
+                  if ( ! api.has( self.localSectionsSettingId() ) )
+                    return;
+                  //console.log( 'self.localSectionsSettingId() ? ', api( self.localSectionsSettingId() )() );
+            },
+
             // This method updated the levelTree observable api.Value()
             setLevelTreeValue : function() {
                   var self = this,
@@ -115,6 +126,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Store it now
                   self.levelTree( _.union( _global_col, _local_col ) );
+
+                  //console.log('hasLocalHeaderFooter ??', api( self.localSectionsSettingId() )() );
             },
 
 
