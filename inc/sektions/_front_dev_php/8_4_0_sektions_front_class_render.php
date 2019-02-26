@@ -156,8 +156,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // hook : 'the_content'::-9999
         function sek_schedule_sektion_rendering_before_content( $html ) {
-            if ( did_action( 'sek_before_location_before_content' ) )
-              return $html;
+            // Disable because https://github.com/presscustomizr/nimble-builder/issues/380
+            // No regression ?
+
+            // if ( did_action( 'sek_before_location_before_content' ) )
+            //   return $html;
 
             do_action( 'sek_before_location_before_content' );
             return $this -> _filter_the_content( $html, 'before_content' );
@@ -165,8 +168,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
         // hook : 'the_content'::9999
         function sek_schedule_sektion_rendering_after_content( $html ) {
-            if ( did_action( 'sek_before_location_after_content' ) )
-              return $html;
+            // Disable because https://github.com/presscustomizr/nimble-builder/issues/380
+            // No regression ?
+
+            // if ( did_action( 'sek_before_location_after_content' ) )
+            //   return $html;
 
             do_action( 'sek_before_location_after_content' );
             return $this -> _filter_the_content( $html, 'after_content' );
