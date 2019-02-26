@@ -1140,11 +1140,11 @@ body.nimble-save-ui-visible #nimble-top-save-ui {
 /* LEVEL TREE */
 /* space for the Level Tree */
 #customize-preview iframe, #nimble-level-tree {
-  -webkit-transition: all 0.3s ease-in-out;
-  -moz-transition: all, 0.3s ease-in-out;
-  -ms-transition: all, 0.3s ease-in-out;
-  -o-transition: all, 0.3s ease-in-out;
-  transition: all 0.3s ease-in-out;
+  -webkit-transition: top 0.3s ease-in-out;
+  -moz-transition: top, 0.3s ease-in-out;
+  -ms-transition: top, 0.3s ease-in-out;
+  -o-transition: top, 0.3s ease-in-out;
+  transition: top 0.3s ease-in-out;
 }
 #customize-preview iframe {
   z-index: 1;
