@@ -6,7 +6,7 @@ Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.0
-Stable tag: 1.4.13
+Stable tag: 1.4.14
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,10 +56,14 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.4.13 =
-New option to customize the acceptable score returned by Google reCAPTCHA in the form module.
+= 1.4.14 =
+Improved compatibility with Yoast SEO plugin.
 
 == Changelog ==
+= 1.4.14 : February 26th, 2019 =
+* fixed : compatibility issue with Yoast SEO plugin. Sections located before and after the_content were not rendered.
+* fixed : add section button could inherit unwanted CSS properties from themes
+
 = 1.4.13 : February 24th, 2019 =
 * fixed : wrong check when deciding between local and global for header and footer
 * added : New option to customize the acceptable score returned by Google reCAPTCHA in the form module.

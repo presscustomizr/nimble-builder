@@ -71,7 +71,9 @@ function sek_enqueue_controls_js_css() {
                 'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() ),
 
                 'globalOptionsMap' => SEK_Front_Construct::$global_options_map,
-                'localOptionsMap' => SEK_Front_Construct::$local_options_map
+                'localOptionsMap' => SEK_Front_Construct::$local_options_map,
+
+                'registeredLocations' => sek_get_locations()
             )
         )
     );//wp_localize_script()
@@ -427,7 +429,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'codeEditorPlural'     => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_doma' ),
             'Settings on desktops' => __('Settings on desktops', 'text_doma'),
             'Settings on tablets' => __('Settings on tablets', 'text_doma'),
-            'Settings on mobiles' => __('Settings on mobiles', 'text_doma')
+            'Settings on mobiles' => __('Settings on mobiles', 'text_doma'),
+            'No sections to navigate' => __('No sections to navigate', 'text_dom')
 
         )//array()
     )//array()
@@ -489,6 +492,11 @@ function sek_print_nimble_customizer_tmpl() {
           <div class="sek-add-content">
             <button type="button" class="material-icons" title="<?php _e('Add content', 'text_domain'); ?>" data-nimble-state="enabled">
               add_circle_outline<span class="screen-reader-text"><?php _e('Add content', 'text_domain'); ?></span>
+            </button>
+          </div>
+          <div class="sek-level-tree">
+            <button type="button" class="fas fa-stream" title="<?php _e('Section navigation', 'text_domain'); ?>" data-nimble-state="enabled">
+              <span class="screen-reader-text"><?php _e('Section navigation', 'text_domain'); ?></span>
             </button>
           </div>
           <div class="sek-do-undo">

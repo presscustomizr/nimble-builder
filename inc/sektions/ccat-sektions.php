@@ -9739,15 +9739,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             do_action( "sek_after_location_{$location_id}" );
         }
         function sek_schedule_sektion_rendering_before_content( $html ) {
-            if ( did_action( 'sek_before_location_before_content' ) )
-              return $html;
 
             do_action( 'sek_before_location_before_content' );
             return $this -> _filter_the_content( $html, 'before_content' );
         }
         function sek_schedule_sektion_rendering_after_content( $html ) {
-            if ( did_action( 'sek_before_location_after_content' ) )
-              return $html;
 
             do_action( 'sek_before_location_after_content' );
             return $this -> _filter_the_content( $html, 'after_content' );
