@@ -2,6 +2,93 @@
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            printLevelUI : function( $el ) {
+                  var self = this;
+                  var tmpl,
+                      level,
+                      params,
+                      $levelEl;
+                  if ( _.isUndefined( $el ) || $el.length < 1 ) {
+                        self.errare('sekPreview::printeLevelUI => invalid level element => ', $el );
+                  }
+                  level = $el.data('sek-level');
+                  // we don't print a ui for locations
+                  if ( 'location' == level )
+                    return;
+
+                  $levelEl = $el;
+
+                  // stop here if the .sek-dyn-ui-wrapper is already printed for this level AND is not being faded out.
+                  // if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 && true !== $levelEl.data( 'UIisFadingOut' ) )
+                  //   return;
+
+                  if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 )
+                    return;
+
+                  var levelRect = $levelEl[0].getBoundingClientRect(),
+                      levelType = $levelEl.data('sek-level');
+
+                  // Adapt the size of the UI icons and text in narrow containers
+                  $levelEl.toggleClass( 'sek-shrink-my-ui', levelRect.width && levelRect.width < ( 'section' === levelType ? 350 : ( 'column' === levelType ? 300 : 200 ) ) );
+
+                  params = {
+                        id : $levelEl.data('sek-id'),
+                        level : levelType
+                  };
+                  switch ( level ) {
+                        case 'section' :
+                              //$el = $('.sektion-wrapper').find('[data-sek-id="' + id + '"]');
+                              // Let's prepare the is_last and is_first params that we are going to send to the js template
+                              // => this will determine which up / down arrow to display in the UI menu for moving a section
+                              var $parentLocation = $levelEl.closest('div[data-sek-level="location"]'),
+                                  _is_last_section,
+                                  _is_first_section;
+
+                              if ( $parentLocation.length > 0 ) {
+                                    var $sectionCollection = $parentLocation.children( 'div[data-sek-level="section"]' );
+                                    _is_last_section = $sectionCollection.length == $levelEl.index() + 1;
+                                    _is_first_section = 0 === $levelEl.index();
+                              }
+
+                              params = _.extend( params, {
+                                    is_nested : true === $levelEl.data('sek-is-nested'),
+                                    can_have_more_columns : $levelEl.find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
+                                    is_global_location : true === $parentLocation.data('sek-is-global-location'),
+                                    is_last_section_in_location : _is_last_section,
+                                    is_first_section_in_location : _is_first_section,
+                                    is_header_location : true === $parentLocation.data('sek-is-header-location'),
+                                    is_footer_location : true === $parentLocation.data('sek-is-footer-location')
+                              });
+                        break;
+                        case 'column' :
+                              var $parent_sektion = $levelEl.closest('div[data-sek-level="section"]');
+                              params = _.extend( params, {
+                                    parent_can_have_more_columns : $parent_sektion.find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
+                                    parent_is_single_column : $parent_sektion.find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 2,
+                                    parent_is_last_allowed_nested : true === $parent_sektion.data('sek-is-nested')
+                              });
+                        break;
+                        case 'module' :
+                              var module_name = self.getRegisteredModuleProperty( $levelEl.data('sek-module-type'), 'name' );
+                              params = _.extend( params, {
+                                    module_name : 'not_set' != module_name ? module_name : ''
+                              });
+                        break;
+                  }
+                  // don't display the column and module ui when resizing columns
+                  if ( true === $('.sektion-wrapper').data('sek-resizing-columns') && _.contains( ['column', 'module'], level ) ) {
+                        return;
+                  }
+
+                  tmpl = self.parseTemplate( '#sek-dyn-ui-tmpl-' + level );
+                  $.when( $levelEl.prepend( tmpl( params ) ) ).done( function() {
+                        $levelEl.find('.sek-dyn-ui-wrapper').stop( true, true ).fadeIn( {
+                              duration : 150,
+                              complete : function() {}
+                        } );
+                  });
+            },//printLevelUI()
+
             // Fired on Dom Ready, in ::initialize()
             setupUiHoverVisibility : function() {
                   var self = this;
@@ -9,85 +96,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                       level,
                       params,
                       $levelEl;
-
-                  var printLevelUI = function() {
-                        level = $(this).data('sek-level');
-                        // we don't print a ui for locations
-                        if ( 'location' == level )
-                          return;
-
-                        $levelEl = $(this);
-
-                        // stop here if the .sek-dyn-ui-wrapper is already printed for this level AND is not being faded out.
-                        // if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 && true !== $levelEl.data( 'UIisFadingOut' ) )
-                        //   return;
-
-                        if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 )
-                          return;
-
-                        var levelRect = $levelEl[0].getBoundingClientRect(),
-                            levelType = $levelEl.data('sek-level');
-
-                        // Adapt the size of the UI icons and text in narrow containers
-                        $levelEl.toggleClass( 'sek-shrink-my-ui', levelRect.width && levelRect.width < ( 'section' === levelType ? 350 : ( 'column' === levelType ? 300 : 200 ) ) );
-
-                        params = {
-                              id : $levelEl.data('sek-id'),
-                              level : levelType
-                        };
-                        switch ( level ) {
-                              case 'section' :
-                                    //$el = $('.sektion-wrapper').find('[data-sek-id="' + id + '"]');
-                                    // Let's prepare the is_last and is_first params that we are going to send to the js template
-                                    // => this will determine which up / down arrow to display in the UI menu for moving a section
-                                    var $parentLocation = $levelEl.closest('div[data-sek-level="location"]'),
-                                        _is_last_section,
-                                        _is_first_section;
-
-                                    if ( $parentLocation.length > 0 ) {
-                                          var $sectionCollection = $parentLocation.children( 'div[data-sek-level="section"]' );
-                                          _is_last_section = $sectionCollection.length == $levelEl.index() + 1;
-                                          _is_first_section = 0 === $levelEl.index();
-                                    }
-
-                                    params = _.extend( params, {
-                                          is_nested : true === $(this).data('sek-is-nested'),
-                                          can_have_more_columns : $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
-                                          is_global_location : true === $parentLocation.data('sek-is-global-location'),
-                                          is_last_section_in_location : _is_last_section,
-                                          is_first_section_in_location : _is_first_section,
-                                          is_header_location : true === $parentLocation.data('sek-is-header-location'),
-                                          is_footer_location : true === $parentLocation.data('sek-is-footer-location')
-                                    });
-                              break;
-                              case 'column' :
-                                    var $parent_sektion = $(this).closest('div[data-sek-level="section"]');
-                                    params = _.extend( params, {
-                                          parent_can_have_more_columns : $parent_sektion.find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
-                                          parent_is_single_column : $parent_sektion.find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 2,
-                                          parent_is_last_allowed_nested : true === $parent_sektion.data('sek-is-nested')
-                                    });
-                              break;
-                              case 'module' :
-                                    var module_name = self.getRegisteredModuleProperty( $levelEl.data('sek-module-type'), 'name' );
-                                    params = _.extend( params, {
-                                          module_name : 'not_set' != module_name ? module_name : ''
-                                    });
-                              break;
-                        }
-                        // don't display the column and module ui when resizing columns
-                        if ( true === $('.sektion-wrapper').data('sek-resizing-columns') && _.contains( ['column', 'module'], level ) ) {
-                              return;
-                        }
-
-                        tmpl = self.parseTemplate( '#sek-dyn-ui-tmpl-' + level );
-                        $.when( $(this).prepend( tmpl( params ) ) ).done( function() {
-                              $levelEl.find('.sek-dyn-ui-wrapper').stop( true, true ).fadeIn( {
-                                    duration : 150,
-                                    complete : function() {}
-                              } );
-                        });
-                  };//printLevelUI()
 
                   var removeLevelUI = function() {
                         $levelEl = $(this);
@@ -335,7 +343,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     case 'printOrScheduleRemoval' :
                                           if ( isInHorizontally && isInVertically ) {
                                                 $levelEl.data('sek-ui-removal-scheduled', false );
-                                                printLevelUI.call( $levelEl );
+                                                self.printLevelUI( $levelEl );
                                           } else {
                                                 if ( true !== $levelEl.data('sek-ui-removal-scheduled') ) {
                                                       $levelEl.data('sek-ui-removal-scheduled', true );

@@ -655,9 +655,15 @@ div[data-sek-align].selected {
   box-shadow: none;
   border-top: 1px solid transparent;
   border-bottom: 4px solid transparent;
-  transition: .15s color ease-in-out,
+  -webkit-transition: .15s color ease-in-out,
               .15s background-color ease-in-out,
               .15s border-color ease-in-out;
+  -o-transition: .15s color ease-in-out,
+                .15s background-color ease-in-out,
+                .15s border-color ease-in-out;
+  transition: .15s color ease-in-out,
+                .15s background-color ease-in-out,
+                .15s border-color ease-in-out;
 }
 
 /*.sek-input-device-switcher .sek-switcher.active {
@@ -913,10 +919,17 @@ credits : Gutenberg team @wordpress */
 
 
 
-/* TOP BAR */
 
+
+
+
+
+
+/* TOP BAR */
 /* space for the Nimble topbar */
-#customize-preview iframe {top: 36px;}
+#customize-preview iframe {
+  top: 36px;
+}
 
 #nimble-top-bar {
   max-height: 36px;
@@ -1121,6 +1134,56 @@ body.nimble-save-ui-visible #nimble-top-save-ui {
   line-height: 1.5em;
   margin: 0.5em 0;
 }*/
+
+
+
+/* LEVEL TREE */
+/* space for the Level Tree */
+#customize-preview iframe, #nimble-level-tree {
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all, 0.3s ease-in-out;
+  -ms-transition: all, 0.3s ease-in-out;
+  -o-transition: all, 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+#customize-preview iframe {
+  z-index: 1;
+}
+.sek-level-tree-expanded #customize-preview iframe {
+  top: 366px;
+}
+/* highlight icon */
+.sek-level-tree-expanded #nimble-top-bar .sek-level-tree button {
+  color: #44b9e2;
+}
+#nimble-level-tree {
+    position: absolute;
+    top: 36px;
+    right: 0;
+    left: 0;
+    background: #000000ad;
+    min-height: 20px;
+    color: #32ff1e;
+    height: 300px;
+    overflow: auto;
+    padding: 15px;
+    z-index: 0;
+}
+/*.sek-level-tree-expanded #nimble-level-tree {
+    top: 36px;
+    -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all, 0.3s ease-in-out;
+  -ms-transition: all, 0.3s ease-in-out;
+  -o-transition: all, 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}*/
+#nimble-level-tree ul li {
+    padding-left: 25px;
+    line-height: 1.5em;
+    font-size: 12px;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
 
 
 

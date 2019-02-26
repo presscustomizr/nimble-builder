@@ -24,6 +24,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         // if the collection setting is not registered yet
                         // => register it and bind it
+                        // => ensure that it will be bound only once, because the setting are never unregistered
                         if ( ! api.has( settingData.collectionSettingId ) ) {
                               var __collectionSettingInstance__ = api.CZR_Helpers.register({
                                     what : 'setting',

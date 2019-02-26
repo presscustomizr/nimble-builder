@@ -396,7 +396,18 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   if ( $elToFocusOn.length > 0 ) {
                                         $('html, body').animate({
                                               scrollTop : $elToFocusOn.offset().top - 100
-                                        }, 'slow');
+                                        }, 200 );
+                                  }
+                            },
+
+                            'sek-display-level-ui' : function( params ) {
+
+                                  var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
+                                  console.log('PARAMS ??', params, $elToFocusOn.length );
+                                  if ( $elToFocusOn.length > 0 ) {
+                                    console.log('JOIE ??', $elToFocusOn);
+                                        $elToFocusOn.trigger('click');
+                                        self.printLevelUI($elToFocusOn);
                                   }
                             },
 

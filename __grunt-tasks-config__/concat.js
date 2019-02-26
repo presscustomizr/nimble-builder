@@ -198,7 +198,9 @@ module.exports = {
     src: [
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_0_sektions_initialize.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_1_sektions_topbar.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_2_sektions_save_ui.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_2_sektions_navigate_history.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_3_sektions_level_tree.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_sektions_save_ui.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_2_sektions_setup_collection_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_4_sektions_react_to_preview.js',
 

@@ -2,19 +2,20 @@
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // TOP BAR
             // fired in ::initialize(), at api.bind( 'ready', function() {})
             setupTopBar : function() {
                   var self = this;
                   self.topBarId = '#nimble-top-bar';
                   self.topBarVisible = new api.Value( false );
                   self.topBarVisible.bind( function( visible ){
-                        self.toggleTopBar( visible );
+                        if ( ! self.levelTreeExpanded() ) {
+                              self.toggleTopBar( visible );
+                        }
                   });
 
                   self.mouseMovedRecently = new api.Value( {} );
                   self.mouseMovedRecently.bind( function( position ) {
-                        self.topBarVisible( ! _.isEmpty( position ) );
+                        self.topBarVisible( ! _.isEmpty( position )  );
                   });
 
                   var trackMouseMovements = function( evt ) {
@@ -28,6 +29,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.previewer.bind('ready', function() {
                         $(api.previewer.targetWindow().document ).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
                   });
+
+                  // LEVEL TREE
+                  self.setupLevelTree();
             },
 
 
@@ -98,8 +102,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
 
-                  // CLICK EVENT
+                  // CLICK EVENTS
                   // Attach click events
+                  $('.sek-add-content', self.topBarId).on( 'click', function(evt) {
+                        evt.preventDefault();
+                        api.previewer.trigger( 'sek-pick-content', { content_type : 'module' });
+                  });
+                  $('.sek-level-tree', self.topBarId).on( 'click', function(evt) {
+                        evt.preventDefault();
+                        self.levelTreeExpanded(!self.levelTreeExpanded());
+                  });
                   $('[data-nimble-history]', self.topBarId).on( 'click', function(evt) {
                         try { self.navigateHistory( $(this).data( 'nimble-history') ); } catch( er ) {
                               api.errare( 'Error when firing self.navigateHistory', er );
@@ -118,15 +130,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       });
                         // });
                   });
-                  $('.sek-add-content', self.topBarId).on( 'click', function(evt) {
-                        evt.preventDefault();
-                        api.previewer.trigger( 'sek-pick-content', { content_type : 'module' });
-                  });
+
                   $('.sek-nimble-doc', self.topBarId).on( 'click', function(evt) {
                         evt.preventDefault();
                         window.open($(this).data('doc-href'), '_blank');
                   });
-
 
                   // NOTIFICATION WHEN USING CUSTOM TEMPLATE
                   // implemented for https://github.com/presscustomizr/nimble-builder/issues/304
@@ -171,142 +179,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   return $( self.topBarId );
-            },
-
-
-            /* HISTORY */
-            // @param direction = string 'undo', 'redo'
-            // @return void()
-            navigateHistory : function( direction ) {
-                  var self = this,
-                      historyLog = $.extend( true, [], self.historyLog() );
-                  // log model
-                  // {
-                  //       status : 'current', 'previous', 'future'
-                  //       value : {},
-                  //       action : 'sek-add-column'
-                  // }
-
-                  // UPDATE THE SETTING VALUE
-                  var previous,
-                      current,
-                      future,
-                      newHistoryLog = [],
-                      newSettingValue,
-                      previousSektionToRefresh,
-                      currentSektionToRefresh;
-
-                  _.each( historyLog, function( log ) {
-                        if ( ! _.isEmpty( newSettingValue ) ) {
-                              return;
-                        }
-                        switch( log.status ) {
-                              case 'previous' :
-                                    previous = log;
-                              break;
-                              case 'current' :
-                                    current = log;
-                              break;
-                              case 'future' :
-                                    future = log;
-                              break;
-                        }
-                        switch( direction ) {
-                              case 'undo' :
-                                    // the last previous is our new setting value
-                                    if ( ! _.isEmpty( current ) && ! _.isEmpty( previous ) ) {
-                                          newSettingValue = previous.value;
-                                          previousSektionToRefresh = current.sektionToRefresh;
-                                          currentSektionToRefresh = previous.sektionToRefresh;
-                                    }
-                              break;
-                              case 'redo' :
-                                    // the first future is our new setting value
-                                    if ( ! _.isEmpty( future ) ) {
-                                          newSettingValue = future.value;
-                                          previousSektionToRefresh = current.sektionToRefresh;
-                                          currentSektionToRefresh = future.sektionToRefresh;
-                                    }
-                              break;
-                        }
-                  });
-
-                  // set the new setting Value
-                  if( ! _.isUndefined( newSettingValue ) ) {
-                        if ( ! _.isEmpty( newSettingValue.local ) ) {
-                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local ), { navigatingHistoryLogs : true } );
-                        }
-                        if ( ! _.isEmpty( newSettingValue.global ) ) {
-                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global ), { navigatingHistoryLogs : true } );
-                        }
-                        // If the information is available, refresh only the relevant sections
-                        // otherwise fallback on a full refresh
-                        var previewHasBeenRefreshed = false;
-
-                        // if ( ! _.isEmpty( previousSektionToRefresh ) ) {
-                        //       api.previewer.trigger( 'sek-refresh-level', {
-                        //             level : 'section',
-                        //             id : previousSektionToRefresh
-                        //       });
-                        // } else {
-                        //       api.previewer.refresh();
-                        //       previewHasBeenRefreshed = true;
-                        // }
-                        // if ( currentSektionToRefresh != previousSektionToRefresh ) {
-                        //     if ( ! _.isEmpty( currentSektionToRefresh ) ) {
-                        //           api.previewer.trigger( 'sek-refresh-level', {
-                        //                 level : 'section',
-                        //                 id : currentSektionToRefresh
-                        //           });
-                        //     } else if ( ! previewHasBeenRefreshed ) {
-                        //           api.previewer.refresh();
-                        //     }
-                        // }
-                        api.previewer.refresh();
-
-                        // Always make sure that the ui gets refreshed
-                        api.previewer.trigger( 'sek-pick-content', {});
-                        // Clean registered setting and control, even the level settings
-                        // => otherwise the level settings won't be synchronized when regenerating their ui.
-                        self.cleanRegistered();//<= normal cleaning
-                        self.cleanRegisteredLevelSettingsAfterHistoryNavigation();// setting cleaning
-                  }
-
-                  // UPDATE THE HISTORY LOG
-                  var currentKey = _.findKey( historyLog, { status : 'current'} );
-                  currentKey = Number( currentKey );
-                  if ( ! _.isNumber( currentKey ) ) {
-                        api.errare( 'Error when navigating the history log, the current key should be a number');
-                        return;
-                  }
-
-                  _.each( historyLog, function( log, key ) {
-                        newLog = $.extend( true, {}, log );
-                        // cast keys to number so we can compare them
-                        key = Number( key );
-                        switch( direction ) {
-                              case 'undo' :
-                                    if ( 0 < currentKey ) {
-                                          if ( key === ( currentKey - 1 ) ) {
-                                                newLog.status = 'current';
-                                          } else if ( key === currentKey ) {
-                                                newLog.status = 'future';
-                                          }
-                                    }
-                              break;
-                              case 'redo' :
-                                    if ( historyLog.length > ( currentKey + 1 ) ) {
-                                          if ( key === currentKey ) {
-                                                newLog.status = 'previous';
-                                          } else if ( key === ( currentKey + 1 ) ) {
-                                                newLog.status = 'current';
-                                          }
-                                    }
-                              break;
-                        }
-                        newHistoryLog.push( newLog );
-                  });
-                  self.historyLog( newHistoryLog );
             }
       });//$.extend()
 })( wp.customize, jQuery );
