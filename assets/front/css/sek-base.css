@@ -809,6 +809,9 @@ button.sek-btn,
     -ms-flex-preferred-size: auto;
     flex-basis: auto;
   }
+  .sek-mobile-menu {
+    display: none !important;
+  }
   .sek-nav-toggler {
     display: none;
   }

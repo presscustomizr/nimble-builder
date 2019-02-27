@@ -1139,7 +1139,6 @@ body.nimble-save-ui-visible #nimble-top-save-ui {
 
 /* LEVEL TREE */
 /* space for the Level Tree */
-#nimble-top-bar .sek-level-tree { display: none;}
 #customize-preview iframe, #nimble-level-tree {
   -webkit-transition: top 0.3s ease-in-out;
   -moz-transition: top, 0.3s ease-in-out;
