@@ -29,8 +29,33 @@ module.exports = {
         singleline: true,
         multiline: false
     },
-    src: [ 'inc/czr-base-fmk/czr-base-fmk.php' ] // files to remove comments from
+    src: [ '<%= paths.sektions %>czr-base-fmk.php' ] // files to remove comments from
   },
+  czr_base_fmk_js : {
+    // Target-specific file lists and/or options go here.
+    options: {
+        singleline: true,
+        multiline: false
+    },
+    src: [ '<%= paths.czr_base_fmk %>assets/js/_0_ccat_czr-base-fmk.js'] // files to remove comments from
+  },
+  czr_theme_fmk_js : {
+    // Target-specific file lists and/or options go here.
+    options: {
+        singleline: true,
+        multiline: false
+    },
+    src: [ '<%= paths.czr_base_fmk %>assets/js/_1_ccat_czr-theme-fmk.js'] // files to remove comments from
+  },
+  czr_preview_base_js : {
+    // Target-specific file lists and/or options go here.
+    options: {
+        singleline: true,
+        multiline: false
+    },
+    src: [ '<%= paths.czr_base_fmk %>assets/js/czr-preview-base.js'] // files to remove comments from
+  },
+
   czr_skope_php: {
     // Target-specific file lists and/or options go here.
     options: {
@@ -38,6 +63,14 @@ module.exports = {
         multiline: false
     },
     src: [ 'inc/czr-skope/index.php' ] // files to remove comments from
+  },
+  czr_skope_js : {
+    // Target-specific file lists and/or options go here.
+    options: {
+        singleline: true,
+        multiline: false
+    },
+    src: [ 'inc/czr-skope/assets/czr/js/czr-skope-base.js'] // files to remove comments from
   },
 
   sektions_front_js : {

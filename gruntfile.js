@@ -45,6 +45,9 @@ module.exports = function(grunt) {
               'concat:czr_theme_control_js',
               'uglify:czr_control_js',
               'uglify:czr_preview_js',
+              'comments:czr_base_fmk_js',
+              'comments:czr_theme_fmk_js',
+              'comments:czr_preview_base_js',
 
               'concat:czr_control_css',
               'cssmin:czr_css',
@@ -53,7 +56,9 @@ module.exports = function(grunt) {
           'build_skope_php_js' : [
               'concat:czr_flat_skope_php',
               'comments:czr_skope_php',
+
               'concat:czr_flat_skope_js',
+              'comments:czr_skope_js',
               'uglify:czr_flat_skope_js'
           ],
 
