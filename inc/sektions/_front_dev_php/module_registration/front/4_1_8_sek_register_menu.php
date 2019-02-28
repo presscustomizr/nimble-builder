@@ -36,7 +36,9 @@ function sek_get_module_params_for_czr_menu_module() {
         'children' => array(
             'content' => 'czr_menu_content_child',
             //'design' => 'czr_menu_design_child',
-            'font' => 'czr_font_child'
+            'font' => 'czr_font_child',
+            'mobile_options' => 'czr_menu_mobile_options'
+
         ),
         'name' => __( 'Menu', 'text_doma' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
@@ -61,8 +63,9 @@ function sek_get_module_params_for_czr_menu_module() {
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/menu_module_tmpl.php"
     );
 }
- /* ------------------------------------------------------------------------- *
- *  BUTTON CONTENT
+
+/* ------------------------------------------------------------------------- *
+ *  MENU CONTENT
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_menu_content_child() {
     return array(
@@ -95,6 +98,31 @@ function sek_get_module_params_for_czr_menu_content_child() {
                     'css_selectors' => array( '.sek-nav-collapse', '.sek-nav-wrap' ),
                     'title_width' => 'width-100',
                     'width-100'   => true,
+                ),
+            ),
+        ),
+        'render_tmpl_path' => '',
+    );
+}
+
+/* ------------------------------------------------------------------------- *
+ * MOBILE OPTIONS
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_menu_mobile_options() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_menu_mobile_options',
+        'name' => __( 'Settings for mobile devices', 'text_doma' ),
+        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        //'css_selectors' =>'',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'expand_below' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => sprintf('%s %s', '<i class="material-icons sek-level-option-icon">devices</i>', __('On mobile devices, expand the menu in full width below the menu hamburger icon', 'text_doma') ),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
                 ),
             ),
         ),

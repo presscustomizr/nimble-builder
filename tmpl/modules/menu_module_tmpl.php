@@ -5,14 +5,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 $model = Nimble_Manager()->model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
-//sek_error_log('MODEL ?', $model );
 $menu_content = $value['content'];
-
+$mobile_options = $value['mobile_options'];
 //test
 $sek_nav_collapse_additional_classes = 'sek-submenu-fade sek-submenu-move';
-
+$expand_below = true === sek_booleanize_checkbox_val( $mobile_options['expand_below'] ) ? 'yes' : 'no';
 ?>
- <nav class="sek-nav-wrap">
+ <nav class="sek-nav-wrap" data-sek-expand-below="<?php echo $expand_below; ?>">
     <button class="sek-nav-toggler sek-collapsed" type="button" data-sek-toggle="sek-collapse" data-target="#<?php echo $model['id'] ?>" aria-controls="<?php echo $model['id'] ?>" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'textdomain_to_be_replaced' ) ?>">
         <div class="sek-ham__span-wrapper">
           <span class="line line-1"></span>

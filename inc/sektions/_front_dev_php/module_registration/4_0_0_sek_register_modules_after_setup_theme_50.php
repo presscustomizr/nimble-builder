@@ -101,6 +101,8 @@ function sek_register_modules() {
             // modules for header and footer
             'czr_menu_module',
             'czr_menu_content_child',
+            'czr_menu_mobile_options',
+
             'czr_widget_area_module'
             //'czr_menu_design_child',
         ]);

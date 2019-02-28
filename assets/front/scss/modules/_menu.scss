@@ -34,7 +34,9 @@
     justify-content: space-between;
     justify-content: center;
     padding: .5rem 0;
-    .#{$project-prefix}mobile-menu & {
+
+    // https://github.com/presscustomizr/nimble-builder/issues/368
+    .#{$project-prefix}mobile-menu-expanded-below & {
         padding: 0;
     }
 }
@@ -311,7 +313,9 @@
         display: flex!important;
         flex-basis: auto;
     }
-    .#{$project-prefix}mobile-menu {
+
+    // https://github.com/presscustomizr/nimble-builder/issues/368
+    .#{$project-prefix}mobile-menu-expanded-below {
         display: none!important;
     }
     .#{$project-prefix}nav-toggler {
