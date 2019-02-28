@@ -521,6 +521,10 @@ button.sek-btn,
   padding: .5rem 0;
 }
 
+.sek-mobile-menu .sek-nav-wrap {
+  padding: 0;
+}
+
 .sek-nav-collapse {
   -ms-flex-preferred-size: 100%;
   flex-basis: 100%;
