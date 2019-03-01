@@ -119,7 +119,7 @@ function sek_get_module_params_for_czr_menu_mobile_options() {
             'item-inputs' => array(
                 'expand_below' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => sprintf('%s %s', '<i class="material-icons sek-level-option-icon">devices</i>', __('On mobile devices, expand the menu in full width below the menu hamburger icon', 'text_doma') ),
+                    'title'       => sprintf('%s %s', '<i class="material-icons sek-level-option-icon">devices</i>', __('On mobile devices, expand the menu in full width below the menu hamburger icon.', 'text_doma') ),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
