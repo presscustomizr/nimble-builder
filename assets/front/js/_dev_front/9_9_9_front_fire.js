@@ -481,7 +481,6 @@ jQuery( function($){
             _doMobileMenuSetup();
             // When previewing, react to level refresh
             // This can occur to any level. We listen to the bubbling event on 'body' tag
-            // and salmon up to maybe instantiate any missing candidate
             $('body').on('sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added', function( evt ){
                     // clean the previously duplicated menu if any
                     $('.sek-mobile-menu-expanded-below').remove();
