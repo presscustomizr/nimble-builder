@@ -45,9 +45,9 @@ module.exports = function(grunt) {
               'concat:czr_theme_control_js',
               'uglify:czr_control_js',
               'uglify:czr_preview_js',
-              'comments:czr_base_fmk_js',
-              'comments:czr_theme_fmk_js',
-              'comments:czr_preview_base_js',
+              //'comments:czr_base_fmk_js',
+              //'comments:czr_theme_fmk_js',
+              //'comments:czr_preview_base_js',
 
               'concat:czr_control_css',
               'cssmin:czr_css',
@@ -69,15 +69,15 @@ module.exports = function(grunt) {
               'comments:sektions_customizer_php',
 
               'concat:sektions_front_js',
-              'comments:sektions_front_js',
+              //'comments:sektions_front_js',
               'uglify:sektions_front_js',
 
               'concat:czr_sektions_customizer_control_js',
-              'comments:czr_base_control_js',
+              //'comments:czr_base_control_js',
               'uglify:czr_sektions_customizer_control_js',
 
               'concat:czr_sektions_customizer_preview_js',
-              'comments:czr_base_preview_js',
+              //'comments:czr_base_preview_js',
               'uglify:czr_sektions_customizer_preview_js',
 
               'uglify:czr_sektions_customizer_libs_js',
@@ -96,7 +96,7 @@ module.exports = function(grunt) {
             'build_skope_php_js',
             'build_sektion_php_js_css',
             'replace',
-            'clean',
+            'clean:main',
             'copy:main',
             'addtextdomain',
             'compress',
