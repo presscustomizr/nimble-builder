@@ -35,6 +35,7 @@ function sek_enqueue_controls_js_css() {
         $in_footer = true
     );
 
+
     wp_localize_script(
         'czr-sektions',
         'sektionsLocalizedData',
@@ -90,7 +91,10 @@ function sek_enqueue_controls_js_css() {
                 'globalOptionsMap' => SEK_Front_Construct::$global_options_map,
                 'localOptionsMap' => SEK_Front_Construct::$local_options_map,
 
-                'registeredLocations' => sek_get_locations()
+                'registeredLocations' => sek_get_locations(),
+                // added for the module tree #359
+                'moduleCollection' => sek_get_module_collection(),
+                'moduleIconPath' => NIMBLE_MODULE_ICON_PATH
             )
         )
     );//wp_localize_script()
@@ -408,7 +412,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_doma'),
             'Height and vertical alignment for the' => __('Height and vertical alignment for the', 'text_doma'),
             'Width settings for the' => __('Width settings for the', 'text_doma'),
-            'Set a custom anchor for the' => __('Set a custom anchor for the', 'text_doma'),
+            'Set a custom anchor ( CSS ID ) for the' => __('Set a custom anchor ( CSS ID ) for the', 'text_doma'),
             'Device visibility settings for the' => __('Device visibility settings for the', 'text_doma'),
             'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_doma'),
 
@@ -443,6 +447,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // Levels
             'location' => __('location', 'text_doma'),
             'section' => __('section', 'text_doma'),
+            'nested section' => __('nested section', 'text_doma'),
             'column' => __('column', 'text_doma'),
             'module' => __('module', 'text_doma'),
 
@@ -477,7 +482,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Settings on mobiles' => __('Settings on mobiles', 'text_doma'),
 
             // Level Tree
-            'No sections to navigate' => __('No sections to navigate', 'text_dom')
+            'No sections to navigate' => __('No sections to navigate', 'text_dom'),
+            'Remove this element' => __('Remove this element', 'text_dom'),
 
             // 'Module' => __('Module', 'text_doma'),
             // 'Module' => __('Module', 'text_doma'),
@@ -621,6 +627,15 @@ function sek_print_nimble_customizer_tmpl() {
           </div>
           <button class="button sek-cancel-save far fa-times-circle" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
               <?php _e('Cancel', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Cancel', 'text_domain'); ?></span>
+          </button>
+      </div>
+    </script>
+
+    <script type="text/html" id="tmpl-nimble-level-tree">
+      <div id="nimble-level-tree">
+          <div class="sek-tree-wrap"></div>
+          <button class="button sek-close-level-tree far fa-times-circle" type="button" title="<?php _e('Close', 'text_domain'); ?>">
+            <?php _e('Close', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Close', 'text_domain'); ?></span>
           </button>
       </div>
     </script>

@@ -20,6 +20,7 @@ if ( ! defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_N
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
 if ( ! defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'nimble-widget-area-' ); }
 if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) { define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION ); }
+if ( ! defined( 'NIMBLE_MODULE_ICON_PATH' ) ) { define( 'NIMBLE_MODULE_ICON_PATH' , NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' ); }
 
 
 /* ------------------------------------------------------------------------- *
@@ -1552,5 +1553,133 @@ function sek_is_pro() {
 // added when fixing https://github.com/presscustomizr/nimble-builder/issues/351
 function sek_is_customize_previewing_a_changeset_post() {
     return !( defined('DOING_AJAX') && DOING_AJAX ) && is_customize_preview() && !isset( $_REQUEST['customize_messenger_channel']);
+}
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  MODULES
+/* ------------------------------------------------------------------------- */
+// introduced when implementing the level tree #359
+function sek_get_module_collection() {
+    return array(
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_tiny_mce_editor_module',
+          'title' => __( 'WordPress Editor', 'text_doma' ),
+          'icon' => 'Nimble_rich-text-editor_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_image_module',
+          'title' => __( 'Image', 'text_doma' ),
+          'icon' => 'Nimble__image_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_heading_module',
+          'title' => __( 'Heading', 'text_doma' ),
+          'icon' => 'Nimble__heading_icon.svg'
+        ),
+
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_icon_module',
+          'title' => __( 'Icon', 'text_doma' ),
+          'icon' => 'Nimble__icon_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_button_module',
+          'title' => __( 'Button', 'text_doma' ),
+          'icon' => 'Nimble_button_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_map_module',
+          'title' => __( 'Map', 'text_doma' ),
+          'icon' => 'Nimble_map_icon.svg'
+        ),
+
+        array(
+          'content-type' => 'preset_section',
+          'content-id' => 'two_columns',
+          'title' => __( 'Two Columns', 'text_doma' ),
+          'icon' => 'Nimble_2-columns_icon.svg'
+        ),
+        array(
+          'content-type' => 'preset_section',
+          'content-id' => 'three_columns',
+          'title' => __( 'Three Columns', 'text_doma' ),
+          'icon' => 'Nimble_3-columns_icon.svg'
+        ),
+        array(
+          'content-type' => 'preset_section',
+          'content-id' => 'four_columns',
+          'title' => __( 'Four Columns', 'text_doma' ),
+          'icon' => 'Nimble_4-columns_icon.svg'
+        ),
+
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_simple_html_module',
+          'title' => __( 'Html Content', 'text_doma' ),
+          'icon' => 'Nimble_html_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_quote_module',
+          'title' => __( 'Quote', 'text_doma' ),
+          'icon' => 'Nimble_quote_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_spacer_module',
+          'title' => __( 'Spacer', 'text_doma' ),
+          'icon' => 'Nimble__spacer_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_divider_module',
+          'title' => __( 'Divider', 'text_doma' ),
+          'icon' => 'Nimble__divider_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_simple_form_module',
+          'title' => __( 'Simple Contact Form', 'text_doma' ),
+          'icon' => 'Nimble_contact-form_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_widget_area_module',
+          'title' => __( 'WordPress widget area', 'text_doma' ),
+          'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
+          'active' => sek_is_header_footer_enabled()
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_menu_module',
+          'title' => __( 'Menu', 'text_doma' ),
+          'font_icon' => '<i class="material-icons">menu</i>',
+          'active' => sek_is_header_footer_enabled()
+        ),
+
+        // array(
+        //   'content-type' => 'module',
+        //   'content-id' => 'czr_special_img_module',
+        //   'title' => __( 'Nimble Image', 'text_doma' ),
+        //   'font_icon' => '<i class="material-icons">all_out</i>',
+        //   'active' => sek_is_pro()
+        // )
+        // array(
+        //   'content-type' => 'module',
+        //   'content-id' => 'czr_featured_pages_module',
+        //   'title' => __( 'Featured pages',  'text_doma' ),
+        //   'icon' => 'Nimble__featured_icon.svg'
+        // ),
+
+
+    );
 }
 ?>

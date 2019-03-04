@@ -78,7 +78,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             //@param = { }
             renderAndSetupTopBarTmpl : function( params ) {
-                  var self = this;
+                  var self = this,
+                      _tmpl;
+
                   // CHECK IF ALREADY RENDERED
                   if ( $( self.topBarId ).length > 0 )
                     return $( self.topBarId );
