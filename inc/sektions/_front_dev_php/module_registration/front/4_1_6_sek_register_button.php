@@ -171,6 +171,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                     'default'    => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
+                    'notice_after' => __( 'You can also customize the text color on mouseover in the group of text settings below.', 'text_doma')
                     //'css_identifier' => 'background_color_hover',
                     //'css_selectors'=> $css_selectors
                 ),
