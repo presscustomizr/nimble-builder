@@ -95,6 +95,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // Now that the local and global settings are registered, initialize the history log
                         self.initializeHistoryLogWhenSettingsRegistered();
+
+                        // On init and when skope changes, request the contextually active locations
+                        // We should not need this call, because the preview sends it on initialize
+                        // But this is safer.
+                        // The preview send back the list of active locations 'sek-active-locations-in-preview'
+                        // introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
+                        api.previewer.send('sek-request-active-locations');
                   });
 
 
@@ -242,6 +249,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // say it
                               //this.trigger( [params.what, params.id , 'registered' ].join('__'), params );
                         }
+                  });
+
+
+                  // store active locations
+                  // introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
+                  self.activeLocations = new api.Value([]);
+                  api.previewer.bind('sek-active-locations-in-preview', function( activelocs ){
+                        self.activeLocations( ( _.isObject(activelocs) && _.isArray( activelocs.active_locations ) ) ? activelocs.active_locations : [] );
                   });
 
 

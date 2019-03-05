@@ -7,7 +7,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this;
                   self.levelTree = new api.Value([]);
                   self.levelTree.bind( function() {
-                        //console.log('Level Tree changed => ', _collection);
                         // Refresh when the collection is being modified from the tree
                         if ( self.levelTreeExpanded() ) {
                               self.renderOrRefreshTree();
@@ -48,6 +47,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
 
+                  // REFRESH THE TREE WHEN THE ACTIVE LOCATIONS CHANGE
+                  // @see ::initialize to understand how active locations are updated
+                  self.activeLocations.bind(function() {
+                        if ( !_.isEmpty( self.levelTree() ) ) {
+                              self.renderOrRefreshTree();
+                        }
+                  });
 
                   // API READY
                   api.previewer.bind('ready', function() {
@@ -56,13 +62,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // - set the level tree
                         // - bind the local and global settings so that they refresh the level tree when changed
                         self.localSectionsSettingId.callbacks.add( function() {
-                              // Set the initial levelTreeValue when settings are registered
-                              // api.when( self.getGlobalSectionsSettingId(), self.localSectionsSettingId(), function( _global_, _local_ ) {
-                              //       self.setLevelTreeValue();
-                              // });
-
+                              self.levelTreeExpanded(false);
                               // Bind the global and local settings if not bound yet
-                              _.each( [ self.getGlobalSectionsSettingId(), self.localSectionsSettingId() ], function( setId ){
+                              _.each( [ self.getGlobalSectionsSettingId(), self.localSectionsSettingId(), sektionsLocalizedData.optNameForGlobalOptions ], function( setId ){
                                     if ( api(setId)._isBoundForNimbleLevelTree )
                                       return;
 
@@ -109,42 +111,56 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
-
-            // @return boolean
-            hasLocalHeaderFooter : function() {
-                  if ( ! api.has( self.localSectionsSettingId() ) )
-                    return;
-                  //console.log( 'self.localSectionsSettingId() ? ', api( self.localSectionsSettingId() )() );
-            },
-
             // This method updates the levelTree observable api.Value()
             setLevelTreeValue : function() {
                   var self = this,
-                      globalId = self.getGlobalSectionsSettingId(),
-                      localId = self.localSectionsSettingId();
+                      globalCollSetId = self.getGlobalSectionsSettingId(),
+                      localCollSetId = self.localSectionsSettingId(),
+                      globalOptionSetId = sektionsLocalizedData.optNameForGlobalOptions,
+                      globalColSetValue, localColSetValue,
+                      globalCollection, localCollection,
+                      rawGlobalOptionsValue,
+                      missingDependantSettingId = false;
 
-                  _global_col = api(globalId)();
-                  _global_col = ( _.isObject( _global_col ) && ! _.isEmpty( _global_col.collection ) ) ? _global_col.collection : [];
-                  _global_col = _.isArray( _global_col ) ? _global_col : [];
+                  // Check if all dependant settings are registered
+                  // we won't go further if any of the 3 setting id's is not yet registered
+                  _.each( [globalCollSetId, localCollSetId, globalOptionSetId ], function( setId ) {
+                        if ( !api.has(setId) ) {
+                              missingDependantSettingId = setId;
+                              return;
+                        }
+                  });
 
-                  _local_col = api(localId)();
-                  _local_col = ( _.isObject( _local_col ) && ! _.isEmpty( _local_col.collection ) ) ? _local_col.collection : [];
-                  _local_col = _.isArray( _local_col ) ? _local_col : [];
+                  if ( false !== missingDependantSettingId ) {
+                        api.errare( '::setLevelTreeValue => a setting id is not registered ');
+                        return;
+                  }
 
-                  var raw_col = _.union( _global_col, _local_col ),
+                  // Normalizes the setting values
+                  globalColSetValue = api(globalCollSetId)();
+                  globalCollection = _.isObject( globalColSetValue ) ? $.extend( true, {}, globalColSetValue ) : {};
+                  globalCollection = ! _.isEmpty( globalCollection.collection )? globalCollection.collection : [];
+                  globalCollection = _.isArray( globalCollection ) ? globalCollection : [];
+
+                  localColSetValue = api(localCollSetId)();
+                  localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
+                  localCollection = $.extend( true, {}, localColSetValue );
+                  localCollection = ! _.isEmpty( localCollection.collection ) ? localCollection.collection : [];
+                  localCollection = _.isArray( localCollection ) ? localCollection : [];
+
+                  var raw_col = _.union( globalCollection, localCollection ),
                       local_header_footer_value,
                       global_header_footer_value,
                       has_local_header_footer = false,
-                      has_global_header_footer = false,
-                      localSeks = api( self.localSectionsSettingId() )(),
-                      globalSeks = api( self.getGlobalSectionsSettingId() )(),
-                      rawGlobalOptions = api( sektionsLocalizedData.optNameForGlobalOptions )();
+                      has_global_header_footer = false;
 
-                  // do we have a header-footer set, local or global ?
+                  rawGlobalOptionsValue = api( globalOptionSetId )();
+                  rawGlobalOptionsValue = _.isObject( rawGlobalOptionsValue ) ? rawGlobalOptionsValue : {};
 
+                  // HEADER-FOOTER => do we have a header-footer set, local or global ?
                   // LOCAL
-                  if ( localSeks.local_options && localSeks.local_options.local_header_footer ) {
-                        local_header_footer_value = localSeks.local_options.local_header_footer['header-footer'];
+                  if ( localColSetValue.local_options && localColSetValue.local_options.local_header_footer ) {
+                        local_header_footer_value = localColSetValue.local_options.local_header_footer['header-footer'];
                         has_local_header_footer = 'nimble_local' === local_header_footer_value;
                   }
 
@@ -156,8 +172,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //
                   // OR when
                   // 1) local is set to 'nimble_global'
-                  if ( rawGlobalOptions.global_header_footer && !has_local_header_footer && 'theme' !== local_header_footer_value) {
-                        global_header_footer_value = rawGlobalOptions.global_header_footer['header-footer'];
+                  if ( rawGlobalOptionsValue.global_header_footer && !has_local_header_footer && 'theme' !== local_header_footer_value) {
+                        global_header_footer_value = rawGlobalOptionsValue.global_header_footer['header-footer'];
                         has_global_header_footer = 'nimble_global' === global_header_footer_value || 'nimble_global' === local_header_footer_value;
                   }
 
@@ -168,18 +184,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   filteredCollection = _.filter( filteredCollection, function( loc, key ) {
                       return !_.contains( ['nimble_global_header', 'nimble_global_footer', 'nimble_local_header', 'nimble_local_footer'], loc.id );
                   });
-                  if ( has_local_header_footer ) {
-                        header_loc = _.findWhere(raw_col, {id:'nimble_local_header'});
-                        footer_loc = _.findWhere(raw_col, {id:'nimble_local_footer'});
-                        filteredCollection.unshift(header_loc);
-                        filteredCollection.push(header_loc);
-                  } else if ( has_global_header_footer ) {
-                        header_loc = _.findWhere(raw_col, {id:'nimble_global_header'});
-                        footer_loc = _.findWhere(raw_col, {id:'nimble_global_footer'});
+
+                  // RE-ORGANIZE LOCATIONS SO THAT WE HAVE
+                  // - header
+                  // - content loc #1
+                  // - content loc #2
+                  // - ...
+                  // - footer
+                  var wrapContentLocationWithHeaderFoooterLocations = function( scope ) {
+                        header_loc = _.findWhere(raw_col, {id:'nimble_' + scope + '_header'});
+                        footer_loc = _.findWhere(raw_col, {id:'nimble_' + scope + '_footer'});
                         filteredCollection.unshift(header_loc);
                         filteredCollection.push(footer_loc);
+                  };
+                  if ( has_local_header_footer ) {
+                        wrapContentLocationWithHeaderFoooterLocations('local');
+                  } else if ( has_global_header_footer ) {
+                        wrapContentLocationWithHeaderFoooterLocations('global');
                   }
-                  //console.log('ALORS COLLECITONS ?', raw_col, filteredCollection );
 
                   // Store it now
                   self.levelTree( filteredCollection );
@@ -200,15 +222,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         $( '#customize-preview' ).after( $( _tmpl ) );
                   }
-                  $('#nimble-level-tree').find('.sek-tree-wrap').html( self.getLevelTreeHtml( self.levelTree() ) );
+                  $('#nimble-level-tree').find('.sek-tree-wrap').html( self.getLevelTreeHtml() );
             },
 
             // recursive helper
             // return an html string describing the contextually printed sections
             getLevelTreeHtml : function( _col, level ) {
-                  var self = this,
-                      levelType,
+                  var self = this;
+                  _col = _col || self.levelTree();
+
+                  var levelType,
                       levelName,
+                      _html,
                       skipLevel = false;
 
                   if ( !_.isArray( _col ) || _.isEmpty( _col ) ) {
@@ -227,18 +252,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               return;
                         }
 
-                        // Shall we skip this level ?
-                        // Yes if the level is a location AND the location has no section AND that this location is not a header or a footer
-                        if ( 'location' === levelType && !_.contains( ['nimble_global_header', 'nimble_global_footer', 'nimble_local_header', 'nimble_local_footer'], _level_param.id ) && ( ! _.isArray( _level_param.collection ) || _.isEmpty( _level_param.collection ) ) ) {
-                              skipLevel = true;
-                        } else {
-                              skipLevel = false;
+                        // Set some vars now
+                        levelType = _level_param.level;
+                        levelName = levelType;
+
+                        // if the level is a location, is this location contextually active ?
+                        if ( 'location' === levelType ) {
+                              skipLevel = !_.contains( self.activeLocations(), _level_param.id );
                         }
 
                         if ( !skipLevel ) {
-                              // cache the levelType var
-                              levelType = _level_param.level;
-                              levelName = levelType;
                               //try to get the i18n level name, fall back on the level type
                               if ( sektionsLocalizedData.i18n[levelType] ) {
                                     levelName = sektionsLocalizedData.i18n[levelType];
@@ -246,9 +269,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( true === _level_param.is_nested ) {
                                     levelName = sektionsLocalizedData.i18n['nested section'];
                               }
-                              //console.log('_level_param ??', _level_param );
-                              // if ( 'module' !== levelType && ( _.isUndefined( _level_param.collection ) || !_.isArray( _level_param.collection ) || _.isEmpty( _level_param.collection ) ) )
-                              //   return;
+
                               remove_icon_html = 'location' !== levelType ? remove_icon_html : '';
                               _html += '<li data-nimb-level="'+levelType+'" data-nimb-id="'+_level_param.id+'">';
 

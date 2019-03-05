@@ -912,16 +912,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   this.bind( function( to ) {
                         item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
                   });
-            },
-
-            // // @return boolean
-            // hasLocalHeaderFooter : function() {
-            //       if ( ! api.has( self.localSectionsSettingId() ) )
-            //         return;
-            //       console.log( 'hasLocalHeaderFooter ? ', self.getGlobalSectionsSettingId() );
-            // },
-
-            // //self.getGlobalSectionsSettingId()
-
+            }
       });//$.extend()
 })( wp.customize, jQuery );
