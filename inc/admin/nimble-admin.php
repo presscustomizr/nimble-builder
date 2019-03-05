@@ -311,15 +311,11 @@ foreach ( array( 'wptexturize', 'convert_smilies', 'wpautop') as $callback ) {
 * @hook : admin_notices
 */
 function sek_may_be_display_update_notice() {
-		if ( ! defined('NIMBLE_DISPLAY_UPDATE_NOTICE') || ! NIMBLE_DISPLAY_UPDATE_NOTICE )
+		// bail here if the current version has no update notice
+		if ( defined('NIMBLE_SHOW_UPDATE_NOTICE_FOR_VERSION') && NIMBLE_SHOW_UPDATE_NOTICE_FOR_VERSION !== NIMBLE_VERSION )
 			return;
 
-		// bail here if the current version should not display an update notice
-		// may be useful in case of a minor update
-		if ( defined('NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION') && NIMBLE_NO_UPDATE_NOTICE_FOR_VERSION === NIMBLE_VERSION )
-			return;
-
-		// always wait for the welcome note to be dismissed before display
+		// always wait for the welcome note to be dismissed before displaying the update notice
 		if ( ! sek_welcome_notice_is_dismissed() )
 			return;
 
@@ -328,12 +324,12 @@ function sek_may_be_display_update_notice() {
 		$display_ct = 5;
 
 		if ( ! $last_update_notice_values || ! is_array($last_update_notice_values) ) {
-				//first time user of the theme, the option does not exist
-				// 1) initialize it => set it to the current Hueman version, displayed 0 times.
+				// first time user of the plugin, the option does not exist
+				// 1) initialize it => set it to the current version, displayed 0 times.
 				// 2) update in db
 				$last_update_notice_values = array( "version" => NIMBLE_VERSION, "display_count" => 0 );
 				update_option( 'nimble_last_update_notice', $last_update_notice_values );
-				//already user of the theme ? => show the notice if
+				// already user of the plugin ? => show the notice if
 				if ( sek_user_started_before_version( NIMBLE_VERSION ) ) {
 						$show_new_notice = true;
 				}
@@ -342,10 +338,10 @@ function sek_may_be_display_update_notice() {
 		$_db_version          = $last_update_notice_values["version"];
 		$_db_displayed_count  = $last_update_notice_values["display_count"];
 
-		//user who just upgraded the theme will be notified until he/she clicks on the dismiss link
-		//or until the notice has been displayed n times.
+		// user who just upgraded the plugin will be notified until clicking on the dismiss link
+		// or until the notice has been displayed n times.
 		if ( version_compare( NIMBLE_VERSION, $_db_version , '>' ) ) {
-				//CASE 1 : displayed less than n times
+				// CASE 1 : displayed less than n times
 				if ( $_db_displayed_count < $display_ct ) {
 						$show_new_notice = true;
 						//increments the counter
@@ -354,7 +350,7 @@ function sek_may_be_display_update_notice() {
 						//updates the option val with the new count
 						update_option( 'nimble_last_update_notice', $last_update_notice_values );
 				}
-				//CASE 2 : displayed n times => automatic dismiss
+				// CASE 2 : displayed n times => automatic dismiss
 				else {
 						//reset option value with new version and counter to 0
 						$new_val  = array( "version" => NIMBLE_VERSION, "display_count" => 0 );
@@ -382,12 +378,8 @@ function sek_may_be_display_update_notice() {
 				<?php
 					printf( '<h4>%1$s <a class="" href="%2$s" title="%3$s" target="_blank">%3$s &raquo;</a></h4>',
 							'',//__( "Let us introduce the new features we've been working on.", 'text_doma'),
-							"https://presscustomizr.com/release-note-for-the-nimble-builder-version-1-4-2/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-update-notice",
+							NIMBLE_RELEASE_NOTE_URL,
 							__( "Read the detailled release notes" , 'text_doma' )
-							// ! NIMBLE_IS_PRO ? sprintf( '<p style="position: absolute;right: 7px;top: 4px;"><a class="button button-primary upgrade-to-pro" href="%1$s" title="%2$s" target="_blank">%2$s &raquo;</a></p>',
-							//   esc_url('presscustomizr.com/hueman-pro?ref=a'),
-							//   __( "Upgrade to Hueman Pro", 'text_doma' )
-							// ) : ''
 					);
 				?>
 				<p style="text-align:right;position: absolute;font-size: 1.1em;<?php echo is_rtl()? 'left' : 'right';?>: 7px;bottom: -6px;">
@@ -406,6 +398,11 @@ function sek_may_be_display_update_notice() {
 					?>
 				</p> -->
 			</div>
+      <?php
+      $_html = ob_get_contents();
+      if ($_html) ob_end_clean();
+      echo apply_filters( 'sek_update_notice', $_html );
+      ?>
 			<script type="text/javascript" id="nimble-dismiss-update-notice">
 				( function($){
 					var _ajax_action = function( $_el ) {
@@ -441,15 +438,12 @@ function sek_may_be_display_update_notice() {
 				})( jQuery );
 			</script>
 			<?php
-		$_html = ob_get_contents();
-		if ($_html) ob_end_clean();
-		echo apply_filters( 'sek_update_notice', $_html );
 }
 
 
 /**
 * hook : wp_ajax_dismiss_nimble_update_notice
-* => sets the last_update_notice to the current Hueman version when user click on dismiss notice link
+* => sets the last_update_notice to the current Nimble version when user click on dismiss notice link
 */
 function sek_dismiss_update_notice_action() {
 		check_ajax_referer( 'dismiss-update-notice-nonce', 'dismissUpdateNoticeNonce' );
