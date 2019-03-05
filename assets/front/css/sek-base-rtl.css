@@ -521,7 +521,7 @@ button.sek-btn,
   padding: .5rem 0;
 }
 
-.sek-mobile-menu .sek-nav-wrap {
+.sek-mobile-menu-expanded-below .sek-nav-wrap {
   padding: 0;
 }
 
@@ -814,7 +814,7 @@ button.sek-btn,
     -ms-flex-preferred-size: auto;
     flex-basis: auto;
   }
-  .sek-mobile-menu {
+  .sek-mobile-menu-expanded-below {
     display: none !important;
   }
   .sek-nav-toggler {

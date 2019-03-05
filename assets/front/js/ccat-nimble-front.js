@@ -1,40 +1,81 @@
-
+//     Underscore.js 1.9.1
+//     http://underscorejs.org
+//     (c) 2009-2018 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     Underscore may be freely distributed under the MIT license.
+//
+//     Modified by Nicolas GUILLAUME => replace the globally exposed underscore object window._ by window._utils_
+//     => fixes issues generated when plugins are using different versions of underscore
+//     @see https://github.com/presscustomizr/nimble-builder/issues/221
 (function() {
+  // Baseline setup
+  // --------------
+
+  // Establish the root object, `window` (`self`) in the browser, `global`
+  // on the server, or `this` in some virtual machines. We use `self`
+  // instead of `window` for `WebWorker` support.
   var root = typeof self == 'object' && self.self === self && self ||
             typeof global == 'object' && global.global === global && global ||
             this ||
             {};
+
+  // Save the previous value of the `_` variable.
   var previousUnderscore = root._;
+
+  // Save bytes in the minified (but not gzipped) version:
   var ArrayProto = Array.prototype, ObjProto = Object.prototype;
   var SymbolProto = typeof Symbol !== 'undefined' ? Symbol.prototype : null;
+
+  // Create quick reference variables for speed access to core prototypes.
   var push = ArrayProto.push,
       slice = ArrayProto.slice,
       toString = ObjProto.toString,
       hasOwnProperty = ObjProto.hasOwnProperty;
+
+  // All **ECMAScript 5** native function implementations that we hope to use
+  // are declared here.
   var nativeIsArray = Array.isArray,
       nativeKeys = Object.keys,
       nativeCreate = Object.create;
+
+  // Naked function reference for surrogate-prototype-swapping.
   var Ctor = function(){};
+
+  // Create a safe reference to the Underscore object for use below.
   var _ = function(obj) {
     if (obj instanceof _) return obj;
     if (!(this instanceof _)) return new _(obj);
     this._wrapped = obj;
   };
+
+  // Export the Underscore object for **Node.js**, with
+  // backwards-compatibility for their old module API. If we're in
+  // the browser, add `_` as a global object.
+  // (`nodeType` is checked to ensure that `module`
+  // and `exports` are not HTML elements.)
   if (typeof exports != 'undefined' && !exports.nodeType) {
     if (typeof module != 'undefined' && !module.nodeType && module.exports) {
       exports = module.exports = _;
     }
+    // modification by @nikeo, November 2, 2018
     exports._utils_ = _;
   } else {
+    // modification by @nikeo, November 2, 2018
     root._utils_ = _;
   }
+
+  // Current version.
   _.VERSION = '1.9.1';
+
+  // Internal function that returns an efficient (for current engines) version
+  // of the passed-in callback, to be repeatedly applied in other Underscore
+  // functions.
   var optimizeCb = function(func, context, argCount) {
     if (context === void 0) return func;
     switch (argCount == null ? 3 : argCount) {
       case 1: return function(value) {
         return func.call(context, value);
       };
+      // The 2-argument case is omitted because we’re not using it.
       case 3: return function(value, index, collection) {
         return func.call(context, value, index, collection);
       };
@@ -48,6 +89,10 @@
   };
 
   var builtinIteratee;
+
+  // An internal function to generate callbacks that can be applied to each
+  // element in a collection, returning the desired result — either `identity`,
+  // an arbitrary callback, a property matcher, or a property accessor.
   var cb = function(value, context, argCount) {
     if (_.iteratee !== builtinIteratee) return _.iteratee(value, context);
     if (value == null) return _.identity;
@@ -55,9 +100,19 @@
     if (_.isObject(value) && !_.isArray(value)) return _.matcher(value);
     return _.property(value);
   };
+
+  // External wrapper for our callback generator. Users may customize
+  // `_.iteratee` if they want additional predicate/iteratee shorthand styles.
+  // This abstraction hides the internal-only argCount argument.
   _.iteratee = builtinIteratee = function(value, context) {
     return cb(value, context, Infinity);
   };
+
+  // Some functions take a variable number of arguments, or a few expected
+  // arguments at the beginning and then a variable number of values to operate
+  // on. This helper accumulates all remaining arguments past the function’s
+  // argument length (or an explicit `startIndex`), into an array that becomes
+  // the last argument. Similar to ES6’s "rest parameter".
   var restArguments = function(func, startIndex) {
     startIndex = startIndex == null ? func.length - 1 : +startIndex;
     return function() {
@@ -80,6 +135,8 @@
       return func.apply(this, args);
     };
   };
+
+  // An internal function for creating a new object that inherits from another.
   var baseCreate = function(prototype) {
     if (!_.isObject(prototype)) return {};
     if (nativeCreate) return nativeCreate(prototype);
@@ -107,12 +164,24 @@
     }
     return length ? obj : void 0;
   };
+
+  // Helper for collection methods to determine whether a collection
+  // should be iterated as an array or as an object.
+  // Related: http://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
+  // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
   var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
   var getLength = shallowProperty('length');
   var isArrayLike = function(collection) {
     var length = getLength(collection);
     return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
   };
+
+  // Collection Functions
+  // --------------------
+
+  // The cornerstone, an `each` implementation, aka `forEach`.
+  // Handles raw objects in addition to array-likes. Treats all
+  // sparse array-likes as if they were dense.
   _.each = _.forEach = function(obj, iteratee, context) {
     iteratee = optimizeCb(iteratee, context);
     var i, length;
@@ -128,6 +197,8 @@
     }
     return obj;
   };
+
+  // Return the results of applying the iteratee to each element.
   _.map = _.collect = function(obj, iteratee, context) {
     iteratee = cb(iteratee, context);
     var keys = !isArrayLike(obj) && _.keys(obj),
@@ -139,7 +210,11 @@
     }
     return results;
   };
+
+  // Create a reducing function iterating left or right.
   var createReduce = function(dir) {
+    // Wrap code that reassigns argument variables in a separate function than
+    // the one that accesses `arguments.length` to avoid a perf hit. (#1991)
     var reducer = function(obj, iteratee, memo, initial) {
       var keys = !isArrayLike(obj) && _.keys(obj),
           length = (keys || obj).length,
@@ -160,13 +235,23 @@
       return reducer(obj, optimizeCb(iteratee, context, 4), memo, initial);
     };
   };
+
+  // **Reduce** builds up a single result from a list of values, aka `inject`,
+  // or `foldl`.
   _.reduce = _.foldl = _.inject = createReduce(1);
+
+  // The right-associative version of reduce, also known as `foldr`.
   _.reduceRight = _.foldr = createReduce(-1);
+
+  // Return the first value which passes a truth test. Aliased as `detect`.
   _.find = _.detect = function(obj, predicate, context) {
     var keyFinder = isArrayLike(obj) ? _.findIndex : _.findKey;
     var key = keyFinder(obj, predicate, context);
     if (key !== void 0 && key !== -1) return obj[key];
   };
+
+  // Return all the elements that pass a truth test.
+  // Aliased as `select`.
   _.filter = _.select = function(obj, predicate, context) {
     var results = [];
     predicate = cb(predicate, context);
@@ -175,9 +260,14 @@
     });
     return results;
   };
+
+  // Return all the elements for which a truth test fails.
   _.reject = function(obj, predicate, context) {
     return _.filter(obj, _.negate(cb(predicate)), context);
   };
+
+  // Determine whether all of the elements match a truth test.
+  // Aliased as `all`.
   _.every = _.all = function(obj, predicate, context) {
     predicate = cb(predicate, context);
     var keys = !isArrayLike(obj) && _.keys(obj),
@@ -188,6 +278,9 @@
     }
     return true;
   };
+
+  // Determine if at least one element in the object matches a truth test.
+  // Aliased as `any`.
   _.some = _.any = function(obj, predicate, context) {
     predicate = cb(predicate, context);
     var keys = !isArrayLike(obj) && _.keys(obj),
@@ -198,11 +291,16 @@
     }
     return false;
   };
+
+  // Determine if the array or object contains a given item (using `===`).
+  // Aliased as `includes` and `include`.
   _.contains = _.includes = _.include = function(obj, item, fromIndex, guard) {
     if (!isArrayLike(obj)) obj = _.values(obj);
     if (typeof fromIndex != 'number' || guard) fromIndex = 0;
     return _.indexOf(obj, item, fromIndex) >= 0;
   };
+
+  // Invoke a method (with arguments) on every item in a collection.
   _.invoke = restArguments(function(obj, path, args) {
     var contextPath, func;
     if (_.isFunction(path)) {
@@ -223,15 +321,25 @@
       return method == null ? method : method.apply(context, args);
     });
   });
+
+  // Convenience version of a common use case of `map`: fetching a property.
   _.pluck = function(obj, key) {
     return _.map(obj, _.property(key));
   };
+
+  // Convenience version of a common use case of `filter`: selecting only objects
+  // containing specific `key:value` pairs.
   _.where = function(obj, attrs) {
     return _.filter(obj, _.matcher(attrs));
   };
+
+  // Convenience version of a common use case of `find`: getting the first object
+  // containing specific `key:value` pairs.
   _.findWhere = function(obj, attrs) {
     return _.find(obj, _.matcher(attrs));
   };
+
+  // Return the maximum element (or element-based computation).
   _.max = function(obj, iteratee, context) {
     var result = -Infinity, lastComputed = -Infinity,
         value, computed;
@@ -255,6 +363,8 @@
     }
     return result;
   };
+
+  // Return the minimum element (or element-based computation).
   _.min = function(obj, iteratee, context) {
     var result = Infinity, lastComputed = Infinity,
         value, computed;
@@ -278,9 +388,16 @@
     }
     return result;
   };
+
+  // Shuffle a collection.
   _.shuffle = function(obj) {
     return _.sample(obj, Infinity);
   };
+
+  // Sample **n** random values from a collection using the modern version of the
+  // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
+  // If **n** is not specified, returns a single random element.
+  // The internal `guard` argument allows it to work with `map`.
   _.sample = function(obj, n, guard) {
     if (n == null || guard) {
       if (!isArrayLike(obj)) obj = _.values(obj);
@@ -298,6 +415,8 @@
     }
     return sample.slice(0, n);
   };
+
+  // Sort the object's values by a criterion produced by an iteratee.
   _.sortBy = function(obj, iteratee, context) {
     var index = 0;
     iteratee = cb(iteratee, context);
@@ -317,6 +436,8 @@
       return left.index - right.index;
     }), 'value');
   };
+
+  // An internal function used for aggregate "group by" operations.
   var group = function(behavior, partition) {
     return function(obj, iteratee, context) {
       var result = partition ? [[], []] : {};
@@ -328,58 +449,98 @@
       return result;
     };
   };
+
+  // Groups the object's values by a criterion. Pass either a string attribute
+  // to group by, or a function that returns the criterion.
   _.groupBy = group(function(result, value, key) {
     if (has(result, key)) result[key].push(value); else result[key] = [value];
   });
+
+  // Indexes the object's values by a criterion, similar to `groupBy`, but for
+  // when you know that your index values will be unique.
   _.indexBy = group(function(result, value, key) {
     result[key] = value;
   });
+
+  // Counts instances of an object that group by a certain criterion. Pass
+  // either a string attribute to count by, or a function that returns the
+  // criterion.
   _.countBy = group(function(result, value, key) {
     if (has(result, key)) result[key]++; else result[key] = 1;
   });
 
   var reStrSymbol = /[^\ud800-\udfff]|[\ud800-\udbff][\udc00-\udfff]|[\ud800-\udfff]/g;
+  // Safely create a real, live array from anything iterable.
   _.toArray = function(obj) {
     if (!obj) return [];
     if (_.isArray(obj)) return slice.call(obj);
     if (_.isString(obj)) {
+      // Keep surrogate pair characters together
       return obj.match(reStrSymbol);
     }
     if (isArrayLike(obj)) return _.map(obj, _.identity);
     return _.values(obj);
   };
+
+  // Return the number of elements in an object.
   _.size = function(obj) {
     if (obj == null) return 0;
     return isArrayLike(obj) ? obj.length : _.keys(obj).length;
   };
+
+  // Split a collection into two arrays: one whose elements all satisfy the given
+  // predicate, and one whose elements all do not satisfy the predicate.
   _.partition = group(function(result, value, pass) {
     result[pass ? 0 : 1].push(value);
   }, true);
+
+  // Array Functions
+  // ---------------
+
+  // Get the first element of an array. Passing **n** will return the first N
+  // values in the array. Aliased as `head` and `take`. The **guard** check
+  // allows it to work with `_.map`.
   _.first = _.head = _.take = function(array, n, guard) {
     if (array == null || array.length < 1) return n == null ? void 0 : [];
     if (n == null || guard) return array[0];
     return _.initial(array, array.length - n);
   };
+
+  // Returns everything but the last entry of the array. Especially useful on
+  // the arguments object. Passing **n** will return all the values in
+  // the array, excluding the last N.
   _.initial = function(array, n, guard) {
     return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
   };
+
+  // Get the last element of an array. Passing **n** will return the last N
+  // values in the array.
   _.last = function(array, n, guard) {
     if (array == null || array.length < 1) return n == null ? void 0 : [];
     if (n == null || guard) return array[array.length - 1];
     return _.rest(array, Math.max(0, array.length - n));
   };
+
+  // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
+  // Especially useful on the arguments object. Passing an **n** will return
+  // the rest N values in the array.
   _.rest = _.tail = _.drop = function(array, n, guard) {
     return slice.call(array, n == null || guard ? 1 : n);
   };
+
+  // Trim out all falsy values from an array.
   _.compact = function(array) {
     return _.filter(array, Boolean);
   };
+
+  // Internal implementation of a recursive `flatten` function.
   var flatten = function(input, shallow, strict, output) {
     output = output || [];
     var idx = output.length;
     for (var i = 0, length = getLength(input); i < length; i++) {
       var value = input[i];
       if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
+        // Flatten current level of array or arguments object.
         if (shallow) {
           var j = 0, len = value.length;
           while (j < len) output[idx++] = value[j++];
@@ -393,12 +554,23 @@
     }
     return output;
   };
+
+  // Flatten out an array, either recursively (by default), or just one level.
   _.flatten = function(array, shallow) {
     return flatten(array, shallow, false);
   };
+
+  // Return a version of the array that does not contain the specified value(s).
   _.without = restArguments(function(array, otherArrays) {
     return _.difference(array, otherArrays);
   });
+
+  // Produce a duplicate-free version of the array. If the array has already
+  // been sorted, you have the option of using a faster algorithm.
+  // The faster algorithm will not work with an iteratee if the iteratee
+  // is not a one-to-one function, so providing an iteratee will disable
+  // the faster algorithm.
+  // Aliased as `unique`.
   _.uniq = _.unique = function(array, isSorted, iteratee, context) {
     if (!_.isBoolean(isSorted)) {
       context = iteratee;
@@ -425,9 +597,15 @@
     }
     return result;
   };
+
+  // Produce an array that contains the union: each distinct element from all of
+  // the passed-in arrays.
   _.union = restArguments(function(arrays) {
     return _.uniq(flatten(arrays, true, true));
   });
+
+  // Produce an array that contains every item shared between all the
+  // passed-in arrays.
   _.intersection = function(array) {
     var result = [];
     var argsLength = arguments.length;
@@ -442,12 +620,18 @@
     }
     return result;
   };
+
+  // Take the difference between one array and a number of other arrays.
+  // Only the elements present in just the first array will remain.
   _.difference = restArguments(function(array, rest) {
     rest = flatten(rest, true, true);
     return _.filter(array, function(value){
       return !_.contains(rest, value);
     });
   });
+
+  // Complement of _.zip. Unzip accepts an array of arrays and groups
+  // each array's elements on shared indices.
   _.unzip = function(array) {
     var length = array && _.max(array, getLength).length || 0;
     var result = Array(length);
@@ -457,7 +641,14 @@
     }
     return result;
   };
+
+  // Zip together multiple lists into a single array -- elements that share
+  // an index go together.
   _.zip = restArguments(_.unzip);
+
+  // Converts lists into objects. Pass either a single array of `[key, value]`
+  // pairs, or two parallel arrays of the same length -- one of keys, and one of
+  // the corresponding values. Passing by pairs is the reverse of _.pairs.
   _.object = function(list, values) {
     var result = {};
     for (var i = 0, length = getLength(list); i < length; i++) {
@@ -469,6 +660,8 @@
     }
     return result;
   };
+
+  // Generator function to create the findIndex and findLastIndex functions.
   var createPredicateIndexFinder = function(dir) {
     return function(array, predicate, context) {
       predicate = cb(predicate, context);
@@ -480,8 +673,13 @@
       return -1;
     };
   };
+
+  // Returns the first index on an array-like that passes a predicate test.
   _.findIndex = createPredicateIndexFinder(1);
   _.findLastIndex = createPredicateIndexFinder(-1);
+
+  // Use a comparator function to figure out the smallest index at which
+  // an object should be inserted so as to maintain order. Uses binary search.
   _.sortedIndex = function(array, obj, iteratee, context) {
     iteratee = cb(iteratee, context, 1);
     var value = iteratee(obj);
@@ -492,6 +690,8 @@
     }
     return low;
   };
+
+  // Generator function to create the indexOf and lastIndexOf functions.
   var createIndexFinder = function(dir, predicateFind, sortedIndex) {
     return function(array, item, idx) {
       var i = 0, length = getLength(array);
@@ -515,8 +715,17 @@
       return -1;
     };
   };
+
+  // Return the position of the first occurrence of an item in an array,
+  // or -1 if the item is not included in the array.
+  // If the array is large and already in sort order, pass `true`
+  // for **isSorted** to use binary search.
   _.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);
   _.lastIndexOf = createIndexFinder(-1, _.findLastIndex);
+
+  // Generate an integer Array containing an arithmetic progression. A port of
+  // the native Python `range()` function. See
+  // [the Python documentation](http://docs.python.org/library/functions.html#range).
   _.range = function(start, stop, step) {
     if (stop == null) {
       stop = start || 0;
@@ -535,6 +744,9 @@
 
     return range;
   };
+
+  // Chunk a single array into multiple arrays, each containing `count` or fewer
+  // items.
   _.chunk = function(array, count) {
     if (count == null || count < 1) return [];
     var result = [];
@@ -544,6 +756,12 @@
     }
     return result;
   };
+
+  // Function (ahem) Functions
+  // ------------------
+
+  // Determines whether to execute a function as a constructor
+  // or a normal function with the provided arguments.
   var executeBound = function(sourceFunc, boundFunc, context, callingContext, args) {
     if (!(callingContext instanceof boundFunc)) return sourceFunc.apply(context, args);
     var self = baseCreate(sourceFunc.prototype);
@@ -551,6 +769,10 @@
     if (_.isObject(result)) return result;
     return self;
   };
+
+  // Create a function bound to a given object (assigning `this`, and arguments,
+  // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
+  // available.
   _.bind = restArguments(function(func, context, args) {
     if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
     var bound = restArguments(function(callArgs) {
@@ -558,6 +780,11 @@
     });
     return bound;
   });
+
+  // Partially apply a function by creating a version that has had some of its
+  // arguments pre-filled, without changing its dynamic `this` context. _ acts
+  // as a placeholder by default, allowing any combination of arguments to be
+  // pre-filled. Set `_.partial.placeholder` for a custom placeholder argument.
   _.partial = restArguments(function(func, boundArgs) {
     var placeholder = _.partial.placeholder;
     var bound = function() {
@@ -573,6 +800,10 @@
   });
 
   _.partial.placeholder = _;
+
+  // Bind a number of an object's methods to that object. Remaining arguments
+  // are the method names to be bound. Useful for ensuring that all callbacks
+  // defined on an object belong to it.
   _.bindAll = restArguments(function(obj, keys) {
     keys = flatten(keys, false, false);
     var index = keys.length;
@@ -582,6 +813,8 @@
       obj[key] = _.bind(obj[key], obj);
     }
   });
+
+  // Memoize an expensive function by storing its results.
   _.memoize = function(func, hasher) {
     var memoize = function(key) {
       var cache = memoize.cache;
@@ -592,12 +825,24 @@
     memoize.cache = {};
     return memoize;
   };
+
+  // Delays a function for the given number of milliseconds, and then calls
+  // it with the arguments supplied.
   _.delay = restArguments(function(func, wait, args) {
     return setTimeout(function() {
       return func.apply(null, args);
     }, wait);
   });
+
+  // Defers a function, scheduling it to run after the current call stack has
+  // cleared.
   _.defer = _.partial(_.delay, _, 1);
+
+  // Returns a function, that, when invoked, will only be triggered at most once
+  // during a given window of time. Normally, the throttled function will run
+  // as much as it can, without ever going more than once per `wait` duration;
+  // but if you'd like to disable the execution on the leading edge, pass
+  // `{leading: false}`. To disable execution on the trailing edge, ditto.
   _.throttle = function(func, wait, options) {
     var timeout, context, args, result;
     var previous = 0;
@@ -638,6 +883,11 @@
 
     return throttled;
   };
+
+  // Returns a function, that, as long as it continues to be invoked, will not
+  // be triggered. The function will be called after it stops being called for
+  // N milliseconds. If `immediate` is passed, trigger the function on the
+  // leading edge, instead of the trailing.
   _.debounce = function(func, wait, immediate) {
     var timeout, result;
 
@@ -666,14 +916,23 @@
 
     return debounced;
   };
+
+  // Returns the first function passed as an argument to the second,
+  // allowing you to adjust arguments, run code before and after, and
+  // conditionally execute the original function.
   _.wrap = function(func, wrapper) {
     return _.partial(wrapper, func);
   };
+
+  // Returns a negated version of the passed-in predicate.
   _.negate = function(predicate) {
     return function() {
       return !predicate.apply(this, arguments);
     };
   };
+
+  // Returns a function that is the composition of a list of functions, each
+  // consuming the return value of the function that follows.
   _.compose = function() {
     var args = arguments;
     var start = args.length - 1;
@@ -684,6 +943,8 @@
       return result;
     };
   };
+
+  // Returns a function that will only be executed on and after the Nth call.
   _.after = function(times, func) {
     return function() {
       if (--times < 1) {
@@ -691,6 +952,8 @@
       }
     };
   };
+
+  // Returns a function that will only be executed up to (but not including) the Nth call.
   _.before = function(times, func) {
     var memo;
     return function() {
@@ -701,9 +964,17 @@
       return memo;
     };
   };
+
+  // Returns a function that will be executed at most one time, no matter how
+  // often you call it. Useful for lazy initialization.
   _.once = _.partial(_.before, 2);
 
   _.restArguments = restArguments;
+
+  // Object Functions
+  // ----------------
+
+  // Keys in IE < 9 that won't be iterated by `for key in ...` and thus missed.
   var hasEnumBug = !{toString: null}.propertyIsEnumerable('toString');
   var nonEnumerableProps = ['valueOf', 'isPrototypeOf', 'toString',
     'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
@@ -712,6 +983,8 @@
     var nonEnumIdx = nonEnumerableProps.length;
     var constructor = obj.constructor;
     var proto = _.isFunction(constructor) && constructor.prototype || ObjProto;
+
+    // Constructor is a special case.
     var prop = 'constructor';
     if (has(obj, prop) && !_.contains(keys, prop)) keys.push(prop);
 
@@ -722,21 +995,30 @@
       }
     }
   };
+
+  // Retrieve the names of an object's own properties.
+  // Delegates to **ECMAScript 5**'s native `Object.keys`.
   _.keys = function(obj) {
     if (!_.isObject(obj)) return [];
     if (nativeKeys) return nativeKeys(obj);
     var keys = [];
     for (var key in obj) if (has(obj, key)) keys.push(key);
+    // Ahem, IE < 9.
     if (hasEnumBug) collectNonEnumProps(obj, keys);
     return keys;
   };
+
+  // Retrieve all the property names of an object.
   _.allKeys = function(obj) {
     if (!_.isObject(obj)) return [];
     var keys = [];
     for (var key in obj) keys.push(key);
+    // Ahem, IE < 9.
     if (hasEnumBug) collectNonEnumProps(obj, keys);
     return keys;
   };
+
+  // Retrieve the values of an object's properties.
   _.values = function(obj) {
     var keys = _.keys(obj);
     var length = keys.length;
@@ -746,6 +1028,9 @@
     }
     return values;
   };
+
+  // Returns the results of applying the iteratee to each element of the object.
+  // In contrast to _.map it returns an object.
   _.mapObject = function(obj, iteratee, context) {
     iteratee = cb(iteratee, context);
     var keys = _.keys(obj),
@@ -757,6 +1042,9 @@
     }
     return results;
   };
+
+  // Convert an object into a list of `[key, value]` pairs.
+  // The opposite of _.object.
   _.pairs = function(obj) {
     var keys = _.keys(obj);
     var length = keys.length;
@@ -766,6 +1054,8 @@
     }
     return pairs;
   };
+
+  // Invert the keys and values of an object. The values must be serializable.
   _.invert = function(obj) {
     var result = {};
     var keys = _.keys(obj);
@@ -774,6 +1064,9 @@
     }
     return result;
   };
+
+  // Return a sorted list of the function names available on the object.
+  // Aliased as `methods`.
   _.functions = _.methods = function(obj) {
     var names = [];
     for (var key in obj) {
@@ -781,6 +1074,8 @@
     }
     return names.sort();
   };
+
+  // An internal function for creating assigner functions.
   var createAssigner = function(keysFunc, defaults) {
     return function(obj) {
       var length = arguments.length;
@@ -798,8 +1093,15 @@
       return obj;
     };
   };
+
+  // Extend a given object with all the properties in passed-in object(s).
   _.extend = createAssigner(_.allKeys);
+
+  // Assigns a given object with all the own properties in the passed-in object(s).
+  // (https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
   _.extendOwn = _.assign = createAssigner(_.keys);
+
+  // Returns the first key on an object that passes a predicate test.
   _.findKey = function(obj, predicate, context) {
     predicate = cb(predicate, context);
     var keys = _.keys(obj), key;
@@ -808,9 +1110,13 @@
       if (predicate(obj[key], key, obj)) return key;
     }
   };
+
+  // Internal pick helper function to determine if `obj` has key `key`.
   var keyInObj = function(value, key, obj) {
     return key in obj;
   };
+
+  // Return a copy of the object only containing the whitelisted properties.
   _.pick = restArguments(function(obj, keys) {
     var result = {}, iteratee = keys[0];
     if (obj == null) return result;
@@ -829,6 +1135,8 @@
     }
     return result;
   });
+
+  // Return a copy of the object without the blacklisted properties.
   _.omit = restArguments(function(obj, keys) {
     var iteratee = keys[0], context;
     if (_.isFunction(iteratee)) {
@@ -842,20 +1150,34 @@
     }
     return _.pick(obj, iteratee, context);
   });
+
+  // Fill in a given object with default properties.
   _.defaults = createAssigner(_.allKeys, true);
+
+  // Creates an object that inherits from the given prototype object.
+  // If additional properties are provided then they will be added to the
+  // created object.
   _.create = function(prototype, props) {
     var result = baseCreate(prototype);
     if (props) _.extendOwn(result, props);
     return result;
   };
+
+  // Create a (shallow-cloned) duplicate of an object.
   _.clone = function(obj) {
     if (!_.isObject(obj)) return obj;
     return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
   };
+
+  // Invokes interceptor with the obj, and then returns obj.
+  // The primary purpose of this method is to "tap into" a method chain, in
+  // order to perform operations on intermediate results within the chain.
   _.tap = function(obj, interceptor) {
     interceptor(obj);
     return obj;
   };
+
+  // Returns whether an object has a given set of `key:value` pairs.
   _.isMatch = function(object, attrs) {
     var keys = _.keys(attrs), length = keys.length;
     if (object == null) return !length;
@@ -866,29 +1188,51 @@
     }
     return true;
   };
+
+
+  // Internal recursive comparison function for `isEqual`.
   var eq, deepEq;
   eq = function(a, b, aStack, bStack) {
+    // Identical objects are equal. `0 === -0`, but they aren't identical.
+    // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
     if (a === b) return a !== 0 || 1 / a === 1 / b;
+    // `null` or `undefined` only equal to itself (strict comparison).
     if (a == null || b == null) return false;
+    // `NaN`s are equivalent, but non-reflexive.
     if (a !== a) return b !== b;
+    // Exhaust primitive checks
     var type = typeof a;
     if (type !== 'function' && type !== 'object' && typeof b != 'object') return false;
     return deepEq(a, b, aStack, bStack);
   };
+
+  // Internal recursive comparison function for `isEqual`.
   deepEq = function(a, b, aStack, bStack) {
+    // Unwrap any wrapped objects.
     if (a instanceof _) a = a._wrapped;
     if (b instanceof _) b = b._wrapped;
+    // Compare `[[Class]]` names.
     var className = toString.call(a);
     if (className !== toString.call(b)) return false;
     switch (className) {
+      // Strings, numbers, regular expressions, dates, and booleans are compared by value.
       case '[object RegExp]':
+      // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
       case '[object String]':
+        // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
+        // equivalent to `new String("5")`.
         return '' + a === '' + b;
       case '[object Number]':
+        // `NaN`s are equivalent, but non-reflexive.
+        // Object(NaN) is equivalent to NaN.
         if (+a !== +a) return +b !== +b;
+        // An `egal` comparison is performed for other numeric values.
         return +a === 0 ? 1 / +a === 1 / b : +a === +b;
       case '[object Date]':
       case '[object Boolean]':
+        // Coerce dates and booleans to numeric primitive values. Dates are compared by their
+        // millisecond representations. Note that invalid dates with millisecond representations
+        // of `NaN` are not equivalent.
         return +a === +b;
       case '[object Symbol]':
         return SymbolProto.valueOf.call(a) === SymbolProto.valueOf.call(b);
@@ -897,6 +1241,9 @@
     var areArrays = className === '[object Array]';
     if (!areArrays) {
       if (typeof a != 'object' || typeof b != 'object') return false;
+
+      // Objects with different constructors are not equivalent, but `Object`s or `Array`s
+      // from different frames are.
       var aCtor = a.constructor, bCtor = b.constructor;
       if (aCtor !== bCtor && !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
                                _.isFunction(bCtor) && bCtor instanceof bCtor)
@@ -904,82 +1251,132 @@
         return false;
       }
     }
+    // Assume equality for cyclic structures. The algorithm for detecting cyclic
+    // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+
+    // Initializing stack of traversed objects.
+    // It's done here since we only need them for objects and arrays comparison.
     aStack = aStack || [];
     bStack = bStack || [];
     var length = aStack.length;
     while (length--) {
+      // Linear search. Performance is inversely proportional to the number of
+      // unique nested structures.
       if (aStack[length] === a) return bStack[length] === b;
     }
+
+    // Add the first object to the stack of traversed objects.
     aStack.push(a);
     bStack.push(b);
+
+    // Recursively compare objects and arrays.
     if (areArrays) {
+      // Compare array lengths to determine if a deep comparison is necessary.
       length = a.length;
       if (length !== b.length) return false;
+      // Deep compare the contents, ignoring non-numeric properties.
       while (length--) {
         if (!eq(a[length], b[length], aStack, bStack)) return false;
       }
     } else {
+      // Deep compare objects.
       var keys = _.keys(a), key;
       length = keys.length;
+      // Ensure that both objects contain the same number of properties before comparing deep equality.
       if (_.keys(b).length !== length) return false;
       while (length--) {
+        // Deep compare each member
         key = keys[length];
         if (!(has(b, key) && eq(a[key], b[key], aStack, bStack))) return false;
       }
     }
+    // Remove the first object from the stack of traversed objects.
     aStack.pop();
     bStack.pop();
     return true;
   };
+
+  // Perform a deep comparison to check if two objects are equal.
   _.isEqual = function(a, b) {
     return eq(a, b);
   };
+
+  // Is a given array, string, or object empty?
+  // An "empty" object has no enumerable own-properties.
   _.isEmpty = function(obj) {
     if (obj == null) return true;
     if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
     return _.keys(obj).length === 0;
   };
+
+  // Is a given value a DOM element?
   _.isElement = function(obj) {
     return !!(obj && obj.nodeType === 1);
   };
+
+  // Is a given value an array?
+  // Delegates to ECMA5's native Array.isArray
   _.isArray = nativeIsArray || function(obj) {
     return toString.call(obj) === '[object Array]';
   };
+
+  // Is a given variable an object?
   _.isObject = function(obj) {
     var type = typeof obj;
     return type === 'function' || type === 'object' && !!obj;
   };
+
+  // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError, isMap, isWeakMap, isSet, isWeakSet.
   _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error', 'Symbol', 'Map', 'WeakMap', 'Set', 'WeakSet'], function(name) {
     _['is' + name] = function(obj) {
       return toString.call(obj) === '[object ' + name + ']';
     };
   });
+
+  // Define a fallback version of the method in browsers (ahem, IE < 9), where
+  // there isn't any inspectable "Arguments" type.
   if (!_.isArguments(arguments)) {
     _.isArguments = function(obj) {
       return has(obj, 'callee');
     };
   }
+
+  // Optimize `isFunction` if appropriate. Work around some typeof bugs in old v8,
+  // IE 11 (#1621), Safari 8 (#1929), and PhantomJS (#2236).
   var nodelist = root.document && root.document.childNodes;
   if (typeof /./ != 'function' && typeof Int8Array != 'object' && typeof nodelist != 'function') {
     _.isFunction = function(obj) {
       return typeof obj == 'function' || false;
     };
   }
+
+  // Is a given object a finite number?
   _.isFinite = function(obj) {
     return !_.isSymbol(obj) && isFinite(obj) && !isNaN(parseFloat(obj));
   };
+
+  // Is the given value `NaN`?
   _.isNaN = function(obj) {
     return _.isNumber(obj) && isNaN(obj);
   };
+
+  // Is a given value a boolean?
   _.isBoolean = function(obj) {
     return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
   };
+
+  // Is a given value equal to null?
   _.isNull = function(obj) {
     return obj === null;
   };
+
+  // Is a given variable undefined?
   _.isUndefined = function(obj) {
     return obj === void 0;
   };
+
+  // Shortcut function for checking if an object has a given property directly
+  // on itself (in other words, not on a prototype).
   _.has = function(obj, path) {
     if (!_.isArray(path)) {
       return has(obj, path);
@@ -994,13 +1391,23 @@
     }
     return !!length;
   };
+
+  // Utility Functions
+  // -----------------
+
+  // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
+  // previous owner. Returns a reference to the Underscore object.
   _.noConflict = function() {
     root._ = previousUnderscore;
     return this;
   };
+
+  // Keep the identity function around for default iteratees.
   _.identity = function(value) {
     return value;
   };
+
+  // Predicate-generating functions. Often useful outside of Underscore.
   _.constant = function(value) {
     return function() {
       return value;
@@ -1008,6 +1415,9 @@
   };
 
   _.noop = function(){};
+
+  // Creates a function that, when passed an object, will traverse that object’s
+  // properties down the given `path`, specified as an array of keys or indexes.
   _.property = function(path) {
     if (!_.isArray(path)) {
       return shallowProperty(path);
@@ -1016,6 +1426,8 @@
       return deepGet(obj, path);
     };
   };
+
+  // Generates a function for a given object that returns a given property.
   _.propertyOf = function(obj) {
     if (obj == null) {
       return function(){};
@@ -1024,18 +1436,25 @@
       return !_.isArray(path) ? obj[path] : deepGet(obj, path);
     };
   };
+
+  // Returns a predicate for checking whether an object has a given set of
+  // `key:value` pairs.
   _.matcher = _.matches = function(attrs) {
     attrs = _.extendOwn({}, attrs);
     return function(obj) {
       return _.isMatch(obj, attrs);
     };
   };
+
+  // Run a function **n** times.
   _.times = function(n, iteratee, context) {
     var accum = Array(Math.max(0, n));
     iteratee = optimizeCb(iteratee, context, 1);
     for (var i = 0; i < n; i++) accum[i] = iteratee(i);
     return accum;
   };
+
+  // Return a random integer between min and max (inclusive).
   _.random = function(min, max) {
     if (max == null) {
       max = min;
@@ -1043,9 +1462,13 @@
     }
     return min + Math.floor(Math.random() * (max - min + 1));
   };
+
+  // A (possibly faster) way to get the current timestamp as an integer.
   _.now = Date.now || function() {
     return new Date().getTime();
   };
+
+  // List of HTML entities for escaping.
   var escapeMap = {
     '&': '&amp;',
     '<': '&lt;',
@@ -1055,10 +1478,13 @@
     '`': '&#x60;'
   };
   var unescapeMap = _.invert(escapeMap);
+
+  // Functions for escaping and unescaping strings to/from HTML interpolation.
   var createEscaper = function(map) {
     var escaper = function(match) {
       return map[match];
     };
+    // Regexes for identifying a key that needs to be escaped.
     var source = '(?:' + _.keys(map).join('|') + ')';
     var testRegexp = RegExp(source);
     var replaceRegexp = RegExp(source, 'g');
@@ -1069,6 +1495,10 @@
   };
   _.escape = createEscaper(escapeMap);
   _.unescape = createEscaper(unescapeMap);
+
+  // Traverses the children of `obj` along `path`. If a child is a function, it
+  // is invoked with its parent as context. Returns the value of the final
+  // child, or `fallback` if any child is undefined.
   _.result = function(obj, path, fallback) {
     if (!_.isArray(path)) path = [path];
     var length = path.length;
@@ -1085,17 +1515,30 @@
     }
     return obj;
   };
+
+  // Generate a unique integer id (unique within the entire client session).
+  // Useful for temporary DOM ids.
   var idCounter = 0;
   _.uniqueId = function(prefix) {
     var id = ++idCounter + '';
     return prefix ? prefix + id : id;
   };
+
+  // By default, Underscore uses ERB-style template delimiters, change the
+  // following template settings to use alternative delimiters.
   _.templateSettings = {
     evaluate: /<%([\s\S]+?)%>/g,
     interpolate: /<%=([\s\S]+?)%>/g,
     escape: /<%-([\s\S]+?)%>/g
   };
+
+  // When customizing `templateSettings`, if you don't want to define an
+  // interpolation, evaluation or escaping regex, we need one that is
+  // guaranteed not to match.
   var noMatch = /(.)^/;
+
+  // Certain characters need to be escaped so that they can be put into a
+  // string literal.
   var escapes = {
     "'": "'",
     '\\': '\\',
@@ -1110,14 +1553,23 @@
   var escapeChar = function(match) {
     return '\\' + escapes[match];
   };
+
+  // JavaScript micro-templating, similar to John Resig's implementation.
+  // Underscore templating handles arbitrary delimiters, preserves whitespace,
+  // and correctly escapes quotes within interpolated code.
+  // NB: `oldSettings` only exists for backwards compatibility.
   _.template = function(text, settings, oldSettings) {
     if (!settings && oldSettings) settings = oldSettings;
     settings = _.defaults({}, settings, _.templateSettings);
+
+    // Combine delimiters into one regular expression via alternation.
     var matcher = RegExp([
       (settings.escape || noMatch).source,
       (settings.interpolate || noMatch).source,
       (settings.evaluate || noMatch).source
     ].join('|') + '|$', 'g');
+
+    // Compile the template source, escaping string literals appropriately.
     var index = 0;
     var source = "__p+='";
     text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
@@ -1131,9 +1583,13 @@
       } else if (evaluate) {
         source += "';\n" + evaluate + "\n__p+='";
       }
+
+      // Adobe VMs need the match returned to produce the correct offset.
       return match;
     });
     source += "';\n";
+
+    // If a variable is not specified, place data values in local scope.
     if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
 
     source = "var __t,__p='',__j=Array.prototype.join," +
@@ -1151,19 +1607,33 @@
     var template = function(data) {
       return render.call(this, data, _);
     };
+
+    // Provide the compiled source as a convenience for precompilation.
     var argument = settings.variable || 'obj';
     template.source = 'function(' + argument + '){\n' + source + '}';
 
     return template;
   };
+
+  // Add a "chain" function. Start chaining a wrapped Underscore object.
   _.chain = function(obj) {
     var instance = _(obj);
     instance._chain = true;
     return instance;
   };
+
+  // OOP
+  // ---------------
+  // If Underscore is called as a function, it returns a wrapped object that
+  // can be used OO-style. This wrapper holds altered versions of all the
+  // underscore functions. Wrapped objects may be chained.
+
+  // Helper function to continue chaining intermediate results.
   var chainResult = function(instance, obj) {
     return instance._chain ? _(obj).chain() : obj;
   };
+
+  // Add your own custom functions to the Underscore object.
   _.mixin = function(obj) {
     _.each(_.functions(obj), function(name) {
       var func = _[name] = obj[name];
@@ -1175,7 +1645,11 @@
     });
     return _;
   };
+
+  // Add all of the Underscore functions to the wrapper object.
   _.mixin(_);
+
+  // Add all mutator Array functions to the wrapper.
   _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
     var method = ArrayProto[name];
     _.prototype[name] = function() {
@@ -1185,20 +1659,35 @@
       return chainResult(this, obj);
     };
   });
+
+  // Add all accessor Array functions to the wrapper.
   _.each(['concat', 'join', 'slice'], function(name) {
     var method = ArrayProto[name];
     _.prototype[name] = function() {
       return chainResult(this, method.apply(this._wrapped, arguments));
     };
   });
+
+  // Extracts the result from a wrapped and chained object.
   _.prototype.value = function() {
     return this._wrapped;
   };
+
+  // Provide unwrapping proxy for some methods used in engine operations
+  // such as arithmetic and JSON stringification.
   _.prototype.valueOf = _.prototype.toJSON = _.prototype.value;
 
   _.prototype.toString = function() {
     return String(this._wrapped);
   };
+
+  // AMD registration happens at the end for compatibility with AMD loaders
+  // that may not enforce next-turn semantics on modules. Even though general
+  // practice for AMD registration is to be anonymous, underscore registers
+  // as a named module because, like jQuery, it is a base library that is
+  // popular enough to be bundled in a third party lib, but not be part of
+  // an AMD load request. Those cases could generate an error when an
+  // anonymous define() is called outside of a loader request.
   if (typeof define == 'function' && define.amd) {
     define('underscore', [], function() {
       return _;
@@ -1218,6 +1707,8 @@
 (function( $ ){
 
   $.fn.fitText = function( kompressor, options ) {
+
+    // Setup options
     var compressor = kompressor || 1,
         settings = $.extend({
           'minFontSize' : Number.NEGATIVE_INFINITY,
@@ -1225,11 +1716,19 @@
         }, options);
 
     return this.each(function(){
+
+      // Store the object
       var $this = $(this);
+
+      // Resizer() resizes items based on the object width divided by the compressor * 10
       var resizer = function () {
         $this.css('font-size', Math.max(Math.min($this.width() / (compressor*10), parseFloat(settings.maxFontSize)), parseFloat(settings.minFontSize)));
       };
+
+      // Call once to set.
       resizer();
+
+      // Call on resize. Opera debounces their resize by default.
       $(window).on('resize.fittext orientationchange.fittext', resizer);
 
     });
@@ -1260,21 +1759,27 @@
  * Feb 2019 : added support for iframe lazyloading for https://github.com/presscustomizr/nimble-builder/issues/361
  * =================================================== */
 (function ( $, window ) {
+      //defaults
       var pluginName = 'nimbleLazyLoad',
           defaults = {
                 load_all_images_on_first_scroll : false,
+                //attribute : [ 'data-sek-src' ],
                 excludeImg : [],
                 threshold : 200,
                 fadeIn_options : { duration : 400 },
                 delaySmartLoadEvent : 0,
 
           },
+          //with intersecting cointainers:
+          //- to avoid race conditions
+          //- to avoid multi processing in general
           skipLazyLoadClass = 'smartload-skip';
 
 
       function Plugin( element, options ) {
             this.element = element;
             this.options = $.extend( {}, defaults, options) ;
+            //add .smartload-skip to the excludeImg
             if ( _utils_.isArray( this.options.excludeImg ) ) {
                   this.options.excludeImg.push( '.'+skipLazyLoadClass );
             } else {
@@ -1285,6 +1790,9 @@
             this._name = pluginName;
             this.init();
       }
+
+
+      //can access this.element and this.option
       Plugin.prototype.init = function () {
             var self        = this,
                 $_ImgOrDivOrIFrameElements  = $( '[data-sek-src]:not('+ this.options.excludeImg.join() +'), [data-sek-iframe-src]' , this.element );
@@ -1293,15 +1801,20 @@
             this.timer      = 0;
 
             $_ImgOrDivOrIFrameElements
+                  //avoid intersecting containers to parse the same images
                   .addClass( skipLazyLoadClass )
                   .bind( 'sek_load_img', {}, function() { self._load_img(this); })
                   .bind( 'sek_load_iframe', {}, function() { self._load_iframe(this); });
+
+            //the scroll event gets throttled with the requestAnimationFrame
             $(window).scroll( function( _evt ) {
                   self._better_scroll_event_handler( $_ImgOrDivOrIFrameElements, _evt );
             });
+            //debounced resize event
             $(window).resize( _utils_.debounce( function( _evt ) {
                   self._maybe_trigger_load( $_ImgOrDivOrIFrameElements, _evt );
             }, 100 ) );
+            //on load
             this._maybe_trigger_load( $_ImgOrDivOrIFrameElements);
 
       };
@@ -1332,6 +1845,7 @@
       */
       Plugin.prototype._maybe_trigger_load = function( $_Elements , _evt ) {
             var self = this,
+                //get the visible images list
                 _visible_list = $_Elements.filter( function( ind, _el ) { return self._is_visible( _el ,  _evt ); } );
 
             _visible_list.map( function( ind, _el ) {
@@ -1355,18 +1869,26 @@
                   if ( $el.length > 0 && $el.is(':visible') )
                     return $el;
                   var $prev = $el.prev();
+                  // if there's a previous sibling and this sibling is visible, use it
                   if ( $prev.length > 0 && $prev.is(':visible') ) {
                       return $prev;
                   }
+                  // if there's a previous sibling but it's not visible, let's try the next previous sibling
                   if ( $prev.length > 0 && !$prev.is(':visible') ) {
                       return sniffFirstVisiblePrevElement( $prev );
                   }
+                  // if no previous sibling visible, let's go up the parent level
                   var $parent = $el.parent();
                   if ( $parent.length > 0 ) {
                       return sniffFirstVisiblePrevElement( $parent );
                   }
+                  // we don't have siblings or parent
                   return null;
             };
+
+            // Is the candidate visible ? <= not display:none
+            // If not visible, we can't determine the offset().top because of https://github.com/presscustomizr/nimble-builder/issues/363
+            // So let's sniff up in the DOM to find the first visible sibling or container
             var $el_candidate = sniffFirstVisiblePrevElement( $(element) );
             if ( !$el_candidate || $el_candidate.length < 1 )
               return false;
@@ -1376,6 +1898,8 @@
                 it  = $el_candidate.offset().top,
                 ib  = it + $el_candidate.height(),
                 th = this.options.threshold;
+
+            //force all images to visible if first scroll option enabled
             if ( _evt && 'scroll' == _evt.type && this.options.load_all_images_on_first_scroll )
               return true;
 
@@ -1400,7 +1924,11 @@
             $_el.unbind('sek_load_img');
 
             $jQueryImgToLoad
+                  // .hide()
                   .load( function () {
+                        //https://api.jquery.com/removeAttr/
+                        //An attribute to remove; as of version 1.7, it can be a space-separated list of attributes.
+                        //minimum supported wp version (3.4+) embeds jQuery 1.7.2
                         $_el.removeAttr( [ 'data-sek-src', 'data-sek-srcset', 'data-sek-sizes' ].join(' ') );
                         if( $_el.data("sek-lazy-bg") ){
                               $_el.css('backgroundImage', 'url('+_src+')');
@@ -1413,13 +1941,18 @@
                                     $_el.attr("sizes", _sizes );
                               }
                         }
+                        //prevent executing this twice on an already smartloaded img
                         if ( ! $_el.hasClass('sek-lazy-loaded') ) {
                               $_el.addClass('sek-lazy-loaded');
                         }
+                        //Following would be executed twice if needed, as some browsers at the
+                        //first execution of the load callback might still have not actually loaded the img
 
                         $_el.trigger('smartload');
+                        //flag to avoid double triggering
                         $_el.data('sek-lazy-loaded', true );
                   });//<= create a load() fn
+            //http://stackoverflow.com/questions/1948672/how-to-tell-if-an-image-is-loaded-or-cached-in-jquery
             if ( $jQueryImgToLoad[0].complete ) {
                   $jQueryImgToLoad.load();
             }
@@ -1434,6 +1967,8 @@
       Plugin.prototype._load_iframe = function( _el_ ) {
             var $_el    = $(_el_),
                 self = this;
+
+            //$_el.addClass('lazy-loading');
             $_el.unbind('sek_load_iframe');
 
             $_el.attr( 'src', function() {
@@ -1446,7 +1981,11 @@
                   }
                   return src;
             });
+            //$_el.removeClass('lazy-loading');
       };
+
+
+      // prevents against multiple instantiations
       $.fn[pluginName] = function ( options ) {
             return this.each(function () {
                   if (!$.data(this, 'plugin_' + pluginName)) {
@@ -1463,6 +2002,7 @@
  * ===================================================
 */
 (function ( $, window ) {
+      //defaults
       var pluginName = 'parallaxBg',
           defaults = {
                 parallaxForce : 40,
@@ -1472,6 +2012,7 @@
 
       function Plugin( element, options ) {
             this.element         = $(element);
+            //this.element_wrapper = this.element.closest( '.parallax-wrapper' );
             this.options         = $.extend( {}, defaults, options, this.parseElementDataOptions() ) ;
             this._defaults       = defaults;
             this._name           = pluginName;
@@ -1481,13 +2022,20 @@
       Plugin.prototype.parseElementDataOptions = function () {
             return this.element.data();
       };
+
+      //can access this.element and this.option
+      //@return void
       Plugin.prototype.init = function () {
             var self = this;
+            //cache some element
             this.$_window     = $(window);
             this.doingAnimation = false;
             this.isVisible = false;
             this.isBefore = false;//the element is before the scroll point
             this.isAfter = true;// the element is after the scroll point
+
+            // normalize the parallax ratio
+            // must be a number 0 > ratio > 100
             if ( 'number' !== typeof( self.options.parallaxForce ) || self.options.parallaxForce < 0 ) {
                   if ( sekFrontLocalized.isDevMode ) {
                         console.log('parallaxBg => the provided parallaxForce is invalid => ' + self.options.parallaxForce );
@@ -1497,13 +2045,20 @@
             if ( self.options.parallaxForce > 100 ) {
                   self.options.parallaxForce = 100;
             }
+
+            //the scroll event gets throttled with the requestAnimationFrame
             this.$_window.scroll( function(_evt) { self.maybeParallaxMe(); } );
+            //debounced resize event
             this.$_window.resize( _utils_.debounce( function(_evt) {
                   self.maybeParallaxMe();
             }, 100 ) );
+
+            //on load
             this.checkIfIsVisibleAndCacheProperties();
             this.setTopPositionAndBackgroundSize();
       };
+
+      //@see https://www.paulirish.com/2012/why-moving-elements-with-translate-is-better-than-posabs-topleft/
       Plugin.prototype.setTopPositionAndBackgroundSize = function() {
             var self = this,
                 $element       = this.element,
@@ -1512,7 +2067,10 @@
                 offsetTop = $element.offset().top,
                 scrollTop = this.$_window.scrollTop(),
                 percentOfPage = 100;
+
+            // the percentOfPage can vary from -1 to 1
             if ( this.isVisible ) {
+                  //percentOfPage = currentDistanceToMiddleScreen / maxDistanceToMiddleScreen;
                   percentOfPage = ( offsetTop - scrollTop ) / winHeight;
             } else if ( this.isBefore ) {
                   percentOfPage = 1;
@@ -1531,8 +2089,13 @@
                   ].join('')
             });
       };
+
+      // When does the image enter the viewport ?
       Plugin.prototype.checkIfIsVisibleAndCacheProperties = function( _evt ) {
           var $element = this.element;
+          // bail if the level is display:none;
+          // because $.offset() won't work
+          // see because of https://github.com/presscustomizr/nimble-builder/issues/363
           if ( ! $element.is(':visible') )
               return false;
 
@@ -1540,15 +2103,22 @@
               wb = scrollTop + this.$_window.height(),
               offsetTop  = $element.offset().top,
               ib  = offsetTop + $element.outerHeight();
+
+          // Cache now
           this.isVisible = ib >= scrollTop && offsetTop <= wb;
           this.isBefore = offsetTop > wb ;//the element is before the scroll point
           this.isAfter = ib < scrollTop;// the element is after the scroll point
           return this.isVisible;
       };
+
+      // a throttle is implemented with window.requestAnimationFrame
       Plugin.prototype.maybeParallaxMe = function() {
             var self = this;
             if ( ! this.checkIfIsVisibleAndCacheProperties() )
               return;
+
+            //options.matchMedia is set to 'only screen and (max-width: 768px)' by default
+            //if a match is found, then reset the top position
             if ( _utils_.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
                   this.element.css({'background-position-y' : '', 'background-attachment' : '' });
                   return;
@@ -1562,6 +2132,8 @@
                   });
             }
       };
+
+      // prevents against multiple instantiations
       $.fn[pluginName] = function ( options ) {
           return this.each(function () {
               if (!$.data(this, 'plugin_' + pluginName)) {
@@ -1577,6 +2149,7 @@
 jQuery(function($){
       $('[data-sek-module-type="czr_image_module"]').each( function() {
             $linkCandidate = $(this).find('.sek-link-to-img-lightbox');
+            // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
             if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
               return;
             if ( 'function' !== typeof( $.fn.magnificPopup ) )
@@ -1624,6 +2197,10 @@ jQuery(function($){
       $('[data-sek-bg-parallax="true"]').each( function() {
             $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
       });
+      // When previewing, react to level refresh
+      // This can occur to any level. We listen to the bubbling event on 'body' tag
+      // and salmon up to maybe instantiate any missing candidate
+      // Example : when a preset_section is injected
       $('body').on('sek-level-refreshed sek-section-added', function( evt ){
             if ( "true" === $(this).data('sek-bg-parallax') ) {
                   $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
@@ -1644,6 +2221,7 @@ jQuery( function($){
           $(".sek-module-placeholder").each( function() {
                 $(this).fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
           });
+          // Delegate instantiation
           $('.sektion-wrapper').on(
                 'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed',
                 'div[data-sek-level="section"]',
@@ -1653,6 +2231,14 @@ jQuery( function($){
           );
 
     };
+    //doFitText();
+    // if ( 'function' == typeof(_) && ! _utils_.isUndefined( wp.customize ) ) {
+    //     wp.customize.selectiveRefresh.bind('partial-content-rendered' , function() {
+    //         doFitText();
+    //     });
+    // }
+
+    // animate menu item to Nimble anchors
     $('body').find('.sek-menu-module, .menu, .nav' ).on( 'click', '.menu-item [href^="#"]', function( evt ){
           evt.preventDefault();
           var anchorCandidate = $(this).attr('href');
@@ -1674,7 +2260,9 @@ jQuery( function($){
  *  MENU
 /* ------------------------------------------------------------------------- */
 jQuery( function($){
+    //DROPDOWN
     var Dropdown = function() {
+          //dropdown
           var DATA_KEY  = 'sek.sekDropdown',
               EVENT_KEY = '.' + DATA_KEY,
               Event     = {
@@ -1701,15 +2289,22 @@ jQuery( function($){
                 PARENTS                  : '.sek-nav-wrap .menu-item-has-children',
                 SNAKE_PARENTS            : '.sek-nav-wrap .menu-item-has-children',
               };
+
+          // unify all the dropdowns classes whether the menu is a proper menu or the all pages fall-back
           $( '.sek-nav .children, .sek-nav .sub-menu' ).addClass( ClassName.DROPDOWN );
           $( '.sek-nav-wrap .page_item_has_children' ).addClass( ClassName.PARENTS );
           $( '.sek-nav' + ' .' + ClassName.DROPDOWN + ' .' + ClassName.PARENTS ).addClass( ClassName.DROPDOWN_SUBMENU );
+
+          //Handle dropdown on hover via js
           var dropdownMenuOnHover = function() {
                 var _dropdown_selector = Selector.HOVER_PARENT;
 
                 function _addOpenClass () {
                       var $_el = $(this);
+
+                      //a little delay to balance the one added in removing the open class
                       var _debounced_addOpenClass = _utils_.debounce( function() {
+                            //do nothing if menu is mobile
                             if( 'static' == $_el.find( '.'+ClassName.DROPDOWN ).css( 'position' ) ) {
                                   return false;
                             }
@@ -1732,6 +2327,8 @@ jQuery( function($){
                 function _removeOpenClass () {
 
                       var $_el = $(this);
+
+                      //a little delay before closing to avoid closing a parent before accessing the child
                       var _debounced_removeOpenClass = _utils_.debounce( function() {
                             if ( $_el.find("ul li:hover").length < 1 && ! $_el.closest('ul').find('li:hover').is( $_el ) ) {
                                   $_el.trigger( Event.HIDE )
@@ -1748,19 +2345,25 @@ jQuery( function($){
 
                       _debounced_removeOpenClass();
                 }
+
+                //BIND
                 $( document )
                     .on( 'mouseenter', _dropdown_selector, _addOpenClass )
                     .on( 'mouseleave', _dropdown_selector , _removeOpenClass );
           },
+
+          //SNAKE
           dropdownPlacement = function() {
                 var isRTL = 'rtl' === $('html').attr('dir'),
                     doingAnimation = false;
 
                 $(window)
+                    //on resize trigger Event.PLACE on active dropdowns
                     .on( 'resize', function() {
                             if ( ! doingAnimation ) {
                                   doingAnimation = true;
                                   window.requestAnimationFrame(function() {
+                                    //trigger a placement on the open dropdowns
                                     $( Selector.SNAKE_PARENTS+'.'+ClassName.SHOW)
                                         .trigger(Event.PLACE_ME);
                                     doingAnimation = false;
@@ -1771,13 +2374,19 @@ jQuery( function($){
 
                 $( document )
                     .on( Event.PLACE_ALL, function() {
+                                //trigger a placement on all
                                 $( Selector.SNAKE_PARENTS )
                                     .trigger(Event.PLACE_ME);
                     })
+                    //snake bound on menu-item shown and place
                     .on( Event.SHOWN+' '+Event.PLACE_ME, Selector.SNAKE_PARENTS, function(evt) {
                       evt.stopPropagation();
                       _do_snake( $(this), evt );
                     });
+
+
+                //snake
+                //$_el is the menu item with children whose submenu will be 'snaked'
                 function _do_snake( $_el, evt ) {
                       if ( !( evt && evt.namespace && DATA_KEY === evt.namespace ) ) {
                             return;
@@ -1789,6 +2398,8 @@ jQuery( function($){
                       if ( !$_dropdown.length ) {
                             return;
                       }
+
+                      //stage
                       /*
                       * we display the dropdown so that jQuery is able to retrieve exact size and positioning
                       * we also hide whatever overflows the menu item with children whose submenu will be 'snaked'
@@ -1807,6 +2418,8 @@ jQuery( function($){
                       });
 
                       _maybe_move( $_dropdown, $_el );
+
+                      //unstage
                       $_dropdown.css({
                         'zIndex'  : '',
                         'display' : ''
@@ -1817,9 +2430,11 @@ jQuery( function($){
 
                 function _maybe_move( $_dropdown, $_el ) {
                       var Direction          = isRTL ? {
+                                //when in RTL we open the submenu by default on the left side
                                 _DEFAULT          : 'left',
                                 _OPPOSITE         : 'right'
                           } : {
+                                //when in LTR we open the submenu by default on the right side
                                 _DEFAULT          : 'right',
                                 _OPPOSITE         : 'left'
                           },
@@ -1827,6 +2442,7 @@ jQuery( function($){
                                 OPEN_PREFIX       : 'open-',
                                 DD_SUBMENU        : 'sek-dropdown-submenu',
                                 CARET_TITLE_FLIP  : 'sek-menu-link__row-reverse',
+                                //CARET             : 'caret__dropdown-toggler',
                                 DROPDOWN          : 'sek-dropdown-menu'
                           },
                           _caret_title_maybe_flip = function( $_el, _direction, _old_direction ) {
@@ -1840,25 +2456,39 @@ jQuery( function($){
                                 });
                           },
                           _setOpenDirection       = function( _direction ) {
+                                //retrieve the old direction => used to remove the old direction class
                                 var _old_direction = _direction == Direction._OPPOSITE ? Direction._DEFAULT : Direction._OPPOSITE;
+
+                                //tell the dropdown to open on the direction _direction (hence remove the old direction class)
                                 $_dropdown.removeClass( ClassName.OPEN_PREFIX + _old_direction ).addClass( ClassName.OPEN_PREFIX + _direction );
                                 if ( $_el.hasClass( ClassName.DD_SUBMENU ) ) {
                                       _caret_title_maybe_flip( $_el, _direction, _old_direction );
+                                      //make the first level submenus caret inherit this
                                       _caret_title_maybe_flip( $_dropdown.children( '.' + ClassName.DD_SUBMENU ), _direction, _old_direction );
                                 }
                           };
+
+                      //snake inheritance
                       if ( $_dropdown.parent().closest( '.'+ClassName.DROPDOWN ).hasClass( ClassName.OPEN_PREFIX + Direction._OPPOSITE ) ) {
+                            //open on the opposite direction
                             _setOpenDirection( Direction._OPPOSITE );
                       } else {
+                            //open on the default direction
                             _setOpenDirection( Direction._DEFAULT );
                       }
+
+                      //let's compute on which side open the dropdown
                       if ( $_dropdown.offset().left + $_dropdown.width() > $(window).width() ) {
+                            //open on the left
                             _setOpenDirection( 'left' );
                       } else if ( $_dropdown.offset().left < 0 ) {
+                            //open on the right
                             _setOpenDirection( 'right' );
                       }
                 }//_maybe_move
           };//dropdownPlacement
+
+          //FireAll
           dropdownMenuOnHover();
           dropdownPlacement();
     },
@@ -1897,12 +2527,16 @@ jQuery( function($){
                         'height' : ''
                   });
             };
+
+          //bind
           $(document).on( Event.CLICK_DATA_API, Selector.DATA_TOGGLE, function (event) {
+                // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
                 if (event.currentTarget.tagName === 'A') {
                       event.preventDefault();
                 }
 
                 var $toggler             = $(this),
+                   //get the data toggle
                    _collapsible_selector = $toggler.data('target');
 
                 $(_collapsible_selector).each( function () {
@@ -1934,6 +2568,7 @@ jQuery( function($){
                                         event       = Event.SHOWN;
                                   }
                                   $collapsible.removeClass(ClassName.COLLAPSING + ' ' + removeClass).addClass( addClass ).trigger(event);
+                                  //remove all the inline style added by the slideUp/Down methods
                                   _onSlidingCompleteResetCSS( $collapsible );
                             }
                       });//end slideUp/slideDown
@@ -1944,6 +2579,8 @@ jQuery( function($){
 
     Dropdown();
     SimpleCollapse();
+
+    // handle the mobile hamburger hover effect
     $( document )
           .on( 'mouseenter', '.sek-nav-toggler', function(){ $(this).addClass( 'hovering' ); } )
           .on( 'mouseleave', '.sek-nav-toggler', function(){ $(this).removeClass( 'hovering' ); } )
@@ -1952,19 +2589,46 @@ jQuery( function($){
                 $(window).trigger('scroll');
           });
 
-
+    // How to have a logo plus an hamburger in mobiles on the same line?
+    // => clone the menu module, and append it to the closest sektion-inner wrapper
+    // => this way it will occupy 100% of the width
+    // => and also the clone inherits the style of the module
+    // https://github.com/presscustomizr/nimble-builder/issues/368
     $( document ).on( 'ready', function() {
-            $( '[data-sek-module-type="czr_menu_module"]' ).each( function() {
-                  var $_mobile_menu_module  = $(this).clone(true),
-                      _new_id        = $( '.sek-nav-collapse', this ).attr('id') + '-mobile';
+            var _doMobileMenuSetup = function() {
+                  $( '[data-sek-module-type="czr_menu_module"]' ).find('[data-sek-expand-below="yes"]').each( function() {
+                        // make sure we don't do the setup twice when customizing
+                        if ( true === $(this).data('sek-setup-menu-mobile-expanded-below-done') )
+                          return;
 
-                  $_mobile_menu_module
-                        .appendTo( $(this).closest( '.sek-sektion-inner' ) )
-                        .wrap( '<div class="sek-col-base sek-mobile-menu" id="'+_new_id+'-wrapper"></div>');
-                  $( '.sek-nav-collapse', '#'+_new_id+'-wrapper' ).attr( 'id', _new_id );
-                  $( '.sek-nav-toggler', '#'+_new_id+'-wrapper' ).detach();
-                  $( '.sek-nav-toggler', this ).data( 'target', '#' + _new_id )
-                                               .attr( 'aria-controls', _new_id );
+                        var $_mobile_menu_module  = $(this).closest('[data-sek-module-type="czr_menu_module"]').clone(true),
+                            //create a new id for the mobile menu nav collapse that will used by the button toggler too
+                            _new_id = $( '.sek-nav-collapse', this ).attr('id') + '-mobile';
+
+                        $_mobile_menu_module
+                              /// place the mobile menu at the end of this sektion inner
+                              .appendTo( $(this).closest( '.sek-sektion-inner' ) )
+                              //wrap in a convenient div for styling and targeting
+                              .wrap( '<div class="sek-col-base sek-mobile-menu-expanded-below" id="'+_new_id+'-wrapper"></div>');
+
+                        // assign the new id to the mobile nav collapse
+                        $( '.sek-nav-collapse', '#'+_new_id+'-wrapper' ).attr( 'id', _new_id );
+                        // remove the duplicate button
+                        $( '.sek-nav-toggler', '#'+_new_id+'-wrapper' ).detach();
+                        // update the toggler button so that will now refer to the "cloned" mobile menu
+                        $( '.sek-nav-toggler', this ).data( 'target', '#' + _new_id )
+                                                     .attr( 'aria-controls', _new_id );
+                        // flag setup done
+                        $(this).data('sek-setup-menu-mobile-expanded-below-done', true );
+                  });//$.each()
+            };
+            _doMobileMenuSetup();
+            // When previewing, react to level refresh
+            // This can occur to any level. We listen to the bubbling event on 'body' tag
+            $('body').on('sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added', function( evt ){
+                    // clean the previously duplicated menu if any
+                    $('.sek-mobile-menu-expanded-below').remove();
+                    _doMobileMenuSetup();
             });
     });
 });

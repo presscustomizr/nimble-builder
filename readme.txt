@@ -6,7 +6,7 @@ Tags: page builder, customizer, drag and drop, header, footer, landing page
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.0
-Stable tag: 1.4.15-alpha
+Stable tag: 1.5.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,10 +56,14 @@ You'll find an online knowledge base for the Nimble builder here : [Nimble build
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.4.14 =
-Improved compatibility with Yoast SEO plugin.
+= 1.5.0 =
+Introducing a section navigation UI. A new interface allowing users to navigate in the structure of Nimble Builder elements : locations, sections, columns and modules. Added a new option for the Menu module to expand the mobile menu in full width below the hamburger icon.
 
 == Changelog ==
+= 1.5.0 : March 5th 2019 =
+* added : [menu module] a new option to expand the mobile menu in full width below the hamburger icon.
+* added : a new user interface for section navigation, allowing users to navigate in the structure of Nimble Builder elements : locations, sections, columns and modules.
+
 = 1.4.14 : February 26th, 2019 =
 * fixed : compatibility issue with Yoast SEO plugin. Sections located before and after the_content were not rendered.
 * fixed : add section button could inherit unwanted CSS properties from themes

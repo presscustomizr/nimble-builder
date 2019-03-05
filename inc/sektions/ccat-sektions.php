@@ -19,6 +19,7 @@ if ( ! defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_N
 if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
 if ( ! defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'nimble-widget-area-' ); }
 if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) { define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION ); }
+if ( ! defined( 'NIMBLE_MODULE_ICON_PATH' ) ) { define( 'NIMBLE_MODULE_ICON_PATH' , NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' ); }
 
 
 /* ------------------------------------------------------------------------- *
@@ -1173,6 +1174,119 @@ function sek_is_pro() {
 function sek_is_customize_previewing_a_changeset_post() {
     return !( defined('DOING_AJAX') && DOING_AJAX ) && is_customize_preview() && !isset( $_REQUEST['customize_messenger_channel']);
 }
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  MODULES
+/* ------------------------------------------------------------------------- */
+function sek_get_module_collection() {
+    return array(
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_tiny_mce_editor_module',
+          'title' => __( 'WordPress Editor', 'text_doma' ),
+          'icon' => 'Nimble_rich-text-editor_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_image_module',
+          'title' => __( 'Image', 'text_doma' ),
+          'icon' => 'Nimble__image_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_heading_module',
+          'title' => __( 'Heading', 'text_doma' ),
+          'icon' => 'Nimble__heading_icon.svg'
+        ),
+
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_icon_module',
+          'title' => __( 'Icon', 'text_doma' ),
+          'icon' => 'Nimble__icon_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_button_module',
+          'title' => __( 'Button', 'text_doma' ),
+          'icon' => 'Nimble_button_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_map_module',
+          'title' => __( 'Map', 'text_doma' ),
+          'icon' => 'Nimble_map_icon.svg'
+        ),
+
+        array(
+          'content-type' => 'preset_section',
+          'content-id' => 'two_columns',
+          'title' => __( 'Two Columns', 'text_doma' ),
+          'icon' => 'Nimble_2-columns_icon.svg'
+        ),
+        array(
+          'content-type' => 'preset_section',
+          'content-id' => 'three_columns',
+          'title' => __( 'Three Columns', 'text_doma' ),
+          'icon' => 'Nimble_3-columns_icon.svg'
+        ),
+        array(
+          'content-type' => 'preset_section',
+          'content-id' => 'four_columns',
+          'title' => __( 'Four Columns', 'text_doma' ),
+          'icon' => 'Nimble_4-columns_icon.svg'
+        ),
+
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_simple_html_module',
+          'title' => __( 'Html Content', 'text_doma' ),
+          'icon' => 'Nimble_html_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_quote_module',
+          'title' => __( 'Quote', 'text_doma' ),
+          'icon' => 'Nimble_quote_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_spacer_module',
+          'title' => __( 'Spacer', 'text_doma' ),
+          'icon' => 'Nimble__spacer_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_divider_module',
+          'title' => __( 'Divider', 'text_doma' ),
+          'icon' => 'Nimble__divider_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_simple_form_module',
+          'title' => __( 'Simple Contact Form', 'text_doma' ),
+          'icon' => 'Nimble_contact-form_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_widget_area_module',
+          'title' => __( 'WordPress widget area', 'text_doma' ),
+          'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
+          'active' => sek_is_header_footer_enabled()
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_menu_module',
+          'title' => __( 'Menu', 'text_doma' ),
+          'font_icon' => '<i class="material-icons">menu</i>',
+          'active' => sek_is_header_footer_enabled()
+        ),
+
+
+    );
+}
 ?><?php
 add_action( 'admin_bar_menu', '\Nimble\sek_add_customize_link', 1000 );
 function sek_add_customize_link() {
@@ -1547,6 +1661,18 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
 
     return $post;
 }
+
+/**
+ * Fetch the revisions of the `nimble_post_type` post for a given {skope_id}
+ *
+ * @since 4.7.0
+ *
+ * @param string $stylesheet Optional. A theme object stylesheet name. Defaults to the current theme.
+ * @return WP_Post|null The skope post or null if none exists.
+ */
+
+
+
 
 /**
  * Fetch the saved collection of sektion for a given skope_id / location
@@ -2456,6 +2582,8 @@ function sek_register_modules() {
             'sek_footer_sec_picker_module',
             'czr_menu_module',
             'czr_menu_content_child',
+            'czr_menu_mobile_options',
+
             'czr_widget_area_module'
         ]);
     }
@@ -5996,6 +6124,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                     'default'    => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
+                    'notice_after' => __( 'You can also customize the text color on mouseover in the group of text settings below.', 'text_doma')
                 ),
                 'border-type' => array(
                     'input_type'  => 'select',
@@ -7114,7 +7243,9 @@ function sek_get_module_params_for_czr_menu_module() {
         'is_father' => true,
         'children' => array(
             'content' => 'czr_menu_content_child',
-            'font' => 'czr_font_child'
+            'font' => 'czr_font_child',
+            'mobile_options' => 'czr_menu_mobile_options'
+
         ),
         'name' => __( 'Menu', 'text_doma' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
@@ -7124,8 +7255,9 @@ function sek_get_module_params_for_czr_menu_module() {
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/menu_module_tmpl.php"
     );
 }
- /* ------------------------------------------------------------------------- *
- *  BUTTON CONTENT
+
+/* ------------------------------------------------------------------------- *
+ *  MENU CONTENT
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_menu_content_child() {
     return array(
@@ -7156,6 +7288,29 @@ function sek_get_module_params_for_czr_menu_content_child() {
                     'css_selectors' => array( '.sek-nav-collapse', '.sek-nav-wrap' ),
                     'title_width' => 'width-100',
                     'width-100'   => true,
+                ),
+            ),
+        ),
+        'render_tmpl_path' => '',
+    );
+}
+
+/* ------------------------------------------------------------------------- *
+ * MOBILE OPTIONS
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_menu_mobile_options() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_menu_mobile_options',
+        'name' => __( 'Settings for mobile devices', 'text_doma' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'expand_below' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => sprintf('%s %s', '<i class="material-icons sek-level-option-icon">devices</i>', __('On mobile devices, expand the menu in full width below the menu hamburger icon.', 'text_doma') ),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
                 ),
             ),
         ),
