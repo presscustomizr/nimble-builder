@@ -203,8 +203,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         wrapContentLocationWithHeaderFoooterLocations('global');
                   }
 
+                  // RE-ORDER LOCATIONS IN THE SAME ORDER AS THEY ARE IN THE DOM
+                  // @see ::initialize to understand how active locations are updated
+                  var contextuallyActiveLocactions = self.activeLocations(),
+                      orderedCollection = [],
+                      candidate;
+                  if ( !_.isEmpty(contextuallyActiveLocactions) ) {
+                        _.each( contextuallyActiveLocactions, function( loc ) {
+                              candidate = _.findWhere(filteredCollection, {id:loc});
+                              if( !_.isUndefined(candidate) ) {
+                                    orderedCollection.push(candidate);
+                              }
+                        });
+                  } else {
+                        orderedCollection = filteredCollection;
+                  }
+
                   // Store it now
-                  self.levelTree( filteredCollection );
+                  self.levelTree( orderedCollection );
             },
 
 
@@ -257,6 +273,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         levelName = levelType;
 
                         // if the level is a location, is this location contextually active ?
+                        // @see ::initialize to understand how active locations are updated
                         if ( 'location' === levelType ) {
                               skipLevel = !_.contains( self.activeLocations(), _level_param.id );
                         }
