@@ -95,6 +95,37 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
 }
 
 /**
+ * Fetch the revisions of the `nimble_post_type` post for a given {skope_id}
+ *
+ * @since 4.7.0
+ *
+ * @param string $stylesheet Optional. A theme object stylesheet name. Defaults to the current theme.
+ * @return WP_Post|null The skope post or null if none exists.
+ */
+// function sek_get_seks_post_revisions( $skope_id = '', $skope_level = 'local' ) {
+//     //sek_error_log('skope_id in sek_get_seks_post => ' . $skope_id );
+//     if ( empty( $skope_id ) ) {
+//         $skope_id = skp_get_skope_id( $skope_level );
+//     }
+//     $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+//     $post_id = (int)get_option( $option_name );
+//     error_log('$post_id ??' . $post_id);
+//     $revision_history = array();
+//     if ( -1 !== $post_id ) {
+//         $args = array(
+//             'post_parent' => $post_id, // id
+//             'post_type' => 'revision',
+//             'post_status' => 'inherit'
+//         );
+//         $revision_history = get_children($args);
+//     }
+//     return $revision_history;
+// }
+
+
+
+
+/**
  * Fetch the saved collection of sektion for a given skope_id / location
  *
  * @since 4.7.0
