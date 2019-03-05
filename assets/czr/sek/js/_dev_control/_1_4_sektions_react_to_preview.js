@@ -737,7 +737,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       '<span style="font-size:0.95em">',
                                                         '<strong>' + er + '</strong>',
                                                         '<br>',
-                                                        sektionsLocalizedData.i18n['If this problem locks the Nimble builder, you might try to reset the sections for this page.'],
+                                                        sektionsLocalizedData.i18n['If this problem locks Nimble Builder, you can try resetting the sections of this page.'],
                                                         '<br>',
                                                         '<span style="text-align:center;display:block">',
                                                           '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',

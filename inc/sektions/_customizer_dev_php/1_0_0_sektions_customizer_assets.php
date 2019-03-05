@@ -377,7 +377,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_doma'),
             "A section must have at least one column." => __( "A section must have at least one column.", 'text_doma'),
 
-            'If this problem locks the Nimble builder, you might try to reset the sections for this page.' => __('If this problem locks the Nimble builder, you might try to reset the sections for this page.', 'text_doma'),
+            'If this problem locks Nimble Builder, you can try resetting the sections of this page.' => __('If this problem locks Nimble Builder, you can try resetting the sections of this page.', 'text_doma'),
             'Reset' => __('Reset', 'text_doma'),
             'Reset complete' => __('Reset complete', 'text_doma'),
 
