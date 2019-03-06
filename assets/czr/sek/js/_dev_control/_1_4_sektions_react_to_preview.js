@@ -607,17 +607,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // }
                             'sek-notify' : function( params ) {
                                   sendToPreview = false;
+                                  var notif_id = params.notif_id || 'sek-notify';
                                   return $.Deferred(function() {
                                         api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
-                                              api.notifications.add( new api.Notification( 'sek-notify', {
+                                              api.notifications.add( new api.Notification( notif_id, {
                                                     type: params.type || 'info',
                                                     message:  params.message,
                                                     dismissible: true
-                                              } ) );
+                                              }));
 
                                               // Removed if not dismissed after 5 seconds
                                               _.delay( function() {
-                                                    api.notifications.remove( 'sek-notify' );
+                                                    api.notifications.remove( notif_id );
                                               }, params.duration || 5000 );
                                         });
                                         // always pass the local or global skope of the currently customized location id when resolving the promise.
