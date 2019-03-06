@@ -501,7 +501,7 @@ class Sek_Dyn_CSS_Handler {
 
     //@return string
     private function sek_get_gfont_print_candidates() {
-        // in a front end, not logged in scenario, the sek_model is 'not set', because the stylesheet has not been re-built in the constructor
+        // in a front end, not logged-in scenario, the sek_model is 'not set', because the stylesheet has not been re-built in the constructor
         $sektions = 'no_set' === $this->sek_model ? sek_get_skoped_seks( $this -> skope_id ) : $this->sek_model;
         $print_candidates = '';
 
