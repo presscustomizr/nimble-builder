@@ -94,7 +94,9 @@ function sek_enqueue_controls_js_css() {
                 'registeredLocations' => sek_get_locations(),
                 // added for the module tree #359
                 'moduleCollection' => sek_get_module_collection(),
-                'moduleIconPath' => NIMBLE_MODULE_ICON_PATH
+                'moduleIconPath' => NIMBLE_MODULE_ICON_PATH,
+
+                'hasActiveCachePlugin' => sek_has_active_cache_plugin()
             )
         )
     );//wp_localize_script()
@@ -485,6 +487,10 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'No sections to navigate' => __('No sections to navigate', 'text_dom'),
             'Remove this element' => __('Remove this element', 'text_dom'),
 
+            // Cache plugin warning
+            // @see https://github.com/presscustomizr/nimble-builder/issues/395
+            'You seem to be using a cache plugin.' => __('You seem to be using a cache plugin.', 'text_dom'),
+            'It is recommended to disable your cache plugin when customizing your website.' => __('It is recommended to disable your cache plugin when customizing your website.', 'text_dom'),
             // 'Module' => __('Module', 'text_doma'),
             // 'Module' => __('Module', 'text_doma'),
             // 'Module' => __('Module', 'text_doma'),
@@ -642,5 +648,58 @@ function sek_print_nimble_customizer_tmpl() {
     <?php
 }
 
+// Introduced for https://github.com/presscustomizr/nimble-builder/issues/395
+function sek_has_active_cache_plugin() {
+    $cache_plugins = array(
+        'WP Fastest Cache' => 'wp-fastest-cache/wpFastestCache.php',
+        'W3 Total Cache' => 'w3-total-cache/w3-total-cache.php',
+        'LiteSpeed Cache' => 'litespeed-cache/litespeed-cache.php',
+        'WP Super Cache' => 'wp-super-cache/wp-cache.php',
+        'Cache Enabler' => 'cache-enabler/cache-enabler.php',
+        'Autoptimize' => 'autoptimize/autoptimize.php',
+        'CachePress' => 'sg-cachepress/sg-cachepress.php',
+        'Comet Cache' => 'comet-cache/comet-cache.php'
+    );
+    $active = null;
+    foreach ( $cache_plugins as $plug_name => $plug_file ) {
+        if( !is_null($active) )
+          break;
+        if ( sek_is_plugin_active( $plug_file ) )
+          $active = $plug_name;
+    }
+    return $active;
+}
 
+/**
+* HELPER
+* Check whether the plugin is active by checking the active_plugins list.
+* copy of is_plugin_active declared in wp-admin/includes/plugin.php
+*
+*
+* @param string $plugin Base plugin path from plugins directory.
+* @return bool True, if in the active plugins list. False, not in the list.
+*/
+function sek_is_plugin_active( $plugin ) {
+  return in_array( $plugin, (array) get_option( 'active_plugins', array() ) ) || sek_is_plugin_active_for_network( $plugin );
+}
+
+
+/**
+* HELPER
+* Check whether the plugin is active for the entire network.
+* copy of is_plugin_active_for_network declared in wp-admin/includes/plugin.php
+*
+* @param string $plugin Base plugin path from plugins directory.
+* @return bool True, if active for the network, otherwise false.
+*/
+function sek_is_plugin_active_for_network( $plugin ) {
+  if ( ! is_multisite() )
+    return false;
+
+  $plugins = get_site_option( 'active_sitewide_plugins');
+  if ( isset($plugins[$plugin]) )
+    return true;
+
+  return false;
+}
 ?>
