@@ -1070,6 +1070,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // For all scenarios but section injection, we can update the sektion setting now
                               // otherwise we need to wait for the injection to be processed asynchronously
+                              // CRITICAL => __updateAPISettingDeferred__ has to be resolved / rejected
+                              // otherwise this can lead to scenarios where a change is not taken into account in ::updateAPISettingAndExecutePreviewActions
+                              // like in https://github.com/presscustomizr/nimble-builder/issues/373
                               if ( '_not_injection_scenario_' === __presetSectionInjected__ ) {
                                     mayBeUpdateSektionsSetting();
                                     // At this point the __updateAPISettingDeferred__ obj can't be in a 'pending' state
@@ -1091,6 +1094,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         }
                   });//api( _collectionSettingId_, function( sektionSetInstance ) {}
+
                   return __updateAPISettingDeferred__.promise();
             },//updateAPISetting
 
