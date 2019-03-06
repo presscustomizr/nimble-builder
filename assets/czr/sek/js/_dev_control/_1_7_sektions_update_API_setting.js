@@ -44,7 +44,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             //duplication variable
                             cloneId, //will be passed in resolve()
                             startingModuleValue,// will be populated by the optional starting value specificied on module registration
-                            __presetSectionInjected__ = false,
+                            __presetSectionInjected__ = '_not_injection_scenario_',//this property is turned into a $.Deferred() object in a scenario of section injection
                             parentSektionCandidate;
 
                         // make sure we have a collection array to populate
@@ -1053,9 +1053,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 'pending' == __updateAPISettingDeferred__.state() ) {
                               var mayBeUpdateSektionsSetting = function() {
                                     if ( _.isEqual( currentSetValue, newSetValue ) ) {
-                                          if ( sektionsLocalizedData.isDevMode ) {
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
-                                          }
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
                                           if ( null !== self.validateSettingValue( newSetValue ) ) {
                                                 sektionSetInstance( newSetValue, params );
@@ -1070,12 +1068,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               };//mayBeUpdateSektionsSetting()
 
-                              if ( false === __presetSectionInjected__ ) {
+                              // For all scenarios but section injection, we can update the sektion setting now
+                              // otherwise we need to wait for the injection to be processed asynchronously
+                              if ( '_not_injection_scenario_' === __presetSectionInjected__ ) {
                                     mayBeUpdateSektionsSetting();
+                                    // At this point the __updateAPISettingDeferred__ obj can't be in a 'pending' state
+                                    if ( 'pending' === __updateAPISettingDeferred__.state() ) {
+                                          api.errare( '::updateAPISetting => The __updateAPISettingDeferred__ promise has not been resolved properly.');
+                                    }
                               } else {
                                     __presetSectionInjected__
                                           .done( function() {
                                                mayBeUpdateSektionsSetting();
+                                               // At this point the __updateAPISettingDeferred__ obj can't be in a 'pending' state
+                                               if ( 'pending' === __updateAPISettingDeferred__.state() ) {
+                                                    api.errare( '::updateAPISetting => The __updateAPISettingDeferred__ promise has not been resolved properly.');
+                                               }
                                           })
                                           .fail( function( _er_ ) {
                                                 api.errare( 'updateAPISetting => __presetSectionInjected__ failed', _er_ );
