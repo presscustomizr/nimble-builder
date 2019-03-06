@@ -212,17 +212,17 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
 
-                        <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
                         <?php if ( sek_is_dev_mode() ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
+                        <# if ( true !== data.is_first_section_in_parent ) { #>
+                          <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'text_domain' ); ?>">keyboard_arrow_up</i>
+                        <# } #>
+                        <# if ( true !== data.is_last_section_in_parent ) { #>
+                          <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'text_domain' ); ?>">keyboard_arrow_down</i>
+                        <# } #>
+                        <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it draggable for the moment. @todo ?>
                         <# if ( ! data.is_nested ) { #>
-                          <# if ( true !== data.is_first_section_in_location ) { #>
-                            <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'text_domain' ); ?>">keyboard_arrow_up</i>
-                          <# } #>
-                          <# if ( true !== data.is_last_section_in_location ) { #>
-                            <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'text_domain' ); ?>">keyboard_arrow_down</i>
-                          <# } #>
                           <# if ( true !== data.is_global_location ) { #>
                             <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Drag section', 'text_domain' ); ?>"></i>
                            <# } #>

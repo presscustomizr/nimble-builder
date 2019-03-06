@@ -270,7 +270,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               direction : 'up',
                                               id : params.id,
                                               is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
-                                              location : params.location
+                                              location : params.location,
+                                              in_column : params.in_column//<= will be used when moving a nested section
                                         };
                                         return self.updateAPISetting( apiParams );
                                   },
@@ -291,7 +292,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               direction : 'down',
                                               id : params.id,
                                               is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
-                                              location : params.location
+                                              location : params.location,
+                                              in_column : params.in_column//<= will be used when moving a nested section
                                         };
                                         return self.updateAPISetting( apiParams );
                                   },

@@ -253,18 +253,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
 
-                              // Fired on click on up / down arrows in the ( not nested ) section ui menu
+                              // Fired on click on up / down arrows in the section ui menu
+                              // This handles the nested sections case
                               case 'sek-move-section-up-down' :
                                     //api.infoLog('PARAMS in sek-move-section-up', params );
-
-                                    inLocationCandidate = self.getLevelModel( params.location, newSetValue.collection );
-
-                                    if ( _.isEmpty( inLocationCandidate ) || 'no_match' == inLocationCandidate ) {
+                                    parentCandidate = self.getLevelModel( params.is_nested ? params.in_column : params.location , newSetValue.collection );
+                                    if ( _.isEmpty( parentCandidate ) || 'no_match' == parentCandidate ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
                                     }
-                                    inLocationCandidate.collection = _.isArray( inLocationCandidate.collection ) ? inLocationCandidate.collection : [];
-                                    originalCollection = $.extend( true, [], inLocationCandidate.collection );
-                                    reorderedCollection = $.extend( true, [], inLocationCandidate.collection );
+                                    parentCandidate.collection = _.isArray( parentCandidate.collection ) ? parentCandidate.collection : [];
+                                    originalCollection = $.extend( true, [], parentCandidate.collection );
+                                    reorderedCollection = $.extend( true, [], parentCandidate.collection );
 
                                     var _indexInOriginal = _.findIndex( originalCollection, function( _sec_ ) {
                                           return _sec_.id === params.id;
@@ -276,10 +275,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // Swap up <=> down
                                     var direction = params.direction || 'up';
+
+                                    // prevent absurd movements of a section
+                                    // this should not happen because up / down arrows are not displayed when section is positionned top / bottom
+                                    // but safer to add it
+                                    if ( 'up' !== direction && originalCollection.length === _indexInOriginal + 1 ) {
+                                          throw new Error( 'updateAPISetting => ' + params.action + ' => bottom reached' );
+                                    } else if ( 'up' === direction && 0 === _indexInOriginal ){
+                                          throw new Error( 'updateAPISetting => ' + params.action + ' => top reached' );
+                                    }
+
                                     reorderedCollection[ _indexInOriginal ] = originalCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ];
                                     reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
-
-                                    inLocationCandidate.collection = reorderedCollection;
+                                    parentCandidate.collection = reorderedCollection;
                               break;
 
 

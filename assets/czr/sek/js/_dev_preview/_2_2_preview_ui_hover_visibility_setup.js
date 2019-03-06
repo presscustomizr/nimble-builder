@@ -41,21 +41,33 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               // Let's prepare the is_last and is_first params that we are going to send to the js template
                               // => this will determine which up / down arrow to display in the UI menu for moving a section
                               var $parentLocation = $levelEl.closest('div[data-sek-level="location"]'),
+                                  $parentColumn = $levelEl.closest('div[data-sek-level="column"]'),
+                                  $sectionCollection,
                                   _is_last_section,
-                                  _is_first_section;
+                                  _is_first_section,
+                                  _is_nested =  true === $levelEl.data('sek-is-nested');
 
-                              if ( $parentLocation.length > 0 ) {
-                                    var $sectionCollection = $parentLocation.children( 'div[data-sek-level="section"]' );
-                                    _is_last_section = $sectionCollection.length == $levelEl.index() + 1;
-                                    _is_first_section = 0 === $levelEl.index();
+                              // information about first and last section is used when rendering the up / down moving arrows
+                              if ( _is_nested ) {
+                                    if ( $parentColumn.length > 0 ) {
+                                          $sectionCollection = $parentColumn.find('.sek-column-inner').first().children( 'div[data-sek-level]' );
+                                          _is_last_section = $sectionCollection.length == $levelEl.index() + 1;
+                                          _is_first_section = 0 === $levelEl.index();
+                                    }
+                              } else {
+                                    if ( $parentLocation.length > 0 ) {
+                                          $sectionCollection = $parentLocation.children( 'div[data-sek-level="section"]' );
+                                          _is_last_section = $sectionCollection.length == $levelEl.index() + 1;
+                                          _is_first_section = 0 === $levelEl.index();
+                                    }
                               }
 
                               params = _.extend( params, {
-                                    is_nested : true === $levelEl.data('sek-is-nested'),
+                                    is_nested : _is_nested,
                                     can_have_more_columns : $levelEl.find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
                                     is_global_location : true === $parentLocation.data('sek-is-global-location'),
-                                    is_last_section_in_location : _is_last_section,
-                                    is_first_section_in_location : _is_first_section,
+                                    is_last_section_in_parent : _is_last_section,
+                                    is_first_section_in_parent : _is_first_section,
                                     is_header_location : true === $parentLocation.data('sek-is-header-location'),
                                     is_footer_location : true === $parentLocation.data('sek-is-footer-location')
                               });
