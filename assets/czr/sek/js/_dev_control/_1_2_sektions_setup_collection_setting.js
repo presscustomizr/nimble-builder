@@ -301,8 +301,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   _.each( level.collection, function( _l_ ) {
                                         // Set the parent level now
                                         parentLevel = $.extend( true, {}, level );
-                                        // And walk sub levels
-                                        _checkWalker_( _l_ );
+                                        if ( ! _.isUndefined( _l_ ) ) {
+                                              // And walk sub levels
+                                              _checkWalker_( _l_ );
+                                        } else {
+                                              _errorDetected_('validation error => undefined level ' );
+                                        }
                                   });
                             }
                       }
