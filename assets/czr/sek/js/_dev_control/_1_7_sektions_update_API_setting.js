@@ -9,7 +9,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //    in_column
             // }
             updateAPISetting : function( params ) {
-
                   var self = this,
                       __updateAPISettingDeferred__ = $.Deferred();
 
@@ -20,10 +19,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   params.is_global_location = self.isGlobalLocation( params );
 
                   var _collectionSettingId_ = params.is_global_location ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
-
-                  // Update the sektion collection
-                  api( _collectionSettingId_, function( sektionSetInstance ) {
-                        // sektionSetInstance() = {
+                  var _do_update_setting_id = function() {
+                        // api( _collectionSettingId_)() = {
                         //    collection : [
                         //       'loop_start' :  { level : location,  collection : [ 'sek124' : { collection : [], level : section, options : {} }], options : {}},
                         //       'loop_end' : { level : location, collection : [], options : {}}
@@ -32,7 +29,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //    options : {}
                         //
                         // }
-                        var currentSetValue = sektionSetInstance(),
+                        var currentSetValue = api( _collectionSettingId_ )(),
                             newSetValue = _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
                             locationCandidate,
                             sektionCandidate,
@@ -1052,6 +1049,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // this is then used server side in Sek_Dyn_CSS_Handler::sek_get_gfont_print_candidates to build the Google Fonts request
                                     newSetValue.fonts = currentGfonts;
                               break;
+
+                              //-------------------------------------------------------------------------------------------------
+                              //-- RESTORE A REVISION
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-restore-revision' :
+                                    //api.infoLog( 'sek-restore-revision', params );
+                                    newSetValue = params.revision_value;
+                              break;
                         }// switch
 
 
@@ -1064,7 +1069,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
                                           if ( null !== self.validateSettingValue( newSetValue ) ) {
-                                                sektionSetInstance( newSetValue, params );
+                                                api( _collectionSettingId_ )( newSetValue, params );
                                                 // Add the cloneId to the params when we resolve
                                                 // the cloneId is only needed in the duplication scenarii
                                                 params.cloneId = cloneId;
@@ -1101,8 +1106,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                               }
                         }
-                  });//api( _collectionSettingId_, function( sektionSetInstance ) {}
+                  };//_do_update_setting_id()
 
+
+                  // Update the sektion collection
+                  api( _collectionSettingId_, function( sektionSetInstance ) {
+                        _do_update_setting_id();
+                  });
                   return __updateAPISettingDeferred__.promise();
             },//updateAPISetting
 

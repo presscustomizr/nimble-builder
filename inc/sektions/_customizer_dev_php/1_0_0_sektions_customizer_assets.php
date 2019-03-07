@@ -491,7 +491,13 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // @see https://github.com/presscustomizr/nimble-builder/issues/395
             'You seem to be using a cache plugin.' => __('You seem to be using a cache plugin.', 'text_dom'),
             'It is recommended to disable your cache plugin when customizing your website.' => __('It is recommended to disable your cache plugin when customizing your website.', 'text_dom'),
-            // 'Module' => __('Module', 'text_doma'),
+
+            // Revision history
+            // @see https://github.com/presscustomizr/nimble-builder/issues/392
+            'Revisions history' => __('Revisions history', 'text_doma'),
+            'The revision could not be restored.' => __('The revision could not be restored.', 'text_doma'),
+            'The revision has been successfully restored.' => __('The revision has been successfully restored.', 'text_doma')
+
             // 'Module' => __('Module', 'text_doma'),
             // 'Module' => __('Module', 'text_doma'),
             // 'Module' => __('Module', 'text_doma'),

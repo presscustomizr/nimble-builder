@@ -76,7 +76,9 @@ function sek_enqueue_controls_js_css() {
 
                 'registeredLocations' => sek_get_locations(),
                 'moduleCollection' => sek_get_module_collection(),
-                'moduleIconPath' => NIMBLE_MODULE_ICON_PATH
+                'moduleIconPath' => NIMBLE_MODULE_ICON_PATH,
+
+                'hasActiveCachePlugin' => sek_has_active_cache_plugin()
             )
         )
     );//wp_localize_script()
@@ -436,6 +438,11 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Settings on mobiles' => __('Settings on mobiles', 'text_doma'),
             'No sections to navigate' => __('No sections to navigate', 'text_dom'),
             'Remove this element' => __('Remove this element', 'text_dom'),
+            'You seem to be using a cache plugin.' => __('You seem to be using a cache plugin.', 'text_dom'),
+            'It is recommended to disable your cache plugin when customizing your website.' => __('It is recommended to disable your cache plugin when customizing your website.', 'text_dom'),
+            'Revisions history' => __('Revisions history', 'text_doma'),
+            'The revision could not be restored.' => __('The revision could not be restored.', 'text_doma'),
+            'The revision has been successfully restored.' => __('The revision has been successfully restored.', 'text_doma')
 
         )//array()
     )//array()
@@ -560,8 +567,59 @@ function sek_print_nimble_customizer_tmpl() {
     </script>
     <?php
 }
+function sek_has_active_cache_plugin() {
+    $cache_plugins = array(
+        'WP Fastest Cache' => 'wp-fastest-cache/wpFastestCache.php',
+        'W3 Total Cache' => 'w3-total-cache/w3-total-cache.php',
+        'LiteSpeed Cache' => 'litespeed-cache/litespeed-cache.php',
+        'WP Super Cache' => 'wp-super-cache/wp-cache.php',
+        'Cache Enabler' => 'cache-enabler/cache-enabler.php',
+        'Autoptimize' => 'autoptimize/autoptimize.php',
+        'CachePress' => 'sg-cachepress/sg-cachepress.php',
+        'Comet Cache' => 'comet-cache/comet-cache.php'
+    );
+    $active = null;
+    foreach ( $cache_plugins as $plug_name => $plug_file ) {
+        if( !is_null($active) )
+          break;
+        if ( sek_is_plugin_active( $plug_file ) )
+          $active = $plug_name;
+    }
+    return $active;
+}
+
+/**
+* HELPER
+* Check whether the plugin is active by checking the active_plugins list.
+* copy of is_plugin_active declared in wp-admin/includes/plugin.php
+*
+*
+* @param string $plugin Base plugin path from plugins directory.
+* @return bool True, if in the active plugins list. False, not in the list.
+*/
+function sek_is_plugin_active( $plugin ) {
+  return in_array( $plugin, (array) get_option( 'active_plugins', array() ) ) || sek_is_plugin_active_for_network( $plugin );
+}
 
 
+/**
+* HELPER
+* Check whether the plugin is active for the entire network.
+* copy of is_plugin_active_for_network declared in wp-admin/includes/plugin.php
+*
+* @param string $plugin Base plugin path from plugins directory.
+* @return bool True, if active for the network, otherwise false.
+*/
+function sek_is_plugin_active_for_network( $plugin ) {
+  if ( ! is_multisite() )
+    return false;
+
+  $plugins = get_site_option( 'active_sitewide_plugins');
+  if ( isset($plugins[$plugin]) )
+    return true;
+
+  return false;
+}
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  SETUP DYNAMIC SERVER REGISTRATION FOR SETTING
@@ -786,6 +844,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         break;
         case 'reset_button' :
             sek_set_input_tmpl___reset_button( $input_id, $input_data );
+        break;
+        case 'revision_history' :
+            sek_set_input_tmpl___revision_history( $input_id, $input_data );
         break;
     }
 }
@@ -1628,6 +1689,23 @@ function sek_set_input_tmpl___reset_button( $input_id, $input_data ) {
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
         <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Reset', 'text-domain'); ?>" data-sek-reset-scope="<?php echo $input_data['scope']; ?>"><?php _e('Reset', 'text-domain'); ?></button>
       </div>
+  <?php
+}
+?>
+<?php
+/* ------------------------------------------------------------------------- *
+ *  RESET BUTTON INPUT TEMPLATE
+/* ------------------------------------------------------------------------- */
+function sek_set_input_tmpl___revision_history( $input_id, $input_data ) {
+    ?>
+      <# //console.log( 'IN php::sek_set_input_tmpl___buttons_choice() => data range_slide => ', data ); #>
+      <?php
+        if ( ! is_array( $input_data ) || empty( $input_data['scope'] ) ) {
+            sek_error_log( __FUNCTION__ . ' error => missing scope property' );
+            return;
+        }
+      ?>
+      <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
   <?php
 }
 ?>

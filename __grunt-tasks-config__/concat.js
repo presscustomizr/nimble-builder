@@ -201,6 +201,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_2_sektions_navigate_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_3_sektions_level_tree.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_sektions_save_ui.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_8_sektions_revision_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_2_sektions_setup_collection_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_4_sektions_react_to_preview.js',
 
@@ -235,6 +236,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_1_border_radius.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_2_buttons_choice.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_3_reset_button.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_4_revision_history.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
@@ -256,6 +258,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_3_UI_local_reset.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_4_UI_local_performances.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_5_UI_local_header_footer.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_6_UI_local_revisions.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_1_UI_global_breakpoint.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_2_UI_global_widths.js',
@@ -334,6 +337,7 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/0_7_0_sektions_retro_compatibilities.php',
       '<%= paths.sektions %>_front_dev_php/0_9_0_sektions_functions_seks_post_set_get.php',
       '<%= paths.sektions %>_front_dev_php/0_9_1_sektions_functions_saved_sektions.php',
+      '<%= paths.sektions %>_front_dev_php/0_9_2_sektions_functions_revision_history.php',
 
       // MODULE REGISTRATION
       '<%= paths.sektions %>_front_dev_php/module_registration/10_0_0_sek_module_helpers_for_css_rules_generation.php',
@@ -358,6 +362,7 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_2_local/4_1_3_sek_register_local_reset.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_2_local/4_1_4_sek_register_local_performances.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_2_local/4_1_5_sek_register_local_header_footer.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_2_local/4_1_6_sek_register_local_revisions.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php',
@@ -439,6 +444,7 @@ module.exports = {
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_5_sek_input_tmpl_border_radius.php',
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_6_sek_input_tmpl_buttons_choice.php',
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_7_sek_input_tmpl_reset_button.php',
+        '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_8_sek_input_tmpl_revision_history.php'
       ],
       dest: '<%= paths.sektions %>ccat-czr-sektions.php',
   },

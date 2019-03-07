@@ -75,7 +75,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'widths' => 'sek_local_widths',
             'custom_css' => 'sek_local_custom_css',
             'local_performances' => 'sek_local_performances',
-            'local_reset' => 'sek_local_reset'
+            'local_reset' => 'sek_local_reset',
+            'local_revisions' => 'sek_local_revisions'
         ];
 
         /////////////////////////////////////////////////////////////////

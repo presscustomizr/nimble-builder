@@ -1662,17 +1662,6 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
     return $post;
 }
 
-/**
- * Fetch the revisions of the `nimble_post_type` post for a given {skope_id}
- *
- * @since 4.7.0
- *
- * @param string $stylesheet Optional. A theme object stylesheet name. Defaults to the current theme.
- * @return WP_Post|null The skope post or null if none exists.
- */
-
-
-
 
 /**
  * Fetch the saved collection of sektion for a given skope_id / location
@@ -1938,6 +1927,62 @@ function sek_update_saved_seks_post( $seks_data ) {
     }
     return get_post( $r );
 }
+?><?php
+/* ------------------------------------------------------------------------- *
+ *  REVISION HELPERS
+/* ------------------------------------------------------------------------- */
+/**
+ * Fetch the revisions of the `nimble_post_type` post for a given {skope_id}
+ * @param string $skope_id optional
+ * @return string $skope_level optional
+ */
+function sek_get_seks_post_revision_list( $skope_id = '', $skope_level = 'local' ) {
+    if ( empty( $skope_id ) ) {
+        $skope_id = skp_get_skope_id( $skope_level );
+    }
+    if ( defined('DOING_AJAX') && DOING_AJAX && '_skope_not_set_' === $skope_id ) {
+          wp_send_json_error( __FUNCTION__ . ' => invalid skope id' );
+    }
+    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+    $post_id = (int)get_option( $option_name );
+    $raw_revision_history = array();
+    if ( -1 !== $post_id ) {
+        $args = array(
+            'post_parent' => $post_id, // id
+            'post_type' => 'revision',
+            'post_status' => 'inherit',
+            'orderby' => 'date',
+            'order' => 'DESC',
+        );
+        $raw_revision_history = get_children($args);
+    }
+    $revision_history = array();
+    if ( is_array( $raw_revision_history ) ) {
+        foreach ($raw_revision_history as $post_id => $post_object ) {
+            $revision_history[$post_id] = $post_object->post_date;
+        }
+    }
+    return $revision_history;
+}
+
+
+/**
+ * Fetch the revisions of the `nimble_post_type` post for a given revision post id
+ * @param string $skope_id optional
+ * @return string $skope_level optional
+ */
+function sek_get_single_post_revision( $post_id = null ) {
+    if ( defined('DOING_AJAX') && DOING_AJAX && ( is_null( $post_id ) || !is_numeric( (int)$post_id ) ) ) {
+          wp_send_json_error( __FUNCTION__ . ' => invalid post id' );
+    }
+    $post = get_post( (int)$post_id );
+    if ( is_wp_error( $post ) ) {
+        wp_send_json_error( __FUNCTION__ . ' => post does not exist' );
+        return;
+    }
+    return maybe_unserialize( $post->post_content );
+}
+
 ?><?php
 function sek_generate_css_rules_for_multidimensional_border_options( $rules, $border_settings, $border_type, $css_selectors = '' ) {
     if ( ! is_array( $rules ) )
@@ -2533,6 +2578,7 @@ function sek_register_modules() {
         'sek_local_reset',
         'sek_local_performances',
         'sek_local_header_footer',
+        'sek_local_revisions',
         'sek_global_breakpoint',
         'sek_global_widths',
         'sek_global_performances',
@@ -4143,6 +4189,26 @@ function sek_get_module_params_for_sek_local_header_footer() {
                             __('site wide options', 'text_doma')
                         )
                     ),
+                )
+            )
+        )//tmpl
+    );
+}
+?><?php
+function sek_get_module_params_for_sek_local_revisions() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_local_revisions',
+        'name' => __('Revision history', 'text_doma'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'local_revisions' => array(
+                    'input_type'  => 'revision_history',
+                    'title'       => __('Browse your revision history', 'text_doma'),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
                 )
             )
         )//tmpl
@@ -9001,7 +9067,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'widths' => 'sek_local_widths',
             'custom_css' => 'sek_local_custom_css',
             'local_performances' => 'sek_local_performances',
-            'local_reset' => 'sek_local_reset'
+            'local_reset' => 'sek_local_reset',
+            'local_revisions' => 'sek_local_revisions'
         ];
         function __construct( $params = array() ) {
             $this->registered_locations = $this->default_locations;
@@ -9045,6 +9112,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function _schedule_front_ajax_actions() {
             add_action( 'wp_ajax_sek_get_content', array( $this, 'sek_get_level_content_for_injection' ) );
             add_action( 'wp_ajax_sek_get_preset_sections', array( $this, 'sek_get_preset_sektions' ) );
+            add_action( 'wp_ajax_sek_get_revision_list', array( $this, 'sek_get_revision_list' ) );
+            add_action( 'wp_ajax_sek_get_single_revision', array( $this, 'sek_get_single_revision' ) );
             $this -> ajax_action_map = array(
                   'sek-add-section',
                   'sek-remove-section',
@@ -9079,7 +9148,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
                  wp_send_json_error( array(
                     'code' => 'invalid_nonce',
-                    'message' => __( 'sek_get_preset_sektions => check_ajax_referer() failed.' ),
+                    'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' => check_ajax_referer() failed.' ),
                 ) );
             }
             if ( ! is_user_logged_in() ) {
@@ -9453,6 +9522,64 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => missing post data for section title ' . $section_infos['title'] );
             }
         }
+        function sek_get_revision_list() {
+            $action = 'save-customize_' . get_stylesheet();
+            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+                 wp_send_json_error( array(
+                    'code' => 'invalid_nonce',
+                    'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' check_ajax_referer() failed.' ),
+                ) );
+            }
+            if ( ! is_user_logged_in() ) {
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
+            }
+            if ( ! current_user_can( 'edit_theme_options' ) ) {
+              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
+            }
+            if ( ! current_user_can( 'customize' ) ) {
+                status_header( 403 );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
+            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+                status_header( 405 );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
+            }
+
+            if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+                wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
+            }
+            $rev_list = sek_get_seks_post_revision_list( $_POST['skope_id'] );
+            wp_send_json_success( $rev_list );
+        }
+
+
+        function sek_get_single_revision() {
+            $action = 'save-customize_' . get_stylesheet();
+            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+                 wp_send_json_error( array(
+                    'code' => 'invalid_nonce',
+                    'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' check_ajax_referer() failed.' ),
+                ) );
+            }
+            if ( ! is_user_logged_in() ) {
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
+            }
+            if ( ! current_user_can( 'edit_theme_options' ) ) {
+              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
+            }
+            if ( ! current_user_can( 'customize' ) ) {
+                status_header( 403 );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
+            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+                status_header( 405 );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
+            }
+
+            if ( ! isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
+                wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
+            }
+            $revision = sek_get_single_post_revision( $_POST['revision_post_id'] );
+            wp_send_json_success( $revision );
+        }
         /*function sek_get_ui_content_for_injection( $params ) {
             if ( ! is_user_logged_in() ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
@@ -9684,17 +9811,17 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
 
-                        <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it movable for the moment. @todo ?>
                         <?php if ( sek_is_dev_mode() ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
+                        <# if ( true !== data.is_first_section_in_parent ) { #>
+                          <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'text_domain' ); ?>">keyboard_arrow_up</i>
+                        <# } #>
+                        <# if ( true !== data.is_last_section_in_parent ) { #>
+                          <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'text_domain' ); ?>">keyboard_arrow_down</i>
+                        <# } #>
+                        <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it draggable for the moment. @todo ?>
                         <# if ( ! data.is_nested ) { #>
-                          <# if ( true !== data.is_first_section_in_location ) { #>
-                            <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'text_domain' ); ?>">keyboard_arrow_up</i>
-                          <# } #>
-                          <# if ( true !== data.is_last_section_in_location ) { #>
-                            <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'text_domain' ); ?>">keyboard_arrow_down</i>
-                          <# } #>
                           <# if ( true !== data.is_global_location ) { #>
                             <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Drag section', 'text_domain' ); ?>"></i>
                            <# } #>

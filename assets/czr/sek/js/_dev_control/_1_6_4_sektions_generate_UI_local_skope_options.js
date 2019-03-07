@@ -91,6 +91,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">cached</i>'
                                     };
                               break;
+                              case 'local_revisions' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__local_revisions',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Revisions history'],
+                                          icon : '<i class="material-icons sek-level-option-icon">settings_backup_restore</i>'
+                                    };
+                              break;
                               default :
                                     api.errare('::generateUIforLocalOptions => an option group could not be registered => ' + mod_type, opt_name );
                               break;
