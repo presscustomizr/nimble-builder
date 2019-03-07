@@ -14,13 +14,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Fetches the_content and try to set the setting value through normalized ::updateAPISetting method
             setSingleRevision : function(revision_post_id) {
                   var self = this;
-                  var _notify = function( message ) {
+                  var _notify = function( message, type ) {
                         api.previewer.trigger('sek-notify', {
                               notif_id : 'restore-revision-error',
-                              type : 'info',
+                              type : type || 'info',
                               duration : 10000,
                               message : [
-                                    '<span style="color:#0075a2">',
+                                    '<span style="">',
+                                      '<strong>',
                                       message || '',
                                       '</strong>',
                                     '</span>'
@@ -43,16 +44,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               is_global_location : false,
                               revision_value : revision_value
                         }).done( function() {
-                              _notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'] );
+                              _notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
                               api.previewer.refresh();
                         }).fail( function( response ) {
                               api.errare( '::setSingleRevision error when firing ::updateAPISetting', response );
-                              _notify( sektionsLocalizedData.i18n['The revision could not be restored.'] );
+                              _notify( sektionsLocalizedData.i18n['The revision could not be restored.'], 'error' );
                         });
                         //api.previewer.refresh();
                   }).fail( function( response ) {
                         api.errare( '::setSingleRevision ajax error', response );
-                        _notify( sektionsLocalizedData.i18n['The revision could not be restored.'] );
+                        _notify( sektionsLocalizedData.i18n['The revision could not be restored.'], 'error' );
                   });
             }
       });//$.extend()
