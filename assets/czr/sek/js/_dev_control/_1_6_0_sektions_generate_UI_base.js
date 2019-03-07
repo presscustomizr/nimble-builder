@@ -358,7 +358,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( null !== parentModuleType ) {
                               inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
                               if ( 'no_default_value_specified' === inputDefaultValue ) {
-                                    api.infoLog( '::updateAPISettingAndExecutePreviewActions => missing default value for input ' + input_id + ' in module ' + parentModuleType );
+                                    api.infoLog( '::normalizeAndSanitizeSingleItemInputValues => missing default value for input ' + input_id + ' in module ' + parentModuleType );
                               }
                         }
                         if ( isEqualToDefault( _val, inputDefaultValue ) ) {
