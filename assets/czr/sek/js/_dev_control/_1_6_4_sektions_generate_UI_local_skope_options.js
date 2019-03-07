@@ -87,7 +87,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_reset',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
+                                          controlLabel : sektionsLocalizedData.i18n['Reset the sections in this page'],
                                           icon : '<i class="material-icons sek-level-option-icon">cached</i>'
                                     };
                               break;
@@ -95,7 +95,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_revisions',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Revisions history'],
+                                          controlLabel : sektionsLocalizedData.i18n['Revisions history of local sections'],
                                           icon : '<i class="material-icons sek-level-option-icon">settings_backup_restore</i>'
                                     };
                               break;

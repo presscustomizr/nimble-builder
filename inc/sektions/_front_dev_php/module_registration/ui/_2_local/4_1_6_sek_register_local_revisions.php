@@ -18,7 +18,8 @@ function sek_get_module_params_for_sek_local_revisions() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'notice_before' => __('This is the revision history of the sections of the currently customized page.', 'text_doma')
                 )
             )
         )//tmpl
