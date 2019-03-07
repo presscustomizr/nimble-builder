@@ -3,36 +3,44 @@
       // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
 
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
+      // the input id determine if we fetch the revision history of the local or global setting
       $.extend( api.czrInputMap, {
             revision_history : function( params ) {
                   var input = this;
-
                   _selected_found = false;
                   //generates the options
                   var _generateOptions = function( revisionHistory ) {
                         if ( input.container.find('.sek-revision-history').length > 0 )
                           return;
-                        input.container.append( $('<select/>', { class : 'sek-revision-history', html : '<option value="_select_">@missi18n Select</option>' } ) );
+                        if ( _.isEmpty( revisionHistory ) ) {
+                              input.container.append( [ '<i>', sektionsLocalizedData.i18n['No revision history available for the moment.'], '</i>' ].join('') );
+                              return;
+                        }
+                        input.container.append( $('<select/>', {
+                              class : 'sek-revision-history',
+                              html : [ '<option value="_select_">', ' -', sektionsLocalizedData.i18n['Select'], '- ', '</option>'].join('')
+                        }));
 
+                        // The revisions are listed by ascending date
+                        // => let's reverse the order so that we see the latest first
+                        var optionsNodes = [];
                         _.each( revisionHistory , function( _date, _post_id ) {
                               var _attributes = {
                                     value: _post_id,
-                                    //iconClass is in the form "fa(s|b|r) fa-{$name}" so the name starts at position 7
-                                    html: _date //api.CZR_Helpers.capitalize( iconClass.substring( 7 ) )
+                                    html: _date
                               };
 
                               if ( _attributes.value == input() ) {
                                     $.extend( _attributes, { selected : "selected" } );
                                     _selected_found = true;
                               }
-                              $( 'select.sek-revision-history', input.container ).append( $('<option>', _attributes) );
+                              optionsNodes.unshift( $('<option>', _attributes) );
+                        });
+                        _.each( optionsNodes, function( nod ) {
+                              $( 'select.sek-revision-history', input.container ).append( nod );
                         });
 
-                        //Initialize selecter
+                        // Initialize selecter
                         $( 'select.sek-revision-history', input.container ).selecter();
                   };//_generateOptions
 
@@ -42,10 +50,16 @@
                               if ( ! _.isEmpty( input.sek_revisionHistory ) ) {
                                     _dfd_.resolve( input.sek_revisionHistory );
                               } else {
-                                    api.czr_sektions.getLocalRevisionList().done( function( revisionHistory ) {
+                                    // The revision history sent by the server is an object
+                                    // {
+                                    //  post_id : date,
+                                    //  post_id : date,
+                                    //  ...
+                                    // }
+                                    api.czr_sektions.getRevisionHistory( { is_local : 'local_revisions' === input.id } ).done( function( revisionHistory ) {
                                           // Ensure we have a string that's JSON.parse-able
                                           if ( !_.isObject(revisionHistory) ) {
-                                                throw new Error( 'fa_icon_picker => server list is not JSON.parse-able');
+                                                throw new Error( '_getRevisionHistory => server list is not a object');
                                           }
                                           input.sek_revisionHistory = revisionHistory;
                                           _dfd_.resolve( input.sek_revisionHistory );
@@ -70,7 +84,7 @@
                                     }, 100 );
                               }
                         }).fail( function( _r_ ) {
-                              api.errare( 'fa_icon_picker => fail response =>', _r_ );
+                              api.errare( '_getRevisionHistory => fail response =>', _r_ );
                         });
                         input.revisionHistorySet = true;
                   };
@@ -79,7 +93,7 @@
                   input.container.on('change', '.sek-revision-history', function() {
                         var _val = $(this).val();
                         if ( '_select_' !== _val ) {
-                              api.czr_sektions.setSingleRevision( _val );
+                              api.czr_sektions.setSingleRevision( { revision_post_id : _val, is_local : 'local_revisions' === input.id } );
                         }
                   });
 
