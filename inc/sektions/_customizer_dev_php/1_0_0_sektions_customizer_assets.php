@@ -427,7 +427,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Page header and footer' => __( 'Page header and footer', 'text_doma'),
             'Inner and outer widths' => __( 'Inner and outer widths', 'text_doma'),
             'Custom CSS' => __( 'Custom CSS', 'text_doma'),
-            'Remove the sections in this page' => __( 'Remove the sections in this page', 'text_doma'),
+            'Reset the sections in this page' => __( 'Reset the sections in this page', 'text_doma'),
             'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
 
             'Site wide header and footer' => __( 'Site wide header and footer', 'text_doma'),
@@ -494,13 +494,15 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             // Revision history
             // @see https://github.com/presscustomizr/nimble-builder/issues/392
-            'Revisions history' => __('Revisions history', 'text_doma'),
+            'Revisions history of local sections' => __('Revisions history of local sections', 'text_doma'),
+            'Revisions history of global sections' => __('Revisions history of global sections', 'text_doma'),
             'The revision could not be restored.' => __('The revision could not be restored.', 'text_doma'),
-            'The revision has been successfully restored.' => __('The revision has been successfully restored.', 'text_doma')
+            'The revision has been successfully restored.' => __('The revision has been successfully restored.', 'text_doma'),
+            'Select' => __('Select', 'text_doma'),
+            'No revision history available for the moment.' => __('No revision history available for the moment.', 'text_doma'),
+            'This is the current version.' => __('This is the current version.', 'text_doma')
 
-            // 'Module' => __('Module', 'text_doma'),
-            // 'Module' => __('Module', 'text_doma'),
-            // 'Module' => __('Module', 'text_doma'),
+            // 'This is the current version.' => __('This is the current version.', 'text_doma'),
             // 'Module' => __('Module', 'text_doma'),
 
         )//array()

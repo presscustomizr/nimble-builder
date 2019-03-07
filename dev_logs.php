@@ -50,7 +50,7 @@ function render_test_logs( $query = null ) {
       <div>
         <h2>LOCAL SKOPE REVISIONS</h2>
         <pre style="font-size: 11px;overflow:visible;">
-          <?php print_r( sek_get_seks_post_revision_list() ); ?>
+          <?php print_r( sek_get_revision_history_from_posts() ); ?>
         </pre>
       </div>
     <?php

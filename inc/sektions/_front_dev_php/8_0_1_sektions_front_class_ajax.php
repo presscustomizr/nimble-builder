@@ -10,7 +10,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             add_action( 'wp_ajax_sek_get_preset_sections', array( $this, 'sek_get_preset_sektions' ) );
 
             // Fetches the list of revision for a given skope_id
-            add_action( 'wp_ajax_sek_get_revision_list', array( $this, 'sek_get_revision_list' ) );
+            add_action( 'wp_ajax_sek_get_revision_history', array( $this, 'sek_get_revision_history' ) );
 
             // Fetches the revision for a given post id
             add_action( 'wp_ajax_sek_get_single_revision', array( $this, 'sek_get_single_revision' ) );
@@ -580,7 +580,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         ////////////////////////////////////////////////////////////////
         // REVISIONS
         // Fired in __construct()
-        function sek_get_revision_list() {
+        function sek_get_revision_history() {
             $action = 'save-customize_' . get_stylesheet();
             if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
                  wp_send_json_error( array(
@@ -605,7 +605,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
             }
-            $rev_list = sek_get_seks_post_revision_list( $_POST['skope_id'] );
+            $rev_list = sek_get_revision_history_from_posts( $_POST['skope_id'] );
             wp_send_json_success( $rev_list );
         }
 

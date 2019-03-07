@@ -65,6 +65,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'widths' => 'sek_global_widths',
             'performances' => 'sek_global_performances',
             'recaptcha' => 'sek_global_recaptcha',
+            'global_revisions' => 'sek_global_revisions',
             'beta_features' => 'sek_global_beta_features'
         ];
         // option key as saved in db => module_type

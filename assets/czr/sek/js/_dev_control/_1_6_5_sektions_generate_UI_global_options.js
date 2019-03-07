@@ -76,6 +76,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">security</i>'
                                     };
                               break;
+                              case 'global_revisions' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__global_revisions',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Revisions history of global sections'],
+                                          icon : '<i class="material-icons sek-level-option-icon">settings_backup_restore</i>'
+                                    };
+                              break;
                               case 'beta_features' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__beta_features',

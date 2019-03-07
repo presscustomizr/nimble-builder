@@ -44,6 +44,7 @@ function sek_register_modules() {
         'sek_global_performances',
         'sek_global_header_footer',
         'sek_global_recaptcha',
+        'sek_global_revisions',
         'sek_global_beta_features',
 
         // FRONT MODULES

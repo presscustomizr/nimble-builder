@@ -7,7 +7,7 @@
  * @param string $skope_id optional
  * @return string $skope_level optional
  */
-function sek_get_seks_post_revision_list( $skope_id = '', $skope_level = 'local' ) {
+function sek_get_revision_history_from_posts( $skope_id = '', $skope_level = 'local' ) {
     //sek_error_log('skope_id in sek_get_seks_post => ' . $skope_id );
     if ( empty( $skope_id ) ) {
         $skope_id = skp_get_skope_id( $skope_level );
@@ -23,9 +23,7 @@ function sek_get_seks_post_revision_list( $skope_id = '', $skope_level = 'local'
         $args = array(
             'post_parent' => $post_id, // id
             'post_type' => 'revision',
-            'post_status' => 'inherit',
-            'orderby' => 'date',
-            'order' => 'DESC',
+            'post_status' => 'inherit'
         );
         $raw_revision_history = get_children($args);
     }
