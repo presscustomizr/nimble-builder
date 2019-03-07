@@ -318,17 +318,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _.delay( function() {
                             api.previewer.trigger('sek-notify', {
                                   notif_id : 'has-active-cache-plugin',
-                                        type : 'info',
-                                        duration : 60000,
-                                        message : [
-                                              '<span style="color:#0075a2">',
-                                                sektionsLocalizedData.i18n['You seem to be using a cache plugin.'],
-                                                '<strong> (' + sektionsLocalizedData.hasActiveCachePlugin + ')</strong><br/>',
-                                                '<strong>',
-                                                sektionsLocalizedData.i18n['It is recommended to disable your cache plugin when customizing your website.'],
-                                                '</strong>',
-                                              '</span>'
-                                        ].join('')
+                                  type : 'info',
+                                  duration : 60000,
+                                  message : [
+                                        '<span style="color:#0075a2">',
+                                          sektionsLocalizedData.i18n['You seem to be using a cache plugin.'],
+                                          '<strong> (' + sektionsLocalizedData.hasActiveCachePlugin + ')</strong><br/>',
+                                          '<strong>',
+                                          sektionsLocalizedData.i18n['It is recommended to disable your cache plugin when customizing your website.'],
+                                          '</strong>',
+                                        '</span>'
+                                  ].join('')
                             });
                         }, 2000 );//delay()
                   }
