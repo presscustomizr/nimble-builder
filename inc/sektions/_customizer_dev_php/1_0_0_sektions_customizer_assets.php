@@ -494,8 +494,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             // Revision history
             // @see https://github.com/presscustomizr/nimble-builder/issues/392
-            'Revisions history of local sections' => __('Revisions history of local sections', 'text_doma'),
-            'Revisions history of global sections' => __('Revisions history of global sections', 'text_doma'),
+            'Revision history of local sections' => __('Revision history of local sections', 'text_doma'),
+            'Revision history of global sections' => __('Revision history of global sections', 'text_doma'),
             'The revision could not be restored.' => __('The revision could not be restored.', 'text_doma'),
             'The revision has been successfully restored.' => __('The revision has been successfully restored.', 'text_doma'),
             'Select' => __('Select', 'text_doma'),
