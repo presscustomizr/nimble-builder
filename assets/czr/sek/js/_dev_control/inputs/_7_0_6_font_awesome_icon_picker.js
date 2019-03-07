@@ -8,7 +8,6 @@
       // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             // FONT AWESOME ICON PICKER
-            // FONT AWESOME ICON PICKER
             fa_icon_picker : function() {
                   var input           = this,
                       _selected_found = false;
