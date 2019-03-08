@@ -1936,7 +1936,7 @@ function sek_update_saved_seks_post( $seks_data ) {
  * @param string $skope_id optional
  * @return string $skope_level optional
  */
-function sek_get_seks_post_revision_list( $skope_id = '', $skope_level = 'local' ) {
+function sek_get_revision_history_from_posts( $skope_id = '', $skope_level = 'local' ) {
     if ( empty( $skope_id ) ) {
         $skope_id = skp_get_skope_id( $skope_level );
     }
@@ -1950,9 +1950,7 @@ function sek_get_seks_post_revision_list( $skope_id = '', $skope_level = 'local'
         $args = array(
             'post_parent' => $post_id, // id
             'post_type' => 'revision',
-            'post_status' => 'inherit',
-            'orderby' => 'date',
-            'order' => 'DESC',
+            'post_status' => 'inherit'
         );
         $raw_revision_history = get_children($args);
     }
@@ -2584,6 +2582,7 @@ function sek_register_modules() {
         'sek_global_performances',
         'sek_global_header_footer',
         'sek_global_recaptcha',
+        'sek_global_revisions',
         'sek_global_beta_features',
         'czr_simple_html_module',
 
@@ -3788,8 +3787,16 @@ function sek_get_module_params_for_sek_level_anchor_module() {
                     'input_type'  => 'text',
                     'title'       => __('Custom anchor', 'text_doma'),
                     'default'     => '',
-                    'notice_after' => __('Note : white spaces, numbers and special characters are not allowed when setting an anchor.')
+                    'notice_after' => __('Note : white spaces, numbers and special characters are not allowed when setting a CSS ID.'),
+                    'refresh_markup' => true
                 ),
+                'custom_css_classes' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Custom CSS classes', 'text_doma'),
+                    'default'     => '',
+                    'notice_after' => __('Note : you can add several custom CSS classes separated by a white space.'),
+                    'refresh_markup' => true
+                )
             )
         )//tmpl
     );
@@ -4208,7 +4215,9 @@ function sek_get_module_params_for_sek_local_revisions() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'notice_before' => __('This is the revision history of the sections of the currently customized page.', 'text_doma'),
+                    'notice_after' => __('Select a revision from the drop-down list to preview it. You can then restore it by clicking the Publish button at the top of the page.', 'text_doma')
                 )
             )
         )//tmpl
@@ -4513,6 +4522,29 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after'       => __( 'The badge is not previewable when customizing.', 'text_doma')
+                )
+            )
+        )//tmpl
+    );
+}
+
+?><?php
+function sek_get_module_params_for_sek_global_revisions() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_global_revisions',
+        'name' => __('Revision history', 'text_doma'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'global_revisions' => array(
+                    'input_type'  => 'revision_history',
+                    'title'       => __('Browse your revision history', 'text_doma'),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'notice_before' => __('This is the revision history of the global sections displayed site wide.', 'text_doma'),
+                    'notice_after' => __('Select a revision from the drop-down list to preview it. You can then restore it by clicking the Publish button at the top of the page.', 'text_doma')
                 )
             )
         )//tmpl
@@ -9059,6 +9091,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'widths' => 'sek_global_widths',
             'performances' => 'sek_global_performances',
             'recaptcha' => 'sek_global_recaptcha',
+            'global_revisions' => 'sek_global_revisions',
             'beta_features' => 'sek_global_beta_features'
         ];
         public static $local_options_map = [
@@ -9112,7 +9145,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function _schedule_front_ajax_actions() {
             add_action( 'wp_ajax_sek_get_content', array( $this, 'sek_get_level_content_for_injection' ) );
             add_action( 'wp_ajax_sek_get_preset_sections', array( $this, 'sek_get_preset_sektions' ) );
-            add_action( 'wp_ajax_sek_get_revision_list', array( $this, 'sek_get_revision_list' ) );
+            add_action( 'wp_ajax_sek_get_revision_history', array( $this, 'sek_get_revision_history' ) );
             add_action( 'wp_ajax_sek_get_single_revision', array( $this, 'sek_get_single_revision' ) );
             $this -> ajax_action_map = array(
                   'sek-add-section',
@@ -9522,7 +9555,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => missing post data for section title ' . $section_infos['title'] );
             }
         }
-        function sek_get_revision_list() {
+        function sek_get_revision_history() {
             $action = 'save-customize_' . get_stylesheet();
             if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
                  wp_send_json_error( array(
@@ -9547,7 +9580,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
             }
-            $rev_list = sek_get_seks_post_revision_list( $_POST['skope_id'] );
+            $rev_list = sek_get_revision_history_from_posts( $_POST['skope_id'] );
             wp_send_json_success( $rev_list );
         }
 
@@ -10161,6 +10194,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $this -> model = $model;
 
             $collection = array_key_exists( 'collection', $model ) ? $model['collection'] : array();
+            $custom_anchor = null;
+            if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'anchor' ] ) && !empty( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
+                if ( is_string( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
+                    $custom_anchor = esc_attr( $model[ 'options' ][ 'anchor' ]['custom_anchor'] );
+                }
+            }
+            $custom_css_classes = null;
+            if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'anchor' ] ) && !empty( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] ) ) {
+                if ( is_string( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] ) ) {
+                    $custom_css_classes = esc_attr( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] );
+                }
+            }
 
             switch ( $level_type ) {
                 case 'location' :
@@ -10208,21 +10253,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     if ( !empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
                         $column_container_class = 'sek-container';
                     }
-                    $custom_anchor = null;
-                    if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'anchor' ] ) && !empty( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
-                        if ( is_string( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
-                            $custom_anchor = $model[ 'options' ][ 'anchor' ]['custom_anchor'];
-                        }
-                    }
 
                     ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s" %5$s %6$s>',
+                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %7$s" %5$s %6$s>',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
                         $this->get_level_visibility_css_class( $model ),
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
-                        $this -> sek_maybe_add_bg_attributes( $model )
+                        $this -> sek_maybe_add_bg_attributes( $model ),
+                        is_null( $custom_css_classes ) ? '' : $custom_css_classes
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -10254,12 +10294,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
                     ?>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s" %4$s %5$s>',
+                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %7$s" %4$s %5$s %6$s>',
                               $id,
                               $grid_column_class,
                               $this->get_level_visibility_css_class( $model ),
                               empty( $collection ) ? 'data-sek-no-modules="true"' : '',
-                              $this -> sek_maybe_add_bg_attributes( $model )
+                              $this -> sek_maybe_add_bg_attributes( $model ),
+                              is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                              is_null( $custom_css_classes ) ? '' : $custom_css_classes
                           );
                       ?>
                         <?php
@@ -10307,12 +10349,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $title_attribute = 'title="'.$title_attribute.'"';
                     }
                     ?>
-                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s %5$s>',
+                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %7$s" %4$s %5$s %6$s>',
                           $id,
                           $module_type,
                           $this->get_level_visibility_css_class( $model ),
                           $title_attribute,
-                          $this -> sek_maybe_add_bg_attributes( $model )
+                          $this -> sek_maybe_add_bg_attributes( $model ),
+                          is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                          is_null( $custom_css_classes ) ? '' : $custom_css_classes
                         );?>
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>

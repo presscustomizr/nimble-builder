@@ -312,6 +312,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             self.lastClickedTargetInPreview({});
                         }
                   });
+
+                  // PRINT A WARNING NOTICE FOR USERS OF CACHE PLUGIN
+                  if ( sektionsLocalizedData.hasActiveCachePlugin ) {
+                        _.delay( function() {
+                            api.previewer.trigger('sek-notify', {
+                                  notif_id : 'has-active-cache-plugin',
+                                  type : 'info',
+                                  duration : 60000,
+                                  message : [
+                                        '<span style="color:#0075a2">',
+                                          sektionsLocalizedData.i18n['You seem to be using a cache plugin.'],
+                                          '<strong> (' + sektionsLocalizedData.hasActiveCachePlugin + ')</strong><br/>',
+                                          '<strong>',
+                                          sektionsLocalizedData.i18n['It is recommended to disable your cache plugin when customizing your website.'],
+                                          '</strong>',
+                                        '</span>'
+                                  ].join('')
+                            });
+                        }, 2000 );//delay()
+                  }
             },//doSektionThinksOnApiReady
 
 
@@ -450,7 +470,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
 
-                  // GLOBAL OPTIONS SETTING
+                  // SITE WIDE GLOBAL OPTIONS SETTING
                   // Will Be updated in ::generateUIforGlobalOptions()
                   // has no control.
                   api.CZR_Helpers.register( {
@@ -725,9 +745,83 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            /* HISTORY */
+            // Fired in ::initialize(), at api 'ready'
+            // March 2019 : history log tracks local and global section settings
+            // no tracking of the global option sektionsLocalizedData.optNameForGlobalOptions
+            initializeHistoryLogWhenSettingsRegistered : function() {
+                  var self = this;
+                  // This api.Value() is bound in ::setupTopBar
+                  self.historyLog = new api.Value([{
+                        status : 'current',
+                        value : {
+                              'local' : api( self.localSectionsSettingId() )(),//<= "nimble___[skp__post_page_10]"
+                              'global' : api(  self.getGlobalSectionsSettingId() )()
+                        },
+                        action : 'initial'
+                  }]);
+                  // LISTEN TO HISTORY LOG CHANGES AND UPDATE THE BUTTON STATE
+                  self.historyLog.bind( function( newLog ) {
+                        if ( _.isEmpty( newLog ) )
+                          return;
+
+                        var newCurrentKey = _.findKey( newLog, { status : 'current'} );
+                        newCurrentKey = Number( newCurrentKey );
+                        $( '#nimble-top-bar' ).find('[data-nimble-history]').each( function() {
+                              if ( 'undo' === $(this).data('nimble-history') ) {
+                                    $(this).attr('data-nimble-state', 0 >= newCurrentKey ? 'disabled' : 'enabled');
+                              } else {
+                                    $(this).attr('data-nimble-state', newLog.length <= ( newCurrentKey + 1 ) ? 'disabled' : 'enabled');
+                              }
+                        });
+                  });
+            },
+
+            // React to a local or global setting change api( settingData.collectionSettingId )
+            // =>populates self.historyLog() observable value
+            // invoked in ::setupSettingsToBeSaved, if params.navigatingHistoryLogs !== true <=> not already navigating
+            trackHistoryLog : function( sektionSetInstance, params ) {
+                  var self = this,
+                      _isGlobal = sektionSetInstance.id === self.getGlobalSectionsSettingId();
+
+                  // Safety checks
+                  // trackHistoryLog must be invoked with a try catch statement
+                  if ( !_.isObject( params ) || !_.isFunction( self.historyLog ) || !_.isArray( self.historyLog() ) ) {
+                        throw new Error('trackHistoryLog => invalid params or historyLog value');
+                  }
+
+                  // Always clean future values if the logs have been previously navigated back
+                  var newHistoryLog = [],
+                      historyLog = $.extend( true, [], self.historyLog() ),
+                      sektionToRefresh;
+
+                  if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
+                        sektionToRefresh = params.in_sektion;
+                  } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
+                        sektionToRefresh = params.to_sektion;
+                  }
+
+                  // Reset all status but 'future' to 'previous'
+                  _.each( historyLog, function( log ) {
+                        var newStatus = 'previous';
+                        if ( 'future' == log.status )
+                          return;
+                        $.extend( log, { status : 'previous' } );
+                        newHistoryLog.push( log );
+                  });
+                  newHistoryLog.push({
+                        status : 'current',
+                        value : _isGlobal ? { global : sektionSetInstance() } : { local : sektionSetInstance() },
+                        action : _.isObject( params ) ? ( params.action || '' ) : '',
+                        sektionToRefresh : sektionToRefresh
+                  });
+                  self.historyLog( newHistoryLog );
+            },
+
+
+
             // @param direction = string 'undo', 'redo'
             // @return void()
+            // Fired on click in the topbar or when hitting ctrl z / y
             navigateHistory : function( direction ) {
                   var self = this,
                       historyLog = $.extend( true, [], self.historyLog() );
@@ -1384,6 +1478,76 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
+            // the input id determine if we fetch the revision history of the local or global setting
+            // @return a deferred promise
+            // @params object : { is_local:bool} <= 'local_revisions' === input.id
+            getRevisionHistory : function(params) {
+                  return wp.ajax.post( 'sek_get_revision_history', {
+                        nonce: api.settings.nonce.save,
+                        skope_id : params.is_local ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId
+                  });
+            },
+
+            // @return void()
+            // Fetches the_content and try to set the setting value through normalized ::updateAPISetting method
+            // @params {
+            //    is_local : bool//<= 'local_revisions' === input.id
+            //    revision_post_id : int
+            // }
+            setSingleRevision : function(params) {
+                  var self = this;
+                  var _notify = function( message, type ) {
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'restore-revision-error',
+                              type : type || 'info',
+                              duration : 10000,
+                              message : [
+                                    '<span style="">',
+                                      '<strong>',
+                                      message || '',
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  };
+                  wp.ajax.post( 'sek_get_single_revision', {
+                        nonce: api.settings.nonce.save,
+                        //skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                        revision_post_id : params.revision_post_id
+                  }).done( function( revision_value ){
+                        // If the setting value is unchanged, no need to go further
+                        // is_local is decided with the input id => @see revision_history input type.
+                        var setId = params.is_local ? self.localSectionsSettingId() : self.getGlobalSectionsSettingId();
+                        if ( _.isEqual( api( setId )(), revision_value ) ) {
+                              _notify( sektionsLocalizedData.i18n['This is the current version.'], 'info' );
+                              return;
+                        }
+                        // api.infoLog( 'getSingleRevision response', revision_value );
+                        // api.infoLog( 'Current val', api(self.localSectionsSettingId())() );
+                        self.updateAPISetting({
+                              action : 'sek-restore-revision',
+                              is_global_location : !params.is_local,//<= will determine which setting will be updated,
+                              // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
+                              revision_value : revision_value
+                        }).done( function() {
+                              //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
+                              api.previewer.refresh();
+                        }).fail( function( response ) {
+                              api.errare( '::setSingleRevision error when firing ::updateAPISetting', response );
+                              _notify( sektionsLocalizedData.i18n['The revision could not be restored.'], 'error' );
+                        });
+                        //api.previewer.refresh();
+                  }).fail( function( response ) {
+                        api.errare( '::setSingleRevision ajax error', response );
+                        _notify( sektionsLocalizedData.i18n['The revision could not be restored.'], 'error' );
+                  });
+            }
+      });//$.extend()
+})( wp.customize, jQuery );
+//global sektionsLocalizedData
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
             // Fired on api 'ready', in reaction to ::setContextualCollectionSettingIdWhenSkopeSet => ::localSectionsSettingId
             // 1) register the collection setting nimble___[{$skope_id}] ( ex : nimble___[skp__post_page_20] )
             // 2) validate that the setting is well formed before being changed
@@ -1431,7 +1595,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           //             params : params
                                           //       }
                                           // );
-                                          self.trackHistoryLog( sektionSetInstance, params );
+
+                                          // Track changes, if not already navigating the logs
+                                          if ( !_.isObject( params ) || true !== params.navigatingHistoryLogs ) {
+                                                try { self.trackHistoryLog( sektionSetInstance, params ); } catch(er) {
+                                                      api.errare( 'setupSettingsToBeSaved => trackHistoryLog', er );
+                                                }
+                                          }
 
                                     }, 1000 ) );
                               });//api( settingData.collectionSettingId, function( sektionSetInstance ){}
@@ -1462,74 +1632,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       track : false//don't register in the self.registered()
                   // });
             },// SetupSettingsToBeSaved()
-
-
-            // React to a local or global setting change api( settingData.collectionSettingId )
-            trackHistoryLog : function( sektionSetInstance, params ) {
-                  var self = this,
-                      _isGlobal = sektionSetInstance.id === self.getGlobalSectionsSettingId();
-
-                  // Track changes, if not currently navigating the logs
-                  // Always clean future values if the logs have been previously navigated back
-                  if ( params && true !== params.navigatingHistoryLogs ) {
-                        var newHistoryLog = [],
-                            historyLog = $.extend( true, [], self.historyLog() ),
-                            sektionToRefresh;
-
-                        if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
-                              sektionToRefresh = params.in_sektion;
-                        } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
-                              sektionToRefresh = params.to_sektion;
-                        }
-
-                        // Reset all status but 'future' to 'previous'
-                        _.each( historyLog, function( log ) {
-                              var newStatus = 'previous';
-                              if ( 'future' == log.status )
-                                return;
-                              $.extend( log, { status : 'previous' } );
-                              newHistoryLog.push( log );
-                        });
-                        newHistoryLog.push({
-                              status : 'current',
-                              value : _isGlobal ? { global : sektionSetInstance() } : { local : sektionSetInstance() },
-                              action : _.isObject( params ) ? ( params.action || '' ) : '',
-                              sektionToRefresh : sektionToRefresh
-                        });
-                        self.historyLog( newHistoryLog );
-                  }
-            },
-
-
-
-            // Fired in ::initialize(), at api 'ready'
-            initializeHistoryLogWhenSettingsRegistered : function() {
-                  var self = this;
-                  // This api.Value() is bound in ::setupTopBar
-                  self.historyLog = new api.Value([{
-                        status : 'current',
-                        value : {
-                              'local' : api( self.localSectionsSettingId() )(),//<= "nimble___[skp__post_page_10]"
-                              'global' : api(  self.getGlobalSectionsSettingId() )()
-                        },
-                        action : 'initial'
-                  }]);
-                  // LISTEN TO HISTORY LOG CHANGES TO UPDATE THE BUTTON STATE
-                  self.historyLog.bind( function( newLog ) {
-                        if ( _.isEmpty( newLog ) )
-                          return;
-
-                        var newCurrentKey = _.findKey( newLog, { status : 'current'} );
-                        newCurrentKey = Number( newCurrentKey );
-                        $( '#nimble-top-bar' ).find('[data-nimble-history]').each( function() {
-                              if ( 'undo' === $(this).data('nimble-history') ) {
-                                    $(this).attr('data-nimble-state', 0 >= newCurrentKey ? 'disabled' : 'enabled');
-                              } else {
-                                    $(this).attr('data-nimble-state', newLog.length <= ( newCurrentKey + 1 ) ? 'disabled' : 'enabled');
-                              }
-                        });
-                  });
-            },
 
             // Fired :
             // 1) when instantiating the setting
@@ -1683,8 +1785,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   _.each( level.collection, function( _l_ ) {
                                         // Set the parent level now
                                         parentLevel = $.extend( true, {}, level );
-                                        // And walk sub levels
-                                        _checkWalker_( _l_ );
+                                        if ( ! _.isUndefined( _l_ ) ) {
+                                              // And walk sub levels
+                                              _checkWalker_( _l_ );
+                                        } else {
+                                              _errorDetected_('validation error => undefined level ' );
+                                        }
                                   });
                             }
                       }
@@ -2014,7 +2120,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               direction : 'up',
                                               id : params.id,
                                               is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
-                                              location : params.location
+                                              location : params.location,
+                                              in_column : params.in_column//<= will be used when moving a nested section
                                         };
                                         return self.updateAPISetting( apiParams );
                                   },
@@ -2035,7 +2142,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               direction : 'down',
                                               id : params.id,
                                               is_nested : ! _.isEmpty( params.in_sektion ) && ! _.isEmpty( params.in_column ),
-                                              location : params.location
+                                              location : params.location,
+                                              in_column : params.in_column//<= will be used when moving a nested section
                                         };
                                         return self.updateAPISetting( apiParams );
                                   },
@@ -2351,17 +2459,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // }
                             'sek-notify' : function( params ) {
                                   sendToPreview = false;
+                                  var notif_id = params.notif_id || 'sek-notify';
                                   return $.Deferred(function() {
                                         api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
-                                              api.notifications.add( new api.Notification( 'sek-notify', {
+                                              api.notifications.add( new api.Notification( notif_id, {
                                                     type: params.type || 'info',
                                                     message:  params.message,
                                                     dismissible: true
-                                              } ) );
+                                              }));
 
                                               // Removed if not dismissed after 5 seconds
                                               _.delay( function() {
-                                                    api.notifications.remove( 'sek-notify' );
+                                                    api.notifications.remove( notif_id );
                                               }, params.duration || 5000 );
                                         });
                                         // always pass the local or global skope of the currently customized location id when resolving the promise.
@@ -2907,7 +3016,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( null !== parentModuleType ) {
                               inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
                               if ( 'no_default_value_specified' === inputDefaultValue ) {
-                                    api.infoLog( '::updateAPISettingAndExecutePreviewActions => missing default value for input ' + input_id + ' in module ' + parentModuleType );
+                                    api.infoLog( '::normalizeAndSanitizeSingleItemInputValues => missing default value for input ' + input_id + ' in module ' + parentModuleType );
                               }
                         }
                         if ( isEqualToDefault( _val, inputDefaultValue ) ) {
@@ -3510,7 +3619,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         anchor : {
                               settingControlId : params.id + '__anchor_options',
                               module_type : 'sek_level_anchor_module',
-                              controlLabel : sektionsLocalizedData.i18n['Set a custom anchor ( CSS ID ) for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              controlLabel : sektionsLocalizedData.i18n['Custom anchor ( CSS ID ) and CSS classes for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                               icon : '<i class="fas fa-anchor sek-level-option-icon"></i>'
                         },
                         visibility : {
@@ -3819,8 +3928,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_reset',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Remove the sections in this page'],
+                                          controlLabel : sektionsLocalizedData.i18n['Reset the sections in this page'],
                                           icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                                    };
+                              break;
+                              case 'local_revisions' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__local_revisions',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Revision history of local sections'],
+                                          icon : '<i class="material-icons sek-level-option-icon">settings_backup_restore</i>'
                                     };
                               break;
                               default :
@@ -4009,6 +4126,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">security</i>'
                                     };
                               break;
+                              case 'global_revisions' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__global_revisions',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Revision history of global sections'],
+                                          icon : '<i class="material-icons sek-level-option-icon">settings_backup_restore</i>'
+                                    };
+                              break;
                               case 'beta_features' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__beta_features',
@@ -4135,7 +4260,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //    in_column
             // }
             updateAPISetting : function( params ) {
-
                   var self = this,
                       __updateAPISettingDeferred__ = $.Deferred();
 
@@ -4146,10 +4270,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   params.is_global_location = self.isGlobalLocation( params );
 
                   var _collectionSettingId_ = params.is_global_location ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
-
-                  // Update the sektion collection
-                  api( _collectionSettingId_, function( sektionSetInstance ) {
-                        // sektionSetInstance() = {
+                  var _do_update_setting_id = function() {
+                        // api( _collectionSettingId_)() = {
                         //    collection : [
                         //       'loop_start' :  { level : location,  collection : [ 'sek124' : { collection : [], level : section, options : {} }], options : {}},
                         //       'loop_end' : { level : location, collection : [], options : {}}
@@ -4158,7 +4280,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //    options : {}
                         //
                         // }
-                        var currentSetValue = sektionSetInstance(),
+                        var currentSetValue = api( _collectionSettingId_ )(),
                             newSetValue = _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
                             locationCandidate,
                             sektionCandidate,
@@ -4170,7 +4292,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             //duplication variable
                             cloneId, //will be passed in resolve()
                             startingModuleValue,// will be populated by the optional starting value specificied on module registration
-                            __presetSectionInjected__ = false,
+                            __presetSectionInjected__ = '_not_injection_scenario_',//this property is turned into a $.Deferred() object in a scenario of section injection
                             parentSektionCandidate;
 
                         // make sure we have a collection array to populate
@@ -4379,18 +4501,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
 
-                              // Fired on click on up / down arrows in the ( not nested ) section ui menu
+                              // Fired on click on up / down arrows in the section ui menu
+                              // This handles the nested sections case
                               case 'sek-move-section-up-down' :
                                     //api.infoLog('PARAMS in sek-move-section-up', params );
-
-                                    inLocationCandidate = self.getLevelModel( params.location, newSetValue.collection );
-
-                                    if ( _.isEmpty( inLocationCandidate ) || 'no_match' == inLocationCandidate ) {
+                                    parentCandidate = self.getLevelModel( params.is_nested ? params.in_column : params.location , newSetValue.collection );
+                                    if ( _.isEmpty( parentCandidate ) || 'no_match' == parentCandidate ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
                                     }
-                                    inLocationCandidate.collection = _.isArray( inLocationCandidate.collection ) ? inLocationCandidate.collection : [];
-                                    originalCollection = $.extend( true, [], inLocationCandidate.collection );
-                                    reorderedCollection = $.extend( true, [], inLocationCandidate.collection );
+                                    parentCandidate.collection = _.isArray( parentCandidate.collection ) ? parentCandidate.collection : [];
+                                    originalCollection = $.extend( true, [], parentCandidate.collection );
+                                    reorderedCollection = $.extend( true, [], parentCandidate.collection );
 
                                     var _indexInOriginal = _.findIndex( originalCollection, function( _sec_ ) {
                                           return _sec_.id === params.id;
@@ -4402,10 +4523,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // Swap up <=> down
                                     var direction = params.direction || 'up';
+
+                                    // prevent absurd movements of a section
+                                    // this should not happen because up / down arrows are not displayed when section is positionned top / bottom
+                                    // but safer to add it
+                                    if ( 'up' !== direction && originalCollection.length === _indexInOriginal + 1 ) {
+                                          throw new Error( 'updateAPISetting => ' + params.action + ' => bottom reached' );
+                                    } else if ( 'up' === direction && 0 === _indexInOriginal ){
+                                          throw new Error( 'updateAPISetting => ' + params.action + ' => top reached' );
+                                    }
+
                                     reorderedCollection[ _indexInOriginal ] = originalCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ];
                                     reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
-
-                                    inLocationCandidate.collection = reorderedCollection;
+                                    parentCandidate.collection = reorderedCollection;
                               break;
 
 
@@ -5170,6 +5300,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // this is then used server side in Sek_Dyn_CSS_Handler::sek_get_gfont_print_candidates to build the Google Fonts request
                                     newSetValue.fonts = currentGfonts;
                               break;
+
+                              //-------------------------------------------------------------------------------------------------
+                              //-- RESTORE A REVISION
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-restore-revision' :
+                                    //api.infoLog( 'sek-restore-revision', params );
+                                    newSetValue = params.revision_value;
+                              break;
                         }// switch
 
 
@@ -5179,12 +5317,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 'pending' == __updateAPISettingDeferred__.state() ) {
                               var mayBeUpdateSektionsSetting = function() {
                                     if ( _.isEqual( currentSetValue, newSetValue ) ) {
-                                          if ( sektionsLocalizedData.isDevMode ) {
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
-                                          }
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
                                           if ( null !== self.validateSettingValue( newSetValue ) ) {
-                                                sektionSetInstance( newSetValue, params );
+                                                api( _collectionSettingId_ )( newSetValue, params );
                                                 // Add the cloneId to the params when we resolve
                                                 // the cloneId is only needed in the duplication scenarii
                                                 params.cloneId = cloneId;
@@ -5196,19 +5332,38 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               };//mayBeUpdateSektionsSetting()
 
-                              if ( false === __presetSectionInjected__ ) {
+                              // For all scenarios but section injection, we can update the sektion setting now
+                              // otherwise we need to wait for the injection to be processed asynchronously
+                              // CRITICAL => __updateAPISettingDeferred__ has to be resolved / rejected
+                              // otherwise this can lead to scenarios where a change is not taken into account in ::updateAPISettingAndExecutePreviewActions
+                              // like in https://github.com/presscustomizr/nimble-builder/issues/373
+                              if ( '_not_injection_scenario_' === __presetSectionInjected__ ) {
                                     mayBeUpdateSektionsSetting();
+                                    // At this point the __updateAPISettingDeferred__ obj can't be in a 'pending' state
+                                    if ( 'pending' === __updateAPISettingDeferred__.state() ) {
+                                          api.errare( '::updateAPISetting => The __updateAPISettingDeferred__ promise has not been resolved properly.');
+                                    }
                               } else {
                                     __presetSectionInjected__
                                           .done( function() {
                                                mayBeUpdateSektionsSetting();
+                                               // At this point the __updateAPISettingDeferred__ obj can't be in a 'pending' state
+                                               if ( 'pending' === __updateAPISettingDeferred__.state() ) {
+                                                    api.errare( '::updateAPISetting => The __updateAPISettingDeferred__ promise has not been resolved properly.');
+                                               }
                                           })
                                           .fail( function( _er_ ) {
                                                 api.errare( 'updateAPISetting => __presetSectionInjected__ failed', _er_ );
                                           });
                               }
                         }
-                  });//api( _collectionSettingId_, function( sektionSetInstance ) {}
+                  };//_do_update_setting_id()
+
+
+                  // Update the sektion collection
+                  api( _collectionSettingId_, function( sektionSetInstance ) {
+                        _do_update_setting_id();
+                  });
                   return __updateAPISettingDeferred__.promise();
             },//updateAPISetting
 
@@ -8285,7 +8440,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             // FONT AWESOME ICON PICKER
-            // FONT AWESOME ICON PICKER
             fa_icon_picker : function() {
                   var input           = this,
                       _selected_found = false;
@@ -9479,6 +9633,113 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
             }
+      });//$.extend( api.czrInputMap, {})
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // the input id determine if we fetch the revision history of the local or global setting
+      $.extend( api.czrInputMap, {
+            revision_history : function( params ) {
+                  var input = this;
+                  _selected_found = false;
+                  //generates the options
+                  var _generateOptions = function( revisionHistory ) {
+                        if ( input.container.find('.sek-revision-history').length > 0 )
+                          return;
+                        if ( _.isEmpty( revisionHistory ) ) {
+                              input.container.append( [ '<i>', sektionsLocalizedData.i18n['No revision history available for the moment.'], '</i>' ].join('') );
+                              return;
+                        }
+                        input.container.append( $('<select/>', {
+                              class : 'sek-revision-history',
+                              html : [ '<option value="_select_">', ' -', sektionsLocalizedData.i18n['Select'], '- ', '</option>'].join('')
+                        }));
+
+                        // The revisions are listed by ascending date
+                        // => let's reverse the order so that we see the latest first
+                        var optionsNodes = [];
+                        _.each( revisionHistory , function( _date, _post_id ) {
+                              var _attributes = {
+                                    value: _post_id,
+                                    html: _date
+                              };
+
+                              if ( _attributes.value == input() ) {
+                                    $.extend( _attributes, { selected : "selected" } );
+                                    _selected_found = true;
+                              }
+                              optionsNodes.unshift( $('<option>', _attributes) );
+                        });
+
+                        // Add the 'published' note to the first node
+                        optionsNodes[0].html( [ optionsNodes[0].html(), sektionsLocalizedData.i18n['(currently published version)'] ].join(' ') );
+                        _.each( optionsNodes, function( nod ) {
+                              $( 'select.sek-revision-history', input.container ).append( nod );
+                        });
+
+                        // Initialize selecter
+                        $( 'select.sek-revision-history', input.container ).selecter();
+                  };//_generateOptions
+
+
+                  var _getRevisionHistory = function() {
+                        return $.Deferred( function( _dfd_ ) {
+                              if ( ! _.isEmpty( input.sek_revisionHistory ) ) {
+                                    _dfd_.resolve( input.sek_revisionHistory );
+                              } else {
+                                    // The revision history sent by the server is an object
+                                    // {
+                                    //  post_id : date,
+                                    //  post_id : date,
+                                    //  ...
+                                    // }
+                                    api.czr_sektions.getRevisionHistory( { is_local : 'local_revisions' === input.id } ).done( function( revisionHistory ) {
+                                          // Ensure we have a string that's JSON.parse-able
+                                          if ( !_.isObject(revisionHistory) ) {
+                                                throw new Error( '_getRevisionHistory => server list is not a object');
+                                          }
+                                          input.sek_revisionHistory = revisionHistory;
+                                          _dfd_.resolve( input.sek_revisionHistory );
+                                    }).fail( function( _r_ ) {
+                                          _dfd_.reject( _r_ );
+                                    });
+                              }
+                              //return dfd.promise();
+                        });
+                  };//_getRevisionHistory
+
+                  // do
+                  var _do_ = function( params ) {
+                        if ( true === input.revisionHistorySet )
+                          return;
+                        $.when( _getRevisionHistory() ).done( function( revisionHistory ) {
+                              _generateOptions( revisionHistory );
+                              if ( params && true === params.open_on_init ) {
+                                    // let's open select2 after a delay ( because there's no 'ready' event with select2 )
+                                    _.delay( function() {
+                                          try{ $( 'select[data-czrtype]', input.container ).czrSelect2('open'); }catch(er) {}
+                                    }, 100 );
+                              }
+                        }).fail( function( _r_ ) {
+                              api.errare( '_getRevisionHistory => fail response =>', _r_ );
+                        });
+                        input.revisionHistorySet = true;
+                  };
+
+                  // Generate options and open select2
+                  input.container.on('change', '.sek-revision-history', function() {
+                        var _val = $(this).val();
+                        if ( '_select_' !== _val ) {
+                              api.czr_sektions.setSingleRevision( { revision_post_id : _val, is_local : 'local_revisions' === input.id } );
+                        }
+                  });
+
+                  // schedule the revisionHistorySet after a delay
+                  _.delay( function() { _do_( { open_on_init : false } );}, 1000 );
+
+            }//revision_history
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
@@ -10733,6 +10994,31 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_local_revisions : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_revisions', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_local_revisions' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
@@ -11064,6 +11350,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_recaptcha' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_global_revisions : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_revisions', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_revisions' )
                   )
             },
       });

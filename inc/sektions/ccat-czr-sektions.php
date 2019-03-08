@@ -387,7 +387,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_doma'),
             'Height and vertical alignment for the' => __('Height and vertical alignment for the', 'text_doma'),
             'Width settings for the' => __('Width settings for the', 'text_doma'),
-            'Set a custom anchor ( CSS ID ) for the' => __('Set a custom anchor ( CSS ID ) for the', 'text_doma'),
+            'Custom anchor ( CSS ID ) and CSS classes for the' => __('Custom anchor ( CSS ID ) and CSS classes for the', 'text_doma'),
             'Device visibility settings for the' => __('Device visibility settings for the', 'text_doma'),
             'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_doma'),
 
@@ -398,7 +398,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Page header and footer' => __( 'Page header and footer', 'text_doma'),
             'Inner and outer widths' => __( 'Inner and outer widths', 'text_doma'),
             'Custom CSS' => __( 'Custom CSS', 'text_doma'),
-            'Remove the sections in this page' => __( 'Remove the sections in this page', 'text_doma'),
+            'Reset the sections in this page' => __( 'Reset the sections in this page', 'text_doma'),
             'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
 
             'Site wide header and footer' => __( 'Site wide header and footer', 'text_doma'),
@@ -440,9 +440,14 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Remove this element' => __('Remove this element', 'text_dom'),
             'You seem to be using a cache plugin.' => __('You seem to be using a cache plugin.', 'text_dom'),
             'It is recommended to disable your cache plugin when customizing your website.' => __('It is recommended to disable your cache plugin when customizing your website.', 'text_dom'),
-            'Revisions history' => __('Revisions history', 'text_doma'),
+            'Revision history of local sections' => __('Revision history of local sections', 'text_doma'),
+            'Revision history of global sections' => __('Revision history of global sections', 'text_doma'),
             'The revision could not be restored.' => __('The revision could not be restored.', 'text_doma'),
-            'The revision has been successfully restored.' => __('The revision has been successfully restored.', 'text_doma')
+            'The revision has been successfully restored.' => __('The revision has been successfully restored.', 'text_doma'),
+            'Select' => __('Select', 'text_doma'),
+            'No revision history available for the moment.' => __('No revision history available for the moment.', 'text_doma'),
+            'This is the current version.' => __('This is the current version.', 'text_doma'),
+            '(currently published version)' => __('(currently published version)','text_doma')
 
         )//array()
     )//array()

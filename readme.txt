@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.5.1-beta
+Stable tag: 1.5.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -91,10 +91,17 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.5.0 =
-Introducing a section navigation UI. A new interface allowing users to navigate in the structure of Nimble Builder elements : locations, sections, columns and modules. Added a new option for the Menu module to expand the mobile menu in full width below the hamburger icon.
+= 1.5.1 =
+New option to preview and restore a revision. New option to add custom CSS classes to elements. Fixed a Google font bug.
 
 == Changelog ==
+= 1.5.1 : March 8th 2019 =
+* fixed : Google font customizations could be not taken into account in some cases
+* improved : nested sections can now be moved up and down in a column
+* added : a new option to preview and restore a revision, for contextual and site wide sections
+* added : new option to add custom CSS classes to sections, columns and modules
+* added : a customizer notification for users of cache plugins
+
 = 1.5.0 : March 5th 2019 =
 * added : [menu module] a new option to expand the mobile menu in full width below the hamburger icon.
 * added : a new user interface for section navigation, allowing users to navigate in the structure of Nimble Builder elements : locations, sections, columns and modules.
