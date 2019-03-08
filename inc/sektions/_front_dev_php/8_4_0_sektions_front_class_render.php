@@ -360,6 +360,19 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $collection = array_key_exists( 'collection', $model ) ? $model['collection'] : array();
 
             //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id, current_filter() . ' | ' . current_action() );
+            $custom_anchor = null;
+            if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'anchor' ] ) && !empty( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
+                if ( is_string( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
+                    $custom_anchor = esc_attr( $model[ 'options' ][ 'anchor' ]['custom_anchor'] );
+                }
+            }
+            $custom_css_classes = null;
+            if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'anchor' ] ) && !empty( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] ) ) {
+                if ( is_string( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] ) ) {
+                    $custom_css_classes = esc_attr( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] );
+                    //$custom_css_classes = preg_replace("/[^0-9a-zA-Z]/","", $custom_css_classes);
+                }
+            }
 
             switch ( $level_type ) {
                 case 'location' :
@@ -412,22 +425,17 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     if ( !empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
                         $column_container_class = 'sek-container';
                     }
-                    $custom_anchor = null;
-                    if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'anchor' ] ) && !empty( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
-                        if ( is_string( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
-                            $custom_anchor = $model[ 'options' ][ 'anchor' ]['custom_anchor'];
-                        }
-                    }
 
                     ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s" %5$s %6$s>',
+                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %7$s" %5$s %6$s>',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
                         $this->get_level_visibility_css_class( $model ),
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
                         // add smartload + parallax attributes
-                        $this -> sek_maybe_add_bg_attributes( $model )
+                        $this -> sek_maybe_add_bg_attributes( $model ),
+                        is_null( $custom_css_classes ) ? '' : $custom_css_classes
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -475,13 +483,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
                     ?>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s" %4$s %5$s>',
+                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %7$s" %4$s %5$s %6$s>',
                               $id,
                               $grid_column_class,
                               $this->get_level_visibility_css_class( $model ),
                               empty( $collection ) ? 'data-sek-no-modules="true"' : '',
                               // add smartload + parallax attributes
-                              $this -> sek_maybe_add_bg_attributes( $model )
+                              $this -> sek_maybe_add_bg_attributes( $model ),
+                              is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                              is_null( $custom_css_classes ) ? '' : $custom_css_classes
                           );
                       ?>
                         <?php
@@ -536,13 +546,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $title_attribute = 'title="'.$title_attribute.'"';
                     }
                     ?>
-                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s %5$s>',
+                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %7$s" %4$s %5$s %6$s>',
                           $id,
                           $module_type,
                           $this->get_level_visibility_css_class( $model ),
                           $title_attribute,
                           // add smartload + parallax attributes
-                          $this -> sek_maybe_add_bg_attributes( $model )
+                          $this -> sek_maybe_add_bg_attributes( $model ),
+                          is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                          is_null( $custom_css_classes ) ? '' : $custom_css_classes
                         );?>
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>

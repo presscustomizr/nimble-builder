@@ -49,7 +49,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         anchor : {
                               settingControlId : params.id + '__anchor_options',
                               module_type : 'sek_level_anchor_module',
-                              controlLabel : sektionsLocalizedData.i18n['Set a custom anchor ( CSS ID ) for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              controlLabel : sektionsLocalizedData.i18n['Custom anchor ( CSS ID ) and CSS classes for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                               icon : '<i class="fas fa-anchor sek-level-option-icon"></i>'
                         },
                         visibility : {

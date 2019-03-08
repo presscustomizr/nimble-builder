@@ -13,8 +13,16 @@ function sek_get_module_params_for_sek_level_anchor_module() {
                     'input_type'  => 'text',
                     'title'       => __('Custom anchor', 'text_doma'),
                     'default'     => '',
-                    'notice_after' => __('Note : white spaces, numbers and special characters are not allowed when setting an anchor.')
+                    'notice_after' => __('Note : white spaces, numbers and special characters are not allowed when setting a CSS ID.'),
+                    'refresh_markup' => true
                 ),
+                'custom_css_classes' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Custom CSS classes', 'text_doma'),
+                    'default'     => '',
+                    'notice_after' => __('Note : you can add several custom CSS classes separated by a white space.'),
+                    'refresh_markup' => true
+                )
             )
         )//tmpl
     );

@@ -414,7 +414,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_doma'),
             'Height and vertical alignment for the' => __('Height and vertical alignment for the', 'text_doma'),
             'Width settings for the' => __('Width settings for the', 'text_doma'),
-            'Set a custom anchor ( CSS ID ) for the' => __('Set a custom anchor ( CSS ID ) for the', 'text_doma'),
+            'Custom anchor ( CSS ID ) and CSS classes for the' => __('Custom anchor ( CSS ID ) and CSS classes for the', 'text_doma'),
             'Device visibility settings for the' => __('Device visibility settings for the', 'text_doma'),
             'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_doma'),
 
