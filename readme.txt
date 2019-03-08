@@ -19,7 +19,7 @@ Powerful drag and drop page builder using the native WordPress customizer.
 The plugin allows you to drag-and-drop modules like text-editor, images, contact forms, maps, icons, or beautiful pre-built sections with a [parallax background](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), into any page of your site. You can edit your sections in real-time, and then click "publish" when you are happy with the result, or save for later.
 
 = Works in any page of your site and with all WordPress themes =
-Nimble Builder allows you to insert sections in **any context of your site** : home page, single post or page, category or tag page, even search results or [404 pages](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link). No only that, but you can also decide to [start designing from a blank page](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) in any page of your site, and even create a custom header and footer. Nimble Builder uses WordPress default action hooks, which makes it compatible with all WordPress themes.
+Nimble Builder allows you to insert sections in any context of your site : home page, single post or page, category or tag page, even search results or [404 pages](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link). No only that, but you can also decide to [start designing from a blank page](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) in any page of your site, and even create a custom header and footer. Nimble Builder uses WordPress default action hooks, which makes it compatible with all WordPress themes.
 
 = Live demos =
 * Example of [integration with the Customizr theme](https://demo.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)
@@ -32,7 +32,7 @@ Nimble Builder allows you to insert sections in **any context of your site** : h
 * Includes many content modules : classic text editor, image, column layouts, contact form, button, icons, map, html code, WordPress widget area, menu, and more.
 * Add image background to your sections, and [enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link).
 * Easily [customize your content specifically for mobile devices](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) : change the responsive breakpoint, adapt font-size, spacing, alignment, column layouts, in real-time preview.
-* Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)
+* Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link).
 * Create content, style, move / duplicate / remove elements in real-time preview.
 * [Embed shortcodes](https://docs.presscustomizr.com/article/350-how-to-use-shortcodes-from-other-plugins-with-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page) from other plugins, and see the result in real-time preview.
 * Nimble Builder automatically generates responsive HTML markup for a pixel-perfect rendering on smartphones and tablets.
@@ -63,6 +63,7 @@ Once [installed](https://docs.presscustomizr.com/article/347-installing-the-nimb
 
 == Documentation ==
 You'll find a growing online knowledge base for Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page).
+
 * [Getting started with Nimble Page Builder for WordPress](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin)
 * [Technical requirements for the Nimble Builder : server, browser, php version, WP version](https://docs.presscustomizr.com/article/355-technical-requirements-server-browser-php-version-wordpress-version)
 * [Designing for mobile devices with the WordPress Nimble Builder](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder)
