@@ -9,6 +9,7 @@ Tested up to: 5.1.1
 Stable tag: 1.5.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
 
 Powerful drag and drop page builder using the native WordPress customizer.
 
@@ -77,6 +78,7 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 3. Editing content in live preview
 4. Creating columns layouts
 5. Customizing a section with an image background
+6. Using the section navigator
 
 == Installation ==
 1. Install the plugin through the WordPress plugins screen. Or download the plugin, unzip the package and upload it to your /wp-content/plugins/ directory
