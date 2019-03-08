@@ -2,11 +2,11 @@
 Contributors: nikeo, d4z_c0nf
 Author URI: https://nimblebuilder.com
 Plugin URI: https://wordpress.org/plugins/nimble-builder/
-Tags: page builder, customizer, drag and drop, header, footer, landing page
+Tags: page builder, visual editor, customizer, drag and drop, header, footer, landing page, contact form
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.1.0
-Stable tag: 1.5.0
+Tested up to: 5.1.1
+Stable tag: 1.5.1-beta
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -14,27 +14,62 @@ Powerful drag and drop page builder using the native WordPress customizer.
 
 == Description ==
 = What is the Nimble Page Builder ? =
-The **[Nimble Page Builder](https://nimblebuilder.com/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** is a powerful and easy to use page builder plugin. It takes the native WordPress customizer to a level you've never seen before.
+**[Nimble Page Builder](https://nimblebuilder.com/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** is a powerful yet easy to use page builder plugin for WordPress. Nimble Builder uses the live customizer which is the native WordPress interface for real-time design.
+The plugin allows you to drag-and-drop modules like text-editor, images, contact forms, maps, icons, or beautiful pre-built sections with a [parallax background](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), into any page of your site. You can edit your sections in real-time, and then click "publish" when you are happy with the result, or save for later.
 
-Nimble allows you to drag and drop content modules, or pre-built section templates, into any context of your site, including search results or 404 pages. You can edit your sections in real time from the live customizer, and then publish when you are happy of the result, or save for later.
+= Works in any page of your site and with all WordPress themes =
+Nimble Builder allows you to insert sections in **any context of your site** : home page, single post or page, category or tag page, even search results or [404 pages](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link). No only that, but you can also decide to [start designing from a blank page](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) in any page of your site, and even create a custom header and footer. Nimble Builder uses WordPress default action hooks, which makes it compatible with all WordPress themes.
 
-You can also start designing from a blank page, and create your header, footer, and custom content.
+= Live demos =
+* Example of [integration with the Customizr theme](https://demo.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)
+* Example of [integration with the Hueman theme](https://demo-hueman.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)
+* Example of a [404 page created with Nimble Builder](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), header and footer disabled.
 
-The plugin automatically creates fluid and responsive sections for a pixel-perfect rendering on smartphones and tablets, without the need to add complex code.
+= Features overview =
+* Drag and drop neatly pre-designed sections and customize them in real-time preview.
+* **Works in any WordPress contexts** : home, pages, posts, custom post types, archives, author pages, search page, ...
+* Includes many content modules : classic text editor, image, column layouts, contact form, button, icons, map, html code, WordPress widget area, menu, and more.
+* Add image background to your sections, and [enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link).
+* Easily [customize your content specifically for mobile devices](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) : change the responsive breakpoint, adapt font-size, spacing, alignment, column layouts, in real-time preview.
+* Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)
+* Create content, style, move / duplicate / remove elements in real-time preview.
+* [Embed shortcodes](https://docs.presscustomizr.com/article/350-how-to-use-shortcodes-from-other-plugins-with-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page) from other plugins, and see the result in real-time preview.
+* Nimble Builder automatically generates responsive HTML markup for a pixel-perfect rendering on smartphones and tablets.
+* Embed WordPress blocks, videos, tweets or any embed types supported by WordPress, and see the result in real-time preview.
+* Nimble Builder Leverage the WordPress customizer auto-drafting and schedule publishing features. You can safely build and save drafts of your content before deploying in production.
 
-= Features =
-* Drag and drop carefully crafted pre-designed sections into any pages.
-* Content modules: classic text editor, image, column layouts, contact form, button, icons, map, html code, and more.
-* Add image background to your sections, and activate a parallax effect.
-* Easily create responsive column layouts.
-* Create content, style, move / duplicate / remove elements in live preview.
-* Embed shortcodes from other plugins, and see the result in live preview.
-* Embed WordPress blocks, videos, tweets or any embed types supported by WordPress, and see the result in live preview.
-* Leverage the customizer auto-drafting and schedule publishing features, and safely build and save drafts of your content before deploying in production.
-* Works in any WordPress contexts : home, pages, posts, custom post types, archives, author pages, search page, ...
+= Content modules =
+* Headings
+* WordPress text editor
+* [Image](https://docs.presscustomizr.com/article/381-how-to-enable-lightbox-on-your-images-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
+* Button
+* Icon
+* [Contact Form](https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
+* [Google Map](https://docs.presscustomizr.com/article/387-how-to-insert-google-maps-in-your-wordpress-pages-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
+* Divider
+* Spacer
+* Columns
+* Quote
+* Widget zone
+* Menu
+* Post Grid ( under development )
+* Image Slider ( under development )
+* Accordion ( under development )
+* ... and more to come !
+
+= Getting started =
+Once [installed](https://docs.presscustomizr.com/article/347-installing-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page), Nimble Builder can be accessed in the WordPress live customizer. You can [start creating your first section](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page) !
 
 == Documentation ==
-You'll find an online knowledge base for the Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page).
+You'll find a growing online knowledge base for Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page).
+* [Getting started with Nimble Page Builder for WordPress](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin)
+* [Technical requirements for the Nimble Builder : server, browser, php version, WP version](https://docs.presscustomizr.com/article/355-technical-requirements-server-browser-php-version-wordpress-version)
+* [Designing for mobile devices with the WordPress Nimble Builder](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder)
+* [How to start building from a blank page with the WordPress Nimble Builder?](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder)
+* [How to build your WordPress header and footer with the Nimble Builder ?](https://docs.presscustomizr.com/article/358-building-your-header-and-footer-with-the-nimble-builder)
+* [How to set a parallax background for a section in WordPress with the Nimble Builder ?](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder)
+* [How to enable reCAPTCHA protection against spam in your forms with the Nimble Builder?](https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder)
+* [How to change the page template with Nimble Builder ?](https://docs.presscustomizr.com/article/339-changing-the-page-template)
 
 == Screenshots ==
 1. Creating a page with 3 sections
