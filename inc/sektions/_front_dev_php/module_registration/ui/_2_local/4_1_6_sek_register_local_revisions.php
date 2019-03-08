@@ -19,7 +19,8 @@ function sek_get_module_params_for_sek_local_revisions() {
                     'refresh_stylesheet' => false,
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'notice_before' => __('This is the revision history of the sections of the currently customized page.', 'text_doma')
+                    'notice_before' => __('This is the revision history of the sections of the currently customized page.', 'text_doma'),
+                    'notice_after' => __('Select a revision from the drop-down list to preview it. You can then restore it by clicking the Publish button at the top of the page.', 'text_doma')
                 )
             )
         )//tmpl

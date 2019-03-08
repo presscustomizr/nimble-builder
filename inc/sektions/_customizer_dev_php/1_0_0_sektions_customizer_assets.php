@@ -500,7 +500,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'The revision has been successfully restored.' => __('The revision has been successfully restored.', 'text_doma'),
             'Select' => __('Select', 'text_doma'),
             'No revision history available for the moment.' => __('No revision history available for the moment.', 'text_doma'),
-            'This is the current version.' => __('This is the current version.', 'text_doma')
+            'This is the current version.' => __('This is the current version.', 'text_doma'),
+            '(currently published version)' => __('(currently published version)','text_doma')
 
             // 'This is the current version.' => __('This is the current version.', 'text_doma'),
             // 'Module' => __('Module', 'text_doma'),

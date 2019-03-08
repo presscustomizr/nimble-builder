@@ -36,6 +36,12 @@
                               }
                               optionsNodes.unshift( $('<option>', _attributes) );
                         });
+
+                        // Add the 'pulished'
+                        optionsNodes[0].html( [ optionsNodes[0].html(), sektionsLocalizedData.i18n['(currently published version)'] ].join(' ') );
+
+                        console.log( 'ALORS ?',optionsNodes, optionsNodes[0] );
+
                         _.each( optionsNodes, function( nod ) {
                               $( 'select.sek-revision-history', input.container ).append( nod );
                         });
