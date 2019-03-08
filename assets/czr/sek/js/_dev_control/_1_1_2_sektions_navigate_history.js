@@ -2,9 +2,83 @@
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            /* HISTORY */
+            // Fired in ::initialize(), at api 'ready'
+            // March 2019 : history log tracks local and global section settings
+            // no tracking of the global option sektionsLocalizedData.optNameForGlobalOptions
+            initializeHistoryLogWhenSettingsRegistered : function() {
+                  var self = this;
+                  // This api.Value() is bound in ::setupTopBar
+                  self.historyLog = new api.Value([{
+                        status : 'current',
+                        value : {
+                              'local' : api( self.localSectionsSettingId() )(),//<= "nimble___[skp__post_page_10]"
+                              'global' : api(  self.getGlobalSectionsSettingId() )()
+                        },
+                        action : 'initial'
+                  }]);
+                  // LISTEN TO HISTORY LOG CHANGES AND UPDATE THE BUTTON STATE
+                  self.historyLog.bind( function( newLog ) {
+                        if ( _.isEmpty( newLog ) )
+                          return;
+
+                        var newCurrentKey = _.findKey( newLog, { status : 'current'} );
+                        newCurrentKey = Number( newCurrentKey );
+                        $( '#nimble-top-bar' ).find('[data-nimble-history]').each( function() {
+                              if ( 'undo' === $(this).data('nimble-history') ) {
+                                    $(this).attr('data-nimble-state', 0 >= newCurrentKey ? 'disabled' : 'enabled');
+                              } else {
+                                    $(this).attr('data-nimble-state', newLog.length <= ( newCurrentKey + 1 ) ? 'disabled' : 'enabled');
+                              }
+                        });
+                  });
+            },
+
+            // React to a local or global setting change api( settingData.collectionSettingId )
+            // =>populates self.historyLog() observable value
+            // invoked in ::setupSettingsToBeSaved, if params.navigatingHistoryLogs !== true <=> not already navigating
+            trackHistoryLog : function( sektionSetInstance, params ) {
+                  var self = this,
+                      _isGlobal = sektionSetInstance.id === self.getGlobalSectionsSettingId();
+
+                  // Safety checks
+                  // trackHistoryLog must be invoked with a try catch statement
+                  if ( !_.isObject( params ) || !_.isFunction( self.historyLog ) || !_.isArray( self.historyLog() ) ) {
+                        throw new Error('trackHistoryLog => invalid params or historyLog value');
+                  }
+
+                  // Always clean future values if the logs have been previously navigated back
+                  var newHistoryLog = [],
+                      historyLog = $.extend( true, [], self.historyLog() ),
+                      sektionToRefresh;
+
+                  if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
+                        sektionToRefresh = params.in_sektion;
+                  } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
+                        sektionToRefresh = params.to_sektion;
+                  }
+
+                  // Reset all status but 'future' to 'previous'
+                  _.each( historyLog, function( log ) {
+                        var newStatus = 'previous';
+                        if ( 'future' == log.status )
+                          return;
+                        $.extend( log, { status : 'previous' } );
+                        newHistoryLog.push( log );
+                  });
+                  newHistoryLog.push({
+                        status : 'current',
+                        value : _isGlobal ? { global : sektionSetInstance() } : { local : sektionSetInstance() },
+                        action : _.isObject( params ) ? ( params.action || '' ) : '',
+                        sektionToRefresh : sektionToRefresh
+                  });
+                  self.historyLog( newHistoryLog );
+            },
+
+
+
             // @param direction = string 'undo', 'redo'
             // @return void()
+            // Fired on click in the topbar or when hitting ctrl z / y
             navigateHistory : function( direction ) {
                   var self = this,
                       historyLog = $.extend( true, [], self.historyLog() );

@@ -470,7 +470,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
 
-                  // GLOBAL OPTIONS SETTING
+                  // SITE WIDE GLOBAL OPTIONS SETTING
                   // Will Be updated in ::generateUIforGlobalOptions()
                   // has no control.
                   api.CZR_Helpers.register( {

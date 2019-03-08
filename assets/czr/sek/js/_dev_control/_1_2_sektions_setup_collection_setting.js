@@ -49,7 +49,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           //             params : params
                                           //       }
                                           // );
-                                          self.trackHistoryLog( sektionSetInstance, params );
+
+                                          // Track changes, if not already navigating the logs
+                                          if ( !_.isObject( params ) || true !== params.navigatingHistoryLogs ) {
+                                                try { self.trackHistoryLog( sektionSetInstance, params ); } catch(er) {
+                                                      api.errare( 'setupSettingsToBeSaved => trackHistoryLog', er );
+                                                }
+                                          }
 
                                     }, 1000 ) );
                               });//api( settingData.collectionSettingId, function( sektionSetInstance ){}
@@ -80,74 +86,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       track : false//don't register in the self.registered()
                   // });
             },// SetupSettingsToBeSaved()
-
-
-            // React to a local or global setting change api( settingData.collectionSettingId )
-            trackHistoryLog : function( sektionSetInstance, params ) {
-                  var self = this,
-                      _isGlobal = sektionSetInstance.id === self.getGlobalSectionsSettingId();
-
-                  // Track changes, if not currently navigating the logs
-                  // Always clean future values if the logs have been previously navigated back
-                  if ( params && true !== params.navigatingHistoryLogs ) {
-                        var newHistoryLog = [],
-                            historyLog = $.extend( true, [], self.historyLog() ),
-                            sektionToRefresh;
-
-                        if ( ! _.isEmpty( params.in_sektion ) ) {//<= module changed, column resized, removed...
-                              sektionToRefresh = params.in_sektion;
-                        } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
-                              sektionToRefresh = params.to_sektion;
-                        }
-
-                        // Reset all status but 'future' to 'previous'
-                        _.each( historyLog, function( log ) {
-                              var newStatus = 'previous';
-                              if ( 'future' == log.status )
-                                return;
-                              $.extend( log, { status : 'previous' } );
-                              newHistoryLog.push( log );
-                        });
-                        newHistoryLog.push({
-                              status : 'current',
-                              value : _isGlobal ? { global : sektionSetInstance() } : { local : sektionSetInstance() },
-                              action : _.isObject( params ) ? ( params.action || '' ) : '',
-                              sektionToRefresh : sektionToRefresh
-                        });
-                        self.historyLog( newHistoryLog );
-                  }
-            },
-
-
-
-            // Fired in ::initialize(), at api 'ready'
-            initializeHistoryLogWhenSettingsRegistered : function() {
-                  var self = this;
-                  // This api.Value() is bound in ::setupTopBar
-                  self.historyLog = new api.Value([{
-                        status : 'current',
-                        value : {
-                              'local' : api( self.localSectionsSettingId() )(),//<= "nimble___[skp__post_page_10]"
-                              'global' : api(  self.getGlobalSectionsSettingId() )()
-                        },
-                        action : 'initial'
-                  }]);
-                  // LISTEN TO HISTORY LOG CHANGES TO UPDATE THE BUTTON STATE
-                  self.historyLog.bind( function( newLog ) {
-                        if ( _.isEmpty( newLog ) )
-                          return;
-
-                        var newCurrentKey = _.findKey( newLog, { status : 'current'} );
-                        newCurrentKey = Number( newCurrentKey );
-                        $( '#nimble-top-bar' ).find('[data-nimble-history]').each( function() {
-                              if ( 'undo' === $(this).data('nimble-history') ) {
-                                    $(this).attr('data-nimble-state', 0 >= newCurrentKey ? 'disabled' : 'enabled');
-                              } else {
-                                    $(this).attr('data-nimble-state', newLog.length <= ( newCurrentKey + 1 ) ? 'disabled' : 'enabled');
-                              }
-                        });
-                  });
-            },
 
             // Fired :
             // 1) when instantiating the setting
