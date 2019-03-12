@@ -1,5 +1,7 @@
 <?php
 // Set input content
+// the default input type templates are declared in inc/czr-base-fmk/_dev_php/0_3_czr-base-fmk-tmpl_builder.php
+// the template of input specific to Nimble are declared here
 add_action( 'czr_set_input_tmpl_content', '\Nimble\sek_set_input_tmpl_content', 10, 3 );
 function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
     // error_log( print_r( $input_data, true ) );
@@ -74,6 +76,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         break;
         case 'revision_history' :
             sek_set_input_tmpl___revision_history( $input_id, $input_data );
+        break;
+        case 'detached_tinymce_editor' :
+            sek_set_input_tmpl___detached_tinymce_editor( $input_id, $input_data );
         break;
     }
 }

@@ -49,7 +49,7 @@ function sek_get_module_params_for_czr_tinymce_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'content' => array(
-                    'input_type'  => 'tiny_mce_editor',
+                    'input_type'  => 'detached_tinymce_editor',
                     'title'       => __('Content', 'text_doma'),
                     'default'     => ''
                 ),

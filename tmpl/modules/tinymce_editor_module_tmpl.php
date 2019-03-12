@@ -14,7 +14,7 @@ $value = $value['main_settings'];
 if ( ! function_exists( 'Nimble\sek_print_tiny_mce_text_content') ) {
     function sek_print_tiny_mce_text_content( $tiny_mce_content, $input_id, $value ) {
         if ( empty( $tiny_mce_content ) ) {
-            echo Nimble_Manager()->sek_get_input_placeholder_content( 'tiny_mce_editor', $input_id );
+            echo Nimble_Manager()->sek_get_input_placeholder_content( 'detached_tinymce_editor', $input_id );
         } else {
             if ( false === sek_booleanize_checkbox_val( $value['autop'] ) ) {
                 remove_filter( 'the_nimble_tinymce_module_content', 'wpautop');
@@ -28,7 +28,7 @@ if ( ! function_exists( 'Nimble\sek_print_tiny_mce_text_content') ) {
                 add_filter( 'the_nimble_tinymce_module_content', 'wpautop');
             }
             if ( skp_is_customizing() ) {
-                printf('<div title="%3$s" data-sek-input-type="tiny_mce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
+                printf('<div title="%3$s" data-sek-input-type="detached_tinymce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
             } else {
                 echo apply_filters( 'nimble_parse_for_smart_load', $content );
             }

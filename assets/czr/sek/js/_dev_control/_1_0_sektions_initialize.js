@@ -66,6 +66,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
                   });
 
+                  // added for https://github.com/presscustomizr/nimble-builder/issues/403
+                  // in fmk::setupTinyMceEditor => each id of newly instantiated editor is added to the [] api.czrActiveWPEditors
+                  // We need to remove those instances when cleaning registered controls
+                  api.bind( 'sek-before-clean-registered', function() {
+                        if ( _.isArray( api.czrActiveWPEditors ) ) {
+                              _.each( api.czrActiveWPEditors, function( _id ) {
+                                    wp.editor.remove( _id );
+                              });
+                              api.czrActiveWPEditors = [];
+                        }
+                  });
             },// initialize()
 
 

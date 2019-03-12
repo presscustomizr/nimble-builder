@@ -20,7 +20,7 @@
                     initialize : function( name, options ) {
                           var input = this;
                           // Expand the editor when ready
-                          if ( 'tiny_mce_editor' == input.type ) {
+                          if ( 'detached_tinymce_editor' == input.type ) {
                                 input.isReady.then( function() {
                                       input.container.find('[data-czr-action="open-tinymce-editor"]').trigger('click');
                                 });

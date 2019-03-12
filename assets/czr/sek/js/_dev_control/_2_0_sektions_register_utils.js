@@ -13,6 +13,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
 
+                  // added for https://github.com/presscustomizr/nimble-builder/issues/403
+                  // in order to remove all instantiations of WP editor
+                  // @see ::initialize()
+                  api.trigger('sek-before-clean-registered');
+
                   registered = _.filter( registered, function( _reg_ ) {
                         if ( 'setting' !== _reg_.what ) {
                               if ( api[ _reg_.what ].has( _reg_.id ) ) {

@@ -3,8 +3,8 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-// TINY MCE EDITOR
-//require_once(  dirname( __FILE__ ) . '/customizer/seks_tiny_mce_editor_actions.php' );
+
+
 
 // ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
 add_action ( 'customize_controls_enqueue_scripts', '\Nimble\sek_enqueue_controls_js_css', 20 );
@@ -654,8 +654,55 @@ function sek_print_nimble_customizer_tmpl() {
           </button>
       </div>
     </script>
+
+    <?php // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403 ?>
+    <div id="czr-customize-content_editor-pane">
+      <div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="<?php _e( 'Hide Editor', 'text_doma' ); ?>"></i>&nbsp;<span><?php _e( 'Hide Editor', 'text_doma');?></span></div>
+      <div id="czr-customize-content_editor-dragbar" title="<?php _e('Resize the editor', 'text_domain'); ?>">
+        <span class="screen-reader-text"><?php _e( 'Resize the editor', 'nimble-builder' ); ?></span>
+        <i class="czr-resize-handle fas fa-arrows-alt-v"></i>
+      </div>
+      <!-- <textarea style="height:250px;width:100%" id="czr-customize-content_editor"></textarea> -->
+      <?php
+        // // The settings passed in here are inspired from edit-form-advanced.php.
+        sek_setup_nimble_editor( '', 'czr-customize-content_editor', array(
+            '_content_editor_dfw' => false,
+            'drag_drop_upload' => true,
+            'tabfocus_elements' => 'content-html,save-post',
+            'editor_height' => 200,
+            'default_editor' => 'tinymce',
+            'tinymce' => array(
+                'resize' => false,
+                'wp_autoresize_on' => false,
+                'add_unload_trigger' => false,
+                'wpautop' => true
+            ),
+        ) );
+      ?>
+    </div>
     <?php
 }
+
+
+
+
+//add_action( 'customize_controls_init', '\Nimble\sek_enqueue_tiny_mce_editor' );
+// Enqueue a WP Editor instance if not done
+// @hook customize_controls_init
+function sek_enqueue_tiny_mce_editor() {
+    //add_action( 'customize_controls_print_footer_scripts', 'render_editor' , 0 );
+    if ( false === has_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'enqueue_scripts' ) ) ) {
+        //sek_error_log('_wp_editors enqueue_scripts included by Nimble Builder');
+        add_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'enqueue_scripts' ) );
+    }
+    // if ( false === has_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'force_uncompressed_tinymce' ) ) ) {
+    //     //sek_error_log('_wp_editors force_uncompressed_tinymce included by Nimble Builder');
+    //     add_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'force_uncompressed_tinymce' ), 1 );
+    // }
+
+}
+
+
 
 // Introduced for https://github.com/presscustomizr/nimble-builder/issues/395
 function sek_has_active_cache_plugin() {
@@ -711,4 +758,7 @@ function sek_is_plugin_active_for_network( $plugin ) {
 
   return false;
 }
+
+
+
 ?>

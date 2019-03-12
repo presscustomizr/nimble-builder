@@ -645,7 +645,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         function sek_get_input_placeholder_content( $input_type = '', $input_id = '' ) {
             $ph = '<i class="material-icons">pan_tool</i>';
             switch( $input_type ) {
-                case 'tiny_mce_editor' :
+                case 'detached_tinymce_editor' :
+                case 'simple_text_editor' :
                 case 'text' :
                   $ph = skp_is_customizing() ? '<div class="sek-tiny-mce-module-placeholder-text">' . __('Click to edit', 'here') .'</div>' : '';
                 break;

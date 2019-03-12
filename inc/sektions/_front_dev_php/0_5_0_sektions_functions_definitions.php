@@ -502,7 +502,7 @@ function sek_get_default_module_model( $module_type = '' ) {
                 //         //'attributes' => 'data-sek-device="desktop"',
                 //         'inputs' => array(
                 //             'content' => array(
-                //                 'input_type'  => 'tiny_mce_editor',
+                //                 'input_type'  => 'detached_tinymce_editor',
                 //                 'title'       => __('Content', 'text_doma')
                 //             ),
                 //             'h_alignment_css' => array(
@@ -644,7 +644,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
                 //         //'attributes' => 'data-sek-device="desktop"',
                 //         'inputs' => array(
                 //             'content' => array(
-                //                 'input_type'  => 'tiny_mce_editor',
+                //                 'input_type'  => 'detached_tinymce_editor',
                 //                 'title'       => __('Content', 'text_doma')
                 //             ),
                 //             'h_alignment_css' => array(

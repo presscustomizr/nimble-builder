@@ -390,7 +390,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'wp_color_alpha' :
                               case 'wp_color' :
                               case 'content_picker' :
-                              case 'tiny_mce_editor' :
+                              case 'detached_tinymce_editor' :
+                              case 'simple_text_editor' :
                               case 'password' :
                               case 'range' :
                               case 'range_slider' :

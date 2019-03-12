@@ -11,64 +11,48 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this;
                   // OBSERVABLE VALUES
                   api.sekEditorExpanded   = new api.Value( false );
-                  api.sekEditorSynchronizedInput = new api.Value();
+                  //api.sekEditorSynchronizedInput = new api.Value();
 
                   self.editorEventsListenerSetup = false;//this status will help us ensure that we bind the shared tinyMce instance only once
 
+                  // Cache some dom elements
+                  self.$editorTextArea = $( '#czr-customize-content_editor' );
+                  self.$editorPane = $( '#czr-customize-content_editor-pane' );
+                  self.$editorDragbar = $( '#czr-customize-content_editor-dragbar' );
+                  self.$editorFrame  = $( '#czr-customize-content_editor_ifr' );
+                  self.$mceTools     = $( '#wp-czr-customize-content_editor-tools' );
+                  self.$mceToolbar   = self.$editorPane.find( '.mce-toolbar-grp' );
+                  self.$mceStatusbar = self.$editorPane.find( '.mce-statusbar' );
+
+                  self.$preview = $( '#customize-preview' );
+                  self.$collapseSidebar = $( '.collapse-sidebar' );
+
                   // Cache the instance and attach
                   var mayBeAwakeTinyMceEditor = function() {
-                        api.sekTinyMceEditor = api.sekTinyMceEditor || tinyMCE.get( 'czr-customize-content_editor' );
-
-                        if ( false === self.editorEventsListenerSetup ) {
-                              self.attachEventsToEditor();
-                              self.editorEventsListenerSetup = true;
-                              self.trigger('sek-tiny-mce-editor-bound-and-instantiated');
-                        }
-                  };
-
-
-                  // SET THE SYNCHRONIZED INPUT
-                  // CASE 1) When user has clicked on a tiny-mce editable content block
-                  // CASE 2) when user click on the edit button in the module ui
-                  // @see reactToPreviewMsg
-                  // Each time a message is received from the preview, the corresponding action are executed
-                  // and an event {msgId}_done is triggered on the current instance
-                  // This is how we can listen here to 'sek-edit-module_done'
-                  // The sek-edit-module is fired when clicking on a .sek-module wrapper @see ::scheduleUiClickReactions
-                  self.bind( 'sek-edit-module_done', function( params ) {
-                        params = _.isObject( params ) ? params : {};
-                        if ( 'tiny_mce_editor' !== params.clicked_input_type && 'czr_tiny_mce_editor_module' !== params.module_type )
-                          return;
-
-                        // @see preview::scheduleUiClickReactions()
-                        // Fixes : https://github.com/presscustomizr/nimble-builder/issues/251
-                        if ( _.isEmpty( params.syncedTinyMceInputId ) )
-                          return;
-
-                        var controlId = params.id;
-                        // When the module is a father, we need to assign the right child module id
-                        if ( true === self.getRegisteredModuleProperty( params.module_type, 'is_father' ) ) {
-                              var _childModules_ = self.getRegisteredModuleProperty( params.module_type, 'children' );
-                              if ( _.isEmpty( _childModules_ ) ) {
-                                    throw new Error('::generateUIforFrontModules => a father module ' + params.module_type + ' is missing children modules ');
+                        api.sekTinyMceEditor = tinyMCE.get( 'czr-customize-content_editor' );
+                        var _do = function() {
+                              if ( ! api.sekTinyMceEditor ) {
+                                    throw new Error('::setupTinyMceEditor => ::mayBeAwakeTinyMceEditor => wp editor not instantiated');
+                              }
+                              if ( false === self.editorEventsListenerSetup ) {
+                                    console.log('ATTACH EVENTS');
+                                    self.attachEventsToEditor();
+                                    self.editorEventsListenerSetup = true;
+                                    self.trigger('sek-tiny-mce-editor-bound-and-instantiated');
+                              }
+                        };
+                        if ( api.sekTinyMceEditor ) {
+                              if ( api.sekTinyMceEditor.initialized ) {
+                                    _do();
                               } else {
-                                    _.each( _childModules_, function( mod_type, optionType ){
-                                          if ( 'czr_tinymce_child' === mod_type ) {
-                                                controlId = controlId + '__' + optionType;//<= as defined when generating the ui in ::generateUIforFrontModules
-                                          }
-                                    });
+                                    api.sekTinyMceEditor.on( 'init',function() {
+                                        _do();
+                                    } );
                               }
                         }
+                        console.log('ALORS mayBeAwakeTinyMceEditor ?', api.sekTinyMceEditor );
 
-                        // Set a new sync input
-                        api.sekEditorSynchronizedInput({
-                              control_id : controlId,
-                              input_id : params.syncedTinyMceInputId
-                        });
-
-                        api.sekEditorExpanded( true );
-                        api.sekTinyMceEditor.focus();
-                  });
+                  };
 
                   // CASE 1)
                   // Toggle the editor visibility
@@ -84,48 +68,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare('toggle-tinymce-editor => missing input or control id');
                               return;
                         }
-                        var currentEditorSyncData = $.extend( true, {}, api.sekEditorSynchronizedInput() ),
-                            newEditorSyncData = _.extend( currentEditorSyncData, {
-                                  input_id : input_id,
-                                  control_id : control_id
-                            });
-                        api.sekEditorSynchronizedInput( newEditorSyncData );
+                        // var currentEditorSyncData = $.extend( true, {}, api.sekEditorSynchronizedInput() ),
+                        //     newEditorSyncData = _.extend( currentEditorSyncData, {
+                        //           input_id : input_id,
+                        //           control_id : control_id
+                        //     });
+                        //api.sekEditorSynchronizedInput( newEditorSyncData );
                         api.sekEditorExpanded( true );
-                        api.sekTinyMceEditor.focus();
+                        //api.sekTinyMceEditor.focus();
                   });
-
-
-                  // CASE 2)
-                  // when the synchronized input gets changed by the user
-                  // 1) make sure the editor is expanded
-                  // 2) refresh the editor content with the input() one
-                  api.sekEditorSynchronizedInput.bind( function( to, from ) {
-                        mayBeAwakeTinyMceEditor();
-                        //api.sekEditorExpanded( true );
-                        //console.log('MODULE VALUE ?', self.getLevelProperty( { property : 'value', id : to.control_id } ) );
-
-                        // When initializing the module, its customized value might not be set yet
-                        // => defer the setContent action when the api setting is instantiated
-                        api( to.control_id, function( _setting_ ) {
-                              var _currentModuleValue_ = _setting_(),
-                                  _currentInputContent_ = ( _.isObject( _currentModuleValue_ ) && ! _.isEmpty( _currentModuleValue_[ to.input_id ] ) ) ? _currentModuleValue_[ to.input_id ] : '';
-
-                              // automatically add line breaks when setting the content
-                              // simplified version of php wpautop()
-                              // fixes https://github.com/presscustomizr/nimble-builder/issues/259
-                              _currentInputContent_ = _currentInputContent_.replace(/\r?\n/g, '<br/>');
-                              try { api.sekTinyMceEditor.setContent( _currentInputContent_ ); } catch( er ) {
-                                    api.errare( 'Error when setting the tiny mce editor content in setupTinyMceEditor', er );
-                              }
-                              api.sekTinyMceEditor.focus();
-                        });
-
-                  });//api.sekEditorSynchronizedInput.bind( function( to, from )
-
-
-
-
-
 
 
 
@@ -133,7 +84,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.sekEditorExpanded.bind( function ( expanded, from, params ) {
                         mayBeAwakeTinyMceEditor();
                         //api.infoLog('in api.sekEditorExpanded', expanded );
-                        if ( expanded ) {
+                        if ( expanded && api.sekTinyMceEditor ) {
                               api.sekTinyMceEditor.focus();
                         }
                         $(document.body).toggleClass( 'czr-customize-content_editor-pane-open', expanded);
@@ -230,55 +181,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             attachEventsToEditor : function() {
+                  console.log('ATTACH EVENT TO EDITOR ?');
                   var self = this;
-                  // Cache some dom elements
-                  self.$editorTextArea = $( '#czr-customize-content_editor' );
-                  self.$editorPane = $( '#czr-customize-content_editor-pane' );
-                  self.$editorDragbar = $( '#czr-customize-content_editor-dragbar' );
-                  self.$editorFrame  = $( '#czr-customize-content_editor_ifr' );
-                  self.$mceTools     = $( '#wp-czr-customize-content_editor-tools' );
-                  self.$mceToolbar   = self.$editorPane.find( '.mce-toolbar-grp' );
-                  self.$mceStatusbar = self.$editorPane.find( '.mce-statusbar' );
-
-                  self.$preview = $( '#customize-preview' );
-                  self.$collapseSidebar = $( '.collapse-sidebar' );
-
-                  // REACT TO EDITOR CHANGES
-                  // bind on / off event actions
-                  // Problem to solve : we need to attach event to both the visual and the text editor tab ( html editor ), which have different selectors
-                  // If we bind only the visual editor, changes made to the simple textual html editor won't be taken into account
-                  // VISUAL EDITOR
-                  api.sekTinyMceEditor.on( 'input change keyup', function( evt ) {
-                        //console.log('api.sekTinyMceEditor on input change keyup', evt.type, api.sekTinyMceEditor.getContent() );
-                        // set the input value
-                        if ( api.control.has( api.sekEditorSynchronizedInput().control_id ) ) {
-                              try { api.control( api.sekEditorSynchronizedInput().control_id )
-                                    .trigger( 'tinyMceEditorUpdated', {
-                                          input_id : api.sekEditorSynchronizedInput().input_id,
-                                          html_content : api.sekTinyMceEditor.getContent(),
-                                          modified_editor_element : api.sekTinyMceEditor
-                                    });
-                              } catch( er ) {
-                                    api.errare( 'Error when triggering tinyMceEditorUpdated', er );
-                              }
-                        }
-                  });
-
-                  // TEXT EDITOR
-                  self.$editorTextArea.on( 'input', function( evt ) {
-                        //console.log('self.$editorTextArea EVENT ', evt.type, self.$editorTextArea.val() );
-                        try { api.control( api.sekEditorSynchronizedInput().control_id )
-                              .trigger( 'tinyMceEditorUpdated', {
-                                    input_id : api.sekEditorSynchronizedInput().input_id,
-                                    html_content : self.$editorTextArea.val(),
-                                    modified_editor_element : self.$editorTextArea
-                              });
-                        } catch( er ) {
-                              api.errare( 'Error when triggering tinyMceEditorUpdated', er );
-                        }
-                  });
-
-
 
                   // LISTEN TO USER DRAG ACTIONS => RESIZE EDITOR
                   // Note : attaching event to the dragbar element was broken => the mouseup event could not be triggered for some reason, probably because adding the class "czr-customize-content_editor-pane-resize", makes us lose access to the dragbar element
@@ -312,6 +216,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             czrResizeEditor : function( position ) {
+              console.log('RESIZE EDITOR ?');
               var self = this,
                   //$sectionContent = input.container.closest( 'ul.accordion-section-content' ),
                   windowHeight = window.innerHeight,
