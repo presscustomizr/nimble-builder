@@ -867,6 +867,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'the_nimble_tinymce_module_content', 'wp_make_content_images_responsive' );
             add_filter( 'the_nimble_tinymce_module_content', 'do_shortcode', 11 ); // AFTER wpautop()
             add_filter( 'the_nimble_tinymce_module_content', 'capital_P_dangit', 9 );
+            add_filter( 'the_nimble_tinymce_module_content', '\Nimble\sek_parse_template_tags', 21 );
 
             // Hack to get the [embed] shortcode to run before wpautop()
             // fixes Video Embed not showing when using Add Media > Insert from Url

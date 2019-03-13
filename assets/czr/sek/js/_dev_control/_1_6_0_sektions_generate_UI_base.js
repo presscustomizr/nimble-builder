@@ -174,13 +174,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Maybe set the input based value
                   var input_id = params.settingParams.args.input_changed;
                   var inputRegistrationParams;
+
+                  // introduced when updating the new text editors
+                  // https://github.com/presscustomizr/nimble-builder/issues/403
+                  var refreshMarkupWhenNeededForInput = function() {
+                        return inputRegistrationParams && _.isString( inputRegistrationParams.refresh_markup ) && 'true' !== inputRegistrationParams.refresh_markup && 'false' !== inputRegistrationParams.refresh_markup;
+                  };
+
                   if ( ! _.isUndefined( input_id ) ) {
                         inputRegistrationParams = self.getInputRegistrationParams( input_id, parentModuleType );
                         if ( ! _.isUndefined( inputRegistrationParams.refresh_stylesheet ) ) {
                               refresh_stylesheet = Boolean( inputRegistrationParams.refresh_stylesheet );
                         }
                         if ( ! _.isUndefined( inputRegistrationParams.refresh_markup ) ) {
-                              refresh_markup = Boolean( inputRegistrationParams.refresh_markup );
+                              if ( refreshMarkupWhenNeededForInput() ) {
+                                    refresh_markup = inputRegistrationParams.refresh_markup;
+                              } else {
+                                    refresh_markup = Boolean( inputRegistrationParams.refresh_markup );
+                              }
                         }
                         if ( ! _.isUndefined( inputRegistrationParams.refresh_fonts ) ) {
                               refresh_fonts = Boolean( inputRegistrationParams.refresh_fonts );
@@ -243,8 +254,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     }
 
+
                                     // MARKUP
-                                    if ( true === refresh_markup ) {
+                                    // since https://github.com/presscustomizr/nimble-builder/issues/403, 2 cases :
+                                    // 1) update simply by postMessage, without ajax action <= refresh_markup is a string of selectors, and the content does not include content that needs server side parsing, like shortcode or template tages
+                                    // 2) otherwise => update the level with an ajax refresh action
+                                    var _sendRequestForAjaxMarkupRefresh = function() {
                                           api.previewer.send( 'sek-refresh-level', {
                                                 location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                 local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
@@ -255,6 +270,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 },
                                                 skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                           });
+                                    };
+
+                                    if ( true === refresh_markup ) {
+                                          _sendRequestForAjaxMarkupRefresh();
+                                    }
+
+                                    // @todo:
+                                    // for multi-item modules, send the item identifier
+                                    if ( refreshMarkupWhenNeededForInput() ) {
+                                          var _html_content = params.settingParams.args.input_value;
+                                          if ( ! _.isString( _html_content ) ) {
+                                                throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refreshMarkupWhenNeededForInput => html content is not a string.');
+                                          }
+                                          if ( ! self.htmlIncludesShortcodesOrTmplTags( _html_content ) ) {
+                                                api.previewer.send( 'sek-update-html-in-selector', {
+                                                      selector : inputRegistrationParams.refresh_markup,
+                                                      html : _html_content,
+                                                      id : params.uiParams.id,
+                                                      location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      apiParams : {
+                                                            action : 'sek-update-html-in-selector',
+                                                            id : params.uiParams.id,
+                                                            level : params.uiParams.level
+                                                      },
+                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                });
+                                          } else {
+                                                _sendRequestForAjaxMarkupRefresh();
+                                          }
                                     }
 
                                     // REFRESH THE PREVIEW ?
@@ -449,6 +494,40 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   }
                   return controlIsAlreadyRegistered;
+            },
+
+
+
+            /**
+             * Gets a list of unique shortcodes or shortcode-look-alikes in the content.
+             *
+             * @param {string} content The content we want to scan for shortcodes.
+             */
+            htmlIncludesShortcodesOrTmplTags : function( content ) {
+                  var shortcodes = content.match( /\[+([\w_-])+/g ),
+                      tmpl_tags = content.match( /\{\{+([\w_-])+/g ),
+                      shortcode_result = [],
+                      tmpl_tag_result = [];
+
+                  if ( shortcodes ) {
+                    for ( var i = 0; i < shortcodes.length; i++ ) {
+                      var _shortcode = shortcodes[ i ].replace( /^\[+/g, '' );
+
+                      if ( shortcode_result.indexOf( _shortcode ) === -1 ) {
+                        shortcode_result.push( _shortcode );
+                      }
+                    }
+                  }
+                  if ( tmpl_tags ) {
+                    for ( var j = 0; j < tmpl_tags.length; j++ ) {
+                      var _tag = tmpl_tags[ j ].replace( /^\[+/g, '' );
+
+                      if ( tmpl_tag_result.indexOf( _tag ) === -1 ) {
+                        tmpl_tag_result.push( _tag );
+                      }
+                    }
+                  }
+                  return !_.isEmpty( shortcode_result ) || !_.isEmpty( tmpl_tag_result );
             }
       });//$.extend()
 })( wp.customize, jQuery );
