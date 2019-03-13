@@ -51,7 +51,8 @@ function sek_get_module_params_for_czr_tinymce_child() {
                 'content' => array(
                     'input_type'  => 'detached_tinymce_editor',
                     'title'       => __('Content', 'text_doma'),
-                    'default'     => ''
+                    'default'     => '',
+                    'refresh_markup' => '.sek-module-inner [data-sek-input-type="detached_tinymce_editor"]',
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',

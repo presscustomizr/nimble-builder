@@ -16,27 +16,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.editorEventsListenerSetup = false;//this status will help us ensure that we bind the shared tinyMce instance only once
 
                   // Cache some dom elements
-                  self.$editorTextArea = $( '#czr-customize-content_editor' );
                   self.$editorPane = $( '#czr-customize-content_editor-pane' );
                   self.$editorDragbar = $( '#czr-customize-content_editor-dragbar' );
-                  self.$editorFrame  = $( '#czr-customize-content_editor_ifr' );
-                  self.$mceTools     = $( '#wp-czr-customize-content_editor-tools' );
-                  self.$mceToolbar   = self.$editorPane.find( '.mce-toolbar-grp' );
-                  self.$mceStatusbar = self.$editorPane.find( '.mce-statusbar' );
-
                   self.$preview = $( '#customize-preview' );
                   self.$collapseSidebar = $( '.collapse-sidebar' );
 
+                  self.attachResizeEventsToEditor();
+
                   // Cache the instance and attach
                   var mayBeAwakeTinyMceEditor = function() {
-                        api.sekTinyMceEditor = tinyMCE.get( 'czr-customize-content_editor' );
+                        api.sekTinyMceEditor = tinyMCE.get( sektionsLocalizedData.idOfDetachedTinyMceTextArea );
                         var _do = function() {
-                              if ( ! api.sekTinyMceEditor ) {
-                                    throw new Error('::setupTinyMceEditor => ::mayBeAwakeTinyMceEditor => wp editor not instantiated');
-                              }
                               if ( false === self.editorEventsListenerSetup ) {
-                                    console.log('ATTACH EVENTS');
-                                    self.attachEventsToEditor();
                                     self.editorEventsListenerSetup = true;
                                     self.trigger('sek-tiny-mce-editor-bound-and-instantiated');
                               }
@@ -50,8 +41,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } );
                               }
                         }
-                        console.log('ALORS mayBeAwakeTinyMceEditor ?', api.sekTinyMceEditor );
-
                   };
 
                   // CASE 1)
@@ -180,10 +169,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-            attachEventsToEditor : function() {
-                  console.log('ATTACH EVENT TO EDITOR ?');
+            attachResizeEventsToEditor : function() {
                   var self = this;
-
                   // LISTEN TO USER DRAG ACTIONS => RESIZE EDITOR
                   // Note : attaching event to the dragbar element was broken => the mouseup event could not be triggered for some reason, probably because adding the class "czr-customize-content_editor-pane-resize", makes us lose access to the dragbar element
                   // => that's why we listen for the mouse events when they have bubbled up to the parent wrapper, and then check if the target is our candidate.
@@ -194,29 +181,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           return;
                         switch( evt.type ) {
                               case 'mousedown' :
-                                    $( document ).on( 'mousemove.czr-customize-content_editor', function( event ) {
+                                    $( document ).on( 'mousemove.' + sektionsLocalizedData.idOfDetachedTinyMceTextArea, function( event ) {
                                           event.preventDefault();
                                           $( document.body ).addClass( 'czr-customize-content_editor-pane-resize' );
-                                          self.$editorFrame.css( 'pointer-events', 'none' );
+                                          $( '#czr-customize-content_editor_ifr' ).css( 'pointer-events', 'none' );
                                           self.czrResizeEditor( event.pageY );
                                     });
                               break;
 
                               case 'mouseup' :
-                                    $( document ).off( 'mousemove.czr-customize-content_editor' );
+                                    $( document ).off( 'mousemove.' + sektionsLocalizedData.idOfDetachedTinyMceTextArea );
                                     $( document.body ).removeClass( 'czr-customize-content_editor-pane-resize' );
-                                    self.$editorFrame.css( 'pointer-events', '' );
+                                    $( '#czr-customize-content_editor_ifr' ).css( 'pointer-events', '' );
                               break;
                         }
                   });
             },
 
 
-
-
-
             czrResizeEditor : function( position ) {
-              console.log('RESIZE EDITOR ?');
               var self = this,
                   //$sectionContent = input.container.closest( 'ul.accordion-section-content' ),
                   windowHeight = window.innerHeight,
@@ -230,6 +213,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   args = {},
                   resizeHeight;
 
+              var $editorFrame  = $( '#czr-customize-content_editor_ifr' ),
+                  $mceTools     = $( '#wp-czr-customize-content_editor-tools' ),
+                  $mceToolbar   = self.$editorPane.find( '.mce-toolbar-grp' ),
+                  $mceStatusbar = self.$editorPane.find( '.mce-statusbar' );
+
               if ( ! api.sekEditorExpanded() ) {
                 return;
               }
@@ -239,7 +227,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               }
 
               args.height = resizeHeight;
-              args.components = self.$mceTools.outerHeight() + self.$mceToolbar.outerHeight() + self.$mceStatusbar.outerHeight();
+              args.components = $mceTools.outerHeight() + $mceToolbar.outerHeight() + $mceStatusbar.outerHeight();
 
               if ( resizeHeight < minScroll ) {
                     args.height = minScroll;
@@ -255,10 +243,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
               self.$preview.css( 'bottom', args.height );
               self.$editorPane.css( 'height', args.height );
-              self.$editorFrame.css( 'height', args.height - args.components );
+              $editorFrame.css( 'height', args.height - args.components );
               self.$collapseSidebar.css(
                     'bottom',
-                    collapseMinSpacing > windowHeight - args.height ? self.$mceStatusbar.outerHeight() + collapseBottomInsideEditor : args.height + collapseBottomOutsideEditor
+                    collapseMinSpacing > windowHeight - args.height ? $mceStatusbar.outerHeight() + collapseBottomInsideEditor : args.height + collapseBottomOutsideEditor
               );
 
               //$sectionContent.css( 'padding-bottom',  windowWidth <= mobileWidth ? args.height : '' );

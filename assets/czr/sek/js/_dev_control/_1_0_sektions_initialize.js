@@ -26,6 +26,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // prevent hammering server + fixes https://github.com/presscustomizr/nimble-builder/issues/244
                   self.SETTING_UPDATE_BUFFER = 100;
 
+                  // introduced for https://github.com/presscustomizr/nimble-builder/issues/403
+                  self.TINYMCE_EDITOR_HEIGHT = '150px';
+
                   // Define a default value for the sektion setting value, used when no server value has been sent
                   // @see php function
                   // function sek_get_default_location_model() {

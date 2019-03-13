@@ -96,7 +96,10 @@ function sek_enqueue_controls_js_css() {
                 'moduleCollection' => sek_get_module_collection(),
                 'moduleIconPath' => NIMBLE_MODULE_ICON_PATH,
 
-                'hasActiveCachePlugin' => sek_has_active_cache_plugin()
+                'hasActiveCachePlugin' => sek_has_active_cache_plugin(),
+
+                'idOfDetachedTinyMceTextArea' => NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID,
+                'tinyMceNimbleEditorStylesheetUrl' => sprintf( '%1$s/assets/czr/sek/css/sek-tinymce-content.css', NIMBLE_BASE_URL )
             )
         )
     );//wp_localize_script()
@@ -664,8 +667,9 @@ function sek_print_nimble_customizer_tmpl() {
       </div>
       <!-- <textarea style="height:250px;width:100%" id="czr-customize-content_editor"></textarea> -->
       <?php
-        // // The settings passed in here are inspired from edit-form-advanced.php.
-        sek_setup_nimble_editor( '', 'czr-customize-content_editor', array(
+        // the textarea id for the detached editor is 'czr-customize-content_editor'
+        // this function generates the <textarea> markup
+        sek_setup_nimble_editor( '', NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID , array(
             '_content_editor_dfw' => false,
             'drag_drop_upload' => true,
             'tabfocus_elements' => 'content-html,save-post',
@@ -683,24 +687,6 @@ function sek_print_nimble_customizer_tmpl() {
     <?php
 }
 
-
-
-
-//add_action( 'customize_controls_init', '\Nimble\sek_enqueue_tiny_mce_editor' );
-// Enqueue a WP Editor instance if not done
-// @hook customize_controls_init
-function sek_enqueue_tiny_mce_editor() {
-    //add_action( 'customize_controls_print_footer_scripts', 'render_editor' , 0 );
-    if ( false === has_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'enqueue_scripts' ) ) ) {
-        //sek_error_log('_wp_editors enqueue_scripts included by Nimble Builder');
-        add_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'enqueue_scripts' ) );
-    }
-    // if ( false === has_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'force_uncompressed_tinymce' ) ) ) {
-    //     //sek_error_log('_wp_editors force_uncompressed_tinymce included by Nimble Builder');
-    //     add_action( 'customize_controls_print_footer_scripts', array( '_WP_Editors', 'force_uncompressed_tinymce' ), 1 );
-    // }
-
-}
 
 
 

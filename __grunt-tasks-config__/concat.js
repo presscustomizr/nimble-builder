@@ -49,7 +49,6 @@ module.exports = {
       '<%= paths.czr_assets %>fmk/js/base-fmk/1_0_input_item_module_control/1_0_input/_0_0_1_input_0_init.js',
       '<%= paths.czr_assets %>fmk/js/base-fmk/1_0_input_item_module_control/1_0_input/_0_0_1_input_1_img_upload.js',
       '<%= paths.czr_assets %>fmk/js/base-fmk/1_0_input_item_module_control/1_0_input/_0_0_1_input_4_content_picker.js',
-      '<%= paths.czr_assets %>fmk/js/base-fmk/1_0_input_item_module_control/1_0_input/_0_0_1_input_5_text_editors.js',
 
       '<%= paths.czr_assets %>fmk/js/base-fmk/1_0_input_item_module_control/1_1_item_and_modopt/1_1_0_item/_0_0_2_item_0_init.js',
       '<%= paths.czr_assets %>fmk/js/base-fmk/1_0_input_item_module_control/1_1_item_and_modopt/1_1_0_item/_0_0_2_item_2_model.js',
@@ -237,7 +236,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_2_buttons_choice.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_3_reset_button.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_4_revision_history.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_5_detached_tiny_mce_editor.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_5_tiny_mce_editor.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
@@ -448,7 +447,7 @@ module.exports = {
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_6_sek_input_tmpl_buttons_choice.php',
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_7_sek_input_tmpl_reset_button.php',
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_8_sek_input_tmpl_revision_history.php',
-        '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_9_sek_input_tmpl_detached_tinymce_editor.php'
+        '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_9_sek_input_tmpl_tinymce_editors.php'
       ],
       dest: '<%= paths.sektions %>ccat-czr-sektions.php',
   },

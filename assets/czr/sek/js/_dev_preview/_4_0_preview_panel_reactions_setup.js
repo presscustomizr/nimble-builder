@@ -434,6 +434,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                                   if ( $level_el.length > 0 && $target_el.length > 0 ) {
                                         $target_el.html( params.html );
+                                  } else {
+                                        self.errare( 'reactToPanelMsg => sek-update-html-in-selector => missing level or target dom element', params );
                                   }
                             }
 

@@ -646,7 +646,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $ph = '<i class="material-icons">pan_tool</i>';
             switch( $input_type ) {
                 case 'detached_tinymce_editor' :
-                case 'simple_text_editor' :
+                case 'nimble_tinymce_editor' :
                 case 'text' :
                   $ph = skp_is_customizing() ? '<div class="sek-tiny-mce-module-placeholder-text">' . __('Click to edit', 'here') .'</div>' : '';
                 break;

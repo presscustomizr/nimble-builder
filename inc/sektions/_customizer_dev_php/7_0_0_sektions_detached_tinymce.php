@@ -7,12 +7,11 @@ function sek_setup_nimble_editor( $content, $editor_id, $settings = array() ) {
 
 
 /**
- * Facilitates adding of the WordPress editor as used on the Write and Edit screens.
- *
- * @package WordPress
- * @since 3.3.0
- *
- * Private, not included by default. See wp_editor() in wp-includes/general-template.php.
+ * started from a copy of class-wp-editor.php as of March 2019
+ * _NIMBLE_Editors::nimble_editor() is fired with sek_setup_nimble_editor() in hook 'customize_controls_print_footer_scripts'
+ * the job of this class is to print the js parameters for the detached tinyMce editor for Nimble
+ * the editor is then destroyed and re-instantiated each time a WP text editor module is customized
+ * @see api.czrInputMap.detached_tinymce_editor
  */
 
 final class _NIMBLE_Editors {
@@ -519,7 +518,7 @@ final class _NIMBLE_Editors {
                 }
               }
 
-              $ext_plugins .= 'tinyMCEPreInit.load_ext("' . $plugurl . '", "' . $mce_locale . '");' . "\n";
+              $ext_plugins .= 'nimbleTinyMCEPreInit.load_ext("' . $plugurl . '", "' . $mce_locale . '");' . "\n";
             }
           }
         }
@@ -584,7 +583,9 @@ final class _NIMBLE_Editors {
         $mce_buttons   = apply_filters( 'teeny_mce_buttons', array( 'bold', 'italic', 'underline', 'blockquote', 'strikethrough', 'bullist', 'numlist', 'alignleft', 'aligncenter', 'alignright', 'undo', 'redo', 'link', 'fullscreen' ), $editor_id );
         $mce_buttons_2 = $mce_buttons_3 = $mce_buttons_4 = array();
       } else {
-        $mce_buttons = array( 'formatselect', 'bold', 'italic', 'bullist', 'numlist', 'blockquote', 'alignleft', 'aligncenter', 'alignright', 'link', 'wp_more', 'spellchecker' );
+        //@nikeo modif
+        //$mce_buttons = array( 'formatselect', 'bold', 'italic', 'bullist', 'numlist', 'blockquote', 'alignleft', 'aligncenter', 'alignright', 'link', 'wp_more', 'spellchecker' );
+        $mce_buttons = array( 'formatselect', 'bold', 'italic', 'bullist', 'numlist', 'blockquote', 'alignleft', 'aligncenter', 'alignright', 'link', 'spellchecker' );
 
         if ( ! wp_is_mobile() ) {
           if ( $set['_content_editor_dfw'] ) {
@@ -608,9 +609,10 @@ final class _NIMBLE_Editors {
 
         $mce_buttons_2 = array( 'strikethrough', 'hr', 'forecolor', 'pastetext', 'removeformat', 'charmap', 'outdent', 'indent', 'undo', 'redo' );
 
-        if ( ! wp_is_mobile() ) {
-          $mce_buttons_2[] = 'wp_help';
-        }
+        // @nikeo modif
+        // if ( ! wp_is_mobile() ) {
+        //   $mce_buttons_2[] = 'wp_help';
+        // }
 
         /**
          * Filters the second-row list of TinyMCE buttons (Visual tab).
@@ -900,7 +902,7 @@ final class _NIMBLE_Editors {
       $baseurl = self::get_baseurl();
 
       ?>
-      var tinyMCEPreInit = {
+      var nimbleTinyMCEPreInit = {
         baseURL: "<?php echo $baseurl; ?>",
         suffix: "<?php echo $suffix; ?>",
         mceInit: {},
@@ -1499,7 +1501,7 @@ final class _NIMBLE_Editors {
     ?>
 
     <script type="text/javascript">
-    tinyMCEPreInit = {
+    nimbleTinyMCEPreInit = {
       baseURL: "<?php echo $baseurl; ?>",
       suffix: "<?php echo $suffix; ?>",
       <?php
@@ -1559,27 +1561,25 @@ final class _NIMBLE_Editors {
           return;
         }
 
-        for ( id in tinyMCEPreInit.mceInit ) {
-          init = tinyMCEPreInit.mceInit[id];
+        for ( id in nimbleTinyMCEPreInit.mceInit ) {
+          init = nimbleTinyMCEPreInit.mceInit[id];
           $wrap = tinymce.$( '#wp-' + id + '-wrap' );
 
-          if ( ( $wrap.hasClass( 'tmce-active' ) || ! tinyMCEPreInit.qtInit.hasOwnProperty( id ) ) && ! init.wp_skip_init ) {
-            console.log('ALORS INIT NIMBLE EDITOR ?');
+          if ( ( $wrap.hasClass( 'tmce-active' ) || ! nimbleTinyMCEPreInit.qtInit.hasOwnProperty( id ) ) && ! init.wp_skip_init ) {
             tinymce.init( init );
-
             if ( ! window.wpActiveEditor ) {
-              window.wpActiveEditor = id;
+              window.wpActiveEditor = id;//<= where is this used ?
             }
           }
         }
       }
 
       if ( typeof quicktags !== 'undefined' ) {
-        for ( id in tinyMCEPreInit.qtInit ) {
-          quicktags( tinyMCEPreInit.qtInit[id] );
+        for ( id in nimbleTinyMCEPreInit.qtInit ) {
+          quicktags( nimbleTinyMCEPreInit.qtInit[id] );
 
           if ( ! window.wpActiveEditor ) {
-            window.wpActiveEditor = id;
+            window.wpActiveEditor = id;//<= where is this used ?
           }
         }
       }

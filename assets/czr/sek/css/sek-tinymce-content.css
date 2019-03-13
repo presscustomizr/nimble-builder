@@ -1,0 +1,27 @@
+/*
+This stylesheet is loaded when instantiating the tinymce editor
+its url is added to the list of default stylesheet urls
+@see : api.czrInputMap.nimble_tinymce_editor
+wp.editor.initialize( _id, {
+        //tinymce: nimbleTinyMCEPreInit.mceInit["czr-customize-content_editor"],
+        tinymce: {
+            //plugins:"charmap,colorpicker,hr,lists,media,paste,tabfocus,textcolor,wordpress,wpeditimage,wpemoji,wpgallery,wplink,wpdialogs,wptextpattern,wpview",
+            toolbar1:getToolbarBtns(),
+            content_css:( function() {
+                  var default_settings = wp.editor.getDefaultSettings(),
+                      stylesheets = [ sektionsLocalizedData.tinyMceNimbleEditorStylesheetUrl ];
+                  if ( default_settings && default_settings.tinymce && default_settings.tinymce.content_css ) {
+                        stylesheets = _.union( default_settings.tinymce.content_css.split(','), stylesheets );
+                  }
+
+                  return stylesheets.join(',');
+            })()
+            //toolbar2:""
+        },
+        quicktags : defaultQuickTagBtns,
+        mediaButtons: ( inputRegistrationParams.editor_params && false === inputRegistrationParams.editor_params.media_button ) ? false : true
+  });
+ */
+body#tinymce{
+  font-size: 14px;
+}
