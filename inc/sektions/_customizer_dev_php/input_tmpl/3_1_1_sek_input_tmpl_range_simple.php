@@ -18,7 +18,7 @@ function sek_set_input_tmpl___range_simple( $input_id, $input_data ) {
       unit = _.isEmpty( unit ) ? 'px' : unit;
     #>
     <div class="sek-range-with-unit-picker-wrapper sek-no-unit-picker">
-        <# //console.log( 'IN php::sek_set_input_tmpl___range_simple() => data range_slide => ', data ); #>
+        <?php //<# //console.log( 'IN php::sek_set_input_tmpl___range_simple() => data range_slide => ', data ); #> ?>
         <div class="sek-range-wrapper">
           <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
           <?php

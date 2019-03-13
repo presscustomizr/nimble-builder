@@ -11,7 +11,7 @@ function sek_set_input_tmpl___borders( $input_id, $input_data ) {
       // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <div class="sek-borders">
-        <# //console.log( 'IN php::sek_set_input_tmpl___borders() => data range_slide => ', data ); #>
+        <?php //<# //console.log( 'IN php::sek_set_input_tmpl___borders() => data range_slide => ', data ); #> ?>
         <div class="sek-border-type-wrapper">
             <div aria-label="unit" class="sek-ui-button-group" role="group"><button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('All', 'text-domain');?>" data-sek-border-type="_all_"><?php _e('All', 'text-domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Left', 'text-domain');?>" data-sek-border-type="left"><?php _e('Left', 'text-domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Top', 'text-domain');?>" data-sek-border-type="top"><?php _e('Top', 'text-domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Right', 'text-domain');?>" data-sek-border-type="right"><?php _e('Right', 'text-domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Bottom', 'text-domain');?>" data-sek-border-type="bottom"><?php _e('Bottom', 'text-domain');?></button></div>
         </div>
