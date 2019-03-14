@@ -10,16 +10,17 @@ function sek_is_dev_mode() {
   return ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || sek_is_debug_mode();
 }
 
-if ( ! defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
-if ( ! defined( 'NIMBLE_CSS_FOLDER_NAME' ) ) { define( 'NIMBLE_CSS_FOLDER_NAME' , 'sek_css' ); }
-if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
-if ( ! defined( 'NIMBLE_GLOBAL_SKOPE_ID' ) ) { define( 'NIMBLE_GLOBAL_SKOPE_ID' , 'skp__global' ); }
-if ( ! defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
-if ( ! defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' , 'nimble_saved_sektions' ); }
-if ( ! defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
-if ( ! defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'nimble-widget-area-' ); }
+if ( !defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
+if ( !defined( 'NIMBLE_CSS_FOLDER_NAME' ) ) { define( 'NIMBLE_CSS_FOLDER_NAME' , 'sek_css' ); }
+if ( !defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
+if ( !defined( 'NIMBLE_GLOBAL_SKOPE_ID' ) ) { define( 'NIMBLE_GLOBAL_SKOPE_ID' , 'skp__global' ); }
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' , 'nimble_saved_sektions' ); }
+if ( !defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
+if ( !defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'nimble-widget-area-' ); }
 if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) { define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION ); }
-if ( ! defined( 'NIMBLE_MODULE_ICON_PATH' ) ) { define( 'NIMBLE_MODULE_ICON_PATH' , NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' ); }
+if ( !defined( 'NIMBLE_MODULE_ICON_PATH' ) ) { define( 'NIMBLE_MODULE_ICON_PATH' , NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' ); }
+if ( !defined( 'NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID') ) { define( 'NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID' , 'czr-customize-content_editor' ); }
 
 
 /* ------------------------------------------------------------------------- *
@@ -4648,9 +4649,10 @@ function sek_get_module_params_for_czr_tinymce_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'content' => array(
-                    'input_type'  => 'tiny_mce_editor',
+                    'input_type'  => 'detached_tinymce_editor',
                     'title'       => __('Content', 'text_doma'),
-                    'default'     => ''
+                    'default'     => '',
+                    'refresh_markup' => '.sek-module-inner [data-sek-input-type="detached_tinymce_editor"]',
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
@@ -5006,7 +5008,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'choices'     => sek_get_select_options_for_input_id( 'content-type' )
                 ),
                 'content-custom-text' => array(
-                    'input_type'  => 'tiny_mce_editor',
+                    'input_type'  => 'nimble_tinymce_editor',
                     'title'       => __('Custom text content', 'text_doma'),
                     'default'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
                 ),
@@ -5018,7 +5020,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'input_width' => 'width-20',
                 ),
                 'btn-custom-text' => array(
-                    'input_type'  => 'tiny_mce_editor',
+                    'input_type'  => 'nimble_tinymce_editor',
                     'title'       => __('Custom button text', 'text_doma'),
                     'default'     => __('Read More', 'text_doma'),
                 )
@@ -5069,11 +5071,16 @@ function sek_get_module_params_for_czr_heading_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'heading_text' => array(
-                    'input_type'         => 'text',
+                    'input_type'        => 'nimble_tinymce_editor',
+                    'editor_params'     => array(
+                        'media_button' => false,
+                        'includedBtns' => array('forecolor','bold','italic','strikethrough','link'),
+                        'height' => '50px'
+                    ),
                     'title'              => __( 'Heading text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
+                    'refresh_markup'    => '.sek-heading [data-sek-input-type="textarea"]'
 
                 ),
                 'heading_tag' => array(
@@ -5681,11 +5688,15 @@ function sek_get_module_params_for_czr_quote_quote_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'quote_text' => array(
-                    'input_type'         => 'textarea',
-                    'title'              => __( 'Quote text', 'text_doma' ),
-                    'default'            => '',
+                    'input_type'        => 'nimble_tinymce_editor',
+                    'editor_params'     => array(
+                        'media_button' => true,
+                        'excludedBtns' => array( 'blockquote' )
+                    ),
+                    'title'             => __( 'Main quote content', 'text_doma' ),
+                    'default'           => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_doma'),
+                    'refresh_markup'    => '.sek-quote-content'
                 ),
                 'quote_font_family_css' => array(
                     'input_type'  => 'font_picker',
@@ -5839,11 +5850,15 @@ function sek_get_module_params_for_czr_quote_cite_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'cite_text' => array(
-                    'input_type'         => 'textarea',
+                    'input_type'        => 'nimble_tinymce_editor',
+                    'editor_params'     => array(
+                        'media_button' => false,
+                        'excludedBtns' => array( 'blockquote' )
+                    ),
+                    'refresh_markup' => '.sek-cite',
                     'title'              => __( 'Cite text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
                 ),
                 'cite_font_family_css' => array(
                     'input_type'  => 'font_picker',
@@ -10434,7 +10449,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         function sek_get_input_placeholder_content( $input_type = '', $input_id = '' ) {
             $ph = '<i class="material-icons">pan_tool</i>';
             switch( $input_type ) {
-                case 'tiny_mce_editor' :
+                case 'detached_tinymce_editor' :
+                case 'nimble_tinymce_editor' :
                 case 'text' :
                   $ph = skp_is_customizing() ? '<div class="sek-tiny-mce-module-placeholder-text">' . __('Click to edit', 'here') .'</div>' : '';
                 break;
@@ -10627,6 +10643,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'the_nimble_tinymce_module_content', 'wp_make_content_images_responsive' );
             add_filter( 'the_nimble_tinymce_module_content', 'do_shortcode', 11 ); // AFTER wpautop()
             add_filter( 'the_nimble_tinymce_module_content', 'capital_P_dangit', 9 );
+            add_filter( 'the_nimble_tinymce_module_content', '\Nimble\sek_parse_template_tags', 21 );
             add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_run_shortcode' ), 8 );
             add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_parse_content_for_video_embed') , 8 );
         }
@@ -10836,7 +10853,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         }
         $form_composition = $this->_set_form_composition( $form_composition, $module_model );
         $this->fields = $this->simple_form_generate_fields( $form_composition );
-        $this->form   = $this->simple_form_generate_form( $this->fields );
+        $this->form = $this->simple_form_generate_form( $this->fields );
         $this->mailer = new Sek_Mailer( $this->form );
         $this->mailer->maybe_send( $form_composition, $module_model );
     }
@@ -11083,7 +11100,10 @@ class Sek_Form {
     }
 
     public function get_field( $field_name ) {
-        return $this->fields[ sanitize_key( $field_name ) ] ? $this->fields[ sanitize_key( $field_name ) ] : null;
+        if ( is_array( $this->fields ) && array_key_exists(sanitize_key( $field_name ), $this->fields) ) {
+            return $this->fields[ sanitize_key( $field_name ) ];
+        }
+        return null;
     }
     public function has_invalid_field() {
         $has_invalid_field = false;
@@ -11554,11 +11574,11 @@ class Sek_Mailer {
 
         return $is_valid;
     }
-
     public function maybe_send( $form_composition, $module_model ) {
         if ( 'recaptcha_fail' === $this->status ) {
             return;
         }
+
         $invalid_field = $this->form->has_invalid_field();
         if ( false !== $invalid_field ) {
             $this->status = 'aborted';
@@ -11572,6 +11592,7 @@ class Sek_Mailer {
 
         $sender_email   = $this->form->get_field('nimble_email')->get_input()->get_value();
         $sender_name    = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
+        $sender_body_message = null === $this->form->get_field('nimble_message') ? '' : $this->form->get_field('nimble_message')->get_input()->get_value();
 
         if ( array_key_exists( 'recipients', $submission_options ) ) {
             $recipient      = $submission_options['recipients'];
@@ -11597,15 +11618,19 @@ class Sek_Mailer {
             );
         }
 
-        $body           = sprintf( '%1$s%2$s%3$s%4$s%5$s',
-                            $before_message,
-                            sprintf( '<br><br>%1$s: <br>%2$s',
-                                __('Message body', 'text_doma'),
-                                $this->form->get_field('nimble_message')->get_input()->get_value()
-                            ),
-                            $after_message,
-                            $allow_html ? '<br><br>--<br>': "\r\n\r\n--\r\n",
-                            $email_footer
+        if ( !empty( $sender_body_message ) ) {
+            $sender_body_message = sprintf( '<br><br>%1$s: <br>%2$s',
+                __('Message body', 'text_doma'),
+                $sender_body_message
+            );
+        }
+
+        $body = sprintf( '%1$s%2$s%3$s%4$s%5$s',
+            $before_message,
+            $sender_body_message,
+            $after_message,
+            $allow_html ? '<br><br>--<br>': "\r\n\r\n--\r\n",
+            $email_footer
         );
 
         $headers        = array();

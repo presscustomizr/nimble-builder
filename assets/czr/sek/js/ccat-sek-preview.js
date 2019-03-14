@@ -1956,6 +1956,18 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             },
                             'sek-reset-double-click-target' : function( params ) {
                                   $('.sek-target-for-double-click-insertion').removeClass('sek-target-for-double-click-insertion');
+                            },
+
+                            // introduced for https://github.com/presscustomizr/nimble-builder/issues/403
+                            'sek-update-html-in-selector' : function( params ) {
+                                  var $level_el = $('[data-sek-id="' + params.id + '"]' ),
+                                      $target_el = $(params.selector, $level_el);
+
+                                  if ( $level_el.length > 0 && $target_el.length > 0 ) {
+                                        $target_el.html( params.html );
+                                  } else {
+                                        self.errare( 'reactToPanelMsg => sek-update-html-in-selector => missing level or target dom element', params );
+                                  }
                             }
 
                       };//msgCollection

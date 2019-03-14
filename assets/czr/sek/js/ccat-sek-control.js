@@ -26,6 +26,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // prevent hammering server + fixes https://github.com/presscustomizr/nimble-builder/issues/244
                   self.SETTING_UPDATE_BUFFER = 100;
 
+                  // introduced for https://github.com/presscustomizr/nimble-builder/issues/403
+                  self.TINYMCE_EDITOR_HEIGHT = '150px';
+
                   // Define a default value for the sektion setting value, used when no server value has been sent
                   // @see php function
                   // function sek_get_default_location_model() {
@@ -66,6 +69,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
                   });
 
+                  // added for https://github.com/presscustomizr/nimble-builder/issues/403
+                  // in fmk::setupTinyMceEditor => each id of newly instantiated editor is added to the [] api.czrActiveWPEditors
+                  // We need to remove those instances when cleaning registered controls
+                  api.bind( 'sek-before-clean-registered', function() {
+                        if ( _.isArray( api.czrActiveWPEditors ) ) {
+                              _.each( api.czrActiveWPEditors, function( _id ) {
+                                    wp.editor.remove( _id );
+                              });
+                              api.czrActiveWPEditors = [];
+                        }
+                  });
             },// initialize()
 
 
@@ -2832,13 +2846,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Maybe set the input based value
                   var input_id = params.settingParams.args.input_changed;
                   var inputRegistrationParams;
+
+                  // introduced when updating the new text editors
+                  // https://github.com/presscustomizr/nimble-builder/issues/403
+                  var refreshMarkupWhenNeededForInput = function() {
+                        return inputRegistrationParams && _.isString( inputRegistrationParams.refresh_markup ) && 'true' !== inputRegistrationParams.refresh_markup && 'false' !== inputRegistrationParams.refresh_markup;
+                  };
+
                   if ( ! _.isUndefined( input_id ) ) {
                         inputRegistrationParams = self.getInputRegistrationParams( input_id, parentModuleType );
                         if ( ! _.isUndefined( inputRegistrationParams.refresh_stylesheet ) ) {
                               refresh_stylesheet = Boolean( inputRegistrationParams.refresh_stylesheet );
                         }
                         if ( ! _.isUndefined( inputRegistrationParams.refresh_markup ) ) {
-                              refresh_markup = Boolean( inputRegistrationParams.refresh_markup );
+                              if ( refreshMarkupWhenNeededForInput() ) {
+                                    refresh_markup = inputRegistrationParams.refresh_markup;
+                              } else {
+                                    refresh_markup = Boolean( inputRegistrationParams.refresh_markup );
+                              }
                         }
                         if ( ! _.isUndefined( inputRegistrationParams.refresh_fonts ) ) {
                               refresh_fonts = Boolean( inputRegistrationParams.refresh_fonts );
@@ -2901,8 +2926,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     }
 
+
                                     // MARKUP
-                                    if ( true === refresh_markup ) {
+                                    // since https://github.com/presscustomizr/nimble-builder/issues/403, 2 cases :
+                                    // 1) update simply by postMessage, without ajax action <= refresh_markup is a string of selectors, and the content does not include content that needs server side parsing, like shortcode or template tages
+                                    // 2) otherwise => update the level with an ajax refresh action
+                                    var _sendRequestForAjaxMarkupRefresh = function() {
                                           api.previewer.send( 'sek-refresh-level', {
                                                 location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                                 local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
@@ -2913,6 +2942,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 },
                                                 skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                           });
+                                    };
+
+                                    if ( true === refresh_markup ) {
+                                          _sendRequestForAjaxMarkupRefresh();
+                                    }
+
+                                    // @todo:
+                                    // for multi-item modules, send the item identifier
+                                    if ( refreshMarkupWhenNeededForInput() ) {
+                                          var _html_content = params.settingParams.args.input_value;
+                                          if ( ! _.isString( _html_content ) ) {
+                                                throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refreshMarkupWhenNeededForInput => html content is not a string.');
+                                          }
+                                          if ( ! self.htmlIncludesShortcodesOrTmplTags( _html_content ) ) {
+                                                api.previewer.send( 'sek-update-html-in-selector', {
+                                                      selector : inputRegistrationParams.refresh_markup,
+                                                      html : _html_content,
+                                                      id : params.uiParams.id,
+                                                      location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      apiParams : {
+                                                            action : 'sek-update-html-in-selector',
+                                                            id : params.uiParams.id,
+                                                            level : params.uiParams.level
+                                                      },
+                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                });
+                                          } else {
+                                                _sendRequestForAjaxMarkupRefresh();
+                                          }
                                     }
 
                                     // REFRESH THE PREVIEW ?
@@ -3048,7 +3107,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'wp_color_alpha' :
                               case 'wp_color' :
                               case 'content_picker' :
-                              case 'tiny_mce_editor' :
+                              case 'detached_tinymce_editor' :
+                              case 'nimble_tinymce_editor' :
                               case 'password' :
                               case 'range' :
                               case 'range_slider' :
@@ -3106,6 +3166,40 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   }
                   return controlIsAlreadyRegistered;
+            },
+
+
+
+            /**
+             * Gets a list of unique shortcodes or shortcode-look-alikes in the content.
+             *
+             * @param {string} content The content we want to scan for shortcodes.
+             */
+            htmlIncludesShortcodesOrTmplTags : function( content ) {
+                  var shortcodes = content.match( /\[+([\w_-])+/g ),
+                      tmpl_tags = content.match( /\{\{+([\w_-])+/g ),
+                      shortcode_result = [],
+                      tmpl_tag_result = [];
+
+                  if ( shortcodes ) {
+                    for ( var i = 0; i < shortcodes.length; i++ ) {
+                      var _shortcode = shortcodes[ i ].replace( /^\[+/g, '' );
+
+                      if ( shortcode_result.indexOf( _shortcode ) === -1 ) {
+                        shortcode_result.push( _shortcode );
+                      }
+                    }
+                  }
+                  if ( tmpl_tags ) {
+                    for ( var j = 0; j < tmpl_tags.length; j++ ) {
+                      var _tag = tmpl_tags[ j ].replace( /^\[+/g, '' );
+
+                      if ( tmpl_tag_result.indexOf( _tag ) === -1 ) {
+                        tmpl_tag_result.push( _tag );
+                      }
+                    }
+                  }
+                  return !_.isEmpty( shortcode_result ) || !_.isEmpty( tmpl_tag_result );
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
@@ -5581,6 +5675,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
 
+                  // added for https://github.com/presscustomizr/nimble-builder/issues/403
+                  // in order to remove all instantiations of WP editor
+                  // @see ::initialize()
+                  api.trigger('sek-before-clean-registered');
+
                   registered = _.filter( registered, function( _reg_ ) {
                         if ( 'setting' !== _reg_.what ) {
                               if ( api[ _reg_.what ].has( _reg_.id ) ) {
@@ -7344,64 +7443,37 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this;
                   // OBSERVABLE VALUES
                   api.sekEditorExpanded   = new api.Value( false );
-                  api.sekEditorSynchronizedInput = new api.Value();
+                  //api.sekEditorSynchronizedInput = new api.Value();
 
                   self.editorEventsListenerSetup = false;//this status will help us ensure that we bind the shared tinyMce instance only once
 
+                  // Cache some dom elements
+                  self.$editorPane = $( '#czr-customize-content_editor-pane' );
+                  self.$editorDragbar = $( '#czr-customize-content_editor-dragbar' );
+                  self.$preview = $( '#customize-preview' );
+                  self.$collapseSidebar = $( '.collapse-sidebar' );
+
+                  self.attachResizeEventsToEditor();
+
                   // Cache the instance and attach
                   var mayBeAwakeTinyMceEditor = function() {
-                        api.sekTinyMceEditor = api.sekTinyMceEditor || tinyMCE.get( 'czr-customize-content_editor' );
-
-                        if ( false === self.editorEventsListenerSetup ) {
-                              self.attachEventsToEditor();
-                              self.editorEventsListenerSetup = true;
-                              self.trigger('sek-tiny-mce-editor-bound-and-instantiated');
-                        }
-                  };
-
-
-                  // SET THE SYNCHRONIZED INPUT
-                  // CASE 1) When user has clicked on a tiny-mce editable content block
-                  // CASE 2) when user click on the edit button in the module ui
-                  // @see reactToPreviewMsg
-                  // Each time a message is received from the preview, the corresponding action are executed
-                  // and an event {msgId}_done is triggered on the current instance
-                  // This is how we can listen here to 'sek-edit-module_done'
-                  // The sek-edit-module is fired when clicking on a .sek-module wrapper @see ::scheduleUiClickReactions
-                  self.bind( 'sek-edit-module_done', function( params ) {
-                        params = _.isObject( params ) ? params : {};
-                        if ( 'tiny_mce_editor' !== params.clicked_input_type && 'czr_tiny_mce_editor_module' !== params.module_type )
-                          return;
-
-                        // @see preview::scheduleUiClickReactions()
-                        // Fixes : https://github.com/presscustomizr/nimble-builder/issues/251
-                        if ( _.isEmpty( params.syncedTinyMceInputId ) )
-                          return;
-
-                        var controlId = params.id;
-                        // When the module is a father, we need to assign the right child module id
-                        if ( true === self.getRegisteredModuleProperty( params.module_type, 'is_father' ) ) {
-                              var _childModules_ = self.getRegisteredModuleProperty( params.module_type, 'children' );
-                              if ( _.isEmpty( _childModules_ ) ) {
-                                    throw new Error('::generateUIforFrontModules => a father module ' + params.module_type + ' is missing children modules ');
+                        api.sekTinyMceEditor = tinyMCE.get( sektionsLocalizedData.idOfDetachedTinyMceTextArea );
+                        var _do = function() {
+                              if ( false === self.editorEventsListenerSetup ) {
+                                    self.editorEventsListenerSetup = true;
+                                    self.trigger('sek-tiny-mce-editor-bound-and-instantiated');
+                              }
+                        };
+                        if ( api.sekTinyMceEditor ) {
+                              if ( api.sekTinyMceEditor.initialized ) {
+                                    _do();
                               } else {
-                                    _.each( _childModules_, function( mod_type, optionType ){
-                                          if ( 'czr_tinymce_child' === mod_type ) {
-                                                controlId = controlId + '__' + optionType;//<= as defined when generating the ui in ::generateUIforFrontModules
-                                          }
-                                    });
+                                    api.sekTinyMceEditor.on( 'init',function() {
+                                        _do();
+                                    } );
                               }
                         }
-
-                        // Set a new sync input
-                        api.sekEditorSynchronizedInput({
-                              control_id : controlId,
-                              input_id : params.syncedTinyMceInputId
-                        });
-
-                        api.sekEditorExpanded( true );
-                        api.sekTinyMceEditor.focus();
-                  });
+                  };
 
                   // CASE 1)
                   // Toggle the editor visibility
@@ -7417,48 +7489,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare('toggle-tinymce-editor => missing input or control id');
                               return;
                         }
-                        var currentEditorSyncData = $.extend( true, {}, api.sekEditorSynchronizedInput() ),
-                            newEditorSyncData = _.extend( currentEditorSyncData, {
-                                  input_id : input_id,
-                                  control_id : control_id
-                            });
-                        api.sekEditorSynchronizedInput( newEditorSyncData );
+                        // var currentEditorSyncData = $.extend( true, {}, api.sekEditorSynchronizedInput() ),
+                        //     newEditorSyncData = _.extend( currentEditorSyncData, {
+                        //           input_id : input_id,
+                        //           control_id : control_id
+                        //     });
+                        //api.sekEditorSynchronizedInput( newEditorSyncData );
                         api.sekEditorExpanded( true );
-                        api.sekTinyMceEditor.focus();
+                        //api.sekTinyMceEditor.focus();
                   });
-
-
-                  // CASE 2)
-                  // when the synchronized input gets changed by the user
-                  // 1) make sure the editor is expanded
-                  // 2) refresh the editor content with the input() one
-                  api.sekEditorSynchronizedInput.bind( function( to, from ) {
-                        mayBeAwakeTinyMceEditor();
-                        //api.sekEditorExpanded( true );
-                        //console.log('MODULE VALUE ?', self.getLevelProperty( { property : 'value', id : to.control_id } ) );
-
-                        // When initializing the module, its customized value might not be set yet
-                        // => defer the setContent action when the api setting is instantiated
-                        api( to.control_id, function( _setting_ ) {
-                              var _currentModuleValue_ = _setting_(),
-                                  _currentInputContent_ = ( _.isObject( _currentModuleValue_ ) && ! _.isEmpty( _currentModuleValue_[ to.input_id ] ) ) ? _currentModuleValue_[ to.input_id ] : '';
-
-                              // automatically add line breaks when setting the content
-                              // simplified version of php wpautop()
-                              // fixes https://github.com/presscustomizr/nimble-builder/issues/259
-                              _currentInputContent_ = _currentInputContent_.replace(/\r?\n/g, '<br/>');
-                              try { api.sekTinyMceEditor.setContent( _currentInputContent_ ); } catch( er ) {
-                                    api.errare( 'Error when setting the tiny mce editor content in setupTinyMceEditor', er );
-                              }
-                              api.sekTinyMceEditor.focus();
-                        });
-
-                  });//api.sekEditorSynchronizedInput.bind( function( to, from )
-
-
-
-
-
 
 
 
@@ -7466,7 +7505,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.sekEditorExpanded.bind( function ( expanded, from, params ) {
                         mayBeAwakeTinyMceEditor();
                         //api.infoLog('in api.sekEditorExpanded', expanded );
-                        if ( expanded ) {
+                        if ( expanded && api.sekTinyMceEditor ) {
                               api.sekTinyMceEditor.focus();
                         }
                         $(document.body).toggleClass( 'czr-customize-content_editor-pane-open', expanded);
@@ -7562,57 +7601,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-            attachEventsToEditor : function() {
+            attachResizeEventsToEditor : function() {
                   var self = this;
-                  // Cache some dom elements
-                  self.$editorTextArea = $( '#czr-customize-content_editor' );
-                  self.$editorPane = $( '#czr-customize-content_editor-pane' );
-                  self.$editorDragbar = $( '#czr-customize-content_editor-dragbar' );
-                  self.$editorFrame  = $( '#czr-customize-content_editor_ifr' );
-                  self.$mceTools     = $( '#wp-czr-customize-content_editor-tools' );
-                  self.$mceToolbar   = self.$editorPane.find( '.mce-toolbar-grp' );
-                  self.$mceStatusbar = self.$editorPane.find( '.mce-statusbar' );
-
-                  self.$preview = $( '#customize-preview' );
-                  self.$collapseSidebar = $( '.collapse-sidebar' );
-
-                  // REACT TO EDITOR CHANGES
-                  // bind on / off event actions
-                  // Problem to solve : we need to attach event to both the visual and the text editor tab ( html editor ), which have different selectors
-                  // If we bind only the visual editor, changes made to the simple textual html editor won't be taken into account
-                  // VISUAL EDITOR
-                  api.sekTinyMceEditor.on( 'input change keyup', function( evt ) {
-                        //console.log('api.sekTinyMceEditor on input change keyup', evt.type, api.sekTinyMceEditor.getContent() );
-                        // set the input value
-                        if ( api.control.has( api.sekEditorSynchronizedInput().control_id ) ) {
-                              try { api.control( api.sekEditorSynchronizedInput().control_id )
-                                    .trigger( 'tinyMceEditorUpdated', {
-                                          input_id : api.sekEditorSynchronizedInput().input_id,
-                                          html_content : api.sekTinyMceEditor.getContent(),
-                                          modified_editor_element : api.sekTinyMceEditor
-                                    });
-                              } catch( er ) {
-                                    api.errare( 'Error when triggering tinyMceEditorUpdated', er );
-                              }
-                        }
-                  });
-
-                  // TEXT EDITOR
-                  self.$editorTextArea.on( 'input', function( evt ) {
-                        //console.log('self.$editorTextArea EVENT ', evt.type, self.$editorTextArea.val() );
-                        try { api.control( api.sekEditorSynchronizedInput().control_id )
-                              .trigger( 'tinyMceEditorUpdated', {
-                                    input_id : api.sekEditorSynchronizedInput().input_id,
-                                    html_content : self.$editorTextArea.val(),
-                                    modified_editor_element : self.$editorTextArea
-                              });
-                        } catch( er ) {
-                              api.errare( 'Error when triggering tinyMceEditorUpdated', er );
-                        }
-                  });
-
-
-
                   // LISTEN TO USER DRAG ACTIONS => RESIZE EDITOR
                   // Note : attaching event to the dragbar element was broken => the mouseup event could not be triggered for some reason, probably because adding the class "czr-customize-content_editor-pane-resize", makes us lose access to the dragbar element
                   // => that's why we listen for the mouse events when they have bubbled up to the parent wrapper, and then check if the target is our candidate.
@@ -7623,25 +7613,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           return;
                         switch( evt.type ) {
                               case 'mousedown' :
-                                    $( document ).on( 'mousemove.czr-customize-content_editor', function( event ) {
+                                    $( document ).on( 'mousemove.' + sektionsLocalizedData.idOfDetachedTinyMceTextArea, function( event ) {
                                           event.preventDefault();
                                           $( document.body ).addClass( 'czr-customize-content_editor-pane-resize' );
-                                          self.$editorFrame.css( 'pointer-events', 'none' );
+                                          $( '#czr-customize-content_editor_ifr' ).css( 'pointer-events', 'none' );
                                           self.czrResizeEditor( event.pageY );
                                     });
                               break;
 
                               case 'mouseup' :
-                                    $( document ).off( 'mousemove.czr-customize-content_editor' );
+                                    $( document ).off( 'mousemove.' + sektionsLocalizedData.idOfDetachedTinyMceTextArea );
                                     $( document.body ).removeClass( 'czr-customize-content_editor-pane-resize' );
-                                    self.$editorFrame.css( 'pointer-events', '' );
+                                    $( '#czr-customize-content_editor_ifr' ).css( 'pointer-events', '' );
                               break;
                         }
                   });
             },
-
-
-
 
 
             czrResizeEditor : function( position ) {
@@ -7658,6 +7645,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   args = {},
                   resizeHeight;
 
+              var $editorFrame  = $( '#czr-customize-content_editor_ifr' ),
+                  $mceTools     = $( '#wp-czr-customize-content_editor-tools' ),
+                  $mceToolbar   = self.$editorPane.find( '.mce-toolbar-grp' ),
+                  $mceStatusbar = self.$editorPane.find( '.mce-statusbar' );
+
               if ( ! api.sekEditorExpanded() ) {
                 return;
               }
@@ -7667,7 +7659,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               }
 
               args.height = resizeHeight;
-              args.components = self.$mceTools.outerHeight() + self.$mceToolbar.outerHeight() + self.$mceStatusbar.outerHeight();
+              args.components = $mceTools.outerHeight() + $mceToolbar.outerHeight() + $mceStatusbar.outerHeight();
 
               if ( resizeHeight < minScroll ) {
                     args.height = minScroll;
@@ -7683,10 +7675,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
               self.$preview.css( 'bottom', args.height );
               self.$editorPane.css( 'height', args.height );
-              self.$editorFrame.css( 'height', args.height - args.components );
+              $editorFrame.css( 'height', args.height - args.components );
               self.$collapseSidebar.css(
                     'bottom',
-                    collapseMinSpacing > windowHeight - args.height ? self.$mceStatusbar.outerHeight() + collapseBottomInsideEditor : args.height + collapseBottomOutsideEditor
+                    collapseMinSpacing > windowHeight - args.height ? $mceStatusbar.outerHeight() + collapseBottomInsideEditor : args.height + collapseBottomOutsideEditor
               );
 
               //$sectionContent.css( 'padding-bottom',  windowWidth <= mobileWidth ? args.height : '' );
@@ -9741,6 +9733,244 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             }//revision_history
       });//$.extend( api.czrInputMap, {})
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            nimble_tinymce_editor : function() {
+                  var input = this,
+                      $textarea = input.container.find('textarea').first(),
+                      _id = $textarea.length > 0 ? $textarea.attr('id') : null,
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      // see how those buttons can be set in php class _NIMBLE_Editors
+                      // @see the global js var nimbleTinyMCEPreInit includes all params
+                      defaultToolbarBtns = "formatselect,forecolor,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,strikethrough,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo",
+                      defaultQuickTagBtns = "strong,em,link,block,del,ins,img,ul,ol,li,code,more,close";
+
+                  if ( _.isNull( _id ) ) {
+                        throw new Error( 'setupTinyMceEditor => missing textarea for module :' + input.module.id );
+                  }
+                  if ( tinyMCE.get( _id ) ) {
+                        throw new Error( 'setupTinyMceEditor => duplicate editor id.');
+                  }
+                  var getToolbarBtns = function() {
+                        var toolBarBtn = defaultToolbarBtns.split(',');
+                        if ( inputRegistrationParams.editor_params && _.isArray( inputRegistrationParams.editor_params.excludedBtns ) ) {
+                            var excluded = inputRegistrationParams.editor_params.excludedBtns;
+                            toolBarBtn = _.filter( toolBarBtn, function( _btn ) {
+                                  return !_.contains( excluded, _btn );
+                            });
+                        }
+                        if ( inputRegistrationParams.editor_params && _.isArray( inputRegistrationParams.editor_params.includedBtns ) ) {
+                            var includedBtns = inputRegistrationParams.editor_params.includedBtns;
+                            toolBarBtn = _.filter( toolBarBtn, function( _btn ) {
+                                  return _.contains( includedBtns, _btn );
+                            });
+                        }
+                        return toolBarBtn.join(',');
+                  };
+                  var getEditorHeight = function() {
+                        return ( inputRegistrationParams.editor_params && _.isString( inputRegistrationParams.editor_params.height ) ) ? inputRegistrationParams.editor_params.height : self.TINYMCE_EDITOR_HEIGHT;
+                  };
+                  // Set a height for the textarea before instanciation
+                  $textarea.css( { 'height' : getEditorHeight() } );
+
+                  // the plugins like colorpicker have been loaded when instantiating the detached tinymce editor
+                  // @see php class _NIMBLE_Editors
+                  // if not specified, wp.editor falls back on the ones of wp.editor.getDefaultSettings()
+                  // we can use them here without the need to specify them in the tinymce {} params
+                  // @see the tinyMCE params with this global var : nimbleTinyMCEPreInit.mceInit["czr-customize-content_editor"]
+                  wp.editor.initialize( _id, {
+                        //tinymce: nimbleTinyMCEPreInit.mceInit["czr-customize-content_editor"],
+                        tinymce: {
+                            //plugins:"charmap,colorpicker,hr,lists,media,paste,tabfocus,textcolor,wordpress,wpeditimage,wpemoji,wpgallery,wplink,wpdialogs,wptextpattern,wpview",
+                            toolbar1:getToolbarBtns(),
+                            //toolbar2:"",
+                            content_css:( function() {
+                                  var default_settings = wp.editor.getDefaultSettings(),
+                                      stylesheets = [ sektionsLocalizedData.tinyMceNimbleEditorStylesheetUrl ];
+                                  if ( default_settings && default_settings.tinymce && default_settings.tinymce.content_css ) {
+                                        stylesheets = _.union( default_settings.tinymce.content_css.split(','), stylesheets );
+                                  }
+                                  return stylesheets.join(',');
+                            })()
+                        },
+                        quicktags : defaultQuickTagBtns,
+                        mediaButtons: ( inputRegistrationParams.editor_params && false === inputRegistrationParams.editor_params.media_button ) ? false : true
+                  });
+
+                  // Note that an easy way to instantiate a basic editor would be to use :
+                  //wp.editor.initialize( _id, { tinymce : { wpautop: false }, quicktags : true });
+
+                  var _editor = tinyMCE.get( _id );
+                  if ( ! _editor ) {
+                        throw new Error( 'setupTinyMceEditor => missing editor instance for module :' + input.module.id );
+                  }
+
+                  // Store the id of each instantiated tinyMceEditor
+                  // used in api.czrSektion::cleanRegistered
+                  api.czrActiveWPEditors = api.czrActiveWPEditors || [];
+                  var currentEditors = $.extend( true, [], api.czrActiveWPEditors );
+                  currentEditors.push(_id);
+                  api.czrActiveWPEditors = currentEditors;
+
+                  // Let's set the input() value when the editor is ready
+                  // Because when we instantiate it, the textarea might not reflect the input value because too early
+                  var _doOnInit = function() {
+                        _editor.setContent( input() );
+                  };
+                  if ( _editor.initialized ) {
+                        _doOnInit();
+                  } else {
+                        _editor.on( 'init',_doOnInit );
+                  }
+
+                  // bind events
+                  _editor.on( 'input change keyup', function( evt ) {
+                        input( _editor.getContent() );
+                  } );
+            },
+
+
+
+
+            // this input setup works in collaboration with ::setupTinyMceEditor()
+            // for api.sekEditorExpanded() and resizing of the editor.
+            detached_tinymce_editor : function() {
+                  var input = this,
+                      $textarea = $('textarea#' + sektionsLocalizedData.idOfDetachedTinyMceTextArea ), //$('textarea#czr-customize-content_editor'),
+                      _id;
+                  if ( $textarea.length > 0  ) {
+                        _id = $textarea.attr('id');
+                  } else {
+                        throw new Error( 'api.czrInputMap::detached_tinymce_editor => missing textarea element');
+                  }
+
+                  // if ( _.isNull( _id ) ) {
+                  //       throw new Error( 'setupDetachedTinyMceEditor => missing textarea for module :' + input.module.id );
+                  // }
+                  // See wp.editor.initialize() in wp-admin/js/editor.js for initialization options.
+                   // **
+                   // * Initialize TinyMCE and/or Quicktags. For use with wp_enqueue_editor() (PHP).
+                   // *
+                   // * Intended for use with an existing textarea that will become the Text editor tab.
+                   // * The editor width will be the width of the textarea container, height will be adjustable.
+                   // *
+                   // * Settings for both TinyMCE and Quicktags can be passed on initialization, and are "filtered"
+                   // * with custom jQuery events on the document element, wp-before-tinymce-init and wp-before-quicktags-init.
+                   // *
+                   // * @since 4.8.0
+                   // *
+                   // * @param {string} id The HTML id of the textarea that is used for the editor.
+                   // *                    Has to be jQuery compliant. No brackets, special chars, etc.
+                   // * @param {object} settings Example:
+                   // * settings = {
+                   // *    // See https://www.tinymce.com/docs/configure/integration-and-setup/.
+                   // *    // Alternatively set to `true` to use the defaults.
+                   // *    tinymce: {
+                   // *        setup: function( editor ) {
+                   // *            console.log( 'Editor initialized', editor );
+                   // *        }
+                   // *    }
+                   // *
+                   // *    // Alternatively set to `true` to use the defaults.
+                   // *    quicktags: {
+                   // *        buttons: 'strong,em,link'
+                   // *    }
+                   // * }
+                   // */
+
+                  // Remove now
+                  // the initial instance has been created with php inline js generated by sek_setup_nimble_editor()
+                  // IMPORTANT !! => don't use wp.editor.remove() @see wp-admin/js/editor.js, because it can remove the stylesheet editor.css
+                  // and break the style of all editors
+                  if ( window.tinymce ) {
+                    mceInstance = window.tinymce.get( _id );
+
+                    if ( mceInstance ) {
+                      // if ( ! mceInstance.isHidden() ) {
+                      //   mceInstance.save();
+                      // }
+                      mceInstance.remove();
+                    }
+                  }
+                  // if ( window.quicktags ) {
+                  //   qtInstance = window.QTags.getInstance( id );
+
+                  //   if ( qtInstance ) {
+                  //     qtInstance.remove();
+                  //   }
+                  // }
+
+                  // Instantiate a new one
+                  // see in wp-admin/js/editor.js
+                  // the nimbleTinyMCEPreInit are set in php class _NIMBLE_Editors
+                  if ( !window.nimbleTinyMCEPreInit || !window.nimbleTinyMCEPreInit.mceInit || !window.nimbleTinyMCEPreInit.mceInit[ _id ] ) {
+                        throw new Error('setupDetachedTinyMceEditor => invalid nimbleTinyMCEPreInit global var');
+                  }
+
+                  var init_settings = nimbleTinyMCEPreInit.mceInit[ _id ];
+                  init_settings.content_css = ( function() {
+                        var default_settings = wp.editor.getDefaultSettings(),
+                            stylesheets = [ sektionsLocalizedData.tinyMceNimbleEditorStylesheetUrl ];
+                        if ( default_settings && default_settings.tinymce && default_settings.tinymce.content_css ) {
+                              stylesheets = _.union( default_settings.tinymce.content_css.split(','), stylesheets );
+                        }
+                        return stylesheets.join(',');
+                  })();
+
+                  window.tinymce.init( init_settings );
+                  window.QTags.getInstance( _id );
+                  // wp.editor.initialize( _id, {
+                  //       //tinymce : true,
+                  //       tinymce: nimbleTinyMCEPreInit.mceInit[_id],
+                  //       quicktags : nimbleTinyMCEPreInit.qtInit[_id],
+                  //       mediaButtons: true
+                  // });
+
+                  var _editor = tinyMCE.get( _id );
+                  if ( ! _editor ) {
+                        throw new Error( 'setupDetachedTinyMceEditor => missing editor instance for module :' + input.module.id );
+                  }
+
+                  // Let's set the input() value when the editor is ready
+                  // Because when we instantiate it, the textarea might not reflect the input value because too early
+                  var _doOnInit = function() {
+                        _editor.setContent( input() );
+                        api.sekEditorExpanded( true );
+                  };
+                  if ( _editor.initialized ) {
+                        _doOnInit();
+                  } else {
+                        _editor.on( 'init', _doOnInit );
+                  }
+
+                  // bind events
+                  _editor.on( 'input change keyup keydown click SetContent BeforeSetContent', function( evt ) {
+                        //$textarea.trigger( 'change', {current_input : input} );
+                        input( _editor.getContent() );
+                  } );
+
+                  // store the current input now, so we'll always get the right one when textarea changes
+                  api.sekCurrentDetachedTinyMceInput = input;
+
+                  // TEXT EDITOR => This is the original textarea element => needs to be bound separatelyn because not considered part of the tinyMce editor.
+                  // Bound only once
+                  if ( !$textarea.data('czr-bound-for-detached-editor') ) {
+                        $textarea.on( 'input', function( evt, params ) {
+                              api.sekCurrentDetachedTinyMceInput( $(this).val() );
+                        });
+                        $textarea.data('czr-bound-for-detached-editor', true );
+                  }
+
+            },//setupDetachedTinyMceEditor
+      });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 /* ------------------------------------------------------------------------- *
@@ -11687,7 +11917,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     initialize : function( name, options ) {
                           var input = this;
                           // Expand the editor when ready
-                          if ( 'tiny_mce_editor' == input.type ) {
+                          if ( 'detached_tinymce_editor' == input.type ) {
                                 input.isReady.then( function() {
                                       input.container.find('[data-czr-action="open-tinymce-editor"]').trigger('click');
                                 });

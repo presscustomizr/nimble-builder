@@ -107,7 +107,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //generate fields
         $this->fields = $this->simple_form_generate_fields( $form_composition );
         //generate form
-        $this->form   = $this->simple_form_generate_form( $this->fields );
+        $this->form = $this->simple_form_generate_form( $this->fields );
 
         //mailer
         $this->mailer = new Sek_Mailer( $this->form );
