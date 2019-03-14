@@ -98,8 +98,10 @@ function sek_enqueue_controls_js_css() {
 
                 'hasActiveCachePlugin' => sek_has_active_cache_plugin(),
 
+                // Tiny MCE
                 'idOfDetachedTinyMceTextArea' => NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID,
-                'tinyMceNimbleEditorStylesheetUrl' => sprintf( '%1$s/assets/czr/sek/css/sek-tinymce-content.css', NIMBLE_BASE_URL )
+                'tinyMceNimbleEditorStylesheetUrl' => sprintf( '%1$s/assets/czr/sek/css/sek-tinymce-content.css', NIMBLE_BASE_URL ),
+                'defaultToolbarBtns' => "formatselect,forecolor,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,strikethrough,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo"
             )
         )
     );//wp_localize_script()

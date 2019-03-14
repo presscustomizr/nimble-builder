@@ -339,7 +339,9 @@ final class _NIMBLE_Editors {
       }
 
       if ( empty( $qtInit['buttons'] ) ) {
-        $qtInit['buttons'] = 'strong,em,link,block,del,ins,img,ul,ol,li,code,more,close';
+        //$qtInit['buttons'] = 'strong,em,link,block,del,ins,img,ul,ol,li,code,more,close';
+        //@nikeo modif
+        $qtInit['buttons'] = 'strong,em,link,block,del,ins,img,ul,ol,li,code';
       }
 
       if ( $set['_content_editor_dfw'] ) {

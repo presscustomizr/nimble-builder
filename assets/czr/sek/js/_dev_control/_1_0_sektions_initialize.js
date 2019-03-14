@@ -27,7 +27,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.SETTING_UPDATE_BUFFER = 100;
 
                   // introduced for https://github.com/presscustomizr/nimble-builder/issues/403
-                  self.TINYMCE_EDITOR_HEIGHT = '150px';
+                  self.TINYMCE_EDITOR_HEIGHT = 100;
 
                   // Define a default value for the sektion setting value, used when no server value has been sent
                   // @see php function

@@ -86,7 +86,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'input_type'        => 'nimble_tinymce_editor',
                     'editor_params'     => array(
                         'media_button' => true,
-                        'excludedBtns' => array( 'blockquote' )
+                        'includedBtns' => array('forecolor','bold','italic','link','strikethrough'),
                     ),
                     'title'             => __( 'Main quote content', 'text_doma' ),
                     'default'           => '',
@@ -255,7 +255,8 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'input_type'        => 'nimble_tinymce_editor',
                     'editor_params'     => array(
                         'media_button' => false,
-                        'excludedBtns' => array( 'blockquote' )
+                        'includedBtns' => array('forecolor','bold','italic','link','strikethrough'),
+                        'height' => 50
                     ),
                     'refresh_markup' => '.sek-cite',
                     'title'              => __( 'Cite text', 'text_doma' ),

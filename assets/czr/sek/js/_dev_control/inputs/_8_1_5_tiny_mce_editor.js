@@ -15,8 +15,9 @@
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                       // see how those buttons can be set in php class _NIMBLE_Editors
                       // @see the global js var nimbleTinyMCEPreInit includes all params
-                      defaultToolbarBtns = "formatselect,forecolor,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,strikethrough,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo",
-                      defaultQuickTagBtns = "strong,em,link,block,del,ins,img,ul,ol,li,code,more,close";
+                      defaultToolbarBtns = sektionsLocalizedData.defaultToolbarBtns,
+                      //defaultQuickTagBtns = "strong,em,link,block,del,ins,img,ul,ol,li,code,more,close",
+                      defaultQuickTagBtns = "strong,em,link,code";
 
                   if ( _.isNull( _id ) ) {
                         throw new Error( 'setupTinyMceEditor => missing textarea for module :' + input.module.id );
@@ -41,17 +42,24 @@
                         return toolBarBtn.join(',');
                   };
                   var getEditorHeight = function() {
-                        return ( inputRegistrationParams.editor_params && _.isString( inputRegistrationParams.editor_params.height ) ) ? inputRegistrationParams.editor_params.height : self.TINYMCE_EDITOR_HEIGHT;
+                        return ( inputRegistrationParams.editor_params && _.isNumber( inputRegistrationParams.editor_params.height ) ) ? inputRegistrationParams.editor_params.height : api.czr_sektions.TINYMCE_EDITOR_HEIGHT;
+                  };
+                  var isAutoPEnabled = function() {
+                        // on registration, the autop can be specified
+                        return inputRegistrationParams && inputRegistrationParams.editor_params && true === inputRegistrationParams.editor_params.autop;
                   };
                   // Set a height for the textarea before instanciation
-                  $textarea.css( { 'height' : getEditorHeight() } );
+                  //$textarea.css( { 'height' : getEditorHeight() } );
 
                   // the plugins like colorpicker have been loaded when instantiating the detached tinymce editor
                   // @see php class _NIMBLE_Editors
                   // if not specified, wp.editor falls back on the ones of wp.editor.getDefaultSettings()
                   // we can use them here without the need to specify them in the tinymce {} params
                   // @see the tinyMCE params with this global var : nimbleTinyMCEPreInit.mceInit["czr-customize-content_editor"]
-                  wp.editor.initialize( _id, {
+                  //
+                  // forced_root_block added to remove <p> tags automatically added
+                  // @see https://stackoverflow.com/questions/20464028/how-to-remove-unwanted-p-tags-from-wordpress-editor-using-tinymce
+                  var init_settings = {
                         //tinymce: nimbleTinyMCEPreInit.mceInit["czr-customize-content_editor"],
                         tinymce: {
                             //plugins:"charmap,colorpicker,hr,lists,media,paste,tabfocus,textcolor,wordpress,wpeditimage,wpemoji,wpgallery,wplink,wpdialogs,wptextpattern,wpview",
@@ -64,14 +72,29 @@
                                         stylesheets = _.union( default_settings.tinymce.content_css.split(','), stylesheets );
                                   }
                                   return stylesheets.join(',');
-                            })()
+                            })(),
+                            // https://www.tiny.cloud/docs/plugins/autoresize/
+                            min_height :40,
+                            height:getEditorHeight()
                         },
-                        quicktags : defaultQuickTagBtns,
+                        quicktags : {
+                            buttons : defaultQuickTagBtns
+                        },
                         mediaButtons: ( inputRegistrationParams.editor_params && false === inputRegistrationParams.editor_params.media_button ) ? false : true
-                  });
+                  };
 
+                  // AUTOP
+                  init_settings.tinymce.wpautop = isAutoPEnabled();
+                  // forced_root_block is added to remove <p> tags automatically added
+                  // @see https://stackoverflow.com/questions/20464028/how-to-remove-unwanted-p-tags-from-wordpress-editor-using-tinymce
+                  if ( !isAutoPEnabled() ) {
+                        init_settings.tinymce.forced_root_block = "";
+                  }
+
+                  // INITIALIZE
+                  wp.editor.initialize( _id, init_settings );
                   // Note that an easy way to instantiate a basic editor would be to use :
-                  //wp.editor.initialize( _id, { tinymce : { wpautop: false }, quicktags : true });
+                  // wp.editor.initialize( _id, { tinymce : { forced_root_block : "", wpautop: false }, quicktags : true });
 
                   var _editor = tinyMCE.get( _id );
                   if ( ! _editor ) {
@@ -89,6 +112,7 @@
                   // Because when we instantiate it, the textarea might not reflect the input value because too early
                   var _doOnInit = function() {
                         _editor.setContent( input() );
+                        //$('#wp-' + _editor.id + '-wrap' ).find('iframe').addClass('labite').css('height','50px');
                   };
                   if ( _editor.initialized ) {
                         _doOnInit();
@@ -110,7 +134,9 @@
             detached_tinymce_editor : function() {
                   var input = this,
                       $textarea = $('textarea#' + sektionsLocalizedData.idOfDetachedTinyMceTextArea ), //$('textarea#czr-customize-content_editor'),
-                      _id;
+                      _id,
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type );
+
                   if ( $textarea.length > 0  ) {
                         _id = $textarea.attr('id');
                   } else {
@@ -156,14 +182,13 @@
                   // IMPORTANT !! => don't use wp.editor.remove() @see wp-admin/js/editor.js, because it can remove the stylesheet editor.css
                   // and break the style of all editors
                   if ( window.tinymce ) {
-                    mceInstance = window.tinymce.get( _id );
-
-                    if ( mceInstance ) {
-                      // if ( ! mceInstance.isHidden() ) {
-                      //   mceInstance.save();
-                      // }
-                      mceInstance.remove();
-                    }
+                        mceInstance = window.tinymce.get( _id );
+                        if ( mceInstance ) {
+                          // if ( ! mceInstance.isHidden() ) {
+                          //   mceInstance.save();
+                          // }
+                          mceInstance.remove();
+                        }
                   }
                   // if ( window.quicktags ) {
                   //   qtInstance = window.QTags.getInstance( id );
@@ -181,6 +206,8 @@
                   }
 
                   var init_settings = nimbleTinyMCEPreInit.mceInit[ _id ];
+
+                  // Add the nimble editor's stylesheet to the default's ones
                   init_settings.content_css = ( function() {
                         var default_settings = wp.editor.getDefaultSettings(),
                             stylesheets = [ sektionsLocalizedData.tinyMceNimbleEditorStylesheetUrl ];
@@ -189,6 +216,30 @@
                         }
                         return stylesheets.join(',');
                   })();
+
+                  // Handle wpautop param
+                  var item = input.input_parent;
+                  var isAutoPEnabled = function() {
+                        var parent_item_val = item();
+                        // 1) the module 'czr_tinymce_child' includes an autop option
+                        // 2) on registration, the autop can be specified
+                        if ( !_.isUndefined( parent_item_val.autop ) ) {
+                            return parent_item_val.autop;
+                        } else {
+                            return inputRegistrationParams && inputRegistrationParams.editor_params && true === inputRegistrationParams.editor_params.autop;
+                        }
+                  };
+
+                  init_settings.wpautop = isAutoPEnabled();
+                  // forced_root_block is added to remove <p> tags automatically added
+                  // @see https://stackoverflow.com/questions/20464028/how-to-remove-unwanted-p-tags-from-wordpress-editor-using-tinymce
+                  if ( !isAutoPEnabled() ) {
+                        init_settings.forced_root_block = "";
+                  }
+
+                  // TOOLBARS
+                  init_settings.toolbar1 = sektionsLocalizedData.defaultToolbarBtns;
+                  init_settings.toolbar2 = "";
 
                   window.tinymce.init( init_settings );
                   window.QTags.getInstance( _id );
@@ -207,7 +258,11 @@
                   // Let's set the input() value when the editor is ready
                   // Because when we instantiate it, the textarea might not reflect the input value because too early
                   var _doOnInit = function() {
-                        _editor.setContent( input() );
+                        // To ensure retro-compat with content created prior to Nimble v1.5.2, in which the editor has been updated
+                        // @see https://github.com/presscustomizr/nimble-builder/issues/404
+                        // we add the <p> tag on init, if autop option is checked
+                        var initial_content = !isAutoPEnabled() ? input() : wp.editor.autop( input() );
+                        _editor.setContent( initial_content );
                         api.sekEditorExpanded( true );
                   };
                   if ( _editor.initialized ) {
@@ -219,8 +274,8 @@
                   // bind events
                   _editor.on( 'input change keyup keydown click SetContent BeforeSetContent', function( evt ) {
                         //$textarea.trigger( 'change', {current_input : input} );
-                        input( _editor.getContent() );
-                  } );
+                        input( isAutoPEnabled() ? _editor.getContent() : wp.editor.removep( _editor.getContent() ) );
+                  });
 
                   // store the current input now, so we'll always get the right one when textarea changes
                   api.sekCurrentDetachedTinyMceInput = input;

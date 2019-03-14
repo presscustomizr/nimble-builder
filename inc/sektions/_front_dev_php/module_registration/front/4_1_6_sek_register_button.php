@@ -77,14 +77,20 @@ function sek_get_module_params_for_czr_btn_content_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'button_text' => array(
-                    'input_type'         => 'text',
+                    'input_type'        => 'nimble_tinymce_editor',
+                    'editor_params'     => array(
+                        'media_button' => false,
+                        'includedBtns' => array('forecolor','bold','italic','strikethrough'),
+                        'height' => 45
+                    ),
                     'title'              => __( 'Button text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
+                    'refresh_markup'    => '.sek-btn-text'
                 ),
                 'btn_text_on_hover' => array(
                     'input_type'         => 'text',
-                    'title'              => __( 'Button text on mouse hover', 'text_doma' ),
+                    'title'              => __( 'Tooltip text on mouse hover', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
                     'title_width' => 'width-100',

@@ -47,8 +47,8 @@ function sek_get_module_params_for_czr_heading_child() {
                     'input_type'        => 'nimble_tinymce_editor',
                     'editor_params'     => array(
                         'media_button' => false,
-                        'includedBtns' => array('forecolor','bold','italic','strikethrough','link'),
-                        'height' => '50px'
+                        'includedBtns' => array('forecolor','bold','italic','link','strikethrough'),
+                        'height' => 50
                     ),
                     'title'              => __( 'Heading text', 'text_doma' ),
                     'default'            => '',
@@ -75,7 +75,7 @@ function sek_get_module_params_for_czr_heading_child() {
                 ),
                 'heading_title' => array(
                     'input_type'         => 'text',
-                    'title' => __('Display a text when the mouse is held over', 'text_domain_to' ),
+                    'title' => __('Display a tooltip text when the mouse is held over', 'text_domain_to' ),
                     'default'            => '',
                     'title_width' => 'width-100',
                     'width-100'         => true,
