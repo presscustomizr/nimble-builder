@@ -79,9 +79,9 @@ function sek_enqueue_controls_js_css() {
                 'moduleIconPath' => NIMBLE_MODULE_ICON_PATH,
 
                 'hasActiveCachePlugin' => sek_has_active_cache_plugin(),
-
                 'idOfDetachedTinyMceTextArea' => NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID,
-                'tinyMceNimbleEditorStylesheetUrl' => sprintf( '%1$s/assets/czr/sek/css/sek-tinymce-content.css', NIMBLE_BASE_URL )
+                'tinyMceNimbleEditorStylesheetUrl' => sprintf( '%1$s/assets/czr/sek/css/sek-tinymce-content.css', NIMBLE_BASE_URL ),
+                'defaultToolbarBtns' => "formatselect,forecolor,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,strikethrough,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo"
             )
         )
     );//wp_localize_script()
@@ -1095,7 +1095,7 @@ final class _NIMBLE_Editors {
       }
 
       if ( empty( $qtInit['buttons'] ) ) {
-        $qtInit['buttons'] = 'strong,em,link,block,del,ins,img,ul,ol,li,code,more,close';
+        $qtInit['buttons'] = 'strong,em,link,block,del,ins,img,ul,ol,li,code';
       }
 
       if ( $set['_content_editor_dfw'] ) {
