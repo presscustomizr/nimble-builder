@@ -33,7 +33,10 @@ class Sek_Form {
     }
 
     public function get_field( $field_name ) {
-        return $this->fields[ sanitize_key( $field_name ) ] ? $this->fields[ sanitize_key( $field_name ) ] : null;
+        if ( is_array( $this->fields ) && array_key_exists(sanitize_key( $field_name ), $this->fields) ) {
+            return $this->fields[ sanitize_key( $field_name ) ];
+        }
+        return null;
     }
 
     //make sure fields are well formed

@@ -101,14 +101,19 @@ class Sek_Mailer {
         return $is_valid;
     }
 
+
+    // Depending on the user options, some fields might exists in the $form object
+    // We need to check their existence ( @see https://github.com/presscustomizr/nimble-builder/issues/399 )
     public function maybe_send( $form_composition, $module_model ) {
         // the captcha validation has been made on Sek_Mailer instantiation
         if ( 'recaptcha_fail' === $this->status ) {
             return;
         }
 
-        //sek_error_log('$form_composition', $form_composition );
-        //sek_error_log('$module_model', $module_model );
+        //sek_error_log('$form_composition ??', $form_composition );
+        //sek_error_log('$module_model ??', $module_model );
+        //sek_error_log('$this->form ??', $form_composition , $this->form );
+
         $invalid_field = $this->form->has_invalid_field();
         if ( false !== $invalid_field ) {
             $this->status = 'aborted';
@@ -125,6 +130,7 @@ class Sek_Mailer {
 
         $sender_email   = $this->form->get_field('nimble_email')->get_input()->get_value();
         $sender_name    = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
+        $sender_body_message = null === $this->form->get_field('nimble_message') ? '' : $this->form->get_field('nimble_message')->get_input()->get_value();
 
         if ( array_key_exists( 'recipients', $submission_options ) ) {
             $recipient      = $submission_options['recipients'];
@@ -160,16 +166,20 @@ class Sek_Mailer {
             );
         }
 
-        $body           = sprintf( '%1$s%2$s%3$s%4$s%5$s',
-                            $before_message,
-                            sprintf( '<br><br>%1$s: <br>%2$s',
-                                __('Message body', 'text_doma'),
-                                //$allow_html ? '<br><br>': "\r\n\r\n",
-                                $this->form->get_field('nimble_message')->get_input()->get_value()
-                            ),
-                            $after_message,
-                            $allow_html ? '<br><br>--<br>': "\r\n\r\n--\r\n",
-                            $email_footer
+        if ( !empty( $sender_body_message ) ) {
+            $sender_body_message = sprintf( '<br><br>%1$s: <br>%2$s',
+                __('Message body', 'text_doma'),
+                //$allow_html ? '<br><br>': "\r\n\r\n",
+                $sender_body_message
+            );
+        }
+
+        $body = sprintf( '%1$s%2$s%3$s%4$s%5$s',
+            $before_message,
+            $sender_body_message,
+            $after_message,
+            $allow_html ? '<br><br>--<br>': "\r\n\r\n--\r\n",
+            $email_footer
         );
 
         $headers        = array();
