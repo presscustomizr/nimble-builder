@@ -31,11 +31,20 @@
                             toolBarBtn = _.filter( toolBarBtn, function( _btn ) {
                                   return !_.contains( excluded, _btn );
                             });
-                       }
-                       return toolBarBtn.join(',');
+                        }
+                        if ( inputRegistrationParams.editor_params && _.isArray( inputRegistrationParams.editor_params.includedBtns ) ) {
+                            var includedBtns = inputRegistrationParams.editor_params.includedBtns;
+                            toolBarBtn = _.filter( toolBarBtn, function( _btn ) {
+                                  return _.contains( includedBtns, _btn );
+                            });
+                        }
+                        return toolBarBtn.join(',');
+                  };
+                  var getEditorHeight = function() {
+                        return ( inputRegistrationParams.editor_params && _.isString( inputRegistrationParams.editor_params.height ) ) ? inputRegistrationParams.editor_params.height : self.TINYMCE_EDITOR_HEIGHT;
                   };
                   // Set a height for the textarea before instanciation
-                  $textarea.css( 'height', self.TINYMCE_EDITOR_HEIGHT );
+                  $textarea.css( { 'height' : getEditorHeight() } );
 
                   // the plugins like colorpicker have been loaded when instantiating the detached tinymce editor
                   // @see php class _NIMBLE_Editors
