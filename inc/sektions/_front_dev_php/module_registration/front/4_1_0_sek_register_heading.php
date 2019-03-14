@@ -44,11 +44,17 @@ function sek_get_module_params_for_czr_heading_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'heading_text' => array(
-                    'input_type'         => 'text',
+                    'input_type'        => 'nimble_tinymce_editor',
+                    'editor_params'     => array(
+                        'media_button' => false,
+                        'includedBtns' => array('forecolor','bold','italic','strikethrough','link'),
+                        'height' => '50px'
+                    ),
                     'title'              => __( 'Heading text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
+                    'refresh_markup'    => '.sek-heading [data-sek-input-type="textarea"]'
+                    //'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
 
                 ),
                 'heading_tag' => array(

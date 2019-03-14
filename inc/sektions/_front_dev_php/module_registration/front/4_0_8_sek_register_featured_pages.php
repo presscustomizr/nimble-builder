@@ -68,7 +68,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'choices'     => sek_get_select_options_for_input_id( 'content-type' )
                 ),
                 'content-custom-text' => array(
-                    'input_type'  => 'tiny_mce_editor',
+                    'input_type'  => 'nimble_tinymce_editor',
                     'title'       => __('Custom text content', 'text_doma'),
                     'default'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
                 ),
@@ -80,7 +80,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'input_width' => 'width-20',
                 ),
                 'btn-custom-text' => array(
-                    'input_type'  => 'tiny_mce_editor',
+                    'input_type'  => 'nimble_tinymce_editor',
                     'title'       => __('Custom button text', 'text_doma'),
                     'default'     => __('Read More', 'text_doma'),
                 )

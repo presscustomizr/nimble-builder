@@ -83,11 +83,16 @@ function sek_get_module_params_for_czr_quote_quote_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'quote_text' => array(
-                    'input_type'         => 'textarea',
-                    'title'              => __( 'Quote text', 'text_doma' ),
-                    'default'            => '',
+                    'input_type'        => 'nimble_tinymce_editor',
+                    'editor_params'     => array(
+                        'media_button' => true,
+                        'excludedBtns' => array( 'blockquote' )
+                    ),
+                    'title'             => __( 'Main quote content', 'text_doma' ),
+                    'default'           => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_doma'),
+                    //'notice_before'     => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_doma'),
+                    'refresh_markup'    => '.sek-quote-content'
                 ),
                 'quote_font_family_css' => array(
                     'input_type'  => 'font_picker',
@@ -247,11 +252,16 @@ function sek_get_module_params_for_czr_quote_cite_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'cite_text' => array(
-                    'input_type'         => 'textarea',
+                    'input_type'        => 'nimble_tinymce_editor',
+                    'editor_params'     => array(
+                        'media_button' => false,
+                        'excludedBtns' => array( 'blockquote' )
+                    ),
+                    'refresh_markup' => '.sek-cite',
                     'title'              => __( 'Cite text', 'text_doma' ),
                     'default'            => '',
                     'width-100'         => true,
-                    'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
+                    //'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
                 ),
                 'cite_font_family_css' => array(
                     'input_type'  => 'font_picker',

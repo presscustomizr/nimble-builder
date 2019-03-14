@@ -15,6 +15,11 @@ $design_settings = $value['design'];
 //  => so we can listen to user click actions and open the editor on for each separate tiny_mce_editor input
 if ( ! function_exists( __NAMESPACE__ . '\sek_print_quote_content' ) ) {
     function sek_print_quote_content( $quote_content, $input_id, $module_model, $echo = false ) {
+        // filter added since text editor implementation https://github.com/presscustomizr/nimble-builder/issues/403
+        // Use our own content filter instead of $content = apply_filters( 'the_content', $tiny_mce_content );
+        // because of potential third party plugins corrupting 'the_content' filter. https://github.com/presscustomizr/nimble-builder/issues/233
+        $quote_content = apply_filters( 'the_nimble_tinymce_module_content', $quote_content );
+
         if ( skp_is_customizing() ) {
             $to_print = sprintf('<div title="%3$s" data-sek-input-type="textarea" data-sek-input-id="%1$s">%2$s</div>', $input_id, $quote_content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
         } else {
@@ -32,10 +37,16 @@ if ( ! function_exists( __NAMESPACE__ . '\sek_print_quote_content' ) ) {
 
 // print the module content if not empty
 if ( ! empty( $quote_content_settings['quote_text'] ) ) {
+    $cite_text = '';
+    if ( ! empty( $cite_content_settings['cite_text'] ) ) {
+        // filter added since text editor implementation https://github.com/presscustomizr/nimble-builder/issues/403
+        $cite_text = apply_filters( 'the_nimble_tinymce_module_content', $cite_content_settings['cite_text'] );
+    }
+
     sek_print_quote_content(
         sprintf( '<blockquote class="sek-quote%3$s"><div class="sek-quote-inner"><div class="sek-quote-content">%1$s</div>%2$s</div></blockquote>',
-            wpautop( $quote_content_settings['quote_text'] ),
-            ! empty( $cite_content_settings['cite_text'] ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', $cite_content_settings['cite_text'] ) : '',
+            $quote_content_settings['quote_text'],
+            ! empty( $cite_text ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', $cite_text ) : '',
             empty( $design_settings['quote_design'] ) || 'none' == $design_settings['quote_design'] ? '' : " sek-quote-design sek-{$design_settings['quote_design']}"
         ),
         'quote_text',

@@ -16,6 +16,12 @@ if ( ! function_exists( 'Nimble\sek_print_text_heading_content' ) ) {
         if ( empty( $heading_content ) ) {
             $to_print = Nimble_Manager()->sek_get_input_placeholder_content( 'text', $input_id );
         } else {
+            // filter added since text editor implementation https://github.com/presscustomizr/nimble-builder/issues/403
+            // Use our own content filter instead of $content = apply_filters( 'the_content', $tiny_mce_content );
+            // because of potential third party plugins corrupting 'the_content' filter. https://github.com/presscustomizr/nimble-builder/issues/233
+            remove_filter( 'the_nimble_tinymce_module_content', 'wpautop');
+            $heading_content = apply_filters( 'the_nimble_tinymce_module_content', $heading_content );
+            add_filter( 'the_nimble_tinymce_module_content', 'wpautop');
             if ( skp_is_customizing() ) {
                 $to_print = sprintf('<div title="%3$s" data-sek-input-type="textarea" data-sek-input-id="%1$s">%2$s</div>', $input_id, $heading_content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
             } else {
