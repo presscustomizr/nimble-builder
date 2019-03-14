@@ -85,7 +85,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 'quote_text' => array(
                     'input_type'        => 'nimble_tinymce_editor',
                     'editor_params'     => array(
-                        'media_button' => true,
+                        'media_button' => false,
                         'includedBtns' => array('forecolor','bold','italic','link','strikethrough'),
                     ),
                     'title'             => __( 'Main quote content', 'text_doma' ),
