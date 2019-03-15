@@ -36,6 +36,7 @@ function sek_register_modules() {
         'sek_local_performances',
         'sek_local_header_footer',
         'sek_local_revisions',
+        'sek_local_imp_exp',
 
         // global options modules
         'sek_global_breakpoint',

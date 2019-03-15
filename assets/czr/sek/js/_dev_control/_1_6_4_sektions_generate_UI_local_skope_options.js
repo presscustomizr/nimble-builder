@@ -99,6 +99,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">settings_backup_restore</i>'
                                     };
                               break;
+                              case 'import_export' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__local_imp_exp',
+                                          module_type : mod_type,
+                                          controlLabel : '@missi18n import export',
+                                          icon : '<i class="material-icons sek-level-option-icon">import_export</i>'
+                                    };
+                              break;
                               default :
                                     api.errare('::generateUIforLocalOptions => an option group could not be registered => ' + mod_type, opt_name );
                               break;
