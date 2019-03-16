@@ -333,7 +333,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             api.previewer.trigger('sek-notify', {
                                   notif_id : 'has-active-cache-plugin',
                                   type : 'info',
-                                  duration : 60000,
+                                  duration : 20000,
                                   message : [
                                         '<span style="color:#0075a2">',
                                           sektionsLocalizedData.i18n['You seem to be using a cache plugin.'],
