@@ -96,6 +96,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare('validation error => the setting should be an object', valCandidate );
                         return null;
                   }
+
+                  console.log('valCandidate ?? ', valCandidate);
+
                   var parentLevel = {},
                       errorDetected = false,
                       levelIds = [];

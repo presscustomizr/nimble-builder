@@ -1295,3 +1295,24 @@ li[id^="accordion-section-__nimble__"] {
 li[id^="accordion-section-__nimble__"] > h3 {
   border-top:1px solid #ddd;
 }
+
+
+/* IMPORT / EXPORT */
+.sek-import-export-form {
+    position: absolute;
+    left: -99999px;
+}
+.sek-import-file {
+    background: #eeeeee;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 12px;
+}
+.sek-uploading {
+    background: #eeeeee;
+    display: none;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 12px;
+}

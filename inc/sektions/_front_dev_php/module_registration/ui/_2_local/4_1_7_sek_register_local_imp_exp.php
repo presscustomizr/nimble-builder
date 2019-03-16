@@ -12,8 +12,9 @@ function sek_get_module_params_for_sek_local_imp_exp() {
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
-                'local_revisions' => array(
+                'import_export' => array(
                     'input_type'  => 'import_export',
+                    'scope' => 'local',
                     'title'       => __('Import / export', 'text_doma'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,

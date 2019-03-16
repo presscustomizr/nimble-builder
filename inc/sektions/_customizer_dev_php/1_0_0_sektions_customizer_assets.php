@@ -44,6 +44,7 @@ function sek_enqueue_controls_js_css() {
                 'nimbleVersion' => NIMBLE_VERSION,
                 'isDevMode' => sek_is_dev_mode(),
                 'baseUrl' => NIMBLE_BASE_URL,
+                'customizerURL'   => admin_url( 'customize.php' ),
                 'sektionsPanelId' => '__sektions__',
                 'addNewSektionId' => 'sek_add_new_sektion',
                 'addNewColumnId' => 'sek_add_new_column',

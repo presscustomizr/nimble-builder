@@ -1057,6 +1057,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     //api.infoLog( 'sek-restore-revision', params );
                                     newSetValue = params.revision_value;
                               break;
+
+                              //-------------------------------------------------------------------------------------------------
+                              //-- FILE IMPORT
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-import-from-file' :
+                                    //api.infoLog( 'sek-import-from-file', params );
+                                    newSetValue = params.imported_data;
+                              break;
                         }// switch
 
 
