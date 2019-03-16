@@ -48,7 +48,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // IMPORT IMG
         // Fired in __construct()
         function _schedule_img_import_ajax_actions() {
-            add_action( 'wp_ajax_sek_import_attachment', array( $this, 'sek_ajax_import_attachemnt' ) );
+            add_action( 'wp_ajax_sek_import_attachment', array( $this, 'sek_ajax_import_attachment' ) );
         }
 
         ////////////////////////////////////////////////////////////////
@@ -339,7 +339,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
         /////////////////////////////////////////////////////////////////
         // hook : wp_ajax_sek_import_attachment
-        function sek_ajax_import_attachemnt() {
+        function sek_ajax_import_attachment() {
             if ( ! is_user_logged_in() ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
             }
