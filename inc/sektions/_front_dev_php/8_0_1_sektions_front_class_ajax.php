@@ -633,7 +633,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             }
 
             if ( ! isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
-                wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
+                wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing revision_post_id' );
             }
             $revision = sek_get_single_post_revision( $_POST['revision_post_id'] );
             wp_send_json_success( $revision );
