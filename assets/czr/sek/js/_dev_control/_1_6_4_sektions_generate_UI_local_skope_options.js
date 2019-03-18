@@ -96,7 +96,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           settingControlId : _id_ + '__local_revisions',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Revision history of local sections'],
-                                          icon : '<i class="material-icons sek-level-option-icon">settings_backup_restore</i>'
+                                          icon : '<i class="material-icons sek-level-option-icon">history</i>'
                                     };
                               break;
                               default :
