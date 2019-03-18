@@ -101,7 +101,11 @@ function sek_enqueue_controls_js_css() {
                 // Tiny MCE
                 'idOfDetachedTinyMceTextArea' => NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID,
                 'tinyMceNimbleEditorStylesheetUrl' => sprintf( '%1$s/assets/czr/sek/css/sek-tinymce-content.css', NIMBLE_BASE_URL ),
-                'defaultToolbarBtns' => "formatselect,forecolor,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,strikethrough,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo"
+                // defaultToolbarBtns is used for the detached tinymce editor
+                'defaultToolbarBtns' => "formatselect,fontsizeselect,forecolor,bold,italic,underline,strikethrough,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,unlink,spellchecker,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo",
+                // basic btns are used for the heading, the quote content and quote cite
+                'basic_btns' => array('forecolor','bold','italic','underline','strikethrough','link'),
+                'basic_btns_nolink' => array('forecolor','bold','italic','underline','strikethrough')
             )
         )
     );//wp_localize_script()

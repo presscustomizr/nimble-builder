@@ -33,11 +33,17 @@
                                   return !_.contains( excluded, _btn );
                             });
                         }
-                        if ( inputRegistrationParams.editor_params && _.isArray( inputRegistrationParams.editor_params.includedBtns ) ) {
+                        if ( inputRegistrationParams.editor_params && _.isString( inputRegistrationParams.editor_params.includedBtns ) ) {
                             var includedBtns = inputRegistrationParams.editor_params.includedBtns;
-                            toolBarBtn = _.filter( toolBarBtn, function( _btn ) {
-                                  return _.contains( includedBtns, _btn );
-                            });
+                            // 'basic_btns' or 'basic_btns_nolink'
+                            if ( _.isEmpty( includedBtns ) || !_.isArray( sektionsLocalizedData[includedBtns] ) ) {
+                                  api.errare('nimble_tinymce_editor input => invalid set of buttons provided', includedBtns );
+                            } else {
+                                  includedBtns = sektionsLocalizedData[includedBtns];
+                                  toolBarBtn = _.filter( toolBarBtn, function( _btn ) {
+                                        return _.contains( includedBtns, _btn );
+                                  });
+                            }
                         }
                         return toolBarBtn.join(',');
                   };

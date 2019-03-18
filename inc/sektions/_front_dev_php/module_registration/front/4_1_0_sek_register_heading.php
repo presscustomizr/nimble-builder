@@ -47,7 +47,7 @@ function sek_get_module_params_for_czr_heading_child() {
                     'input_type'        => 'nimble_tinymce_editor',
                     'editor_params'     => array(
                         'media_button' => false,
-                        'includedBtns' => array('forecolor','bold','italic','link','strikethrough'),
+                        'includedBtns' => 'basic_btns',
                         'height' => 50
                     ),
                     'title'              => __( 'Heading text', 'text_doma' ),

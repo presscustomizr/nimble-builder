@@ -80,7 +80,7 @@ function sek_get_module_params_for_czr_btn_content_child() {
                     'input_type'        => 'nimble_tinymce_editor',
                     'editor_params'     => array(
                         'media_button' => false,
-                        'includedBtns' => array('forecolor','bold','italic','strikethrough'),
+                        'includedBtns' => 'basic_btns_nolink',
                         'height' => 45
                     ),
                     'title'              => __( 'Button text', 'text_doma' ),
