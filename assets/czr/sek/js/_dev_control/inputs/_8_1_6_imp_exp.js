@@ -9,7 +9,12 @@
       // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             import_export : function() {
-                  var input = this;
+                  var input = this,
+                      $file_input = input.container.find('input[name=sek-import-file]');
+
+                  $file_input.on('change', function( evt ) {
+                        input.container.find('button[data-czr-action="sek-import"]').toggleClass( 'disabled', _.isEmpty( $(this).val() ) );
+                  });
 
                   // Schedule choice changes on button click
                   input.container.on( 'click', '[data-czr-action]', function( evt, params ) {
@@ -30,12 +35,12 @@
                                           '?',
                                           query.join('&')
                                     ].join('');
-                              break;
-                              case 'sek-import' :
-                                    var inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
-                                        $file_input = input.container.find('input[name=sek-import-file]');
+                              break;//'sek-export'
 
-                                    if ( _.isEmpty( $file_input.val() ) ) {
+                              case 'sek-import' :
+                                    var inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type );
+
+                                    if ( $file_input.length < 1 || _.isUndefined( $file_input[0] ) || ! $file_input[0].files || _.isEmpty( $file_input.val() ) ) {
                                           api.previewer.trigger('sek-notify', {
                                                 notif_id : 'missing-import-file',
                                                 type : 'info',
@@ -43,7 +48,7 @@
                                                 message : [
                                                       '<span style="color:#0075a2">',
                                                         '<strong>',
-                                                        '@missi18n Missing file',//sektionsLocalizedData.i18n['It is recommended to disable your cache plugin when customizing your website.'],
+                                                        sektionsLocalizedData.i18n['Missing file'],
                                                         '</strong>',
                                                       '</span>'
                                                 ].join('')
@@ -51,17 +56,22 @@
                                     } else {
                                           // make sure a previous warning gets removed
                                           api.notifications.remove( 'missing-import-file' );
+                                          api.notifications.remove( 'import-success' );
+                                          api.notifications.remove( 'import-failed' );
 
-                                          // prevent browser to print the message "Are you sure you want to leave the page?"
-                                          //$( window ).off( 'beforeunload' );
-
+                                          // the uploading message is removed on .always()
                                           input.container.find('.sek-uploading').show();
-
-
                                           var fd = new FormData();
                                           fd.append( 'file_candidate', $file_input[0].files[0] );
                                           fd.append( 'action', 'sek_get_imported_file_content' );
                                           fd.append( 'nonce', api.settings.nonce.save );
+
+                                          // Make sure we have a correct scope provided
+                                          if ( !_.contains( ['local', 'global'], inputRegistrationParams.scope ) ) {
+                                                api.errare('sek-import input => invalid scope provided', inputRegistrationParams.scope );
+                                                return;
+                                          }
+
                                           fd.append( 'skope', inputRegistrationParams.scope);
                                           $.ajax({
                                                 url: wp.ajax.settings.url,
@@ -74,25 +84,40 @@
                                                 // success: function(data){
                                                 //   alert(data);
                                                 // }
-                                          }).done( function( server_data ){
+                                          }).done( function( server_resp ){
                                                 // If the setting value is unchanged, no need to go further
                                                 // is_local is decided with the input id => @see revision_history input type.
                                                 var setId = 'local' === inputRegistrationParams.scope ? api.czr_sektions.localSectionsSettingId() : api.czr_sektions.getGlobalSectionsSettingId(),
-                                                    unserialized_file_content = server_data.data;
+                                                    unserialized_file_content = server_resp.data;
                                                 if ( ! _.isObject( unserialized_file_content ) ) {
                                                       api.errare('sek-import input => invalid data sent from server', unserialized_file_content );
+                                                      api.previewer.trigger('sek-notify', {
+                                                            notif_id : 'import-failed',
+                                                            type : 'error',
+                                                            duration : 10000,
+                                                            message : [
+                                                                  '<span>',
+                                                                    '<strong>',
+                                                                    sektionsLocalizedData.i18n['Import failed, invalid file content'],
+                                                                    '</strong>',
+                                                                  '</span>'
+                                                            ].join('')
+                                                      });
                                                       return;
                                                 }
                                                 if ( _.isEqual( api( setId )(), unserialized_file_content ) ) {
                                                       api.infoLog('sek-import input => Setting unchanged');
                                                       return;
                                                 }
-                                                console.log('api.czr_sektions.localSectionsSettingId()?', api.czr_sektions.localSectionsSettingId());
-                                                console.log('AJAX SUCCESS file_content ', unserialized_file_content );
+                                                api.infoLog('api.czr_sektions.localSectionsSettingId()?', api.czr_sektions.localSectionsSettingId());
+                                                api.infoLog('AJAX SUCCESS file_content ', unserialized_file_content );
+                                                api.infoLog('inputRegistrationParams.scope ?', inputRegistrationParams.scope );
 
+                                                // Update the setting api via the normalized method
+                                                // the scope will determine the setting id, local or global
                                                 api.czr_sektions.updateAPISetting({
                                                       action : 'sek-import-from-file',
-                                                      is_global_location : 'local' === inputRegistrationParams.scope,//<= will determine which setting will be updated,
+                                                      scope : 'global' === inputRegistrationParams.scope,//<= will determine which setting will be updated,
                                                       // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
                                                       imported_data : unserialized_file_content
                                                 }).done( function() {
@@ -105,7 +130,7 @@
                                                             message : [
                                                                   '<span>',
                                                                     '<strong>',
-                                                                    '@missi18n file successfully imported',
+                                                                    sektionsLocalizedData.i18n['File successfully imported'],
                                                                     '</strong>',
                                                                   '</span>'
                                                             ].join('')
@@ -119,12 +144,14 @@
                                                             message : [
                                                                   '<span>',
                                                                     '<strong>',
-                                                                    '@missi18n import failed, invalid file content',
+                                                                    sektionsLocalizedData.i18n['Import failed, invalid file content'],
                                                                     '</strong>',
                                                                   '</span>'
                                                             ].join('')
                                                       });
                                                 });
+
+                                                // Refresh the preview, so the markup is refreshed and the css stylesheet are generated
                                                 api.previewer.refresh();
                                           }).fail( function( response ) {
                                                 api.errare( 'sek-import input => ajax error', response );
@@ -135,16 +162,18 @@
                                                       message : [
                                                             '<span>',
                                                               '<strong>',
-                                                              '@missi18n import failed, file problem',
+                                                              sektionsLocalizedData.i18n['Import failed, file problem'],
                                                               '</strong>',
                                                             '</span>'
                                                       ].join('')
                                                 });
                                           }).always( function() {
                                                 input.container.find('.sek-uploading').hide();
+                                                // Clean the file input val
+                                                $file_input.val('').trigger('change');
                                           });
                                     }
-                              break;
+                              break;//'sek-import'
                         }
                   });
             },

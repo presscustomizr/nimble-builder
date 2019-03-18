@@ -103,7 +103,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_imp_exp',
                                           module_type : mod_type,
-                                          controlLabel : '@missi18n import export',
+                                          controlLabel : sektionsLocalizedData.i18n['Import / Export'],
                                           icon : '<i class="material-icons sek-level-option-icon">import_export</i>'
                                     };
                               break;

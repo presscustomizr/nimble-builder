@@ -1298,9 +1298,15 @@ li[id^="accordion-section-__nimble__"] > h3 {
 
 
 /* IMPORT / EXPORT */
-.sek-import-export-form {
-    position: absolute;
-    left: -99999px;
+.sek-import-btn-wrap {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+.sek-import-btn-wrap input.sek-import-file {
+    margin-bottom: 10px;
+}
+.sek-export-btn-wrap {
+    padding: 20px 0;
 }
 .sek-import-file {
     background: #eeeeee;
