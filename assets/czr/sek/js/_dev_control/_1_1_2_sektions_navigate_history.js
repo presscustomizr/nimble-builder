@@ -43,6 +43,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Safety checks
                   // trackHistoryLog must be invoked with a try catch statement
                   if ( !_.isObject( params ) || !_.isFunction( self.historyLog ) || !_.isArray( self.historyLog() ) ) {
+                        api.errare( 'params, self.historyLog() ', params, self.historyLog() );
                         throw new Error('trackHistoryLog => invalid params or historyLog value');
                   }
 
@@ -136,10 +137,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // set the new setting Value
                   if( ! _.isUndefined( newSettingValue ) ) {
                         if ( ! _.isEmpty( newSettingValue.local ) ) {
-                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local ), { navigatingHistoryLogs : true } );
+                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local, 'local' ), { navigatingHistoryLogs : true } );
                         }
                         if ( ! _.isEmpty( newSettingValue.global ) ) {
-                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global ), { navigatingHistoryLogs : true } );
+                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global, 'global' ), { navigatingHistoryLogs : true } );
                         }
                         // If the information is available, refresh only the relevant sections
                         // otherwise fallback on a full refresh
