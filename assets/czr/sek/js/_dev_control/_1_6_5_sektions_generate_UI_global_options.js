@@ -84,6 +84,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">settings_backup_restore</i>'
                                     };
                               break;
+                              case 'global_reset' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__global_reset',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Reset the sections displayed in global locations'],
+                                          icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                                    };
+                              break;
                               case 'beta_features' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__beta_features',

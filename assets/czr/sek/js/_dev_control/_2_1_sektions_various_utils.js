@@ -92,6 +92,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   params = params || {};
                   if ( _.has( params, 'is_global_location' ) ) {
                         is_global_location = params.is_global_location;
+                  } else if ( _.has( params, 'scope' ) ) {
+                        is_global_location = 'global' === params.scope;
                   } else if ( !_.isEmpty( params.location ) ) {
                         is_global_location = self.isChildOfAGlobalLocation( params.location );
                   } else if ( !_.isEmpty( params.in_sektion ) ) {

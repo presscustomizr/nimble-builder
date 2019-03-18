@@ -16,7 +16,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Add the global information to the params
                   // => is used to determine the skope id when resolving the promise in reactToPreviewMsg
                   params = params || {};
-                  params.is_global_location = self.isGlobalLocation( params );
+                  params.is_global_location = 'global' === params.scope || self.isGlobalLocation( params );
 
                   var _collectionSettingId_ = params.is_global_location ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
                   var _do_update_setting_id = function() {
@@ -1036,7 +1036,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // }
                               case 'sek-update-fonts' :
                                     // Get the gfonts from the level options and modules values
-                                    var currentGfonts = self.sniffGFonts( { is_global_location : params && true === params.is_global_location } );
+                                    var currentGfonts = self.sniffGFonts( { is_global_location : ( params && true === params.is_global_location ) } );
                                     if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
                                           if ( params.font_family.indexOf('gfont') < 0 ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
@@ -1065,6 +1065,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     //api.infoLog( 'sek-import-from-file', params );
                                     newSetValue = params.imported_data;
                               break;
+
+                              //-------------------------------------------------------------------------------------------------
+                              //-- RESET COLLECTION, LOCAL OR GLOBAL
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-reset-collection' :
+                                    //api.infoLog( 'sek-import-from-file', params );
+                                    try { newSetValue = api.czr_sektions.resetCollectionSetting( params.scope ); } catch( er ) {
+                                          api.errare( 'sek-reset-collection => error when firing resetCollectionSetting()', er );
+                                    }
+                              break;
                         }// switch
 
 
@@ -1076,7 +1086,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( _.isEqual( currentSetValue, newSetValue ) ) {
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
-                                          if ( null !== self.validateSettingValue( newSetValue ) ) {
+                                          if ( null !== self.validateSettingValue( newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
                                                 api( _collectionSettingId_ )( newSetValue, params );
                                                 // Add the cloneId to the params when we resolve
                                                 // the cloneId is only needed in the duplication scenarii

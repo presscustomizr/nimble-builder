@@ -66,6 +66,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'performances' => 'sek_global_performances',
             'recaptcha' => 'sek_global_recaptcha',
             'global_revisions' => 'sek_global_revisions',
+            'global_reset' => 'sek_global_reset',
             'beta_features' => 'sek_global_beta_features'
         ];
         // option key as saved in db => module_type
@@ -77,8 +78,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'custom_css' => 'sek_local_custom_css',
             'local_performances' => 'sek_local_performances',
             'local_reset' => 'sek_local_reset',
-            'local_revisions' => 'sek_local_revisions',
-            'import_export' => 'sek_local_imp_exp'
+            'import_export' => 'sek_local_imp_exp',
+            'local_revisions' => 'sek_local_revisions'
         ];
 
         /////////////////////////////////////////////////////////////////

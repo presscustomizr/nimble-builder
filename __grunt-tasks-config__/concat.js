@@ -268,6 +268,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_4_UI_global_header_footer.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_5_UI_global_google_recaptcha.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_6_UI_global_revisions.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_7_UI_global_reset.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_9_UI_global_beta_features.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
@@ -370,7 +371,7 @@ module.exports = {
 
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php',
-      //'<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_3_sek_register_global_reset.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_3_sek_register_global_reset.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_4_sek_register_global_performances.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_5_sek_register_global_header_footer.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php',
