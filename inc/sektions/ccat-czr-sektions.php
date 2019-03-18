@@ -39,6 +39,7 @@ function sek_enqueue_controls_js_css() {
                 'nimbleVersion' => NIMBLE_VERSION,
                 'isDevMode' => sek_is_dev_mode(),
                 'baseUrl' => NIMBLE_BASE_URL,
+                'customizerURL'   => admin_url( 'customize.php' ),
                 'sektionsPanelId' => '__sektions__',
                 'addNewSektionId' => 'sek_add_new_sektion',
                 'addNewColumnId' => 'sek_add_new_column',
@@ -362,6 +363,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'If this problem locks Nimble Builder, you can try resetting the sections of this page.' => __('If this problem locks Nimble Builder, you can try resetting the sections of this page.', 'text_doma'),
             'Reset' => __('Reset', 'text_doma'),
             'Reset complete' => __('Reset complete', 'text_doma'),
+            'Reset failed' => __('Reset failed', 'text_doma'),
             'Drag and drop content' => __('Drag and drop content', 'text_doma'),
             'Content Picker' => __('Content Picker', 'text_doma'),
             'Pick a module' => __('Pick a module', 'text_doma'),
@@ -402,6 +404,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Inner and outer widths' => __( 'Inner and outer widths', 'text_doma'),
             'Custom CSS' => __( 'Custom CSS', 'text_doma'),
             'Reset the sections in this page' => __( 'Reset the sections in this page', 'text_doma'),
+            'Reset the sections displayed in global locations' => __( 'Reset the sections displayed in global locations', 'text_doma'),
             'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
 
             'Site wide header and footer' => __( 'Site wide header and footer', 'text_doma'),
@@ -450,7 +453,12 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Select' => __('Select', 'text_doma'),
             'No revision history available for the moment.' => __('No revision history available for the moment.', 'text_doma'),
             'This is the current version.' => __('This is the current version.', 'text_doma'),
-            '(currently published version)' => __('(currently published version)','text_doma')
+            '(currently published version)' => __('(currently published version)','text_doma'),
+            'Import / Export' => __('Import / Export', 'text_doma'),
+            'Missing file' => __('Missing file', 'text_doma'),
+            'File successfully imported' => __('File successfully imported', 'text_doma'),
+            'Import failed, invalid file content' => __('Import failed, invalid file content', 'text_doma'),
+            'Import failed, file problem' => __('Import failed, file problem', 'text_doma'),
 
         )//array()
     )//array()
@@ -754,14 +762,6 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
  }//class
 endif;
-
-?><?php
-add_action( 'customize_save_validation_before', '\Nimble\sek_remove_callback_wp_targeted_link_rel' );
-function sek_remove_callback_wp_targeted_link_rel( $wp_customize ) {
-    if ( false !== has_filter( 'content_save_pre', 'wp_targeted_link_rel' ) ) {
-        remove_filter( 'content_save_pre', 'wp_targeted_link_rel' );
-    }
-};
 
 ?><?php
 function sek_setup_nimble_editor( $content, $editor_id, $settings = array() ) {
@@ -2478,6 +2478,77 @@ final class _NIMBLE_Editors {
   }
 }
 ?><?php
+add_action( 'customize_register', '\Nimble\sek_catch_import_export_action', PHP_INT_MAX );
+function sek_catch_import_export_action( $wp_customize ) {
+    if ( current_user_can( 'edit_theme_options' ) ) {
+        if ( isset( $_REQUEST['sek_export_nonce'] ) ) {
+            sek_maybe_export();
+        }
+    }
+}
+
+function sek_maybe_export() {
+    $nonce = 'save-customize_' . get_stylesheet();
+    if ( ! isset( $_REQUEST['sek_export_nonce'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing nonce.');
+        return;
+    }
+    if ( !isset( $_REQUEST['skope_id']) || empty( $_REQUEST['skope_id'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing or empty skope_id.');
+        return;
+    }
+    if ( ! wp_verify_nonce( $_REQUEST['sek_export_nonce'], $nonce ) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid none.');
+        return;
+    }
+    if ( ! is_user_logged_in() ) {
+        sek_error_log( __FUNCTION__ . ' => user not logged in.');
+        return;
+    }
+    if ( ! current_user_can( 'customize' ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing customize capabilities.');
+        return;
+    }
+
+    $export = sek_get_skoped_seks( $_REQUEST['skope_id'] );
+    header( 'Content-disposition: attachment; filename=nimble-' . $_REQUEST['skope_id'] . '-export.txt' );
+    header( 'Content-Type: application/octet-stream; charset=' . get_option( 'blog_charset' ) );
+    echo serialize( $export );
+    die();
+}
+add_action( 'wp_ajax_sek_get_imported_file_content', '\Nimble\sek_ajax_get_imported_file_content' );
+function sek_ajax_get_imported_file_content() {
+    sek_error_log('AJAX $_POST ?', $_POST );
+    sek_error_log('AJAX $_FILES ?', $_FILES );
+    sek_error_log('AJAX $_REQUEST ?', $_REQUEST );
+    $action = 'save-customize_' . get_stylesheet();
+    if ( ! function_exists( 'wp_handle_upload' ) ) {
+      require_once( ABSPATH . 'wp-admin/includes/file.php' );
+    }
+    $overrides   = array( 'test_form' => false, 'test_type' => false, 'mimes' => array('text' => 'text/plain') );
+    $file = wp_handle_upload( $_FILES['file_candidate'], $overrides );
+    if ( isset( $file['error'] ) ) {
+      $cei_error = $file['error'];
+      return;
+    }
+    if ( ! file_exists( $file['file'] ) ) {
+      $cei_error = __( 'Error importing your Nimble Builder file! Please try again.', 'text_doma' );
+      return;
+    }
+    $raw  = file_get_contents( $file['file'] );
+    $unserialized_data = @unserialize( $raw );
+    unlink( $file['file'] );
+    wp_send_json_success( $unserialized_data );
+}
+?><?php
+add_action( 'customize_save_validation_before', '\Nimble\sek_remove_callback_wp_targeted_link_rel' );
+function sek_remove_callback_wp_targeted_link_rel( $wp_customize ) {
+    if ( false !== has_filter( 'content_save_pre', 'wp_targeted_link_rel' ) ) {
+        remove_filter( 'content_save_pre', 'wp_targeted_link_rel' );
+    }
+};
+
+?><?php
 add_action( 'czr_set_input_tmpl_content', '\Nimble\sek_set_input_tmpl_content', 10, 3 );
 function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
     if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
@@ -2555,6 +2626,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         break;
         case 'nimble_tinymce_editor' :
             sek_set_input_tmpl___nimble_tinymce_editor( $input_id, $input_data );
+        break;
+        case 'import_export' :
+            sek_set_input_tmpl___imp_exp( $input_id, $input_data );
         break;
     }
 }
@@ -3438,5 +3512,29 @@ function sek_set_input_tmpl___nimble_tinymce_editor( $input_id, $input_data ) {
     <?php //<# console.log( 'IN php::ac_get_default_input_tmpl() => data range_slide => ', data ); #> ?>
       <textarea id="textarea-{{ data.control_id }}" data-czrtype="<?php echo $input_id; ?>" class="width-100" name="textarea" rows="10" cols="">{{ data.value }}</textarea>
     <?php
+}
+?>
+<?php
+/* ------------------------------------------------------------------------- *
+ *  IMPORT / EXPORT
+/* ------------------------------------------------------------------------- */
+function sek_set_input_tmpl___imp_exp( $input_id, $input_data ) {
+    ?>
+      <?php //<# console.log( 'IN php::sek_set_input_tmpl___detached_tinymce_edito() => input data => ', data ); #> ?>
+      <?php // sek_error_log( 'INPUT DATA ??', $input_data ); ?>
+      <div class="sek-import-btn-wrap">
+        <span class="czr-notice"><?php _e('Select the file to import and click on the import button.', 'text_doma' ); ?></span><br/>
+        <span class="czr-notice"><?php _e('Be sure to import a file generated with the Nimble Builder export system.', 'text_doma' ); ?></span>
+        <input type="file" name="sek-import-file" class="sek-import-file" />
+        <input type="hidden" name="sek-skope" value="<?php echo $input_data['scope']; ?>" />
+        <button type="button" class="button disabled" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-import"><?php _e('Import', 'text_doma' ); ?></button>
+        <div class="sek-uploading"><?php _e( 'Uploading...', 'text_doma' ); ?></div>
+      </div>
+      <div class="sek-export-btn-wrap">
+        <div class="customize-control-title width-100"><?php _e('Export', 'text_doma'); ?></div>
+        <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-export"><?php _e('Export', 'text_doma' ); ?></button>
+      </div>
+      <input data-czrtype="<?php echo $input_id; ?>" type="hidden" value="{{ data.value }}"/>
+  <?php
 }
 ?>

@@ -1,4 +1,4 @@
-//global sektionsLocalizedData
+
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
@@ -8,70 +8,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isUndefined( window.sektionsLocalizedData ) ) {
                         throw new Error( 'CZRSeksPrototype => missing localized server params sektionsLocalizedData' );
                   }
-                  // this class is skope dependant
                   if ( ! _.isFunction( api.czr_activeSkopes ) ) {
                         throw new Error( 'CZRSeksPrototype => api.czr_activeSkopes' );
                   }
-                  // SECTIONS ID FOR LOCAL AND GLOBAL OPTIONS
                   self.SECTION_ID_FOR_GLOBAL_OPTIONS = '__globalOptionsSectionId';
                   self.SECTION_ID_FOR_LOCAL_OPTIONS = '__localOptionsSection';
-
-                  // SECTION ID FOR THE CONTENT PICKER
                   self.SECTION_ID_FOR_CONTENT_PICKER = '__content_picker__';
-
-                  // Max possible number of columns in a section
                   self.MAX_NUMBER_OF_COLUMNS = 12;
-
-                  // _.debounce param when updating the UI setting
-                  // prevent hammering server + fixes https://github.com/presscustomizr/nimble-builder/issues/244
                   self.SETTING_UPDATE_BUFFER = 100;
-
-                  // introduced for https://github.com/presscustomizr/nimble-builder/issues/403
                   self.TINYMCE_EDITOR_HEIGHT = 100;
-
-                  // Define a default value for the sektion setting value, used when no server value has been sent
-                  // @see php function
-                  // function sek_get_default_location_model() {
-                  //     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
-                  //     foreach( sek_get_locations() as $location ) {
-                  //         $defaut_sektions_value['collection'][] = [
-                  //             'id' => $location,
-                  //             'level' => 'location',
-                  //             'collection' => [],
-                  //             'options' => []
-                  //         ];
-                  //     }
-                  //     return $defaut_sektions_value;
-                  // }
                   self.defaultLocalSektionSettingValue = self.getDefaultSektionSettingValue( 'local' );
-
-                  // Store the contextual setting prefix
                   self.localSectionsSettingId = new api.Value( {} );
-
-                  // Keep track of the registered ui elements dynamically registered
-                  // this collection is populated in ::register(), if the track param is true
-                  // this is used to know what ui elements are currently being displayed
                   self.registered = new api.Value([]);
 
 
                   api.bind( 'ready', function() {
                         self.doSektionThinksOnApiReady();
                   });//api.bind( 'ready' )
-
-                  // Add the skope id on save
-                  // Uses a WP core hook to filter the query on a customize_save action
-                  //
-                  // This posted skope id is useful when we need to know the skope id during ajax.
-                  // ( Note that with the nimble ajax action, the skope_id is always posted. Not in WP core ajax actions. )
-                  // Example of use of $_POST['local_skope_id'] => @see sek_get_parent_level_model()
-                  // Helps fixing : https://github.com/presscustomizr/nimble-builder/issues/242, for which sek_add_css_rules_for_spacing() couldn't be set for columns margins
                   api.bind( 'save-request-params', function( query ) {
                         $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
                   });
-
-                  // added for https://github.com/presscustomizr/nimble-builder/issues/403
-                  // in fmk::setupTinyMceEditor => each id of newly instantiated editor is added to the [] api.czrActiveWPEditors
-                  // We need to remove those instances when cleaning registered controls
                   api.bind( 'sek-before-clean-registered', function() {
                         if ( _.isArray( api.czrActiveWPEditors ) ) {
                               _.each( api.czrActiveWPEditors, function( _id ) {
@@ -81,56 +37,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
             },// initialize()
-
-
-            // @ API READY
-            // Fired at api.bind( 'ready', function() {})
             doSektionThinksOnApiReady : function() {
                   var self = this;
-                  // the main sektion panel
-                  // the local and global options section
                   self.registerAndSetupDefaultPanelSectionOptions();
-
-                  // Setup the collection settings => register the main settings for local and global skope and bind it
-                  // schedule reaction to collection setting ids => the setup of the collection setting when the collection setting ids are set
-                  //=> on skope change
-                  //@see setContextualCollectionSettingIdWhenSkopeSet
-                  //
-                  // var _settingsToRegister_ = {
-                  //       'local' : { collectionSettingId : self.localSectionsSettingId() },//<= "nimble___[skp__post_page_10]"
-                  //       'global' : { collectionSettingId : self.getGlobalSectionsSettingId() }//<= "nimble___[skp__global]"
-                  // };
                   self.localSectionsSettingId.callbacks.add( function( collectionSettingIds, previousCollectionSettingIds ) {
-                        // register the collection setting id
-                        // and schedule the reaction to different collection changes : refreshModules, ...
                         try { self.setupSettingsToBeSaved(); } catch( er ) {
                               api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
                         }
-
-                        // Now that the local and global settings are registered, initialize the history log
                         self.initializeHistoryLogWhenSettingsRegistered();
-
-                        // On init and when skope changes, request the contextually active locations
-                        // We should not need this call, because the preview sends it on initialize
-                        // But this is safer.
-                        // The preview send back the list of active locations 'sek-active-locations-in-preview'
-                        // introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
                         api.previewer.send('sek-request-active-locations');
                   });
-
-
-                  // POPULATE THE MAIN SETTING ID NOW
-                  // + GENERATE UI FOR THE LOCAL SKOPE OPTIONS
-                  // + GENERATE UI FOR THE GLOBAL OPTIONS
                   var doSkopeDependantActions = function( newSkopes, previousSkopes ) {
                         self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
-
-                        // Generate UI for the local skope options and the global options
                         api.section( self.SECTION_ID_FOR_LOCAL_OPTIONS, function( _section_ ) {
                               _section_.deferred.embedded.done( function() {
                                     if( true === _section_.boundForLocalOptionGeneration )
                                       return;
-                                     // Defer the UI generation when the section is expanded
                                     _section_.boundForLocalOptionGeneration = true;
                                     _section_.expanded.bind( function( expanded ) {
                                           if ( true === expanded ) {
@@ -139,58 +61,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               });
                         });
-
-                        // The UI of the global option must be generated only once.
-                        // We don't want to re-generate on each skope change
-                        // fixes https://github.com/presscustomizr/nimble-builder/issues/271
                         api.section( self.SECTION_ID_FOR_GLOBAL_OPTIONS, function( _section_ ) {
                               if ( true === _section_.nimbleGlobalOptionGenerated )
                                 return;
                               self.generateUI({ action : 'sek-generate-global-options-ui'});
                               _section_.nimbleGlobalOptionGenerated = true;
                         });
-
-                        // This event has been introduced when implementing https://github.com/presscustomizr/nimble-builder/issues/304
                         api.trigger('nimble-ready-for-current-skope');
                   };//doSkopeDependantActions()
-
-                  // populate the setting ids now if skopes are set
                   if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
                         doSkopeDependantActions();
                   }
-                  // ON SKOPE READY
-                  // - Set the contextual setting prefix
-                  // - Generate UI for Nimble local skope options
-                  // - Generate the content picker
                   api.czr_activeSkopes.callbacks.add( function( newSkopes, previousSkopes ) {
                         doSkopeDependantActions( newSkopes, previousSkopes );
                   });
-
-
-                  // Communicate with the preview
                   self.reactToPreviewMsg();
-
-                  // Setup Dnd
                   self.setupDnd();
-
-
-                  // setup the tinyMce editor used for the tiny_mce_editor input
-                  // => one object listened to by each tiny_mce_editor input
                   self.setupTinyMceEditor();
-
-                  // print json
                   self.schedulePrintSectionJson();
-
-                  // Always set the previewed device back to desktop on ui change
-                  // event 'sek-ui-removed' id triggered when cleaning the registered ui controls
-                  // @see ::cleanRegistered()
                   self.bind( 'sek-ui-removed', function() {
                         api.previewedDevice( 'desktop' );
                   });
-
-                  // Synchronize api.previewedDevice with the currently rendered ui
-                  // ensure that the selected device tab of the spacing module is the one being previewed
-                  // =>@see spacing module, in item constructor CZRSpacingItemMths
                   api.previewedDevice.bind( function( device ) {
                         var currentControls = _.filter( self.registered(), function( uiData ) {
                               return 'control' == uiData.what;
@@ -203,18 +94,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });
                   });
-
-                  // Schedule a reset
                   $('#customize-notifications-area').on( 'click', '[data-sek-reset="true"]', function() {
                         self.resetCollectionSetting();
                   });
-
-
-                  // CLEAN UI BEFORE REMOVAL
-                  // 'sek-ui-pre-removal' is triggered in ::cleanRegistered
-                  // @params { what : control, id : '' }
                   self.bind( 'sek-ui-pre-removal', function( params ) {
-                        // CLEAN DRAG N DROP
                         if ( 'control' == params.what && -1 < params.id.indexOf( 'draggable') ) {
                               api.control( params.id, function( _ctrl_ ) {
                                     _ctrl_.container.find( '[draggable]' ).each( function() {
@@ -222,9 +105,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               });
                         }
-
-                        // CLEAN SELECT2
-                        // => we need to destroy the czrSelect2 instance, otherwise it can stay open when switching to another ui.
                         if ( 'control' == params.what ) {
                               api.control( params.id, function( _ctrl_ ) {
                                     _ctrl_.container.find( 'select' ).each( function() {
@@ -235,105 +115,58 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         }
                   });
-
-
-                  // POPULATE THE REGISTERED COLLECTION
-                  // 'czr-new-registered' is fired in api.CZR_Helpers.register()
                   api.bind( 'czr-new-registered', function( params ) {
-                        //console.log( 'czr-new-registered => ', params );
-                        // Check that we have an origin property and that make sure we populate only the registration emitted by 'nimble'
                         if ( _.isUndefined( params.origin ) ) {
                               throw new Error( 'czr-new-registered event => missing params.origin' );
                         }
                         if ( 'nimble' !== params.origin )
                           return;
-
-                        // when no collection is provided, we use
                         if ( false !== params.track ) {
                               var currentlyRegistered = self.registered();
                               var newRegistered = $.extend( true, [], currentlyRegistered );
-                              //Check for duplicates
                               var duplicateCandidate = _.findWhere( newRegistered, { id : params.id } );
                               if ( ! _.isEmpty( duplicateCandidate ) && _.isEqual( duplicateCandidate, params ) ) {
                                     throw new Error( 'register => duplicated element in self.registered() collection ' + params.id );
                               }
                               newRegistered.push( params );
                               self.registered( newRegistered );
-
-                              // say it
-                              //this.trigger( [params.what, params.id , 'registered' ].join('__'), params );
                         }
                   });
-
-
-                  // store active locations
-                  // introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
                   self.activeLocations = new api.Value([]);
                   api.previewer.bind('sek-active-locations-in-preview', function( activelocs ){
                         self.activeLocations( ( _.isObject(activelocs) && _.isArray( activelocs.active_locations ) ) ? activelocs.active_locations : [] );
                   });
-
-
-                  // TOP BAR
-                  // Setup the topbar including do/undo action buttons
                   self.setupTopBar();//@see specific dev file
-
-                  // SAVE SECTION UI
                   if ( sektionsLocalizedData.isSavedSectionEnabled ) {
                         self.setupSaveUI();
                   }
-
-
-                  // SETUP DOUBLE CLICK INSERTION THINGS
-                  // Stores the preview target for double click insertion
-                  // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
                   self.lastClickedTargetInPreview = new api.Value();
                   self.lastClickedTargetInPreview.bind( function( to, from ) {
-                        // to and from are formed this way : { id : "__nimble__fb2ab3e47472" }
-                        // @see 'sek-pick-content' event in ::reactToPreviewMsg()
-
-                        // Send the level id of the current double-click insertion target
-                        // => this will be used to style the level id container with a pulse animation
                         if ( _.isObject( to ) && to.id ) {
                               api.previewer.send( 'sek-set-double-click-target', to );
                         } else {
-                              // Tell the preview to clean the target highlight effect
                               api.previewer.send( 'sek-reset-double-click-target' );
                         }
-
-                        // reset after a delay
                         clearTimeout( $(window).data('_preview_target_timer_') );
                         $(window).data('_preview_target_timer_', setTimeout(function() {
-                              // Reset the click target
                               self.lastClickedTargetInPreview( {} );
-                              // Tell the preview to clean the target highlight effect
                               api.previewer.send( 'sek-reset-double-click-target' );
                         }, 20000 ) );
                   });
-
-                  // React to the preview to clean any currently highlighted drop zone
-                  // This event is triggered on all click in the preview iframe
-                  // @see preview::scheduleUiClickReactions()
                   api.previewer.bind( 'sek-clean-target-drop-zone', function() {
-                        // Reset the click target
                         self.lastClickedTargetInPreview({});
                   });
-
-                  // Clean the current target when hitting escape
                   $(document).keydown(function( evt ) {
-                        // ESCAPE key pressed
                         if ( evt && 27 === evt.keyCode ) {
                             self.lastClickedTargetInPreview({});
                         }
                   });
-
-                  // PRINT A WARNING NOTICE FOR USERS OF CACHE PLUGIN
                   if ( sektionsLocalizedData.hasActiveCachePlugin ) {
                         _.delay( function() {
                             api.previewer.trigger('sek-notify', {
                                   notif_id : 'has-active-cache-plugin',
                                   type : 'info',
-                                  duration : 60000,
+                                  duration : 20000,
                                   message : [
                                         '<span style="color:#0075a2">',
                                           sektionsLocalizedData.i18n['You seem to be using a cache plugin.'],
@@ -347,29 +180,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }, 2000 );//delay()
                   }
             },//doSektionThinksOnApiReady
-
-
-
-
-
-
-
-            // Fired at api "ready"
             registerAndSetupDefaultPanelSectionOptions : function() {
                   var self = this;
-
-                  // MAIN SEKTION PANEL
                   var SektionPanelConstructor = api.Panel.extend({
-                        //attachEvents : function () {},
-                        // Always make the panel active, event if we have no sections / control in it
                         isContextuallyActive : function () {
                           return this.active();
                         },
                         _toggleActive : function(){ return true; }
                   });
-
-                  // Prepend the Nimble logo in the main panel title
-                  // the panel.expanded() Value is not the right candidate to be observed because it gets changed on too many events, when generating the various UI.
                   api.panel( sektionsLocalizedData.sektionsPanelId, function( _mainPanel_ ) {
                         _mainPanel_.deferred.embedded.done( function() {
                               var $sidePanelTitleEl = _mainPanel_.container.find('h3.accordion-section-title'),
@@ -377,25 +195,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   logoHtml = [ '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="', sektionsLocalizedData.baseUrl, '/assets/img/nimble/nimble_horizontal.svg?ver=' + sektionsLocalizedData.nimbleVersion , '"/>' ].join('');
 
                               if ( 0 < $sidePanelTitleEl.length ) {
-                                    // The default title looks like this : Nimble Builder <span class="screen-reader-text">Press return or enter to open this section</span>
-                                    // we want to style "Nimble Builder" only.
                                     var $sidePanelTitleElSpan = $sidePanelTitleEl.find('span');
                                     $sidePanelTitleEl
                                           .addClass('sek-side-nimble-logo-wrapper')
                                           .html( logoHtml )
                                           .append( $sidePanelTitleElSpan );
                               }
-
-                              // default looks like
-                              // <span class="preview-notice">You are customizing <strong class="panel-title">Nimble Builder</strong></span>
-                              // if ( 0 < $topPanelTitleEl.length ) {
-                              //       var $topPanelTitleElInner = $topPanelTitleEl.find('.panel-title');
-                              //       $topPanelTitleElInner.html( logoHtml );
-                              // }
                         });
                   });
-
-                  // The parent panel for all ui sections + global options section
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'panel',
@@ -405,9 +212,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         constructWith : SektionPanelConstructor,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                   });
-
-
-                  //GLOBAL OPTIONS SECTION
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
@@ -417,8 +221,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         priority : 20,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                         constructWith : api.Section.extend({
-                              //attachEvents : function () {},
-                              // Always make the section active, event if we have no control in it
                               isContextuallyActive : function () {
                                 return this.active();
                               },
@@ -426,26 +228,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         })
                   }).done( function() {
                         api.section( self.SECTION_ID_FOR_GLOBAL_OPTIONS, function( _section_ ) {
-                              // Style the section title
                               var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
                                   $panelTitleEl = _section_.container.find('.customize-section-title h3');
-
-                              // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
                               if ( 0 < $sectionTitleEl.length ) {
                                     $sectionTitleEl.prepend( '<i class="fas fa-globe sek-level-option-icon"></i>' );
                               }
-
-                              // The default title looks like this : <span class="customize-action">Customizing</span> Title
                               if ( 0 < $panelTitleEl.length ) {
                                     $panelTitleEl.find('.customize-action').after( '<i class="fas fa-globe sek-level-option-icon"></i>' );
                               }
-
-                              // Schedule the accordion behaviour
                               self.scheduleModuleAccordion.call( _section_ );
                         });
                   });
-
-                  //LOCAL OPTIONS SECTION
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
@@ -455,8 +248,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         priority : 10,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                         constructWith : api.Section.extend({
-                              //attachEvents : function () {},
-                              // Always make the section active, event if we have no control in it
                               isContextuallyActive : function () {
                                 return this.active();
                               },
@@ -464,32 +255,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         })
                   }).done( function() {
                         api.section( self.SECTION_ID_FOR_LOCAL_OPTIONS, function( _section_ ) {
-                              // Style the section title
                               var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
                                   $panelTitleEl = _section_.container.find('.customize-section-title h3');
-
-                              // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
                               if ( 0 < $sectionTitleEl.length ) {
                                     $sectionTitleEl.prepend( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
                               }
-
-                              // The default title looks like this : <span class="customize-action">Customizing</span> Title
                               if ( 0 < $panelTitleEl.length ) {
                                     $panelTitleEl.find('.customize-action').after( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
                               }
-
-                              // Schedule the accordion behaviour
                               self.scheduleModuleAccordion.call( _section_ );
                         });
                   });
-
-
-                  // SITE WIDE GLOBAL OPTIONS SETTING
-                  // Will Be updated in ::generateUIforGlobalOptions()
-                  // has no control.
                   api.CZR_Helpers.register( {
                         origin : 'nimble',
-                        //level : params.level,
                         what : 'setting',
                         id : sektionsLocalizedData.optNameForGlobalOptions,
                         dirty : false,
@@ -497,9 +275,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         transport : 'refresh',//'refresh',//// ,
                         type : 'option'
                   });
-
-
-                  // CONTENT PICKER SECTION
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
@@ -509,19 +284,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         priority : 30,
                         track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                         constructWith : api.Section.extend({
-                              //attachEvents : function () {},
-                              // Always make the section active, event if we have no control in it
                               isContextuallyActive : function () {
                                 return this.active();
                               },
                               _toggleActive : function(){ return true; }
                         })
                   }).done( function() {
-                        // generate the UI for the content picker if not done yet
-                        // defer this action when the section is instantiated AND the api.previewer is active, so we can trigger event on it
-                        // => we also need the local skope to be set, that's why api.czr_initialSkopeCollectionPopulated is convenient because it ensures the api.previewer is ready and we have a local skope set.
-                        // @see czr-skope-base.js
-                        // @fixes https://github.com/presscustomizr/nimble-builder/issues/187
                         api.section( self.SECTION_ID_FOR_CONTENT_PICKER, function( _section_ ) {
                               if ( 'resolved' != api.czr_initialSkopeCollectionPopulated.state() ) {
                                     api.czr_initialSkopeCollectionPopulated.done( function() {
@@ -533,28 +301,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });
             },//registerAndSetupDefaultPanelSectionOptions()
-
-
-
-
-
-
-
-            //@return void()
-            // sektionsData is built server side :
-            //array(
-            //     'db_values' => sek_get_skoped_seks( $skope_id ),
-            //     'setting_id' => sek_get_seks_setting_id( $skope_id )//nimble___[skp__post_page_home]
-            // )
             setContextualCollectionSettingIdWhenSkopeSet : function( newSkopes, previousSkopes ) {
                   var self = this;
                   previousSkopes = previousSkopes || {};
-                  // Clear all previous sektions if the main panel is expanded and we're coming from a previousSkopes
                   if ( ! _.isEmpty( previousSkopes.local ) && api.panel( sektionsLocalizedData.sektionsPanelId ).expanded() ) {
                         api.previewer.trigger('sek-pick-content');
                   }
-
-                  // set the localSectionsSettingId now, and update it on skope change
                   sektionsData = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local');
                   if ( sektionsLocalizedData.isDevMode ) {
                         api.infoLog( '::setContextualCollectionSettingIdWhenSkopeSet => SEKTIONS DATA ? ', sektionsData );
@@ -569,11 +321,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });//$.extend()
 })( wp.customize, jQuery );
-//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // fired in ::initialize(), at api.bind( 'ready', function() {})
             setupTopBar : function() {
                   var self = this;
                   self.topBarId = '#nimble-top-bar';
@@ -600,23 +350,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.previewer.bind('ready', function() {
                         $(api.previewer.targetWindow().document ).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
                   });
-
-                  // LEVEL TREE
                   self.setupLevelTree();
             },
-
-
-            // @return void()
-            // self.topBarVisible.bind( function( visible ){
-            //       self.toggleTopBar( visible );
-            // });
             toggleTopBar : function( visible ) {
                   visible = _.isUndefined( visible ) ? true : visible;
                   var self = this,
                       _renderAndSetup = function() {
                             $.when( self.renderAndSetupTopBarTmpl({}) ).done( function( $_el ) {
                                   self.topBarContainer = $_el;
-                                  //display
                                   _.delay( function() {
                                       $('body').addClass('nimble-top-bar-visible');
                                   }, 200 );
@@ -626,9 +367,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             var dfd = $.Deferred();
                             $('body').removeClass('nimble-top-bar-visible');
                             if ( self.topBarContainer && self.topBarContainer.length ) {
-                                  //remove Dom element after slide up
                                   _.delay( function() {
-                                        //self.topBarContainer.remove();
                                         dfd.resolve();
                                   }, 300 );
                             } else {
@@ -645,18 +384,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   }
             },
-
-
-            //@param = { }
             renderAndSetupTopBarTmpl : function( params ) {
                   var self = this,
                       _tmpl;
-
-                  // CHECK IF ALREADY RENDERED
                   if ( $( self.topBarId ).length > 0 )
                     return $( self.topBarId );
-
-                  // RENDER
                   try {
                         _tmpl =  wp.template( 'nimble-top-bar' )( {} );
                   } catch( er ) {
@@ -664,8 +396,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return false;
                   }
                   $('#customize-preview').after( $( _tmpl ) );
-
-                  // UNDO / REDO ON CTRL + Z / CTRL + Y EVENTS
                   $(document).keydown( function( evt ) {
                         if ( evt.ctrlKey && _.contains( [89, 90], evt.keyCode ) ) {
                               try { self.navigateHistory( 90 === evt.keyCode ? 'undo' : 'redo'); } catch( er ) {
@@ -673,10 +403,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         }
                   });
-
-
-                  // CLICK EVENTS
-                  // Attach click events
                   $('.sek-add-content', self.topBarId).on( 'click', function(evt) {
                         evt.preventDefault();
                         api.previewer.trigger( 'sek-pick-content', { content_type : 'module' });
@@ -691,26 +417,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   $('.sek-settings', self.topBarId).on( 'click', function(evt) {
-                        // Focus on the Nimble panel
                         api.panel( sektionsLocalizedData.sektionsPanelId, function( _panel_ ) {
                               self.rootPanelFocus();
                               _panel_.focus();
                         });
-                        // // Generate UI for the local skope options
-                        // self.generateUI({ action : 'sek-generate-local-skope-options-ui'}).done( function() {
-                        //       api.control( self.getLocalSkopeOptionId(), function( _control_ ) {
-                        //             _control_.focus();
-                        //       });
-                        // });
                   });
 
                   $('.sek-nimble-doc', self.topBarId).on( 'click', function(evt) {
                         evt.preventDefault();
                         window.open($(this).data('doc-href'), '_blank');
                   });
-
-                  // NOTIFICATION WHEN USING CUSTOM TEMPLATE
-                  // implemented for https://github.com/presscustomizr/nimble-builder/issues/304
                   var maybePrintNotificationForUsageOfNimbleTemplate = function( templateSettingValue ) {
                         if ( $(self.topBarId).length < 1 )
                           return;
@@ -725,28 +441,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   var initOnSkopeReady = function() {
-                        // Schedule notification rendering on init
-                        // @see ::generateUIforLocalSkopeOptions()
                         api( self.localSectionsSettingId(), function( _localSectionsSetting_ ) {
                               var localSectionsValue = _localSectionsSetting_(),
                                   initialLocalTemplateValue = ( _.isObject( localSectionsValue ) && localSectionsValue.local_options && localSectionsValue.local_options.template ) ? localSectionsValue.local_options.template : null;
-                              // on init
                               maybePrintNotificationForUsageOfNimbleTemplate( initialLocalTemplateValue );
                         });
-
-                        // React to template changes
-                        // @see ::generateUIforLocalSkopeOptions() for the declaration of self.getLocalSkopeOptionId() + '__template'
                         api( self.getLocalSkopeOptionId() + '__template', function( _set_ ) {
                               _set_.bind( function( to, from ) {
                                     maybePrintNotificationForUsageOfNimbleTemplate( to );
                               });
                         });
                   };
-
-                  // fire now
                   initOnSkopeReady();
-                  // and on skope change, when user navigates through the previewed pages
-                  // 'nimble-ready-for-current-skope' declared in ::initialize()
                   api.bind('nimble-ready-for-current-skope', function() {
                         initOnSkopeReady();
                   });
@@ -755,16 +461,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });//$.extend()
 })( wp.customize, jQuery );
-//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // Fired in ::initialize(), at api 'ready'
-            // March 2019 : history log tracks local and global section settings
-            // no tracking of the global option sektionsLocalizedData.optNameForGlobalOptions
             initializeHistoryLogWhenSettingsRegistered : function() {
                   var self = this;
-                  // This api.Value() is bound in ::setupTopBar
                   self.historyLog = new api.Value([{
                         status : 'current',
                         value : {
@@ -773,7 +474,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         },
                         action : 'initial'
                   }]);
-                  // LISTEN TO HISTORY LOG CHANGES AND UPDATE THE BUTTON STATE
                   self.historyLog.bind( function( newLog ) {
                         if ( _.isEmpty( newLog ) )
                           return;
@@ -789,21 +489,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });
             },
-
-            // React to a local or global setting change api( settingData.collectionSettingId )
-            // =>populates self.historyLog() observable value
-            // invoked in ::setupSettingsToBeSaved, if params.navigatingHistoryLogs !== true <=> not already navigating
             trackHistoryLog : function( sektionSetInstance, params ) {
                   var self = this,
                       _isGlobal = sektionSetInstance.id === self.getGlobalSectionsSettingId();
-
-                  // Safety checks
-                  // trackHistoryLog must be invoked with a try catch statement
                   if ( !_.isObject( params ) || !_.isFunction( self.historyLog ) || !_.isArray( self.historyLog() ) ) {
+                        api.errare( 'params, self.historyLog() ', params, self.historyLog() );
                         throw new Error('trackHistoryLog => invalid params or historyLog value');
                   }
-
-                  // Always clean future values if the logs have been previously navigated back
                   var newHistoryLog = [],
                       historyLog = $.extend( true, [], self.historyLog() ),
                       sektionToRefresh;
@@ -813,8 +505,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   } else if ( ! _.isEmpty( params.to_sektion ) ) {// column moved /
                         sektionToRefresh = params.to_sektion;
                   }
-
-                  // Reset all status but 'future' to 'previous'
                   _.each( historyLog, function( log ) {
                         var newStatus = 'previous';
                         if ( 'future' == log.status )
@@ -830,23 +520,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   self.historyLog( newHistoryLog );
             },
-
-
-
-            // @param direction = string 'undo', 'redo'
-            // @return void()
-            // Fired on click in the topbar or when hitting ctrl z / y
             navigateHistory : function( direction ) {
                   var self = this,
                       historyLog = $.extend( true, [], self.historyLog() );
-                  // log model
-                  // {
-                  //       status : 'current', 'previous', 'future'
-                  //       value : {},
-                  //       action : 'sek-add-column'
-                  // }
-
-                  // UPDATE THE SETTING VALUE
                   var previous,
                       current,
                       future,
@@ -872,7 +548,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         switch( direction ) {
                               case 'undo' :
-                                    // the last previous is our new setting value
                                     if ( ! _.isEmpty( current ) && ! _.isEmpty( previous ) ) {
                                           newSettingValue = previous.value;
                                           previousSektionToRefresh = current.sektionToRefresh;
@@ -880,7 +555,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               break;
                               case 'redo' :
-                                    // the first future is our new setting value
                                     if ( ! _.isEmpty( future ) ) {
                                           newSettingValue = future.value;
                                           previousSektionToRefresh = current.sektionToRefresh;
@@ -889,49 +563,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
                         }
                   });
-
-                  // set the new setting Value
                   if( ! _.isUndefined( newSettingValue ) ) {
                         if ( ! _.isEmpty( newSettingValue.local ) ) {
-                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local ), { navigatingHistoryLogs : true } );
+                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local, 'local' ), { navigatingHistoryLogs : true } );
                         }
                         if ( ! _.isEmpty( newSettingValue.global ) ) {
-                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global ), { navigatingHistoryLogs : true } );
+                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global, 'global' ), { navigatingHistoryLogs : true } );
                         }
-                        // If the information is available, refresh only the relevant sections
-                        // otherwise fallback on a full refresh
                         var previewHasBeenRefreshed = false;
-
-                        // if ( ! _.isEmpty( previousSektionToRefresh ) ) {
-                        //       api.previewer.trigger( 'sek-refresh-level', {
-                        //             level : 'section',
-                        //             id : previousSektionToRefresh
-                        //       });
-                        // } else {
-                        //       api.previewer.refresh();
-                        //       previewHasBeenRefreshed = true;
-                        // }
-                        // if ( currentSektionToRefresh != previousSektionToRefresh ) {
-                        //     if ( ! _.isEmpty( currentSektionToRefresh ) ) {
-                        //           api.previewer.trigger( 'sek-refresh-level', {
-                        //                 level : 'section',
-                        //                 id : currentSektionToRefresh
-                        //           });
-                        //     } else if ( ! previewHasBeenRefreshed ) {
-                        //           api.previewer.refresh();
-                        //     }
-                        // }
                         api.previewer.refresh();
-
-                        // Always make sure that the ui gets refreshed
                         api.previewer.trigger( 'sek-pick-content', {});
-                        // Clean registered setting and control, even the level settings
-                        // => otherwise the level settings won't be synchronized when regenerating their ui.
                         self.cleanRegistered();//<= normal cleaning
                         self.cleanRegisteredLevelSettingsAfterHistoryNavigation();// setting cleaning
                   }
-
-                  // UPDATE THE HISTORY LOG
                   var currentKey = _.findKey( historyLog, { status : 'current'} );
                   currentKey = Number( currentKey );
                   if ( ! _.isNumber( currentKey ) ) {
@@ -941,7 +585,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   _.each( historyLog, function( log, key ) {
                         newLog = $.extend( true, {}, log );
-                        // cast keys to number so we can compare them
                         key = Number( key );
                         switch( direction ) {
                               case 'undo' :
@@ -969,31 +612,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });//$.extend()
 })( wp.customize, jQuery );
-//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // fired in ::setupTopBar(), at api.bind( 'ready', function() {})
             setupLevelTree : function() {
                   var self = this;
                   self.levelTree = new api.Value([]);
                   self.levelTree.bind( function() {
-                        // Refresh when the collection is being modified from the tree
                         if ( self.levelTreeExpanded() ) {
                               self.renderOrRefreshTree();
                         }
                   });
-
-
-                  // SETUP AND REACT TO LEVEL TREE EXPANSION
                   self.levelTreeExpanded = new api.Value(false);
                   self.levelTreeExpanded.bind( function(expanded) {
                         $('body').toggleClass( 'sek-level-tree-expanded', expanded );
                         if ( expanded ) {
-                              // Set the level tree now
                               self.setLevelTreeValue();
-
-                              // Make sure we the tree is set first
                               if ( _.isEmpty( self.levelTree() ) ) {
                                     api.previewer.trigger('sek-notify', {
                                           type : 'info',
@@ -1004,7 +638,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 '</span>'
                                           ].join('')
                                     });
-                                    // self disable
                                     self.levelTreeExpanded(false);
                                     return;
                               }
@@ -1017,24 +650,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }, 300 );
                         }
                   });
-
-                  // REFRESH THE TREE WHEN THE ACTIVE LOCATIONS CHANGE
-                  // @see ::initialize to understand how active locations are updated
                   self.activeLocations.bind(function() {
                         if ( !_.isEmpty( self.levelTree() ) ) {
                               self.renderOrRefreshTree();
                         }
                   });
-
-                  // API READY
                   api.previewer.bind('ready', function() {
-                        // LEVEL TREE
-                        // on each skope change
-                        // - set the level tree
-                        // - bind the local and global settings so that they refresh the level tree when changed
                         self.localSectionsSettingId.callbacks.add( function() {
                               self.levelTreeExpanded(false);
-                              // Bind the global and local settings if not bound yet
                               _.each( [ self.getGlobalSectionsSettingId(), self.localSectionsSettingId(), sektionsLocalizedData.optNameForGlobalOptions ], function( setId ){
                                     if ( api(setId)._isBoundForNimbleLevelTree )
                                       return;
@@ -1046,10 +669,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });
                   });
-
-
-
-                  // SETUP CLICK EVENTS IN THE TREE
                   $('body').on('click', '#nimble-level-tree [data-nimb-level]', function(evt) {
                         evt.preventDefault();
                         evt.stopPropagation();
@@ -1071,18 +690,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               in_column : $el.closest('[data-nimb-level="column"]').data('nimb-id')
                         });
                         $el.fadeOut('slow');
-                        // Refresh
                         self.renderOrRefreshTree();
                   });
-
-                  // Collapse tree ( also possible by clicking on the tree icon in the top Nimble bar )
                   $('body').on('click', '.sek-close-level-tree' , function(evt) {
                         evt.preventDefault();
                         self.levelTreeExpanded(false);
                   });
             },
-
-            // This method updates the levelTree observable api.Value()
             setLevelTreeValue : function() {
                   var self = this,
                       globalCollSetId = self.getGlobalSectionsSettingId(),
@@ -1092,9 +706,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       globalCollection, localCollection,
                       rawGlobalOptionsValue,
                       missingDependantSettingId = false;
-
-                  // Check if all dependant settings are registered
-                  // we won't go further if any of the 3 setting id's is not yet registered
                   _.each( [globalCollSetId, localCollSetId, globalOptionSetId ], function( setId ) {
                         if ( !api.has(setId) ) {
                               missingDependantSettingId = setId;
@@ -1106,8 +717,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( '::setLevelTreeValue => a setting id is not registered ');
                         return;
                   }
-
-                  // Normalizes the setting values
                   globalColSetValue = api(globalCollSetId)();
                   globalCollection = _.isObject( globalColSetValue ) ? $.extend( true, {}, globalColSetValue ) : {};
                   globalCollection = ! _.isEmpty( globalCollection.collection )? globalCollection.collection : [];
@@ -1127,22 +736,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   rawGlobalOptionsValue = api( globalOptionSetId )();
                   rawGlobalOptionsValue = _.isObject( rawGlobalOptionsValue ) ? rawGlobalOptionsValue : {};
-
-                  // HEADER-FOOTER => do we have a header-footer set, local or global ?
-                  // LOCAL
                   if ( localColSetValue.local_options && localColSetValue.local_options.local_header_footer ) {
                         local_header_footer_value = localColSetValue.local_options.local_header_footer['header-footer'];
                         has_local_header_footer = 'nimble_local' === local_header_footer_value;
                   }
-
-                  // GLOBAL
-                  // there can be a global header footer if
-                  // 1) local is not set to 'nimble_local' or 'theme'
-                  // and
-                  // 2) the global option is set to 'nimble_global'
-                  //
-                  // OR when
-                  // 1) local is set to 'nimble_global'
                   if ( rawGlobalOptionsValue.global_header_footer && !has_local_header_footer && 'theme' !== local_header_footer_value) {
                         global_header_footer_value = rawGlobalOptionsValue.global_header_footer['header-footer'];
                         has_global_header_footer = 'nimble_global' === global_header_footer_value || 'nimble_global' === local_header_footer_value;
@@ -1155,13 +752,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   filteredCollection = _.filter( filteredCollection, function( loc, key ) {
                       return !_.contains( ['nimble_global_header', 'nimble_global_footer', 'nimble_local_header', 'nimble_local_footer'], loc.id );
                   });
-
-                  // RE-ORGANIZE LOCATIONS SO THAT WE HAVE
-                  // - header
-                  // - content loc #1
-                  // - content loc #2
-                  // - ...
-                  // - footer
                   var wrapContentLocationWithHeaderFoooterLocations = function( scope ) {
                         header_loc = _.findWhere(raw_col, {id:'nimble_' + scope + '_header'});
                         footer_loc = _.findWhere(raw_col, {id:'nimble_' + scope + '_footer'});
@@ -1173,9 +763,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   } else if ( has_global_header_footer ) {
                         wrapContentLocationWithHeaderFoooterLocations('global');
                   }
-
-                  // RE-ORDER LOCATIONS IN THE SAME ORDER AS THEY ARE IN THE DOM
-                  // @see ::initialize to understand how active locations are updated
                   var contextuallyActiveLocactions = self.activeLocations(),
                       orderedCollection = [],
                       candidate;
@@ -1189,18 +776,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   } else {
                         orderedCollection = filteredCollection;
                   }
-
-                  // Store it now
                   self.levelTree( orderedCollection );
             },
-
-
-            // print the tree
             renderOrRefreshTree : function() {
                   var self = this,
                       _tmpl;
                   if( $('#nimble-level-tree').length < 1 ) {
-                        // RENDER
                         try {
                               _tmpl =  wp.template( 'nimble-level-tree' )( {} );
                         } catch( er ) {
@@ -1211,9 +792,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   $('#nimble-level-tree').find('.sek-tree-wrap').html( self.getLevelTreeHtml() );
             },
-
-            // recursive helper
-            // return an html string describing the contextually printed sections
             getLevelTreeHtml : function( _col, level ) {
                   var self = this;
                   _col = _col || self.levelTree();
@@ -1238,19 +816,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare('::buildLevelTree => missing id property', _level_param );
                               return;
                         }
-
-                        // Set some vars now
                         levelType = _level_param.level;
                         levelName = levelType;
-
-                        // if the level is a location, is this location contextually active ?
-                        // @see ::initialize to understand how active locations are updated
                         if ( 'location' === levelType ) {
                               skipLevel = !_.contains( self.activeLocations(), _level_param.id );
                         }
 
                         if ( !skipLevel ) {
-                              //try to get the i18n level name, fall back on the level type
                               if ( sektionsLocalizedData.i18n[levelType] ) {
                                     levelName = sektionsLocalizedData.i18n[levelType];
                               }
@@ -1262,14 +834,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _html += '<li data-nimb-level="'+levelType+'" data-nimb-id="'+_level_param.id+'">';
 
                                 _html += '<div class="sek-level-infos"><div class="sek-inner-level-infos">';
-                                  // add module type and icon
                                   if ( 'module' === levelType ) {
                                         _html += [
                                               self.getTreeModuleIcon( _level_param.module_type ),
                                               self.getTreeModuleTitle( _level_param.module_type )
                                         ].join(' ');
                                   }
-                                  // add the rest of the html, common to all elements
                                   _html += [
                                         ' ',
                                         levelName,
@@ -1291,10 +861,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   return _html;
             },
-
-            // the module icons can be
-            // an svg file like Nimble__divider_icon.svg => in this case we build and return the full url
-            // or a font_icon like '<i class="fab fa-wordpress-simple"></i>'
             getTreeModuleIcon : function( modType ) {
                   var _icon = {};
                   _.each( sektionsLocalizedData.moduleCollection, function( modData ) {
@@ -1327,12 +893,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });//$.extend()
 })( wp.customize, jQuery );
-//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // SAVE DIALOG BLOCK
-            // fired in ::initialize()
             setupSaveUI : function() {
                   var self = this;
                   self.saveUIVisible = new api.Value( false );
@@ -1340,23 +903,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.toggleSaveUI( to, params ? params.id : null );
                   });
             },
-
-
-            // @return void()
-            // self.saveUIVisible.bind( function( visible ){
-            //       self.toggleSaveUI( visible );
-            // });
             toggleSaveUI : function( visible, sectionId ) {
                   visible = _.isUndefined( visible ) ? true : visible;
                   var self = this,
                       _renderAndSetup = function() {
                             $.when( self.renderAndSetupSaveUITmpl({}) ).done( function( $_el ) {
                                   self.saveUIContainer = $_el;
-                                  //display
                                   _.delay( function() {
                                       $('body').addClass('nimble-save-ui-visible');
                                   }, 200 );
-                                  // set section id input value
                                   $('#sek-saved-section-id').val( sectionId );
                             });
                       },
@@ -1364,7 +919,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             var dfd = $.Deferred();
                             $('body').removeClass('nimble-save-ui-visible');
                             if ( $( '#nimble-top-save-ui' ).length > 0 ) {
-                                  //remove Dom element after slide up
                                   _.delay( function() {
 
                                         self.saveUIContainer.remove();
@@ -1384,27 +938,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   }
             },
-
-
-            // @return a section model with clean ids
-            // also removes the section properties "id" and "level", which are dynamically set when dragging and dropping
-            // Example of section model before preprocessing
-            // {
-            //    collection: [{…}]
-            //    id: "" //<= to remove
-            //    level: "section" // <= to remove
-            //    options: {bg: {…}}
-            //    ver_ini: "1.1.8"
-            // }
             preProcessSektion : function( sectionModel ) {
                   var self = this, sektionCandidate = self.cleanIds( sectionModel );
                   return _.omit( sektionCandidate, function( val, key ) {
                         return _.contains( ['id', 'level'], key );
                   });
             },
-
-
-            //@param = { }
             renderAndSetupSaveUITmpl : function( params ) {
                   if ( $( '#nimble-top-save-ui' ).length > 0 )
                     return $( '#nimble-top-save-ui' );
@@ -1418,8 +957,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return false;
                   }
                   $('#customize-preview').after( $( _tmpl ) );
-
-                  // Attach click events
                   $('.sek-do-save-section', '#nimble-top-save-ui').on( 'click', function(evt) {
                         evt.preventDefault();
                         var sectionModel = $.extend( true, {}, self.getLevelModel( $('#sek-saved-section-id').val() ) ),
@@ -1453,8 +990,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               sek_data: JSON.stringify( sek_data )
                         })
                         .done( function( response ) {
-                              // response is {section_post_id: 436}
-                              //self.saveUIVisible( false );
                               api.previewer.trigger('sek-notify', {
                                   type : 'success',
                                   duration : 10000,
@@ -1488,26 +1023,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });//$.extend()
 })( wp.customize, jQuery );
-//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // the input id determine if we fetch the revision history of the local or global setting
-            // @return a deferred promise
-            // @params object : { is_local:bool} <= 'local_revisions' === input.id
             getRevisionHistory : function(params) {
                   return wp.ajax.post( 'sek_get_revision_history', {
                         nonce: api.settings.nonce.save,
                         skope_id : params.is_local ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId
                   });
             },
-
-            // @return void()
-            // Fetches the_content and try to set the setting value through normalized ::updateAPISetting method
-            // @params {
-            //    is_local : bool//<= 'local_revisions' === input.id
-            //    revision_post_id : int
-            // }
             setSingleRevision : function(params) {
                   var self = this;
                   var _notify = function( message, type ) {
@@ -1526,31 +1050,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
                   wp.ajax.post( 'sek_get_single_revision', {
                         nonce: api.settings.nonce.save,
-                        //skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
                         revision_post_id : params.revision_post_id
                   }).done( function( revision_value ){
-                        // If the setting value is unchanged, no need to go further
-                        // is_local is decided with the input id => @see revision_history input type.
                         var setId = params.is_local ? self.localSectionsSettingId() : self.getGlobalSectionsSettingId();
                         if ( _.isEqual( api( setId )(), revision_value ) ) {
                               _notify( sektionsLocalizedData.i18n['This is the current version.'], 'info' );
                               return;
                         }
-                        // api.infoLog( 'getSingleRevision response', revision_value );
-                        // api.infoLog( 'Current val', api(self.localSectionsSettingId())() );
                         self.updateAPISetting({
                               action : 'sek-restore-revision',
                               is_global_location : !params.is_local,//<= will determine which setting will be updated,
-                              // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
                               revision_value : revision_value
                         }).done( function() {
-                              //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
                               api.previewer.refresh();
                         }).fail( function( response ) {
                               api.errare( '::setSingleRevision error when firing ::updateAPISetting', response );
                               _notify( sektionsLocalizedData.i18n['The revision could not be restored.'], 'error' );
                         });
-                        //api.previewer.refresh();
                   }).fail( function( response ) {
                         api.errare( '::setSingleRevision ajax error', response );
                         _notify( sektionsLocalizedData.i18n['The revision could not be restored.'], 'error' );
@@ -1558,20 +1074,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });//$.extend()
 })( wp.customize, jQuery );
-//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // Fired on api 'ready', in reaction to ::setContextualCollectionSettingIdWhenSkopeSet => ::localSectionsSettingId
-            // 1) register the collection setting nimble___[{$skope_id}] ( ex : nimble___[skp__post_page_20] )
-            // 2) validate that the setting is well formed before being changed
-            // 3) schedule reactions on change ?
-            // @return void()
             setupSettingsToBeSaved : function() {
                   var self = this,
                       serverCollection;
-
-                  // maybe register the sektion_collection settings
                   var _settingsToRegister_ = {
                         'local' : { collectionSettingId : self.localSectionsSettingId() },//<= "nimble___[skp__post_page_10]"
                         'global' : { collectionSettingId : self.getGlobalSectionsSettingId() }//<= "nimble___[skp__global]"
@@ -1582,35 +1090,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( _.isEmpty( settingData.collectionSettingId ) ) {
                               throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
                         }
-                        // if the collection setting is not registered yet
-                        // => register it and bind it
-                        // => ensure that it will be bound only once, because the setting are never unregistered
                         if ( ! api.has( settingData.collectionSettingId ) ) {
                               var __collectionSettingInstance__ = api.CZR_Helpers.register({
                                     what : 'setting',
                                     id : settingData.collectionSettingId,
-                                    value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( localOrGlobal )  ),
+                                    value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( localOrGlobal ), localOrGlobal ),
                                     transport : 'postMessage',//'refresh'
                                     type : 'option',
                                     track : false,//don't register in the self.registered()
                                     origin : 'nimble'
                               });
-
-
-                              //if ( sektionsLocalizedData.isDevMode ) {}
                               api( settingData.collectionSettingId, function( sektionSetInstance ) {
-
-                                    // Schedule reactions to a collection change
                                     sektionSetInstance.bind( _.debounce( function( newSektionSettingValue, previousValue, params ) {
-                                          // api.infoLog( 'sektionSettingValue is updated',
-                                          //       {
-                                          //             newValue : newSektionSettingValue,
-                                          //             previousValue : previousValue,
-                                          //             params : params
-                                          //       }
-                                          // );
-
-                                          // Track changes, if not already navigating the logs
                                           if ( !_.isObject( params ) || true !== params.navigatingHistoryLogs ) {
                                                 try { self.trackHistoryLog( sektionSetInstance, params ); } catch(er) {
                                                       api.errare( 'setupSettingsToBeSaved => trackHistoryLog', er );
@@ -1621,50 +1112,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });//api( settingData.collectionSettingId, function( sektionSetInstance ){}
                         }//if ( ! api.has( settingData.collectionSettingId ) ) {
                   });//_.each(
-
-                  // global options for all collection setting of this skope_id
-                  // loop_start, before_content, after_content, loop_end
-
-                  // Global Options : section
-                  // api.CZR_Helpers.register({
-                  //       what : 'section',
-                  //       id : sektionsLocalizedData.optPrefixForSektionGlobalOptsSetting,//'__sektions__'
-                  //       title: 'Global Options',
-                  //       priority : 1000,
-                  //       constructWith : SektionPanelConstructor,
-                  //       track : false//don't register in the self.registered()
-                  // });
-
-                  // // => register a control
-                  // // Template
-                  // api.CZR_Helpers.register({
-                  //       what : 'control',
-                  //       id : sektionsLocalizedData.sektionsPanelId,//'__sektions__'
-                  //       title: 'Main sektions panel',
-                  //       priority : 1000,
-                  //       constructWith : SektionPanelConstructor,
-                  //       track : false//don't register in the self.registered()
-                  // });
             },// SetupSettingsToBeSaved()
-
-            // Fired :
-            // 1) when instantiating the setting
-            // 2) on each setting change, as an override of api.Value::validate( to ) @see customize-base.js
-            // @return {} or null if did not pass the checks
-            validateSettingValue : function( valCandidate ) {
+            validateSettingValue : function( valCandidate, scope ) {
                   if ( ! _.isObject( valCandidate ) ) {
-                        api.errare('validation error => the setting should be an object', valCandidate );
+                        api.errare('::validateSettingValue => validation error => the setting should be an object', valCandidate );
                         return null;
+                  }
+                  if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
+                        api.errare( '::validateSettingValue =>  invalid scope provided.', scope );
+                        return;
                   }
                   var parentLevel = {},
                       errorDetected = false,
                       levelIds = [];
-                  // walk the collections tree and verify it passes the various consistency checks
                   var _errorDetected_ = function( msg ) {
                         api.errare( msg , valCandidate );
                         api.previewer.trigger('sek-notify', {
                               type : 'error',
-                              duration : 30000,
+                              duration : 60000,
                               message : [
                                     '<span style="font-size:0.95em">',
                                       '<strong>' + msg + '</strong>',
@@ -1685,12 +1150,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             return;
                       }
                       if ( _.isUndefined( level ) && _.isEmpty( parentLevel ) ) {
-                            // we are at the root level
                             level = $.extend( true, {}, valCandidate );
                             if ( _.isUndefined( level.id ) || _.isUndefined( level.level ) ) {
-                                  // - there should be no 'level' property or 'id'
-                                  // - there should be a collection of registered locations
-                                  // - there should be no parent level defined
                                   if ( _.isUndefined( level.collection ) ) {
                                         _errorDetected_( 'validation error => the root level is missing the collection of locations' );
                                         return;
@@ -1699,20 +1160,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _errorDetected_( 'validation error => the root level should not have a "level" or an "id" property' );
                                         return;
                                   }
-
-                                  // Walk the section collection
+                                  _.each( level, function( _opts, _opt_group_name) {
+                                        switch( scope ) {
+                                              case 'local' :
+                                                    if( !_.contains( ['collection', 'local_options', 'fonts' ] , _opt_group_name ) ) {
+                                                          _errorDetected_( 'validation error => unauthorized option group for local setting value => ' + _opt_group_name );
+                                                          return;
+                                                    }
+                                              break;
+                                              case 'global' :
+                                                    if( !_.contains( ['collection', 'fonts' ] , _opt_group_name ) ) {
+                                                          _errorDetected_( 'validation error => unauthorized option group for global setting value => ' + _opt_group_name );
+                                                          return;
+                                                    }
+                                              break;
+                                        }
+                                  });
                                   _.each( valCandidate.collection, function( _l_ ) {
-                                        // Set the parent level now
                                         parentLevel = level;
-                                        // walk
                                         _checkWalker_( _l_ );
                                   });
                             }
                       } else {
-                            // we have a level.
-                            // - make sure we have at least the following properties : id, level
-
-                            // ID
                             if ( _.isEmpty( level.id ) || ! _.isString( level.id )) {
                                   _errorDetected_('validation error => a ' + level.level + ' level must have a valid id' );
                                   return;
@@ -1722,14 +1191,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             } else {
                                   levelIds.push( level.id );
                             }
-
-                            // OPTIONS
-                            // if ( _.isEmpty( level.options ) || ! _.isObject( level.options )) {
-                            //       _errorDetected_('validation error => a ' + level.level + ' level must have a valid options property' );
-                            //       return;
-                            // }
-
-                            // LEVEL
                             if ( _.isEmpty( level.level ) || ! _.isString( level.level ) ) {
                                   _errorDetected_('validation error => a ' + level.level + ' level must have a level property' );
                                   return;
@@ -1737,9 +1198,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   _errorDetected_('validation error => the level "' + level.level + '" is not authorized' );
                                   return;
                             }
-
-                            // - Unless we are in a module, there should be a collection property
-                            // - make sure a module doesn't have a collection property
                             if ( 'module' == level.level ) {
                                   if ( ! _.isUndefined( level.collection ) ) {
                                         _errorDetected_('validation error => a module can not have a collection property' );
@@ -1751,15 +1209,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return;
                                   }
                             }
-
-                            // a level should always have a version "ver_ini" property
                             if ( _.isUndefined( level.ver_ini ) ) {
-                                  //_errorDetected_('validation error => a ' + level.level + ' should have a version property : "ver_ini"' );
-                                  //return;
                                   api.errare( 'validateSettingValue() => validation error => a ' + level.level + ' should have a version property : "ver_ini"' );
                             }
-
-                            // Specific checks by level type
                             switch ( level.level ) {
                                   case 'location' :
                                         if ( ! _.isEmpty( parentLevel.level ) ) {
@@ -1793,14 +1245,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         }
                                   break;
                             }
-
-                            // If we are not in a module, keep walking the collections
                             if ( 'module' != level.level ) {
                                   _.each( level.collection, function( _l_ ) {
-                                        // Set the parent level now
                                         parentLevel = $.extend( true, {}, level );
                                         if ( ! _.isUndefined( _l_ ) ) {
-                                              // And walk sub levels
                                               _checkWalker_( _l_ );
                                         } else {
                                               _errorDetected_('validation error => undefined level ' );
@@ -1810,82 +1258,37 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       }
                   };
                   _checkWalker_();
-
-                  //api.infoLog('in ::validateSettingValue', valCandidate );
-                  // if null is returned, the setting value is not set @see customize-base.js
                   return errorDetected ? null : valCandidate;
             },//validateSettingValue
-
-
-
-            // triggered when clicking on [data-sek-reset="true"]
-            // scheduled in ::initialize()
-            // Note :
-            // 1) this is not a real reset, the customizer setting is set to self.getDefaultSektionSettingValue( 'local' )
-            // @see php function which defines the defaults
-            // function sek_get_default_location_model() {
-            //     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
-            //     foreach( sek_get_locations() as $location ) {
-            //         $defaut_sektions_value['collection'][] = [
-            //             'id' => $location,
-            //             'level' => 'location',
-            //             'collection' => [],
-            //             'options' => []
-            //         ];
-            //     }
-            //     return $defaut_sektions_value;
-            // }
-            // 2) a real reset should delete the sektion post ( nimble_post_type, with for example title nimble___skp__post_page_21 ) and its database option storing its id ( for example : nimble___skp__post_page_21 )
-            resetCollectionSetting : function() {
+            resetCollectionSetting : function( scope ) {
                   var self = this;
-                  if ( _.isEmpty( self.localSectionsSettingId() ) ) {
-                        throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
+                  if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
+                        throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
-                  // reset the setting to default
-                  api( self.localSectionsSettingId() )( self.getDefaultSektionSettingValue( 'local' ) );
-                  // refresh the preview
-                  api.previewer.refresh();
-                  // remove any previous notification
-                  api.notifications.remove( 'sek-notify' );
-                  // display a success msg
-                  api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
-                        api.notifications.add( new api.Notification( 'sek-reset-done', {
-                              type: 'success',
-                              message: sektionsLocalizedData.i18n['Reset complete'],
-                              dismissible: true
-                        } ) );
+                  var _collectionSettingId_ = 'global' === scope ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
 
-                        // Removed if not dismissed after 5 seconds
-                        _.delay( function() {
-                              api.notifications.remove( 'sek-reset-done' );
-                        }, 5000 );
-                  });
+                  if ( _.isEmpty( _collectionSettingId_ ) ) {
+                        throw new Error( 'resetCollectionSetting => the collectionSettingId is invalid' );
+                  }
+                  var clonedDefaultSetting = $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) ),
+                      currentSetting = api( _collectionSettingId_ )(),
+                      clonedSetting;
+
+                  clonedSetting = _.isObject( currentSetting ) ? $.extend( true, {}, currentSetting ) : clonedDefaultSetting;
+                  clonedSetting.collection = $.extend( true, [], clonedDefaultSetting.collection );
+                  return clonedSetting;
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // invoked on api('ready') from self::initialize()
-            // update the main setting OR generate a UI in the panel
-            // AND
-            // always send back a confirmation to the preview, so we can fire the ajax actions
-            // the message sent back is used in particular to
-            // - always pass the location_skope_id, which otherwise would be impossible to get in ajax
-            // - in a duplication case, to pass the the newly generated id of the cloned level
             reactToPreviewMsg : function() {
                   var self = this,
                       apiParams = {},
                       uiParams = {},
                       sendToPreview = true, //<= the default behaviour is to send a message to the preview when the setting has been changed
                       msgCollection = {
-                            // A section can be added in various scenarios :
-                            // - when clicking on the ( + ) Insert content => @see preview::scheduleUiClickReactions() => addContentButton
-                            // - when adding a nested section to a column
-                            // - when dragging a module in a 'between-sections' or 'in-empty-location' drop zone
-                            //
-                            // Note : if the target location level already has section(s), then the section is appended in ajax, at the right place
-                            // Note : if the target location is empty ( is_first_section is true ), nothing is send to the preview when updating the api setting, and we refresh the location level. => this makes sure that we removes the placeholder printed in the previously empty location
                             'sek-add-section' : {
                                   callback : function( params ) {
                                         sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;//<= when the level is refreshed when complete, we don't need to send to preview.
@@ -1904,7 +1307,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        // When a section is created ( not duplicated )
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
                                                     level : 'location',
@@ -1912,8 +1314,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               });
                                         }
                                         api.previewer.trigger( 'sek-pick-content', {
-                                              // the "id" param is added to set the target for double click insertion
-                                              // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
                                               id : params.apiParams ? params.apiParams.id : '',
                                               content_type : 'section'
                                         });
@@ -1935,9 +1335,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        // When adding a section, a nested column is automatically added
-                                        // We want to focus on the module picker in this case, that's why the autofocus is set to false
-                                        // @see 'sek-add-section' action description
                                         if ( false !== params.apiParams.autofocus ) {
                                               api.previewer.trigger( 'sek-pick-content', {});
                                         }
@@ -1966,17 +1363,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               in_sektion : params.apiParams.in_sektion,
                                               in_column : params.apiParams.in_column
                                         });
-                                        // always update the root fonts property after a module addition
-                                        // because there might be a google font specified in the starting value
                                         self.updateAPISetting({
                                               action : 'sek-update-fonts',
                                               is_global_location : self.isGlobalLocation( params.apiParams )
                                         });
-
-                                        // Refresh the stylesheet to generate the css rules of the clone
-                                        // api.previewer.send( 'sek-refresh-stylesheet', {
-                                        //       location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                        // });
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               id : params.apiParams.in_column,
                                               location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
@@ -2026,14 +1416,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   },
                                   complete : function( params ) {
                                         api.previewer.trigger( 'sek-pick-content', {});
-                                        // always update the root fonts property after a removal
-                                        // because the removed level(s) might had registered fonts
                                         self.updateAPISetting({
                                               action : 'sek-update-fonts',
                                               is_global_location : self.isGlobalLocation( params.apiParams )
                                         });
-
-                                        // When the last section of a location gets removed, make sure we refresh the location level, to print the sek-empty-location-placeholder
                                         if ( 'sek-remove-section' === params.apiParams.action ) {
                                               var locationLevel = self.getLevelModel( params.apiParams.location );
                                               if ( _.isEmpty( locationLevel.collection ) ) {
@@ -2092,7 +1478,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           level : 'section',
                                                           in_sektion : params.apiParams.id
                                                     });
-                                                    // refresh location levels if the source and target location are differents
                                                     if ( params.apiParams.from_location != params.apiParams.to_location ) {
                                                           api.previewer.trigger( 'sek-refresh-level', {
                                                                 level : 'location',
@@ -2168,9 +1553,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         });
                                   }
                             },
-
-                            // the level will be cloned and walked to replace all ids by new one
-                            // then the level clone id will be send back to the preview for the ajax rendering ( this is done in updateAPISetting() promise() )
                             'sek-duplicate' : {
                                   callback : function( params ) {
                                         sendToPreview = true;
@@ -2215,7 +1597,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           in_sektion : params.apiParams.id
                                                     });
                                                     idForStyleSheetRefresh = params.apiParams.location;
-                                                    // Focus on the cloned level
                                                     api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                               break;
                                               case 'sek-duplicate-column' :
@@ -2237,10 +1618,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     idForStyleSheetRefresh = params.apiParams.in_column;
                                               break;
                                         }
-                                        // Refresh the stylesheet to generate the css rules of the clone
-                                        // api.previewer.send( 'sek-refresh-stylesheet', {
-                                        //       location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                        // });
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               id : idForStyleSheetRefresh,
                                               location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
@@ -2254,15 +1631,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   apiParams = params;
                                   return self.updateAPISetting( apiParams );
                             },
-
-                            // @params {
-                            //       drop_target_element : $(this),
-                            //       position : _position,
-                            //       before_section : $(this).data('sek-before-section'),
-                            //       after_section : $(this).data('sek-after-section'),
-                            //       content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                            //       content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                            // }
                             'sek-add-content-in-new-sektion' : {
                                   callback : function( params ) {
                                         sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;//<= when the level is refreshed when complete, we don't need to send to preview.
@@ -2271,12 +1639,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         apiParams.action = 'sek-add-content-in-new-sektion';
                                         apiParams.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
                                         switch( params.content_type) {
-                                              // When a module is dropped in a section + column structure to be generated
                                               case 'module' :
                                                     apiParams.droppedModuleId = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
                                               break;
-
-                                              // When a preset section is dropped
                                               case 'preset_section' :
                                                     api.previewer.send( 'sek-maybe-print-loader', { loader_located_in_level_id : params.location });
                                                     api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true });
@@ -2292,44 +1657,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           id : params.apiParams.droppedModuleId
                                                     });
                                               break;
-                                              // Clean the full page loader if not autocleaned yet
                                               case 'preset_section' :
                                                     api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
                                               break;
                                         }
-
-                                        // Always update the root fonts property after a module addition
-                                        // => because there might be a google font specified in the starting value or in a preset section
                                         self.updateAPISetting({
                                               action : 'sek-update-fonts',
                                               is_global_location : self.isGlobalLocation( params.apiParams )
                                         });
-
-                                        // Refresh the stylesheet to generate the css rules of the clone
-                                        // api.previewer.send( 'sek-refresh-stylesheet', {
-                                        //       location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                        // });
-
-                                        // Use the location_skope_id provided if set, otherwise generate it
                                         var location_skope_id = params.location_skope_id;
                                         if ( _.isUndefined( location_skope_id ) ) {
                                               location_skope_id = true === params.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' );
                                         }
                                         api.previewer.trigger('sek-refresh-stylesheet', {
-                                              //id : params.apiParams.location,
                                               location_skope_id : location_skope_id,//<= send skope id to the preview so we can use it when ajaxing
                                               is_global_location : self.isGlobalLocation( params.apiParams )
                                         });
-
-                                        // Refresh when a section is created ( not duplicated )
                                         if ( params.apiParams.is_first_section ) {
                                               api.previewer.trigger( 'sek-refresh-level', {
                                                     level : 'location',
                                                     id :  params.apiParams.location
                                               });
                                         }
-
-                                        // Remove the sektion_to_replace when dropping a preset_section in an empty section ( <= the one to replace )
                                         if ( params.apiParams.sektion_to_replace ) {
                                               api.previewer.trigger( 'sek-remove', {
                                                     id : params.apiParams.sektion_to_replace,
@@ -2338,28 +1687,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     level : 'section'
                                               });
                                         }
-
-                                        // Refresh the stylesheet again after a delay
-                                        // For the moment, some styling, like fonts are not
-                                        // @todo fix => see why we need to do it.
-                                        // _.delay( function() {
-                                        //       // Refresh the stylesheet to generate the css rules of the module
-                                        //       api.previewer.send( 'sek-refresh-stylesheet', {
-                                        //             location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                        //       });
-                                        // }, 1000 );
                                   }
                             },
-
-
-                            // @params {
-                            //       drop_target_element : $(this),
-                            //       position : _position,
-                            //       before_section : $(this).data('sek-before-section'),
-                            //       after_section : $(this).data('sek-after-section'),
-                            //       content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                            //       content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                            // }
                             'sek-add-preset-section-in-new-nested-sektion' : {
                                   callback : function( params ) {
                                         sendToPreview = false;//<= when the level is refreshed when complete, we don't need to send to preview.
@@ -2371,17 +1700,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
-                                        // Refresh the stylesheet to generate the css rules of the clone
-                                        // api.previewer.send( 'sek-refresh-stylesheet', {
-                                        //       location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                        // });
                                         api.previewer.trigger('sek-refresh-stylesheet', {
                                               id : params.apiParams.in_sektion,
                                               location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
-
-                                        // Always update the root fonts property after a module addition
-                                        // => because there might be a google font specified in the starting value or in a preset section
                                         self.updateAPISetting({
                                               action : 'sek-update-fonts',
                                               is_global_location : self.isGlobalLocation( params.apiParams )
@@ -2393,27 +1715,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         });
                                   }
                             },
-
-
-
-
-
-
-
-                            // GENERATE UI ELEMENTS
                             'sek-pick-content' : function( params ) {
                                   params = _.isObject(params) ? params : {};
-                                  // Set the active content type here
-                                  // This is used in api.czrInputMap.content_type_switcher()
-                                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
                                   api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value();
                                   api.czr_sektions.currentContentPickerType( params.content_type || 'module' );
-
-                                  // Set the last clicked target element id now => will be used for double click insertion of module / section
                                   if ( _.isObject( params ) && params.id ) {
-                                        // self reset after a moment.
-                                        // @see CZRSeksPrototype::initialize
-                                        // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
                                         self.lastClickedTargetInPreview( { id : params.id } );
                                   }
 
@@ -2423,9 +1729,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   uiParams = {
                                         action : 'sek-generate-draggable-candidates-picker-ui',
                                         content_type : params.content_type || 'module',
-                                        // <= the "was_triggered" param can be used to determine if we need to animate the picker control or not. @see ::generateUI() case 'sek-generate-draggable-candidates-picker-ui'
-                                        // true by default, because this is the most common scenario ( when adding a section, a column ... )
-                                        // but false when clicking on the + ui icon in the preview
                                         was_triggered : _.has( params, 'was_triggered' ) ? params.was_triggered : true,
                                         focus : _.has( params, 'focus' ) ? params.focus : true
                                   };
@@ -2463,14 +1766,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   };
                                   return self.generateUI( uiParams );
                             },
-
-
-                            // OTHER MESSAGE TYPES
-                            // @params {
-                            //  type : info, error, success
-                            //  message : ''
-                            //  duration : in ms
-                            // }
                             'sek-notify' : function( params ) {
                                   sendToPreview = false;
                                   var notif_id = params.notif_id || 'sek-notify';
@@ -2481,14 +1776,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     message:  params.message,
                                                     dismissible: true
                                               }));
-
-                                              // Removed if not dismissed after 5 seconds
                                               _.delay( function() {
                                                     api.notifications.remove( notif_id );
                                               }, params.duration || 5000 );
                                         });
-                                        // always pass the local or global skope of the currently customized location id when resolving the promise.
-                                        // It will be send to the preview and used when ajaxing
                                         this.resolve({
                                               is_global_location : self.isGlobalLocation( params )
                                         });
@@ -2504,8 +1795,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               id : params.id
                                         };
                                         uiParams = {};
-                                        // always pass the local or global skope of the currently customized location id when resolving the promise.
-                                        // It will be send to the preview and used when ajaxing
                                         _dfd_.resolve({
                                               is_global_location : self.isGlobalLocation( params )
                                         });
@@ -2518,8 +1807,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return $.Deferred(function(_dfd_) {
                                         apiParams = {id : params.id};
                                         uiParams = {};
-                                        // always pass the local or global skope of the currently customized location id when resolving the promise.
-                                        // It will be send to the preview and used when ajaxing
                                         _dfd_.resolve({
                                               is_global_location : self.isGlobalLocation( params )
                                         });
@@ -2531,22 +1818,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   self.saveUIVisible( true, params );
                                   return $.Deferred(function(_dfd_) {
                                         apiParams = {
-                                              // action : 'sek-refresh-level',
-                                              // level : params.level,
-                                              // id : params.id
                                         };
                                         uiParams = {};
-                                        // always pass the local or global skope of the currently customized location id when resolving the promise.
-                                        // It will be send to the preview and used when ajaxing
                                         _dfd_.resolve({
                                               is_global_location : self.isGlobalLocation( params )
                                         });
                                   });
                             }
                       };//msgCollection
-
-                  // Schedule the reactions
-                  // May be send a message to the preview
                   _.each( msgCollection, function( callbackFn, msgId ) {
                         api.previewer.bind( msgId, function( params ) {
                               var _cb_;
@@ -2560,11 +1839,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
 
                               try { _cb_( params )
-                                    // the cloneId is passed when resolving the ::updateAPISetting() promise()
-                                    // they are needed on level duplication to get the newly generated level id.
                                     .done( function( promiseParams ) {
                                           promiseParams = promiseParams || {};
-                                          // Send to the preview
                                           if ( sendToPreview ) {
                                                 api.previewer.send(
                                                       msgId,
@@ -2577,26 +1853,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       }
                                                 );
                                           } else {
-                                                // if nothing was sent to the preview, trigger the '*_done' action so we can execute the 'complete' callback
                                                 api.previewer.trigger( [ msgId, 'done' ].join('_'), { apiParams : apiParams, uiParams : uiParams } );
                                           }
-                                          // say it
                                           self.trigger( [ msgId, 'done' ].join('_'), params );
                                     })
                                     .fail( function( er ) {
                                           api.errare( 'reactToPreviewMsg => error when firing ' + msgId, er );
-                                          // api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
-                                          //       api.notifications.add( new api.Notification( 'sek-react-to-preview', {
-                                          //             type: 'info',
-                                          //             message:  er,
-                                          //             dismissible: true
-                                          //       } ) );
-
-                                          //       // Removed if not dismissed after 5 seconds
-                                          //       _.delay( function() {
-                                          //             api.notifications.remove( 'sek-react-to-preview' );
-                                          //       }, 5000 );
-                                          // });
                                           api.previewer.trigger('sek-notify', {
                                                 type : 'error',
                                                 duration : 30000,
@@ -2618,9 +1880,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                           });
                   });
-
-
-                  // Schedule actions when callback done msg is sent by the preview
                   _.each( msgCollection, function( callbackFn, msgId ) {
                         api.previewer.bind( [ msgId, 'done' ].join('_'), function( params ) {
                               if ( _.isFunction( callbackFn.complete ) ) {
@@ -2631,19 +1890,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });
             },//reactToPreview();
-
-
-
-
-
-
-            // Fired in initialized on api(ready)
             schedulePrintSectionJson : function() {
                   var self = this;
                   var popupCenter = function ( content ) {
                         w = 400;
                         h = 300;
-                        // Fixes dual-screen position                         Most browsers      Firefox
                         var dualScreenLeft = ! _.isUndefined( window.screenLeft ) ? window.screenLeft : window.screenX;
                         var dualScreenTop = ! _.isUndefined( window.screenTop ) ? window.screenTop : window.screenY;
 
@@ -2657,7 +1908,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         doc.open("text/html");
                         doc.write( content );
                         doc.close();
-                        // Puts focus on the newWindow
                         if (window.focus) {
                             newWindow.focus();
                         }
@@ -2666,7 +1916,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.previewer.bind( 'sek-to-json', function( params ) {
                         var sectionModel = $.extend( true, {}, self.getLevelModel( params.id ) );
                         console.log( JSON.stringify( self.cleanIds( sectionModel ) ) );
-                        //popupCenter( JSON.stringify( cleanIds( sectionModel ) ) );
                   });
             }//schedulePrintSectionJson
       });//$.extend()
@@ -2674,15 +1923,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // @params = {
-            //    action : 'sek-generate-module-ui' / 'sek-generate-level-options-ui'
-            //    level : params.level,
-            //    id : params.id,
-            //    in_sektion : params.in_sektion,
-            //    in_column : params.in_column,
-            //    options : params.options || []
-            // }
-            // @return promise()
             generateUI : function( params ) {
                   var self = this,
                       dfd = $.Deferred();
@@ -2690,12 +1930,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isEmpty( params.action ) ) {
                         dfd.reject( 'generateUI => missing action' );
                   }
-
-                  // REGISTER SETTING AND CONTROL
                   switch ( params.action ) {
-                        // FRONT AND LEVEL MODULES UI
-                        // The registered elements are cleaned (self.cleanRegistered()) in the callbacks,
-                        // because we want to check if the requested UI is not the one already rendered, and fire a button-see-me animation if yes.
                         case 'sek-generate-module-ui' :
                               try{ dfd = self.generateUIforFrontModules( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
@@ -2709,32 +1944,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     dfd = $.Deferred();
                               }
                         break;
-
-                        // Possible content types :
-                        // 1) module
-                        // 2) preset_section
                         case 'sek-generate-draggable-candidates-picker-ui' :
-                              // Clean previously generated UI elements
                               self.cleanRegistered();
                               try{ dfd = self.generateUIforDraggableContent( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
                               }
                         break;
-
-                        // Fired in ::initialize()
                         case 'sek-generate-local-skope-options-ui' :
-                              // Clean previously generated UI elements
                               self.cleanRegistered();
                               try{ dfd = self.generateUIforLocalSkopeOptions( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
                               }
                         break;
-
-                        // Fired in ::initialize()
                         case 'sek-generate-global-options-ui' :
-                              // Clean previously generated UI elements
                               self.cleanRegistered();
                               try{ dfd = self.generateUIforGlobalOptions( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
@@ -2745,56 +1969,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   return 'pending' == dfd.state() ? dfd.resolve().promise() : dfd.promise();//<= we might want to resolve on focus.completeCallback ?
             },//generateUI()
-
-
-
-
-
-
-
-            // @params = {
-            //     uiParams : params,
-            //     options_type : 'spacing',
-            //     settingParams : {
-            //           to : to,
-            //           from : from,
-            //           args : args
-            //     }
-            // }
-            //
-            // @param settingParams.args = {
-            //  inputRegistrationParams : {
-            //     id :,
-            //     type :
-            //     refresh_markup : bool
-            //     refresh_stylesheet : bool
-            //     refresh_fonts : bool
-            //  }
-            //  input_changed : input_id
-            //  input_transport : 'inherit'/'postMessage',
-            //  module : { items : [...]}
-            //  module_id :
-            //  not_preview_sent : bool
-            //}
-            //
-            // Note 1 : this method must handle two types of modules :
-            // 1) mono item modules, for which the settingParams.to is an object, a single item object
-            // 2) multi-items modules, for which the settingParams.to is an array, a collection of item objects
-            // How do we know that we are a in single / multi item module ?
-            //
-            // Note 2 : we must also handle several scenarios of module value update :
-            // 1) mono-items and multi-items module => input change
-            // 2) crud multi item => item added or removed => in this case some args are not passed, like params.settingParams.args.inputRegistrationParams
             updateAPISettingAndExecutePreviewActions : function( params ) {
                   if ( _.isEmpty( params.settingParams ) || ! _.has( params.settingParams, 'to' ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.to. The api main setting can not be updated', params );
                         return;
                   }
                   var self = this;
-
-                  // NORMALIZE THE VALUE WE WANT TO WRITE IN THE MAIN SETTING
-                  // 1) We don't want to store the default title and id module properties
-                  // 2) We don't want to write in db the properties that are set to their default values
                   var rawModuleValue = params.settingParams.to,
                       moduleValueCandidate,// {} or [] if mono item of multi-item module
                       parentModuleType = null,
@@ -2815,11 +1995,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   } else {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing parentModuleInstance', params );
                   }
-
-
-
-                  // The new module value can be a single item object if monoitem module, or an array of item objects if multi-item crud
-                  // Let's normalize it
                   if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
                         moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( rawModuleValue, parentModuleType );
                   } else {
@@ -2828,27 +2003,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               moduleValueCandidate.push( self.normalizeAndSanitizeSingleItemInputValues( item, parentModuleType ) );
                         });
                   }
-
-                  // WHAT TO REFRESH IN THE PREVIEW ? Markup, stylesheet, font ?
-                  // The action to trigger is determined by the changed input
-                  // For the options of a level, the default action is to refresh the stylesheet.
-                  // But we might need to refresh the markup in some cases. Like for example when a css class is added. @see the boxed-wide layout example
                   if ( _.isEmpty( params.defaultPreviewAction ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing defaultPreviewAction in passed params. No action can be triggered to the api.previewer.', params );
                         return;
                   }
-                  // Set the default value
                   var refresh_stylesheet = 'refresh_stylesheet' === params.defaultPreviewAction,//<= default action for level options
                       refresh_markup = 'refresh_markup' === params.defaultPreviewAction,//<= default action for module options
                       refresh_fonts = 'refresh_fonts' === params.defaultPreviewAction,
                       refresh_preview = 'refresh_preview' === params.defaultPreviewAction;
-
-                  // Maybe set the input based value
                   var input_id = params.settingParams.args.input_changed;
                   var inputRegistrationParams;
-
-                  // introduced when updating the new text editors
-                  // https://github.com/presscustomizr/nimble-builder/issues/403
                   var refreshMarkupWhenNeededForInput = function() {
                         return inputRegistrationParams && _.isString( inputRegistrationParams.refresh_markup ) && 'true' !== inputRegistrationParams.refresh_markup && 'false' !== inputRegistrationParams.refresh_markup;
                   };
@@ -2874,46 +2038,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   var _doUpdateWithRequestedAction = function() {
-                        // GLOBAL OPTIONS CASE => SITE WIDE => WRITING IN A SPECIFIC OPTION, SEPARATE FROM THE SEKTION
                         if ( true === params.isGlobalOptions ) {
                               if ( _.isEmpty( params.options_type ) ) {
                                     api.errare( 'updateAPISettingAndExecutePreviewActions => error when updating the global options => missing options_type');
                                     return;
                               }
-                              //api( sektionsLocalizedData.optNameForGlobalOptions )() is registered on ::initialize();
                               var rawGlobalOptions = api( sektionsLocalizedData.optNameForGlobalOptions )(),
                                   clonedGlobalOptions = $.extend( true, {}, _.isObject( rawGlobalOptions ) ? rawGlobalOptions : {} ),
                                   _valueCandidate = {};
-
-                              // consider only the non empty settings for db
-                              // booleans should bypass this check
                               _.each( moduleValueCandidate || {}, function( _val_, _key_ ) {
-                                    // Note : _.isEmpty( 5 ) returns true when checking an integer,
-                                    // that's why we need to cast the _val_ to a string when using _.isEmpty()
                                     if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
                                       return;
                                     _valueCandidate[ _key_ ] = _val_;
                               });
 
                               clonedGlobalOptions[ params.options_type ] = _valueCandidate;
-
-                              // Set it
                               api( sektionsLocalizedData.optNameForGlobalOptions )( clonedGlobalOptions );
                         } else {
-                              // LEVEL OPTION CASE => LOCAL
                               return self.updateAPISetting({
                                     action : params.uiParams.action,// mandatory : 'sek-generate-level-options-ui', 'sek-generate-local-skope-options-ui',...
                                     id : params.uiParams.id,
                                     value : moduleValueCandidate,
                                     in_column : params.uiParams.in_column,//not mandatory
                                     in_sektion : params.uiParams.in_sektion,//not mandatory
-
-                                    // specific for level options and local skope options
                                     options_type : params.options_type,// mandatory : 'layout', 'spacing', 'bg_border', 'height', ...
 
                                     settingParams : params.settingParams
                               }).done( function( promiseParams ) {
-                                    // STYLESHEET => default action when modifying the level options
                                     if ( true === refresh_stylesheet ) {
                                           api.previewer.send( 'sek-refresh-stylesheet', {
                                                 location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
@@ -2925,12 +2076,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 },
                                           });
                                     }
-
-
-                                    // MARKUP
-                                    // since https://github.com/presscustomizr/nimble-builder/issues/403, 2 cases :
-                                    // 1) update simply by postMessage, without ajax action <= refresh_markup is a string of selectors, and the content does not include content that needs server side parsing, like shortcode or template tages
-                                    // 2) otherwise => update the level with an ajax refresh action
                                     var _sendRequestForAjaxMarkupRefresh = function() {
                                           api.previewer.send( 'sek-refresh-level', {
                                                 location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
@@ -2947,9 +2092,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( true === refresh_markup ) {
                                           _sendRequestForAjaxMarkupRefresh();
                                     }
-
-                                    // @todo:
-                                    // for multi-item modules, send the item identifier
                                     if ( refreshMarkupWhenNeededForInput() ) {
                                           var _html_content = params.settingParams.args.input_value;
                                           if ( ! _.isString( _html_content ) ) {
@@ -2973,42 +2115,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 _sendRequestForAjaxMarkupRefresh();
                                           }
                                     }
-
-                                    // REFRESH THE PREVIEW ?
                                     if ( true === refresh_preview ) {
                                           api.previewer.refresh();
                                     }
                               });//self.updateAPISetting()
                         }
                   };//_doUpdateWithRequestedAction
-
-                  // if the changed input is a google font modifier ( <=> true === refresh_fonts )
-                  // => we want to first refresh the google font collection, and then proceed the requested action
-                  // this way we make sure that the customized value used when ajaxing will take into account when writing the google font http request link
                   if ( true === refresh_fonts ) {
                         var newFontFamily = params.settingParams.args.input_value;
                         if ( ! _.isString( newFontFamily ) ) {
                               api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', newFontFamily );
                               return;
                         }
-
-                        // add it only if gfont
                         if ( newFontFamily.indexOf('gfont') > -1 ) {
                               self.updateAPISetting({
                                     action : 'sek-update-fonts',
                                     font_family : newFontFamily,
                                     is_global_location : self.isGlobalLocation( params.uiParams )
                               })
-                              // we use always() instead of done here, because the api section setting might not be changed ( and therefore return a reject() promise ).
-                              // => this can occur when a user is setting a google font already picked elsewhere
-                              // @see case 'sek-update-fonts'
                               .always( function() {
                                     _doUpdateWithRequestedAction().then( function() {
-                                          // always refresh again after
-                                          // Why ?
-                                          // Because the first refresh was done before actually setting the new font family, so based on a previous set of fonts
-                                          // which leads to have potentially an additional google fonts that we don't need after the first refresh
-                                          // that's why this second refresh is required. It wont trigger any preview ajax actions. Simply refresh the root fonts property of the main api setting.
                                           self.updateAPISetting({
                                                 action : 'sek-update-fonts',
                                                 is_global_location : self.isGlobalLocation( params.uiParams )
@@ -3022,22 +2148,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _doUpdateWithRequestedAction();
                   }
             },//updateAPISettingAndExecutePreviewActions
-
-
-
-
-
-
-
-
-
-
-
-
-            // @return a normalized and sanitized item value
-            // What does this helper do ?
-            // 1) remove title and id properties, we don't need them in db
-            // 2) don't write if is equal to default
             normalizeAndSanitizeSingleItemInputValues : function( _item_, parentModuleType ) {
                   var itemNormalized = {},
                       itemNormalizedAndSanitized = {},
@@ -3056,18 +2166,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             } else if ( _.isObject( _val ) && _.isObject( _default ) ) {
                                   equal = _.isEqual( _val,_default );
                             } else if ( _.isArray( _val ) && _.isArray( _default ) ) {
-                                  //@see https://stackoverflow.com/questions/39517316/check-for-equality-between-two-array
                                   equal = JSON.stringify(_val.sort()) === JSON.stringify(_default.sort());
                             } else {
                                   equal = _val === _default;
                             }
                             return equal;
                       };
-
-                  // NORMALIZE
-                  // title, id and module_type don't need to be saved in database
-                  // title and id are legacy entries that can be used in multi-items modules to identify and name the item
-                  // @see ::getDefaultItemModelFromRegisteredModuleData()
                   _.each( _item_, function( _val, input_id ) {
                         if ( _.contains( ['title', 'id' ], input_id ) )
                           return;
@@ -3080,19 +2184,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         if ( isEqualToDefault( _val, inputDefaultValue ) ) {
                               return;
-                        // When the value is a string of an object, no need to write an empty value
                         } else if ( ( _.isString( _val ) || _.isObject( _val ) ) && _.isEmpty( _val ) ) {
                               return;
                         } else {
                               itemNormalized[ input_id ] = _val;
                         }
                   });
-
-
-                  // SANITIZE
                   _.each( itemNormalized, function( _val, input_id ) {
-                        // @see extend_api_base.js
-                        // @see sektions::_7_0_sektions_add_inputs_to_api.js
                         switch( self.getInputType( input_id, parentModuleType ) ) {
                               case 'text' :
                               case 'textarea' :
@@ -3133,34 +2231,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   return itemNormalizedAndSanitized;
             },
-
-
-
-
-
-
-
-
-
-
-
-            // Is the UI currently displayed the one that is being requested ?
-            // If so, don't generate the ui again
-            // @return bool
             isUIControlAlreadyRegistered : function( uiElementId ) {
                   var self = this,
                       uiCandidate = _.filter( self.registered(), function( registered ) {
                             return registered.id == uiElementId && 'control' === registered.what;
                       }),
                       controlIsAlreadyRegistered = false;
-
-                  // If the control is not been tracked in our self.registered(), let's check if it is registered in the api
-                  // Typically, the module / section picker will match that case, because we don't keep track of it ( so it's not cleaned )
                   if ( _.isEmpty( uiCandidate ) ) {
                         controlIsAlreadyRegistered = api.control.has( uiElementId );
                   } else {
                         controlIsAlreadyRegistered = true;
-                        // we should have only one uiCandidate with this very id
                         if ( uiCandidate.length > 1 ) {
                               api.errare( 'generateUI => why is this control registered more than once ? => ' + uiElementId );
                         }
@@ -3206,19 +2286,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // @params = {
-            //    action : 'sek-generate-module-ui' / 'sek-generate-level-options-ui'
-            //    level : params.level,
-            //    id : params.id,
-            //    in_sektion : params.in_sektion,
-            //    in_column : params.in_column,
-            //    options : params.options || []
-            // }
-            // @dfd = $.Deferred()
-            // @return the state promise dfd
             generateUIforDraggableContent : function( params, dfd ) {
                   var self = this;
-                  // Prepare the module map to register
                   var registrationParams = {};
 
                   $.extend( registrationParams, {
@@ -3228,7 +2297,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel :  sektionsLocalizedData.i18n['Select a content type'],
                               priority : 0,
                               settingValue : { content_type : params.content_type }
-                              //icon : '<i class="material-icons sek-level-option-icon">center_focus_weak</i>'
                         },
                         module_picker : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_draggable_modules_ui',
@@ -3276,9 +2344,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         }
                   });
-
-                  // Header and footer have been introduced in v1.4.0 but not enabled by default
-                  // The header and footer preset sections are on hold until "header and footer" feature is released.
                   if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
                         $.extend( registrationParams, {
                               sek_header_sec_picker_module : {
@@ -3315,13 +2380,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   }
-
-
-                  // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
-                  // Is the UI currently displayed the one that is being requested ?
-                  // If so :
-                  // 1) visually remind the user that a module should be dragged
-                  // 2) pass the content_type param to display the requested content_type
                   var firstKey = _.keys( registrationParams )[0],
                       firstControlId = registrationParams[firstKey].settingControlId;
 
@@ -3330,7 +2388,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _control_.focus({
                                     completeCallback : function() {
                                           var $container = _control_.container;
-                                          // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
                                           if ( $container.hasClass( 'button-see-me') )
                                             return;
                                           $container.addClass('button-see-me');
@@ -3343,13 +2400,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         return dfd;
                   }//if
-
-
-                  // @return void()
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
                               if ( ! api.has( optionData.settingControlId ) ) {
-                                    // synchronize the module setting with the main collection setting
                                     api( optionData.settingControlId, function( _setting_ ) {
                                           _setting_.bind( function( to, from ) {
                                                 api.errare('generateUIforDraggableContent => the setting() should not changed');
@@ -3381,10 +2434,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                               }).done( function() {
                                     api.control( optionData.settingControlId, function( _control_ ) {
-                                          // set the control type property
                                           _control_.content_type = optionData.content_type;//<= used to handle visibility when switching content type with the "content_type_switcher" control
-
-                                          // we set the focus to false when firing api.previewer.trigger( 'sek-pick-content', { focus : false }); in ::initialize()
                                           if ( true === params.focus ) {
                                                 _control_.focus({
                                                       completeCallback : function() {}
@@ -3393,22 +2443,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                           var $title = _control_.container.find('label > .customize-control-title'),
                                               _titleContent = $title.html();
-                                          // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
                                           $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
-
-                                          // if this level has an icon, let's prepend it to the title
                                           if ( ! _.isUndefined( optionData.icon ) ) {
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                           }
-
-                                          // ACCORDION
-                                          // Setup the accordion only for section content type
                                           if ( 'section' === _control_.content_type ) {
-                                                // Hide the item wrapper
                                                 _control_.container.find('.czr-items-wrapper').hide();
-                                                // prepend the animated arrow
                                                 $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                                // setup the initial state + initial click
                                                 _control_.container.attr('data-sek-expanded', "false" );
                                                 if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
                                                       _control_.container.find('.czr-items-wrapper').show();
@@ -3422,32 +2463,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });//_.each
                   };//_do_register_
-
-
-                  // the self.SECTION_ID_FOR_CONTENT_PICKER section is registered on initialize
-                  // @fixes https://github.com/presscustomizr/nimble-builder/issues/187
                   api.section( self.SECTION_ID_FOR_CONTENT_PICKER, function( _section_ ) {
                         _do_register_();
-
-                        // Style the section title
                         var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
                             $panelTitleEl = _section_.container.find('.customize-section-title h3');
-
-                        // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
                         if ( 0 < $sectionTitleEl.length && $sectionTitleEl.find('.sek-level-option-icon').length < 1 ) {
                               $sectionTitleEl.prepend( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
                         }
-
-                        // The default title looks like this : <span class="customize-action">Customizing</span> Title
                         if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
                               $panelTitleEl.find('.customize-action').after( '<i class="fas fa-grip-vertical sek-level-option-icon"></i>' );
                         }
-
-                        // Schedule the accordion behaviour
                         self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
-
-                        // Fetch the presetSectionCollection from the server now, so we save a few milliseconds when injecting the first preset_section
-                        // it populates api.sek_presetSections
                         self._maybeFetchSectionsFromServer();
                   });
                   return dfd;
@@ -3457,23 +2483,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // @params = {
-            //    action : 'sek-generate-module-ui' / 'sek-generate-level-options-ui'
-            //    level : params.level,
-            //    id : params.id,
-            //    in_sektion : params.in_sektion,
-            //    in_column : params.in_column,
-            //    options : params.options || []
-            // }
-            // @dfd = $.Deferred()
-            // @return the state promise dfd
             generateUIforFrontModules : function( params, dfd ) {
                   var self = this;
                   if ( _.isEmpty( params.id ) ) {
                         dfd.reject( 'generateUI => missing id' );
                   }
-
-                  // For modules, we need to generate a UI for the module value
                   var moduleValue = self.getLevelProperty({
                         property : 'value',
                         id : params.id
@@ -3489,8 +2503,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isEmpty( moduleType ) ) {
                         dfd.reject( 'generateUI => module => invalid module_type' );
                   }
-
-                  // Prepare the module map to register
                   var modulesRegistrationParams = {};
 
                   if ( true === self.getRegisteredModuleProperty( moduleType, 'is_father' ) ) {
@@ -3503,7 +2515,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           settingControlId : params.id + '__' + optionType,
                                           module_type : mod_type,
                                           controlLabel : self.getRegisteredModuleProperty( mod_type, 'name' )
-                                          //icon : '<i class="material-icons sek-level-option-icon">code</i>'
                                     };
                               });
                         }
@@ -3512,14 +2523,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : params.id,
                               module_type : moduleType,
                               controlLabel : moduleName
-                              //icon : '<i class="material-icons sek-level-option-icon">code</i>'
                         };
                   }
-
-                  // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
-                  // Is the UI currently displayed the one that is being requested ?
-                  // Check if the first control of the list is already registered
-                  // If so, visually remind the user and break;
                   var firstKey = _.keys( modulesRegistrationParams )[0],
                       firstControlId = modulesRegistrationParams[firstKey].settingControlId;
 
@@ -3527,7 +2532,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.control( firstControlId ).focus({
                               completeCallback : function() {
                                     var $container = api.control( firstControlId ).container;
-                                    // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
                                     if ( $container.hasClass( 'button-see-me') )
                                       return;
                                     $container.addClass('button-see-me');
@@ -3538,13 +2542,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                         return dfd;
                   }//if
-
-                  // Clean previously generated UI elements
                   self.cleanRegistered();
 
                   _do_register_ = function() {
                         _.each( modulesRegistrationParams, function( optionData, optionType ){
-                              // Make sure this setting is bound only once !
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
@@ -3560,11 +2561,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 api.errare( '::generateUIforFrontModules => Error in updateAPISettingAndExecutePreviewActions', er );
                                           }
                                     };
-
-                                    // Schedule the binding to synchronize the module setting with the main collection setting
-                                    // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
-                                    // They need to be kept in order to keep track of the changes in the customizer.
-                                    // => that's why we check if ! api.has( ... )
                                     api( optionData.settingControlId, function( _setting_ ) {
                                           _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });
@@ -3592,47 +2588,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     what : 'control',
                                     id : optionData.settingControlId,
                                     label : optionData.controlLabel,
-                                    //label : sektionsLocalizedData.i18n['Customize the options for module :'] + ' ' + optionData.controlLabel,
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
                                     section : params.id,
                                     priority : 10,
                                     settings : { default : optionData.settingControlId }
                               }).done( function() {});
-
-                              // Implement the animated arrow markup, and the initial state of the module visibility
                               api.control( optionData.settingControlId, function( _control_ ) {
                                     api.control( optionData.settingControlId ).focus({
                                           completeCallback : function() {}
                                     });
-                                    // Hide the item wrapper
                                     _control_.container.find('.czr-items-wrapper').hide();
                                     var $title = _control_.container.find('label > .customize-control-title'),
                                         _titleContent = $title.html();
 
                                     $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
-                                    // if this level has an icon, let's prepend it to the title
                                     if ( ! _.isUndefined( optionData.icon ) ) {
                                           $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                     }
-                                    // prepend the animated arrow
                                     $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                    // setup the initial state + initial click
                                     _control_.container.attr('data-sek-expanded', "false" );
                               });
                         });//each()
                   };//_do_register()
-
-
-
-                  // Defer the registration when the parent section gets added to the api
                   api.section.when( params.id, function() {
                         api.section(params.id).focus();
                         _do_register_();
                   });
-
-
-                  // MAIN CONTENT SECTION
                   api.CZR_Helpers.register({
                         origin : 'nimble',
                         what : 'section',
@@ -3640,23 +2622,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         title: sektionsLocalizedData.i18n['Content for'] + ' ' + moduleName,
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 1000,
-                        //track : false//don't register in the self.registered()
-                        //constructWith : MainSectionConstructor,
                   }).done( function() {});
 
                   api.section( params.id, function( _section_ ) {
-                        // don't display the clickable section title in the nimble root panel
                         _section_.container.find('.accordion-section-title').first().hide();
-
-                        // Style the section title
                         var $panelTitleEl = _section_.container.find('.customize-section-title h3');
-
-                        // The default title looks like this : <span class="customize-action">Customizing</span> Title
                         if ( 0 < $panelTitleEl.length ) {
                               $panelTitleEl.find('.customize-action').after( '<i class="fas fa-pencil-alt sek-level-option-icon"></i>' );
                         }
-
-                        // Schedule the accordion behaviour
                         self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                   });
                   return dfd;
@@ -3666,27 +2639,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // @params = {
-            //    action : 'sek-generate-module-ui' / 'sek-generate-level-options-ui'
-            //    level : params.level,
-            //    id : params.id,
-            //    in_sektion : params.in_sektion,
-            //    in_column : params.in_column,
-            //    options : params.options || []
-            // }
-            // @dfd = $.Deferred()
-            // @return the state promise dfd
             generateUIforLevelOptions : function( params, dfd ) {
                   var self = this;
-                  // Get this level options
                   var levelOptionValues = self.getLevelProperty({
                             property : 'options',
                             id : params.id
                       });
                   levelOptionValues = _.isObject( levelOptionValues ) ? levelOptionValues : {};
-
-
-                  // Prepare the module map to register
                   var modulesRegistrationParams = {};
 
                   $.extend( modulesRegistrationParams, {
@@ -3701,7 +2660,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               settingControlId : params.id + '__border_options',
                               module_type : 'sek_level_border_module',
                               controlLabel : sektionsLocalizedData.i18n['Borders settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
-                              //expandAndFocusOnInit : true,
                               icon : '<i class="material-icons sek-level-option-icon">rounded_corner</i>'//'<i class="material-icons sek-level-option-icon">brush</i>'
                         },
                         spacing : {
@@ -3739,16 +2697,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
                               }
                         });
-                        // Deactivated
-                        // => replaced by sek_level_width_section
-                        // $.extend( modulesRegistrationParams, {
-                        //       layout : {
-                        //             settingControlId : params.id + '__sectionLayout_options',
-                        //             module_type : 'sek_level_section_layout_module',
-                        //             controlLabel : sektionsLocalizedData.i18n['Layout settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
-                        //             icon : '<i class="material-icons sek-level-option-icon">crop_din</i>'
-                        //       }
-                        // });
                         $.extend( modulesRegistrationParams, {
                               breakpoint : {
                                     settingControlId : params.id + '__breakpoint_options',
@@ -3768,12 +2716,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   }
-
-
-                  // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
-                  // Is the UI currently displayed the one that is being requested ?
-                  // Check if the first control of the list is already registered
-                  // If so, visually remind the user and break;
                   var firstKey = _.keys( modulesRegistrationParams )[0],
                       firstControlId = modulesRegistrationParams[firstKey].settingControlId;
 
@@ -3781,7 +2723,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.control( firstControlId ).focus({
                               completeCallback : function() {
                                     var $container = api.control( firstControlId ).container;
-                                    // @use button-see-mee css class declared in core in /wp-admin/css/customize-controls.css
                                     if ( $container.hasClass( 'button-see-me') )
                                       return;
                                     $container.addClass('button-see-me');
@@ -3792,16 +2733,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                         return dfd;
                   }//if
-
-                  // Clean previously generated UI elements
                   self.cleanRegistered();
-
-
-                  // @return void()
                   _do_register_ = function() {
                         _.each( modulesRegistrationParams, function( optionData, optionType ){
-                               // Is the UI currently displayed the one that is being requested ?
-                              // If so, don't generate the ui again, simply focus on the section
                               if ( self.isUIControlAlreadyRegistered( optionData.settingControlId ) ) {
                                     api.section( api.control( optionData.settingControlId ).section() ).expanded( true );
                                     return;
@@ -3821,20 +2755,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 api.errare( '::generateUIforLevelOptions => Error in updateAPISettingAndExecutePreviewActions', er );
                                           }
                                     };
-
-                                    // Schedule the binding to synchronize the options with the main collection setting
-                                    // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
-                                    // They need to be kept in order to keep track of the changes in the customizer.
-                                    // => that's why we check if ! api.has( ... )
                                     api( optionData.settingControlId, function( _setting_ ) {
                                           _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
-
-                                    // Let's add the starting values if provided when registrating the module
                                     var initialModuleValues = levelOptionValues[ optionType ] || {};
                                     var startingModuleValue = self.getModuleStartingValue( optionData.module_type );
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
-                                          // make sure the starting values are deeped clone now, before being extended
                                           var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
                                           initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
                                     }
@@ -3864,41 +2790,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     priority : 0,
                                     settings : { default : optionData.settingControlId }
                               }).done( function() {});
-
-                              // Implement the animated arrow markup, and the initial state of the module visibility
                               api.control( optionData.settingControlId, function( _control_ ) {
                                     if ( true === optionData.expandAndFocusOnInit ) {
                                           _control_.focus({
                                                 completeCallback : function() {}
                                           });
                                     }
-
-                                    // Hide the item wrapper
                                     _control_.container.find('.czr-items-wrapper').hide();
                                     var $title = _control_.container.find('label > .customize-control-title'),
                                         _titleContent = $title.html();
-                                    // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
                                     $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
-                                    // if this level has an icon, let's prepend it to the title
                                     if ( ! _.isUndefined( optionData.icon ) ) {
                                           $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                     }
-                                    // prepend the animated arrow
                                     $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                    // setup the initial state + initial click
                                     _control_.container.attr('data-sek-expanded', "false" );
-                                    // if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                    //       $title.trigger('click');
-                                    // }
                               });
                         });//_.each()
                   };//_do_register_()
-
-                  // The section won't be tracked <= not removed on each ui update
-                  // Note : the check on api.section.has( params.id ) is also performd on api.CZR_Helpers.register(), but here we use it to avoid setting up the click listeners more than once.
                   if ( ! api.section.has( params.id ) ) {
                         api.section( params.id, function( _section_ ) {
-                              // Schedule the accordion behaviour
                               self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                         });
                   }
@@ -3910,21 +2821,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         title: sektionsLocalizedData.i18n['Settings for the'] + ' ' + params.level,
                         panel : sektionsLocalizedData.sektionsPanelId,
                         priority : 10,
-                        //track : false//don't register in the self.registered()
-                        //constructWith : MainSectionConstructor,
                   }).done( function() {});
-
-                  // - Defer the registration when the parent section gets added to the api
-                  // - Implement the module visibility
                   api.section( params.id, function( _section_ ) {
                         _do_register_();
-                        // don't display the clickable section title in the nimble root panel
                         _section_.container.find('.accordion-section-title').first().hide();
-
-                        // Style the section title
                         var $panelTitleEl = _section_.container.find('.customize-section-title h3');
-
-                        // The default title looks like this : <span class="customize-action">Customizing</span> Title
                         if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
                               $panelTitleEl.find('.customize-action').after( '<i class="fas fa-sliders-h sek-level-option-icon"></i>' );
                         }
@@ -3945,33 +2846,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   return sektionsLocalizedData.optPrefixForSektionsNotSaved + skope_id + '__localSkopeOptions';
             },
-            // @params = {
-            //    action : 'sek-generate-module-ui' / 'sek-generate-level-options-ui'
-            //    level : params.level,
-            //    id : params.id,
-            //    in_sektion : params.in_sektion,
-            //    in_column : params.in_column,
-            //    options : params.options || []
-            // }
-            // @dfd = $.Deferred()
-            // @return the state promise dfd
             generateUIforLocalSkopeOptions : function( params, dfd ) {
                   var self = this,
                       _id_ = self.getLocalSkopeOptionId();
-                  // Is the UI currently displayed the one that is being requested ?
-                  // If so, visually remind the user that a module should be dragged
                   if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
                         return dfd;
                   }
-
-                  // Prepare the module map to register
                   var registrationParams = {};
                   if ( _.isUndefined( sektionsLocalizedData.localOptionsMap ) || ! _.isObject( sektionsLocalizedData.localOptionsMap ) ) {
                         api.errare( '::generateUIforGlobalOptions => missing or invalid localOptionsMap');
                         return dfd;
                   }
-
-                  // Populate the registration params
                   _.each( sektionsLocalizedData.localOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
                               case 'template' :
@@ -3983,7 +2868,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
                                     };
                               break;
-                              // Header and footer have been introduced in v1.4.0 but not enabled by default.
                               case 'local_header_footer':
                                     if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
                                           registrationParams[ opt_name ] = {
@@ -4034,6 +2918,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">settings_backup_restore</i>'
                                     };
                               break;
+                              case 'import_export' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__local_imp_exp',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Import / Export'],
+                                          icon : '<i class="material-icons sek-level-option-icon">import_export</i>'
+                                    };
+                              break;
                               default :
                                     api.errare('::generateUIforLocalOptions => an option group could not be registered => ' + mod_type, opt_name );
                               break;
@@ -4058,16 +2950,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 api.errare( '::generateUIforLocalSkopeOptions => Error in updateAPISettingAndExecutePreviewActions', er );
                                           }
                                     };
-
-                                    // Schedule the binding to synchronize the options with the main collection setting
-                                    // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
-                                    // They need to be kept in order to keep track of the changes in the customizer.
-                                    // => that's why we check if ! api.has( ... )
                                     api( optionData.settingControlId, function( _setting_ ) {
                                           _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
-
-                                    // Let's add the starting values if provided when registrating the module
                                     var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
                                         currentSetValue = api( self.localSectionsSettingId() )(),
                                         allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} ),
@@ -4075,7 +2960,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         initialModuleValues = optionTypeValue;
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
-                                          // make sure the starting values are deeped clone now, before being extended
                                           var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
                                           initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
                                     }
@@ -4102,31 +2986,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     section : self.SECTION_ID_FOR_LOCAL_OPTIONS,
                                     priority : 10,
                                     settings : { default : optionData.settingControlId },
-                                    //track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                               }).done( function() {
-
-                                    // if ( true === optionData.expandAndFocusOnInit ) {
-                                    //       api.control( optionData.settingControlId ).focus({
-                                    //             completeCallback : function() {}
-                                    //       });
-                                    // }
-
-                                    // Implement the animated arrow markup, and the initial state of the module visibility
                                     api.control( optionData.settingControlId, function( _control_ ) {
-                                          // Hide the item wrapper
                                           _control_.container.find('.czr-items-wrapper').hide();
                                           var $title = _control_.container.find('label > .customize-control-title'),
                                               _titleContent = $title.html();
-                                          // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
                                           $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
-
-                                          // if this level has an icon, let's prepend it to the title
                                           if ( ! _.isUndefined( optionData.icon ) ) {
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                           }
-                                          // prepend the animated arrow
                                           $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                          // setup the initial state + initial click
                                           _control_.container.attr('data-sek-expanded', "false" );
                                           if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
                                                 $title.trigger('click');
@@ -4135,8 +3004,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });//_.each()
                   };//_do_register()
-
-                  // The parent section has already been added in ::initialize()
                   _do_register_();
 
                   return dfd;
@@ -4146,37 +3013,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // @params = {
-            //    action : 'sek-generate-module-ui' / 'sek-generate-level-options-ui'
-            //    level : params.level,
-            //    id : params.id,
-            //    in_sektion : params.in_sektion,
-            //    in_column : params.in_column,
-            //    options : params.options || []
-            // }
-            // @dfd = $.Deferred()
-            // @return the state promise dfd
             generateUIforGlobalOptions : function( params, dfd ) {
                   var self = this,
                       _id_ = sektionsLocalizedData.optPrefixForSektionsNotSaved + sektionsLocalizedData.optNameForGlobalOptions;
-
-                  // Is the UI currently displayed the one that is being requested ?
-                  // If so, visually remind the user that a module should be dragged
                   if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
                         return dfd;
                   }
-
-                  // Prepare the module map to register
                   var registrationParams = {};
                   if ( _.isUndefined( sektionsLocalizedData.globalOptionsMap ) || ! _.isObject( sektionsLocalizedData.globalOptionsMap ) ) {
                         api.errare( '::generateUIforGlobalOptions => missing or invalid globalOptionsMap');
                         return dfd;
                   }
-
-                  // Populate the registration params
                   _.each( sektionsLocalizedData.globalOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
-                              // Header and footer have been introduced in v1.4.0 but not enabled by default.
                               case 'global_header_footer':
                                     if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
                                           registrationParams[ opt_name ] = {
@@ -4228,6 +3077,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">settings_backup_restore</i>'
                                     };
                               break;
+                              case 'global_reset' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__global_reset',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Reset the sections displayed in global locations'],
+                                          icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                                    };
+                              break;
                               case 'beta_features' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__beta_features',
@@ -4261,22 +3118,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 api.errare( '::generateUIforGlobalOptions => Error in updateAPISettingAndExecutePreviewActions', er );
                                           }
                                     };
-
-                                    // Schedule the binding to synchronize the options with the main collection setting
-                                    // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
-                                    // They need to be kept in order to keep track of the changes in the customizer.
-                                    // => that's why we check if ! api.has( ... )
                                     api( optionData.settingControlId, function( _setting_ ) {
                                           _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
-
-                                    // Let's add the starting values if provided when registrating the module
                                     var dbValues = sektionsLocalizedData.globalOptionDBValues,
                                         startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
                                         initialModuleValues = ( _.isObject( dbValues ) && ! _.isEmpty( dbValues[ optionType ] ) ) ? dbValues[ optionType ] : {};
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
-                                          // make sure the starting values are deeped clone now, before being extended
                                           var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
                                           initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
                                     }
@@ -4306,28 +3155,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     settings : { default : optionData.settingControlId },
                                     track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
                               }).done( function() {
-                                    // if ( true === optionData.expandAndFocusOnInit ) {
-                                    //       api.control( optionData.settingControlId ).focus({
-                                    //             completeCallback : function() {}
-                                    //       });
-                                    // }
-
-                                    // Implement the animated arrow markup, and the initial state of the module visibility
                                     api.control( optionData.settingControlId, function( _control_ ) {
-                                          // Hide the item wrapper
                                           _control_.container.find('.czr-items-wrapper').hide();
                                           var $title = _control_.container.find('label > .customize-control-title'),
                                               _titleContent = $title.html();
-                                          // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
                                           $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
-
-                                          // if this level has an icon, let's prepend it to the title
                                           if ( ! _.isUndefined( optionData.icon ) ) {
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                           }
-                                          // prepend the animated arrow
                                           $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                          // setup the initial state + initial click
                                           _control_.container.attr('data-sek-expanded', "false" );
                                           if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
                                                 $title.trigger('click');
@@ -4336,8 +3172,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });//_.each();
                   };//do register
-
-                  // The parent section has already been added in ::initialize()
                   _do_register_();
 
                   return dfd;
@@ -4347,57 +3181,30 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // user action => this utility must be used to set the main setting value
-            // params = {
-            //    action : 'sek-add-section', 'sek-add-column', 'sek-add-module',...
-            //    in_sektion
-            //    in_column
-            // }
             updateAPISetting : function( params ) {
                   var self = this,
                       __updateAPISettingDeferred__ = $.Deferred();
-
-                  // Are we in global location ?
-                  // Add the global information to the params
-                  // => is used to determine the skope id when resolving the promise in reactToPreviewMsg
                   params = params || {};
-                  params.is_global_location = self.isGlobalLocation( params );
+                  params.is_global_location = 'global' === params.scope || self.isGlobalLocation( params );
 
                   var _collectionSettingId_ = params.is_global_location ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
                   var _do_update_setting_id = function() {
-                        // api( _collectionSettingId_)() = {
-                        //    collection : [
-                        //       'loop_start' :  { level : location,  collection : [ 'sek124' : { collection : [], level : section, options : {} }], options : {}},
-                        //       'loop_end' : { level : location, collection : [], options : {}}
-                        //        ...
-                        //    ],
-                        //    options : {}
-                        //
-                        // }
                         var currentSetValue = api( _collectionSettingId_ )(),
                             newSetValue = _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
                             locationCandidate,
                             sektionCandidate,
                             columnCandidate,
                             moduleCandidate,
-                            // move variables
                             originalCollection,
                             reorderedCollection,
-                            //duplication variable
                             cloneId, //will be passed in resolve()
                             startingModuleValue,// will be populated by the optional starting value specificied on module registration
                             __presetSectionInjected__ = '_not_injection_scenario_',//this property is turned into a $.Deferred() object in a scenario of section injection
                             parentSektionCandidate;
-
-                        // make sure we have a collection array to populate
                         newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ).collection;
 
                         switch( params.action ) {
-                              //-------------------------------------------------------------------------------------------------
-                              //-- SEKTION
-                              //-------------------------------------------------------------------------------------------------
                               case 'sek-add-section' :
-                                    // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
                                     }
@@ -4405,11 +3212,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( _.isEmpty( params.location ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing location' );
                                     }
-                                    // Is this a nested sektion ?
                                     if ( true === params.is_nested ) {
                                           columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                          // can we add this nested sektion ?
-                                          // if the parent sektion of the column has is_nested = true, then we can't
                                           parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                           if ( 'no_match' == parentSektionCandidate ) {
                                                 __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
@@ -4453,10 +3257,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       position = index + 1;
                                                 }
                                           });
-
-                                          // @see reactToCollectionSettingIdChange
                                           locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
-                                          // insert the section in the collection at the right place
                                           locationCandidate.collection.splice( position, 0, {
                                                 id : params.id,
                                                 level : 'section',
@@ -4473,8 +3274,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                               case 'sek-duplicate-section' :
-                                    //api.infoLog('PARAMS IN sek-duplicate-section', params );
-                                    // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
                                     }
@@ -4489,7 +3288,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     var _position_ = self.getLevelPositionInCollection( params.id, newSetValue.collection );
-                                    // Is this a nested sektion ?
                                     if ( true === params.is_nested ) {
                                           columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                           if ( 'no_match' == columnCandidate ) {
@@ -4510,17 +3308,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 break;
                                           }
                                           locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
-                                          // @see reactToCollectionSettingIdChange
                                           locationCandidate.collection.splice( parseInt( _position_ + 1, 10 ), 0, deepClonedSektion );
 
                                     }
                                     cloneId = deepClonedSektion.id;//will be passed in resolve()
                               break;
-
-                              // in the case of a nested sektion, we have to remove it from a column
-                              // otherwise from the root sektion collection
                               case 'sek-remove-section' :
-                                    //api.infoLog('PARAMS IN sek-remove-sektion', params );
                                     if ( true === params.is_nested ) {
                                           columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
                                           if ( 'no_match' != columnCandidate ) {
@@ -4545,7 +3338,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
                               case 'sek-move-section' :
-                                    //api.infoLog('PARAMS in sek-move-section', params );
                                     var toLocationCandidate = self.getLevelModel( params.to_location, newSetValue.collection ),
                                         movedSektionCandidate,
                                         copyOfMovedSektionCandidate;
@@ -4553,33 +3345,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( _.isEmpty( toLocationCandidate ) || 'no_match' == toLocationCandidate ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
                                     }
-
-                                    // MOVED CROSS LOCATIONS
-                                    // - make a copy of the moved sektion
-                                    // - remove the moved sektion from the source location
                                     if ( params.from_location != params.to_location ) {
-                                          // Remove the moved sektion from the source location
                                           var fromLocationCandidate = self.getLevelModel( params.from_location, newSetValue.collection );
                                           if ( _.isEmpty( fromLocationCandidate ) || 'no_match' == fromLocationCandidate ) {
                                                 throw new Error( 'updateAPISetting => ' + params.action + ' => missing source location' );
                                           }
 
                                           fromLocationCandidate.collection =  _.isArray( fromLocationCandidate.collection ) ? fromLocationCandidate.collection : [];
-                                          // Make a copy of the sektion candidate now, before removing it
                                           movedSektionCandidate = self.getLevelModel( params.id, fromLocationCandidate.collection );
                                           copyOfMovedSektionCandidate = $.extend( true, {}, movedSektionCandidate );
-                                          // remove the sektion from its previous sektion
                                           fromLocationCandidate.collection = _.filter( fromLocationCandidate.collection, function( sektion ) {
                                                 return sektion.id != params.id;
                                           });
                                     }
-
-                                    // UPDATE THE TARGET LOCATION
                                     toLocationCandidate.collection = _.isArray( toLocationCandidate.collection ) ? toLocationCandidate.collection : [];
                                     originalCollection = $.extend( true, [], toLocationCandidate.collection );
                                     reorderedCollection = [];
                                     _.each( params.newOrder, function( _id_ ) {
-                                          // in the case of a cross location movement, we need to add the moved sektion to the target location
                                           if ( params.from_location != params.to_location && _id_ == copyOfMovedSektionCandidate.id ) {
                                                 reorderedCollection.push( copyOfMovedSektionCandidate );
                                           } else {
@@ -4593,12 +3375,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     toLocationCandidate.collection = reorderedCollection;
 
                               break;
-
-
-                              // Fired on click on up / down arrows in the section ui menu
-                              // This handles the nested sections case
                               case 'sek-move-section-up-down' :
-                                    //api.infoLog('PARAMS in sek-move-section-up', params );
                                     parentCandidate = self.getLevelModel( params.is_nested ? params.in_column : params.location , newSetValue.collection );
                                     if ( _.isEmpty( parentCandidate ) || 'no_match' == parentCandidate ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
@@ -4610,17 +3387,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var _indexInOriginal = _.findIndex( originalCollection, function( _sec_ ) {
                                           return _sec_.id === params.id;
                                     });
-                                    // @see https://underscorejs.org/#findIndex
                                     if ( -1 === _indexInOriginal ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => invalid index' );
                                     }
-
-                                    // Swap up <=> down
                                     var direction = params.direction || 'up';
-
-                                    // prevent absurd movements of a section
-                                    // this should not happen because up / down arrows are not displayed when section is positionned top / bottom
-                                    // but safer to add it
                                     if ( 'up' !== direction && originalCollection.length === _indexInOriginal + 1 ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => bottom reached' );
                                     } else if ( 'up' === direction && 0 === _indexInOriginal ){
@@ -4631,19 +3401,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
                                     parentCandidate.collection = reorderedCollection;
                               break;
-
-
-
-
-
-
-
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- COLUMN
-                              //-------------------------------------------------------------------------------------------------
                               case 'sek-add-column' :
-                                    // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
                                     }
@@ -4655,13 +3413,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
-                                    // can we add another column ?
                                     if ( ( self.MAX_NUMBER_OF_COLUMNS - 1 ) < _.size( sektionCandidate.collection ) ) {
                                           __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]);
                                           break;
                                     }
-
-                                    // RESET ALL COLUMNS WIDTH
                                     _.each( sektionCandidate.collection, function( colModel ) {
                                           colModel.width = '';
                                     });
@@ -4677,7 +3432,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'sek-remove-column' :
                                     sektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' != sektionCandidate ) {
-                                          // can we remove the column ?
                                           if ( 1 === _.size( sektionCandidate.collection ) ) {
                                                 __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n["A section must have at least one column."]);
                                                 break;
@@ -4686,7 +3440,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           sektionCandidate.collection = _.filter( sektionCandidate.collection, function( column ) {
                                                 return column.id != params.id;
                                           });
-                                          // RESET ALL COLUMNS WIDTH
                                           _.each( sektionCandidate.collection, function( colModel ) {
                                                 colModel.width = '';
                                           });
@@ -4697,7 +3450,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
                               case 'sek-duplicate-column' :
-                                    // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
                                     }
@@ -4710,7 +3462,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
-                                    // can we add another column ?
                                     if ( ( self.MAX_NUMBER_OF_COLUMNS - 1 ) < _.size( sektionCandidate.collection ) ) {
                                           __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]);
                                           break;
@@ -4724,24 +3475,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var _position = self.getLevelPositionInCollection( params.id, newSetValue.collection );
                                     cloneId = deepClonedColumn.id;//will be passed in resolve()
                                     sektionCandidate.collection.splice( parseInt( _position + 1, 10 ), 0, deepClonedColumn );
-                                    // RESET ALL COLUMNS WIDTH
                                     _.each( sektionCandidate.collection, function( colModel ) {
                                           colModel.width = '';
                                     });
                               break;
-
-
-                              // Note : the css rules are generated in Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
                               case 'sek-resize-columns' :
                                     if ( params.col_number < 2 )
                                       break;
 
                                     var resizedColumn = self.getLevelModel( params.resized_column, newSetValue.collection ),
                                         sistercolumn = self.getLevelModel( params.sister_column, newSetValue.collection );
-
-                                    //api.infoLog( 'updateAPISetting => ' + params.action + ' => ', params );
-
-                                    // SET RESIZED COLUMN WIDTH
                                     if ( 'no_match' == resizedColumn ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no resized column matched' );
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no resized column matched');
@@ -4749,9 +3492,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     resizedColumn.width = parseFloat( params.resizedColumnWidthInPercent );
-
-
-                                    // SET OTHER COLUMNS WIDTH
                                     var parentSektion = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     var otherColumns = _.filter( parentSektion.collection, function( _col_ ) {
                                               return _col_.id != resizedColumn.id && _col_.id != sistercolumn.id;
@@ -4764,25 +3504,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 if ( ! _.has( colModel, 'width') || ! _.isNumber( currentColWidth * 1 ) || _.isEmpty( currentColWidth + '' ) || 1 > currentColWidth ) {
                                                       colModel.width = parseFloat( ( 100 / params.col_number ).toFixed(3) );
                                                 }
-                                                // sum up all other column's width, excluding the resized and sister one.
                                                 otherColumnsWidth = parseFloat( ( otherColumnsWidth  +  colModel.width ).toFixed(3) );
                                           });
                                     }
-
-
-                                    // SET SISTER COLUMN WIDTH
-
-                                    // sum up all other column's width, excluding the resized and sister one.
-                                    // api.infoLog( "resizedColumn.width", resizedColumn.width  );
-                                    // api.infoLog( "otherColumns", otherColumns );
-
-                                    // then calculate the sistercolumn so we are sure that we feel the entire space of the sektion
                                     sistercolumn.width = parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) );
-
-                                    // api.infoLog('otherColumnsWidth', otherColumnsWidth );
-                                    // api.infoLog("sistercolumn.width", sistercolumn.width );
-                                    // api.infoLog( "sistercolumn.width + otherColumnsWidth" , Number( sistercolumn.width ) + Number( otherColumnsWidth ) );
-                                    //api.infoLog('COLLECTION AFTER UPDATE ', parentSektion.collection );
                               break;
 
 
@@ -4798,32 +3523,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     if ( params.from_sektion != params.to_sektion ) {
-                                          // Remove the moved column from the source sektion
                                           var fromSektionCandidate = self.getLevelModel( params.from_sektion, newSetValue.collection );
                                           if ( _.isEmpty( fromSektionCandidate ) || 'no_match' == fromSektionCandidate ) {
                                                 throw new Error( 'updateAPISetting => ' + params.action + ' => missing source column' );
                                           }
 
                                           fromSektionCandidate.collection =  _.isArray( fromSektionCandidate.collection ) ? fromSektionCandidate.collection : [];
-                                          // Make a copy of the column candidate now, before removing it
                                           movedColumnCandidate = self.getLevelModel( params.id, fromSektionCandidate.collection );
                                           copyOfMovedColumnCandidate = $.extend( true, {}, movedColumnCandidate );
-                                          // remove the column from its previous sektion
                                           fromSektionCandidate.collection = _.filter( fromSektionCandidate.collection, function( column ) {
                                                 return column.id != params.id;
                                           });
-                                          // Reset the column's width in the target sektion
                                           _.each( fromSektionCandidate.collection, function( colModel ) {
                                                 colModel.width = '';
                                           });
                                     }
-
-                                    // update the target sektion
                                     toSektionCandidate.collection =  _.isArray( toSektionCandidate.collection ) ? toSektionCandidate.collection : [];
                                     originalCollection = $.extend( true, [], toSektionCandidate.collection );
                                     reorderedCollection = [];
                                     _.each( params.newOrder, function( _id_ ) {
-                                          // in the case of a cross sektion movement, we need to add the moved column to the target sektion
                                           if ( params.from_sektion != params.to_sektion && _id_ == copyOfMovedColumnCandidate.id ) {
                                                 reorderedCollection.push( copyOfMovedColumnCandidate );
                                           } else {
@@ -4835,34 +3553,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }
                                     });
                                     toSektionCandidate.collection = reorderedCollection;
-
-                                    // Reset the column's width in the target sektion
                                     _.each( toSektionCandidate.collection, function( colModel ) {
                                           colModel.width = '';
                                     });
 
                               break;
-
-
-
-
-
-
-
-
-
-
-
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- MODULE
-                              //-------------------------------------------------------------------------------------------------
                               case 'sek-add-module' :
-                                    // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
                                     }
-                                    // a module_type must be provided
                                     if ( _.isEmpty( params.module_type ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing module_type' );
                                     }
@@ -4875,7 +3574,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     var position = 0;
                                     columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                    // get the position of the before or after module
                                     _.each( columnCandidate.collection, function( moduleModel, index ) {
                                           if ( params.before_module === moduleModel.id ) {
                                                 position = index;
@@ -4891,7 +3589,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           module_type : params.module_type,
                                           ver_ini : sektionsLocalizedData.nimbleVersion
                                     };
-                                    // Let's add the starting value if provided when registrating the module
                                     startingModuleValue = self.getModuleStartingValue( params.module_type );
                                     if ( 'no_starting_value' !== startingModuleValue ) {
                                           _moduleParams.value = startingModuleValue;
@@ -4901,7 +3598,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
                               case 'sek-duplicate-module' :
-                                    // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
                                     }
@@ -4927,7 +3623,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
                               case 'sek-remove-module' :
-                                    // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
                                     }
@@ -4947,23 +3642,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var toColumnCandidate,
                                         movedModuleCandidate,
                                         copyOfMovedModuleCandidate;
-
-                                    // loop on the sektions to find the toColumnCandidate
-                                    // _.each( newSetValue.collection, function( _sektion_ ) {
-                                    //       _.each( _sektion_.collection, function( _column_ ) {
-                                    //             if ( _column_.id == params.to_column ) {
-                                    //                  toColumnCandidate = _column_;
-                                    //             }
-                                    //       });
-                                    // });
                                     toColumnCandidate = self.getLevelModel( params.to_column, newSetValue.collection );
 
                                     if ( _.isEmpty( toColumnCandidate ) || 'no_match' == toColumnCandidate ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing target column' );
                                     }
-
-                                    // If the module has been moved to another column
-                                    // => remove the moved module from the source column
                                     if ( params.from_column != params.to_column ) {
                                           var fromColumnCandidate;
                                           fromColumnCandidate = self.getLevelModel( params.from_column, newSetValue.collection );
@@ -4973,16 +3656,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }
 
                                           fromColumnCandidate.collection =  _.isArray( fromColumnCandidate.collection ) ? fromColumnCandidate.collection : [];
-                                          // Make a copy of the module candidate now, before removing it
                                           movedModuleCandidate = self.getLevelModel( params.id, newSetValue.collection );
                                           copyOfMovedModuleCandidate = $.extend( true, {}, movedModuleCandidate );
-                                          // remove the module from its previous column
                                           fromColumnCandidate.collection = _.filter( fromColumnCandidate.collection, function( module ) {
                                                 return module.id != params.id;
                                           });
                                     }// if params.from_column != params.to_column
-
-                                    // update the target column
                                     toColumnCandidate.collection =  _.isArray( toColumnCandidate.collection ) ? toColumnCandidate.collection : [];
                                     originalCollection = $.extend( true, [], toColumnCandidate.collection );
                                     reorderedCollection = [];
@@ -4997,7 +3676,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 reorderedCollection.push( moduleCandidate );
                                           }
                                     });
-                                    // Check if we have duplicates ?
                                     if ( reorderedCollection.length != _.uniq( reorderedCollection ).length ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => there are duplicated modules in column : ' + toColumnCandidate.id );
                                     } else {
@@ -5010,11 +3688,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     moduleCandidate = self.getLevelModel( params.id, newSetValue.collection );
 
                                     var _value_ = {};
-                                    // consider only the non empty settings for db
-                                    // booleans should bypass this check
                                     _.each( params.value || {}, function( _val_, _key_ ) {
-                                          // Note : _.isEmpty( 5 ) returns true when checking an integer,
-                                          // that's why we need to cast the _val_ to a string when using _.isEmpty()
                                           if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
                                             return;
                                           _value_[ _key_ ] = _val_;
@@ -5029,10 +3703,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => missing options_type');
                                           break;
                                     }
-
-                                    // Is this a father module ?
-                                    // If yes, the module value is structured by option group, each option group being updated by a child module
-                                    // If no, the default option type is : '__no_option_group_to_be_updated_by_children_modules__'
                                     if ( '__no_option_group_to_be_updated_by_children_modules__' === params.options_type ) {
                                           moduleCandidate.value = _value_;
                                     } else {
@@ -5041,15 +3711,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                               break;
-
-
-
-
-
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- LEVEL OPTIONS
-                              //-------------------------------------------------------------------------------------------------
                               case 'sek-generate-level-options-ui' :
                                     var _candidate_ = self.getLevelModel( params.id, newSetValue.collection ),
                                         _valueCandidate = {};
@@ -5059,12 +3720,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }
                                     _candidate_.options = _candidate_.options || {};
-
-                                    // consider only the non empty settings for db
-                                    // booleans should bypass this check
                                     _.each( params.value || {}, function( _val_, _key_ ) {
-                                          // Note : _.isEmpty( 5 ) returns true when checking an integer,
-                                          // that's why we need to cast the _val_ to a string when using _.isEmpty()
                                           if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
                                             return;
                                           _valueCandidate[ _key_ ] = _val_;
@@ -5074,24 +3730,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                                     _candidate_.options[ params.options_type ] = _valueCandidate;
                               break;
-
-
-
-
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- LOCAL SKOPE OPTIONS
-                              //-------------------------------------------------------------------------------------------------
-                              // Note : this is saved in "local_options"
                               case 'sek-generate-local-skope-options-ui' :
                                     _valueCandidate = {};
 
                                     var _currentOptions = $.extend( true, {}, _.isObject( newSetValue.local_options ) ? newSetValue.local_options : {} );
-                                    // consider only the non empty settings for db
-                                    // booleans should bypass this check
                                     _.each( params.value || {}, function( _val_, _key_ ) {
-                                          // Note : _.isEmpty( 5 ) returns true when checking an integer,
-                                          // that's why we need to cast the _val_ to a string when using _.isEmpty()
                                           if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
                                             return;
                                           _valueCandidate[ _key_ ] = _val_;
@@ -5104,33 +3747,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           newSetValue.local_options = $.extend( _currentOptions, newOptionsValues );
                                     }
                               break;
-
-
-
-
-
-
-
-
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- CONTENT IN NEW SEKTION
-                              //-------------------------------------------------------------------------------------------------
-                              // @params {
-                              //   drop_target_element : $(this),
-                              //   position : _position,// <= top or bottom
-                              //   before_section : $(this).data('sek-before-section'),
-                              //   after_section : $(this).data('sek-after-section'),
-                              //   content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ), //<= module or preset_section
-                              //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                              // }
                               case 'sek-add-content-in-new-sektion' :
-                                    // api.infoLog('update API Setting => sek-add-content-in-new-sektion => PARAMS', params );
-                                    // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
                                     }
-                                    // get the position of the before or after section
                                     position = 0;
                                     locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                     if ( 'no_match' == locationCandidate ) {
@@ -5149,13 +3769,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
 
                                     switch( params.content_type) {
-                                          // When a module is dropped in a section + column structure to be generated
                                           case 'module' :
-                                                // Let's add the starting value if provided when registrating the module
-                                                // Note : params.content_id is the module_type
                                                 startingModuleValue = self.getModuleStartingValue( params.content_id );
-
-                                                // insert the section in the collection at the right place
                                                 locationCandidate.collection.splice( position, 0, {
                                                       id : params.id,
                                                       level : 'section',
@@ -5178,25 +3793,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       ver_ini : sektionsLocalizedData.nimbleVersion
                                                 });
                                           break;
-
-                                          // When a preset section is dropped
                                           case 'preset_section' :
-                                                // insert the section in the collection at the right place
                                                 __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
 
                                                 var _doWhenPresetSectionCollectionFetched = function( presetColumnCollection ) {
                                                       self.preparePresetSectionForInjection( presetColumnCollection )
                                                             .fail( function( _er_ ){
                                                                   __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
-                                                                  // Used when updating the setting
-                                                                  // @see end of this method
                                                                   __presetSectionInjected__.reject( _er_ );
                                                             })
                                                             .done( function( sectionReadyToInject ) {
-                                                                  //api.infoLog( 'sectionReadyToInject', sectionReadyToInject );
-
-                                                                  // If the preset_section is inserted in a an empty nested section, add it at the right place in the parent column of the nested section.
-                                                                  // Otherwise, add the preset section at the right position in the parent location of the section.
                                                                   var insertedInANestedSektion = false;
                                                                   if ( ! _.isEmpty( params.sektion_to_replace ) ) {
                                                                         var sektionToReplace = self.getLevelModel( params.sektion_to_replace, newSetValue.collection );
@@ -5223,7 +3829,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         }
 
                                                                         columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                                                        // get the position of the before or after module
                                                                         _.each( columnCandidate.collection, function( moduleOrSectionModel, index ) {
                                                                               if ( params.before_section === moduleOrSectionModel.id ) {
                                                                                     position = index;
@@ -5241,16 +3846,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                               ver_ini : sektionsLocalizedData.nimbleVersion
                                                                         });
                                                                   }
-
-                                                                  // Used when updating the setting
-                                                                  // @see end of this method
                                                                   __presetSectionInjected__.resolve();
                                                             });// self.preparePresetSectionForInjection.done()
                                                 };//_doWhenPresetSectionCollectionFetched()
-
-
-                                                // Try to fetch the sections from the server
-                                                // if sucessfull, resolve __presetSectionInjected__.promise()
                                                 self.getPresetSectionCollection({
                                                             is_user_section : params.is_user_section,
                                                             presetSectionId : params.content_id,
@@ -5265,36 +3863,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnCollection );
                                                                   __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                                             }
-                                                            // OK. time to resolve __presetSectionInjected__.promise()
                                                             _doWhenPresetSectionCollectionFetched( presetColumnCollection );
                                                       });//self.getPresetSectionCollection().done()
                                           break;
                                     }//switch( params.content_type)
                               break;
-
-
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- CONTENT IN NEW NESTED SEKTION
-                              //-------------------------------------------------------------------------------------------------
-                              // @params {
-                              //   drop_target_element : $(this),
-                              //   position : _position,// <= top or bottom
-                              //   before_section : $(this).data('sek-before-section'),
-                              //   after_section : $(this).data('sek-after-section'),
-                              //   content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ), //<= module or preset_section
-                              //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                              // }
                               case 'sek-add-preset-section-in-new-nested-sektion' :
-                                    // an id must be provided
                                     if ( _.isEmpty( params.id ) ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
                                     }
 
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-
-                                    // can we add this nested sektion ?
-                                    // if the parent sektion of the column has is_nested = true, then we can't
                                     parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
                                     if ( 'no_match' == parentSektionCandidate ) {
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
@@ -5310,8 +3889,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }
                                     columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-
-                                    // insert the section in the collection at the right place
                                     var presetColumnCollection;
                                     __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
 
@@ -5319,8 +3896,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           self.preparePresetSectionForInjection( presetColumnCollection )
                                                 .fail( function( _er_ ){
                                                       __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
-                                                      // Used when updating the setting
-                                                      // @see end of this method
                                                       __presetSectionInjected__.reject( _er_ );
                                                 })
                                                 .done( function( sectionReadyToInject ) {
@@ -5332,16 +3907,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             is_nested : true,
                                                             ver_ini : sektionsLocalizedData.nimbleVersion
                                                       });
-
-                                                      // Used when updating the setting
-                                                      // @see end of this method
                                                       __presetSectionInjected__.resolve();
                                                 });//self.preparePresetSectionForInjection.done()
                                     };//_doWhenPresetSectionCollectionFetched
-
-
-                                    // Try to fetch the sections from the server
-                                    // if sucessfull, resolve __presetSectionInjected__.promise()
                                     self.getPresetSectionCollection({
                                                 is_user_section : params.is_user_section,
                                                 presetSectionId : params.content_id,
@@ -5356,32 +3924,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnCollection );
                                                       __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                                 }
-                                                // OK. time to resolve __presetSectionInjected__.promise()
                                                 _doWhenPresetSectionCollectionFetched( presetColumnCollection );
                                           });//self.getPresetSectionCollection().done()
                               break;
-
-
-
-
-
-
-
-
-
-
-
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- POPULATE GOOGLE FONTS
-                              //-------------------------------------------------------------------------------------------------
-                              //@params {
-                              //       action : 'sek-update-fonts',
-                              //       font_family : newFontFamily,
-                              // }
                               case 'sek-update-fonts' :
-                                    // Get the gfonts from the level options and modules values
-                                    var currentGfonts = self.sniffGFonts( { is_global_location : params && true === params.is_global_location } );
+                                    var currentGfonts = self.sniffGFonts( { is_global_location : ( params && true === params.is_global_location ) } );
                                     if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
                                           if ( params.font_family.indexOf('gfont') < 0 ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
@@ -5390,50 +3937,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }
                                           currentGfonts.push( params.font_family );
                                     }
-                                    // update the global gfonts collection
-                                    // this is then used server side in Sek_Dyn_CSS_Handler::sek_get_gfont_print_candidates to build the Google Fonts request
                                     newSetValue.fonts = currentGfonts;
                               break;
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- RESTORE A REVISION
-                              //-------------------------------------------------------------------------------------------------
                               case 'sek-restore-revision' :
-                                    //api.infoLog( 'sek-restore-revision', params );
                                     newSetValue = params.revision_value;
                               break;
+                              case 'sek-import-from-file' :
+                                    newSetValue = params.imported_data;
+                              break;
+                              case 'sek-reset-collection' :
+                                    try { newSetValue = api.czr_sektions.resetCollectionSetting( params.scope ); } catch( er ) {
+                                          api.errare( 'sek-reset-collection => error when firing resetCollectionSetting()', er );
+                                    }
+                              break;
                         }// switch
-
-
-
-                        // if we did not already rejected the request, let's check if the setting object has actually been modified
-                        // at this point it should have been.
                         if ( 'pending' == __updateAPISettingDeferred__.state() ) {
                               var mayBeUpdateSektionsSetting = function() {
                                     if ( _.isEqual( currentSetValue, newSetValue ) ) {
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
-                                          if ( null !== self.validateSettingValue( newSetValue ) ) {
+                                          if ( null !== self.validateSettingValue( newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
                                                 api( _collectionSettingId_ )( newSetValue, params );
-                                                // Add the cloneId to the params when we resolve
-                                                // the cloneId is only needed in the duplication scenarii
                                                 params.cloneId = cloneId;
                                                 __updateAPISettingDeferred__.resolve( params );
                                           } else {
                                                 __updateAPISettingDeferred__.reject( 'Validation problem for action ' + params.action );
                                           }
-                                          //api.infoLog('COLLECTION SETTING UPDATED => ', _collectionSettingId_, api( _collectionSettingId_ )() );
                                     }
                               };//mayBeUpdateSektionsSetting()
-
-                              // For all scenarios but section injection, we can update the sektion setting now
-                              // otherwise we need to wait for the injection to be processed asynchronously
-                              // CRITICAL => __updateAPISettingDeferred__ has to be resolved / rejected
-                              // otherwise this can lead to scenarios where a change is not taken into account in ::updateAPISettingAndExecutePreviewActions
-                              // like in https://github.com/presscustomizr/nimble-builder/issues/373
                               if ( '_not_injection_scenario_' === __presetSectionInjected__ ) {
                                     mayBeUpdateSektionsSetting();
-                                    // At this point the __updateAPISettingDeferred__ obj can't be in a 'pending' state
                                     if ( 'pending' === __updateAPISettingDeferred__.state() ) {
                                           api.errare( '::updateAPISetting => The __updateAPISettingDeferred__ promise has not been resolved properly.');
                                     }
@@ -5441,7 +3974,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     __presetSectionInjected__
                                           .done( function() {
                                                mayBeUpdateSektionsSetting();
-                                               // At this point the __updateAPISettingDeferred__ obj can't be in a 'pending' state
                                                if ( 'pending' === __updateAPISettingDeferred__.state() ) {
                                                     api.errare( '::updateAPISetting => The __updateAPISettingDeferred__ promise has not been resolved properly.');
                                                }
@@ -5452,24 +3984,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         }
                   };//_do_update_setting_id()
-
-
-                  // Update the sektion collection
                   api( _collectionSettingId_, function( sektionSetInstance ) {
                         _do_update_setting_id();
                   });
                   return __updateAPISettingDeferred__.promise();
             },//updateAPISetting
-
-
-
-            // @return a promise()
-            // caches the sections in api.sek_presetSections when api.section( '__content_picker__') is registered
-            // caches the user saved sections on the first drag and drop of a user-saved section
-            // @params {
-            //  is_user_section : sectionParams.is_user_section
-            //  preset_section_id : '' <= used for user_saved section
-            // }
             _maybeFetchSectionsFromServer : function( params ) {
                   var dfd = $.Deferred(),
                       _ajaxRequest_;
@@ -5490,7 +4009,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.sek_fetchingUserSavedSections = _ajaxRequest_;
                               }
                               _ajaxRequest_.done( function( _sectionData_ ) {
-                                    //api.sek_presetSections = JSON.parse( _collection_ );
                                     api.sek_userSavedSections[ params.preset_section_id ] = _sectionData_;
                                     dfd.resolve( api.sek_userSavedSections );
                               }).fail( function( _r_ ) {
@@ -5508,7 +4026,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.sek_fetchingPresetSections = _ajaxRequest_;
                               }
                               _ajaxRequest_.done( function( _collection_ ) {
-                                    //api.sek_presetSections = JSON.parse( _collection_ );
                                     api.sek_presetSections = _collection_;
                                     dfd.resolve( api.sek_presetSections );
                               }).fail( function( _r_ ) {
@@ -5519,24 +4036,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   return dfd.promise();
             },
-
-
-
-
-            // First run : fetches the collection from the server
-            // Next runs : uses the cached collection
-            //
-            // @return a JSON parsed string,
-            // + guid() ids for each levels
-            // ready for insertion
-            //
-            // @sectionParams : {
-            //       is_user_section : bool, //<= is this section a "saved" section ?
-            //       presetSectionId : params.content_id,
-            //       section_id : params.id
-            // }
-            // Why is the section_id provided ?
-            // Because this id has been generated ::reactToPreviewMsg, case "sek-add-section", and is the identifier that we'll need when ajaxing ( $_POST['id'])
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
                       __dfd__ = $.Deferred();
@@ -5549,7 +4048,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               __dfd__.reject( er );
                         })
                         .done( function( _collection_ ) {
-                              //api.infoLog( 'preset_sections fetched', api.sek_presetSections );
                               var presetSection,
                                   allPresets = $.extend( true, {}, _.isObject( _collection_ ) ? _collection_ : {} );
 
@@ -5560,12 +4058,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
                               }
                               var presetCandidate = allPresets[ sectionParams.presetSectionId ];
-
-                              // Ensure we have a string that's JSON.parse-able
-                              // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
-                              //       throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
-                              // }
-                              // presetCandidate = JSON.parse( presetCandidate );
 
                               var setIds = function( collection ) {
                                     _.each( collection, function( levelData ) {
@@ -5586,44 +4078,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                                     return collection;
                               };
-
-                              // ID's
-                              // set the section id provided.
                               presetCandidate.id = sectionParams.section_id;
-                              // the other level's id have to be generated
                               presetCandidate.collection = setIds( presetCandidate.collection );
-
-                              // NIMBLE VERSION
-                              // set the section version
                               presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
-                              // the other level's version have to be added
                               presetCandidate.collection = setVersion( presetCandidate.collection );
                               __dfd__.resolve( presetCandidate );
                         });//_maybeFetchSectionsFromServer.done()
 
                   return __dfd__.promise();
             },
-
-
-
-
-            // Walk the column collection of a preset section, and replace '::img-path::*' pattern by image ids that we get from ajax calls
-            // Is designed to handle multiple ajax calls in parallel if the preset_section includes several images
-            // @return a promise()
             preparePresetSectionForInjection : function( columnCollection ) {
                 var self = this,
                     deferreds = {},
                     preparedSection = {},
                     _dfd_ = $.Deferred();
-
-                // walk the column collection and populates the deferreds object recursively
                 var _sniffImg = function( data ) {
                       _.each( data, function( val, key ) {
                             if ( _.isObject( val ) || _.isArray( val ) ) {
                                   _sniffImg( val );
                             } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) ) {
-                                  // scenario when a section uses an image more than once.
-                                  // => we don't need to fire a new ajax request for an image already sniffed
                                   if ( ! _.has( deferreds, val ) ) {
                                         deferreds[ val ] = self.importAttachment( val.replace( '::img-path::', '' ) );
                                   }
@@ -5631,12 +4104,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       });
                       return deferreds;
                 };
-
-                // walk the column collection and populates the deferreds object recursively
-                // imdList is formed this way :
-                // ::img-path::/assets/img/1.jpg : {id: 2547, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_1.jpg"}
-                // ::img-path::/assets/img/2.jpg : {id: 2548, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_2.jpg"}
-                // ::img-path::/assets/img/3.jpg : {id: 2549, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_3.jpg"}
                 var _replaceImgPlaceholderById = function( data, imgList) {
                       _.each( data, function( val, key ) {
                             if ( _.isObject( val ) || _.isArray( val ) ) {
@@ -5664,20 +4131,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            //@return void()
-            // clean registered controls, sections, panels
-            // only elements that have a true "track" param on registration are populated in the registered() collection
-            // if the _id_ param is not specified, all registered controls, sections and panels are removed.
-            //
-            // preserve the settings => because this is where the customizer changeset of values is persisted before publishing
-            // typically fired before updating the ui. @see ::generateUI()
             cleanRegistered : function( _id_ ) {
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
-
-                  // added for https://github.com/presscustomizr/nimble-builder/issues/403
-                  // in order to remove all instantiations of WP editor
-                  // @see ::initialize()
                   api.trigger('sek-before-clean-registered');
 
                   registered = _.filter( registered, function( _reg_ ) {
@@ -5685,14 +4141,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( api[ _reg_.what ].has( _reg_.id ) ) {
                                     if ( ! _.isEmpty( _id_ ) && _reg_.id !== _id_ )
                                       return;
-                                    // fire an event before removal, can be used to clean some jQuery plugin instance for example
                                     if (  _.isFunction( api[ _reg_.what ]( _reg_.id ).trigger ) ) {//<= Section and Panel constructor are not extended with the Event class, that's why we check if this method exists
                                            self.trigger( 'sek-ui-pre-removal', { what : _reg_.what, id : _reg_.id } );
                                     }
                                     $.when( api[ _reg_.what ]( _reg_.id ).container.remove() ).done( function() {
-                                          // remove control, section, panel
                                           api[ _reg_.what ].remove( _reg_.id );
-                                          // useful event, used to destroy the $ drop plugin instance for the section / module picker
                                           self.trigger( 'sek-ui-removed', { what : _reg_.what, id : _reg_.id } );
                                     });
                               }
@@ -5701,18 +4154,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   self.registered( registered );
             },
-
-            // Keep only the settings for global option, local options, content picker
-            // Remove all the other
             cleanRegisteredLevelSettingsAfterHistoryNavigation : function() {
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
 
                   registered = _.filter( registered, function( _reg_ ) {
-                        // We check if the level property is set, so we preserve the permanent options like global options, local options, content picker
                         if ( ! _.isEmpty( _reg_.level ) && 'setting' === _reg_.what ) {
                               if ( api.has( _reg_.id ) ) {
-                                    // remove setting from the api
                                     api.remove( _reg_.id );
                               }
                         }
@@ -5726,9 +4174,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            // @eturn void()
             rootPanelFocus : function() {
-                  //close everything
                   if ( api.section.has( api.czr_activeSectionId() ) ) {
                         api.section( api.czr_activeSectionId() ).expanded( false );
                   } else {
@@ -5740,8 +4186,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _p.expanded( false );
                   });
             },
-
-            //@return a global unique identifier
             guid : function() {
                   function s4() {
                         return Math.floor((1 + Math.random()) * 0x10000)
@@ -5750,31 +4194,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   return s4() + s4() + s4();//s4() + s4() + s4() + s4() + s4() + s4();
             },
-
-            //@return a string "nimble___[skp__global]"
             getGlobalSectionsSettingId : function() {
                   return sektionsLocalizedData.settingIdForGlobalSections;
             },
-
-            // @params = { id : '', level : '' }
-            // Recursively walk the level tree until a match is found
-            // @return the level model object
             getLevelModel : function( id, collection ) {
                   var self = this, _data_ = 'no_match',
-                      // @param id mandatory
-                      // @param collection mandatory
-                      // @param collectionSettingId optional
-                      // @param localOrGlobal optional
                       _walk_ = function( id, collection, collectionSettingId, localOrGlobal ) {
-                            // do we have a collection ?
-                            // if not, let's use the root one
                             if ( _.isUndefined( collection ) ) {
                                   var currentSektionSettingValue = api( collectionSettingId )();
                                   var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
                                   collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
                             }
                             _.each( collection, function( levelData ) {
-                                  // did we found a match recursively ?
                                   if ( 'no_match' != _data_ )
                                     return;
                                   if ( id === levelData.id ) {
@@ -5787,9 +4218,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             });
                             return _data_;
                       };
-
-                  // if a collection has been provided in the signature, let's walk it.
-                  // Otherwise, let's walk the local and global ones until a match is found.
                   if ( ! _.isEmpty( collection ) ) {
                         _walk_( id, collection );
                   } else {
@@ -5805,17 +4233,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   return _data_;
             },
-
-
-            // used in react to preview or update api settings
-            // @params is an object {
-            //
-            // }
             isGlobalLocation : function( params ) {
                   var self = this, is_global_location = false;
                   params = params || {};
                   if ( _.has( params, 'is_global_location' ) ) {
                         is_global_location = params.is_global_location;
+                  } else if ( _.has( params, 'scope' ) ) {
+                        is_global_location = 'global' === params.scope;
                   } else if ( !_.isEmpty( params.location ) ) {
                         is_global_location = self.isChildOfAGlobalLocation( params.location );
                   } else if ( !_.isEmpty( params.in_sektion ) ) {
@@ -5825,23 +4249,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   return is_global_location;
             },
-
-            // @params = { id : '', level : '' }
-            // Recursively walk the level tree until a match is found
-            // @return the level model object
             isChildOfAGlobalLocation : function( id ) {
                   var self = this,
                       walkCollection = function( id, collection ) {
                             var _data_ = 'no_match';
-                            // do we have a collection ?
-                            // if not, let's use the root global one
                             if ( _.isUndefined( collection ) ) {
                                   var currentSettingValue = api( self.getGlobalSectionsSettingId() )();
                                   var sektionSettingValue = _.isObject( currentSettingValue ) ? $.extend( true, {}, currentSettingValue ) : self.getDefaultSektionSettingValue( 'global' );
                                   collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
                             }
                             _.each( collection, function( levelData ) {
-                                  // did we found a match recursively ?
                                   if ( 'no_match' != _data_ )
                                     return;
                                   if ( id === levelData.id ) {
@@ -5860,20 +4277,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             getLevelPositionInCollection : function( id, collection ) {
                   var self = this, _position_ = 'no_match',
-                  // @param id mandatory
-                  // @param collection mandatory
-                  // @param collectionSettingId optional
-                  // @param localOrGlobal optional
                   _walk_ = function( id, collection, collectionSettingId, localOrGlobal ) {
-                        // do we have a collection ?
-                        // if not, let's use the root one
                         if ( _.isUndefined( collection ) ) {
                               var currentSektionSettingValue = api( collectionSettingId )();
                               var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
                               collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
                         }
                         _.each( collection, function( levelData, _key_ ) {
-                              // did we find a match recursively ?
                               if ( 'no_match' != _position_ )
                                 return;
                               if ( id === levelData.id ) {
@@ -5885,9 +4295,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   };
-
-                  // if a collection has been provided in the signature, let's walk it.
-                  // Otherwise, let's walk the local and global ones until a match is found.
                   if ( ! _.isEmpty( collection ) ) {
                         _walk_( id, collection );
                   } else {
@@ -5902,10 +4309,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   return _position_;
             },
-
-
-            // @params = { property : 'options', id :  }
-            // @return mixed type
             getLevelProperty : function( params ) {
                   params = _.extend( {
                         id : '',
@@ -5928,8 +4331,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   return modelCandidate[ params.property ];
             },
-
-            // @return a detached clone of a given level model, with new unique ids
             cloneLevel : function( levelId ) {
                   var self = this;
                   var levelModelCandidate = self.getLevelModel( levelId );
@@ -5937,12 +4338,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         throw new Error( 'cloneLevel => no match for level id : ' + levelId );
                   }
                   var deepClonedLevel = $.extend( true, {}, levelModelCandidate );
-                  // recursive
                   var newIdWalker = function( level_model ) {
                         if ( _.isEmpty( level_model.id ) ) {
                             throw new Error( 'cloneLevel => missing level id');
                         }
-                        // No collection, we've reach the end of a branch
                         level_model.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
                         if ( ! _.isEmpty( level_model.collection ) ) {
                               if ( ! _.isArray( level_model.collection ) ) {
@@ -5955,37 +4354,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         return level_model;
                   };
-                  // recursively walk the provided level sub-tree until all collection ids are updated
                   return newIdWalker( deepClonedLevel );
             },
-
-            // Extract the default model values from the server localized registered module
-            // Invoked when registrating a module in api.czrModuleMap
-            // For example :
-            // czr_image_module : {
-            //       mthds : ImageModuleConstructor,
-            //       crud : false,
-            //       name : 'Image',
-            //       has_mod_opt : false,
-            //       ready_on_section_expanded : true,
-            //       defaultItemModel : _.extend(
-            //             { id : '', title : '' },
-            //             api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_image_module' )
-            //       )
-            // },
-            // @return {}
             getDefaultItemModelFromRegisteredModuleData : function( moduleType ) {
                   if ( ! this.isModuleRegistered( moduleType ) ) {
                         return {};
                   }
-                  // This method should normally not be invoked for a father module type
                   if ( sektionsLocalizedData.registeredModules[moduleType].is_father ) {
                         api.errare( 'getDefaultItemModelFromRegisteredModuleData => Father modules should be treated specifically' );
                         return;
                   }
                   var data = sektionsLocalizedData.registeredModules[ moduleType ].tmpl['item-inputs'],
-                      // title, id are always included in the defaultItemModel but those properties don't need to be saved in database
-                      // title and id are legacy entries that can be used in multi-items modules to identify and name the item
                       defaultItemModel = {
                             id : '',
                             title : ''
@@ -6008,29 +4387,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   return defaultItemModel;
             },
-
-            //@return mixed
             getRegisteredModuleProperty : function( moduleType, property ) {
                   if ( ! this.isModuleRegistered( moduleType ) ) {
                         return 'not_set';
                   }
                   return sektionsLocalizedData.registeredModules[ moduleType ][ property ];
             },
-
-            // @return boolean
             isModuleRegistered : function( moduleType ) {
                   return sektionsLocalizedData.registeredModules && ! _.isUndefined( sektionsLocalizedData.registeredModules[ moduleType ] );
             },
-
-
-            // Walk the main sektion setting and populate an array of google fonts
-            // This method is used when processing the 'sek-update-fonts' action to update the .fonts property
-            // To be a candidate for sniffing, an input font value  should meet those criteria :
-            // 1) be the value of a '{...}_css' input id
-            // 2) this input must be a font modifier ( @see 'refresh_fonts' params set on parent module registration )
-            // 2) the font should start with [gfont]
-            // @param args { is_global_location : bool }
-            // @return array
             sniffGFonts : function( args ) {
                   args = args || { is_global_location : false };
                   var self = this,
@@ -6041,7 +4406,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
                         }
                         _.each( level, function( levelData, _key_ ) {
-                              // example of input_id candidate 'font_family_css'
                               if ( _.isString( _key_ ) && '_css' === _key_.substr( _key_.length - 4 ) ) {
                                     if ( true === self.inputIsAFontFamilyModifier( _key_ ) ) {
                                           if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
@@ -6063,26 +4427,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   return gfonts;
             },
-
-
-
-
-
-
-
-
-            //-------------------------------------------------------------------------------------------------
-            // <RECURSIVE UTILITIES USING THE sektionsLocalizedData.registeredModules>
-            //-------------------------------------------------------------------------------------------------
-            // Invoked when updating a setting value => in normalizeAndSanitizeSingleItemInputValues(), when doing updateAPISettingAndExecutePreviewActions()
-            // @return a mixed type default value
-            // @param input_id string
-            // @param module_type string
-            // @param level array || object
             getInputDefaultValue : function( input_id, module_type, level ) {
                   var self = this;
-
-                  // Do we have a cached default value ?
                   self.cachedDefaultInputValues = self.cachedDefaultInputValues || {};
                   self.cachedDefaultInputValues[ module_type ] = self.cachedDefaultInputValues[ module_type ] || {};
                   if ( _.has( self.cachedDefaultInputValues[ module_type ], input_id ) ) {
@@ -6096,7 +4442,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getInputDefaultValue => missing ' + module_type + ' in sektionsLocalizedData.registeredModules' );
                         return;
                   }
-                  // This method should normally not be invoked for a father module type
                   if ( sektionsLocalizedData.registeredModules[module_type].is_father ) {
                         api.errare( 'getInputDefaultValue => Father modules should be treated specifically' );
                         return;
@@ -6106,34 +4451,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   var _defaultVal_ = 'no_default_value_specified';
                   _.each( level, function( levelData, _key_ ) {
-                        // we found a match skip next levels
                         if ( 'no_default_value_specified' !== _defaultVal_ )
                           return;
                         if ( input_id === _key_ && ! _.isUndefined( levelData.default ) ) {
                               _defaultVal_ = levelData.default;
                         }
-                        // if we have still no match, and the data are sniffable, let's go ahead recursively
                         if ( 'no_default_value_specified' === _defaultVal_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
                               _defaultVal_ = self.getInputDefaultValue( input_id, module_type, levelData );
                         }
                         if ( 'no_default_value_specified' !== _defaultVal_ ) {
-                            // cache it
                             self.cachedDefaultInputValues[ module_type ][ input_id ] = _defaultVal_;
                         }
                   });
                   return _defaultVal_;
             },
-
-
-
-            // @return input_type string
-            // @param input_id string
-            // @param module_type string
-            // @param level array || object
             getInputType : function( input_id, module_type, level ) {
                   var self = this;
-
-                  // Do we have a cached default value ?
                   self.cachedInputTypes = self.cachedInputTypes || {};
                   self.cachedInputTypes[ module_type ] = self.cachedInputTypes[ module_type ] || {};
                   if ( _.has( self.cachedInputTypes[ module_type ], input_id ) ) {
@@ -6156,36 +4489,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   var _inputType_ = 'no_input_type_specified';
                   _.each( level, function( levelData, _key_ ) {
-                        // we found a match skip next levels
                         if ( 'no_input_type_specified' !== _inputType_ )
                           return;
                         if ( input_id === _key_ && ! _.isUndefined( levelData.input_type ) ) {
                               _inputType_ = levelData.input_type;
                         }
-                        // if we have still no match, and the data are sniffable, let's go ahead recursively
                         if ( 'no_input_type_specified' === _inputType_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
                               _inputType_ = self.getInputType( input_id, module_type, levelData );
                         }
                         if ( 'no_input_type_specified' !== _inputType_ ) {
-                              // cache it
                               self.cachedInputTypes[ module_type ][ input_id ] = _inputType_;
                         }
                   });
                   return _inputType_;
             },
-
-
-            // Invoked when :
-            // 1) updating a setting value, in ::updateAPISettingAndExecutePreviewActions()
-            // 2) we need to get a registration param like the default value for example, @see spacing input
-            // @return object of registration params
-            // @param input_id string
-            // @param module_type string
-            // @param level array || object
             getInputRegistrationParams : function( input_id, module_type, level ) {
                   var self = this;
-
-                  // Do we have a cached default value ?
                   self.cachedInputRegistrationParams = self.cachedInputRegistrationParams || {};
                   self.cachedInputRegistrationParams[ module_type ] = self.cachedInputRegistrationParams[ module_type ] || {};
                   if ( _.has( self.cachedInputRegistrationParams[ module_type ], input_id ) ) {
@@ -6199,7 +4518,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getInputRegistrationParams => missing ' + module_type + ' in sektionsLocalizedData.registeredModules' );
                         return;
                   }
-                  // This method should normally not be invoked for a father module type
                   if ( sektionsLocalizedData.registeredModules[module_type].is_father ) {
                         api.errare( 'getInputRegistrationParams => Father modules should be treated specifically' );
                         return;
@@ -6209,33 +4527,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   var _params_ = {};
                   _.each( level, function( levelData, _key_ ) {
-                        // we found a match skip next levels
                         if ( ! _.isEmpty( _params_ ) )
                           return;
                         if ( input_id === _key_ && ! _.isUndefined( levelData.input_type ) ) {
                               _params_ = levelData;
                         }
-                        // if we have still no match, and the data are sniffable, let's go ahead recursively
                         if ( _.isEmpty( _params_ ) && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
                               _params_ = self.getInputRegistrationParams( input_id, module_type, levelData );
                         }
                         if ( ! _.isEmpty( _params_ ) ) {
-                              // cache it
                               self.cachedInputRegistrationParams[ module_type ][ input_id ] = _params_;
                         }
                   });
                   return _params_;
             },
-
-
-            // @return bool
-            // @param input_id string
-            // @param module_type string
-            // @param level array || object
             inputIsAFontFamilyModifier : function( input_id, level ) {
                   var self = this;
-
-                  // Do we have a cached default value ?
                   self.cachedFontFamilyModifier = self.cachedFontFamilyModifier || {};
                   if ( _.has( self.cachedFontFamilyModifier, input_id ) ) {
                         return self.cachedFontFamilyModifier[ input_id ];
@@ -6249,42 +4556,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   var _bool_ = 'not_set';
                   _.each( level, function( levelData, _key_ ) {
-                        // we found a match skip next levels
                         if ( 'not_set' !== _bool_ )
                           return;
                         if ( input_id === _key_ && ! _.isUndefined( levelData.input_type ) ) {
                               _bool_ = _.isUndefined( levelData.refresh_fonts ) ? false : levelData.refresh_fonts;
                         }
-                        // if we have still no match, and the data are sniffable, let's go ahead recursively
                         if ( 'not_set' === _bool_ && ( _.isArray( levelData ) || _.isObject( levelData ) ) ) {
                               _bool_ = self.inputIsAFontFamilyModifier( input_id, levelData );
                         }
                         if ( 'not_set' !== _bool_ ) {
-                              // cache it
                               self.cachedFontFamilyModifier[ input_id ] = _bool_;
                         }
                   });
                   return _bool_;
             },
-            //-------------------------------------------------------------------------------------------------
-            // </RECURSIVE UTILITIES USING THE sektionsLocalizedData.registeredModules>
-            //-------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // @return the item(s) ( array of items if multi-item module ) that we should use when adding the module to the main setting
             getModuleStartingValue : function( module_type ) {
                   if ( ! sektionsLocalizedData.registeredModules ) {
                         api.errare( 'getModuleStartingValue => missing sektionsLocalizedData.registeredModules' );
@@ -6334,15 +4619,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   selectables.eq( prevIndex ).focus();
             },
-
-
-
-
-            //-------------------------------------------------------------------------------------------------
-            // GENERIC WAY TO SETUP SELECT INPUTS
-            //-------------------------------------------------------------------------------------------------
-            // used in the module input constructors
-            // "this" is the input
             setupSelectInput : function( selectOptions ) {
                   var input  = this,
                       item   = input.input_parent,
@@ -6355,7 +4631,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'api.czr_sektions.setupSelectInput => missing select options for input id => ' + input.id + ' in image module');
                         return;
                   } else {
-                        //generates the options
                         _.each( selectOptions , function( title, value ) {
                               var _attributes = {
                                         value : value,
@@ -6371,13 +4646,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $( 'select[data-czrtype]', input.container ).selecter();
                   }
             },
-
-
-            //-------------------------------------------------------------------------------------------------
-            // GENERIC WAY TO SETUP FONT SIZE AND LINE HEIGHT INPUTS
-            // DEPRECATED
-            //-------------------------------------------------------------------------------------------------
-            // "this" is the input
             setupFontSizeAndLineHeightInputs : function( obj ) {
                   var input      = this,
                       $wrapper = $('.sek-font-size-line-height-wrapper', input.container ),
@@ -6389,45 +4657,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             }
                             return unit;
                       };
-                  // initialize the unit with the value provided in the dom
                   input.css_unit = new api.Value( _.isEmpty( initial_unit ) ? 'px' : validateUnit( initial_unit ) );
-                  // React to a unit change
                   input.css_unit.bind( function( to ) {
                         to = _.isEmpty( to ) ? 'px' : to;
                         $wrapper.find( 'input[type="number"]').trigger('change');
                   });
-
-                  // instantiate stepper and schedule change reactions
                   $wrapper.find( 'input[type="number"]').on('input change', function( evt ) {
                         input( $(this).val() + validateUnit( input.css_unit() ) );
                   }).stepper();
-
-
-                  // Schedule unit changes on button click
                   $wrapper.on( 'click', '[data-sek-unit]', function(evt) {
                         evt.preventDefault();
-                        // handle the is-selected css class toggling
                         $wrapper.find('[data-sek-unit]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        // update the initial unit ( not mandatory)
                         $wrapper.find('input[data-czrtype]').data('sek-unit', $(this).data('sek-unit') );
-                        // set the current unit Value
                         input.css_unit( $(this).data('sek-unit') );
                   });
-
-                  // add is-selected button on init to the relevant unit button
                   $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
             },
-
-
-
-            //-------------------------------------------------------------------------------------------------
-            // PREPARE INPUT REGISTERED WITH has_device_switcher set to true
-            //-------------------------------------------------------------------------------------------------
-            // "this" is the input
             maybeSetupDeviceSwitcherForInput : function() {
                   var input = this;
-                  // render the device switcher before the input title
                   var deviceSwitcherHtml = [
                         '<span class="sek-input-device-switcher">',
                           '<i data-sek-device="desktop" class="sek-switcher preview-desktop active" title="'+ sektionsLocalizedData.i18n['Settings on desktops'] +'"></i>',
@@ -6453,31 +4701,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         input.previewedDevice( device );
                   };
-                  // react on device click
                   input.container.on( 'click', '[data-sek-device]', syncWithPreviewedDevice );
-
-                  // initialize with the currently previewed device
                   var $currentDeviceIcon = input.container.find('[data-sek-device="' + api.previewedDevice() + '"]');
                   if ( $currentDeviceIcon.length > 0 ) {
                         $currentDeviceIcon.trigger('click');
                   }
             },
-
-
-
-            //-------------------------------------------------------------------------------------------------
-            // GENERIC WAY TO SETUP ACCORDION BEHAVIOUR OF MODULES IN SECTIONS
-            //-------------------------------------------------------------------------------------------------
-            // "this" is the section
-            // in the content picker section, control's container have the attribute "data-sek-accordion" to selectively enable the accordion
-            // @see ::generateUIforDraggableContent()
-            // @params { expand_first_control : boolean }
             scheduleModuleAccordion : function( params ) {
                   params = params || { expand_first_control : true };
                   var _section_ = this;
-                  // Attach event on click
                   $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
-                        //evt.preventDefault();
                         evt.stopPropagation();
                         var $control = $(this).closest( '.customize-control');
 
@@ -6494,15 +4727,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               duration : 0,
                               start : function() {
                                     $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
-                                    // this event 'sek-accordion-expanded', is used to defer the instantiation of the code editor
-                                    // @see api.czrInputMap['code_editor']
-                                    // @see https://github.com/presscustomizr/nimble-builder/issues/176
                                     $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
                               }
                         });
                   });
-
-                  // Expand the first module if requested
                   if ( params.expand_first_control ) {
                         var firstControl = _.first( _section_.controls() );
                         if ( _.isObject( firstControl ) && ! _.isEmpty( firstControl.id ) ) {
@@ -6513,17 +4741,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   }
             },
-
-
-
-            //-------------------------------------------------------------------------------------------------
-            // HELPERS USED WHEN UPLOADING IMAGES FROM PRESET SECTIONS
-            //-------------------------------------------------------------------------------------------------
             isPromise : function (fn) {
                   return fn && typeof fn.then === 'function' && String( $.Deferred().then ) === String( fn.then );
             },
-
-            // @param deferreds = { '::img-path::/assets/img/tests/1.jpg' : 'dfd1', '::img-path::/assets/img/tests/2.jpg' : dfd2, ..., '::img-path::/assets/img/tests/n.jpg' : dfdn }
             whenAllPromisesInParallel : function ( deferreds ) {
                 var self = this,
                     mainDfd = $.Deferred(),
@@ -6552,10 +4772,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                 return mainDfd;
             },
-
-            // Run the deferred in sequence, only one asynchronous method at a time
-            // Was an experiment when implementing the img assets upload for preset sections
-            // Abandonned for whenAllPromisesInParallel
             whenAllPromisesInSerie : function ( deferreds, ind, promiseMessages, mainDfd ) {
                 ind = ind || 0;
                 promiseMessages = promiseMessages || {};
@@ -6578,12 +4794,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                 }//if
                 return mainDfd;
             },
-
-
-            // @param relpath = string : '/assets/img/41883.jpg'
-            // @return a promise
             importAttachment : function( relpath ) {
-                  // @see php wp_ajax_sek_import_attachment
                   return wp.ajax.post( 'sek_import_attachment', {
                         rel_path : relpath,
                         nonce: api.settings.nonce.save//<= do we need to set a specific nonce to fetch the attachment
@@ -6591,18 +4802,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   .fail( function( _er_ ) {
                         api.errare( 'sek_import_attachment ajax action failed for image ' +  relpath, _er_ );
                   });
-                  // .done( function( data) {
-                  //       api.infoLog('relpath and DATA ' + relpath , data );
-                  // });
             },
-
-
-
-
-
-
-            // recursive helper
-            // used when saving a section
             cleanIds : function( levelData ) {
                   levelData.id = "";
                   var self = this;
@@ -6614,25 +4814,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   return levelData;
             },
-
-            // @return { collection[] ... }
             getDefaultSektionSettingValue : function( localOrGlobal ) {
                   if ( _.isUndefined( localOrGlobal ) || !_.contains( [ 'local', 'global' ], localOrGlobal ) ) {
                         api.errare( 'getDefaultSektionSettingValue => the skope should be set to local or global');
                   }
                   return 'global' === localOrGlobal ? sektionsLocalizedData.defaultGlobalSektionSettingValue : sektionsLocalizedData.defaultLocalSektionSettingValue;
             },
-
-            // @return void()
-            // input controller instance == this
             scheduleVisibilityOfInputId : function( controlledInputId, visibilityCallBack ) {
                   var item = this.input_parent;
                   if ( !_.isFunction(visibilityCallBack) || _.isEmpty(controlledInputId) ) {
                         throw new Error('::scheduleVisibilityOfInputId => error when firing for input id : ' + this.id );
                   }
-                  //Fire on init
                   item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                  //React on change
                   this.bind( function( to ) {
                         item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
                   });
@@ -6645,42 +4838,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
  * @https://html.spec.whatwg.org/multipage/dnd.html#dnd
  * @https://caniuse.com/#feat=dragndrop
  */
-// EVENTS
-
-// drag  => handler : ondrag  Fired when an element or text selection is being dragged.
-// dragend => handler : ondragend Fired when a drag operation is being ended (for example, by releasing a mouse button or hitting the escape key). (See Finishing a Drag.)
-// dragenter => handler : ondragenter Fired when a dragged element or text selection enters a valid drop target. (See Specifying Drop Targets.)
-// dragexit  => handler : ondragexit  Fired when an element is no longer the drag operation's immediate selection target.
-// dragleave => handler : ondragleave Fired when a dragged element or text selection leaves a valid drop target.
-// dragover  => handler : ondragover  Fired when an element or text selection is being dragged over a valid drop target (every few hundred milliseconds).
-// dragstart => handler : ondragstart Fired when the user starts dragging an element or text selection. (See Starting a Drag Operation.)
-// drop  => handler : ondrop  Fired when an element or text selection is dropped on a valid drop target. (See Performing a Drop.)
-
-// Drop targets can be rendered statically when the preview is rendered or dynamically on dragstart ( sent to preview with 'sek-drag-start')
-// Typically, an empty column will be populated with a zek-drop-zone element statically in the preview.
-// The other drop zones are rendered dynamically in ::schedulePanelMsgReactions case 'sek-drag-start'
-//
-// droppable targets are defined server side in sektionsLocalizedData.dropSelectors :
-// '.sek-drop-zone' <= to pass the ::dnd_canDrop() test, a droppable target should have this css class
-// 'body' <= body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
-            //-------------------------------------------------------------------------------------------------
-            //-- SETUP DnD
-            //-------------------------------------------------------------------------------------------------
-            //Fired in ::initialize()
-            // INSTANTIATE Dnd ZONES IF SUPPORTED BY THE BROWSER
-            // + SCHEDULE DROP ZONES RE-INSTANTIATION ON PREVIEW REFRESH
-            // + SCHEDULE API REACTION TO *drop event
-            // setup $.sekDrop for $( api.previewer.targetWindow().document ).find( '.sektion-wrapper')
             setupDnd : function() {
                   var self = this;
-                  // emitted by the module_picker or the section_picker module
-                  // @params { type : 'section' || 'module', input_container : input.container }
                   self.bind( 'sek-refresh-dragzones', function( params ) {
-                        // Detecting HTML5 Drag And Drop support in javascript
-                        // https://stackoverflow.com/questions/2856262/detecting-html5-drag-and-drop-support-in-javascript#2856275
                         if (  true !== 'draggable' in document.createElement('span') ) {
                               api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                     api.notifications.add( new api.Notification( 'drag-drop-support', {
@@ -6688,8 +4851,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           message:  sektionsLocalizedData.i18n['This browser does not support drag and drop. You might need to update your browser or use another one.'],
                                           dismissible: true
                                     } ) );
-
-                                    // Removed if not dismissed after 5 seconds
                                     _.delay( function() {
                                           api.notifications.remove( 'drag-drop-support' );
                                     }, 10000 );
@@ -6699,64 +4860,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         self.setupNimbleDragZones( params.input_container );//<= module or section picker
                   });
-
-                  // on previewer refresh
                   api.previewer.bind( 'ready', function() {
                         try { self.setupNimbleDropZones();//<= module or section picker
                         } catch( er ) {
                               api.errare( '::setupDnd => error on self.setupNimbleDropZones()', er );
                         }
-                        // if the module_picker or the section_picker is currently a registered ui control,
-                        // => re-instantiate sekDrop on the new preview frame
-                        // the registered() ui levels look like :
-                        // [
-                        //   { what: "control", id: "__nimble___sek_draggable_sections_ui", label: "Section Picker", type: "czr_module", module_type: "sek_intro_sec_picker_module", …}
-                        //   { what: "setting", id: "__nimble___sek_draggable_sections_ui", dirty: false, value: "", transport: "postMessage", … }
-                        //   { what: "section", id: "__nimble___sek_draggable_sections_ui", title: "Section Picker", panel: "__sektions__", priority: 30}
-                        // ]
                         if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_intro_sec_picker_module' } ) ) ) {
                               self.rootPanelFocus();
                         } else if ( ! _.isUndefined( _.findWhere( self.registered(), { module_type : 'sek_module_picker_module' } ) ) ) {
                               self.rootPanelFocus();
                         }
                   });
-
-                  // React to the *-droped event
                   self.reactToDrop();
             },
-
-            //-------------------------------------------------------------------------------------------------
-            //--DRAG ZONES SETUP
-            //-------------------------------------------------------------------------------------------------
-            // fired in ::initialize, on 'sek-refresh-nimbleDragDropZones
-            // 'sek-refresh-nimbleDragDropZones' is emitted by the section and the module picker modules with param { type : 'section_picker' || 'module_picker'}
             setupNimbleDragZones : function( $draggableWrapper ) {
                   var self = this;
-                  //api.infoLog('instantiate', type );
-                  // $(this) is the dragged element
                   var _onStart = function( evt ) {
-                        // Reset the preview target
-                        // implemented for double-click insertion https://github.com/presscustomizr/nimble-builder/issues/317
                         self.lastClickedTargetInPreview({});
 
                         evt.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
                         evt.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
                         evt.originalEvent.dataTransfer.setData( "sek-section-type", $(this).data('sek-section-type') );
                         evt.originalEvent.dataTransfer.setData( "sek-is-user-section", $(this).data('sek-is-user-section') );
-
-                        // in addition to the dataTransfer storage, store the properties of the dragged object in a static property
-                        // => we will need it for example to access the object property when checking if "can drop"
                         self.dndData = {
                               content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
                               content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
                               section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),
-                              // Saved sections
                               is_user_section : "true" === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" )
                         };
-
-                        // evt.originalEvent.dataTransfer.effectAllowed = "move";
-                        // evt.originalEvent.dataTransfer.dropEffect = "move";
-                        // Notify if not supported : https://caniuse.com/#feat=dragndrop
                         try {
                               evt.originalEvent.dataTransfer.setData( 'browserSupport', 'browserSupport' );
                               evt.originalEvent.dataTransfer.clearData( 'browserSupport' );
@@ -6767,8 +4898,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           message:  sektionsLocalizedData.i18n['This browser does not support drag and drop. You might need to update your browser or use another one.'],
                                           dismissible: true
                                     } ) );
-
-                                    // Removed if not dismissed after 5 seconds
                                     _.delay( function() {
                                           api.notifications.remove( 'drag-drop-support' );
                                     }, 10000 );
@@ -6778,13 +4907,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $('body').addClass('sek-dragging');
                         api.previewer.send( 'sek-drag-start', { type : self.dndData.content_type } );//fires the rendering of the dropzones
                   };
-                  // $(this) is the dragged element
                   var _onEnd = function( evt ) {
                         $('body').removeClass('sek-dragging');
                         $(this).removeClass('sek-dragged');
                         api.previewer.send( 'sek-drag-stop' );
                   };
-                  // $(this) is the double clicked element
                   var _onDoubleClick = function( evt ) {
                         var _targetCandidate = self.lastClickedTargetInPreview();// { id : "__nimble__fb2ab3e47472" }
                         var $dropTarget;
@@ -6795,16 +4922,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
 
                         if ( $dropTarget && $dropTarget.length > 0 ) {
-                              // "Emulate" a drop action
-                              // @see ::dnd_onDrop()
                               api.czr_sektions.trigger( 'sek-content-dropped', {
                                     drop_target_element : $dropTarget,
                                     location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
-                                    // when inserted between modules
                                     before_module : $dropTarget.data('drop-zone-before-module-or-nested-section'),
                                     after_module : $dropTarget.data('drop-zone-after-module-or-nested-section'),
-
-                                    // When inserted between sections
                                     before_section : $dropTarget.data('drop-zone-before-section'),
                                     after_section : $dropTarget.data('drop-zone-after-section'),
 
@@ -6812,10 +4934,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     content_id : $(this).data('sek-content-id'),
 
                                     section_type : $(this).data('sek-section-type'),
-                                    // Saved sections
                                     is_user_section : "true" === $(this).data('sek-is-user-section')
                               });
-                              // And reset the preview target
                               self.lastClickedTargetInPreview({});
                         } else {
                               _doubleClickTargetMissingNotif();
@@ -6828,38 +4948,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               message: sektionsLocalizedData.i18n['You first need to click on a target ( with a + icon ) in the preview.'],
                               dismissible: true
                         } ) );
-                        // Removed if not dismissed after a moment
                         _.delay( function() {
                               api.notifications.remove( 'missing-injection-target' );
                         }, 30000 );
                   };
-
-                  // Schedule
                   $draggableWrapper.find( '[draggable="true"]' ).each( function() {
                         $(this)
                               .on( 'dragstart', function( evt ) { _onStart.call( $(this), evt ); })
                               .on( 'dragend', function( evt ) { _onEnd.call( $(this), evt ); })
-                              // double click insertion
-                              // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
                               .dblclick( function( evt ) { _onDoubleClick.call( $(this), evt ); });
                   });
             },//setupNimbleZones()
-
-
-
-
-
-
-
-
-
-
-
-
-            //-------------------------------------------------------------------------------------------------
-            //--DRAG ZONES SETUP
-            //-------------------------------------------------------------------------------------------------
-            // Scheduled on previewer('ready') each time the previewer is refreshed
             setupNimbleDropZones : function() {
                   var self = this;
                   this.$dropZones = this.dnd_getDropZonesElements();
@@ -6873,21 +4972,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   this.$dropZones.each( function() {
                         var $zone = $(this);
-                        // Make sure we don't delegate an event twice for a given element
                         if ( true === $zone.data('zone-droppable-setup') )
                             return;
 
                         self.enterOverTimer = null;
-                        // Delegated to allow reactions on future modules / sections
                         $zone
-                              //.on( 'dragenter dragover', sektionsLocalizedData.dropSelectors,  )
                               .on( 'dragenter dragover', sektionsLocalizedData.dropSelectors, function( evt ) {
-                                    //api.infoLog( self.enterOverTimer, self.dnd_canDrop( { targetEl : $(this), evt : evt } ) );
                                     if ( _.isNull( self.enterOverTimer ) ) {
                                           self.enterOverTimer = true;
                                           _.delay(function() {
-                                                // If the mouse did not move, reset the time and do nothing
-                                                // this will prevent a drop zone to "dance", aka expand collapse, when stoping the mouse close to it
                                                 if ( self.currentMousePosition && ( ( self.currentMousePosition + '' ) == ( evt.clientY + '' + evt.clientX + '') ) ) {
                                                       self.enterOverTimer = null;
                                                       return;
@@ -6911,7 +5004,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 }
                                           break;
                                           case 'drop' :
-                                                // Reset the this.$cachedDropZoneCandidates now
                                                 this.$cachedDropZoneCandidates = null;//has been declared on enter over
 
                                                 if ( ! self.dnd_canDrop( { targetEl : $(this), evt : evt } ) )
@@ -6919,8 +5011,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
                                                 self.dnd_onDrop( $(this), evt );
                                                 self.dnd_cleanOnLeaveDrop( $(this), evt );
-                                                // this event will fire another cleaner
-                                                // also sent on dragend
                                                 api.previewer.send( 'sek-drag-stop' );
                                           break;
                                     }
@@ -6940,16 +5030,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       isInVertically = yPos >= dzoneRect.top && dzoneRect.bottom >= yPos;
                   return isInVertically && isInHorizontally;
             },
-
-            //-------------------------------------------------------------------------------------------------
-            //-- DnD Helpers
-            //-------------------------------------------------------------------------------------------------
-            // Fired on 'dragenter dragover'
-            // toggles the "approaching" and "close" css classes when conditions are met.
-            //
-            // Because this function can be potentially heavy if there are a lot of drop zones, this is fired with a timer
-            //
-            // Note : this is fired before checking if the target is eligible for drop. This way we can calculate an approach, as soon as we start hovering the 'body' ( which is part the drop selector list )
             dnd_toggleDragApproachClassesToDropZones : function( evt ) {
 
                   var self = this,
@@ -6985,50 +5065,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             isInHorizontally = xPos <= dzoneRect.right && dzoneRect.left <= xPos,
                             isInVertically = yPos >= dzoneRect.top && dzoneRect.bottom >= yPos;
 
-                        // var html = "isApproachingHorizontally : " + isApproachingHorizontally + ' | isCloseHorizontally : ' + isCloseHorizontally + ' | isInHorizontally : ' + isInHorizontally;
-                        // html += ' | xPos : ' + xPos + ' | zoneRect.right : ' + dzoneRect.right;
-                        // html += "isApproachingVertically : " + isApproachingVertically + ' | isCloseVertically : ' + isCloseVertically + ' | isInVertically : ' + isInVertically;
-                        // html += ' | yPos : ' + yPos + ' | zoneRect.top : ' + dzoneRect.top;
-                        // $(this).html( '<span style="font-size:10px">' + html + '</span>');
-
-                        // var html = '';
-                        // html += ' | mouseToBottom : ' + mouseToBottom + ' | mouseToTop : ' + mouseToTop;
-                        // html += "isApproachingVertically : " + isApproachingVertically + ' | isCloseVertically : ' + isCloseVertically + ' | isInVertically : ' + isInVertically;
-                        // $(this).html( '<span style="font-size:12px">' + html + '</span>');
-
-                        // var html = ' | xPos : ' + xPos + ' | zoneRect.right : ' + dzoneRect.right + ' | zoneRect.left : ' + dzoneRect.left;
-                        // html += "mouseToYCenter : " + mouseToYCenter + ' | mouseToXCenter : ' + mouseToXCenter;
-                        // html += ' | yPos : ' + yPos + ' | zoneRect.top : ' + dzoneRect.top + ' | zoneRect.bottom : ' + dzoneRect.bottom;
-                        // $(this).html( '<span style="font-size:10px">' + html + '</span>');
-
                         self.distanceTable.push({
                               el : $(this),
                               dist : ( isInVertically && isInHorizontally ) ? 0 : getHypotenuse( mouseToXCenter, mouseToYCenter )
                         });
-
-
-                        //var html = '';
-
-                        // if ( isInVertically && isInHorizontally ) {
-                        //       $(this).removeClass( 'sek-drag-is-approaching');
-                        //       $(this).removeClass( 'sek-drag-is-close' );
-                        //       $(this).removeClass( 'sek-drag-is-very-close');
-                        //       $(this).addClass( 'sek-drag-is-in');
-                        //       //html += 'is IN';
-                        // }
-                        // else if ( ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally ) ) {
-                        //       $(this).removeClass( 'sek-drag-is-approaching');
-                        //             $(this).addClass( 'sek-drag-is-close' );
-                        //       $(this).removeClass( 'sek-drag-is-very-close');
-                        //       $(this).removeClass( 'sek-drag-is-in');
-                        //       //html += 'is close';
-                        // } else if ( ( isApproachingVertically || isInVertically ) && ( isApproachingHorizontally || isInHorizontally ) ) {
-                        //             $(this).addClass( 'sek-drag-is-approaching');
-                        //       $(this).removeClass( 'sek-drag-is-close' );
-                        //       $(this).removeClass( 'sek-drag-is-very-close');
-                        //       $(this).removeClass( 'sek-drag-is-in');
-                        //       //html += 'is approaching';
-                        //
                         $(this).removeClass( 'sek-drag-is-in');
 
                         if ( ( isVeryCloseVertically || isInVertically ) && ( isVeryCloseHorizontally || isInHorizontally ) ) {
@@ -7036,16 +5076,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               $(this).removeClass( 'sek-drag-is-close' );
                               $(this).addClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-in');
-                              //html += 'is very close';
                         } else {
                               $(this).removeClass( 'sek-drag-is-approaching');
                               $(this).removeClass( 'sek-drag-is-close' );
                               $(this).removeClass( 'sek-drag-is-very-close');
                               $(this).removeClass( 'sek-drag-is-in');
                         }
-
-
-                        //$(this).html( '<span style="font-size:10px">' + html + '</span>');
                   });//$('.sek-drop-zones').each()
 
 
@@ -7059,11 +5095,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( self.$dropTargetCandidate && self.$dropTargetCandidate.length > 0 && self.dnd_isInTarget( self.$dropTargetCandidate, evt ) ) {
                         self.$dropTargetCandidate.addClass('sek-drag-is-in');
                   }
-                  // Reset the timer
                   self.enterOverTimer = null;
             },
-
-            // @return string
             dnd_getPreDropElementContent : function( evt ) {
                   var $target = $( evt.currentTarget ),
                       html,
@@ -7091,15 +5124,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   return preDropContent;
             },
-
-            // Scheduled on previewer('ready') each time the previewer is refreshed
             dnd_getDropZonesElements : function() {
                   return $( api.previewer.targetWindow().document );
             },
-
-            // @return boolean
-            // @paraps = { targetEl : $(this), evt : evt }
-            // Note : the class "sek-content-preset_section-drop-zone" is dynamically generated in preview::schedulePanelMsgReactions() sek-drag-start case
             dnd_canDrop : function( params ) {
                   params = _.extend( { targetEl : {}, evt : {} }, params || {} );
                   var self = this, $dropTarget = params.targetEl;
@@ -7143,16 +5170,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === self.dndData.content_type && isSectionDropZone ) || ( 'module' === self.dndData.content_type && ! isSectionDropZone ) || ( 'preset_section' === self.dndData.content_type && sectionHasNoModule ) );
             },
-
-            // @return void()
             dnd_OnEnterOver : function( $dropTarget, evt ) {
                   evt.preventDefault();//@see :https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets
-                  // Bail here if we are in the currently drag entered element
                   if ( true !== $dropTarget.data( 'is-drag-entered' ) ) {
-                        // Flag now
                         $dropTarget.data( 'is-drag-entered', true );
                         $dropTarget.addClass( 'sek-active-drop-zone' );
-                        // Flag the dropEl parent element
                         this.$dropZones.addClass( 'sek-is-dragging' );
                   }
 
@@ -7160,8 +5182,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare('Error when trying to insert the preDrop content', er );
                   }
             },
-
-            // @return void()
             dnd_cleanOnLeaveDrop : function( $dropTarget, evt ) {
                   var self = this;
                   this.$dropZones = this.$dropZones || this.dnd_getDropZonesElements();
@@ -7172,8 +5192,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.dnd_cleanSingleDropTarget( $(this) );
                   });
             },
-
-            // @return void()
             dnd_cleanSingleDropTarget : function( $dropTarget ) {
                   if ( _.isEmpty( $dropTarget ) || $dropTarget.length < 1 )
                     return;
@@ -7187,14 +5205,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   $dropTarget.find('.sek-no-drop-possible-message').remove();
             },
-
-
-            // @return string after or before
             dnd_getPosition : function( $dropTarget, evt ) {
                   var targetRect = $dropTarget[0].getBoundingClientRect(),
                       targetHeight = targetRect.height;
-
-                  // if the preDrop is already printed, we have to take it into account when calc. the target height
                   if ( 'before' === $dropTarget.data( 'preDrop-position' ) ) {
                         targetHeight = targetHeight + this.preDropElement.outerHeight();
                   } else if ( 'after' === $dropTarget.data( 'preDrop-position' ) ) {
@@ -7203,8 +5216,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   return evt.originalEvent.clientY - targetRect.top - ( targetHeight / 2 ) > 0  ? 'after' : 'before';
             },
-
-            // @return void()
             dnd_mayBePrintPreDropElement : function( $dropTarget, evt ) {
                   var self = this,
                       previousPosition = $dropTarget.data( 'preDrop-position' ),
@@ -7218,14 +5229,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   self.isPrintingPreDrop = true;
-
-                  // make sure we clean the previous wrapper of the pre drop element
                   this.dnd_cleanSingleDropTarget( this.$currentPreDropTarget );
                   var inNewSection = 'between-sections' === $dropTarget.data('sek-location') || 'in-empty-location' === $dropTarget.data('sek-location');
                   $.when( self.preDropElement.remove() ).done( function(){
                         $dropTarget[ 'before' === newPosition ? 'prepend' : 'append' ]( self.preDropElement )
                               .find( '.' + sektionsLocalizedData.preDropElementClass ).html( self.dnd_getPreDropElementContent( evt ) );
-                        // Flag the preDrop element with class to apply a specific style if inserted in a new sektion of in a column
                         $dropTarget.find( '.' + sektionsLocalizedData.preDropElementClass ).toggleClass('in-new-sektion', inNewSection );
                         $dropTarget.data( 'preDrop-position', newPosition );
 
@@ -7235,8 +5243,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.$currentPreDropTarget = $dropTarget;
                   });
             },
-
-            //@return void()
             dnd_isOveringDropTarget : function( $dropTarget, evt ) {
                   var targetRect = $dropTarget[0].getBoundingClientRect(),
                       mouseX = evt.clientX,
@@ -7249,21 +5255,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       isYin = mouseY >= tTop && ( tBottom - tTop ) >= ( mouseY - tTop);
                   return isXin && isYin;
             },
-
-            //@return void()
             dnd_onDrop: function( $dropTarget, evt ) {
                   evt.stopPropagation();
                   var _position = 'after' === this.dnd_getPosition( $dropTarget, evt ) ? $dropTarget.index() + 1 : $dropTarget.index();
-                  // api.infoLog('onDropping params', position, evt );
-                  // api.infoLog('onDropping element => ', $dropTarget.data('drop-zone-before-section'), $dropTarget );
                   api.czr_sektions.trigger( 'sek-content-dropped', {
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
-                        // when inserted between modules
                         before_module : $dropTarget.data('drop-zone-before-module-or-nested-section'),
                         after_module : $dropTarget.data('drop-zone-after-module-or-nested-section'),
-
-                        // When inserted between sections
                         before_section : $dropTarget.data('drop-zone-before-section'),
                         after_section : $dropTarget.data('drop-zone-after-section'),
 
@@ -7271,40 +5270,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
 
                         section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),
-                        // Saved sections
                         is_user_section : "true" === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" )
                   });
             },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //-------------------------------------------------------------------------------------------------
-            //-- SCHEDULE REACTIONS TO 'sek-content-dropped'
-            //-------------------------------------------------------------------------------------------------
-            // invoked on api('ready') from self::initialize()
             reactToDrop : function() {
                   var self = this;
-                  // @param {
-                  //    drop_target_element : $(el) in which the content has been dropped
-                  //    position : 'bottom' or 'top' compared to the drop-zone
-                  //    before_section : $(this).data('drop-zone-before-section'),
-                  //    after_section : $(this).data('drop-zone-after-section'),
-                  //    content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                  //    content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
-                  //    section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),//<= content, header, footer
-                  //    is_user_section : true === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" ),
-                  // }
                   var _do_ = function( params ) {
                         if ( ! _.isObject( params ) ) {
                               throw new Error( 'Invalid params provided' );
@@ -7315,8 +5285,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         var $dropTarget = params.drop_target_element,
                             dropCase = 'content-in-column';
-
-                        // If the data('sek-location') is available, let's use it
                         switch( $dropTarget.data('sek-location') ) {
                               case 'between-sections' :
                                     dropCase = 'content-in-a-section-to-create';
@@ -7330,24 +5298,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     dropCase = 'content-in-new-column';
                               break;
                         }
-
-                        // case of a preset_section content_type being added to an existing but empty section
                         if ( 'preset_section' === params.content_type ) {
                               if ( $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ) ) {
                                     var $parentSektion = $dropTarget.closest('div[data-sek-level="section"]');
-                                    //calculate the number of column in this section, excluding the columns inside nested sections if any
                                     var colNumber = $parentSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).length;
-                                    // if the parent section has more than 1 column, we will need to inject the preset_section inside a nested_section
                                     if ( colNumber > 1 ) {
                                           dropCase = 'preset-section-in-a-nested-section-to-create';
                                           params.is_nested = true;
                                           params.in_column = $dropTarget.closest('[data-sek-level="column"]').data('sek-id');
                                           params.in_sektion = $parentSektion.data('sek-id');
-                                          //params.after_section = params.sektion_to_replace;
                                     } else {
                                           params.sektion_to_replace = $parentSektion.data('sek-id');
                                           params.after_section = params.sektion_to_replace;
-                                          // if the sektion to replace is nested, we will append the new sektion to the parent column of the nested section
                                           params.in_column = $parentSektion.closest('[data-sek-level="column"]').data('sek-id');
                                           dropCase = 'content-in-a-section-to-replace';
                                     }
@@ -7392,7 +5354,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'content-in-a-section-to-create' :
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
-                              // this case fixes https://github.com/presscustomizr/nimble-builder/issues/139
                               case 'content-in-a-section-to-replace' :
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
                               break;
@@ -7406,24 +5367,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               default :
                                     api.errare( 'sek control panel => ::reactToDrop => invalid drop case : ' + dropCase );
                               break;
-                              // case 'content-in-new-column' :
-
-                              // break;
                         }
                   };
-
-                  // @see module picker or section picker modules
-                  // api.czr_sektions.trigger( 'sek-content-dropped', {
-                  //       drop_target_element : $(this),
-                  //       position : _position,
-                  //       before_section : $(this).data('drop-zone-before-section'),
-                  //       after_section : $(this).data('drop-zone-after-section'),
-                  //       content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
-                  //       content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
-                  //       is_user_section : true === evt.originalEvent.dataTransfer.getData( "sek-is-user-section" ),
-                  // });
                   this.bind( 'sek-content-dropped', function( params ) {
-                        //api.infoLog('sek-content-dropped', params );
                         try { _do_( params ); } catch( er ) {
                               api.errare( 'error when reactToDrop', er );
                         }
@@ -7438,24 +5384,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                 Credits : xwp, westonruter, valendesigns, sayedwp, utkarshpatel.
                 Date of original code modification : July 2018
             */
-            // fired from ::initialize()
             setupTinyMceEditor: function() {
                   var self = this;
-                  // OBSERVABLE VALUES
                   api.sekEditorExpanded   = new api.Value( false );
-                  //api.sekEditorSynchronizedInput = new api.Value();
 
                   self.editorEventsListenerSetup = false;//this status will help us ensure that we bind the shared tinyMce instance only once
-
-                  // Cache some dom elements
                   self.$editorPane = $( '#czr-customize-content_editor-pane' );
                   self.$editorDragbar = $( '#czr-customize-content_editor-dragbar' );
                   self.$preview = $( '#customize-preview' );
                   self.$collapseSidebar = $( '.collapse-sidebar' );
 
                   self.attachResizeEventsToEditor();
-
-                  // Cache the instance and attach
                   var mayBeAwakeTinyMceEditor = function() {
                         api.sekTinyMceEditor = tinyMCE.get( sektionsLocalizedData.idOfDetachedTinyMceTextArea );
                         var _do = function() {
@@ -7474,37 +5413,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         }
                   };
-
-                  // CASE 1)
-                  // Toggle the editor visibility
-                  // Change the button text
-                  // set the clicked input id as the new one
                   $('#customize-theme-controls').on('click', '[data-czr-action="open-tinymce-editor"]', function() {
-                        //console.log( '[data-czr-action="toggle-tinymce-editor"]', $(this) , api.sekEditorSynchronizedInput() );
-                        // Get the control and the input id from the clicked element
-                        // => then updated the synchronized input with them
                         var control_id = $(this).data('czr-control-id'),
                             input_id = $(this).data('czr-input-id');
                         if ( _.isEmpty( control_id ) || _.isEmpty( input_id ) ) {
                               api.errare('toggle-tinymce-editor => missing input or control id');
                               return;
                         }
-                        // var currentEditorSyncData = $.extend( true, {}, api.sekEditorSynchronizedInput() ),
-                        //     newEditorSyncData = _.extend( currentEditorSyncData, {
-                        //           input_id : input_id,
-                        //           control_id : control_id
-                        //     });
-                        //api.sekEditorSynchronizedInput( newEditorSyncData );
                         api.sekEditorExpanded( true );
-                        //api.sekTinyMceEditor.focus();
                   });
-
-
-
-                  // REACT TO EDITOR VISIBILITY
                   api.sekEditorExpanded.bind( function ( expanded, from, params ) {
                         mayBeAwakeTinyMceEditor();
-                        //api.infoLog('in api.sekEditorExpanded', expanded );
                         if ( expanded && api.sekTinyMceEditor ) {
                               api.sekTinyMceEditor.focus();
                         }
@@ -7513,13 +5432,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         /*
                         * Ensure only the latest input is bound
                         */
-                        // if ( api.sekTinyMceEditor.locker && api.sekTinyMceEditor.locker !== input ) {
-                        //       //api.sekEditorExpanded.set( false );
-                        //       api.sekTinyMceEditor.locker = null;
-                        // } if ( ! api.sekTinyMceEditor.locker || api.sekTinyMceEditor.locker === input ) {
-                        //       $(document.body).toggleClass('czr-customize-content_editor-pane-open', expanded);
-                        //       api.sekTinyMceEditor.locker = input;
-                        // }
 
                         $( window )[ expanded ? 'on' : 'off' ]('resize', function() {
                                 if ( ! api.sekEditorExpanded() )
@@ -7533,31 +5445,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( expanded ) {
                               self.czrResizeEditor( window.innerHeight - self.$editorPane.height() );
                         } else {
-                              //resize reset
-                              //self.container.closest( 'ul.accordion-section-content' ).css( 'padding-bottom', '' );
                               self.$preview.css( 'bottom', '' );
                               self.$collapseSidebar.css( 'bottom', '' );
                         }
                   });
-
-
-
-
-                  // COLLAPSING THE EDITOR
-                  // or on click on the icon located on top of the editor
                   $('#czr-customize-content_editor-pane' ).on('click', '[data-czr-action="close-tinymce-editor"]', function() {
                         api.sekEditorExpanded( false );
                   });
-
-                  // on click anywhere but on the 'Edit' ( 'open-tinymce-editor' action ) button
                   $('#customize-controls' ).on('click', function( evt ) {
                         if ( 'open-tinymce-editor' == $( evt.target ).data( 'czr-action') )
                           return;
                         api.sekEditorExpanded( false, { context : "clicked anywhere"} );
                   });
-
-                  // Pressing the escape key collapses the editor
-                  // both in the customizer panel and the editor frame
                   $(document).on( 'keydown', _.throttle( function( evt ) {
                         if ( 27 === evt.keyCode ) {
                               api.sekEditorExpanded( false );
@@ -7603,9 +5502,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             attachResizeEventsToEditor : function() {
                   var self = this;
-                  // LISTEN TO USER DRAG ACTIONS => RESIZE EDITOR
-                  // Note : attaching event to the dragbar element was broken => the mouseup event could not be triggered for some reason, probably because adding the class "czr-customize-content_editor-pane-resize", makes us lose access to the dragbar element
-                  // => that's why we listen for the mouse events when they have bubbled up to the parent wrapper, and then check if the target is our candidate.
                   $('#czr-customize-content_editor-pane').on( 'mousedown mouseup', function( evt ) {
                         if ( 'mousedown' === evt.type && 'czr-customize-content_editor-dragbar' !== $(evt.target).attr('id') && ! $(evt.target).hasClass('czr-resize-handle') )
                           return;
@@ -7633,7 +5529,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             czrResizeEditor : function( position ) {
               var self = this,
-                  //$sectionContent = input.container.closest( 'ul.accordion-section-content' ),
                   windowHeight = window.innerHeight,
                   windowWidth = window.innerWidth,
                   minScroll = 40,
@@ -7680,32 +5575,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     'bottom',
                     collapseMinSpacing > windowHeight - args.height ? $mceStatusbar.outerHeight() + collapseBottomInsideEditor : args.height + collapseBottomOutsideEditor
               );
-
-              //$sectionContent.css( 'padding-bottom',  windowWidth <= mobileWidth ? args.height : '' );
       }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
-      // Skope
       $.extend( CZRSeksPrototype, api.Events );
       var CZR_SeksConstructor   = api.Class.extend( CZRSeksPrototype );
-
-      // Schedule skope instantiation on api ready
-      // api.bind( 'ready' , function() {
-      //       api.czr_skopeBase   = new api.CZR_SeksConstructor();
-      // });
       try { api.czr_sektions = new CZR_SeksConstructor(); } catch( er ) {
             api.errare( 'api.czr_sektions => problem on instantiation', er );
       }
 })( wp.customize, jQuery );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-
-      // HELPERS USED IN ALL SPACING INPUT TYPES
-      // "this" is input
       var validateUnit = function( unit ) {
             if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
                   api.errare( 'error : invalid unit for input ' + this.id, unit );
@@ -7718,18 +5600,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
           },
           unitButtonsSetup = function( $wrapper ) {
                 var input = this;
-                // Schedule unit changes on button click
-                // @param params can be { previewed_device_switched : true }
                 $wrapper.on( 'click', '.sek-ui-button', function( evt, params ) {
                       evt.preventDefault();
-                      // handle the is-selected css class toggling
                       $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
                       $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                      // set the current unit Value
                       input.css_unit( $(this).data('sek-unit'), params );
                 });
-
-                // add is-selected button on init to the relevant unit button
                 $wrapper.find( '.sek-ui-button[data-sek-unit="'+ ( input.initial_unit || 'px' ) +'"]').addClass('is-selected').attr( 'aria-pressed', true );
           },
           setupResetAction = function( $wrapper, defaultVal ) {
@@ -7741,7 +5617,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       });
 
                       input( defaultVal );
-                      // Reset unit to pixels
                       $('.sek-unit-wrapper', $wrapper ).find('[data-sek-unit="px"]').trigger('click');
                 });
           };
@@ -7757,36 +5632,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       $wrapper = $('.sek-spacing-wrapper', input.container ),
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                       defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : [];
-
-                  // Listen to user actions on the inputs and set the input value
                   $wrapper.on( 'input', 'input[type="number"]', function(evt) {
                         var _type_ = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
                             _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
                             _rawVal = $(this).val();
-
-                        // Validates
-                        // @fixes https://github.com/presscustomizr/nimble-builder/issues/26
                         if ( ( _.isString( _rawVal ) && ! _.isEmpty( _rawVal ) ) || _.isNumber( _rawVal ) ) {
                               _newInputVal[ _type_ ] = _rawVal;
                         } else {
-                              // this allow users to reset a given padding / margin instead of reseting them all at once with the "reset all spacing" option
                               _newInputVal = _.omit( _newInputVal, _type_ );
                         }
                         input( _newInputVal );
                   });
-                  // Schedule a reset action
                   setupResetAction.call( input, $wrapper, defaultVal );
-
-                  // Synchronize on init
                   if ( _.isObject( input() ) ) {
                         _.each( input(), function( _val_, _key_ ) {
                               $( '[data-sek-spacing="' + _key_ +'"]', $wrapper ).find( 'input[type="number"]' ).val( _val_ );
                         });
-                        // loop on the unit buttons and check which one should be clicked
                         var unitToActivate = 'px';
                         $('.sek-unit-wrapper .sek-ui-button', input.container ).each( function() {
                               var unit = $(this).data('sek-unit');
-                              // do we have a unit for the current device ?
                               if ( ! _.isEmpty( input() ) ) {
                                     if ( ! _.isEmpty( input()[ 'unit' ] ) ) {
                                           if ( unit === input()[ 'unit' ] ) {
@@ -7797,18 +5661,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                         $('.sek-unit-wrapper', input.container ).find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click');
                   }
-
-                  // Set the initial unit
                   var initial_value = input();
                   input.initial_unit = 'px';
                   if ( ! _.isEmpty( initial_value )  ) {
                         input.initial_unit = _.isEmpty( initial_value['unit'] ) ? 'px' : initial_value['unit'];
                   }
-
-                  // initialize the unit with the value provided in the dom
                   input.css_unit = new api.Value( validateUnit.call( input, input.initial_unit ) );
-
-                  // React to a unit change
                   input.css_unit.bind( function( to ) {
                         to = _.isEmpty( to ) ? 'px' : to;
                         var _newInputVal;
@@ -7817,9 +5675,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _newInputVal[ 'unit' ] = to;
                         input( _newInputVal );
                   });
-
-                  // Schedule unit changes on button click
-                  // add is-selected button on init to the relevant unit button
                   unitButtonsSetup.call( input, $wrapper );
             }
       });//$.extend( api.czrInputMap, {})
@@ -7841,24 +5696,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       /* ------------------------------------------------------------------------- *
        *  SPACING WITH DEVICE SWITCHER
       /* ------------------------------------------------------------------------- */
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             spacingWithDeviceSwitcher : function( input_options ) {
-                  // DEFINITIONS
                   var input = this,
                       $wrapper = $('.sek-spacing-wrapper', input.container ),
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                       defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {};
-
-                  // Recursive helper
-                  // return the value set for the currently previewed device if exists
-                  // OR
-                  // return the inherited value from the first parent device for which the value is set
-                  // OR
-                  // falls back on the module default
                   var getCurrentDeviceActualOrInheritedValue = function( inputValues, currentDevice ) {
                         var deviceHierarchy = [ 'mobile' , 'tablet', 'desktop' ];
                         if ( _.has( inputValues, currentDevice ) ) {
@@ -7872,19 +5715,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         }
                   };
-
-                  // Synchronizes on init + refresh on previewed device changes
                   var syncWithPreviewedDevice = function( currentDevice ) {
                         var inputValues = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
                             clonedDefault = $.extend( true, {}, defaultVal );
                         inputValues = _.isObject( inputValues ) ? $.extend( clonedDefault, inputValues ) : clonedDefault;
                         var _currentDeviceValues = getCurrentDeviceActualOrInheritedValue( inputValues, currentDevice );
-
-                        // loop on each sek spacing and check if we find a value to write for this device
                         $( '[data-sek-spacing]', $wrapper ).each( function() {
                               var spacingType = $(this).data('sek-spacing'),
                                   _val_ = '';
-                              // do we have a val for the current device ?
                               if ( ! _.isEmpty( _currentDeviceValues ) ) {
                                     if ( ! _.isEmpty( _currentDeviceValues[ spacingType ] ) ) {
                                           _val_ = _currentDeviceValues[ spacingType ];
@@ -7892,12 +5730,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               $(this).find( 'input[type="number"]' ).val( _val_ );
                         });
-
-                        // loop on the unit button and check which one should be clicked
                         var unitToActivate = 'px';
                         $( '.sek-unit-wrapper .sek-ui-button', input.container).each( function() {
                               var unit = $(this).data('sek-unit');
-                              // do we have a unit for the current device ?
                               if ( ! _.isEmpty( _currentDeviceValues ) ) {
                                     if ( ! _.isEmpty( _currentDeviceValues[ 'unit' ] ) ) {
                                           if ( unit === _currentDeviceValues[ 'unit' ] ) {
@@ -7908,28 +5743,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                         $('.sek-unit-wrapper', input.container ).find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click', { previewed_device_switched : true });// We don't want to update the input();
                   };
-
-
-
-
-                  // SETUP
                   api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
-
-                  // Set the initial unit
                   var initial_value = input();
                   input.initial_unit = 'px';
                   if ( ! _.isEmpty( initial_value ) && ! _.isEmpty( initial_value[ input.previewedDevice() ] ) ) {
                         input.initial_unit = _.isEmpty( initial_value[ input.previewedDevice() ]['unit'] ) ? 'px' : initial_value[ input.previewedDevice() ]['unit'];
                   }
-
-                  // initialize the unit with the value provided in the dom
                   input.css_unit = new api.Value( validateUnit.call( input, input.initial_unit ) );
-
-
-
-
-                  // SCHEDULE REACTIONS
-                  // Listen to user actions on the inputs and set the input value
                   $wrapper.on( 'input', 'input[type="number"]', function(evt) {
                         var changedSpacingType    = $(this).closest('[data-sek-spacing]').data('sek-spacing'),
                             changedNumberInputVal = $(this).val(),
@@ -7938,32 +5758,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
                         _newInputVal[ previewedDevice ] = $.extend( true, {}, _newInputVal[ previewedDevice ] || {} );
-                        // Validates
-                        // @fixes https://github.com/presscustomizr/nimble-builder/issues/26
                         if ( ( _.isString( changedNumberInputVal ) && ! _.isEmpty( changedNumberInputVal ) ) || _.isNumber( changedNumberInputVal ) ) {
                               _newInputVal[ previewedDevice ][ changedSpacingType ] = changedNumberInputVal;
                         } else {
-                              // this allow users to reset a given padding / margin instead of reseting them all at once with the "reset all spacing" option
                               _newInputVal[ previewedDevice ] = _.omit( _newInputVal[ previewedDevice ], changedSpacingType );
                         }
 
                         input( _newInputVal );
                   });
-
-                  // Schedule a reset action
                   setupResetAction.call( input, $wrapper, defaultVal );
-
-                  // react to previewed device changes
-                  // input.previewedDevice is updated in api.czr_sektions.maybeSetupDeviceSwitcherForInput()
                   input.previewedDevice.bind( function( currentDevice ) {
                         try { syncWithPreviewedDevice( currentDevice ); } catch( er ) {
                               api.errare('Error when firing syncWithPreviewedDevice for input type spacingWithDeviceSwitcher for input id ' + input.id , er );
                         }
                   });
-
-
-                  // React to a unit change
-                  // Don't move when switching the device
                   input.css_unit.bind( function( to, from, params ) {
                         if ( _.isObject( params ) && true === params.previewed_device_switched )
                           return;
@@ -7976,14 +5784,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _newInputVal[ previewedDevice ][ 'unit' ] = to;
                         input( _newInputVal );
                   });
-
-                  // Schedule unit changes on button click
-                  // add is-selected button on init to the relevant unit button
                   unitButtonsSetup.call( input, $wrapper );
-
-
-
-                  // INITIALIZES
                   try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
                         api.errare('Error when firing syncWithPreviewedDevice for input type spacingWithDeviceSwitcher for input id ' + input.id , er );
                   }
@@ -7993,25 +5794,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             /* ------------------------------------------------------------------------- *
              *  BG POSITION SIMPLE
             /* ------------------------------------------------------------------------- */
             bg_position : function( input_options ) {
                   var input = this;
-                  // Listen to user actions on the inputs and set the input value
                   $('.sek-bg-pos-wrapper', input.container ).on( 'change', 'input[type="radio"]', function(evt) {
                         input( $(this).val() );
                   });
-
-                  // Synchronize on init
                   if ( ! _.isEmpty( input() ) ) {
                         input.container.find('input[value="'+ input() +'"]').attr('checked', true).trigger('click');
                   }
@@ -8025,8 +5817,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var input = this,
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                       defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {};
-
-                  // SETUP
                   api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
 
                   var getCurrentDeviceActualOrInheritedValue = function( inputValues, currentDevice ) {
@@ -8042,8 +5832,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         }
                   };
-
-                  // Synchronizes on init + refresh on previewed device changes
                   var syncWithPreviewedDevice = function( currentDevice ) {
                         var inputValues = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
                             clonedDefault = $.extend( true, {}, defaultVal );
@@ -8052,10 +5840,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         input.container.find('input[value="'+ _currentDeviceValue +'"]').attr('checked', true).trigger('click', { previewed_device_switched : true } );
                   };
-
-
-
-                  // Listen to user actions on the inputs and set the input value
                   $('.sek-bg-pos-wrapper', input.container ).on( 'change', 'input[type="radio"]', function( evt ) {
                         var changedRadioVal = $(this).val(),
                             _newInputVal;
@@ -8065,17 +5849,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         input( _newInputVal );
                   });
-
-
-                  // react to previewed device changes
-                  // input.previewedDevice is updated in api.czr_sektions.maybeSetupDeviceSwitcherForInput()
                   input.previewedDevice.bind( function( currentDevice ) {
                         try { syncWithPreviewedDevice( currentDevice ); } catch( er ) {
                               api.errare('Error when firing syncWithPreviewedDevice for input type spacingWithDeviceSwitcher for input id ' + input.id , er );
                         }
                   });
-
-                  // INITIALIZES
                   try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
                         api.errare('Error when firing syncWithPreviewedDevice for input type bgPositionWithDeviceSwitcher for input id ' + input.id , er );
                   }
@@ -8085,20 +5863,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // Generic method to instantiate the following input types :
-      // horizTextAlignmentWithDeviceSwitcher and horizAlignmentWithDeviceSwitcher => tmpl => 3_0_5_sek_input_tmpl_horizontal_alignment.php
-      // verticalAlignWithDeviceSwitcher => tmpl => 3_0_6_sek_input_tmpl_vertical_alignment.php
       var x_or_y_AlignWithDeviceSwitcher = function( params ) {
             var input = this,
                 inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                 defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {},
                 tmplSelector = 'verticalAlignWithDeviceSwitcher' === input.type ? '.sek-v-align-wrapper' : '.sek-h-align-wrapper',// <= because used by 2 different input tmpl
                 $wrapper = $( tmplSelector, input.container );
-
-            // SETUP
             api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
 
             var getCurrentDeviceActualOrInheritedValue = function( inputValues, currentDevice ) {
@@ -8114,20 +5885,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   }
             };
-
-            // Synchronizes on init + refresh on previewed device changes
             var syncWithPreviewedDevice = function( currentDevice ) {
                   var inputValues = $.extend( true, {}, _.isObject( input() ) ? input() : {} ),
                       clonedDefault = $.extend( true, {}, defaultVal );
                   inputValues = _.isObject( inputValues ) ? $.extend( clonedDefault, inputValues ) : clonedDefault;
                   var _currentDeviceValue = getCurrentDeviceActualOrInheritedValue( inputValues, currentDevice );
-
-                  //input.container.find('input[value="'+ _currentDeviceValue +'"]').attr('checked', true).trigger('click', { previewed_device_switched : true } );
                   $wrapper.find('.selected').removeClass('selected');
                   $wrapper.find( 'div[data-sek-align="' + _currentDeviceValue +'"]' ).addClass('selected');
             };
-
-            // on click
             $wrapper.on( 'click', '[data-sek-align]', function(evt) {
                   evt.preventDefault();
                   var _newInputVal;
@@ -8140,26 +5905,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         input( _newInputVal );
                   });
             });
-
-            // react to previewed device changes
-            // input.previewedDevice is updated in api.czr_sektions.maybeSetupDeviceSwitcherForInput()
             input.previewedDevice.bind( function( currentDevice ) {
                   try { syncWithPreviewedDevice( currentDevice ); } catch( er ) {
                         api.errare('Error when firing syncWithPreviewedDevice for input type : ' + input.type + ' for input id ' + input.id , er );
                   }
             });
-
-            // INITIALIZES
             try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
                   api.errare('Error when firing syncWithPreviewedDevice for input type : ' + input.type + ' for input id ' + input.id , er );
             }
       };
-
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             horizTextAlignmentWithDeviceSwitcher : x_or_y_AlignWithDeviceSwitcher,
             horizAlignmentWithDeviceSwitcher : x_or_y_AlignWithDeviceSwitcher,
@@ -8167,13 +5921,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             font_size : function( params ) {
                   api.czr_sektions.setupFontSizeAndLineHeightInputs.call(this);
@@ -8184,13 +5932,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             line_height : function( params ) {
                   api.czr_sektions.setupFontSizeAndLineHeightInputs.call(this);
@@ -8200,15 +5942,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
-            // FONT PICKER
             font_picker : function( input_options ) {
                   var input = this,
                       item = input.input_parent;
@@ -8222,8 +5957,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( ! _.isUndefined( api.sek_fetchingFontCollection ) && 'pending' == api.sek_fetchingFontCollection.state() ) {
                                     _ajaxRequest_ = api.sek_fetchingFontCollection;
                               } else {
-                                    // This utility handles a cached version of the font_list once fetched the first time
-                                    // @see api.CZR_Helpers.czr_cachedTmpl
                                     _ajaxRequest_ = api.CZR_Helpers.getModuleTmpl( {
                                           tmpl : 'font_list',
                                           module_type: 'font_picker_input',
@@ -8232,7 +5965,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.sek_fetchingFontCollection = _ajaxRequest_;
                               }
                               _ajaxRequest_.done( function( _serverTmpl_ ) {
-                                    // Ensure we have a string that's JSON.parse-able
                                     if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '{' ) {
                                           throw new Error( 'font_picker => server list is not JSON.parse-able');
                                     }
@@ -8279,10 +6011,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return selectFocusResults.promise();
 
                   };//_preprocessSelect2ForFontFamily
-
-                  // @return void();
-                  // Instantiates a czrSelect2 select input
-                  // http://ivaynberg.github.io/czrSelect2/#documentation
                   var _setupSelectForFontFamilySelector = function( customResultsAdapter, fontCollections ) {
                         var _model = item(),
                             _googleFontsFilteredBySubset = function() {
@@ -8299,9 +6027,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             },
                             $fontSelectElement = $( 'select[data-czrtype="' + input.id + '"]', input.container );
-
-                        // generates the options
-                        // @param type = cfont or gfont
                         var _generateFontOptions = function( fontList, type ) {
                               var _html_ = '';
                               _.each( fontList , function( font_data ) {
@@ -8321,16 +6046,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                               return _html_;
                         };
-
-                        //add the first option
                         if ( _.isNull( input() ) || _.isEmpty( input() ) ) {
                               $fontSelectElement.append( '<option value="none" selected="selected">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
                         } else {
                               $fontSelectElement.append( '<option value="none">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
                         }
-
-
-                        // generate the cfont and gfont html
                         _.each( [
                               {
                                     title : sektionsLocalizedData.i18n['Web Safe Fonts'],
@@ -8348,9 +6068,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
 
                         var _fonts_czrSelect2_params = {
-                                //minimumResultsForSearch: -1, //no search box needed
-                            //templateResult: paintFontOptionElement,
-                            //templateSelection: paintFontOptionElement,
                             escapeMarkup: function(m) { return m; },
                         };
                         /*
@@ -8362,24 +6079,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     closeOnSelect: false,
                               } );
                         }
-
-                        //http://ivaynberg.github.io/czrSelect2/#documentation
-                        //FONTS
                         $fontSelectElement.czrSelect2( _fonts_czrSelect2_params );
                         $( '.czrSelect2-selection__rendered', input.container ).css( getInlineFontStyle( input() ) );
 
                   };//_setupSelectForFontFamilySelector
-
-                  // @return {} used to set $.css()
-                  // @param font {string}.
-                  // Example : Aclonica:regular
-                  // Example : Helvetica Neue, Helvetica, Arial, sans-serif
                   var getInlineFontStyle = function( _fontFamily_ ){
-                        // the font is set to 'none' when "Select a font family" option is picked
                         if ( ! _.isString( _fontFamily_ ) || _.isEmpty( _fontFamily_ ) )
                           return {};
-
-                        //always make sure we remove the prefix.
                         _fontFamily_ = _fontFamily_.replace('[gfont]', '').replace('[cfont]', '');
 
                         var module = this,
@@ -8398,10 +6104,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               'font-style'  : font_style || 'normal'
                         };
                   };
-
-                  // @return the font family name only from a pre Google formated
-                  // Example : input is Inknut+Antiqua:regular
-                  // Should return Inknut Antiqua
                   var getFontFamilyName = function( rawFontFamily ) {
                         if ( ! _.isString( rawFontFamily ) || _.isEmpty( rawFontFamily ) )
                             return rawFontFamily;
@@ -8424,24 +6126,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
-            // FONT AWESOME ICON PICKER
             fa_icon_picker : function() {
                   var input           = this,
                       _selected_found = false;
-
-                  //generates the options
                   var _generateOptions = function( iconCollection ) {
                         _.each( iconCollection , function( iconClass ) {
                               var _attributes = {
                                     value: iconClass,
-                                    //iconClass is in the form "fa(s|b|r) fa-{$name}" so the name starts at position 7
                                     html: api.CZR_Helpers.capitalize( iconClass.substring( 7 ) )
                               };
 
@@ -8455,22 +6148,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         var addIcon = function ( state ) {
                               if (! state.id) { return state.text; }
-
-                              //two spans here because we cannot wrap the text into the icon span as the solid FA5 font-weight is bold
                               var  $state = $(
                                 '<span class="' + state.element.value + '"></span><span class="social-name">&nbsp;&nbsp;' + state.text + '</span>'
                               );
                               return $state;
                         };
-
-                        //blank option to allow placeholders
                         var $_placeholder;
                         if ( _selected_found ) {
                               $_placeholder = $('<option>');
                         } else {
                               $_placeholder = $('<option>', { selected: 'selected' } );
                         }
-                        //Initialize czrSelect2
                         $( 'select[data-czrtype]', input.container )
                             .prepend( $_placeholder )
                             .czrSelect2({
@@ -8487,14 +6175,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( ! _.isEmpty( input.sek_faIconCollection ) ) {
                                     _dfd_.resolve( input.sek_faIconCollection );
                               } else {
-                                    // This utility handles a cached version of the font_list once fetched the first time
-                                    // @see api.CZR_Helpers.czr_cachedTmpl
                                     api.CZR_Helpers.getModuleTmpl( {
                                           tmpl : 'icon_list',
                                           module_type: 'fa_icon_picker_input',
                                           module_id : input.module.id
                                     } ).done( function( _serverTmpl_ ) {
-                                          // Ensure we have a string that's JSON.parse-able
                                           if ( typeof _serverTmpl_ !== 'string' || _serverTmpl_[0] !== '[' ) {
                                                 throw new Error( 'fa_icon_picker => server list is not JSON.parse-able');
                                           }
@@ -8504,18 +6189,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _dfd_.reject( _r_ );
                                     });
                               }
-                              //return dfd.promise();
                         });
                   };//_getIconsCollections
-
-                  // do
                   var _do_ = function( params ) {
                         if ( true === input.iconCollectionSet )
                           return;
                         $.when( _getIconsCollections() ).done( function( iconCollection ) {
                               _generateOptions( iconCollection );
                               if ( params && true === params.open_on_init ) {
-                                    // let's open select2 after a delay ( because there's no 'ready' event with select2 )
                                     _.delay( function() {
                                           try{ $( 'select[data-czrtype]', input.container ).czrSelect2('open'); }catch(er) {}
                                     }, 100 );
@@ -8525,13 +6206,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                         input.iconCollectionSet = true;
                   };
-
-                  // Generate options and open select2
                   input.container.on('click', function() {
                         _do_();
                   });
-
-                  // schedule the iconCollectionSet after a delay
                   _.delay( function() { _do_( { open_on_init : false } );}, 1000 );
 
             }
@@ -8539,13 +6216,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             code_editor : function( input_options ) {
                   var input          = this,
@@ -8555,43 +6226,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       $textarea      = input.container.find( 'textarea' ),
                       $input_title   = input.container.find( '.customize-control-title' ),
                       editor_params  = $textarea.data( 'editor-params' );
-
-                  // // When using blocking notifications (type: error) the following block will append a checkbox to the
-                  // // notification message block that once checked will allow to save and publish anyways
-
-                  // // Note that rendering is debounced so the props will be used when rendering happens after add event.
-                  // control.notifications.bind( 'add', function( notification ) {
-                  //       // Skip if control notification is not from setting csslint_error notification.
-                  //       if ( notification.code !== control.setting.id + ':' + input.id ) {
-                  //             return;
-                  //       }
-
-                  //       // Customize the template and behavior of csslint_error notifications.
-                  //       notification.templateId = 'customize-code-editor-lint-error-notification';
-                  //       notification.render = (function( render ) {
-                  //             return function() {
-                  //                   var li = render.call( this );
-                  //                   li.find( 'input[type=checkbox]' ).on( 'click', function() {
-                  //                         control.setting.notifications.remove( input.id );
-                  //                   } );
-                  //                   return li;
-                  //             };
-                  //       })( notification.render );
-                  // } );
-
-                  // Obtain editorSettings for instantiation.
                   if ( wp.codeEditor  && ( _.isUndefined( editor_params ) || false !== editor_params )  ) {
-                        // Obtain this input editor settings (we don't have defaults).
                         editorSettings = editor_params;
                   }
 
                   input.isReady.done( function() {
                         var _doInstantiate = function( evt ) {
                               var input = this;
-                              // Bail if we have an instance
                               if ( ! _.isEmpty( input.editor ) )
                                 return;
-                              // Bail if the control is not expanded yet
                               if ( _.isEmpty( input.module.control.container.attr('data-sek-expanded') ) || "false" == input.module.control.container.attr('data-sek-expanded') )
                                 return;
 
@@ -8604,17 +6247,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else {
                                           initPlainTextareaEditor();
                                     }
-                                    //focus the editor
                                    $input_title.click();
                               }, 10 );
                         };
-                        // Try to instantiate now
                         _doInstantiate.call(input);
-
-                        // the input should be visible otherwise the code mirror initializes wrongly:
-                        // e.g. bad ui (bad inline CSS maths), not visible content until click.
-                        // When the code_editor input is rendered in an accordion control ( @see CZRSeksPrototype.scheduleModuleAccordion ), we need to defer the instantiation when the control has been expanded.
-                        // fixes @see https://github.com/presscustomizr/nimble-builder/issues/176
                         input.module.control.container.on('sek-accordion-expanded', function() {
                               _doInstantiate.call( input );
                         });
@@ -8635,9 +6271,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
 
                         input.editor = wp.codeEditor.initialize( $textarea, settings );
-
-
-                        // Improve the editor accessibility.
                         $( input.editor.codemirror.display.lineDiv )
                               .attr({
                                     role: 'textbox',
@@ -8645,8 +6278,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     'aria-label': $input_title.html(),
                                     'aria-describedby': 'editor-keyboard-trap-help-1 editor-keyboard-trap-help-2 editor-keyboard-trap-help-3 editor-keyboard-trap-help-4'
                               });
-
-                        // Focus the editor when clicking on its title.
                         $input_title.on( 'click', function( evt ) {
                               evt.stopPropagation();
                               input.editor.codemirror.focus();
@@ -8664,16 +6295,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
 
                         input.editor.codemirror.setValue( input() );
-
-                        // Update CodeMirror when the setting is changed by another plugin.
                         /* TODO: check this */
                         input.bind( input.id + ':changed', function( value ) {
                               if ( ! suspendEditorUpdate ) {
                                     input.editor.codemirror.setValue( value );
                               }
                         });
-
-                        // Prevent collapsing section when hitting Esc to tab out of editor.
                         input.editor.codemirror.on( 'keydown', function onKeydown( codemirror, event ) {
                               var escKeyCode = 27;
                               if ( escKeyCode === event.keyCode ) {
@@ -8704,13 +6331,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                                     return;
                               }
-
-                              // Short-circuit if tab key is not being pressed or if a modifier key *is* being pressed.
                               if ( tabKeyCode !== event.keyCode || event.ctrlKey || event.altKey || event.shiftKey ) {
                                     return;
                               }
-
-                              // Prevent capturing Tab characters if Esc was pressed.
                               if ( $textarea.data( 'next-tab-blurs' ) ) {
                                     return;
                               }
@@ -8754,22 +6377,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             range_simple : function( params ) {
                   var input = this,
                       $wrapper = $('.sek-range-with-unit-picker-wrapper', input.container ),
                       $numberInput = $wrapper.find( 'input[type="number"]'),
                       $rangeInput = $wrapper.find( 'input[type="range"]');
-
-                  // synchronizes range input and number input
-                  // number is the master => sets the input() val
                   $rangeInput.on('input', function( evt ) {
                         $numberInput.val( $(this).val() ).trigger('input');
                   });
@@ -8777,7 +6391,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         input( $(this).val() );
                         $rangeInput.val( $(this).val() );
                   });
-                  // trigger a change on init to sync the range input
                   $rangeInput.val( $numberInput.val() || 0 );
             },
 
@@ -8786,13 +6399,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             range_with_unit_picker : function( params ) {
                   var input = this,
@@ -8807,16 +6414,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         return unit;
                   };
-                  // initialize the unit with the value provided in the dom
                   input.css_unit = new api.Value( _.isEmpty( initial_unit ) ? 'px' : validateUnit( initial_unit ) );
-                  // React to a unit change => trigger a number input change
                   input.css_unit.bind( function( to ) {
                         to = _.isEmpty( to ) ? 'px' : to;
                         $wrapper.find( 'input[type="number"]').trigger('input');
                   });
-
-                  // synchronizes range input and number input
-                  // number is the master => sets the input() val
                   $rangeInput.on('input', function( evt ) {
                         $numberInput.val( $(this).val() ).trigger('input');
                   });
@@ -8824,22 +6426,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         input( $(this).val() + validateUnit( input.css_unit() ) );
                         $rangeInput.val( $(this).val() );
                   });
-                  // trigger a change on init to sync the range input
                   $rangeInput.val( $numberInput.val() || 0 );
-
-                  // Schedule unit changes on button click
                   $wrapper.on( 'click', '.sek-ui-button', function(evt) {
                         evt.preventDefault();
-                        // handle the is-selected css class toggling
                         $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        // update the initial unit ( not mandatory)
                         $wrapper.find('input[data-czrtype]').data('sek-unit', $(this).data('sek-unit') );
-                        // set the current unit Value
                         input.css_unit( $(this).data('sek-unit') );
                   });
-
-                  // add is-selected button on init to the relevant unit button
                   $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
             },
 
@@ -8848,13 +6442,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             range_with_unit_picker_device_switcher : function( params ) {
                   var input = this,
@@ -8868,7 +6456,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             }
                             return unit;
                       },
-                      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
                       _extractNumericVal = function( _rawVal ) {
                             return ( _.isEmpty( _rawVal ) || ! _.isString( _rawVal ) ) ? '16' : _rawVal.replace(/px|em|%/g,'');
                       },
@@ -8881,13 +6468,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var getInitialUnit = function() {
                         return $wrapper.find('input[data-czrtype]').data('sek-unit') || 'px';
                   };
-
-                  // Recursive helper
-                  // return the value set for the currently previewed device if exists
-                  // OR
-                  // return the inherited value from the first parent device for which the value is set
-                  // OR
-                  // falls back on the module default
                   var getCurrentDeviceActualOrInheritedValue = function( inputValues, currentDevice ) {
                         var deviceHierarchy = [ 'mobile' , 'tablet', 'desktop' ];
                         if ( _.has( inputValues, currentDevice ) ) {
@@ -8902,12 +6482,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         }
                   };
-
-                  // Synchronizes on init + refresh on previewed device changes
                   var syncWithPreviewedDevice = function( currentDevice ) {
-                        // initialize the number input with the current input val
-                        // for retro-compatibility, we must handle the case when the initial input val is a string instead of an array
-                        // in this case, the string value is assigned to the desktop device.
                         var inputVal = input(), inputValues = {}, clonedDefault = $.extend( true, {}, defaultVal );
                         inputValues = clonedDefault;
                         if ( _.isObject( inputVal ) ) {
@@ -8915,55 +6490,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         } else if ( _.isString( inputVal ) && ! _.isEmpty( inputVal ) ) {
                               inputValues = { desktop : inputVal };
                         }
-                        //inputValues = _.extend( inputValues, clonedDefault );
-                        // do we have a val for the current device ?
                         var _rawVal = getCurrentDeviceActualOrInheritedValue( inputValues, currentDevice ),
                             _unit = _extractUnit( _rawVal ),
                             _numberVal = _extractNumericVal( _rawVal );
-
-                        // update the unit
                         $('.sek-unit-wrapper', $wrapper).find('[data-sek-unit="' + _unit +'"]').trigger('click', { previewed_device_switched : true });// We don't want to update the input()
-                        // add is-selected button on init to the relevant unit button
                         $wrapper.find( '.sek-ui-button[data-sek-unit="'+ _unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
-
-                        // update the numeric val
                         $numberInput.val(  _numberVal  ).trigger('input', { previewed_device_switched : true });// We don't want to update the input()
                   };
-
-
-
-                  // SETUP
-                  // setup the device switcher
                   api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
-
-                  // initialize the unit with the value provided in the dom
                   input.css_unit = new api.Value( _.isEmpty( getInitialUnit() ) ? 'px' : validateUnit( getInitialUnit() ) );
-
-                  // Append a reset button
                   var resetButton = '<button type="button" class="button sek-reset-button sek-float-right">' + sektionsLocalizedData.i18n['Reset'] + '</button>';
                   input.container.find('.customize-control-title').append( resetButton );
-
-
-
-
-
-
-                  // SCHEDULE REACTIONS
-                  // React to a unit change => trigger a number input change
-                  // Don't move when switching the device
-                  // @param params can be { previewed_device_switched : true }
                   input.css_unit.bind( function( to, from, params ) {
                         if ( _.isObject( params ) && true === params.previewed_device_switched )
                           return;
                         $numberInput.trigger('input');
                   });
-
-                  // synchronizes range input and number input
-                  // number is the master => sets the input() val
                   $rangeInput.on('input', function( evt ) {
                         $numberInput.val( $(this).val() ).trigger('input');
                   });
-                  // Set the input val
                   $numberInput.on('input', function( evt, params ) {
                         var previewedDevice = api.previewedDevice() || 'desktop',
                             changedNumberInputVal = $(this).val() + validateUnit( input.css_unit() ),
@@ -8971,41 +6516,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
                         _newInputVal[ previewedDevice ] = $.extend( true, {}, _newInputVal[ previewedDevice ] || {} );
-
-                        // Validates
                         if ( ( _.isString( changedNumberInputVal ) && ! _.isEmpty( changedNumberInputVal ) ) ) {
                               _newInputVal[ previewedDevice ]= changedNumberInputVal;
                         }
-
-                        // update input if not previewed_device_switched
                         if ( _.isEmpty( params ) || ( _.isObject( params ) && true !== params.previewed_device_switched ) ) {
                               input( _newInputVal );
                         }
                         $rangeInput.val( $(this).val() );
                   });
-
-                  // Schedule unit changes on button click
                   $wrapper.on( 'click', '.sek-ui-button', function( evt, params ) {
-                        //evt.preventDefault();
                         evt.stopPropagation();
-                        // handle the is-selected css class toggling
                         $wrapper.find('.sek-ui-button').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        // update the initial unit ( not mandatory)
                         $wrapper.find('input[data-czrtype]').data('sek-unit', $(this).data('sek-unit') );
-                        // set the current unit Value
                         input.css_unit( $(this).data('sek-unit'), params );
                   });
-
-                  // react to previewed device changes
-                  // input.previewedDevice is updated in api.czr_sektions.maybeSetupDeviceSwitcherForInput()
                   input.previewedDevice.bind( function( currentDevice ) {
                         try { syncWithPreviewedDevice( currentDevice ); } catch( er ) {
                               api.errare('Error when firing syncWithPreviewedDevice for input type range_with_unit_picker_device_switcher for input id ' + input.id , er );
                         }
                   });
-
-                  // Schedule the reset of the value for the currently previewed device
                   input.container.on( 'click', '.sek-reset-button', function( evt ) {
                         var _currentDevice = api.previewedDevice(),
                             _newVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
@@ -9015,10 +6545,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               syncWithPreviewedDevice( api.previewedDevice() );
                         }
                   });
-
-
-                  // INITIALIZES
-                  // trigger a change on init to sync the range input
                   $rangeInput.val( $numberInput.val() || 0 );
                   try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
                         api.errare('Error when firing syncWithPreviewedDevice for input type range_with_unit_picker_device_switcher for input id ' + input.id , er );
@@ -9030,13 +6556,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             borders : function( params ) {
                   var input = this,
@@ -9051,7 +6571,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             }
                             return unit;
                       },
-                      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
                       _extractNumericVal = function( _rawVal ) {
                             return ( _.isEmpty( _rawVal ) || ! _.isString( _rawVal ) ) ? '16' : _rawVal.replace(/px|em|%/g,'');
                       },
@@ -9062,8 +6581,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {};
 
                   input.cssBorderTypes = [ 'top', 'left', 'right', 'bottom' ];
-
-                  // Return the unit of the _all_ border type
                   var getInitialUnit = function() {
                         var inputVal = input(), initial_unit = 'px';
                         if ( _.isObject( inputVal ) && _.has( inputVal, '_all_' ) && _.isObject( inputVal['_all_'] ) && ! _.isEmpty( inputVal['_all_'][ 'wght'] ) ) {
@@ -9071,7 +6588,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         return initial_unit;
                   };
-                  // Return the number value of the _all_ border type
                   var getInitialWeight = function() {
                         var inputVal = input(), initial_weight = 1;
                         if ( _.isObject( inputVal ) && _.has( inputVal, '_all_' ) && _.isObject( inputVal['_all_'] ) && ! _.isEmpty( inputVal['_all_'][ 'wght'] ) ) {
@@ -9084,7 +6600,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         return initial_weight;
                   };
-                  // Return the color of the _all_ border type
                   var getInitialColor = function() {
                         var inputVal = input(), initial_color = '#000000';
                         if ( _.isObject( inputVal ) && _.has( inputVal, '_all_' ) && _.isObject( inputVal['_all_'] ) && ! _.isEmpty( inputVal['_all_'][ 'col'] ) ) {
@@ -9092,10 +6607,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         return initial_color;
                   };
-
-                  // Recursive helper
-                  // _all_ : { wght : 1px, col : #000000 }
-                  // falls back on {}
                   var getCurrentBorderTypeOrAllValue = function( inputValues, borderType ) {
                         var clonedDefaults = $.extend( true, {}, defaultVal ), _all_Value;
                         if ( ! _.has( clonedDefaults, '_all_' ) ) {
@@ -9109,16 +6620,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               return clonedDefaults['_all_'];
                         }
                   };
-
-                  // Synchronizes on init + refresh on border type change
                   var syncWithBorderType = function( borderType ) {
                         if ( ! _.contains( _.union( input.cssBorderTypes, [ '_all_' ] ) , borderType ) ) {
                               throw new Error( "Error in syncWithBorderType : the border type must be one of those values '_all_', 'top', 'left', 'right', 'bottom'" );
                         }
-
-                        // initialize the number input with the current input val
-                        // for retro-compatibility, we must handle the case when the initial input val is a string instead of an array
-                        // in this case, the string value is assigned to the desktop device.
                         var inputVal = input(), inputValues = {}, clonedDefault = $.extend( true, {}, defaultVal );
                         if ( _.isObject( inputVal ) ) {
                               inputValues = $.extend( true, {}, inputVal );
@@ -9126,8 +6631,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               inputValues = { _all_ : { wght : inputVal } };
                         }
                         inputValues = $.extend( clonedDefault, inputValues );
-
-                        // do we have a val for the current border type ?
                         var _rawVal = getCurrentBorderTypeOrAllValue( inputValues, borderType ), _unit, _numberVal;
                         if ( _.isEmpty( _rawVal ) || ! _.isObject( _rawVal ) || _.isEmpty( _rawVal.wght ) || _.isEmpty( _rawVal.col ) ) {
                               throw new Error( "Error in syncWithBorderType : getCurrentBorderTypeOrAllValue must return an object formed : array( 'wght' => '1px', 'col' => '#000000' )");
@@ -9135,103 +6638,48 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         _unit = _extractUnit( _rawVal.wght );
                         _numberVal = _extractNumericVal( _rawVal.wght );
-
-                        // update the unit
                         $('.sek-unit-wrapper', $wrapper).find('[data-sek-unit="' + _unit +'"]').trigger('click', { border_type_switched : true });// We don't want to update the input()
-                        // add is-selected button on init to the relevant unit button
                         $wrapper.find( '.sek-ui-button[data-sek-unit="'+ _unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
-                        // update the numeric val
                         $numberInput.val( _numberVal ).trigger('input', { border_type_switched : true });// We don't want to update the input()
-                        // update the color
-                        // trigger the change between "border_type_switched" data flags, so we know the api setting don't have to be refreshed
-                        // ( there's no easy other way to pass a param when triggering )
                         $colorInput.data('border_type_switched', true );
                         $colorInput.val( _rawVal.col ).trigger( 'change' );
                         $colorInput.data('border_type_switched', false );
                   };
-
-
-
-
-
-                  // SETUP
                   input.borderColor = new api.Value( _.isEmpty( getInitialColor() ) ? '#000000' : getInitialColor() );
-                  // initialize the unit
                   input.css_unit = new api.Value( _.isEmpty( getInitialUnit() ) ? 'px' : validateUnit( getInitialUnit() ) );
-                  // setup the border type switcher. Initialized with all.
                   input.borderType = new api.Value( '_all_');
-                  // Setup the initial state of the number input
                   $numberInput.val( getInitialWeight() );
-                  // Setup the color input
                   $colorInput.val( input.borderColor() );
                   $colorInput.wpColorPicker({
                         palettes: true,
-                        //hide:false,
                         width: window.innerWidth >= 1440 ? 271 : 251,
                         change : function( evt, o ) {
-                              //if the input val is not updated here, it's not detected right away.
-                              //weird
-                              //is there a "change complete" kind of event for iris ?
-                              //$(this).val($(this).wpColorPicker('color'));
-                              //input.container.find('[data-czrtype]').trigger('colorpickerchange');
-
-                              //synchronizes with the original input
-                              //OLD => $(this).val( $(this).wpColorPicker('color') ).trigger('colorpickerchange').trigger('change');
                               $(this).val( o.color.toString() ).trigger('colorpickerchange');
                               input.borderColor( o.color.toString(), { border_type_switched : true === $(this).data('border_type_switched') } );
-                              //input.borderColor( o.color.toString() );
-                              // if ( evt.originalEvent && evt.originalEvent.type && 'external' === evt.originalEvent.type ) {
-                              //       input.borderColor( o.color.toString(), { border_type_switched : true } );
-                              // } else {
-                              //       input.borderColor( o.color.toString() );
-                              // }
                         },
                         clear : function( e, o ) {
                               $(this).val('').trigger('colorpickerchange');
                               input.borderColor('');
                         }
                   });
-
-
-
-
-
-
-                  // SCHEDULE REACTIONS
-                  // React to a unit change => trigger a number input change
-                  // Don't move when switching the border type or initializing unit
-                  // @param params can be { border_type_switched : true }
                   input.css_unit.bind( function( to, from, params ) {
-                        // don't update the main input when switching border types or initializing the unit value
                         if ( _.isObject( params ) && ( true === params.border_type_switched || true === params.initializing_the_unit ) )
                           return;
                         $numberInput.trigger('input', params);
                   });
-
-                  // React to a color change => trigger a number input change
-                  // Don't move when switching the border type or initializing the color
-                  // @param params can be { border_type_switched : true }
                   input.borderColor.bind( function( to, from, params ) {
-                        // don't update the main input when switching border types or initializing the unit value
                         if ( _.isObject( params ) && ( true === params.border_type_switched || true === params.initializing_the_color ) )
                           return;
                         $numberInput.trigger('input', params);
                   });
-
-                  // react to border type changes
                   input.borderType.bind( function( borderType ) {
                         try { syncWithBorderType( borderType ); } catch( er ) {
                               api.errare('Error when firing syncWithBorderType for input type borders for module type ' + input.module.module_type , er );
                         }
                   });
-
-                  // synchronizes range input and number input
-                  // number is the master => sets the input() val
                   $rangeInput.on('input', function( evt ) {
                         $numberInput.val( $(this).val() ).trigger('input');
                   });
-
-                  // Set the input val
                   $numberInput.on('input', function( evt, params ) {
                         var currentBorderType = input.borderType() || '_all_',
                             currentColor = input.borderColor(),
@@ -9241,16 +6689,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : clonedDefaults );
                         _newInputVal[ currentBorderType ] = $.extend( true, {}, _newInputVal[ currentBorderType ] || clonedDefaults[ currentBorderType ] );
-
-                        // populate the border weight value
                         if ( ( _.isString( changedNumberInputVal ) && ! _.isEmpty( changedNumberInputVal ) ) ) {
                               _newInputVal[ currentBorderType ][ 'wght' ] = changedNumberInputVal;
                         }
-                        // populate the color value
                         _newInputVal[ currentBorderType ][ 'col' ] = currentColor;
-
-                        // update input if not border_type_switched
-                        // if _all_ is changed, removed all other types
                         if ( _.isEmpty( params ) || ( _.isObject( params ) && true !== params.border_type_switched ) ) {
                               if ( '_all_' === currentBorderType ) {
                                     _.each( input.cssBorderTypes, function( _type ) {
@@ -9259,27 +6701,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               input( _newInputVal );
                         }
-                        // refresh the range slider
                         $rangeInput.val( $(this).val() );
                   });
-
-
-                  // Schedule unit changes on button click
                   $wrapper.on( 'click', '[data-sek-unit]', function( evt, params ) {
                         evt.preventDefault();
-                        // handle the is-selected css class toggling
                         $wrapper.find('[data-sek-unit]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        // update the initial unit ( not mandatory)
                         $wrapper.find('input[data-czrtype]').data('sek-unit', $(this).data('sek-unit') );
-                        // set the current unit Value
                         input.css_unit( $(this).data('sek-unit'), params );
                   });
-
-                  // Schedule border type changes on button click
                   $wrapper.on( 'click', '[data-sek-border-type]', function( evt, params ) {
                         evt.preventDefault();
-                        // handle the is-selected css class toggling
                         $wrapper.find('[data-sek-border-type]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
                         var border = '_all_';
@@ -9288,8 +6720,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         input.borderType( border, params );
                   });
-
-                  // Schedule the reset of the value for the currently previewed device
                   input.container.on( 'click', '.sek-reset-button', function( evt ) {
                         var currentBorderType = input.borderType() || '_all_',
                             _newVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
@@ -9299,22 +6729,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               syncWithBorderType( currentBorderType );
                         }
                   });
-
-
-
-
-
-
-
-
-                  // INITIALIZES
-                  // trigger a change on init to sync the range input
                   $rangeInput.val( $numberInput.val() || 0 );
                   try { syncWithBorderType( input.borderType() ); } catch( er ) {
                         api.errare('Error when firing syncWithBorderType for input type borders for module type ' + input.module.module_type , er );
                   }
-                  // trigger a click on the initial unit
-                  // => the initial unit could be set when fetching the server template but it's more convenient to handle it once the template is rendered
                   $( '[data-sek-unit="' + input.css_unit() + '"]', $wrapper ).trigger('click', { initializing_the_unit : true } );
             },
 
@@ -9323,13 +6741,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             border_radius : function( params ) {
                   var input = this,
@@ -9343,7 +6755,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             }
                             return unit;
                       },
-                      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
                       _extractNumericVal = function( _rawVal ) {
                             return ( _.isEmpty( _rawVal ) || ! _.isString( _rawVal ) ) ? '16' : _rawVal.replace(/px|em|%/g,'');
                       },
@@ -9354,8 +6765,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {};
 
                   input.cssRadiusTypes = [ 'top_left','top_right','bottom_right','bottom_left' ];
-
-                  // Return the unit of the _all_ border type
                   var getInitialUnit = function() {
                         var inputVal = input(), initial_unit = 'px';
                         if ( _.isObject( inputVal ) && _.has( inputVal, '_all_' ) ) {
@@ -9363,7 +6772,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         return initial_unit;
                   };
-                  // Return the number value of the _all_ border type
                   var getInitialRadius = function() {
                         var inputVal = input(), initial_rad = 0;
                         if ( _.isObject( inputVal ) && _.has( inputVal, '_all_' ) ) {
@@ -9376,11 +6784,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         return initial_rad;
                   };
-
-
-                  // Recursive helper
-                  // _all_ : 3px
-                  // falls back on {}
                   var getCurrentRadiusTypeOrAllValue = function( inputValues, radiusType ) {
                         var clonedDefaults = $.extend( true, {}, defaultVal ), _all_Value;
                         if ( ! _.has( clonedDefaults, '_all_' ) ) {
@@ -9394,16 +6797,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               return _all_Value;
                         }
                   };
-
-                  // Synchronizes on init + refresh on border radius change
                   var syncWithRadiusType = function( radiusType ) {
                         if ( ! _.contains( [ '_all_', 'top_left', 'top_right', 'bottom_right', 'bottom_left' ], radiusType ) ) {
                               throw new Error( "Error in syncWithRadiusType : the radius type must be one of those values '_all_', 'top_left', 'top_right', 'bottom_right', 'bottom_left', => radius type => " + radiusType );
                         }
-
-                        // initialize the number input with the current input val
-                        // for retro-compatibility, we must handle the case when the initial input val is a string instead of an array
-                        // in this case, the string value is assigned to the desktop device.
                         var inputVal = input(), inputValues = {}, clonedDefault = $.extend( true, {}, defaultVal );
                         if ( _.isObject( inputVal ) ) {
                               inputValues = $.extend( true, {}, inputVal );
@@ -9411,8 +6808,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               inputValues = { _all_ : '0px' };
                         }
                         inputValues = $.extend( clonedDefault, inputValues );
-
-                        // do we have a val for the current type ?
                         var _rawVal = getCurrentRadiusTypeOrAllValue( inputValues, radiusType ), _unit, _numberVal;
                         if ( _.isEmpty( _rawVal ) || ! _.isString( _rawVal ) ) {
                               throw new Error( "Error in syncWithRadiusType : getCurrentRadiusTypeOrAllValue must return a string like 3em");
@@ -9420,61 +6815,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         _unit = _extractUnit( _rawVal );
                         _numberVal = _extractNumericVal( _rawVal );
-
-                        // update the unit
                         $('.sek-unit-wrapper', $wrapper).find('[data-sek-unit="' + _unit +'"]').trigger('click', { radius_type_switched : true });// We don't want to update the input()
-                        // add is-selected button on init to the relevant unit button
                         $wrapper.find( '.sek-ui-button[data-sek-unit="'+ _unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
-                        // update the numeric val
                         $numberInput.val( _numberVal ).trigger('input', { radius_type_switched : true });// We don't want to update the input()
                   };
-
-
-
-
-
-
-
-                  // SETUP
-                  // initialize the unit
                   input.css_unit = new api.Value( _.isEmpty( getInitialUnit() ) ? 'px' : validateUnit( getInitialUnit() ) );
-                  // setup the border type switcher. Initialized with all.
                   input.radiusType = new api.Value('_all_');
-                  // Setup the initial state of the number input
                   $numberInput.val( getInitialRadius() );
-
-
-
-
-
-
-
-
-                  // SCHEDULE REACTIONS
-                  // React to a unit change => trigger a number input change
-                  // Don't move when switching the border type or initializing unit
-                  // @param params can be { radius_type_switched : true }
                   input.css_unit.bind( function( to, from, params ) {
-                        // don't update the main input when switching border types or initializing the unit value
                         if ( _.isObject( params ) && ( true === params.radius_type_switched || true === params.initializing_the_unit ) )
                           return;
                         $numberInput.trigger('input', params);
                   });
-
-                  // react to border type changes
                   input.radiusType.bind( function( radiusType ) {
                         try { syncWithRadiusType( radiusType ); } catch( er ) {
                               api.errare('Error when firing syncWithRadiusType for input type border_radius for module type ' + input.module.module_type , er );
                         }
                   });
-
-                  // synchronizes range input and number input
-                  // number is the master => sets the input() val
                   $rangeInput.on('input', function( evt ) {
                         $numberInput.val( $(this).val() ).trigger('input');
                   });
-
-                  // Set the input val
                   $numberInput.on('input', function( evt, params ) {
                         var currentRadiusType = input.radiusType() || '_all_',
                             changedNumberInputVal = $(this).val() + validateUnit( input.css_unit() ),
@@ -9483,13 +6843,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : clonedDefaults );
                         _newInputVal[ currentRadiusType ] = $.extend( true, {}, _newInputVal[ currentRadiusType ] || clonedDefaults[ currentRadiusType ] );
-
-                        // populate the border weight value
                         if ( ( _.isString( changedNumberInputVal ) && ! _.isEmpty( changedNumberInputVal ) ) ) {
                               _newInputVal[ currentRadiusType ] = changedNumberInputVal;
                         }
-                        // update input if not radius_type_switched
-                        // if _all_ is changed, removed all other types
                         if ( _.isEmpty( params ) || ( _.isObject( params ) && true !== params.radius_type_switched ) ) {
                               if ( '_all_' === currentRadiusType ) {
                                     _.each( input.cssRadiusTypes, function( _type ) {
@@ -9498,27 +6854,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               input( _newInputVal );
                         }
-                        // refresh the range slider
                         $rangeInput.val( $(this).val() );
                   });
-
-
-                  // Schedule unit changes on button click
                   $wrapper.on( 'click', '[data-sek-unit]', function( evt, params ) {
                         evt.preventDefault();
-                        // handle the is-selected css class toggling
                         $wrapper.find('[data-sek-unit]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        // update the initial unit ( not mandatory)
                         $wrapper.find('input[data-czrtype]').data('sek-unit', $(this).data('sek-unit') );
-                        // set the current unit Value
                         input.css_unit( $(this).data('sek-unit'), params );
                   });
-
-                  // Schedule border type changes on button click
                   $wrapper.on( 'click', '[data-sek-radius-type]', function( evt, params ) {
                         evt.preventDefault();
-                        // handle the is-selected css class toggling
                         $wrapper.find('[data-sek-radius-type]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
                         var border = '_all_';
@@ -9527,8 +6873,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         input.radiusType( border, params );
                   });
-
-                  // Schedule the reset of the value for the currently previewed device
                   input.container.on( 'click', '.sek-reset-button', function( evt ) {
                         var currentRadiusType = input.radiusType() || '_all_',
                             _newVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
@@ -9538,22 +6882,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               syncWithRadiusType( currentRadiusType );
                         }
                   });
-
-
-
-
-
-
-
-
-                  // INITIALIZES
-                  // trigger a change on init to sync the range input
                   $rangeInput.val( $numberInput.val() || 0 );
                   try { syncWithRadiusType( input.radiusType() ); } catch( er ) {
                         api.errare('Error when firing syncWithRadiusType for input type border_radius for module type ' + input.module.module_type , er );
                   }
-                  // trigger a click on the initial unit
-                  // => the initial unit could be set when fetching the server template but it's more convenient to handle it once the template is rendered
                   $( '[data-sek-unit="' + input.css_unit() + '"]', $wrapper ).trigger('click', { initializing_the_unit : true } );
             },
 
@@ -9562,13 +6894,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             buttons_choice : function( params ) {
                   var input = this,
@@ -9576,15 +6902,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       $mainInput = $wrapper.find( 'input[type="number"]'),
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
                       defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {};
-
-                  // SETUP
-                  // Setup the initial state of the number input
                   $mainInput.val( input() );
-
-                  // Schedule choice changes on button click
                   $wrapper.on( 'click', '[data-sek-choice]', function( evt, params ) {
                         evt.stopPropagation();
-                        // handle the is-selected css class toggling
                         $wrapper.find('[data-sek-choice]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
                         var newChoice;
@@ -9593,50 +6913,65 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         input( newChoice );
                   });
-
-
-                  // INITIALIZES
-                  // trigger a click on the initial unit
-                  // => the initial unit could be set when fetching the server template but it's more convenient to handle it once the template is rendered
                   $( '[data-sek-choice="' + input() + '"]', $wrapper ).trigger('click', { initializing_the_unit : true } );
             }
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             reset_button : function( params ) {
                   var input = this;
-
-                  // Schedule choice changes on button click
                   input.container.on( 'click', '[data-sek-reset-scope]', function( evt, params ) {
                         evt.stopPropagation();
                         var scope = $(this).data( 'sek-reset-scope' );
-                        if ( 'local' === scope ) {
-                              try { api.czr_sektions.resetCollectionSetting(); } catch( er ) {
-                                    api.errare( 'reset_button => error when firing resetCollectionSetting() on click event', er );
-                              }
+
+                        if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
+                              api.errare( 'reset_button input => invalid scope provided.', scope );
+                              return;
                         }
-                  });
+                        api.czr_sektions.updateAPISetting({
+                              action : 'sek-reset-collection',
+                              scope : scope,//<= will determine which setting will be updated,
+                        }).done( function() {
+                              api.previewer.refresh();
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'reset-success',
+                                    type : 'success',
+                                    duration : 8000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            sektionsLocalizedData.i18n['Reset complete'],
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        }).fail( function( response ) {
+                              api.errare( 'reset_button input => error when firing ::updateAPISetting', response );
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'reset-failed',
+                                    type : 'error',
+                                    duration : 8000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            sektionsLocalizedData.i18n['Reset failed'],
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        });
+                  });//on('click')
             }
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // the input id determine if we fetch the revision history of the local or global setting
       $.extend( api.czrInputMap, {
             revision_history : function( params ) {
                   var input = this;
                   _selected_found = false;
-                  //generates the options
                   var _generateOptions = function( revisionHistory ) {
                         if ( input.container.find('.sek-revision-history').length > 0 )
                           return;
@@ -9648,9 +6983,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               class : 'sek-revision-history',
                               html : [ '<option value="_select_">', ' -', sektionsLocalizedData.i18n['Select'], '- ', '</option>'].join('')
                         }));
-
-                        // The revisions are listed by ascending date
-                        // => let's reverse the order so that we see the latest first
                         var optionsNodes = [];
                         _.each( revisionHistory , function( _date, _post_id ) {
                               var _attributes = {
@@ -9664,14 +6996,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               optionsNodes.unshift( $('<option>', _attributes) );
                         });
-
-                        // Add the 'published' note to the first node
                         optionsNodes[0].html( [ optionsNodes[0].html(), sektionsLocalizedData.i18n['(currently published version)'] ].join(' ') );
                         _.each( optionsNodes, function( nod ) {
                               $( 'select.sek-revision-history', input.container ).append( nod );
                         });
-
-                        // Initialize selecter
                         $( 'select.sek-revision-history', input.container ).selecter();
                   };//_generateOptions
 
@@ -9681,14 +7009,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( ! _.isEmpty( input.sek_revisionHistory ) ) {
                                     _dfd_.resolve( input.sek_revisionHistory );
                               } else {
-                                    // The revision history sent by the server is an object
-                                    // {
-                                    //  post_id : date,
-                                    //  post_id : date,
-                                    //  ...
-                                    // }
                                     api.czr_sektions.getRevisionHistory( { is_local : 'local_revisions' === input.id } ).done( function( revisionHistory ) {
-                                          // Ensure we have a string that's JSON.parse-able
                                           if ( !_.isObject(revisionHistory) ) {
                                                 throw new Error( '_getRevisionHistory => server list is not a object');
                                           }
@@ -9698,18 +7019,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _dfd_.reject( _r_ );
                                     });
                               }
-                              //return dfd.promise();
                         });
                   };//_getRevisionHistory
-
-                  // do
                   var _do_ = function( params ) {
                         if ( true === input.revisionHistorySet )
                           return;
                         $.when( _getRevisionHistory() ).done( function( revisionHistory ) {
                               _generateOptions( revisionHistory );
                               if ( params && true === params.open_on_init ) {
-                                    // let's open select2 after a delay ( because there's no 'ready' event with select2 )
                                     _.delay( function() {
                                           try{ $( 'select[data-czrtype]', input.container ).czrSelect2('open'); }catch(er) {}
                                     }, 100 );
@@ -9719,39 +7036,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                         input.revisionHistorySet = true;
                   };
-
-                  // Generate options and open select2
                   input.container.on('change', '.sek-revision-history', function() {
                         var _val = $(this).val();
                         if ( '_select_' !== _val ) {
                               api.czr_sektions.setSingleRevision( { revision_post_id : _val, is_local : 'local_revisions' === input.id } );
                         }
                   });
-
-                  // schedule the revisionHistorySet after a delay
                   _.delay( function() { _do_( { open_on_init : false } );}, 1000 );
 
             }//revision_history
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
-      // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             nimble_tinymce_editor : function() {
                   var input = this,
                       $textarea = input.container.find('textarea').first(),
                       _id = $textarea.length > 0 ? $textarea.attr('id') : null,
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
-                      // see how those buttons can be set in php class _NIMBLE_Editors
-                      // @see the global js var nimbleTinyMCEPreInit includes all params
                       defaultToolbarBtns = sektionsLocalizedData.defaultToolbarBtns,
-                      //defaultQuickTagBtns = "strong,em,link,block,del,ins,img,ul,ol,li,code,more,close",
                       defaultQuickTagBtns = "strong,em,link,code";
 
                   if ( _.isNull( _id ) ) {
@@ -9780,26 +7084,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return ( inputRegistrationParams.editor_params && _.isNumber( inputRegistrationParams.editor_params.height ) ) ? inputRegistrationParams.editor_params.height : api.czr_sektions.TINYMCE_EDITOR_HEIGHT;
                   };
                   var isAutoPEnabled = function() {
-                        // on registration, the autop can be specified
                         return inputRegistrationParams && inputRegistrationParams.editor_params && true === inputRegistrationParams.editor_params.autop;
                   };
-                  // Set a height for the textarea before instanciation
-                  //$textarea.css( { 'height' : getEditorHeight() } );
-
-                  // the plugins like colorpicker have been loaded when instantiating the detached tinymce editor
-                  // @see php class _NIMBLE_Editors
-                  // if not specified, wp.editor falls back on the ones of wp.editor.getDefaultSettings()
-                  // we can use them here without the need to specify them in the tinymce {} params
-                  // @see the tinyMCE params with this global var : nimbleTinyMCEPreInit.mceInit["czr-customize-content_editor"]
-                  //
-                  // forced_root_block added to remove <p> tags automatically added
-                  // @see https://stackoverflow.com/questions/20464028/how-to-remove-unwanted-p-tags-from-wordpress-editor-using-tinymce
                   var init_settings = {
-                        //tinymce: nimbleTinyMCEPreInit.mceInit["czr-customize-content_editor"],
                         tinymce: {
-                            //plugins:"charmap,colorpicker,hr,lists,media,paste,tabfocus,textcolor,wordpress,wpeditimage,wpemoji,wpgallery,wplink,wpdialogs,wptextpattern,wpview",
                             toolbar1:getToolbarBtns(),
-                            //toolbar2:"",
                             content_css:( function() {
                                   var default_settings = wp.editor.getDefaultSettings(),
                                       stylesheets = [ sektionsLocalizedData.tinyMceNimbleEditorStylesheetUrl ];
@@ -9808,7 +7097,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   }
                                   return stylesheets.join(',');
                             })(),
-                            // https://www.tiny.cloud/docs/plugins/autoresize/
                             min_height :40,
                             height:getEditorHeight()
                         },
@@ -9817,55 +7105,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         },
                         mediaButtons: ( inputRegistrationParams.editor_params && false === inputRegistrationParams.editor_params.media_button ) ? false : true
                   };
-
-                  // AUTOP
                   init_settings.tinymce.wpautop = isAutoPEnabled();
-                  // forced_root_block is added to remove <p> tags automatically added
-                  // @see https://stackoverflow.com/questions/20464028/how-to-remove-unwanted-p-tags-from-wordpress-editor-using-tinymce
                   if ( !isAutoPEnabled() ) {
                         init_settings.tinymce.forced_root_block = "";
                   }
-
-                  // INITIALIZE
                   wp.editor.initialize( _id, init_settings );
-                  // Note that an easy way to instantiate a basic editor would be to use :
-                  // wp.editor.initialize( _id, { tinymce : { forced_root_block : "", wpautop: false }, quicktags : true });
 
                   var _editor = tinyMCE.get( _id );
                   if ( ! _editor ) {
                         throw new Error( 'setupTinyMceEditor => missing editor instance for module :' + input.module.id );
                   }
-
-                  // Store the id of each instantiated tinyMceEditor
-                  // used in api.czrSektion::cleanRegistered
                   api.czrActiveWPEditors = api.czrActiveWPEditors || [];
                   var currentEditors = $.extend( true, [], api.czrActiveWPEditors );
                   currentEditors.push(_id);
                   api.czrActiveWPEditors = currentEditors;
-
-                  // Let's set the input() value when the editor is ready
-                  // Because when we instantiate it, the textarea might not reflect the input value because too early
                   var _doOnInit = function() {
                         _editor.setContent( input() );
-                        //$('#wp-' + _editor.id + '-wrap' ).find('iframe').addClass('labite').css('height','50px');
                   };
                   if ( _editor.initialized ) {
                         _doOnInit();
                   } else {
                         _editor.on( 'init',_doOnInit );
                   }
-
-                  // bind events
                   _editor.on( 'input change keyup', function( evt ) {
                         input( _editor.getContent() );
                   } );
             },
-
-
-
-
-            // this input setup works in collaboration with ::setupTinyMceEditor()
-            // for api.sekEditorExpanded() and resizing of the editor.
             detached_tinymce_editor : function() {
                   var input = this,
                       $textarea = $('textarea#' + sektionsLocalizedData.idOfDetachedTinyMceTextArea ), //$('textarea#czr-customize-content_editor'),
@@ -9877,72 +7142,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   } else {
                         throw new Error( 'api.czrInputMap::detached_tinymce_editor => missing textarea element');
                   }
-
-                  // if ( _.isNull( _id ) ) {
-                  //       throw new Error( 'setupDetachedTinyMceEditor => missing textarea for module :' + input.module.id );
-                  // }
-                  // See wp.editor.initialize() in wp-admin/js/editor.js for initialization options.
-                   // **
-                   // * Initialize TinyMCE and/or Quicktags. For use with wp_enqueue_editor() (PHP).
-                   // *
-                   // * Intended for use with an existing textarea that will become the Text editor tab.
-                   // * The editor width will be the width of the textarea container, height will be adjustable.
-                   // *
-                   // * Settings for both TinyMCE and Quicktags can be passed on initialization, and are "filtered"
-                   // * with custom jQuery events on the document element, wp-before-tinymce-init and wp-before-quicktags-init.
-                   // *
-                   // * @since 4.8.0
-                   // *
-                   // * @param {string} id The HTML id of the textarea that is used for the editor.
-                   // *                    Has to be jQuery compliant. No brackets, special chars, etc.
-                   // * @param {object} settings Example:
-                   // * settings = {
-                   // *    // See https://www.tinymce.com/docs/configure/integration-and-setup/.
-                   // *    // Alternatively set to `true` to use the defaults.
-                   // *    tinymce: {
-                   // *        setup: function( editor ) {
-                   // *            console.log( 'Editor initialized', editor );
-                   // *        }
-                   // *    }
-                   // *
-                   // *    // Alternatively set to `true` to use the defaults.
-                   // *    quicktags: {
-                   // *        buttons: 'strong,em,link'
-                   // *    }
-                   // * }
-                   // */
-
-                  // Remove now
-                  // the initial instance has been created with php inline js generated by sek_setup_nimble_editor()
-                  // IMPORTANT !! => don't use wp.editor.remove() @see wp-admin/js/editor.js, because it can remove the stylesheet editor.css
-                  // and break the style of all editors
                   if ( window.tinymce ) {
                         mceInstance = window.tinymce.get( _id );
                         if ( mceInstance ) {
-                          // if ( ! mceInstance.isHidden() ) {
-                          //   mceInstance.save();
-                          // }
                           mceInstance.remove();
                         }
                   }
-                  // if ( window.quicktags ) {
-                  //   qtInstance = window.QTags.getInstance( id );
-
-                  //   if ( qtInstance ) {
-                  //     qtInstance.remove();
-                  //   }
-                  // }
-
-                  // Instantiate a new one
-                  // see in wp-admin/js/editor.js
-                  // the nimbleTinyMCEPreInit are set in php class _NIMBLE_Editors
                   if ( !window.nimbleTinyMCEPreInit || !window.nimbleTinyMCEPreInit.mceInit || !window.nimbleTinyMCEPreInit.mceInit[ _id ] ) {
                         throw new Error('setupDetachedTinyMceEditor => invalid nimbleTinyMCEPreInit global var');
                   }
 
                   var init_settings = nimbleTinyMCEPreInit.mceInit[ _id ];
-
-                  // Add the nimble editor's stylesheet to the default's ones
                   init_settings.content_css = ( function() {
                         var default_settings = wp.editor.getDefaultSettings(),
                             stylesheets = [ sektionsLocalizedData.tinyMceNimbleEditorStylesheetUrl ];
@@ -9951,13 +7161,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         return stylesheets.join(',');
                   })();
-
-                  // Handle wpautop param
                   var item = input.input_parent;
                   var isAutoPEnabled = function() {
                         var parent_item_val = item();
-                        // 1) the module 'czr_tinymce_child' includes an autop option
-                        // 2) on registration, the autop can be specified
                         if ( !_.isUndefined( parent_item_val.autop ) ) {
                             return parent_item_val.autop;
                         } else {
@@ -9966,36 +7172,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   init_settings.wpautop = isAutoPEnabled();
-                  // forced_root_block is added to remove <p> tags automatically added
-                  // @see https://stackoverflow.com/questions/20464028/how-to-remove-unwanted-p-tags-from-wordpress-editor-using-tinymce
                   if ( !isAutoPEnabled() ) {
                         init_settings.forced_root_block = "";
                   }
-
-                  // TOOLBARS
                   init_settings.toolbar1 = sektionsLocalizedData.defaultToolbarBtns;
                   init_settings.toolbar2 = "";
 
                   window.tinymce.init( init_settings );
                   window.QTags.getInstance( _id );
-                  // wp.editor.initialize( _id, {
-                  //       //tinymce : true,
-                  //       tinymce: nimbleTinyMCEPreInit.mceInit[_id],
-                  //       quicktags : nimbleTinyMCEPreInit.qtInit[_id],
-                  //       mediaButtons: true
-                  // });
 
                   var _editor = tinyMCE.get( _id );
                   if ( ! _editor ) {
                         throw new Error( 'setupDetachedTinyMceEditor => missing editor instance for module :' + input.module.id );
                   }
-
-                  // Let's set the input() value when the editor is ready
-                  // Because when we instantiate it, the textarea might not reflect the input value because too early
                   var _doOnInit = function() {
-                        // To ensure retro-compat with content created prior to Nimble v1.5.2, in which the editor has been updated
-                        // @see https://github.com/presscustomizr/nimble-builder/issues/404
-                        // we add the <p> tag on init, if autop option is checked
                         var initial_content = !isAutoPEnabled() ? input() : wp.editor.autop( input() );
                         _editor.setContent( initial_content );
                         api.sekEditorExpanded( true );
@@ -10005,18 +7195,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   } else {
                         _editor.on( 'init', _doOnInit );
                   }
-
-                  // bind events
                   _editor.on( 'input change keyup keydown click SetContent BeforeSetContent', function( evt ) {
-                        //$textarea.trigger( 'change', {current_input : input} );
                         input( isAutoPEnabled() ? _editor.getContent() : wp.editor.removep( _editor.getContent() ) );
                   });
-
-                  // store the current input now, so we'll always get the right one when textarea changes
                   api.sekCurrentDetachedTinyMceInput = input;
-
-                  // TEXT EDITOR => This is the original textarea element => needs to be bound separatelyn because not considered part of the tinyMce editor.
-                  // Bound only once
                   if ( !$textarea.data('czr-bound-for-detached-editor') ) {
                         $textarea.on( 'input', function( evt, params ) {
                               api.sekCurrentDetachedTinyMceInput( $(this).val() );
@@ -10026,24 +7208,166 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             },//setupDetachedTinyMceEditor
       });//$.extend( api.czrInputMap, {})
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      api.czrInputMap = api.czrInputMap || {};
+      $.extend( api.czrInputMap, {
+            import_export : function() {
+                  var input = this,
+                      $file_input = input.container.find('input[name=sek-import-file]');
+
+                  $file_input.on('change', function( evt ) {
+                        input.container.find('button[data-czr-action="sek-import"]').toggleClass( 'disabled', _.isEmpty( $(this).val() ) );
+                  });
+                  input.container.on( 'click', '[data-czr-action]', function( evt, params ) {
+                        evt.stopPropagation();
+                        var _action = $(this).data( 'czr-action' );
+                        switch( _action ) {
+                              case 'sek-export' :
+                                    var query = [],
+                                        query_params = {
+                                        sek_export_nonce : api.settings.nonce.save,
+                                        skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                                    };
+                                    _.each( query_params, function(v,k) {
+                                          query.push( encodeURIComponent(k) + '=' + encodeURIComponent(v) );
+                                    });
+                                    window.location.href = [
+                                          sektionsLocalizedData.customizerURL ,
+                                          '?',
+                                          query.join('&')
+                                    ].join('');
+                              break;//'sek-export'
+
+                              case 'sek-import' :
+                                    var inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type );
+
+                                    if ( $file_input.length < 1 || _.isUndefined( $file_input[0] ) || ! $file_input[0].files || _.isEmpty( $file_input.val() ) ) {
+                                          api.previewer.trigger('sek-notify', {
+                                                notif_id : 'missing-import-file',
+                                                type : 'info',
+                                                duration : 10000,
+                                                message : [
+                                                      '<span style="color:#0075a2">',
+                                                        '<strong>',
+                                                        sektionsLocalizedData.i18n['Missing file'],
+                                                        '</strong>',
+                                                      '</span>'
+                                                ].join('')
+                                          });
+                                    } else {
+                                          api.notifications.remove( 'missing-import-file' );
+                                          api.notifications.remove( 'import-success' );
+                                          api.notifications.remove( 'import-failed' );
+                                          input.container.find('.sek-uploading').show();
+                                          var fd = new FormData();
+                                          fd.append( 'file_candidate', $file_input[0].files[0] );
+                                          fd.append( 'action', 'sek_get_imported_file_content' );
+                                          fd.append( 'nonce', api.settings.nonce.save );
+                                          if ( !_.contains( ['local', 'global'], inputRegistrationParams.scope ) ) {
+                                                api.errare('sek-import input => invalid scope provided', inputRegistrationParams.scope );
+                                                return;
+                                          }
+
+                                          fd.append( 'skope', inputRegistrationParams.scope);
+                                          $.ajax({
+                                                url: wp.ajax.settings.url,
+                                                data: fd,
+                                                processData: false,
+                                                contentType: false,
+                                                type: 'POST',
+                                          }).done( function( server_resp ){
+                                                var setId = 'local' === inputRegistrationParams.scope ? api.czr_sektions.localSectionsSettingId() : api.czr_sektions.getGlobalSectionsSettingId(),
+                                                    unserialized_file_content = server_resp.data;
+                                                if ( ! _.isObject( unserialized_file_content ) ) {
+                                                      api.errare('sek-import input => invalid data sent from server', unserialized_file_content );
+                                                      api.previewer.trigger('sek-notify', {
+                                                            notif_id : 'import-failed',
+                                                            type : 'error',
+                                                            duration : 10000,
+                                                            message : [
+                                                                  '<span>',
+                                                                    '<strong>',
+                                                                    sektionsLocalizedData.i18n['Import failed, invalid file content'],
+                                                                    '</strong>',
+                                                                  '</span>'
+                                                            ].join('')
+                                                      });
+                                                      return;
+                                                }
+                                                if ( _.isEqual( api( setId )(), unserialized_file_content ) ) {
+                                                      api.infoLog('sek-import input => Setting unchanged');
+                                                      return;
+                                                }
+                                                api.infoLog('api.czr_sektions.localSectionsSettingId()?', api.czr_sektions.localSectionsSettingId());
+                                                api.infoLog('AJAX SUCCESS file_content ', unserialized_file_content );
+                                                api.infoLog('inputRegistrationParams.scope ?', inputRegistrationParams.scope );
+                                                api.czr_sektions.updateAPISetting({
+                                                      action : 'sek-import-from-file',
+                                                      scope : 'global' === inputRegistrationParams.scope,//<= will determine which setting will be updated,
+                                                      imported_data : unserialized_file_content
+                                                }).done( function() {
+                                                      api.previewer.refresh();
+                                                      api.previewer.trigger('sek-notify', {
+                                                            notif_id : 'import-success',
+                                                            type : 'success',
+                                                            duration : 10000,
+                                                            message : [
+                                                                  '<span>',
+                                                                    '<strong>',
+                                                                    sektionsLocalizedData.i18n['File successfully imported'],
+                                                                    '</strong>',
+                                                                  '</span>'
+                                                            ].join('')
+                                                      });
+                                                }).fail( function( response ) {
+                                                      api.errare( 'sek-import input => error when firing ::updateAPISetting', response );
+                                                      api.previewer.trigger('sek-notify', {
+                                                            notif_id : 'import-failed',
+                                                            type : 'error',
+                                                            duration : 10000,
+                                                            message : [
+                                                                  '<span>',
+                                                                    '<strong>',
+                                                                    sektionsLocalizedData.i18n['Import failed, invalid file content'],
+                                                                    '</strong>',
+                                                                  '</span>'
+                                                            ].join('')
+                                                      });
+                                                });
+                                                api.previewer.refresh();
+                                          }).fail( function( response ) {
+                                                api.errare( 'sek-import input => ajax error', response );
+                                                api.previewer.trigger('sek-notify', {
+                                                      notif_id : 'import-failed',
+                                                      type : 'error',
+                                                      duration : 10000,
+                                                      message : [
+                                                            '<span>',
+                                                              '<strong>',
+                                                              sektionsLocalizedData.i18n['Import failed, file problem'],
+                                                              '</strong>',
+                                                            '</span>'
+                                                      ].join('')
+                                                });
+                                          }).always( function() {
+                                                input.container.find('.sek-uploading').hide();
+                                                $file_input.val('').trigger('change');
+                                          });
+                                    }
+                              break;//'sek-import'
+                        }
+                  });
+            },
+      });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 /* ------------------------------------------------------------------------- *
  *  CONTENT TYPE SWITCHER
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_content_type_switcher_module : {
-                  //mthds : SectionPickerModuleConstructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_content_type_switcher_module', 'name' ),
                   has_mod_opt : false,
@@ -10056,9 +7380,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       });
 
       api.czrInputMap = api.czrInputMap || {};
-      //input_type => callback fn to fire in the Input constructor on initialize
-      //the callback can receive specific params define in each module constructor
-      //For example, a content picker can be given params to display only taxonomies
       $.extend( api.czrInputMap, {
             content_type_switcher : function( input_options ) {
                   var input = this,
@@ -10069,11 +7390,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         throw new Error( 'api.czrInputMap.content_type_switcher => section not registered' );
                   }
                   _section_ = api.section( input.module.control.section() );
-
-                  // attach click event on data-sek-content-type buttons
                   input.container.on('click', '[data-sek-content-type]', function( evt ) {
                         evt.preventDefault();
-                        // handle the is-selected css class toggling
                         input.container.find('[data-sek-content-type]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
                         api.czr_sektions.currentContentPickerType( $(this).data( 'sek-content-type') );
@@ -10088,13 +7406,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   };
-
-                  // Initialize
-                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
                   api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value( input() );
                   _do_( api.czr_sektions.currentContentPickerType() );
-
-                  // Schedule a reaction to changes
                   api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
                         _do_( contentType );
                   });
@@ -10109,21 +7422,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 /* ------------------------------------------------------------------------- *
  *  MODULE PICKER MODULE
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_module_picker_module : {
-                  //mthds : ModulePickerModuleConstructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_module_picker_module', 'name' ),
                   has_mod_opt : false,
@@ -10136,28 +7438,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       });
 
       api.czrInputMap = api.czrInputMap || {};
-
-      //input_type => callback fn to fire in the Input constructor on initialize
-      //the callback can receive specific params define in each module constructor
-      //For example, a content picker can be given params to display only taxonomies
       $.extend( api.czrInputMap, {
             module_picker : function( input_options ) {
                 var input = this;
-                // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
-                // input.container.find('[draggable]').each( function() {
-                //       $(this).on( 'mousedown mouseup', function( evt ) {
-                //             switch( evt.type ) {
-                //                   case 'mousedown' :
-                //                         //$(this).addClass('sek-grabbing');
-                //                   break;
-                //                   case 'mouseup' :
-                //                         //$(this).removeClass('sek-grabbing');
-                //                   break;
-                //             }
-                //       });
-                // });
                 api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'module', input_container : input.container } );
-                //console.log( this.id, input_options );
             }
       });
 })( wp.customize , jQuery, _ );
@@ -10168,14 +7452,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
  *  SECTION PICKER MODULES
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       var section_modules = [
             'sek_intro_sec_picker_module',
@@ -10183,14 +7459,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             'sek_contact_sec_picker_module',
             'sek_column_layouts_sec_picker_module'
       ];
-      // Header and footer have been introduced in v1.4.0 but not enabled by default
-      // The header and footer preset sections are on hold until "header and footer" feature is released.
       if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
             section_modules = _.union( section_modules, [ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ] );
       }
       _.each( section_modules, function( module_type ) {
             api.czrModuleMap[ module_type ] = {
-                  //mthds : SectionPickerModuleConstructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( module_type, 'name' ),
                   has_mod_opt : false,
@@ -10211,14 +7484,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 /* ------------------------------------------------------------------------- *
  *  MY SECTIONS MODULE
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         initialize : function( name, options ) {
                               var input = this;
@@ -10235,7 +7504,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   html = '',
                                   $wrapper = input.container.find('.sek-content-type-wrapper'),
                                   creation_date = '',
-                                  // https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
                                   formatDate = function(date) {
                                       var monthNames = [
                                           "January", "February", "March",
@@ -10255,7 +7523,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             day,
                                             monthNames[monthIndex],
                                             year
-                                            //[hours,minutes,seconds].join(':')
                                       ].join(' ');
                                   };
 
@@ -10277,27 +7544,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         }
                   });
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-                  // module.embedded.then( function() {
-                  //       console.log('MODULE READY=> lets dance',  module.container,  module.container.find('.sek-content-type-wrapper') );
-                  // });
             },//initialize
       };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       if ( sektionsLocalizedData.isSavedSectionEnabled ) {
             $.extend( api.czrModuleMap, {
@@ -10324,43 +7573,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
       api.czrInputMap = api.czrInputMap || {};
-      //input_type => callback fn to fire in the Input constructor on initialize
-      //the callback can receive specific params define in each module constructor
-      //For example, a content picker can be given params to display only taxonomies
       $.extend( api.czrInputMap, {
             section_picker : function( input_options ) {
                   var input = this;
-                  // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
-                  // input.container.find('[draggable]').each( function() {
-                  //       $(this).on( 'mousedown mouseup', function( evt ) {
-                  //             switch( evt.type ) {
-                  //                   case 'mousedown' :
-                  //                         //$(this).addClass('sek-grabbing');
-                  //                   break;
-                  //                   case 'mouseup' :
-                  //                         //$(this).removeClass('sek-grabbing');
-                  //                   break;
-                  //             }
-                  //       });
-                  // });
                   api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_level_anchor_module : {
-                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_anchor_module', 'name' ),
                   has_mod_opt : false,
@@ -10373,19 +7596,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
-                  //console.log('INITIALIZING SEKTION OPTIONS', id, options );
                   var module = this;
-
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
@@ -10397,11 +7613,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//CZRInputMths
 
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -10409,18 +7622,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'bg-image' :
@@ -10476,7 +7682,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
                                                 }
                                           });
-                                          // uncheck fixed background if needed
                                           input.bind( function( to ) {
                                                 if ( api.CZR_Helpers.isChecked( input() ) ) {
                                                       if ( api.CZR_Helpers.isChecked( item.czr_Input('bg-attachment')()) ) {
@@ -10486,7 +7691,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     break;
                                     case 'bg-attachment' :
-                                          // uncheck parallax if needed
                                           input.bind( function( to ) {
                                                 if ( api.CZR_Helpers.isChecked( input() ) ) {
                                                       if ( api.CZR_Helpers.isChecked( item.czr_Input('bg-parallax')()) ) {
@@ -10500,16 +7704,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             }//CZRItemConstructor
       };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_level_bg_module : {
@@ -10526,19 +7720,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
-                  //console.log('INITIALIZING SEKTION OPTIONS', id, options );
                   var module = this;
-
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
@@ -10550,11 +7737,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//CZRInputMths
 
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -10562,18 +7746,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'border-type' :
@@ -10590,16 +7767,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             }//CZRItemConstructor
       };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_level_border_module : {
@@ -10616,32 +7783,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
             var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  // module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
 
-            // CZRInputMths : {
-            //       setupSelect : function() {
-            //             api.czr_sektions.setupSelectInput.call( this );
-            //       }
-            // },//CZRInputMths
-
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -10649,18 +7802,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-breakpoint' :
@@ -10673,15 +7819,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             }//CZRItemConstructor
       };
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_level_breakpoint_module : {
@@ -10698,16 +7835,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
@@ -10719,11 +7852,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//CZRInputMths
 
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -10731,18 +7861,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'height-type' :
@@ -10759,16 +7882,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             }//CZRItemConstructor
       };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_level_height_module : {
@@ -10785,20 +7898,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_level_visibility_module : {
-                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_visibility_module', 'name' ),
                   has_mod_opt : false,
@@ -10811,16 +7914,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
@@ -10832,11 +7931,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//CZRInputMths
 
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -10844,19 +7940,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'width-type' :
@@ -10872,16 +7960,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             }//CZRItemConstructor
       };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_level_width_module : {
@@ -10898,16 +7976,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
@@ -10919,11 +7993,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//CZRInputMths
 
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -10931,19 +8002,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-outer-width' :
@@ -10961,16 +8024,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             }//CZRItemConstructor
       };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_level_width_section : {
@@ -10987,16 +8040,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_level_spacing_module : {
@@ -11013,34 +8057,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             }//initialize
       };
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_template : {
@@ -11056,30 +8085,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
 
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -11087,19 +8109,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-outer-width' :
@@ -11116,17 +8130,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   }
             }//CZRItemConstructor
-      };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      };//Constructor
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_widths : {
@@ -11142,21 +8146,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_custom_css : {
-                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_custom_css', 'name' ),
                   has_mod_opt : false,
@@ -11168,21 +8161,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_reset : {
-                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_reset', 'name' ),
                   has_mod_opt : false,
@@ -11194,32 +8176,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             }//initialize
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_performances : {
@@ -11235,33 +8204,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             }//initialize
       };
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_header_footer : {
@@ -11277,20 +8232,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_revisions : {
-                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_revisions', 'name' ),
                   has_mod_opt : false,
@@ -11302,30 +8247,38 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_local_imp_exp : {
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_imp_exp', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_local_imp_exp' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
 
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -11333,19 +8286,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-breakpoint' :
@@ -11358,16 +8303,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             }//CZRItemConstructor
       };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_global_breakpoint : {
@@ -11383,30 +8318,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
 
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -11414,19 +8342,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-outer-width' :
@@ -11444,16 +8364,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             }//CZRItemConstructor
       };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_global_widths : {
@@ -11469,20 +8379,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_global_performances : {
-                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_performances', 'name' ),
                   has_mod_opt : false,
@@ -11494,33 +8394,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             }//initialize
       };
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_global_header_footer : {
@@ -11536,30 +8422,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  // module.inputConstructor = api.CZRInput.extend({
-                  //       setupSelect : function() {
-                  //             api.czr_sektions.setupSelectInput.call( this );
-                  //       }
-                  // });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
 
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -11567,19 +8441,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'enable' :
@@ -11614,16 +8480,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             }//CZRItemConstructor
       };
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_global_recaptcha : {
@@ -11639,12 +8495,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_global_revisions : {
-                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_revisions', 'name' ),
                   has_mod_opt : false,
@@ -11656,20 +8510,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_global_reset : {
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_reset', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_reset' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+( function ( api, $, _ ) {
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_global_beta_features : {
-                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_beta_features', 'name' ),
                   has_mod_opt : false,
@@ -11683,28 +8542,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );/* ------------------------------------------------------------------------- *
  *  IMAGE MAIN SETTINGS
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-                  //SET THE CONTENT PICKER DEFAULT OPTIONS
-                  //@see ::setupContentPicker()
                   module.bind( 'set_default_content_picker_options', function( params ) {
                         params.defaultContentPickerOption.defaultOption = {
                               'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
@@ -11717,20 +8565,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return params;
                   });
             },//initialize
-
-
-            // _isChecked : function( v ) {
-            //       return 0 !== v && '0' !== v && false !== v && 'off' !== v;
-            // },
-            //////////////////////////////////////////////////////////
-            /// ITEM CONSTRUCTOR
-            //////////////////////////////////////////
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -11738,19 +8575,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'img' :
@@ -11817,15 +8646,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//CZRItemConstructor
 
       };//Constructor
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_image_main_settings_child : {
@@ -11850,40 +8670,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 /* ------------------------------------------------------------------------- *
  *  IMAGE BORDERS AND BORDER RADIUS
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
-
-
-            // _isChecked : function( v ) {
-            //       return 0 !== v && '0' !== v && false !== v && 'off' !== v;
-            // },
-            //////////////////////////////////////////////////////////
-            /// ITEM CONSTRUCTOR
-            //////////////////////////////////////////
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -11891,27 +8692,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        // input controller instance == this
                         var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              //Fire on init
                               item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              //React on change
                               this.bind( function( to ) {
                                     item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
                               });
                         };
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'border-type' :
@@ -11929,15 +8720,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//CZRItemConstructor
 
       };//Constructor
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_image_borders_corners_child : {
@@ -11951,27 +8733,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
-                    //console.log('INITIALIZING IMAGE MODULE', id, options );
                     var module = this;
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                     module.inputConstructor = api.CZRInput.extend( module.CZRTextEditorInputMths || {} );
-                    // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                    // module.itemConstructor = api.CZRItem.extend( module.CZRSocialsItem || {} );
-
-                    // run the parent initialize
-                    // Note : must be always invoked always after the input / item class extension
-                    // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                     api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
             CZRTextEditorInputMths : {
                     initialize : function( name, options ) {
                           var input = this;
-                          // Expand the editor when ready
                           if ( 'detached_tinymce_editor' == input.type ) {
                                 input.isReady.then( function() {
                                       input.container.find('[data-czr-action="open-tinymce-editor"]').trigger('click');
@@ -11984,19 +8756,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           api.czr_sektions.setupSelectInput.call( this );
                     }
             },//CZRTextEditorInputMths
-
-            // CZRSocialsItem : { },//CZRSocialsItem
       };//Constructor
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_tinymce_child : {
@@ -12010,20 +8770,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_simple_html_module : {
-                  //mthds : SimpleHtmlModuleConstructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_html_module', 'name' ),
                   has_mod_opt : false,
@@ -12033,39 +8783,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var FeaturedPagesConstruct = {
             initialize: function( id, options ) {
-                  //console.log('INITIALIZING FP MODULE', id, options );
                   var module = this;
-
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRFPItemConstructor || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
-
-            //////////////////////////////////////////////////////////
-            /// ITEM CONSTRUCTOR
-            //////////////////////////////////////////
             CZRFPItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -12073,17 +8805,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'img-type' :
@@ -12127,15 +8853,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             },//CZRFPItemConstructor
       };//FeaturedPagesConstruct
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_featured_pages_module : {
@@ -12151,27 +8868,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //ICON MODULE
       var Constructor = {
               initialize: function( id, options ) {
-                      //console.log('INITIALIZING IMAGE MODULE', id, options );
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRIconItemConstructor || {} );
-
-
-                      //SET THE CONTENT PICKER DEFAULT OPTIONS
-                      //@see ::setupContentPicker()
                       module.bind( 'set_default_content_picker_options', function( params ) {
                             params.defaultContentPickerOption.defaultOption = {
                                   'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
@@ -12183,25 +8889,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             };
                             return params;
                       });
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
 
               /* Helpers */
-
-              //////////////////////////////////////////////////////////
-              /// ITEM CONSTRUCTOR
-              //////////////////////////////////////////
               CZRIconItemConstructor : {
-                    //overrides the parent ready
                     ready : function() {
                           var item = this;
-                          //wait for the input collection to be populated,
-                          //and then set the input visibility dependencies
                           item.inputCollection.bind( function( col ) {
                                 if( _.isEmpty( col ) )
                                   return;
@@ -12209,19 +8904,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                                 }
                           });//item.inputCollection.bind()
-
-                          //fire the parent
                           api.CZRItem.prototype.ready.call( item );
                     },
-
-
-                    //Fired when the input collection is populated
-                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-
-                          //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'link-to' :
@@ -12262,16 +8949,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               },//CZRIconItemConstructor
 
       };//Constructor
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_icon_settings_child : {
@@ -12285,42 +8962,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
       });
 })( wp.customize , jQuery, _ );
-
-
-
-
-
-
-
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-                      // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
               },//initialize
 
               CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -12328,27 +8985,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-                        // input controller instance == this
                         var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                              //Fire on init
                               item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                              //React on change
                               this.bind( function( to ) {
                                     item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
                               });
                         };
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'border-type' :
@@ -12365,14 +9012,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             }//CZRItemConstructor
       };// Constructor
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_icon_spacing_border_child: {
@@ -12388,28 +9027,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );/* ------------------------------------------------------------------------- *
  *  HEADING MAIN CHILD
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //HEADING MODULE
       var Constructor  = {
             initialize: function( id, options ) {
                   var module = this;
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
-
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-                  //SET THE CONTENT PICKER DEFAULT OPTIONS
-                  //@see ::setupContentPicker()
                   module.bind( 'set_default_content_picker_options', function( params ) {
                         params.defaultContentPickerOption.defaultOption = {
                               'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
@@ -12428,19 +9052,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.czr_sektions.setupSelectInput.call( this );
                   }
             },//CZRHeadingsInputMths
-
-            // _isChecked : function( v ) {
-            //       return 0 !== v && '0' !== v && false !== v && 'off' !== v;
-            // },
-            //////////////////////////////////////////////////////////
-            /// ITEM CONSTRUCTOR
-            //////////////////////////////////////////
             CZRItemConstructor : {
-                  //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
                         item.inputCollection.bind( function( col ) {
                               if( _.isEmpty( col ) )
                                 return;
@@ -12448,19 +9062,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                               }
                         });//item.inputCollection.bind()
-
-                        //fire the parent
                         api.CZRItem.prototype.ready.call( item );
                   },
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
-
-                        //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'link-to' :
@@ -12494,16 +9100,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }//setInputVisibilityDeps
             },//CZRItemConstructor
       };//Constructor
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_heading_child : {
@@ -12522,21 +9118,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
  *  HEADING SPACING
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
-      //HEADING MODULE
       var Constructor  = {
             initialize: function( id, options ) {
                   var module = this;
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
-
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
@@ -12546,16 +9131,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             },//CZRHeadingsInputMths
       };//Constructor
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_heading_spacing_child : {
@@ -12569,23 +9144,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //DIVIDER MODULE
       var DividerModuleConstructor = {
             initialize: function( id, options ) {
-                  //console.log('INITIALIZING IMAGE MODULE', id, options );
                   var module = this;
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend( module.CZRDividerInputMths || {} );
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
@@ -12596,17 +9159,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
             },//CZRDividerInputMths
       };//DividerModuleConstructor
-
-
-
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_divider_module : {
@@ -12620,20 +9172,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_spacer_module : {
-                  //mthds : ModuleConstructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_spacer_module', 'name' ),
                   has_mod_opt : false,
@@ -12643,20 +9185,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_map_module : {
-                  //mthds : ModuleConstructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_map_module', 'name' ),
                   has_mod_opt : false,
@@ -12666,44 +9198,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 /* ------------------------------------------------------------------------- *
  *  QUOTE DESIGN
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
-
-              //////////////////////////////////////////////////////////
-              /// ITEM CONSTRUCTOR
-              //////////////////////////////////////////
               CZRButtonItemConstructor : {
-                    //overrides the parent ready
                     ready : function() {
                           var item = this;
-                          //wait for the input collection to be populated,
-                          //and then set the input visibility dependencies
                           item.inputCollection.bind( function( col ) {
                                 if( _.isEmpty( col ) )
                                   return;
@@ -12711,18 +9224,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                                 }
                           });//item.inputCollection.bind()
-
-                          //fire the parent
                           api.CZRItem.prototype.ready.call( item );
                     },
-
-                    //Fired when the input collection is populated
-                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-
-                          //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'quote_design' :
@@ -12746,14 +9252,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     }
               }
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_quote_design_child : {
@@ -12780,39 +9278,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 /* ------------------------------------------------------------------------- *
  *  QUOTE CONTENT
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      //module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_quote_quote_child : {
@@ -12835,39 +9313,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 /* ------------------------------------------------------------------------- *
  *  CITE CONTENT
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      //module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_quote_cite_child : {
@@ -12884,26 +9342,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 /* ------------------------------------------------------------------------- *
  *  BUTTON CONTENT
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
-
-                      //SET THE CONTENT PICKER DEFAULT OPTIONS
-                      //@see ::setupContentPicker()
                       module.bind( 'set_default_content_picker_options', function( params ) {
                             params.defaultContentPickerOption.defaultOption = {
                                   'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
@@ -12915,23 +9363,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             };
                             return params;
                       });
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
-
-              //////////////////////////////////////////////////////////
-              /// ITEM CONSTRUCTOR
-              //////////////////////////////////////////
               CZRButtonItemConstructor : {
-                    //overrides the parent ready
                     ready : function() {
                           var item = this;
-                          //wait for the input collection to be populated,
-                          //and then set the input visibility dependencies
                           item.inputCollection.bind( function( col ) {
                                 if( _.isEmpty( col ) )
                                   return;
@@ -12939,18 +9376,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                                 }
                           });//item.inputCollection.bind()
-
-                          //fire the parent
                           api.CZRItem.prototype.ready.call( item );
                     },
-
-                    //Fired when the input collection is populated
-                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-
-                          //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'link-to' :
@@ -12986,14 +9416,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     }
               }
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_btn_content_child : {
@@ -13020,40 +9442,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 /* ------------------------------------------------------------------------- *
  *  BUTTON DESIGN
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
-
-              //////////////////////////////////////////////////////////
-              /// ITEM CONSTRUCTOR
-              //////////////////////////////////////////
               CZRButtonItemConstructor : {
-                    //overrides the parent ready
                     ready : function() {
                           var item = this;
-                          //wait for the input collection to be populated,
-                          //and then set the input visibility dependencies
                           item.inputCollection.bind( function( col ) {
                                 if( _.isEmpty( col ) )
                                   return;
@@ -13061,26 +9465,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                                 }
                           });//item.inputCollection.bind()
-
-                          //fire the parent
                           api.CZRItem.prototype.ready.call( item );
                     },
-
-                    //Fired when the input collection is populated
-                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          // input controller instance == this
                           var scheduleVisibilityOfInputId = function( controlledInputId, visibilityCallBack ) {
-                                //Fire on init
                                 item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
-                                //React on change
                                 this.bind( function( to ) {
                                       item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
                                 });
                           };
-                          //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'use_custom_bg_color_on_hover' :
@@ -13115,14 +9510,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     }
               }
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_btn_design_child : {
@@ -13138,34 +9525,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );/* ------------------------------------------------------------------------- *
  *  MENU CONTENT
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-                       //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      //module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
-                       // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
                },//initialize
       };// Constructor
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_menu_content_child : {
@@ -13184,21 +9555,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 /* ------------------------------------------------------------------------- *
  *  MENU OPTIONS FOR MOBILE DEVICES
 /* ------------------------------------------------------------------------- */
-//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_menu_mobile_options : {
-                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_menu_mobile_options', 'name' ),
                   has_mod_opt : false,
@@ -13208,39 +9568,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
-
-              //////////////////////////////////////////////////////////
-              /// ITEM CONSTRUCTOR
-              //////////////////////////////////////////
               CZRItemConstructor : {
-                    //overrides the parent ready
                     ready : function() {
                           var item = this;
-                          //wait for the input collection to be populated,
-                          //and then set the input visibility dependencies
                           item.inputCollection.bind( function( col ) {
                                 if( _.isEmpty( col ) )
                                   return;
@@ -13248,18 +9591,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                                 }
                           });//item.inputCollection.bind()
-
-                          //fire the parent
                           api.CZRItem.prototype.ready.call( item );
                     },
-
-                    //Fired when the input collection is populated
-                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-
-                          //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'show_name_field' :
@@ -13301,14 +9637,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     }
               }
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_simple_form_fields_child: {
@@ -13322,39 +9650,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
-
-              //////////////////////////////////////////////////////////
-              /// ITEM CONSTRUCTOR
-              //////////////////////////////////////////
               CZRItemConstructor : {
-                    //overrides the parent ready
                     ready : function() {
                           var item = this;
-                          //wait for the input collection to be populated,
-                          //and then set the input visibility dependencies
                           item.inputCollection.bind( function( col ) {
                                 if( _.isEmpty( col ) )
                                   return;
@@ -13362,17 +9673,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                                 }
                           });//item.inputCollection.bind()
-
-                          //fire the parent
                           api.CZRItem.prototype.ready.call( item );
                     },
-
-                    //Fired when the input collection is populated
-                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                     case 'border-type' :
@@ -13389,14 +9694,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     }
               }
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_simple_form_design_child: {
@@ -13410,39 +9707,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
-
-              //////////////////////////////////////////////////////////
-              /// ITEM CONSTRUCTOR
-              //////////////////////////////////////////
               CZRItemConstructor : {
-                    //overrides the parent ready
                     ready : function() {
                           var item = this;
-                          //wait for the input collection to be populated,
-                          //and then set the input visibility dependencies
                           item.inputCollection.bind( function( col ) {
                                 if( _.isEmpty( col ) )
                                   return;
@@ -13450,17 +9730,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                                 }
                           });//item.inputCollection.bind()
-
-                          //fire the parent
                           api.CZRItem.prototype.ready.call( item );
                     },
-
-                    //Fired when the input collection is populated
-                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-                          //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'use_custom_bg_color_on_hover' :
@@ -13495,14 +9769,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     }
               }
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_simple_form_button_child: {
@@ -13516,35 +9782,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_simple_form_fonts_child: {
@@ -13558,78 +9808,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                   module.inputConstructor = api.CZRInput.extend({
                         setupSelect : function() {
                               api.czr_sektions.setupSelectInput.call( this );
                         }
                   });
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  // module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
-
-            //////////////////////////////////////////////////////////
-            /// ITEM CONSTRUCTOR
-            //////////////////////////////////////////
-            // CZRItemConstructor : {
-            //       //overrides the parent ready
-            //       ready : function() {
-            //             var item = this;
-            //             //wait for the input collection to be populated,
-            //             //and then set the input visibility dependencies
-            //             item.inputCollection.bind( function( col ) {
-            //                   if( _.isEmpty( col ) )
-            //                     return;
-            //                   try { item.setInputVisibilityDeps(); } catch( er ) {
-            //                         api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
-            //                   }
-            //             });//item.inputCollection.bind()
-
-            //             //fire the parent
-            //             api.CZRItem.prototype.ready.call( item );
-            //       },
-
-            //       //Fired when the input collection is populated
-            //       //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
-            //       setInputVisibilityDeps : function() {
-            //             var item = this,
-            //                 module = item.module;
-            //             //Internal item dependencies
-            //             item.czr_Input.each( function( input ) {
-            //                   switch( input.id ) {
-            //                         case 'recaptcha_enabled' :
-            //                               _.each( [ 'recaptcha_badge' ] , function( _inputId_ ) {
-            //                                     try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-            //                                           return 'inherit' === input();
-            //                                     }); } catch( er ) {
-            //                                           api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
-            //                                     }
-            //                               });
-            //                         break;
-            //                   }
-            //             });
-            //       }
-            // }
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_simple_form_submission_child: {
@@ -13643,39 +9834,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this );
                             }
                       });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
-
-              //////////////////////////////////////////////////////////
-              /// ITEM CONSTRUCTOR
-              //////////////////////////////////////////
               CZRButtonItemConstructor : {
-                    //overrides the parent ready
                     ready : function() {
                           var item = this;
-                          //wait for the input collection to be populated,
-                          //and then set the input visibility dependencies
                           item.inputCollection.bind( function( col ) {
                                 if( _.isEmpty( col ) )
                                   return;
@@ -13683,18 +9857,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
                                 }
                           });//item.inputCollection.bind()
-
-                          //fire the parent
                           api.CZRItem.prototype.ready.call( item );
                     },
-
-                    //Fired when the input collection is populated
-                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
                     setInputVisibilityDeps : function() {
                           var item = this,
                               module = item.module;
-
-                          //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'use_custom_bg_color_on_hover' :
@@ -13743,14 +9910,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     }
               }
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_font_child : {
@@ -13764,35 +9923,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             }
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
-//extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
                       module.inputConstructor = api.CZRInput.extend({
                             setupSelect : function() {
                                   api.czr_sektions.setupSelectInput.call( this, sektionsLocalizedData.registeredWidgetZones );
                             }
                       });
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
 
               },//initialize
       };
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_widget_area_module : {

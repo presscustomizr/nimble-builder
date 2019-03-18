@@ -100,9 +100,9 @@ function register_location( $location_id, $params = array() ) {
 function sek_get_default_location_model( $skope_id = null ) {
     $is_global_skope = NIMBLE_GLOBAL_SKOPE_ID === $skope_id;
     if ( $is_global_skope ) {
-        $defaut_sektions_value = [ 'collection' => [] ];
+        $defaut_sektions_value = [ 'collection' => [], 'fonts' => [] ];//global_options are saved in a specific option => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS
     } else {
-        $defaut_sektions_value = [ 'collection' => [], 'local_options' => [] ];
+        $defaut_sektions_value = [ 'collection' => [], 'local_options' => [], 'fonts' => [] ];
     }
     foreach( sek_get_locations() as $location_id => $params ) {
         $is_global_location = sek_is_global_location( $location_id );
@@ -2578,12 +2578,14 @@ function sek_register_modules() {
         'sek_local_performances',
         'sek_local_header_footer',
         'sek_local_revisions',
+        'sek_local_imp_exp',
         'sek_global_breakpoint',
         'sek_global_widths',
         'sek_global_performances',
         'sek_global_header_footer',
         'sek_global_recaptcha',
         'sek_global_revisions',
+        'sek_global_reset',
         'sek_global_beta_features',
         'czr_simple_html_module',
 
@@ -4225,6 +4227,28 @@ function sek_get_module_params_for_sek_local_revisions() {
     );
 }
 ?><?php
+function sek_get_module_params_for_sek_local_imp_exp() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_local_imp_exp',
+        'name' => __('Import / Export', 'text_doma'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'import_export' => array(
+                    'input_type'  => 'import_export',
+                    'scope' => 'local',
+                    'title'       => __('Import', 'text_doma'),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'notice_before' => __('Make sure you import a file generated with Nimble Builder export system.', 'text_doma'),
+                )
+            )
+        )//tmpl
+    );
+}
+?><?php
 function sek_get_module_params_for_sek_global_breakpoint() {
     return array(
         'dynamic_registration' => true,
@@ -4399,6 +4423,27 @@ function sek_write_global_custom_section_widths() {
         printf('<style type="text/css" id="nimble-global-widths-options">%1$s</style>', $width_options_css );
     }
 }
+?><?php
+function sek_get_module_params_for_sek_global_reset() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_global_reset',
+        'name' => __('Reset global scope sections', 'text_doma'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'reset_global' => array(
+                    'input_type'  => 'reset_button',
+                    'title'       => __( 'Remove the sections displayed globally' , 'text_doma' ),
+                    'scope'       => 'global',
+                    'notice_after' => __('This will remove the sections displayed on global scope locations. Local scope sections will not be impacted.', 'text_doma'),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                )
+            )
+        )//tmpl
+    );
+}
+
 ?><?php
 function sek_get_module_params_for_sek_global_performances() {
     return array(
@@ -9114,6 +9159,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'performances' => 'sek_global_performances',
             'recaptcha' => 'sek_global_recaptcha',
             'global_revisions' => 'sek_global_revisions',
+            'global_reset' => 'sek_global_reset',
             'beta_features' => 'sek_global_beta_features'
         ];
         public static $local_options_map = [
@@ -9123,6 +9169,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'custom_css' => 'sek_local_custom_css',
             'local_performances' => 'sek_local_performances',
             'local_reset' => 'sek_local_reset',
+            'import_export' => 'sek_local_imp_exp',
             'local_revisions' => 'sek_local_revisions'
         ];
         function __construct( $params = array() ) {
@@ -9192,7 +9239,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             );
         }
         function _schedule_img_import_ajax_actions() {
-            add_action( 'wp_ajax_sek_import_attachment', array( $this, 'sek_ajax_import_attachemnt' ) );
+            add_action( 'wp_ajax_sek_import_attachment', array( $this, 'sek_ajax_import_attachment' ) );
         }
         function _schedule_section_saving_ajax_actions() {
             add_action( 'wp_ajax_sek_save_section', array( $this, 'sek_ajax_save_section' ) );
@@ -9406,7 +9453,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 return apply_filters( "sek_set_ajax_content", $html, $sek_action );// this is sent with wp_send_json_success( apply_filters( 'sek_content_results', $html, $sek_action ) );
             }
         }
-        function sek_ajax_import_attachemnt() {
+        function sek_ajax_import_attachment() {
             if ( ! is_user_logged_in() ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
             }
@@ -9630,7 +9677,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             }
 
             if ( ! isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
-                wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
+                wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing revision_post_id' );
             }
             $revision = sek_get_single_post_revision( $_POST['revision_post_id'] );
             wp_send_json_success( $revision );
