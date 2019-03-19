@@ -104,7 +104,7 @@ function sek_enqueue_controls_js_css() {
                 // defaultToolbarBtns is used for the detached tinymce editor
                 'defaultToolbarBtns' => "formatselect,fontsizeselect,forecolor,bold,italic,underline,strikethrough,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,unlink,spellchecker,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo",
                 // basic btns are used for the heading, the quote content and quote cite
-                'basic_btns' => array('forecolor','bold','italic','underline','strikethrough','link'),
+                'basic_btns' => array('forecolor','bold','italic','underline','strikethrough','link','unlink'),
                 'basic_btns_nolink' => array('forecolor','bold','italic','underline','strikethrough')
             )
         )
