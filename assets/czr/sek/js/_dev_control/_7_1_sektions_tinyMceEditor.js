@@ -89,7 +89,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       api.sekTinyMceEditor.locker = input;
                         // }
 
-                        $( window )[ expanded ? 'on' : 'off' ]('resize', function() {
+                        $(window)[ expanded ? 'on' : 'off' ]('resize', function() {
                                 if ( ! api.sekEditorExpanded() )
                                   return;
                                 _.delay( function() {
@@ -100,6 +100,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         if ( expanded ) {
                               self.czrResizeEditor( window.innerHeight - self.$editorPane.height() );
+                              // fix wrong height on init https://github.com/presscustomizr/nimble-builder/issues/409
+                              // there's probably a smarter way to get the right height on init. But let's be lazy.
+                              _.delay( function() {
+                                    $(window).trigger('resize');
+                              }, 100 );
                         } else {
                               //resize reset
                               //self.container.closest( 'ul.accordion-section-content' ).css( 'padding-bottom', '' );
@@ -218,6 +223,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $mceToolbar   = self.$editorPane.find( '.mce-toolbar-grp' ),
                   $mceStatusbar = self.$editorPane.find( '.mce-statusbar' );
 
+
               if ( ! api.sekEditorExpanded() ) {
                 return;
               }
@@ -244,10 +250,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               self.$preview.css( 'bottom', args.height );
               self.$editorPane.css( 'height', args.height );
               $editorFrame.css( 'height', args.height - args.components );
-              self.$collapseSidebar.css(
-                    'bottom',
-                    collapseMinSpacing > windowHeight - args.height ? $mceStatusbar.outerHeight() + collapseBottomInsideEditor : args.height + collapseBottomOutsideEditor
-              );
+
+              // the code hereafter is not needed.
+              // don't remember why it was included from the beginning...
+              // self.$collapseSidebar.css(
+              //       'bottom',
+              //       collapseMinSpacing > windowHeight - args.height ? $mceStatusbar.outerHeight() + collapseBottomInsideEditor : args.height + collapseBottomOutsideEditor
+              // );
 
               //$sectionContent.css( 'padding-bottom',  windowWidth <= mobileWidth ? args.height : '' );
       }
