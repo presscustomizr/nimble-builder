@@ -679,7 +679,7 @@ function sek_print_nimble_customizer_tmpl() {
             '_content_editor_dfw' => false,
             'drag_drop_upload' => true,
             'tabfocus_elements' => 'content-html,save-post',
-            'editor_height' => 200,
+            'editor_height' => 235,
             'default_editor' => 'tinymce',
             'tinymce' => array(
                 'resize' => false,

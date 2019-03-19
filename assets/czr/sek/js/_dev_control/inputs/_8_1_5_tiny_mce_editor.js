@@ -270,6 +270,8 @@
                         var initial_content = !isAutoPEnabled() ? input() : wp.editor.autop( input() );
                         _editor.setContent( initial_content );
                         api.sekEditorExpanded( true );
+                        // trigger a resize to adjust height on init https://github.com/presscustomizr/nimble-builder/issues/409
+                        $(window).trigger('resize');
                   };
                   if ( _editor.initialized ) {
                         _doOnInit();
