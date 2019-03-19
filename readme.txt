@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -94,10 +94,15 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.5.2 =
-Various performance improvements for the text editor. Bug fixes.
+= 1.5.3 =
+Various improvements and bug fixes for Nimble Builder text editor.
 
 == Changelog ==
+= 1.5.3 : March 19th 2019 =
+* fixed : prevents third party plugins overriding Nimble Builder editor in the customizer
+* fixed : wrong editor height on init
+* added : new control buttons to the text editors in the customizer : font-size buttons, underline, unlink
+
 = 1.5.2 : March 14th 2019 =
 * fixed : a contact form with no body message could generate a fatal error
 * fixed : bulleted list could break in the text editor

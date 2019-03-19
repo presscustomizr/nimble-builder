@@ -5074,7 +5074,7 @@ function sek_get_module_params_for_czr_heading_child() {
                     'input_type'        => 'nimble_tinymce_editor',
                     'editor_params'     => array(
                         'media_button' => false,
-                        'includedBtns' => array('forecolor','bold','italic','link','strikethrough'),
+                        'includedBtns' => 'basic_btns',
                         'height' => 50
                     ),
                     'title'              => __( 'Heading text', 'text_doma' ),
@@ -5691,7 +5691,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'input_type'        => 'nimble_tinymce_editor',
                     'editor_params'     => array(
                         'media_button' => false,
-                        'includedBtns' => array('forecolor','bold','italic','link','strikethrough'),
+                        'includedBtns' => 'basic_btns',
                     ),
                     'title'             => __( 'Main quote content', 'text_doma' ),
                     'default'           => '',
@@ -5853,7 +5853,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'input_type'        => 'nimble_tinymce_editor',
                     'editor_params'     => array(
                         'media_button' => false,
-                        'includedBtns' => array('forecolor','bold','italic','link','strikethrough'),
+                        'includedBtns' => 'basic_btns',
                         'height' => 50
                     ),
                     'refresh_markup' => '.sek-cite',
@@ -6151,7 +6151,7 @@ function sek_get_module_params_for_czr_btn_content_child() {
                     'input_type'        => 'nimble_tinymce_editor',
                     'editor_params'     => array(
                         'media_button' => false,
-                        'includedBtns' => array('forecolor','bold','italic','strikethrough'),
+                        'includedBtns' => 'basic_btns_nolink',
                         'height' => 45
                     ),
                     'title'              => __( 'Button text', 'text_doma' ),

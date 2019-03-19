@@ -81,7 +81,9 @@ function sek_enqueue_controls_js_css() {
                 'hasActiveCachePlugin' => sek_has_active_cache_plugin(),
                 'idOfDetachedTinyMceTextArea' => NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID,
                 'tinyMceNimbleEditorStylesheetUrl' => sprintf( '%1$s/assets/czr/sek/css/sek-tinymce-content.css', NIMBLE_BASE_URL ),
-                'defaultToolbarBtns' => "formatselect,forecolor,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,strikethrough,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo"
+                'defaultToolbarBtns' => "formatselect,fontsizeselect,forecolor,bold,italic,underline,strikethrough,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,unlink,spellchecker,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo",
+                'basic_btns' => array('forecolor','bold','italic','underline','strikethrough','link','unlink'),
+                'basic_btns_nolink' => array('forecolor','bold','italic','underline','strikethrough')
             )
         )
     );//wp_localize_script()
@@ -848,7 +850,7 @@ final class _NIMBLE_Editors {
      * @param array  $settings  Array of editor arguments.
      * @param string $editor_id ID for the current editor instance.
      */
-    $settings = apply_filters( 'wp_editor_settings', $settings, $editor_id );
+    $settings = apply_filters( 'nimble_editor_settings', $settings, $editor_id );
 
     $set = wp_parse_args(
       $settings,
@@ -1027,14 +1029,14 @@ final class _NIMBLE_Editors {
      * @param string $output Editor's HTML markup.
      */
     $the_editor = apply_filters(
-      'the_editor',
+      'the_nimble_editor',
       '<div id="wp-' . $editor_id_attr . '-editor-container" class="wp-editor-container">' .
       $quicktags_toolbar .
       '<textarea' . $editor_class . $height . $tabindex . $autocomplete . ' cols="40" name="' . esc_attr( $set['textarea_name'] ) . '" ' .
       'id="' . $editor_id_attr . '">%s</textarea></div>'
     );
     if ( self::$this_tinymce ) {
-      add_filter( 'the_editor_content', 'format_for_editor', 10, 2 );
+      add_filter( 'the_nimble_editor_content', 'format_for_editor', 10, 2 );
     }
 
     /**
@@ -1046,7 +1048,7 @@ final class _NIMBLE_Editors {
      * @param string $default_editor The default editor for the current user.
      *                               Either 'html' or 'tinymce'.
      */
-    $content = apply_filters( 'the_editor_content', $content, $default_editor );
+    $content = apply_filters( 'the_nimble_editor_content', $content, $default_editor );
     if ( self::$this_tinymce ) {
       remove_filter( 'the_editor_content', 'format_for_editor' );
     }
@@ -1110,7 +1112,7 @@ final class _NIMBLE_Editors {
        * @param array  $qtInit    Quicktags settings.
        * @param string $editor_id The unique editor ID, e.g. 'content'.
        */
-      $qtInit = apply_filters( 'quicktags_settings', $qtInit, $editor_id );
+      $qtInit = apply_filters( 'nimble_quicktags_settings', $qtInit, $editor_id );
 
       self::$qt_settings[ $editor_id ] = $qtInit;
 
@@ -1134,7 +1136,7 @@ final class _NIMBLE_Editors {
            * @param array  $plugins   An array of teenyMCE plugins.
            * @param string $editor_id Unique editor identifier, e.g. 'content'.
            */
-          $plugins = apply_filters( 'teeny_mce_plugins', array( 'colorpicker', 'lists', 'fullscreen', 'image', 'wordpress', 'wpeditimage', 'wplink' ), $editor_id );
+          $plugins = apply_filters( 'nimble_teeny_mce_plugins', array( 'colorpicker', 'lists', 'fullscreen', 'image', 'wordpress', 'wpeditimage', 'wplink' ), $editor_id );
         } else {
 
           /**
@@ -1154,7 +1156,7 @@ final class _NIMBLE_Editors {
            *
            * @param array $external_plugins An array of external TinyMCE plugins.
            */
-          $mce_external_plugins = apply_filters( 'mce_external_plugins', array() );
+          $mce_external_plugins = apply_filters( 'nimble_mce_external_plugins', array() );
 
           $plugins = array(
             'charmap',
@@ -1191,7 +1193,7 @@ final class _NIMBLE_Editors {
            *
            * @param array $plugins An array of default TinyMCE plugins.
            */
-          $plugins = array_unique( apply_filters( 'tiny_mce_plugins', $plugins ) );
+          $plugins = array_unique( apply_filters( 'nimble_tiny_mce_plugins', $plugins ) );
 
           if ( ( $key = array_search( 'spellchecker', $plugins ) ) !== false ) {
             unset( $plugins[ $key ] );
@@ -1212,7 +1214,7 @@ final class _NIMBLE_Editors {
              *
              * @param array $translations Translations for external TinyMCE plugins.
              */
-            $mce_external_languages = apply_filters( 'mce_external_languages', array() );
+            $mce_external_languages = apply_filters( 'nimble_mce_external_languages', array() );
 
             $loaded_langs = array();
             $strings      = '';
@@ -1310,7 +1312,7 @@ final class _NIMBLE_Editors {
          *
          * @param string $stylesheets Comma-delimited list of stylesheets.
          */
-        $mce_css = trim( apply_filters( 'mce_css', $mce_css ), ' ,' );
+        $mce_css = trim( apply_filters( 'nimble_mce_css', $mce_css ), ' ,' );
 
         if ( ! empty( $mce_css ) ) {
           $settings['content_css'] = $mce_css;
@@ -1331,7 +1333,7 @@ final class _NIMBLE_Editors {
          * @param array  $buttons   An array of teenyMCE buttons.
          * @param string $editor_id Unique editor identifier, e.g. 'content'.
          */
-        $mce_buttons   = apply_filters( 'teeny_mce_buttons', array( 'bold', 'italic', 'underline', 'blockquote', 'strikethrough', 'bullist', 'numlist', 'alignleft', 'aligncenter', 'alignright', 'undo', 'redo', 'link', 'fullscreen' ), $editor_id );
+        $mce_buttons   = apply_filters( 'nimble_teeny_mce_buttons', array( 'bold', 'italic', 'underline', 'blockquote', 'strikethrough', 'bullist', 'numlist', 'alignleft', 'aligncenter', 'alignright', 'undo', 'redo', 'link', 'fullscreen' ), $editor_id );
         $mce_buttons_2 = $mce_buttons_3 = $mce_buttons_4 = array();
       } else {
         $mce_buttons = array( 'formatselect', 'bold', 'italic', 'bullist', 'numlist', 'blockquote', 'alignleft', 'aligncenter', 'alignright', 'link', 'spellchecker' );
@@ -1354,7 +1356,7 @@ final class _NIMBLE_Editors {
          * @param array  $buttons   First-row list of buttons.
          * @param string $editor_id Unique editor identifier, e.g. 'content'.
          */
-        $mce_buttons = apply_filters( 'mce_buttons', $mce_buttons, $editor_id );
+        $mce_buttons = apply_filters( 'nimble_mce_buttons', $mce_buttons, $editor_id );
 
         $mce_buttons_2 = array( 'strikethrough', 'hr', 'forecolor', 'pastetext', 'removeformat', 'charmap', 'outdent', 'indent', 'undo', 'redo' );
 
@@ -1366,7 +1368,7 @@ final class _NIMBLE_Editors {
          * @param array  $buttons   Second-row list of buttons.
          * @param string $editor_id Unique editor identifier, e.g. 'content'.
          */
-        $mce_buttons_2 = apply_filters( 'mce_buttons_2', $mce_buttons_2, $editor_id );
+        $mce_buttons_2 = apply_filters( 'nimble_mce_buttons_2', $mce_buttons_2, $editor_id );
 
         /**
          * Filters the third-row list of TinyMCE buttons (Visual tab).
@@ -1376,7 +1378,7 @@ final class _NIMBLE_Editors {
          * @param array  $buttons   Third-row list of buttons.
          * @param string $editor_id Unique editor identifier, e.g. 'content'.
          */
-        $mce_buttons_3 = apply_filters( 'mce_buttons_3', array(), $editor_id );
+        $mce_buttons_3 = apply_filters( 'nimble_mce_buttons_3', array(), $editor_id );
 
         /**
          * Filters the fourth-row list of TinyMCE buttons (Visual tab).
@@ -1386,7 +1388,7 @@ final class _NIMBLE_Editors {
          * @param array  $buttons   Fourth-row list of buttons.
          * @param string $editor_id Unique editor identifier, e.g. 'content'.
          */
-        $mce_buttons_4 = apply_filters( 'mce_buttons_4', array(), $editor_id );
+        $mce_buttons_4 = apply_filters( 'nimble_mce_buttons_4', array(), $editor_id );
       }
 
       $body_class = $editor_id;
