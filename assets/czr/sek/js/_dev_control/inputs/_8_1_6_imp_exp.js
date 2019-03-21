@@ -121,6 +121,17 @@
                                                       // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
                                                       imported_data : unserialized_file_content
                                                 }).done( function() {
+                                                      // Clean an regenerate the local option setting
+                                                      // Settings are normally registered once and never cleaned, unlike controls.
+                                                      // After the import, updating the setting value will refresh the sections
+                                                      // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
+                                                      if ( 'local' === inputRegistrationParams.scope ) {
+                                                            api.czr_sektions.generateUI({
+                                                                  action : 'sek-generate-local-skope-options-ui',
+                                                                  clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                                                            });
+                                                      }
+
                                                       //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
                                                       api.previewer.refresh();
                                                       api.previewer.trigger('sek-notify', {

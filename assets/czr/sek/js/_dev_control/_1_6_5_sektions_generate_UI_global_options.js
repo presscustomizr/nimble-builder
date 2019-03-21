@@ -106,6 +106,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }//switch
                   });//_.each
 
+                  // Let assign the global options to a var
+                  var globalOptionDBValues = sektionsLocalizedData.globalOptionDBValues;
 
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
@@ -135,9 +137,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });//api( Id, function( _setting_ ) {})
 
                                     // Let's add the starting values if provided when registrating the module
-                                    var dbValues = sektionsLocalizedData.globalOptionDBValues,
-                                        startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
-                                        initialModuleValues = ( _.isObject( dbValues ) && ! _.isEmpty( dbValues[ optionType ] ) ) ? dbValues[ optionType ] : {};
+                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
+                                        initialModuleValues = ( _.isObject( globalOptionDBValues ) && ! _.isEmpty( globalOptionDBValues[ optionType ] ) ) ? globalOptionDBValues[ optionType ] : {};
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
                                           // make sure the starting values are deeped clone now, before being extended

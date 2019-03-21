@@ -566,6 +566,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if( ! _.isUndefined( newSettingValue ) ) {
                         if ( ! _.isEmpty( newSettingValue.local ) ) {
                               api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local, 'local' ), { navigatingHistoryLogs : true } );
+                              api.czr_sektions.generateUI({
+                                    action : 'sek-generate-local-skope-options-ui',
+                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                              });
                         }
                         if ( ! _.isEmpty( newSettingValue.global ) ) {
                               api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global, 'global' ), { navigatingHistoryLogs : true } );
@@ -2852,15 +2856,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
                         return dfd;
                   }
-                  var registrationParams = {};
+                  self.localOptionsRegistrationParams = {};
                   if ( _.isUndefined( sektionsLocalizedData.localOptionsMap ) || ! _.isObject( sektionsLocalizedData.localOptionsMap ) ) {
                         api.errare( '::generateUIforGlobalOptions => missing or invalid localOptionsMap');
                         return dfd;
                   }
+
+                  console.log('generateUIforLocalSkopeOptions => params, dfd ?', params, dfd );
+                  if ( true === params.clean_settings ) {
+                        self.cleanRegisteredLocalOptionSettings();
+                  }
                   _.each( sektionsLocalizedData.localOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
                               case 'template' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__template',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Page template'],
@@ -2870,7 +2879,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
                               case 'local_header_footer':
                                     if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                                          registrationParams[ opt_name ] = {
+                                          self.localOptionsRegistrationParams[ opt_name ] = {
                                                 settingControlId : _id_ + '__local_header_footer',
                                                 module_type : mod_type,
                                                 controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
@@ -2879,7 +2888,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               break;
                               case 'widths' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__widths',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Inner and outer widths'],
@@ -2887,7 +2896,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'custom_css' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__custom_css',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
@@ -2895,7 +2904,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'local_performances' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_performances',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Page speed optimizations'],
@@ -2903,7 +2912,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'local_reset' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_reset',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Reset the sections in this page'],
@@ -2911,7 +2920,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'local_revisions' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_revisions',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Revision history of local sections'],
@@ -2919,7 +2928,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'import_export' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_imp_exp',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Import / Export'],
@@ -2931,10 +2940,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
                         }//switch
                   });//_.each
-
+                  var currentSetValue = api( self.localSectionsSettingId() )(),
+                      currentAllLocalOptionsValue = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} );
 
                   _do_register_ = function() {
-                        _.each( registrationParams, function( optionData, optionType ){
+                        _.each( self.localOptionsRegistrationParams, function( optionData, optionType ){
+                              var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
+                                  optionTypeValue = _.isObject( currentAllLocalOptionsValue[ optionType ] ) ? currentAllLocalOptionsValue[ optionType ]: {},
+                                  initialModuleValues = optionTypeValue;
+
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
@@ -2953,16 +2967,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api( optionData.settingControlId, function( _setting_ ) {
                                           _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
-                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
-                                        currentSetValue = api( self.localSectionsSettingId() )(),
-                                        allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} ),
-                                        optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {},
-                                        initialModuleValues = optionTypeValue;
+
+
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
                                           var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
                                           initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
                                     }
+                                    console.log('INITIAL MODULE VALUES ?', initialModuleValues, currentSetValue );
                                     api.CZR_Helpers.register( {
                                           origin : 'nimble',
                                           level : params.level,
@@ -2973,9 +2985,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           transport : 'postMessage',//'refresh',//// ,
                                           type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
                                     });
-                              }
+                              }//if ( ! api.has( optionData.settingControlId ) )
 
-                              api.CZR_Helpers.register( {
+                              api.CZR_Helpers.register({
                                     origin : 'nimble',
                                     level : params.level,
                                     what : 'control',
@@ -3098,7 +3110,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
                         }//switch
                   });//_.each
-
+                  var globalOptionDBValues = sektionsLocalizedData.globalOptionDBValues;
 
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
@@ -3121,9 +3133,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api( optionData.settingControlId, function( _setting_ ) {
                                           _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
-                                    var dbValues = sektionsLocalizedData.globalOptionDBValues,
-                                        startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
-                                        initialModuleValues = ( _.isObject( dbValues ) && ! _.isEmpty( dbValues[ optionType ] ) ) ? dbValues[ optionType ] : {};
+                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
+                                        initialModuleValues = ( _.isObject( globalOptionDBValues ) && ! _.isEmpty( globalOptionDBValues[ optionType ] ) ) ? globalOptionDBValues[ optionType ] : {};
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
                                           var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
@@ -4154,17 +4165,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
                   self.registered( registered );
             },
+            cleanRegisteredLocalOptionSettings : function() {
+                  var self = this,
+                      localOptionPrefix = self.getLocalSkopeOptionId(),
+                      registered = $.extend( true, [], self.registered() || [] );
+
+                  registered = _.filter( registered, function( _reg_ ) {
+                        if ( _reg_.id && -1 !== _reg_.id.indexOf( localOptionPrefix ) && api.has( _reg_.id ) ) {
+                               api.remove( _reg_.id );
+                        }
+                        return _reg_.id && -1 === _reg_.id.indexOf( localOptionPrefix );
+                  });
+                  self.registered( registered );
+            },
             cleanRegisteredLevelSettingsAfterHistoryNavigation : function() {
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
 
                   registered = _.filter( registered, function( _reg_ ) {
-                        if ( ! _.isEmpty( _reg_.level ) && 'setting' === _reg_.what ) {
-                              if ( api.has( _reg_.id ) ) {
-                                    api.remove( _reg_.id );
-                              }
+                        if ( ! _.isEmpty( _reg_.level ) && 'setting' === _reg_.what && api.has( _reg_.id ) ) {
+                              api.remove( _reg_.id );
                         }
-                        return _.isEmpty( _reg_.level ) && 'setting' !== _reg_.what ;
+                        return _.isEmpty( _reg_.level ) && 'setting' === _reg_.what ;
                   });
                   self.registered( registered );
             }
@@ -7307,6 +7329,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       scope : 'global' === inputRegistrationParams.scope,//<= will determine which setting will be updated,
                                                       imported_data : unserialized_file_content
                                                 }).done( function() {
+                                                      if ( 'local' === inputRegistrationParams.scope ) {
+                                                            api.czr_sektions.generateUI({
+                                                                  action : 'sek-generate-local-skope-options-ui',
+                                                                  clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                                                            });
+                                                      }
                                                       api.previewer.refresh();
                                                       api.previewer.trigger('sek-notify', {
                                                             notif_id : 'import-success',

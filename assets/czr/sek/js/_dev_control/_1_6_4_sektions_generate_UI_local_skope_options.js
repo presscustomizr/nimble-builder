@@ -30,17 +30,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   // Prepare the module map to register
-                  var registrationParams = {};
+                  self.localOptionsRegistrationParams = {};
                   if ( _.isUndefined( sektionsLocalizedData.localOptionsMap ) || ! _.isObject( sektionsLocalizedData.localOptionsMap ) ) {
                         api.errare( '::generateUIforGlobalOptions => missing or invalid localOptionsMap');
                         return dfd;
                   }
 
+                  console.log('generateUIforLocalSkopeOptions => params, dfd ?', params, dfd );
+
+                  // remove settings when requested
+                  // Happens when importing a file
+                  if ( true === params.clean_settings ) {
+                        self.cleanRegisteredLocalOptionSettings();
+                  }
+
+
                   // Populate the registration params
                   _.each( sektionsLocalizedData.localOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
                               case 'template' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__template',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Page template'],
@@ -51,7 +60,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // Header and footer have been introduced in v1.4.0 but not enabled by default.
                               case 'local_header_footer':
                                     if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                                          registrationParams[ opt_name ] = {
+                                          self.localOptionsRegistrationParams[ opt_name ] = {
                                                 settingControlId : _id_ + '__local_header_footer',
                                                 module_type : mod_type,
                                                 controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
@@ -60,7 +69,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               break;
                               case 'widths' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__widths',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Inner and outer widths'],
@@ -68,7 +77,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'custom_css' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__custom_css',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
@@ -76,7 +85,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'local_performances' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_performances',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Page speed optimizations'],
@@ -84,7 +93,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'local_reset' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_reset',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Reset the sections in this page'],
@@ -92,7 +101,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'local_revisions' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_revisions',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Revision history of local sections'],
@@ -100,7 +109,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'import_export' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_imp_exp',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Import / Export'],
@@ -113,9 +122,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }//switch
                   });//_.each
 
+                  // Get the current local options from the local setting value
+                  // local setting value is structured this way :
+                  // {
+                  //    collection : [],
+                  //    local_options : {},
+                  //    fonts : []
+                  // }
+                  // we only need the local_options here
+                  var currentSetValue = api( self.localSectionsSettingId() )(),
+                      currentAllLocalOptionsValue = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} );
 
                   _do_register_ = function() {
-                        _.each( registrationParams, function( optionData, optionType ){
+                        _.each( self.localOptionsRegistrationParams, function( optionData, optionType ){
+                              // Let's add the starting values if provided when registrating the module
+                              var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
+                                  optionTypeValue = _.isObject( currentAllLocalOptionsValue[ optionType ] ) ? currentAllLocalOptionsValue[ optionType ]: {},
+                                  initialModuleValues = optionTypeValue;
+
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
@@ -140,18 +164,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
 
-                                    // Let's add the starting values if provided when registrating the module
-                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
-                                        currentSetValue = api( self.localSectionsSettingId() )(),
-                                        allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} ),
-                                        optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {},
-                                        initialModuleValues = optionTypeValue;
+
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
                                           // make sure the starting values are deeped clone now, before being extended
                                           var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
                                           initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
                                     }
+                                    console.log('INITIAL MODULE VALUES ?', initialModuleValues, currentSetValue );
                                     api.CZR_Helpers.register( {
                                           origin : 'nimble',
                                           level : params.level,
@@ -162,9 +182,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           transport : 'postMessage',//'refresh',//// ,
                                           type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
                                     });
-                              }
+                              }//if ( ! api.has( optionData.settingControlId ) )
 
-                              api.CZR_Helpers.register( {
+                              api.CZR_Helpers.register({
                                     origin : 'nimble',
                                     level : params.level,
                                     what : 'control',
