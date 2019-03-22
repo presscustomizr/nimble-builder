@@ -51,10 +51,10 @@
             }
 
             //the scroll event gets throttled with the requestAnimationFrame
-            this.$_window.scroll( function(_evt) { self.maybeParallaxMe(); } );
+            this.$_window.scroll( function(_evt) { self.maybeParallaxMe(_evt); } );
             //debounced resize event
             this.$_window.resize( _utils_.debounce( function(_evt) {
-                  self.maybeParallaxMe();
+                  self.maybeParallaxMe(_evt);
             }, 100 ) );
 
             //on load
@@ -64,8 +64,16 @@
 
       //@see https://www.paulirish.com/2012/why-moving-elements-with-translate-is-better-than-posabs-topleft/
       Plugin.prototype.setTopPositionAndBackgroundSize = function() {
-            var self = this,
-                $element       = this.element,
+            var self = this;
+
+            // options.matchMedia is set to 'only screen and (max-width: 768px)' by default
+            // if a match is found, then reset the top position
+            if ( _utils_.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
+                  this.element.css({'background-position-y' : '', 'background-attachment' : '' });
+                  return;
+            }
+
+            var $element       = this.element,
                 elemHeight = $element.outerHeight(),
                 winHeight = this.$_window.height(),
                 offsetTop = $element.offset().top,
@@ -116,17 +124,10 @@
       };
 
       // a throttle is implemented with window.requestAnimationFrame
-      Plugin.prototype.maybeParallaxMe = function() {
+      Plugin.prototype.maybeParallaxMe = function(evt) {
             var self = this;
             if ( ! this.checkIfIsVisibleAndCacheProperties() )
               return;
-
-            //options.matchMedia is set to 'only screen and (max-width: 768px)' by default
-            //if a match is found, then reset the top position
-            if ( _utils_.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
-                  this.element.css({'background-position-y' : '', 'background-attachment' : '' });
-                  return;
-            }
 
             if ( ! this.doingAnimation ) {
                   this.doingAnimation = true;
