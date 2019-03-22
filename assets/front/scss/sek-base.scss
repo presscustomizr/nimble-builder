@@ -206,6 +206,14 @@
   background-attachment: fixed;
   background-size: cover;
 }
+// the background-attachment:fixed rule is not well supported on mobile devices
+// fix for https://github.com/presscustomizr/nimble-builder/issues/414
+@supports (-webkit-overflow-scrolling:touch) {
+    body [data-sek-level="location"] [data-sek-bg-parallax="true"], body [data-sek-level="location"] [data-sek-bg-fixed="true"] {
+        background-attachment: scroll;
+    }
+}
+
 // https://stackoverflow.com/questions/15789026/smoothing-the-parallax-scrolling-of-a-background-image
 // ensure that Nimble sets its own transition rules, prevents any bg rules from third party theme or plugin to be applied
 [data-sek-level="location"] [data-sek-level] {
