@@ -10571,6 +10571,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $attributes = '';
             $bg_url_for_lazy_load = '';
             $parallax_enabled = false;
+            $fixed_bg_enabled = false;
             $width = '';
             $height = '';
 
@@ -10595,7 +10596,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( ! empty( $bg_url_for_lazy_load ) ) {
                 $attributes .= sprintf('%1$s data-sek-lazy-bg="true" data-sek-src="%2$s"', $attributes, $bg_url_for_lazy_load );
             }
-            if ( $parallax_enabled ) {
+            if ( $fixed_bg_enabled ) {
+                $attributes .= sprintf('%1$s data-sek-bg-fixed="true"',
+                    $attributes
+                );
+            } else if ( $parallax_enabled ) {
                 $attributes .= sprintf('%1$s data-sek-bg-parallax="true" data-bg-width="%2$s" data-bg-height="%3$s" data-sek-parallax-force="%4$s"',
                     $attributes,
                     $width,

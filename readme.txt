@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.5.3
+Stable tag: 1.5.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -94,10 +94,15 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.5.3 =
-Various improvements and bug fixes for Nimble Builder text editor.
+= 1.5.4 =
+Improved support for fixed and parallax background on mobile devices. Improved scroll animation for section anchor links.
 
 == Changelog ==
+= 1.5.4 : March 22nd 2019 =
+* fixed : removed unwanted white space on top of section's background because of a wrong initial parallax setup on mobile devices
+* fixed : CSS background-attachment:fixed rule is not well supported on mobile devices
+* improved : scroll animation for section anchor links did not work on full url links like https://mysite/#services 
+
 = 1.5.3 : March 19th 2019 =
 * fixed : prevents third party plugins overriding Nimble Builder editor in the customizer
 * fixed : wrong editor height on init
