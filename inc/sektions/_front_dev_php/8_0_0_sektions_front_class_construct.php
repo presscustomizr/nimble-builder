@@ -81,6 +81,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'import_export' => 'sek_local_imp_exp',
             'local_revisions' => 'sek_local_revisions'
         ];
+        // introduced when implementing import/export feature
+        // @see https://github.com/presscustomizr/nimble-builder/issues/411
+        public $img_import_errors = array();
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>

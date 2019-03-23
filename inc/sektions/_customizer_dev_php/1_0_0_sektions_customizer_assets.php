@@ -512,11 +512,15 @@ function nimble_add_i18n_localized_control_params( $params ) {
             '(currently published version)' => __('(currently published version)','text_doma'),
 
             // Import / export
+            'You need to publish before exporting.' => __( 'You need to publish before exporting.', 'text_doma'),
             'Import / Export' => __('Import / Export', 'text_doma'),
+            'Export failed' => __('Export failed', 'text_doma'),
+            'Import failed' => __('Import failed', 'text_doma'),
             'Missing file' => __('Missing file', 'text_doma'),
             'File successfully imported' => __('File successfully imported', 'text_doma'),
             'Import failed, invalid file content' => __('Import failed, invalid file content', 'text_doma'),
             'Import failed, file problem' => __('Import failed, file problem', 'text_doma'),
+            'Some image(s) could not be imported' => __('Some image(s) could not be imported', 'text_doma')
             // 'Module' => __('Module', 'text_doma'),
             //
 

@@ -1062,8 +1062,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //-- FILE IMPORT
                               //-------------------------------------------------------------------------------------------------
                               case 'sek-import-from-file' :
-                                    //api.infoLog( 'sek-import-from-file', params );
-                                    newSetValue = params.imported_data;
+                                    api.infoLog( 'sek-import-from-file', params );
+                                    if ( _.isUndefined( params.imported_content.data ) || _.isUndefined( params.imported_content.metas ) ) {
+                                          api.errare( 'updateAPISetting::sek-import-from-file => invalid imported content', imported_content );
+                                          break;
+                                    }
+
+                                    newSetValue = params.imported_content.data;
                               break;
 
                               //-------------------------------------------------------------------------------------------------
