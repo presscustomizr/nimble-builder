@@ -36,8 +36,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return dfd;
                   }
 
-                  console.log('generateUIforLocalSkopeOptions => params, dfd ?', params, dfd );
-
                   // remove settings when requested
                   // Happens when importing a file
                   if ( true === params.clean_settings ) {
@@ -171,7 +169,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
                                           initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
                                     }
-                                    console.log('INITIAL MODULE VALUES ?', initialModuleValues, currentSetValue );
+
                                     api.CZR_Helpers.register( {
                                           origin : 'nimble',
                                           level : params.level,
