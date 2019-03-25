@@ -4237,12 +4237,22 @@ function sek_get_module_params_for_sek_local_imp_exp() {
                 'import_export' => array(
                     'input_type'  => 'import_export',
                     'scope' => 'local',
-                    'title'       => __('Import', 'text_doma'),
+                    'title'       => __('EXPORT', 'text_doma'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'notice_before' => __('Make sure you import a file generated with Nimble Builder export system.', 'text_doma'),
+                ),
+                'keep_existing_sections' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Combine the imported sections with the current ones.', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'refresh_preview' => true,
+                    'notice_after' => __( 'Check this option if you want to keep the existing sections of this page, and combine them with the imported ones.', 'text_doma'),
                 )
             )
         )//tmpl
@@ -9172,6 +9182,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'import_export' => 'sek_local_imp_exp',
             'local_revisions' => 'sek_local_revisions'
         ];
+        public $img_import_errors = array();
         function __construct( $params = array() ) {
             $this->registered_locations = $this->default_locations;
             $this -> _schedule_front_ajax_actions();
@@ -9467,73 +9478,18 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 status_header( 405 );
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
             }
-            $relative_path = $_POST['rel_path'];
-            $filename = 'nimble_asset_' . basename( $relative_path );
-            $args = array(
-                'posts_per_page' => 1,
-                'post_type'      => 'attachment',
-                'name'           => trim ( $filename ),
-            );
-            $get_attachment = new \WP_Query( $args );
-            if ( is_array( $get_attachment->posts ) && array_key_exists(0, $get_attachment->posts) ) {
-                $new_attachment = array(
-                    'id'  => $get_attachment->posts[0] -> ID,
-                    'url' => $get_attachment->posts[0] -> guid
-                );
+            if ( !isset( $_POST['rel_path'] ) || !is_string($_POST['rel_path']) ) {
+                wp_send_json_error( 'missing_or_invalid_rel_path_when_importing_image');
             }
-            if ( isset($new_attachment ) ) {
-                wp_send_json_success( $new_attachment );
+
+            $id = sek_sideload_img_and_return_attachment_id( NIMBLE_BASE_URL . $_POST['rel_path'] );
+            if ( is_wp_error( $id ) ) {
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . $_POST['rel_path'] );
             } else {
-                if ( ! file_exists( NIMBLE_BASE_PATH . $relative_path ) ) {
-                    wp_send_json_error( __CLASS__ . '::' . __CLASS__ . '::' . __FUNCTION__ . ' => no file found for relative path : ' . dirname( __FILE__ ) . $relative_path );
-                    return;
-                }
-                $url = NIMBLE_BASE_URL . $relative_path;
-                $url_content = wp_safe_remote_get( $url );
-
-                if ( '404' == $url_content['response']['code'] ) {
-                    wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => 404 response when wp_safe_remote_get() url : ' . $url );
-                    return;
-                }
-                $file_content = wp_remote_retrieve_body( $url_content );
-                if ( empty( $file_content ) ) {
-                    wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => empty file_content when wp_remote_retrieve_body() for url : ' . $url );
-                    return;
-                }
-
-                $upload = wp_upload_bits(
-                  $filename,
-                  '',
-                  $file_content
-                );
-
-                $attachment = [
-                  'post_title' => $filename,
-                  'guid' => $upload['url'],
-                ];
-                $info = wp_check_filetype( $upload['file'] );
-                if ( $info ) {
-                    $attachment['post_mime_type'] = $info['type'];
-                } else {
-                    wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no info available with wp_check_filetype() when setting the mime type of img : ' . $url );
-                    return;
-                }
-
-                $attachment_id = wp_insert_attachment( $attachment, $upload['file'] );
-                if ( is_wp_error( $attachment_id ) ) {
-                    wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . $url );
-                }
-
-                wp_update_attachment_metadata(
-                    $attachment_id,
-                    wp_generate_attachment_metadata( $attachment_id, $upload['file'] )
-                );
-
-                $new_attachment = [
-                  'id' => $attachment_id,
-                  'url' => $upload['url'],
-                ];
-                wp_send_json_success( $new_attachment );
+                wp_send_json_success([
+                  'id' => $id,
+                  'url' => wp_get_attachment_url( $id )
+                ]);
             }
         }
         function sek_ajax_save_section() {

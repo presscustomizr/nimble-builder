@@ -114,7 +114,8 @@ function sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data ) {
     $new_seks_data = array();
     foreach ( $seks_data as $key => $value ) {
         // Set level ver_ini
-        // If the ver_ini property is not set, it means the level has been created with the previous version of Nimble ( v1.4.0 )
+        // If the ver_ini property is not set, it means the level has been created with the previous version of Nimble ( v1.0.4 )
+        // Let's add it
         if ( is_array($value) && array_key_exists('level', $value) && ! array_key_exists('ver_ini', $value) ) {
             $value['ver_ini'] = '1.0.4';
         }
