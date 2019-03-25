@@ -84,6 +84,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">history</i>'
                                     };
                               break;
+                              case 'global_reset' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__global_reset',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Reset the sections displayed in global locations'],
+                                          icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                                    };
+                              break;
                               case 'beta_features' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__beta_features',
@@ -98,6 +106,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }//switch
                   });//_.each
 
+                  // Let assign the global options to a var
+                  var globalOptionDBValues = sektionsLocalizedData.globalOptionDBValues;
 
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
@@ -127,9 +137,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });//api( Id, function( _setting_ ) {})
 
                                     // Let's add the starting values if provided when registrating the module
-                                    var dbValues = sektionsLocalizedData.globalOptionDBValues,
-                                        startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
-                                        initialModuleValues = ( _.isObject( dbValues ) && ! _.isEmpty( dbValues[ optionType ] ) ) ? dbValues[ optionType ] : {};
+                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
+                                        initialModuleValues = ( _.isObject( globalOptionDBValues ) && ! _.isEmpty( globalOptionDBValues[ optionType ] ) ) ? globalOptionDBValues[ optionType ] : {};
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
                                           // make sure the starting values are deeped clone now, before being extended

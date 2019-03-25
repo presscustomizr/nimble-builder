@@ -1295,3 +1295,44 @@ li[id^="accordion-section-__nimble__"] {
 li[id^="accordion-section-__nimble__"] > h3 {
   border-top:1px solid #ddd;
 }
+
+
+/* IMPORT / EXPORT */
+.sek-import-btn-wrap {
+    padding: 20px 0;
+}
+.sek-import-btn-wrap input.sek-import-file {
+    margin-bottom: 10px;
+}
+.sek-export-btn-wrap {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+.sek-import-file {
+    background: #eeeeee;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 12px;
+}
+.sek-uploading {
+    background: #eeeeee;
+    display: none;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 12px;
+}
+.czr-import-dialog {
+  display: none;
+  padding: 11px;
+}
+.czr-import-message {
+  padding-bottom: 10px;
+}
+.sek-import-btn-wrap .czr-import-dialog .czr-import-message {
+  font-size: 12px!important;
+}
+.sek-import-btn-wrap .czr-import-dialog .button {
+  margin: 4px 0;
+  font-size: 12px!important;
+}

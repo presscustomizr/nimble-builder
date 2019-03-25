@@ -39,6 +39,7 @@ function sek_enqueue_controls_js_css() {
                 'nimbleVersion' => NIMBLE_VERSION,
                 'isDevMode' => sek_is_dev_mode(),
                 'baseUrl' => NIMBLE_BASE_URL,
+                'customizerURL'   => admin_url( 'customize.php' ),
                 'sektionsPanelId' => '__sektions__',
                 'addNewSektionId' => 'sek_add_new_sektion',
                 'addNewColumnId' => 'sek_add_new_column',
@@ -364,6 +365,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'If this problem locks Nimble Builder, you can try resetting the sections of this page.' => __('If this problem locks Nimble Builder, you can try resetting the sections of this page.', 'text_doma'),
             'Reset' => __('Reset', 'text_doma'),
             'Reset complete' => __('Reset complete', 'text_doma'),
+            'Reset failed' => __('Reset failed', 'text_doma'),
             'Drag and drop content' => __('Drag and drop content', 'text_doma'),
             'Content Picker' => __('Content Picker', 'text_doma'),
             'Pick a module' => __('Pick a module', 'text_doma'),
@@ -404,6 +406,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Inner and outer widths' => __( 'Inner and outer widths', 'text_doma'),
             'Custom CSS' => __( 'Custom CSS', 'text_doma'),
             'Reset the sections in this page' => __( 'Reset the sections in this page', 'text_doma'),
+            'Reset the sections displayed in global locations' => __( 'Reset the sections displayed in global locations', 'text_doma'),
             'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
 
             'Site wide header and footer' => __( 'Site wide header and footer', 'text_doma'),
@@ -452,7 +455,18 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Select' => __('Select', 'text_doma'),
             'No revision history available for the moment.' => __('No revision history available for the moment.', 'text_doma'),
             'This is the current version.' => __('This is the current version.', 'text_doma'),
-            '(currently published version)' => __('(currently published version)','text_doma')
+            '(currently published version)' => __('(currently published version)','text_doma'),
+            'You need to publish before exporting.' => __( 'Nimble Builder : you need to publish before exporting.', 'text_doma'),
+            'Import / Export' => __('Import / Export', 'text_doma'),
+            'Export failed' => __('Export failed', 'text_doma'),
+            'Nothing to export.' => __('Nimble Builder : you have nothing to export. Start adding sections to this page!', 'text_doma'),
+            'Import failed' => __('Import failed', 'text_doma'),
+            'The current page has no available locations to import Nimble Builder sections.' => __('The current page has no available locations to import Nimble Builder sections.', 'text_doma'),
+            'Missing file' => __('Missing file', 'text_doma'),
+            'File successfully imported' => __('File successfully imported', 'text_doma'),
+            'Import failed, invalid file content' => __('Import failed, invalid file content', 'text_doma'),
+            'Import failed, file problem' => __('Import failed, file problem', 'text_doma'),
+            'Some image(s) could not be imported' => __('Some image(s) could not be imported', 'text_doma')
 
         )//array()
     )//array()
@@ -756,14 +770,6 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
  }//class
 endif;
-
-?><?php
-add_action( 'customize_save_validation_before', '\Nimble\sek_remove_callback_wp_targeted_link_rel' );
-function sek_remove_callback_wp_targeted_link_rel( $wp_customize ) {
-    if ( false !== has_filter( 'content_save_pre', 'wp_targeted_link_rel' ) ) {
-        remove_filter( 'content_save_pre', 'wp_targeted_link_rel' );
-    }
-};
 
 ?><?php
 function sek_setup_nimble_editor( $content, $editor_id, $settings = array() ) {
@@ -2480,6 +2486,263 @@ final class _NIMBLE_Editors {
   }
 }
 ?><?php
+add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
+function sek_catch_export_action( $wp_customize ) {
+    if ( current_user_can( 'edit_theme_options' ) ) {
+        if ( isset( $_REQUEST['sek_export_nonce'] ) ) {
+            sek_maybe_export();
+        }
+    }
+}
+function sek_maybe_export() {
+    $nonce = 'save-customize_' . get_stylesheet();
+    if ( ! isset( $_REQUEST['sek_export_nonce'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing nonce.');
+        return;
+    }
+    if ( !isset( $_REQUEST['skope_id']) || empty( $_REQUEST['skope_id'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing or empty skope_id.');
+        return;
+    }
+    if ( !isset( $_REQUEST['active_locations'] ) || empty( $_REQUEST['active_locations'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing active locations param.');
+        return;
+    }
+    if ( ! wp_verify_nonce( $_REQUEST['sek_export_nonce'], $nonce ) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid none.');
+        return;
+    }
+    if ( ! is_user_logged_in() ) {
+        sek_error_log( __FUNCTION__ . ' => user not logged in.');
+        return;
+    }
+    if ( ! current_user_can( 'customize' ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing customize capabilities.');
+        return;
+    }
+    $seks_data = sek_get_skoped_seks( $_REQUEST['skope_id'] );
+    $seks_data = apply_filters( 'nimble_pre_export', $seks_data );
+    $theme_name = sanitize_title_with_dashes( get_stylesheet() );
+    $export = array(
+        'data' => $seks_data,
+        'metas' => array(
+            'skope_id' => $_REQUEST['skope_id'],
+            'version' => NIMBLE_VERSION,
+            'active_locations' => is_string( $_REQUEST['active_locations'] ) ? explode( ',', $_REQUEST['active_locations'] ) : array(),
+            'date' => date("Y-m-d"),
+            'theme' => $theme_name
+        )
+    );
+
+    $skope_id = str_replace('skp__', '',  $_REQUEST['skope_id'] );
+    $filename = $theme_name . '_' . $skope_id . '.nimblebuilder';
+    header( 'Content-disposition: attachment; filename=' . $filename );
+    header( 'Content-Type: application/octet-stream; charset=' . get_option( 'blog_charset' ) );
+    echo serialize( $export );
+    die();
+}
+add_action( 'wp_ajax_sek_pre_export_checks', '\Nimble\sek_ajax_pre_export_checks' );
+function sek_ajax_pre_export_checks() {
+    $action = 'save-customize_' . get_stylesheet();
+    if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+        wp_send_json_error( 'check_ajax_referer_failed' );
+    }
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'user_unauthenticated' );
+    }
+    if ( ! current_user_can( 'edit_theme_options' ) ) {
+        wp_send_json_error( 'user_cant_edit_theme_options' );
+    }
+    if ( ! current_user_can( 'customize' ) ) {
+        status_header( 403 );
+        wp_send_json_error( 'customize_not_allowed' );
+    } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+        status_header( 405 );
+        wp_send_json_error( 'bad_ajax_method' );
+    }
+    if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+        wp_send_json_error( 'missing_skope_id' );
+    }
+    if ( ! isset( $_POST['active_locations'] ) || empty( $_POST['active_locations'] ) ) {
+        wp_send_json_error( 'no_active_locations_to_export' );
+    }
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_sek_get_imported_file_content', '\Nimble\sek_ajax_get_imported_file_content' );
+function sek_ajax_get_imported_file_content() {
+
+    $action = 'save-customize_' . get_stylesheet();
+    if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+        wp_send_json_error( 'check_ajax_referer_failed' );
+    }
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'user_unauthenticated' );
+    }
+    if ( ! current_user_can( 'edit_theme_options' ) ) {
+        wp_send_json_error( 'user_cant_edit_theme_options' );
+    }
+    if ( ! current_user_can( 'customize' ) ) {
+        status_header( 403 );
+        wp_send_json_error( 'customize_not_allowed' );
+    } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+        status_header( 405 );
+        wp_send_json_error( 'bad_ajax_method' );
+    }
+    if ( ! isset( $_FILES['file_candidate'] ) || empty( $_FILES['file_candidate'] ) ) {
+        wp_send_json_error( 'missing_file_candidate' );
+    }
+    if ( ! isset( $_POST['skope'] ) || empty( $_POST['skope'] ) ) {
+        wp_send_json_error( 'missing_skope' );
+    }
+    if ( ! function_exists( 'wp_handle_upload' ) ) {
+        require_once( ABSPATH . 'wp-admin/includes/file.php' );
+    }
+    $file = wp_handle_upload(
+        $_FILES['file_candidate'],
+        array(
+            'test_form' => false,
+            'test_type' => false,
+            'mimes' => array(
+                'text' => 'text/plain',
+                'nimblebuilder' => 'text/plain',
+                'json' => 'application/json',
+            )
+        )
+    );
+    if ( isset( $file['error'] ) ) {
+        unlink( $file['file'] );
+        wp_send_json_error( 'import_file_error' );
+        return;
+    }
+    if ( !file_exists( $file['file'] ) ) {
+        unlink( $file['file'] );
+        wp_send_json_error( 'import_file_do_not_exist' );
+        return;
+    }
+    $raw = file_get_contents( $file['file'] );
+    $raw_unserialized_data = @unserialize( $raw );
+    if ( ! is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
+        unlink( $file['file'] );
+        wp_send_json_error(  'invalid_import_content' );
+        return;
+    }
+    if ( !empty( $raw_unserialized_data['metas']['version'] ) && version_compare( NIMBLE_VERSION, $raw_unserialized_data['metas']['version'], '<' ) ) {
+        unlink( $file['file'] );
+        wp_send_json_error( 'nimble_builder_needs_update' );
+        return;
+    }
+    if ( isset( $_POST['pre_import_check'] ) && true == $_POST['pre_import_check'] ) {
+        remove_filter( 'nimble_pre_import', '\Nimble\sek_sniff_imported_img_url' );
+    }
+
+    $imported_content = array(
+        'data' => apply_filters( 'nimble_pre_import', $raw_unserialized_data['data'] ),
+        'metas' => $raw_unserialized_data['metas'],
+        'img_errors' => !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array()
+    );
+    unlink( $file['file'] );
+    wp_send_json_success( $imported_content );
+}
+add_filter( 'nimble_pre_export', '\Nimble\sek_parse_img_and_clean_id' );
+function sek_parse_img_and_clean_id( $seks_data ) {
+    $new_seks_data = array();
+    foreach ( $seks_data as $key => $value ) {
+        if ( is_array($value) ) {
+            $new_seks_data[$key] = sek_parse_img_and_clean_id( $value );
+        } else {
+            switch( $key ) {
+                case 'bg-image' :
+                case 'img' :
+                    if ( is_int( $value ) && (int)$value > 0 ) {
+                        $value = '__img_url__' . wp_get_attachment_url((int)$value);
+                    }
+                break;
+                case 'id' :
+                    if ( is_string( $value ) && false !== strpos( $value, '__nimble__' ) ) {
+                        $value = '__replace_me__';
+                    }
+                break;
+            }
+            $new_seks_data[$key] = $value;
+        }
+    }
+    return $new_seks_data;
+}
+add_filter( 'nimble_pre_import', '\Nimble\sek_sniff_imported_img_url' );
+function sek_sniff_imported_img_url( $seks_data ) {
+    $new_seks_data = array();
+    foreach ( $seks_data as $key => $value ) {
+        if ( is_array($value) ) {
+            $new_seks_data[$key] = sek_sniff_imported_img_url( $value );
+        } else {
+            if ( is_string( $value ) && false !== strpos( $value, '__img_url__' ) && sek_is_img_url( $value ) ) {
+                $url = str_replace( '__img_url__', '', $value );
+                $id = sek_sideload_img_and_return_attachment_id( $url );
+                if ( is_wp_error( $id ) ) {
+                    $value = null;
+                    $img_errors = Nimble_Manager()->img_import_errors;
+                    $img_errors[] = $url;
+                    Nimble_Manager()->img_import_errors = $img_errors;
+                } else {
+                    $value = $id;
+                }
+            }
+            $new_seks_data[$key] = $value;
+        }
+    }
+    return $new_seks_data;
+}
+function sek_is_img_url( $url = '' ) {
+    if ( is_string( $url ) ) {
+      if ( preg_match( '/\.(jpg|jpeg|png|gif)/i', $url ) ) {
+        return true;
+      }
+    }
+    return false;
+}
+function sek_sideload_img_and_return_attachment_id( $img_url ) {
+    preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $img_url, $matches );
+    $filename = basename( $matches[0] );
+    if ( 'nimble_asset_' !== substr($filename, 0, strlen('nimble_asset_') ) ) {
+        $filename = 'nimble_asset_' . $filename;
+    }
+    $img_title = preg_replace( '/\.[^.]+$/', '', trim( $filename ) );
+    $args = array(
+        'posts_per_page' => 1,
+        'post_type' => 'attachment',
+        'name' => $img_title
+    );
+    $get_attachment = new \WP_Query( $args );
+    if ( is_array( $get_attachment->posts ) && array_key_exists(0, $get_attachment->posts) ) {
+        $img_id_already_uploaded = $get_attachment->posts[0] -> ID;
+    }
+    if ( isset($img_id_already_uploaded) ) {
+        return $img_id_already_uploaded;
+    }
+    $file_array = array();
+    $file_array['name'] = $filename;
+    $file_array['tmp_name'] = download_url( $img_url );
+    if ( is_wp_error( $file_array['tmp_name'] ) ) {
+        return $file_array['tmp_name'];
+    }
+    $id = media_handle_sideload( $file_array, 0 );
+    if ( is_wp_error( $id ) ) {
+      @unlink( $file_array['tmp_name'] );
+    }
+    return $id;
+}
+
+
+
+?><?php
+add_action( 'customize_save_validation_before', '\Nimble\sek_remove_callback_wp_targeted_link_rel' );
+function sek_remove_callback_wp_targeted_link_rel( $wp_customize ) {
+    if ( false !== has_filter( 'content_save_pre', 'wp_targeted_link_rel' ) ) {
+        remove_filter( 'content_save_pre', 'wp_targeted_link_rel' );
+    }
+};
+
+?><?php
 add_action( 'czr_set_input_tmpl_content', '\Nimble\sek_set_input_tmpl_content', 10, 3 );
 function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
     if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
@@ -2557,6 +2820,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         break;
         case 'nimble_tinymce_editor' :
             sek_set_input_tmpl___nimble_tinymce_editor( $input_id, $input_data );
+        break;
+        case 'import_export' :
+            sek_set_input_tmpl___imp_exp( $input_id, $input_data );
         break;
     }
 }
@@ -3440,5 +3706,37 @@ function sek_set_input_tmpl___nimble_tinymce_editor( $input_id, $input_data ) {
     <?php //<# console.log( 'IN php::ac_get_default_input_tmpl() => data range_slide => ', data ); #> ?>
       <textarea id="textarea-{{ data.control_id }}" data-czrtype="<?php echo $input_id; ?>" class="width-100" name="textarea" rows="10" cols="">{{ data.value }}</textarea>
     <?php
+}
+?>
+<?php
+/* ------------------------------------------------------------------------- *
+ *  IMPORT / EXPORT
+/* ------------------------------------------------------------------------- */
+function sek_set_input_tmpl___imp_exp( $input_id, $input_data ) {
+    ?>
+      <?php //<# console.log( 'IN php::sek_set_input_tmpl___detached_tinymce_edito() => input data => ', data ); #> ?>
+      <?php // sek_error_log( 'INPUT DATA ??', $input_data ); ?>
+      <div class="sek-export-btn-wrap">
+        <div class="customize-control-title width-100"><?php //_e('Export', 'text_doma'); ?></div>
+        <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-export"><?php _e('Export', 'text_doma' ); ?></button>
+      </div>
+      <div class="sek-import-btn-wrap">
+        <div class="customize-control-title width-100"><?php _e('IMPORT', 'text_doma'); ?></div>
+        <span class="czr-notice"><?php _e('Select the file to import and click on the import button.', 'text_doma' ); ?></span>
+        <span class="czr-notice"><?php _e('Be sure to import a file generated with the Nimble Builder export system.', 'text_doma' ); ?></span>
+        <div class="czr-import-dialog notice notice-info">
+            <div class="czr-import-message"><?php _e('Some of the imported sections need a location that is not active on this page. Sections in missing locations will not be rendered. You can continue importing or assign those sections to a contextually active location.', 'text_doma' ); ?></div>
+            <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-import-as-is"><?php _e('Import without modification', 'text_doma' ); ?></button>
+            <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-import-assign"><?php _e('Import in existing locations', 'text_doma' ); ?></button>
+            <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-cancel-import"><?php _e('Cancel import', 'text_doma' ); ?></button>
+        </div>
+        <div class="sek-uploading"><?php _e( 'Uploading...', 'text_doma' ); ?></div>
+        <input type="file" name="sek-import-file" class="sek-import-file" />
+        <input type="hidden" name="sek-skope" value="<?php echo $input_data['scope']; ?>" />
+        <button type="button" class="button disabled" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-pre-import"><?php _e('Import', 'text_doma' ); ?></button>
+
+      </div>
+      <input data-czrtype="<?php echo $input_id; ?>" type="hidden" value="{{ data.value }}"/>
+  <?php
 }
 ?>

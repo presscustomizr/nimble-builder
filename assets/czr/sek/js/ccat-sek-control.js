@@ -333,7 +333,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             api.previewer.trigger('sek-notify', {
                                   notif_id : 'has-active-cache-plugin',
                                   type : 'info',
-                                  duration : 60000,
+                                  duration : 20000,
                                   message : [
                                         '<span style="color:#0075a2">',
                                           sektionsLocalizedData.i18n['You seem to be using a cache plugin.'],
@@ -800,6 +800,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Safety checks
                   // trackHistoryLog must be invoked with a try catch statement
                   if ( !_.isObject( params ) || !_.isFunction( self.historyLog ) || !_.isArray( self.historyLog() ) ) {
+                        api.errare( 'params, self.historyLog() ', params, self.historyLog() );
                         throw new Error('trackHistoryLog => invalid params or historyLog value');
                   }
 
@@ -893,10 +894,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // set the new setting Value
                   if( ! _.isUndefined( newSettingValue ) ) {
                         if ( ! _.isEmpty( newSettingValue.local ) ) {
-                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local ), { navigatingHistoryLogs : true } );
+                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local, 'local' ), { navigatingHistoryLogs : true } );
+
+                              // Clean and regenerate the local option setting
+                              // Note that we also do it after a local import.
+                              //
+                              // Settings are normally registered once and never cleaned, unlike controls.
+                              // Updating the setting value will refresh the sections
+                              // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
+                              // Example of local setting id :
+                              // __nimble__skp__post_page_2__localSkopeOptions__template
+                              // or
+                              // __nimble__skp__home__localSkopeOptions__custom_css
+                              api.czr_sektions.generateUI({
+                                    action : 'sek-generate-local-skope-options-ui',
+                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                              });
                         }
                         if ( ! _.isEmpty( newSettingValue.global ) ) {
-                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global ), { navigatingHistoryLogs : true } );
+                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global, 'global' ), { navigatingHistoryLogs : true } );
                         }
                         // If the information is available, refresh only the relevant sections
                         // otherwise fallback on a full refresh
@@ -925,9 +941,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // Always make sure that the ui gets refreshed
                         api.previewer.trigger( 'sek-pick-content', {});
-                        // Clean registered setting and control, even the level settings
-                        // => otherwise the level settings won't be synchronized when regenerating their ui.
+
+                        // Clean registered control
                         self.cleanRegistered();//<= normal cleaning
+                        // Clean even the level settings
+                        // => otherwise the level settings won't be synchronized when regenerating their ui.
                         self.cleanRegisteredLevelSettingsAfterHistoryNavigation();// setting cleaning
                   }
 
@@ -1589,7 +1607,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               var __collectionSettingInstance__ = api.CZR_Helpers.register({
                                     what : 'setting',
                                     id : settingData.collectionSettingId,
-                                    value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( localOrGlobal )  ),
+                                    value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( localOrGlobal ), localOrGlobal ),
                                     transport : 'postMessage',//'refresh'
                                     type : 'option',
                                     track : false,//don't register in the self.registered()
@@ -1650,11 +1668,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Fired :
             // 1) when instantiating the setting
             // 2) on each setting change, as an override of api.Value::validate( to ) @see customize-base.js
+            // 3) directly when navigating the history log
             // @return {} or null if did not pass the checks
-            validateSettingValue : function( valCandidate ) {
+            // @param scope = string, local or global
+            validateSettingValue : function( valCandidate, scope ) {
                   if ( ! _.isObject( valCandidate ) ) {
-                        api.errare('validation error => the setting should be an object', valCandidate );
+                        api.errare('::validateSettingValue => validation error => the setting should be an object', valCandidate );
                         return null;
+                  }
+                  if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
+                        api.errare( '::validateSettingValue =>  invalid scope provided.', scope );
+                        return;
                   }
                   var parentLevel = {},
                       errorDetected = false,
@@ -1664,7 +1688,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( msg , valCandidate );
                         api.previewer.trigger('sek-notify', {
                               type : 'error',
-                              duration : 30000,
+                              duration : 60000,
                               message : [
                                     '<span style="font-size:0.95em">',
                                       '<strong>' + msg + '</strong>',
@@ -1699,6 +1723,38 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _errorDetected_( 'validation error => the root level should not have a "level" or an "id" property' );
                                         return;
                                   }
+
+                                  // the local setting is structured this way:
+                                  // {
+                                  //    collection : [],
+                                  //    local_options : {},
+                                  //    fonts : []
+                                  // }
+                                  //
+                                  // global_options like sitewide header and footer are saved in a specific option => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS
+                                  // the global setting is structured this way:
+                                  // {
+                                  //    collection : [],
+                                  //    fonts : []
+                                  // }
+                                  // Make sure that there's no unauthorized option group at root level
+                                  _.each( level, function( _opts, _opt_group_name) {
+                                        switch( scope ) {
+                                              case 'local' :
+                                                    if( !_.contains( ['collection', 'local_options', 'fonts' ] , _opt_group_name ) ) {
+                                                          _errorDetected_( 'validation error => unauthorized option group for local setting value => ' + _opt_group_name );
+                                                          return;
+                                                    }
+                                              break;
+                                              case 'global' :
+                                                    if( !_.contains( ['collection', 'fonts' ] , _opt_group_name ) ) {
+                                                          _errorDetected_( 'validation error => unauthorized option group for global setting value => ' + _opt_group_name );
+                                                          return;
+                                                    }
+                                              break;
+                                        }
+                                  });
+
 
                                   // Walk the section collection
                                   _.each( valCandidate.collection, function( _l_ ) {
@@ -1819,47 +1875,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             // triggered when clicking on [data-sek-reset="true"]
-            // scheduled in ::initialize()
-            // Note :
-            // 1) this is not a real reset, the customizer setting is set to self.getDefaultSektionSettingValue( 'local' )
-            // @see php function which defines the defaults
-            // function sek_get_default_location_model() {
-            //     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
-            //     foreach( sek_get_locations() as $location ) {
-            //         $defaut_sektions_value['collection'][] = [
-            //             'id' => $location,
-            //             'level' => 'location',
-            //             'collection' => [],
-            //             'options' => []
-            //         ];
-            //     }
-            //     return $defaut_sektions_value;
-            // }
-            // 2) a real reset should delete the sektion post ( nimble_post_type, with for example title nimble___skp__post_page_21 ) and its database option storing its id ( for example : nimble___skp__post_page_21 )
-            resetCollectionSetting : function() {
+            // click event is scheduled in ::initialize()
+            // Note : only the collection is set to self.getDefaultSektionSettingValue( 'local' )
+            // @see php function which defines the defaults sek_get_default_location_model()
+            resetCollectionSetting : function( scope ) {
                   var self = this;
-                  if ( _.isEmpty( self.localSectionsSettingId() ) ) {
-                        throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
+                  if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
+                        throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
-                  // reset the setting to default
-                  api( self.localSectionsSettingId() )( self.getDefaultSektionSettingValue( 'local' ) );
-                  // refresh the preview
-                  api.previewer.refresh();
-                  // remove any previous notification
-                  api.notifications.remove( 'sek-notify' );
-                  // display a success msg
-                  api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
-                        api.notifications.add( new api.Notification( 'sek-reset-done', {
-                              type: 'success',
-                              message: sektionsLocalizedData.i18n['Reset complete'],
-                              dismissible: true
-                        } ) );
+                  var _collectionSettingId_ = 'global' === scope ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
 
-                        // Removed if not dismissed after 5 seconds
-                        _.delay( function() {
-                              api.notifications.remove( 'sek-reset-done' );
-                        }, 5000 );
-                  });
+                  if ( _.isEmpty( _collectionSettingId_ ) ) {
+                        throw new Error( 'resetCollectionSetting => the collectionSettingId is invalid' );
+                  }
+                  var clonedDefaultSetting = $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) ),
+                      currentSetting = api( _collectionSettingId_ )(),
+                      clonedSetting;
+
+                  clonedSetting = _.isObject( currentSetting ) ? $.extend( true, {}, currentSetting ) : clonedDefaultSetting;
+                  clonedSetting.collection = $.extend( true, [], clonedDefaultSetting.collection );
+                  return clonedSetting;
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
@@ -3965,17 +4000,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   // Prepare the module map to register
-                  var registrationParams = {};
+                  self.localOptionsRegistrationParams = {};
                   if ( _.isUndefined( sektionsLocalizedData.localOptionsMap ) || ! _.isObject( sektionsLocalizedData.localOptionsMap ) ) {
                         api.errare( '::generateUIforGlobalOptions => missing or invalid localOptionsMap');
                         return dfd;
                   }
 
+                  // remove settings when requested
+                  // Happens when importing a file
+                  if ( true === params.clean_settings ) {
+                        self.cleanRegisteredLocalOptionSettings();
+                  }
+
+
                   // Populate the registration params
                   _.each( sektionsLocalizedData.localOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
                               case 'template' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__template',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Page template'],
@@ -3986,7 +4028,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // Header and footer have been introduced in v1.4.0 but not enabled by default.
                               case 'local_header_footer':
                                     if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                                          registrationParams[ opt_name ] = {
+                                          self.localOptionsRegistrationParams[ opt_name ] = {
                                                 settingControlId : _id_ + '__local_header_footer',
                                                 module_type : mod_type,
                                                 controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
@@ -3995,7 +4037,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               break;
                               case 'widths' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__widths',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Inner and outer widths'],
@@ -4003,7 +4045,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'custom_css' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__custom_css',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
@@ -4011,7 +4053,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'local_performances' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_performances',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Page speed optimizations'],
@@ -4019,7 +4061,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'local_reset' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_reset',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Reset the sections in this page'],
@@ -4027,11 +4069,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'local_revisions' :
-                                    registrationParams[ opt_name ] = {
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_revisions',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Revision history of local sections'],
                                           icon : '<i class="material-icons sek-level-option-icon">history</i>'
+                                    };
+                              break;
+                              case 'import_export' :
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__local_imp_exp',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Import / Export'],
+                                          icon : '<i class="material-icons sek-level-option-icon">import_export</i>'
                                     };
                               break;
                               default :
@@ -4040,9 +4090,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }//switch
                   });//_.each
 
+                  // Get the current local options from the local setting value
+                  // local setting value is structured this way :
+                  // {
+                  //    collection : [],
+                  //    local_options : {},
+                  //    fonts : []
+                  // }
+                  // we only need the local_options here
+                  var currentSetValue = api( self.localSectionsSettingId() )(),
+                      currentAllLocalOptionsValue = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} );
 
                   _do_register_ = function() {
-                        _.each( registrationParams, function( optionData, optionType ){
+                        _.each( self.localOptionsRegistrationParams, function( optionData, optionType ){
+                              // Let's add the starting values if provided when registrating the module
+                              var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
+                                  optionTypeValue = _.isObject( currentAllLocalOptionsValue[ optionType ] ) ? currentAllLocalOptionsValue[ optionType ]: {},
+                                  initialModuleValues = optionTypeValue;
+
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
@@ -4067,18 +4132,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
 
-                                    // Let's add the starting values if provided when registrating the module
-                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
-                                        currentSetValue = api( self.localSectionsSettingId() )(),
-                                        allSkopeOptions = $.extend( true, {}, _.isObject( currentSetValue.local_options ) ? currentSetValue.local_options : {} ),
-                                        optionTypeValue = _.isObject( allSkopeOptions[ optionType ] ) ? allSkopeOptions[ optionType ]: {},
-                                        initialModuleValues = optionTypeValue;
+
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
                                           // make sure the starting values are deeped clone now, before being extended
                                           var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
                                           initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
                                     }
+
                                     api.CZR_Helpers.register( {
                                           origin : 'nimble',
                                           level : params.level,
@@ -4089,9 +4150,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           transport : 'postMessage',//'refresh',//// ,
                                           type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
                                     });
-                              }
+                              }//if ( ! api.has( optionData.settingControlId ) )
 
-                              api.CZR_Helpers.register( {
+                              api.CZR_Helpers.register({
                                     origin : 'nimble',
                                     level : params.level,
                                     what : 'control',
@@ -4228,6 +4289,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">history</i>'
                                     };
                               break;
+                              case 'global_reset' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__global_reset',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Reset the sections displayed in global locations'],
+                                          icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                                    };
+                              break;
                               case 'beta_features' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__beta_features',
@@ -4242,6 +4311,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }//switch
                   });//_.each
 
+                  // Let assign the global options to a var
+                  var globalOptionDBValues = sektionsLocalizedData.globalOptionDBValues;
 
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
@@ -4271,9 +4342,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });//api( Id, function( _setting_ ) {})
 
                                     // Let's add the starting values if provided when registrating the module
-                                    var dbValues = sektionsLocalizedData.globalOptionDBValues,
-                                        startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
-                                        initialModuleValues = ( _.isObject( dbValues ) && ! _.isEmpty( dbValues[ optionType ] ) ) ? dbValues[ optionType ] : {};
+                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
+                                        initialModuleValues = ( _.isObject( globalOptionDBValues ) && ! _.isEmpty( globalOptionDBValues[ optionType ] ) ) ? globalOptionDBValues[ optionType ] : {};
 
                                     if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
                                           // make sure the starting values are deeped clone now, before being extended
@@ -4361,7 +4431,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Add the global information to the params
                   // => is used to determine the skope id when resolving the promise in reactToPreviewMsg
                   params = params || {};
-                  params.is_global_location = self.isGlobalLocation( params );
+                  params.is_global_location = 'global' === params.scope || self.isGlobalLocation( params );
 
                   var _collectionSettingId_ = params.is_global_location ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
                   var _do_update_setting_id = function() {
@@ -5381,7 +5451,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // }
                               case 'sek-update-fonts' :
                                     // Get the gfonts from the level options and modules values
-                                    var currentGfonts = self.sniffGFonts( { is_global_location : params && true === params.is_global_location } );
+                                    var currentGfonts = self.sniffGFonts( { is_global_location : ( params && true === params.is_global_location ) } );
                                     if ( ! _.isEmpty( params.font_family ) && _.isString( params.font_family ) && ! _.contains( currentGfonts, params.font_family ) ) {
                                           if ( params.font_family.indexOf('gfont') < 0 ) {
                                                 api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
@@ -5402,6 +5472,121 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     //api.infoLog( 'sek-restore-revision', params );
                                     newSetValue = params.revision_value;
                               break;
+
+                              //-------------------------------------------------------------------------------------------------
+                              //-- FILE IMPORT
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-import-from-file' :
+                                    api.infoLog( 'sek-import-from-file', params );
+                                    if ( _.isUndefined( params.imported_content.data ) || _.isUndefined( params.imported_content.metas ) ) {
+                                          api.errare( 'updateAPISetting::sek-import-from-file => invalid imported content', imported_content );
+                                          break;
+                                    }
+
+                                    var importedCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [];
+
+                                    // SHALL WE ASSIGN SECTIONS FROM MISSING LOCATIONS TO THE FIRST ACTIVE LOCATION ?
+                                    // For example the current page has only the 'loop_start' location, whereas the imported content includes 3 locations :
+                                    // - after_header
+                                    // - loop_start
+                                    // - before_footer
+                                    // Among those 3 locations, 2 are not active in the page.
+                                    // We will merge all section collections from the 3 imported locations one new collection, that will be assigned to 'loop_start'
+                                    // Note that the active imported locations are ordered like they were on the page when exported.
+                                    //
+                                    // So :
+                                    // 1) identify the first active location of the page
+                                    // 2) populate a new collection of combined sections from all active imported locations.
+                                    // 3) updated the imported collection with this
+                                    if ( true === params.assign_missing_locations ) {
+                                          var importedActiveLocations = params.imported_content.metas.active_locations,
+                                              currentActiveLocations = api.czr_sektions.activeLocations();
+
+                                          // console.log('Current set value ?', api( _collectionSettingId_ )() );
+                                          // console.log('import params', params );
+                                          // console.log('importedCollection?', importedCollection );
+                                          // console.log('importedActiveLocations', importedActiveLocations );
+
+                                          // first active location of the current setting
+                                          var firstCurrentActiveLocationId = _.first( currentActiveLocations );
+
+                                          if ( !_.isEmpty( firstCurrentActiveLocationId ) && !_.isEmpty( importedActiveLocations ) && _.isArray( importedActiveLocations ) ) {
+                                                // importedActiveLocationsNotAvailableInCurrentActiveLocations
+                                                // Example :
+                                                // active location in the page : loop_start, loop_end
+                                                // active locations imported : after_header, loop_start, before_footer
+                                                // importedActiveLocationsNotAvailableInCurrentActiveLocations => after_header, before_footer
+                                                var importedActiveLocationsNotAvailableInCurrentActiveLocations = $(importedActiveLocations).not(currentActiveLocations).get(),
+                                                    firstCurrentLocationData = self.getLevelModel( firstCurrentActiveLocationId, newSetValue.collection ),
+                                                    importedTargetLocationData = self.getLevelModel( firstCurrentActiveLocationId, params.imported_content.data.collection ),
+                                                    newCollectionForTargetLocation = [];// the collection that will hold the merge of all active imported collections
+
+                                                // normalize
+                                                // => make sure we have a collection array, even empty
+                                                firstCurrentLocationData.collection = _.isArray( firstCurrentLocationData.collection ) ? firstCurrentLocationData.collection : [];
+                                                importedTargetLocationData.collection = _.isArray( importedTargetLocationData.collection ) ? importedTargetLocationData.collection : [];
+
+                                                // loop on the active imported locations
+                                                // Example : ["__after_header", "__before_main_wrapper", "loop_start", "__before_footer"]
+                                                // and populate newCollectionForTargetLocation, with locations ordered as they were on export
+                                                // importedCollection is a clone
+                                                _.each( importedActiveLocations, function( impLocationId ){
+                                                      var impLocationData = self.getLevelModel( impLocationId, importedCollection );
+                                                      if ( _.isEmpty( impLocationData.collection ) )
+                                                        return;
+                                                      newCollectionForTargetLocation = _.union( newCollectionForTargetLocation, impLocationData.collection );
+                                                });//_.each( importedActiveLocations
+
+                                                // replace the previous collection of the target location, by the union of all collections.
+                                                // for example, if 'loop_start' is the target location, all sections will be added to it.
+                                                importedTargetLocationData.collection = newCollectionForTargetLocation;
+
+                                                // remove the missing locations from the imported collection
+                                                // importedActiveLocationsNotAvailableInCurrentActiveLocations
+                                                params.imported_content.data.collection = _.filter( params.imported_content.data.collection, function( _location ) {
+                                                      return !_.contains( importedActiveLocationsNotAvailableInCurrentActiveLocations, _location.id );
+                                                });
+                                          }//if ( !_.isEmpty( firstCurrentActiveLocationId ) )
+                                    }//if ( true === params.assign_missing_locations )
+
+
+                                    // SHALL WE MERGE ?
+                                    // loop on each location of the imported content
+                                    // if the current setting value has sections in a location, add them before the imported ones
+                                    // keep_existing_sections is a user check option
+                                    // @see PHP sek_get_module_params_for_sek_local_imp_exp()
+                                    if ( true === params.keep_existing_sections ) {
+                                        // note that importedCollection is a unlinked clone of params.imported_content.data.collection
+                                        // merge sections
+                                        _.each( importedCollection, function( imp_location_data ) {
+                                              var currentLocationData = self.getLevelModel( imp_location_data.id, newSetValue.collection );
+                                              if ( _.isEmpty( currentLocationData.collection ) )
+                                                return;
+
+                                              var importedLocationData = self.getLevelModel( imp_location_data.id, params.imported_content.data.collection );
+                                              importedLocationData.collection = _.union( currentLocationData.collection, importedLocationData.collection );
+                                        });
+
+                                        // merge fonts if needed
+                                        if ( newSetValue.fonts && !_.isEmpty( newSetValue.fonts ) && _.isArray( newSetValue.fonts ) ) {
+                                              params.imported_content.data.fonts = _.isArray( params.imported_content.data.fonts ) ? params.imported_content.data.fonts : [];
+                                              // merge and remove duplicated fonts
+                                              params.imported_content.data.fonts =  _.uniq( _.union( newSetValue.fonts, params.imported_content.data.fonts ) );
+                                        }
+                                    }// if true === params.merge
+
+                                    newSetValue = params.imported_content.data;
+                              break;
+
+                              //-------------------------------------------------------------------------------------------------
+                              //-- RESET COLLECTION, LOCAL OR GLOBAL
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-reset-collection' :
+                                    //api.infoLog( 'sek-import-from-file', params );
+                                    try { newSetValue = api.czr_sektions.resetCollectionSetting( params.scope ); } catch( er ) {
+                                          api.errare( 'sek-reset-collection => error when firing resetCollectionSetting()', er );
+                                    }
+                              break;
                         }// switch
 
 
@@ -5413,7 +5598,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( _.isEqual( currentSetValue, newSetValue ) ) {
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
-                                          if ( null !== self.validateSettingValue( newSetValue ) ) {
+                                          if ( null !== self.validateSettingValue( newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
                                                 api( _collectionSettingId_ )( newSetValue, params );
                                                 // Add the cloneId to the params when we resolve
                                                 // the cloneId is only needed in the duplication scenarii
@@ -5702,21 +5887,41 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.registered( registered );
             },
 
+            // This action can be fired after an import, to update the local settings with the imported values
+            cleanRegisteredLocalOptionSettings : function() {
+                  var self = this,
+                      localOptionPrefix = self.getLocalSkopeOptionId(),
+                      registered = $.extend( true, [], self.registered() || [] );
+
+                  registered = _.filter( registered, function( _reg_ ) {
+                        // Remove the local setting
+                        if ( _reg_.id && -1 !== _reg_.id.indexOf( localOptionPrefix ) && api.has( _reg_.id ) ) {
+                               api.remove( _reg_.id );
+                        }
+                        // keep only the setting not local
+                        return _reg_.id && -1 === _reg_.id.indexOf( localOptionPrefix );
+                  });
+                  self.registered( registered );
+            },
+
+
             // Keep only the settings for global option, local options, content picker
             // Remove all the other
+            // The level ( section, column module ) settings can be identified because they are registered with a level property
             cleanRegisteredLevelSettingsAfterHistoryNavigation : function() {
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
 
                   registered = _.filter( registered, function( _reg_ ) {
-                        // We check if the level property is set, so we preserve the permanent options like global options, local options, content picker
-                        if ( ! _.isEmpty( _reg_.level ) && 'setting' === _reg_.what ) {
-                              if ( api.has( _reg_.id ) ) {
-                                    // remove setting from the api
-                                    api.remove( _reg_.id );
-                              }
+                        // We check if the level property is empty
+                        // if not empty, we can remove the setting from the api.
+                        if ( ! _.isEmpty( _reg_.level ) && 'setting' === _reg_.what && api.has( _reg_.id ) ) {
+                              // remove setting from the api
+                              api.remove( _reg_.id );
                         }
-                        return _.isEmpty( _reg_.level ) && 'setting' !== _reg_.what ;
+                        // we keep only the setting with
+                        // so we preserve the permanent options like global options, local options, content picker
+                        return _.isEmpty( _reg_.level ) && 'setting' === _reg_.what ;
                   });
                   self.registered( registered );
             }
@@ -5816,6 +6021,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   params = params || {};
                   if ( _.has( params, 'is_global_location' ) ) {
                         is_global_location = params.is_global_location;
+                  } else if ( _.has( params, 'scope' ) ) {
+                        is_global_location = 'global' === params.scope;
                   } else if ( !_.isEmpty( params.location ) ) {
                         is_global_location = self.isChildOfAGlobalLocation( params.location );
                   } else if ( !_.isEmpty( params.in_sektion ) ) {
@@ -9627,12 +9834,46 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   input.container.on( 'click', '[data-sek-reset-scope]', function( evt, params ) {
                         evt.stopPropagation();
                         var scope = $(this).data( 'sek-reset-scope' );
-                        if ( 'local' === scope ) {
-                              try { api.czr_sektions.resetCollectionSetting(); } catch( er ) {
-                                    api.errare( 'reset_button => error when firing resetCollectionSetting() on click event', er );
-                              }
+
+                        if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
+                              api.errare( 'reset_button input => invalid scope provided.', scope );
+                              return;
                         }
-                  });
+                        api.czr_sektions.updateAPISetting({
+                              action : 'sek-reset-collection',
+                              scope : scope,//<= will determine which setting will be updated,
+                              // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
+                        }).done( function() {
+                              //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
+                              api.previewer.refresh();
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'reset-success',
+                                    type : 'success',
+                                    duration : 8000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            sektionsLocalizedData.i18n['Reset complete'],
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        }).fail( function( response ) {
+                              api.errare( 'reset_button input => error when firing ::updateAPISetting', response );
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'reset-failed',
+                                    type : 'error',
+                                    duration : 8000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            sektionsLocalizedData.i18n['Reset failed'],
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        });
+                  });//on('click')
             }
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
@@ -10042,6 +10283,470 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
             },//setupDetachedTinyMceEditor
+      });//$.extend( api.czrInputMap, {})
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            import_export : function() {
+                  var input = this,
+                      $pre_import_button = input.container.find('button[data-czr-action="sek-pre-import"]'),
+                      $file_input = input.container.find('input[name=sek-import-file]'),
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      currentSetId = 'local' === inputRegistrationParams.scope ? api.czr_sektions.localSectionsSettingId() : api.czr_sektions.getGlobalSectionsSettingId();
+
+                  // Add event listener to set the button state
+                  $file_input.on('change', function( evt ) {
+                        $pre_import_button.toggleClass( 'disabled', _.isEmpty( $(this).val() ) );
+                  });
+
+                  // Schedule action on button click
+                  input.container.on( 'click', '[data-czr-action]', function( evt ) {
+                        evt.stopPropagation();
+                        var _action = $(this).data( 'czr-action' );
+                        switch( _action ) {
+                              case 'sek-export' :
+                                    // prevent exporting if the customize changeset is dirty
+                                    // => because the PHP sek_catch_export_action() doesn't have access to the customize changeset and needs the one persisted in DB
+                                    if ( !_.isEmpty( wp.customize.dirtyValues() ) ) {
+                                          alert(sektionsLocalizedData.i18n['You need to publish before exporting.']);
+                                          break;
+                                    }
+                                    // Is there something to export ?
+                                    var currentVal = api( currentSetId )(),
+                                        hasNoSections = true;
+                                    _.each( currentVal.collection, function( locationData ){
+                                          if ( !hasNoSections )
+                                            return;
+                                          if ( !_.isEmpty( locationData.collection ) ) {
+                                              hasNoSections = false;
+                                          }
+                                    });
+                                    if ( hasNoSections ) {
+                                          alert(sektionsLocalizedData.i18n['Nothing to export.']);
+                                          break;
+                                    }
+                                    _export();
+                              break;//'sek-export'
+
+                              case 'sek-pre-import' :
+                                    // Can we import ?
+                                    // => the current page must have at least one active location
+                                    if( _.isEmpty( api.czr_sektions.activeLocations() ) ) {
+                                          alert(sektionsLocalizedData.i18n['The current page has no available locations to import Nimble Builder sections.']);
+                                          break;
+                                    }
+
+                                    // Before actually importing, let's do a preliminary
+                                    _import( { pre_import_check : true } )
+                                          .done( function( server_resp ) {
+                                                var currentActiveLocations = api.czr_sektions.activeLocations();
+                                                // Compare current active locations with the imported ones
+                                                var importedActiveLocations = server_resp.data.metas.active_locations;
+                                                if ( _.isArray( importedActiveLocations ) && _.isArray( currentActiveLocations ) ) {
+                                                      var importedActiveLocationsNotAvailableInCurrentActiveLocations = $(importedActiveLocations).not(currentActiveLocations).get();
+                                                      if ( !_.isEmpty( importedActiveLocationsNotAvailableInCurrentActiveLocations ) ) {
+                                                            $pre_import_button.hide();
+                                                            input.container.find('.czr-import-dialog').slideToggle();
+                                                            api.infoLog('sek-pre-import => imported locations missing in current page.', importedActiveLocationsNotAvailableInCurrentActiveLocations );
+                                                      } else {
+                                                            _import();
+                                                      }
+                                                } else {
+                                                      // if not
+                                                      api.previewer.trigger('sek-notify', {
+                                                            notif_id : 'import-failed',
+                                                            type : 'info',
+                                                            duration : 30000,
+                                                            message : [
+                                                                  '<span style="color:#0075a2">',
+                                                                    '<strong>',
+                                                                    sektionsLocalizedData.i18n['Import failed'],
+                                                                    '</strong>',
+                                                                  '</span>'
+                                                            ].join('')
+                                                      });
+                                                      _doAlwaysAfterImportApiSettingUpdate();
+                                                }
+                                          })
+                                          .fail( function( error_resp ) {
+                                                api.errare( 'sek_pre_import_checks failed', error_resp );
+                                                _import();
+                                          });
+                              break;//'sek-import'
+                              case 'sek-import-as-is' :
+                                    _import();
+                              break;
+                              case 'sek-import-assign' :
+                                    _import( { assign_missing_locations : true } );
+                              break;
+                              case 'sek-cancel-import' :
+                                    _doAlwaysAfterImportApiSettingUpdate();
+                              break;
+                        }//switch
+                  });//input.container.on( 'click' .. )
+
+
+
+
+                  ////////////////////////////////////////////////////////
+                  // IMPORT
+                  ////////////////////////////////////////////////////////
+                  var _import = function( params ) {
+                        params = params || {};
+                        // Bail here if the file input is invalid
+                        if ( $file_input.length < 1 || _.isUndefined( $file_input[0] ) || ! $file_input[0].files || _.isEmpty( $file_input.val() ) ) {
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'missing-import-file',
+                                    type : 'info',
+                                    duration : 30000,
+                                    message : [
+                                          '<span style="color:#0075a2">',
+                                            '<strong>',
+                                            sektionsLocalizedData.i18n['Missing file'],
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                              return;
+                        }
+
+
+                        // make sure a previous warning gets removed
+                        api.notifications.remove( 'missing-import-file' );
+                        api.notifications.remove( 'import-success' );
+                        api.notifications.remove( 'import-failed' );
+                        api.notifications.remove( 'img-import-errors');
+
+                        // the uploading message is removed on .always()
+                        input.container.find('.sek-uploading').show();
+                        var fd = new FormData();
+                        fd.append( 'file_candidate', $file_input[0].files[0] );
+                        fd.append( 'action', 'sek_get_imported_file_content' );
+                        fd.append( 'nonce', api.settings.nonce.save );
+
+                        // Make sure we have a correct scope provided
+                        if ( !_.contains( ['local', 'global'], inputRegistrationParams.scope ) ) {
+                              api.errare('sek-import input => invalid scope provided', inputRegistrationParams.scope );
+                              return;
+                        }
+                        fd.append( 'skope', inputRegistrationParams.scope);
+                        // When doing the pre_import_check, we inform the server about it
+                        // so that the image sniff and upload is not processed at this stage.
+                        if ( params.pre_import_check ) {
+                              fd.append( 'pre_import_check', params.pre_import_check );
+                        }
+
+                        __request__ = $.ajax({
+                              url: wp.ajax.settings.url,
+                              data: fd,
+                              // Setting processData to false lets you prevent jQuery from automatically transforming the data into a query string. See the docs for more info. http://api.jquery.com/jQuery.ajax/
+                              // Setting the contentType to false is imperative, since otherwise jQuery will set it incorrectly. https://stackoverflow.com/a/5976031/33080
+                              processData: false,
+                              contentType: false,
+                              type: 'POST',
+                              // success: function(data){
+                              //   alert(data);
+                              // }
+                        });
+
+                        // When pre checking, return a promise
+                        if ( params.pre_import_check ) {
+                            return $.Deferred( function() {
+                                  var dfd = this;
+                                  __request__
+                                        .done( function( server_resp ) {
+                                              if( !server_resp.success ) {
+                                                    dfd.reject( server_resp );
+                                              }
+                                              if ( !_isImportedContentEligibleForAPI( server_resp ) ) {
+                                                    dfd.reject( server_resp );
+                                              }
+                                              dfd.resolve( server_resp );
+                                        })
+                                        .fail( function( server_resp ) {
+                                              dfd.reject( server_resp );
+                                        })
+                                        .always( function() {
+                                              input.container.find('.sek-uploading').hide();
+                                        });
+                            });
+                        }
+
+                        // At this stage, we are not in a pre-check case
+                        // the ajax request is processed and will upload images if needed
+                        __request__
+                              .done( function( server_resp ) {
+                                    // we have a server_resp well structured { success : true, data : { data : , metas, img_errors } }
+                                    // Let's set the unique level ids
+                                    var _setIds = function( _data ) {
+                                          if ( _.isObject( _data ) || _.isArray( _data ) ) {
+                                                _.each( _data, function( _v, _k ) {
+                                                      // go recursive ?
+                                                      if ( _.isObject( _v ) || _.isArray( _v ) ) {
+                                                            _data[_k] = _setIds( _v );
+                                                      }
+                                                      // double check on both the key and the value
+                                                      // also re-generates new ids when the export has been done without replacing the ids by '__replace_me__'
+                                                      if ( 'id' === _k && _.isString( _v ) && ( 0 === _v.indexOf( '__replace_me__' ) || 0 === _v.indexOf( '__nimble__' ) ) ) {
+                                                            _data[_k] = sektionsLocalizedData.optPrefixForSektionsNotSaved + api.czr_sektions.guid();
+                                                      }
+                                                });
+                                          }
+                                          return _data;
+                                    };
+                                    server_resp.data.data.collection = _setIds( server_resp.data.data.collection );
+                                    // and try to update the api setting
+                                    _doUpdateApiSetting( server_resp, params );
+                              })
+                              .fail( function( response ) {
+                                    api.errare( 'sek-import input => ajax error', response );
+                                    api.previewer.trigger('sek-notify', {
+                                          notif_id : 'import-failed',
+                                          type : 'error',
+                                          duration : 30000,
+                                          message : [
+                                                '<span>',
+                                                  '<strong>',
+                                                  sektionsLocalizedData.i18n['Import failed, file problem'],
+                                                  '</strong>',
+                                                '</span>'
+                                          ].join('')
+                                    });
+                              })
+                              .always( _doAlwaysAfterImportApiSettingUpdate );//$.ajax()
+                  };//_import()
+
+
+                  // @return a boolean
+                  // server_resp : { success : true, data : {...} }
+                  // check if :
+                  // - server resp is a success
+                  // - the server_response is well formed
+                  var _isImportedContentEligibleForAPI = function( server_resp ) {
+                        var status = true;
+                        // If the setting value is unchanged, no need to go further
+                        // is_local is decided with the input id => @see revision_history input type.
+                        var unserialized_file_content = server_resp.data,
+                            import_success = server_resp.success,
+                            importErrorMsg = null;
+
+                        // PHP generates the export like this:
+                        // $export = array(
+                        //     'data' => sek_get_skoped_seks( $_REQUEST['skope_id'] ),
+                        //     'metas' => array(
+                        //         'skope_id' => $_REQUEST['skope_id'],
+                        //         'version' => NIMBLE_VERSION,
+                        //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
+                        //         'active_locations' => is_string( $_REQUEST['active_locations'] ) ? explode( ',', $_REQUEST['active_locations'] ) : array(),
+                        //         'date' => date("Y-m-d")
+                        //     )
+                        // );
+                        // @see sek_maybe_export()
+
+                        //api.infoLog('AJAX SUCCESS file_content ', server_resp, unserialized_file_content );
+                        if ( !import_success ) {
+                             importErrorMsg = [ sektionsLocalizedData.i18n['Import failed'], unserialized_file_content ].join(' : ');
+                        }
+
+                        if ( _.isNull( importErrorMsg ) && ! _.isObject( unserialized_file_content ) ) {
+                              importErrorMsg = sektionsLocalizedData.i18n['Import failed, invalid file content'];
+                        }
+
+                        // Verify that we have the setting value and the import metas
+                        var importSettingValue = unserialized_file_content.data,
+                            importMetas = unserialized_file_content.metas,
+                            imgImporErrors = unserialized_file_content.img_errors;
+
+                        if ( _.isNull( importErrorMsg ) && ! _.isObject( importSettingValue ) ) {
+                              importErrorMsg = sektionsLocalizedData.i18n['Import failed, invalid file content'];
+                        }
+
+                        if ( _.isNull( importErrorMsg ) && ! _.isObject( importMetas ) ) {
+                              importErrorMsg = sektionsLocalizedData.i18n['Import failed, invalid file content'];
+                        }
+
+                        if ( _.isNull( importErrorMsg ) && _.isEqual( api( currentSetId )(), importSettingValue ) ) {
+                              api.infoLog('sek-import input => Setting unchanged');
+                              status = false;
+                        }
+
+                        // bail here if we have an import error msg
+                        if ( !_.isNull( importErrorMsg ) ) {
+                              api.errare('sek-import input => invalid data sent from server', unserialized_file_content );
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'import-failed',
+                                    type : 'error',
+                                    duration : 30000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            importErrorMsg,
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                              status = false;
+                        }
+
+                        // Img importation errors ?
+                        if ( !_.isEmpty( imgImporErrors ) ) {
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'img-import-errors',
+                                    type : 'info',
+                                    duration : 60000,
+                                    message : [
+                                          '<span style="color:#0075a2">',
+                                            [
+                                              '<strong>' + sektionsLocalizedData.i18n['Some image(s) could not be imported'] + '</strong><br/>',
+                                              '<span style="font-size:11px">' + imgImporErrors + '</span>'
+                                            ].join(' : '),
+                                          '</span>'
+                                    ].join('')
+                              });
+                        }
+                        return status;
+                  };
+
+
+
+                  // fired on ajaxrequest done
+                  // At this stage, the server_resp data structure has been validated.
+                  // We can try to the update the api setting
+                  var _doUpdateApiSetting = function( server_resp, params ){
+                        params = params || {};
+                        if ( !_isImportedContentEligibleForAPI( server_resp ) )
+                          return;
+                        // api.infoLog('api.czr_sektions.localSectionsSettingId()?', api.czr_sektions.localSectionsSettingId());
+                        // api.infoLog('inputRegistrationParams.scope ?', inputRegistrationParams.scope );
+
+                        //api.infoLog('TODO => verify metas => version, active locations, etc ... ');
+
+                        // Update the setting api via the normalized method
+                        // the scope will determine the setting id, local or global
+                        api.czr_sektions.updateAPISetting({
+                              action : 'sek-import-from-file',
+                              scope : 'global' === inputRegistrationParams.scope,//<= will determine which setting will be updated,
+                              // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
+                              imported_content : server_resp.data,
+                              assign_missing_locations : params.assign_missing_locations,
+                              keep_existing_sections : input.input_parent.czr_Input('keep_existing_sections')()
+                        }).done( function() {
+                              // Clean an regenerate the local option setting
+                              // Settings are normally registered once and never cleaned, unlike controls.
+                              // After the import, updating the setting value will refresh the sections
+                              // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
+                              if ( 'local' === inputRegistrationParams.scope ) {
+                                    api.czr_sektions.generateUI({
+                                          action : 'sek-generate-local-skope-options-ui',
+                                          clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                                    });
+                              }
+
+                              //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
+                              api.previewer.refresh();
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'import-success',
+                                    type : 'success',
+                                    duration : 30000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            sektionsLocalizedData.i18n['File successfully imported'],
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        }).fail( function( response ) {
+                              api.errare( 'sek-import input => error when firing ::updateAPISetting', response );
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'import-failed',
+                                    type : 'error',
+                                    duration : 30000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            [ sektionsLocalizedData.i18n['Import failed'], response ].join(' : '),
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        });
+
+                        // Refresh the preview, so the markup is refreshed and the css stylesheet are generated
+                        api.previewer.refresh();
+                  };//_doUpdateApiSetting()
+
+                  var _doAlwaysAfterImportApiSettingUpdate = function() {
+                        input.container.find('.sek-uploading').hide();
+                        // Clean the file input val
+                        $file_input.val('').trigger('change');
+                        // Close the import dialog
+                        input.container.find('.czr-import-dialog').hide();
+                        // display back the pre import button
+                        $pre_import_button.show();
+                  };
+
+
+
+
+
+                  ////////////////////////////////////////////////////////
+                  // EXPORT
+                  ////////////////////////////////////////////////////////
+                  var _export = function() {
+                          var query = [],
+                              query_params = {
+                                    sek_export_nonce : api.settings.nonce.save,
+                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                                    active_locations : api.czr_sektions.activeLocations()
+                              };
+                          _.each( query_params, function(v,k) {
+                                query.push( encodeURIComponent(k) + '=' + encodeURIComponent(v) );
+                          });
+
+                          // The ajax action is used to make a pre-check
+                          // the idea is to avoid a white screen when generating the download window afterwards
+                          wp.ajax.post( 'sek_pre_export_checks', {
+                                nonce: api.settings.nonce.save,
+                                sek_export_nonce : api.settings.nonce.save,
+                                skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                                active_locations : api.czr_sektions.activeLocations()
+                          }).done( function() {
+                                // disable the 'beforeunload' listeners generating popup window when the changeset is dirty
+                                $( window ).off( 'beforeunload' );
+                                // Generate a download window
+                                // @see add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
+                                window.location.href = [
+                                      sektionsLocalizedData.customizerURL,
+                                      '?',
+                                      query.join('&')
+                                ].join('');
+                                // re-enable the listeners
+                                $( window ).on( 'beforeunload' );
+                          }).fail( function( error_resp ) {
+                                api.previewer.trigger('sek-notify', {
+                                      notif_id : 'import-failed',
+                                      type : 'error',
+                                      duration : 30000,
+                                      message : [
+                                            '<span>',
+                                              '<strong>',
+                                              [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
+                                              '</strong>',
+                                            '</span>'
+                                      ].join('')
+                                });
+                          });
+                  };//_export()
+
+            }//import_export()
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
@@ -11133,7 +11838,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   }
             }//CZRItemConstructor
-      };
+      };//Constructor
 
 
       //provides a description of each module
@@ -11315,6 +12020,31 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_local_revisions' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_local_imp_exp : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_imp_exp', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_local_imp_exp' )
                   )
             },
       });
@@ -11669,6 +12399,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_revisions' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_global_reset : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_reset', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_reset' )
                   )
             },
       });

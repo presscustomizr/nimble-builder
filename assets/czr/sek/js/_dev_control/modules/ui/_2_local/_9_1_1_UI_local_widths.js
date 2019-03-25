@@ -59,7 +59,7 @@
                         });
                   }
             }//CZRItemConstructor
-      };
+      };//Constructor
 
 
       //provides a description of each module

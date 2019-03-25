@@ -269,7 +269,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //     $skopeLocationCollection = $skopeSettingValue['collection'];
             // }
 
-            // sek_error_log( __FUNCTION__ . ' $locationSettingValue ', $locationSettingValue );
+            //sek_error_log( __FUNCTION__ . ' sek_get_skoped_seks(  ', sek_get_skoped_seks() );
 
             foreach( $locations as $location_id ) {
                 if ( ! is_string( $location_id ) || empty( $location_id ) ) {

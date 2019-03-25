@@ -43,6 +43,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Safety checks
                   // trackHistoryLog must be invoked with a try catch statement
                   if ( !_.isObject( params ) || !_.isFunction( self.historyLog ) || !_.isArray( self.historyLog() ) ) {
+                        api.errare( 'params, self.historyLog() ', params, self.historyLog() );
                         throw new Error('trackHistoryLog => invalid params or historyLog value');
                   }
 
@@ -136,10 +137,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // set the new setting Value
                   if( ! _.isUndefined( newSettingValue ) ) {
                         if ( ! _.isEmpty( newSettingValue.local ) ) {
-                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local ), { navigatingHistoryLogs : true } );
+                              api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local, 'local' ), { navigatingHistoryLogs : true } );
+
+                              // Clean and regenerate the local option setting
+                              // Note that we also do it after a local import.
+                              //
+                              // Settings are normally registered once and never cleaned, unlike controls.
+                              // Updating the setting value will refresh the sections
+                              // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
+                              // Example of local setting id :
+                              // __nimble__skp__post_page_2__localSkopeOptions__template
+                              // or
+                              // __nimble__skp__home__localSkopeOptions__custom_css
+                              api.czr_sektions.generateUI({
+                                    action : 'sek-generate-local-skope-options-ui',
+                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                              });
                         }
                         if ( ! _.isEmpty( newSettingValue.global ) ) {
-                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global ), { navigatingHistoryLogs : true } );
+                              api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global, 'global' ), { navigatingHistoryLogs : true } );
                         }
                         // If the information is available, refresh only the relevant sections
                         // otherwise fallback on a full refresh
@@ -168,9 +184,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // Always make sure that the ui gets refreshed
                         api.previewer.trigger( 'sek-pick-content', {});
-                        // Clean registered setting and control, even the level settings
-                        // => otherwise the level settings won't be synchronized when regenerating their ui.
+
+                        // Clean registered control
                         self.cleanRegistered();//<= normal cleaning
+                        // Clean even the level settings
+                        // => otherwise the level settings won't be synchronized when regenerating their ui.
                         self.cleanRegisteredLevelSettingsAfterHistoryNavigation();// setting cleaning
                   }
 

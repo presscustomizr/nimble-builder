@@ -237,6 +237,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_3_reset_button.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_4_revision_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_5_tiny_mce_editor.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_6_imp_exp.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
@@ -259,6 +260,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_4_UI_local_performances.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_5_UI_local_header_footer.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_6_UI_local_revisions.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_7_UI_local_imp_exp.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_1_UI_global_breakpoint.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_2_UI_global_widths.js',
@@ -266,6 +268,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_4_UI_global_header_footer.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_5_UI_global_google_recaptcha.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_6_UI_global_revisions.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_7_UI_global_reset.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_9_UI_global_beta_features.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
@@ -364,10 +367,11 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_2_local/4_1_4_sek_register_local_performances.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_2_local/4_1_5_sek_register_local_header_footer.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_2_local/4_1_6_sek_register_local_revisions.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_2_local/4_1_7_sek_register_local_imp_exp.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php',
-      //'<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_3_sek_register_global_reset.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_3_sek_register_global_reset.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_4_sek_register_global_performances.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_5_sek_register_global_header_footer.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php',
@@ -425,8 +429,9 @@ module.exports = {
       src: [
         '<%= paths.sektions %>_customizer_dev_php/1_0_0_sektions_customizer_assets.php',
         '<%= paths.sektions %>_customizer_dev_php/2_0_0_sektions_customizer_dynamic_registration.php',
-        '<%= paths.sektions %>_customizer_dev_php/9_0_0_sektions_wp_5_0_gutenberg_compat.php',
         '<%= paths.sektions %>_customizer_dev_php/7_0_0_sektions_detached_tinymce.php',
+        '<%= paths.sektions %>_customizer_dev_php/8_0_0_sektions_customizer_import_export.php',
+        '<%= paths.sektions %>_customizer_dev_php/9_0_0_sektions_wp_5_0_gutenberg_compat.php',
 
         // INPUT TEMPLATES
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_0_1_sek_input_tmpl_base_filter.php',
@@ -447,7 +452,8 @@ module.exports = {
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_6_sek_input_tmpl_buttons_choice.php',
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_7_sek_input_tmpl_reset_button.php',
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_8_sek_input_tmpl_revision_history.php',
-        '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_9_sek_input_tmpl_tinymce_editors.php'
+        '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_9_sek_input_tmpl_tinymce_editors.php',
+        '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_2_0_sek_input_tmpl_imp_exp.php',
       ],
       dest: '<%= paths.sektions %>ccat-czr-sektions.php',
   },

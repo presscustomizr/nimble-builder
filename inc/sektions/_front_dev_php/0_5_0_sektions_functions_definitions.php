@@ -133,9 +133,9 @@ function register_location( $location_id, $params = array() ) {
 function sek_get_default_location_model( $skope_id = null ) {
     $is_global_skope = NIMBLE_GLOBAL_SKOPE_ID === $skope_id;
     if ( $is_global_skope ) {
-        $defaut_sektions_value = [ 'collection' => [] ];
+        $defaut_sektions_value = [ 'collection' => [], 'fonts' => [] ];//global_options are saved in a specific option => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS
     } else {
-        $defaut_sektions_value = [ 'collection' => [], 'local_options' => [] ];
+        $defaut_sektions_value = [ 'collection' => [], 'local_options' => [], 'fonts' => [] ];
     }
     foreach( sek_get_locations() as $location_id => $params ) {
         $is_global_location = sek_is_global_location( $location_id );

@@ -29,7 +29,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               var __collectionSettingInstance__ = api.CZR_Helpers.register({
                                     what : 'setting',
                                     id : settingData.collectionSettingId,
-                                    value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( localOrGlobal )  ),
+                                    value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( localOrGlobal ), localOrGlobal ),
                                     transport : 'postMessage',//'refresh'
                                     type : 'option',
                                     track : false,//don't register in the self.registered()
@@ -90,11 +90,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Fired :
             // 1) when instantiating the setting
             // 2) on each setting change, as an override of api.Value::validate( to ) @see customize-base.js
+            // 3) directly when navigating the history log
             // @return {} or null if did not pass the checks
-            validateSettingValue : function( valCandidate ) {
+            // @param scope = string, local or global
+            validateSettingValue : function( valCandidate, scope ) {
                   if ( ! _.isObject( valCandidate ) ) {
-                        api.errare('validation error => the setting should be an object', valCandidate );
+                        api.errare('::validateSettingValue => validation error => the setting should be an object', valCandidate );
                         return null;
+                  }
+                  if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
+                        api.errare( '::validateSettingValue =>  invalid scope provided.', scope );
+                        return;
                   }
                   var parentLevel = {},
                       errorDetected = false,
@@ -104,7 +110,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( msg , valCandidate );
                         api.previewer.trigger('sek-notify', {
                               type : 'error',
-                              duration : 30000,
+                              duration : 60000,
                               message : [
                                     '<span style="font-size:0.95em">',
                                       '<strong>' + msg + '</strong>',
@@ -139,6 +145,38 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _errorDetected_( 'validation error => the root level should not have a "level" or an "id" property' );
                                         return;
                                   }
+
+                                  // the local setting is structured this way:
+                                  // {
+                                  //    collection : [],
+                                  //    local_options : {},
+                                  //    fonts : []
+                                  // }
+                                  //
+                                  // global_options like sitewide header and footer are saved in a specific option => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS
+                                  // the global setting is structured this way:
+                                  // {
+                                  //    collection : [],
+                                  //    fonts : []
+                                  // }
+                                  // Make sure that there's no unauthorized option group at root level
+                                  _.each( level, function( _opts, _opt_group_name) {
+                                        switch( scope ) {
+                                              case 'local' :
+                                                    if( !_.contains( ['collection', 'local_options', 'fonts' ] , _opt_group_name ) ) {
+                                                          _errorDetected_( 'validation error => unauthorized option group for local setting value => ' + _opt_group_name );
+                                                          return;
+                                                    }
+                                              break;
+                                              case 'global' :
+                                                    if( !_.contains( ['collection', 'fonts' ] , _opt_group_name ) ) {
+                                                          _errorDetected_( 'validation error => unauthorized option group for global setting value => ' + _opt_group_name );
+                                                          return;
+                                                    }
+                                              break;
+                                        }
+                                  });
+
 
                                   // Walk the section collection
                                   _.each( valCandidate.collection, function( _l_ ) {
@@ -259,47 +297,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             // triggered when clicking on [data-sek-reset="true"]
-            // scheduled in ::initialize()
-            // Note :
-            // 1) this is not a real reset, the customizer setting is set to self.getDefaultSektionSettingValue( 'local' )
-            // @see php function which defines the defaults
-            // function sek_get_default_location_model() {
-            //     $defaut_sektions_value = [ 'collection' => [], 'options' => [] ];
-            //     foreach( sek_get_locations() as $location ) {
-            //         $defaut_sektions_value['collection'][] = [
-            //             'id' => $location,
-            //             'level' => 'location',
-            //             'collection' => [],
-            //             'options' => []
-            //         ];
-            //     }
-            //     return $defaut_sektions_value;
-            // }
-            // 2) a real reset should delete the sektion post ( nimble_post_type, with for example title nimble___skp__post_page_21 ) and its database option storing its id ( for example : nimble___skp__post_page_21 )
-            resetCollectionSetting : function() {
+            // click event is scheduled in ::initialize()
+            // Note : only the collection is set to self.getDefaultSektionSettingValue( 'local' )
+            // @see php function which defines the defaults sek_get_default_location_model()
+            resetCollectionSetting : function( scope ) {
                   var self = this;
-                  if ( _.isEmpty( self.localSectionsSettingId() ) ) {
-                        throw new Error( 'setupSettingsToBeSaved => the collectionSettingId is invalid' );
+                  if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
+                        throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
-                  // reset the setting to default
-                  api( self.localSectionsSettingId() )( self.getDefaultSektionSettingValue( 'local' ) );
-                  // refresh the preview
-                  api.previewer.refresh();
-                  // remove any previous notification
-                  api.notifications.remove( 'sek-notify' );
-                  // display a success msg
-                  api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
-                        api.notifications.add( new api.Notification( 'sek-reset-done', {
-                              type: 'success',
-                              message: sektionsLocalizedData.i18n['Reset complete'],
-                              dismissible: true
-                        } ) );
+                  var _collectionSettingId_ = 'global' === scope ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
 
-                        // Removed if not dismissed after 5 seconds
-                        _.delay( function() {
-                              api.notifications.remove( 'sek-reset-done' );
-                        }, 5000 );
-                  });
+                  if ( _.isEmpty( _collectionSettingId_ ) ) {
+                        throw new Error( 'resetCollectionSetting => the collectionSettingId is invalid' );
+                  }
+                  var clonedDefaultSetting = $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) ),
+                      currentSetting = api( _collectionSettingId_ )(),
+                      clonedSetting;
+
+                  clonedSetting = _.isObject( currentSetting ) ? $.extend( true, {}, currentSetting ) : clonedDefaultSetting;
+                  clonedSetting.collection = $.extend( true, [], clonedDefaultSetting.collection );
+                  return clonedSetting;
             }
       });//$.extend()
 })( wp.customize, jQuery );

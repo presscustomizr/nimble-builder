@@ -15,12 +15,46 @@
                   input.container.on( 'click', '[data-sek-reset-scope]', function( evt, params ) {
                         evt.stopPropagation();
                         var scope = $(this).data( 'sek-reset-scope' );
-                        if ( 'local' === scope ) {
-                              try { api.czr_sektions.resetCollectionSetting(); } catch( er ) {
-                                    api.errare( 'reset_button => error when firing resetCollectionSetting() on click event', er );
-                              }
+
+                        if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
+                              api.errare( 'reset_button input => invalid scope provided.', scope );
+                              return;
                         }
-                  });
+                        api.czr_sektions.updateAPISetting({
+                              action : 'sek-reset-collection',
+                              scope : scope,//<= will determine which setting will be updated,
+                              // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
+                        }).done( function() {
+                              //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
+                              api.previewer.refresh();
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'reset-success',
+                                    type : 'success',
+                                    duration : 8000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            sektionsLocalizedData.i18n['Reset complete'],
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        }).fail( function( response ) {
+                              api.errare( 'reset_button input => error when firing ::updateAPISetting', response );
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'reset-failed',
+                                    type : 'error',
+                                    duration : 8000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            sektionsLocalizedData.i18n['Reset failed'],
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        });
+                  });//on('click')
             }
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );

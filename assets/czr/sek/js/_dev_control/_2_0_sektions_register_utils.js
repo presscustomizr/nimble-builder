@@ -40,21 +40,41 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.registered( registered );
             },
 
+            // This action can be fired after an import, to update the local settings with the imported values
+            cleanRegisteredLocalOptionSettings : function() {
+                  var self = this,
+                      localOptionPrefix = self.getLocalSkopeOptionId(),
+                      registered = $.extend( true, [], self.registered() || [] );
+
+                  registered = _.filter( registered, function( _reg_ ) {
+                        // Remove the local setting
+                        if ( _reg_.id && -1 !== _reg_.id.indexOf( localOptionPrefix ) && api.has( _reg_.id ) ) {
+                               api.remove( _reg_.id );
+                        }
+                        // keep only the setting not local
+                        return _reg_.id && -1 === _reg_.id.indexOf( localOptionPrefix );
+                  });
+                  self.registered( registered );
+            },
+
+
             // Keep only the settings for global option, local options, content picker
             // Remove all the other
+            // The level ( section, column module ) settings can be identified because they are registered with a level property
             cleanRegisteredLevelSettingsAfterHistoryNavigation : function() {
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
 
                   registered = _.filter( registered, function( _reg_ ) {
-                        // We check if the level property is set, so we preserve the permanent options like global options, local options, content picker
-                        if ( ! _.isEmpty( _reg_.level ) && 'setting' === _reg_.what ) {
-                              if ( api.has( _reg_.id ) ) {
-                                    // remove setting from the api
-                                    api.remove( _reg_.id );
-                              }
+                        // We check if the level property is empty
+                        // if not empty, we can remove the setting from the api.
+                        if ( ! _.isEmpty( _reg_.level ) && 'setting' === _reg_.what && api.has( _reg_.id ) ) {
+                              // remove setting from the api
+                              api.remove( _reg_.id );
                         }
-                        return _.isEmpty( _reg_.level ) && 'setting' !== _reg_.what ;
+                        // we keep only the setting with
+                        // so we preserve the permanent options like global options, local options, content picker
+                        return _.isEmpty( _reg_.level ) && 'setting' === _reg_.what ;
                   });
                   self.registered( registered );
             }

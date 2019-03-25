@@ -36,15 +36,16 @@ function sek_register_modules() {
         'sek_local_performances',
         'sek_local_header_footer',
         'sek_local_revisions',
+        'sek_local_imp_exp',
 
         // global options modules
         'sek_global_breakpoint',
         'sek_global_widths',
-        //'sek_global_reset',
         'sek_global_performances',
         'sek_global_header_footer',
         'sek_global_recaptcha',
         'sek_global_revisions',
+        'sek_global_reset',
         'sek_global_beta_features',
 
         // FRONT MODULES
