@@ -38,7 +38,9 @@ function sek_maybe_export() {
     $seks_data = sek_get_skoped_seks( $_REQUEST['skope_id'] );
 
     //sek_error_log('EXPORT BEFORE FILTER ? ' . $_REQUEST['skope_id'] , $seks_data );
-
+    // the filter 'nimble_pre_export' is used to :
+    // replace image id by the absolute url
+    // clean level ids and replace them with a placeholder string
     $seks_data = apply_filters( 'nimble_pre_export', $seks_data );
     $theme_name = sanitize_title_with_dashes( get_stylesheet() );
 
@@ -233,18 +235,23 @@ function sek_ajax_get_imported_file_content() {
 
 
 // EXPORT FILTER
-add_filter( 'nimble_pre_export', '\Nimble\sek_sniff_img_id' );
-function sek_sniff_img_id( $seks_data ) {
+add_filter( 'nimble_pre_export', '\Nimble\sek_parse_img_and_clean_id' );
+function sek_parse_img_and_clean_id( $seks_data ) {
     $new_seks_data = array();
     foreach ( $seks_data as $key => $value ) {
         if ( is_array($value) ) {
-            $new_seks_data[$key] = sek_sniff_img_id( $value );
+            $new_seks_data[$key] = sek_parse_img_and_clean_id( $value );
         } else {
             switch( $key ) {
                 case 'bg-image' :
                 case 'img' :
                     if ( is_int( $value ) && (int)$value > 0 ) {
                         $value = '__img_url__' . wp_get_attachment_url((int)$value);
+                    }
+                break;
+                case 'id' :
+                    if ( is_string( $value ) && false !== strpos( $value, '__nimble__' ) ) {
+                        $value = '__replace_me__';
                     }
                 break;
             }

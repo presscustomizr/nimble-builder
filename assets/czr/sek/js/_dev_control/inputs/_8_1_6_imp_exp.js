@@ -197,6 +197,26 @@
                         // the ajax request is processed and will upload images if needed
                         __request__
                               .done( function( server_resp ) {
+                                    // we have a server_resp well structured { success : true, data : { data : , metas, img_errors } }
+                                    // Let's set the unique level ids
+                                    var _setIds = function( _data ) {
+                                          if ( _.isObject( _data ) || _.isArray( _data ) ) {
+                                                _.each( _data, function( _v, _k ) {
+                                                      // go recursive ?
+                                                      if ( _.isObject( _v ) || _.isArray( _v ) ) {
+                                                            _data[_k] = _setIds( _v );
+                                                      }
+                                                      // double check on both the key and the value
+                                                      // also re-generates new ids when the export has been done without replacing the ids by '__replace_me__'
+                                                      if ( 'id' === _k && _.isString( _v ) && ( 0 === _v.indexOf( '__replace_me__' ) || 0 === _v.indexOf( '__nimble__' ) ) ) {
+                                                            _data[_k] = sektionsLocalizedData.optPrefixForSektionsNotSaved + api.czr_sektions.guid();
+                                                      }
+                                                });
+                                          }
+                                          return _data;
+                                    };
+                                    server_resp.data.data.collection = _setIds( server_resp.data.data.collection );
+                                    // and try to update the api setting
                                     _doUpdateApiSetting( server_resp, params );
                               })
                               .fail( function( response ) {
