@@ -7,17 +7,25 @@ function sek_set_input_tmpl___imp_exp( $input_id, $input_data ) {
     ?>
       <?php //<# console.log( 'IN php::sek_set_input_tmpl___detached_tinymce_edito() => input data => ', data ); #> ?>
       <?php // sek_error_log( 'INPUT DATA ??', $input_data ); ?>
+      <div class="sek-export-btn-wrap">
+        <div class="customize-control-title width-100"><?php //_e('Export', 'text_doma'); ?></div>
+        <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-export"><?php _e('Export', 'text_doma' ); ?></button>
+      </div>
       <div class="sek-import-btn-wrap">
-        <span class="czr-notice"><?php _e('Select the file to import and click on the import button.', 'text_doma' ); ?></span><br/>
+        <div class="customize-control-title width-100"><?php _e('IMPORT', 'text_doma'); ?></div>
+        <span class="czr-notice"><?php _e('Select the file to import and click on the import button.', 'text_doma' ); ?></span>
         <span class="czr-notice"><?php _e('Be sure to import a file generated with the Nimble Builder export system.', 'text_doma' ); ?></span>
+        <div class="czr-import-dialog">
+            <span class="czr-import-message"><?php _e('Some of the imported sections need locations that are not active on this page. You can decide to assign those sections to a currently active location, or cancel import.', 'text_doma' ); ?></span>
+            <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-import-as-is"><?php _e('Import sections as is', 'text_doma' ); ?></button>
+            <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-import-assign"><?php _e('Import sections to existing locations', 'text_doma' ); ?></button>
+            <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-cancel-import"><?php _e('Cancel', 'text_doma' ); ?></button>
+        </div>
+        <div class="sek-uploading"><?php _e( 'Uploading...', 'text_doma' ); ?></div>
         <input type="file" name="sek-import-file" class="sek-import-file" />
         <input type="hidden" name="sek-skope" value="<?php echo $input_data['scope']; ?>" />
-        <button type="button" class="button disabled" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-import"><?php _e('Import', 'text_doma' ); ?></button>
-        <div class="sek-uploading"><?php _e( 'Uploading...', 'text_doma' ); ?></div>
-      </div>
-      <div class="sek-export-btn-wrap">
-        <div class="customize-control-title width-100"><?php _e('Export', 'text_doma'); ?></div>
-        <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-export"><?php _e('Export', 'text_doma' ); ?></button>
+        <button type="button" class="button disabled" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-pre-import"><?php _e('Import', 'text_doma' ); ?></button>
+
       </div>
       <input data-czrtype="<?php echo $input_id; ?>" type="hidden" value="{{ data.value }}"/>
   <?php

@@ -65,8 +65,8 @@ function sek_maybe_export() {
     header( 'Content-Type: application/octet-stream; charset=' . get_option( 'blog_charset' ) );
 
     // Serialize the export data.
-    //echo serialize( $export );
-    echo wp_json_encode( $export );
+    echo serialize( $export );
+    //echo wp_json_encode( $export );
 
     // Start the download.
     die();
@@ -112,7 +112,6 @@ function sek_ajax_pre_export_checks() {
 // fetch the content from a user imported file
 add_action( 'wp_ajax_sek_get_imported_file_content', '\Nimble\sek_ajax_get_imported_file_content' );
 function sek_ajax_get_imported_file_content() {
-
     // sek_error_log(__FUNCTION__ . ' AJAX $_POST ?', $_POST );
     // sek_error_log(__FUNCTION__ . ' AJAX $_FILES ?', $_FILES );
     // sek_error_log(__FUNCTION__ . ' AJAX $_REQUEST ?', $_REQUEST );
@@ -151,7 +150,16 @@ function sek_ajax_get_imported_file_content() {
     // otherwise WP will write the file in the /wp-content folder
     $file = wp_handle_upload(
         $_FILES['file_candidate'],
-        array( 'test_form' => false, 'test_type' => false, 'mimes' => array('text' => 'text/plain', 'json' => 'application/json', 'nimblebuilder' => 'application/json') )
+        array(
+            'test_form' => false,
+            'test_type' => false,
+            'mimes' => array(
+                'text' => 'text/plain',
+                'nimblebuilder' => 'text/plain',
+                'json' => 'application/json',
+                //'nimblebuilder' => 'application/json'
+            )
+        )
     );
 
     // Make sure we have an uploaded file.
@@ -168,8 +176,8 @@ function sek_ajax_get_imported_file_content() {
 
     // Get the upload data.
     $raw = file_get_contents( $file['file'] );
-    //$raw_unserialized_data = @unserialize( $raw );
-    $raw_unserialized_data = json_decode( $raw, true );
+    $raw_unserialized_data = @unserialize( $raw );
+    //$raw_unserialized_data = json_decode( $raw, true );
 
     // VALIDATE IMPORTED CONTENT
     // data structure :
@@ -198,21 +206,19 @@ function sek_ajax_get_imported_file_content() {
     }
 
     //sek_error_log('IMPORT BEFORE FILTER ?', $raw_unserialized_data );
+
+    // in a pre-import-check context, we don't need to sniff and upload images
+    if ( isset( $_POST['pre_import_check'] ) && true == $_POST['pre_import_check'] ) {
+        remove_filter( 'nimble_pre_import', '\Nimble\sek_sniff_imported_img_url' );
+    }
+
     $imported_content = array(
         'data' => apply_filters( 'nimble_pre_import', $raw_unserialized_data['data'] ),
         'metas' => $raw_unserialized_data['metas'],
+        // the image import errors won't block the import
+        // they are used when notifying user in the customizer
         'img_errors' => !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array()
     );
-    //sek_error_log('IMPORT AFTER FILTER ?', $imported_content );
-    // if ( !empty( Nimble_Manager()->img_import_errors ) ) {
-    //     unlink( $file['file'] );
-    //     wp_send_json_error( array(
-    //         'code' => 'img_import_errors',
-    //         'message' => implode(',', Nimble_Manager()->img_import_errors),
-    //     ));
-    //     //wp_send_json_error( 'img_import_error' );
-    //     return;
-    // }
 
     // Remove the uploaded file
     // Important => always run unlink( $file['file'] ) before sending the json success or error
@@ -259,7 +265,7 @@ function sek_sniff_imported_img_url( $seks_data ) {
             if ( is_string( $value ) && false !== strpos( $value, '__img_url__' ) && sek_is_img_url( $value ) ) {
                 $url = str_replace( '__img_url__', '', $value );
                 //sek_error_log( __FUNCTION__ . ' URL?', $url );
-                $id = sek_sideload_img( $url );
+                $id = sek_sideload_img_and_return_attachment_id( $url );
                 if ( is_wp_error( $id ) ) {
                     $value = null;
                     $img_errors = Nimble_Manager()->img_import_errors;
@@ -275,10 +281,6 @@ function sek_sniff_imported_img_url( $seks_data ) {
     return $new_seks_data;
 }
 
-
-
-
-
 // @return bool
 function sek_is_img_url( $url = '' ) {
     if ( is_string( $url ) ) {
@@ -289,13 +291,17 @@ function sek_is_img_url( $url = '' ) {
     return false;
 }
 
+
+
 // @return attachment id or WP_Error
-function sek_sideload_img( $img_url ) {
+// this method uses download_url()
+// it first checks if the media already exists in the media library
+function sek_sideload_img_and_return_attachment_id( $img_url ) {
     // Set variables for storage, fix file filename for query strings.
     preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $img_url, $matches );
     $filename = basename( $matches[0] );
     // prefix with nimble_asset_ if not done yet
-    // for example, when importing a file, the img might already have the nimble_asset_ prefix
+    // for example, when importing a file, the img might already have the nimble_asset_ prefix if it's been uploaded by Nimble
     if ( 'nimble_asset_' !== substr($filename, 0, strlen('nimble_asset_') ) ) {
         $filename = 'nimble_asset_' . $filename;
     }
@@ -325,11 +331,8 @@ function sek_sideload_img( $img_url ) {
     // Insert the media
     // Prepare the file_array that we will pass to media_handle_sideload()
     $file_array = array();
-
-    // Generate the file name from the url.
-    //$filename = 'nimble_asset_' . $filename;
-
     $file_array['name'] = $filename;
+
     // Download file to temp location.
     $file_array['tmp_name'] = download_url( $img_url );
 

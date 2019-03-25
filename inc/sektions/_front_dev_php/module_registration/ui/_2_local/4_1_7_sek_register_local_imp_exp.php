@@ -15,13 +15,24 @@ function sek_get_module_params_for_sek_local_imp_exp() {
                 'import_export' => array(
                     'input_type'  => 'import_export',
                     'scope' => 'local',
-                    'title'       => __('Import', 'text_doma'),
+                    'title'       => __('EXPORT', 'text_doma'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'notice_before' => __('Make sure you import a file generated with Nimble Builder export system.', 'text_doma'),
+                    //'notice_before' => __('Make sure you import a file generated with Nimble Builder export system.', 'text_doma'),
                     // 'notice_after' => __('Select a revision from the drop-down list to preview it. You can then restore it by clicking the Publish button at the top of the page.', 'text_doma')
+                ),
+                'keep_existing_sections' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Combine the imported sections with the current ones.', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'refresh_preview' => true,
+                    'notice_after' => __( 'Check this option if you want to keep the existing sections of this page, and combine them with the imported ones.', 'text_doma'),
                 )
             )
         )//tmpl

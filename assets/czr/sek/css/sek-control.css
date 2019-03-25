@@ -1299,14 +1299,14 @@ li[id^="accordion-section-__nimble__"] > h3 {
 
 /* IMPORT / EXPORT */
 .sek-import-btn-wrap {
-    padding-bottom: 20px;
-    border-bottom: 1px solid #ddd;
+    padding: 20px 0;
 }
 .sek-import-btn-wrap input.sek-import-file {
     margin-bottom: 10px;
 }
 .sek-export-btn-wrap {
-    padding: 20px 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
 }
 .sek-import-file {
     background: #eeeeee;
@@ -1321,4 +1321,7 @@ li[id^="accordion-section-__nimble__"] > h3 {
     margin: 10px 0;
     padding: 10px;
     font-size: 12px;
+}
+.czr-import-dialog {
+  display: none;
 }

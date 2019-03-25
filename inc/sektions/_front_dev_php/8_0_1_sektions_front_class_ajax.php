@@ -357,7 +357,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error( 'missing_or_invalid_rel_path_when_importing_image');
             }
 
-            $id = sek_sideload_img( NIMBLE_BASE_URL . $_POST['rel_path'] );
+            $id = sek_sideload_img_and_return_attachment_id( NIMBLE_BASE_URL . $_POST['rel_path'] );
             if ( is_wp_error( $id ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . $_POST['rel_path'] );
             } else {
