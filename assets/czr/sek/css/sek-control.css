@@ -1324,4 +1324,15 @@ li[id^="accordion-section-__nimble__"] > h3 {
 }
 .czr-import-dialog {
   display: none;
+  padding: 11px;
+}
+.czr-import-message {
+  padding-bottom: 10px;
+}
+.sek-import-btn-wrap .czr-import-dialog .czr-import-message {
+  font-size: 12px!important;
+}
+.sek-import-btn-wrap .czr-import-dialog .button {
+  margin: 4px 0;
+  font-size: 12px!important;
 }
