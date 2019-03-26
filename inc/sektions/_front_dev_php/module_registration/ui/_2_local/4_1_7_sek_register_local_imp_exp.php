@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_local_imp_exp() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_imp_exp',
-        'name' => __('Import / Export', 'text_doma'),
+        'name' => __('Export / Import', 'text_doma'),
         // 'starting_value' => array(
         //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),

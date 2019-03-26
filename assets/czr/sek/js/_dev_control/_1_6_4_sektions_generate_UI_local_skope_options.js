@@ -110,7 +110,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_imp_exp',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Import / Export'],
+                                          controlLabel : sektionsLocalizedData.i18n['Export / Import'],
                                           icon : '<i class="material-icons sek-level-option-icon">import_export</i>'
                                     };
                               break;

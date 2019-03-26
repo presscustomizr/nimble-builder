@@ -517,7 +517,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             // Import / export
             'You need to publish before exporting.' => __( 'Nimble Builder : you need to publish before exporting.', 'text_doma'),
-            'Import / Export' => __('Import / Export', 'text_doma'),
+            'Export / Import' => __('Export / Import', 'text_doma'),
             'Export failed' => __('Export failed', 'text_doma'),
             'Nothing to export.' => __('Nimble Builder : you have nothing to export. Start adding sections to this page!', 'text_doma'),
             'Import failed' => __('Import failed', 'text_doma'),
