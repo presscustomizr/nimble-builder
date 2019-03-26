@@ -457,7 +457,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'This is the current version.' => __('This is the current version.', 'text_doma'),
             '(currently published version)' => __('(currently published version)','text_doma'),
             'You need to publish before exporting.' => __( 'Nimble Builder : you need to publish before exporting.', 'text_doma'),
-            'Import / Export' => __('Import / Export', 'text_doma'),
+            'Export / Import' => __('Export / Import', 'text_doma'),
             'Export failed' => __('Export failed', 'text_doma'),
             'Nothing to export.' => __('Nimble Builder : you have nothing to export. Start adding sections to this page!', 'text_doma'),
             'Import failed' => __('Import failed', 'text_doma'),
@@ -3722,7 +3722,7 @@ function sek_set_input_tmpl___imp_exp( $input_id, $input_data ) {
       </div>
       <div class="sek-import-btn-wrap">
         <div class="customize-control-title width-100"><?php _e('IMPORT', 'text_doma'); ?></div>
-        <span class="czr-notice"><?php _e('Select the file to import and click on the import button.', 'text_doma' ); ?></span>
+        <span class="czr-notice"><?php _e('Select the file to import and click on Import button.', 'text_doma' ); ?></span>
         <span class="czr-notice"><?php _e('Be sure to import a file generated with the Nimble Builder export system.', 'text_doma' ); ?></span>
         <div class="czr-import-dialog notice notice-info">
             <div class="czr-import-message"><?php _e('Some of the imported sections need a location that is not active on this page. Sections in missing locations will not be rendered. You can continue importing or assign those sections to a contextually active location.', 'text_doma' ); ?></div>

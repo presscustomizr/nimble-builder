@@ -4080,7 +4080,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_imp_exp',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Import / Export'],
+                                          controlLabel : sektionsLocalizedData.i18n['Export / Import'],
                                           icon : '<i class="material-icons sek-level-option-icon">import_export</i>'
                                     };
                               break;
@@ -10306,6 +10306,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $pre_import_button.toggleClass( 'disabled', _.isEmpty( $(this).val() ) );
                   });
 
+                  // @return boolean
+                  var customizeChangesetIncludesNimbleDirties = function() {
+                        var hasNimbleDirties = false,
+                            _dirties = wp.customize.dirtyValues();
+
+                        if ( ! _.isEmpty( _dirties ) ) {
+                              _.each( _dirties, function( _val, _setId ) {
+                                    if ( hasNimbleDirties )
+                                      return;
+                                    // we're after setting id like
+                                    // - nimble___[skp__post_post_1] <= local skope setting
+                                    // - __nimble__4234ae1dc0fa__font_settings <= level setting
+                                    // - __nimble_options__ <= global options
+                                    // - __nimble__skp__post_post_1__localSkopeOptions__template <= local option setting
+                                    hasNimbleDirties = -1 !== _setId.indexOf('nimble');
+                              });
+                        }
+                        return hasNimbleDirties;
+                  };
+
                   // Schedule action on button click
                   input.container.on( 'click', '[data-czr-action]', function( evt ) {
                         evt.stopPropagation();
@@ -10314,7 +10334,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'sek-export' :
                                     // prevent exporting if the customize changeset is dirty
                                     // => because the PHP sek_catch_export_action() doesn't have access to the customize changeset and needs the one persisted in DB
-                                    if ( !_.isEmpty( wp.customize.dirtyValues() ) ) {
+                                    if ( customizeChangesetIncludesNimbleDirties() ) {
                                           alert(sektionsLocalizedData.i18n['You need to publish before exporting.']);
                                           break;
                                     }
