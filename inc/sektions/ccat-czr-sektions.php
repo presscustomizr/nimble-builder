@@ -2538,7 +2538,7 @@ function sek_maybe_export() {
     $filename = $theme_name . '_' . $skope_id . '.nimblebuilder';
     header( 'Content-disposition: attachment; filename=' . $filename );
     header( 'Content-Type: application/octet-stream; charset=' . get_option( 'blog_charset' ) );
-    echo serialize( $export );
+    echo wp_json_encode( $export );
     die();
 }
 add_action( 'wp_ajax_sek_pre_export_checks', '\Nimble\sek_ajax_pre_export_checks' );
@@ -2604,8 +2604,8 @@ function sek_ajax_get_imported_file_content() {
             'test_type' => false,
             'mimes' => array(
                 'text' => 'text/plain',
-                'nimblebuilder' => 'text/plain',
                 'json' => 'application/json',
+                'nimblebuilder' => 'application/json'
             )
         )
     );
@@ -2620,7 +2620,7 @@ function sek_ajax_get_imported_file_content() {
         return;
     }
     $raw = file_get_contents( $file['file'] );
-    $raw_unserialized_data = @unserialize( $raw );
+    $raw_unserialized_data = json_decode( $raw, true );
     if ( ! is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
         unlink( $file['file'] );
         wp_send_json_error(  'invalid_import_content' );
@@ -2659,7 +2659,7 @@ function sek_parse_img_and_clean_id( $seks_data ) {
                 break;
                 case 'id' :
                     if ( is_string( $value ) && false !== strpos( $value, '__nimble__' ) ) {
-                        $value = '__replace_me__';
+                        $value = '__rep__me__';
                     }
                 break;
             }

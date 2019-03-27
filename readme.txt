@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.6.0-beta
+Stable tag: 1.6.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -29,11 +29,12 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 = Features overview =
 * **Drag and drop neatly pre-designed sections** and customize them in real-time preview.
 * **Works in any WordPress contexts** : home, pages, posts, custom post types, archives, author pages, search page, ...
+* Create content, style, move / duplicate / remove elements **in real-time preview**.
 * **Includes many content modules** : classic text editor, image, column layouts, contact form, button, icons, map, html code, WordPress widget area, menu, and more.
 * Add image background to your sections, and **[enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
 * **Easily [customize your content specifically for mobile devices](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** : change the responsive breakpoint, adapt font-size, spacing, alignment, column layouts, in real-time preview.
 * **Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
-* Create content, style, move / duplicate / remove elements **in real-time preview**.
+* **[Export / Import](https://docs.presscustomizr.com/article/391-how-to-export-and-import-templates-with-nimble-builder)** : re-use your sections in other pages and between sites.
 * **[Embed shortcodes](https://docs.presscustomizr.com/article/350-how-to-use-shortcodes-from-other-plugins-with-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page) from other plugins**, and see the result in real-time preview.
 * Nimble Builder automatically generates responsive HTML markup for a **pixel-perfect rendering on smartphones and tablets**.
 * Embed WordPress blocks, videos, tweets or any embed types supported by WordPress, and see the result in real-time preview.
@@ -94,10 +95,14 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.5.4 =
-Improved support for fixed and parallax background on mobile devices. Improved scroll animation for section anchor links.
+= 1.6.0 =
+Added Export / Import feature. Improved navigation in changelog history.
 
 == Changelog ==
+= 1.6.0 : March 27th 2019 =
+* improved : navigation in changelog history
+* added : Export / Import feature
+
 = 1.5.4 : March 22nd 2019 =
 * fixed : removed unwanted white space on top of section's background because of a wrong initial parallax setup on mobile devices
 * fixed : CSS background-attachment:fixed rule is not well supported on mobile devices
