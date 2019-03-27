@@ -79,38 +79,10 @@
 
                                     // Before actually importing, let's do a preliminary
                                     _import( { pre_import_check : true } )
-                                          .done( function( server_resp ) {
-                                                var currentActiveLocations = api.czr_sektions.activeLocations();
-                                                // Compare current active locations with the imported ones
-                                                var importedActiveLocations = server_resp.data.metas.active_locations;
-                                                if ( _.isArray( importedActiveLocations ) && _.isArray( currentActiveLocations ) ) {
-                                                      var importedActiveLocationsNotAvailableInCurrentActiveLocations = $(importedActiveLocations).not(currentActiveLocations).get();
-                                                      if ( !_.isEmpty( importedActiveLocationsNotAvailableInCurrentActiveLocations ) ) {
-                                                            $pre_import_button.hide();
-                                                            input.container.find('.czr-import-dialog').slideToggle();
-                                                            api.infoLog('sek-pre-import => imported locations missing in current page.', importedActiveLocationsNotAvailableInCurrentActiveLocations );
-                                                      } else {
-                                                            _import();
-                                                      }
-                                                } else {
-                                                      // if not
-                                                      api.previewer.trigger('sek-notify', {
-                                                            notif_id : 'import-failed',
-                                                            type : 'info',
-                                                            duration : 30000,
-                                                            message : [
-                                                                  '<span style="color:#0075a2">',
-                                                                    '<strong>',
-                                                                    sektionsLocalizedData.i18n['Import failed'],
-                                                                    '</strong>',
-                                                                  '</span>'
-                                                            ].join('')
-                                                      });
-                                                      _doAlwaysAfterImportApiSettingUpdate();
-                                                }
-                                          })
+                                          .done( _pre_import_checks )
                                           .fail( function( error_resp ) {
                                                 api.errare( 'sek_pre_import_checks failed', error_resp );
+                                                _doAlwaysAfterImportApiSettingUpdate();
                                                 _import();
                                           });
                               break;//'sek-import'
@@ -127,6 +99,49 @@
                   });//input.container.on( 'click' .. )
 
 
+                  ////////////////////////////////////////////////////////
+                  // PRE-IMPORT
+                  ////////////////////////////////////////////////////////
+                  // Compare current active locations with the imported ones
+                  // if some imported locations are not rendered in the current context, reveal the import dialog
+                  // before comparing locations, purge the collection of imported location from header and footer if any
+                  // "nimble_local_header", "nimble_local_footer"
+                  var _pre_import_checks = function( server_resp ) {
+                        var currentActiveLocations = api.czr_sektions.activeLocations(),
+                            importedActiveLocations = $.extend( true, [], _.isArray( server_resp.data.metas.active_locations ) ? server_resp.data.metas.active_locations : [] );
+
+                        // filter to remove local header and footer before comparison with current active locations
+                        importedActiveLocations = _.filter( importedActiveLocations, function( locId ) {
+                              return !_.contains( ['nimble_local_header', 'nimble_local_footer'], locId );
+                        });
+
+                        if ( _.isArray( importedActiveLocations ) && _.isArray( currentActiveLocations ) ) {
+                              var importedActiveLocationsNotAvailableInCurrentActiveLocations = $(importedActiveLocations).not(currentActiveLocations).get();
+
+                              if ( !_.isEmpty( importedActiveLocationsNotAvailableInCurrentActiveLocations ) ) {
+                                    $pre_import_button.hide();
+                                    input.container.find('.czr-import-dialog').slideToggle();
+                                    api.infoLog('sek-pre-import => imported locations missing in current page.', importedActiveLocationsNotAvailableInCurrentActiveLocations );
+                              } else {
+                                    _import();
+                              }
+                        } else {
+                              // if current and imported location are not arrays, there's a problem.
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'import-failed',
+                                    type : 'info',
+                                    duration : 30000,
+                                    message : [
+                                          '<span style="color:#0075a2">',
+                                            '<strong>',
+                                            sektionsLocalizedData.i18n['Import failed'],
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                              _doAlwaysAfterImportApiSettingUpdate();
+                        }
+                  };//_pre_import_checks
 
 
                   ////////////////////////////////////////////////////////
@@ -158,8 +173,9 @@
                         api.notifications.remove( 'import-failed' );
                         api.notifications.remove( 'img-import-errors');
 
-                        // the uploading message is removed on .always()
+                        // display the uploading message
                         input.container.find('.sek-uploading').show();
+
                         var fd = new FormData();
                         fd.append( 'file_candidate', $file_input[0].files[0] );
                         fd.append( 'action', 'sek_get_imported_file_content' );
@@ -208,10 +224,16 @@
                                               dfd.reject( server_resp );
                                         })
                                         .always( function() {
-                                              input.container.find('.sek-uploading').hide();
+                                              //input.container.find('.sek-uploading').hide();
                                         });
                             });
                         }
+
+                        // fire a previewer loader
+                        // and and uploading message
+                        // both removed on .always()
+                        input.container.find('.sek-uploading').show();
+                        api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true });
 
                         // At this stage, we are not in a pre-check case
                         // the ajax request is processed and will upload images if needed
@@ -227,8 +249,8 @@
                                                             _data[_k] = _setIds( _v );
                                                       }
                                                       // double check on both the key and the value
-                                                      // also re-generates new ids when the export has been done without replacing the ids by '__replace_me__'
-                                                      if ( 'id' === _k && _.isString( _v ) && ( 0 === _v.indexOf( '__replace_me__' ) || 0 === _v.indexOf( '__nimble__' ) ) ) {
+                                                      // also re-generates new ids when the export has been done without replacing the ids by '__rep__me__'
+                                                      if ( 'id' === _k && _.isString( _v ) && ( 0 === _v.indexOf( '__rep__me__' ) || 0 === _v.indexOf( '__nimble__' ) ) ) {
                                                             _data[_k] = sektionsLocalizedData.optPrefixForSektionsNotSaved + api.czr_sektions.guid();
                                                       }
                                                 });
@@ -355,8 +377,10 @@
                   // We can try to the update the api setting
                   var _doUpdateApiSetting = function( server_resp, params ){
                         params = params || {};
-                        if ( !_isImportedContentEligibleForAPI( server_resp ) )
-                          return;
+                        if ( !_isImportedContentEligibleForAPI( server_resp ) ) {
+                              _doAlwaysAfterImportApiSettingUpdate();
+                              return;
+                        }
                         // api.infoLog('api.czr_sektions.localSectionsSettingId()?', api.czr_sektions.localSectionsSettingId());
                         // api.infoLog('inputRegistrationParams.scope ?', inputRegistrationParams.scope );
 
@@ -418,6 +442,7 @@
                   };//_doUpdateApiSetting()
 
                   var _doAlwaysAfterImportApiSettingUpdate = function() {
+                        api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
                         input.container.find('.sek-uploading').hide();
                         // Clean the file input val
                         $file_input.val('').trigger('change');
