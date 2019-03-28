@@ -11,49 +11,28 @@ $metas_settings = $value['grid_metas'];
 if ( ! function_exists( 'Nimble\sek_render_post') ) {
     function sek_render_post() {
         ?>
-            <article id="post-<?php the_ID(); ?>" <?php post_class('group'); ?>>
-              <div class="post-inner post-hover">
-                <div class="post-thumbnail">
-                  <a href="<?php the_permalink(); ?>">
-                    <?php the_post_thumbnail(); ?>
-                  </a>
-                  <a class="post-comments" href="<?php comments_link(); ?>"><i class="far fa-comments"></i><?php comments_number( '0', '1', '%' ); ?></a>
-                </div><!--/.post-thumbnail-->
-
-                <div class="post-meta group">
-                  <p class="post-category"><?php the_category(' / '); ?></p>
-                  <?php sek_render_author_date(); ?>
-                </div><!--/.post-meta-->
-
-                <h2 class="post-title entry-title">
+            <article id="sek-pg-<?php the_ID(); ?>">
+              <figure class="sek-pg-thumbnail">
+                <a href="<?php the_permalink(); ?>">
+                  <?php the_post_thumbnail(); ?>
+                </a>
+              </figure><!--/.pg-thumbnail-->
+              <div class="sek-pg-content">
+                <p class="sek-pg-category"><?php the_category(' / '); ?></p>
+                <h2 class="sek-pg-title">
                   <a href="<?php the_permalink(); ?>" rel="bookmark" title="<?php the_title_attribute( array( 'before' => __( 'Permalink to ', 'text_doma' ) ) ); ?>"><?php the_title(); ?></a>
-                </h2><!--/.post-title-->
+                </h2><!--/.pg-title-->
 
-                <div class="entry excerpt entry-summary">
+                <aside class="sek-pg-metas">
+                  <span><?php the_author_posts_link(); ?></span><span class="published updated"><?php echo get_the_date( get_option('date_format') ); ?></span><span><?php comments_number( '0', '1', '%' ); ?> <?php _e('comments', 'text_doma'); ?></span>
+                </aside><!--/.pg-meta-->
+
+                <div class="sek-excerpt">
                   <?php the_excerpt(); ?>
-                </div><!--/.entry-->
-
-              </div><!--/.post-inner-->
-            </article><!--/.post-->
+                </div><!--/.sek-pg-content-->
+              </div><!--/.pg-inner-->
+            </article><!--/#sek-pg-->
         <?php
-    }
-}
-
-
-if ( ! function_exists( 'Nimble\sek_render_author_date') ) {
-    function sek_render_author_date() {
-      ?>
-      <p class="post-date">
-        <time class="published updated" datetime="<?php the_time('Y-m-d H:i:s'); ?>"><?php the_time( get_option('date_format') ); ?></time>
-      </p>
-
-      <p class="post-byline" style="display:none">&nbsp;<?php _e('by','text_doma'); ?>
-        <span class="vcard author">
-          <span class="fn"><?php the_author_posts_link(); ?></span>
-        </span> &middot; Published <span class="published"><?php echo get_the_date( get_option('date_format') ); ?></span>
-        <?php if( get_the_modified_date() != get_the_date() ) : ?> &middot; Last modified <span class="updated"><?php the_modified_date( get_option('date_format') ); ?></span><?php endif; ?>
-      </p>
-    <?php
     }
 }
 
@@ -70,8 +49,11 @@ $post_collection = new \WP_Query(
   )
 );
 if ( $post_collection->have_posts() ) {
+
+$layout = 'list';//to be replace by user choice
+$layout_class = 'list' === $layout ? 'sek-list-layout' : 'sek-column-layout';
   ?>
-  <div class="sek-post-grid-wrapper">
+  <div class="sek-post-grid-wrapper <?php echo $layout_class; ?>">
     <?php
       while ( $post_collection->have_posts() ) {
           $post_collection->the_post();
