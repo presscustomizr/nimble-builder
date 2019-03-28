@@ -67,3 +67,9 @@
       border-bottom: solid 1px #eee;
   }
 }
+@media (max-width:767px){
+  .sek-post-grid-wrapper.sek-list-layout article {
+      grid-template-columns: minmax(0,1fr);
+      grid-gap: 0;
+  }
+}
