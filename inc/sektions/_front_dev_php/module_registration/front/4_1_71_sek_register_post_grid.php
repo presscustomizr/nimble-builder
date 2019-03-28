@@ -54,7 +54,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),//0,
                 'categories'  => array(
                     'input_type'  => 'select',
-                    'title'       => __( 'Categores', 'text_doma' ),
+                    'title'       => __( 'Categories', 'text_doma' ),
                     'default'     => 'none',
                     'choices'      => array()
                 ),//null,
