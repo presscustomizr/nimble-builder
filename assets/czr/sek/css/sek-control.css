@@ -95,6 +95,7 @@ li[id*="__nimble__"].customize-control span.customize-control-title:first-child 
 /* When sections are displayed in the module picker. Typically the columns sections */
 li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   width: 29%;
+  height: 130px;
 }
 
 [data-sek-content-type="preset_section"] {
@@ -102,6 +103,7 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   height: 165px;
   position: relative
 }
+
 [data-sek-content-type="preset_section"] .sek-overlay {
     display: block;
     position: absolute;
