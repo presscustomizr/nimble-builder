@@ -1616,7 +1616,12 @@ function sek_get_module_collection() {
           'title' => __( 'Map', 'text_doma' ),
           'icon' => 'Nimble_map_icon.svg'
         ),
-
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_post_grid_module',
+          'title' => __( 'Post grid', 'text_doma' ),
+          'icon' => 'Nimble_posts-list_icon.svg'
+        ),
         array(
           'content-type' => 'preset_section',
           'content-id' => 'two_columns',
