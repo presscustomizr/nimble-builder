@@ -71,6 +71,16 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'default'     => 'none',
                     'choices'      => array('list' => __('List', 'text_doma'), 'grid' => __('Grid', 'text_doma') )
                 ),//null,
+                'columns'  => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __( 'Number of columns', 'text_doma' ),
+                    'default'     => 2,
+                    'min'         => 1,
+                    'max'         => 4,
+                    'step'        => 1,
+                    'width-100'   => true,
+                ),//null,
+
                 'post_thumb' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Display featured image', 'text_doma'),
@@ -155,16 +165,6 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
-                'cat_number'  => array(
-                    'input_type'  => 'range_simple',
-                    'title'       => __( 'Max number of categories', 'text_doma' ),
-                    'default'     => 5,
-                    'min'         => 1,
-                    'max'         => 10,
-                    'step'        => 1,
-                    'width-100'   => true,
-                    'title_width' => 'width-100'
-                ),//0,
                 'show_tags' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Display tags', 'text_doma'),
@@ -172,16 +172,6 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
-                'tag_number'  => array(
-                    'input_type'  => 'range_simple',
-                    'title'       => __( 'Max number of tags', 'text_doma' ),
-                    'default'     => 5,
-                    'min'         => 1,
-                    'max'         => 10,
-                    'step'        => 1,
-                    'width-100'   => true,
-                    'title_width' => 'width-100'
-                ),//0,
                 'show_comments' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Display comment number', 'text_doma'),
@@ -222,6 +212,7 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
 function sek_get_module_params_for_czr_post_grid_fonts_child() {
     $pt_font_selectors = array( '.sek-post-title' );
     $pe_font_selectors = array( '.sek-post-excerpt' );
+    $cat_font_selectors = array( '.sek-pg-category' );
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_fonts_child',
@@ -313,16 +304,6 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'css_selectors' => $pt_font_selectors,
                                 'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
-                            'pt_text_decoration_css' => array(
-                                'input_type'  => 'select',
-                                'title'       => __( 'Text decoration', 'text_doma' ),
-                                'default'     => 'none',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_decoration',
-                                'css_selectors' => $pt_font_selectors,
-                                'choices'     => sek_get_select_options_for_input_id( 'text_decoration_css' )
-                            ),//null,
                             'pt_text_transform_css'  => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Text transform', 'text_doma' ),
@@ -332,44 +313,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'css_identifier' => 'text_transform',
                                 'css_selectors' => $pt_font_selectors,
                                 'choices'    => sek_get_select_options_for_input_id( 'text_transform_css' )
-                            ),//null,
-                            'pt_letter_spacing_css'  => array(
-                                'input_type'  => 'range_simple',
-                                'title'       => __( 'Letter spacing', 'text_doma' ),
-                                'default'     => 0,
-                                'min'         => 0,
-                                'step'        => 1,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'letter_spacing',
-                                'css_selectors' => $pt_font_selectors,
-                                'width-100'   => true,
-                            ),//0,
-                            // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
-                            'pt___flag_important'       => array(
-                                'input_type'  => 'gutencheck',
-                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
-                                'default'     => 0,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                                // declare the list of input_id that will be flagged with !important when the option is checked
-                                // @see sek_add_css_rules_for_css_sniffed_input_id
-                                // @see Nsek_is_flagged_important
-                                'important_input_list' => array(
-                                    'pt_font_family_css',
-                                    'pt_font_size_css',
-                                    'pt_line_height_css',
-                                    'pt_font_weight_css',
-                                    'pt_font_style_css',
-                                    'pt_text_decoration_css',
-                                    'pt_text_transform_css',
-                                    'pt_letter_spacing_css',
-                                    'pt_color_css',
-                                    'pt_color_hover_css'
-                                )
-                            ),
+                            )
                         )
                     ),
                     array(
@@ -451,17 +395,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'css_identifier' => 'font_style',
                                 'css_selectors' => $pe_font_selectors,
                                 'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
-                            ),//null,
-                            'pe_text_decoration_css' => array(
-                                'input_type'  => 'select',
-                                'title'       => __( 'Text decoration', 'text_doma' ),
-                                'default'     => 'none',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_decoration',
-                                'css_selectors' => $pe_font_selectors,
-                                'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
-                            ),//null,
+                            ),
                             'pe_text_transform_css'  => array(
                                 'input_type'  => 'select',
                                 'title'       => __( 'Text transform', 'text_doma' ),
@@ -471,44 +405,99 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'css_identifier' => 'text_transform',
                                 'css_selectors' => $pe_font_selectors,
                                 'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
-                            ),//null,
-                            'pe_letter_spacing_css'  => array(
-                                'input_type'  => 'range_simple',
-                                'title'       => __( 'Letter spacing', 'text_doma' ),
-                                'default'     => 0,
-                                'min'         => 0,
-                                'step'        => 1,
+                            )
+                        ),//inputs
+                    ),//tab
+                    array(
+                        'title' => __( 'Categories', 'text_doma' ),
+                        'inputs' => array(
+                            'cat_font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_doma' ),
+                                'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'letter_spacing',
-                                'css_selectors' => $pe_font_selectors,
-                                'width-100'   => true,
-                            ),//0,
-                            // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
-                            'pe___flag_important'       => array(
-                                'input_type'  => 'gutencheck',
-                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
-                                'default'     => 0,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                                // declare the list of input_id that will be flagged with !important when the option is checked
-                                // @see sek_add_css_rules_for_css_sniffed_input_id
-                                // @see Nsek_is_flagged_important
-                                'important_input_list' => array(
-                                    'pe_font_family_css',
-                                    'pe_font_size_css',
-                                    'pe_line_height_css',
-                                    'pe_font_weight_css',
-                                    'pe_font_style_css',
-                                    'pe_text_decoration_css',
-                                    'pe_text_transform_css',
-                                    'pe_letter_spacing_css',
-                                    'pe_color_css',
-                                    'pe_color_hover_css'
-                                )
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $cat_font_selectors,
                             ),
+                            'cat_font_size_css'       => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'default'     => array( 'desktop' => '16px' ),
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Font size', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $cat_font_selectors,
+                            ),//16,//"14px",
+                            'cat_line_height_css'     => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_doma' ),
+                                'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $cat_font_selectors,
+                            ),//24,//"20px",
+                            'cat_color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $cat_font_selectors,
+                            ),//"#000000",
+                            'cat_color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover',
+                                'css_selectors' => $cat_font_selectors,
+                            ),//"#000000",
+                            'cat_font_weight_css'     => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'default'     => 'normal',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight',
+                                'css_selectors' => $cat_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
+                            ),//null,
+                            'cat_font_style_css'      => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Font style', 'text_doma' ),
+                                'default'     => 'inherit',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style',
+                                'css_selectors' => $cat_font_selectors,
+                                'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
+                            ),
+                            'cat_text_transform_css'  => array(
+                                'input_type'  => 'select',
+                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'default'     => 'none',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform',
+                                'css_selectors' => $cat_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
+                            )
                         ),//inputs
                     )//tab
                 )//tabs
