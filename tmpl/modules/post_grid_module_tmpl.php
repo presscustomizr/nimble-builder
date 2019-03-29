@@ -63,6 +63,11 @@ if ( $post_collection->have_posts() ) {
             $post_collection->the_post();
             sek_render_post();
         }//while
+        // After looping through a separate query, this function restores the $post global to the current post in the main query.
+        wp_reset_postdata();
+        //  This will remove obscure bugs that occur when the previous WP_Query object is not destroyed properly before another is set up.
+        // $GLOBALS['wp_query'] = $GLOBALS['wp_the_query'];
+        wp_reset_query();
       ?>
     </div><?php //.sek-grid-item ?>
   </div><?php //.sek-post-grid-wrapper ?>
