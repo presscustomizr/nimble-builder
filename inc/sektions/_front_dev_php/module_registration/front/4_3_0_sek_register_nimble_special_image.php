@@ -57,13 +57,13 @@ function sek_get_module_params_for_czr_special_img_main_settings_child() {
                     'default'     => ''
                 ),
                 'img-size' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select the image size', 'text_doma'),
                     'default'     => 'large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
                 'link-to' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Link to', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_select_options_for_input_id( 'link-to' )
@@ -135,7 +135,7 @@ function sek_get_module_params_for_czr_special_img_main_settings_child() {
                 //     'default'     => 0,
                 // ),
                 // 'img_hover_effect' => array(
-                //     'input_type'  => 'select',
+                //     'input_type'  => 'simpleselect',
                 //     'title'       => __('Mouse over effect', 'text_doma'),
                 //     'default'     => 'none',
                 //     'choices'     => sek_get_select_options_for_input_id( 'img_hover_effect' )

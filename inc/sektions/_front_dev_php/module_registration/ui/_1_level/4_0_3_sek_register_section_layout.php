@@ -10,7 +10,7 @@ function sek_get_module_params_for_sek_level_section_layout_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'boxed-wide' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Boxed or full width', 'text_doma'),
                     'refresh_markup' => true,
                     'refresh_stylesheet' => false,

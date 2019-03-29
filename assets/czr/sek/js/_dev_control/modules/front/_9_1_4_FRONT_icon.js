@@ -7,16 +7,8 @@
                       //console.log('INITIALIZING IMAGE MODULE', id, options );
                       var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      module.itemConstructor = api.CZRItem.extend( module.CZRIconItemConstructor || {} );
-
+                      module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                       //SET THE CONTENT PICKER DEFAULT OPTIONS
                       //@see ::setupContentPicker()
@@ -44,7 +36,7 @@
               //////////////////////////////////////////////////////////
               /// ITEM CONSTRUCTOR
               //////////////////////////////////////////
-              CZRIconItemConstructor : {
+              CZRItemConstructor : {
                     //overrides the parent ready
                     ready : function() {
                           var item = this;
@@ -107,7 +99,7 @@
                                 }
                           });
                     }
-              },//CZRIconItemConstructor
+              },//CZRItemConstructor
 
       };//Constructor
 
@@ -148,12 +140,6 @@
               initialize: function( id, options ) {
                       var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
                       // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 

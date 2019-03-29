@@ -232,7 +232,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                     'css_selectors'=> $css_selectors
                 ),
                 'border-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Fields border shape', 'text_doma'),
                     'default' => 'solid',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
@@ -338,7 +338,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                     'css_selectors'=> $css_selectors
                 ),
                 'border-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Border', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
@@ -509,7 +509,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'css_selectors' => $fl_font_selectors,
                             ),//"#000000",
                             'fl_font_weight_css'     => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font weight', 'text_doma' ),
                                 'default'     => 400,
                                 'refresh_markup' => false,
@@ -519,7 +519,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'fl_font_style_css'      => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font style', 'text_doma' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
@@ -529,7 +529,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'fl_text_decoration_css' => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text decoration', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -539,7 +539,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'fl_text_transform_css'  => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text transform', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -648,7 +648,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'css_selectors' => $ft_font_selectors,
                             ),//"#000000",
                             'ft_font_weight_css'     => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font weight', 'text_doma' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
@@ -658,7 +658,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'ft_font_style_css'      => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font style', 'text_doma' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
@@ -668,7 +668,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'ft_text_decoration_css' => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text decoration', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -678,7 +678,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'ft_text_transform_css'  => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text transform', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -787,7 +787,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'css_selectors' => $btn_font_selectors,
                             ),//"#000000",
                             'btn_font_weight_css'     => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font weight', 'text_doma' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
@@ -797,7 +797,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'btn_font_style_css'      => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font style', 'text_doma' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
@@ -807,7 +807,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'btn_text_decoration_css' => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text decoration', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -817,7 +817,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'btn_text_transform_css'  => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text transform', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -951,7 +951,7 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'refresh_markup' => false
                 ),
                 'recaptcha_enabled' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => sprintf( '%s %s',
                         '<i class="material-icons">security</i>',
                         __('Spam protection with Google reCAPTCHA', 'text_doma')

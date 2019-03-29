@@ -13,7 +13,7 @@ function sek_get_module_params_for_sek_local_header_footer() {
         'tmpl' => array(
             'item-inputs' => array(
                 'header-footer' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select a header and a footer for this page', 'text_doma'),
                     'default'     => 'inherit',
                     'choices'     => array(

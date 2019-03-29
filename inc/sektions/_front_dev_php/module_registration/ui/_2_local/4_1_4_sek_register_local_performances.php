@@ -13,7 +13,7 @@ function sek_get_module_params_for_sek_local_performances() {
         'tmpl' => array(
             'item-inputs' => array(
                 'local-img-smart-load' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select how you want to load the images in the sections of this page.', 'text_doma'),
                     'default'     => 'inherit',
                     'choices'     => array(

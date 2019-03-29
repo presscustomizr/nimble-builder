@@ -646,7 +646,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
                         });
-                        $( 'select[data-czrtype]', input.container ).selecter();
+                        if ( 'simpleselect' === input.type ) {
+                              $( 'select[data-czrtype]', input.container ).selecter();
+                        } else if ( 'multiselect' === input.type ) {
+                              // see how the tmpl is rendered server side in PHP with ::ac_set_input_tmpl_content()
+                              $( 'select[data-czrtype]', input.container ).czrSelect2({
+                                    closeOnSelect: false,
+                                    templateSelection: function czrEscapeMarkup(obj) {
+                                          //trim dashes
+                                          return obj.text.replace(/\u2013|\u2014/g, "");
+                                    }
+                              });
+
+                              //handle case when all choices become unselected
+                              $( 'select[data-czrtype]', input.container ).on('change', function(){
+                                    if ( 0 === $(this).find("option:selected").length ) {
+                                          input([]);
+                                    }
+                              });
+                        } else {
+                              api.errare( '::setupSelectInput => invalid input type => ' + input.type );
+                        }
                   }
             },
 

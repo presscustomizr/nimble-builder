@@ -4,20 +4,12 @@
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
-
-            CZRInputMths : {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRInputMths
 
             CZRItemConstructor : {
                   //overrides the parent ready

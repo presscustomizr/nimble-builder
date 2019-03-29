@@ -7,12 +7,7 @@
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
+
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
@@ -174,12 +169,7 @@
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
+
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 

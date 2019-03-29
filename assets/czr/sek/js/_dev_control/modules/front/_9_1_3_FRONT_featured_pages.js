@@ -6,16 +6,8 @@
                   //console.log('INITIALIZING FP MODULE', id, options );
                   var module = this;
 
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
-
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  module.itemConstructor = api.CZRItem.extend( module.CZRFPItemConstructor || {} );
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                   // run the parent initialize
                   // Note : must be always invoked always after the input / item class extension
@@ -26,7 +18,7 @@
             //////////////////////////////////////////////////////////
             /// ITEM CONSTRUCTOR
             //////////////////////////////////////////
-            CZRFPItemConstructor : {
+            CZRItemConstructor : {
                   //overrides the parent ready
                   ready : function() {
                         var item = this;
@@ -91,7 +83,7 @@
                               }
                         });
                   }
-            },//CZRFPItemConstructor
+            },//CZRItemConstructor
       };//FeaturedPagesConstruct
 
       //provides a description of each module

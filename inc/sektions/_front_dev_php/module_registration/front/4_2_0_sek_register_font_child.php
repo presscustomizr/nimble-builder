@@ -77,7 +77,7 @@ function sek_get_module_params_for_czr_font_child() {
                     'css_identifier' => 'color_hover'
                 ),//"#000000",
                 'font_weight_css'     => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Font weight', 'text_doma'),
                     'default'     => 400,
                     'refresh_markup' => false,
@@ -86,7 +86,7 @@ function sek_get_module_params_for_czr_font_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                 ),//null,
                 'font_style_css'      => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Font style', 'text_doma'),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
@@ -95,7 +95,7 @@ function sek_get_module_params_for_czr_font_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                 ),//null,
                 'text_decoration_css' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Text decoration', 'text_doma'),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -104,7 +104,7 @@ function sek_get_module_params_for_czr_font_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                 ),//null,
                 'text_transform_css'  => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Text transform', 'text_doma'),
                     'default'     => 'none',
                     'refresh_markup' => false,

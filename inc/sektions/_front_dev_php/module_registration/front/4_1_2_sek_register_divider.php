@@ -47,7 +47,7 @@ function sek_get_module_params_for_czr_divider_module() {
                     'css_identifier' => 'border_top_width'
                 ),
                 'border_top_style_css' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Style', 'text_doma'),
                     'default' => 'solid',
                     'refresh_markup' => false,

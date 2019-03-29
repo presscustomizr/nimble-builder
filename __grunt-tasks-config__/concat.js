@@ -238,6 +238,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_4_revision_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_5_tiny_mce_editor.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_6_imp_exp.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_7_selects_input.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',

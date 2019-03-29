@@ -72,7 +72,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'refresh_markup' => true
                 ),
                 'bg-repeat' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Repeat', 'text_doma'),
                     'default'     => 'no-repeat',
                     'choices'     => array(
@@ -86,7 +86,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     )
                 ),
                 'bg-scale' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Scale', 'text_doma'),
                     'default'     => 'cover',
                     'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
