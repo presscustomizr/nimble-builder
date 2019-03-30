@@ -633,39 +633,59 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'api.czr_sektions.setupSelectInput => missing select options for input id => ' + input.id + ' in image module');
                         return;
                   } else {
-                        //generates the options
-                        _.each( selectOptions , function( title, value ) {
-                              var _attributes = {
-                                        value : value,
-                                        html: title
-                                  };
-                              if ( value == input() ) {
-                                    $.extend( _attributes, { selected : "selected" } );
-                              } else if ( 'px' === value ) {
-                                    $.extend( _attributes, { selected : "selected" } );
-                              }
-                              $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                        });
-                        if ( 'simpleselect' === input.type ) {
-                              $( 'select[data-czrtype]', input.container ).selecter();
-                        } else if ( 'multiselect' === input.type ) {
-                              // see how the tmpl is rendered server side in PHP with ::ac_set_input_tmpl_content()
-                              $( 'select[data-czrtype]', input.container ).czrSelect2({
-                                    closeOnSelect: false,
-                                    templateSelection: function czrEscapeMarkup(obj) {
-                                          //trim dashes
-                                          return obj.text.replace(/\u2013|\u2014/g, "");
-                                    }
-                              });
+                        switch( input.type ) {
+                              case 'simpleselect' :
+                                    //generates the options
+                                    _.each( selectOptions , function( title, value ) {
+                                          var _attributes = {
+                                                    value : value,
+                                                    html: title
+                                              };
+                                          if ( value == input() ) {
+                                                $.extend( _attributes, { selected : "selected" } );
+                                          } else if ( 'px' === value ) {
+                                                $.extend( _attributes, { selected : "selected" } );
+                                          }
+                                          $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                    });
+                                    $( 'select[data-czrtype]', input.container ).selecter();
+                              break;
+                              case 'multiselect' :
+                                    // when select is multiple, the value is an array
+                                    var input_value = input();
+                                    input_value = _.isString( input_value ) ? [ input_value ] : input_value;
+                                    input_value = !_.isArray( input_value ) ? [] : input_value;
 
-                              //handle case when all choices become unselected
-                              $( 'select[data-czrtype]', input.container ).on('change', function(){
-                                    if ( 0 === $(this).find("option:selected").length ) {
-                                          input([]);
-                                    }
-                              });
-                        } else {
-                              api.errare( '::setupSelectInput => invalid input type => ' + input.type );
+                                    //generates the options
+                                    _.each( selectOptions , function( title, value ) {
+                                          var _attributes = {
+                                                    value : value,
+                                                    html: title
+                                              };
+                                          if ( _.contains( input_value, value ) ) {
+                                                $.extend( _attributes, { selected : "selected" } );
+                                          }
+                                          $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                    });
+                                    // see how the tmpl is rendered server side in PHP with ::ac_set_input_tmpl_content()
+                                    $( 'select[data-czrtype]', input.container ).czrSelect2({
+                                          closeOnSelect: true,
+                                          templateSelection: function czrEscapeMarkup(obj) {
+                                                //trim dashes
+                                                return obj.text.replace(/\u2013|\u2014/g, "");
+                                          }
+                                    });
+
+                                    //handle case when all choices become unselected
+                                    $( 'select[data-czrtype]', input.container ).on('change', function(){
+                                          if ( 0 === $(this).find("option:selected").length ) {
+                                                input([]);
+                                          }
+                                    });
+                              break;
+                              default :
+                                    api.errare( '::setupSelectInput => invalid input type => ' + input.type );
+                              break;
                         }
                   }
             },

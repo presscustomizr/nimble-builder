@@ -5,15 +5,15 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function _schedule_front_ajax_actions() {
             add_action( 'wp_ajax_sek_get_content', array( $this, 'sek_get_level_content_for_injection' ) );
             //add_action( 'wp_ajax_sek_get_preview_ui_element', array( $this, 'sek_get_ui_content_for_injection' ) );
-
             // Fetches the preset_sections
             add_action( 'wp_ajax_sek_get_preset_sections', array( $this, 'sek_get_preset_sektions' ) );
-
             // Fetches the list of revision for a given skope_id
             add_action( 'wp_ajax_sek_get_revision_history', array( $this, 'sek_get_revision_history' ) );
-
             // Fetches the revision for a given post id
             add_action( 'wp_ajax_sek_get_single_revision', array( $this, 'sek_get_single_revision' ) );
+            // Fetches the category collection to generate the options for a select input
+            // @see api.czrInputMap.category_picker
+            add_action( 'wp_ajax_sek_get_post_categories', array( $this, 'sek_get_post_categories' ) );
             // hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
 
             // This is the list of accepted actions
@@ -45,6 +45,37 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         }
 
         ////////////////////////////////////////////////////////////////
+        // GENERIC HELPER FIRED IN ALL AJAX CALLBACKS
+        // @param $params = array('check_nonce' => true )
+        function sek_do_ajax_pre_checks( $params = array() ) {
+            $params = wp_parse_args( $params, array( 'check_nonce' => true ) );
+            if ( $params['check_nonce'] ) {
+                $action = 'save-customize_' . get_stylesheet();
+                if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+                     wp_send_json_error( array(
+                        'code' => 'invalid_nonce',
+                        'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' => check_ajax_referer() failed.' ),
+                    ) );
+                }
+            }
+
+            if ( ! is_user_logged_in() ) {
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
+            }
+            if ( ! current_user_can( 'edit_theme_options' ) ) {
+              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
+            }
+            if ( ! current_user_can( 'customize' ) ) {
+                status_header( 403 );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
+            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+                status_header( 405 );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
+            }
+        }//sek_do_ajax_pre_checks()
+
+
+        ////////////////////////////////////////////////////////////////
         // IMPORT IMG
         // Fired in __construct()
         function _schedule_img_import_ajax_actions() {
@@ -66,26 +97,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // Fired in __construct()
         // hook : 'wp_ajax_sek_get_preset_sektions'
         function sek_get_preset_sektions() {
-            $action = 'save-customize_' . get_stylesheet();
-            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-                 wp_send_json_error( array(
-                    'code' => 'invalid_nonce',
-                    'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' => check_ajax_referer() failed.' ),
-                ) );
-            }
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks();
             $preset_sections = sek_get_preset_sektions();
             if ( empty( $preset_sections ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sektions()' );
@@ -97,20 +109,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
         // hook : 'wp_ajax_sek_get_html_for_injection'
         function sek_get_level_content_for_injection( $params ) {
-            //sek_error_log( __CLASS__ . '::' . __FUNCTION__ , $_POST );
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
 
             if ( ! isset( $_POST['location_skope_id'] ) || empty( $_POST['location_skope_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
@@ -340,19 +339,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         /////////////////////////////////////////////////////////////////
         // hook : wp_ajax_sek_import_attachment
         function sek_ajax_import_attachment() {
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
+
             if ( !isset( $_POST['rel_path'] ) || !is_string($_POST['rel_path']) ) {
                 wp_send_json_error( 'missing_or_invalid_rel_path_when_importing_image');
             }
@@ -386,26 +374,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         /////////////////////////////////////////////////////////////////
         // hook : wp_ajax_sek_save_section
         function sek_ajax_save_section() {
-            $action = 'save-customize_' . get_stylesheet();
-            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-                 wp_send_json_error( array(
-                    'code' => 'invalid_nonce',
-                    'message' => __( 'sek_ajax_save_section => check_ajax_referer() failed.' ),
-                ) );
-            }
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
             // We must have a title and a section_id and sektion data
             if ( empty( $_POST['sek_title']) ) {
                 wp_send_json_error( __FUNCTION__ . ' => missing title' );
@@ -445,26 +415,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
         // @hook wp_ajax_sek_sek_get_user_saved_sections
         function sek_sek_get_user_saved_sections() {
-            $action = 'save-customize_' . get_stylesheet();
-            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-                 wp_send_json_error( array(
-                    'code' => 'invalid_nonce',
-                    'message' => __( 'sek_ajax_save_section => check_ajax_referer() failed.' ),
-                ) );
-            }
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
             // We must have a section_id provided
             if ( empty( $_POST['preset_section_id']) || ! is_string( $_POST['preset_section_id'] ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => missing or invalid preset_section_id' );
@@ -502,26 +454,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // REVISIONS
         // Fired in __construct()
         function sek_get_revision_history() {
-            $action = 'save-customize_' . get_stylesheet();
-            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-                 wp_send_json_error( array(
-                    'code' => 'invalid_nonce',
-                    'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' check_ajax_referer() failed.' ),
-                ) );
-            }
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
             if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
@@ -532,26 +465,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
 
         function sek_get_single_revision() {
-            $action = 'save-customize_' . get_stylesheet();
-            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-                 wp_send_json_error( array(
-                    'code' => 'invalid_nonce',
-                    'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' check_ajax_referer() failed.' ),
-                ) );
-            }
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
             if ( ! isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing revision_post_id' );
@@ -561,6 +475,23 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         }
 
 
+
+        ////////////////////////////////////////////////////////////////
+        // POST CATEGORIES => to be used in the category picker select input
+        // Fired in __construct()
+        function sek_get_post_categories() {
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+            $raw_cats = get_categories();
+            $raw_cats = is_array( $raw_cats ) ? $raw_cats : array();
+            $cat_collection = array();
+            foreach( $raw_cats as $cat ) {
+                $cat_collection[] = array(
+                    'id' => $cat->term_id,
+                    'name' => sprintf( '%s (%s %s)', $cat->cat_name, $cat->count, __('posts', 'text_doma') )
+                );
+            }
+            wp_send_json_success( $cat_collection );
+        }
 
 
         // hook : 'wp_ajax_sek_get_preview_ui_element'

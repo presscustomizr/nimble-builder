@@ -484,11 +484,14 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
 
-            'Select an icon'     => __( 'Select an icon', 'text_doma' ),
+            'Select an icon' => __( 'Select an icon', 'text_doma' ),
 
             // Code Editor
-            'codeEditorSingular'   => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_doma' ),
-            'codeEditorPlural'     => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_doma' ),
+            'codeEditorSingular' => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_doma' ),
+            'codeEditorPlural' => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_doma' ),
+
+            // Category
+            'Cat #' => __( 'Cat #', 'text_doma' ),
 
             // Various
             'Settings on desktops' => __('Settings on desktops', 'text_doma'),

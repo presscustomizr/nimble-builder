@@ -633,6 +633,11 @@ div[data-sek-align].selected {
 }
 
 
+/* CATEGORY PICKER */
+.customize-control select[data-czrtype="categories"] {
+    height: 28px;
+}
+
 
 
 
