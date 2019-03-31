@@ -122,11 +122,30 @@ $post_collection = new \WP_Query(
 );
 
 if ( $post_collection->have_posts() ) {
-  $column_nb = (int)$main_settings['columns'];
-  $column_nb = $column_nb > 4 ? 4 : $column_nb;
-  $column_nb = $column_nb < 1 ? 1 : $column_nb;
+  $columns_by_device = $main_settings['columns'];
+  $columns_by_device = is_array( $columns_by_device ) ? $columns_by_device : array();
+
+  sek_error_log('ALORS ?', $columns_by_device );
+
+  $columns_by_device = wp_parse_args( $columns_by_device, array(
+      'desktop' => 2,
+      'tablet' => '',
+      'mobile' => ''
+  ));
+  $normalized_columns_by_device = array();
+  // normalizes
+  foreach ( $columns_by_device as $device => $column_nb ) {
+      $column_nb = (int)$column_nb;
+      if ( !empty( $column_nb ) ) {
+        $column_nb = $column_nb > 4 ? 4 : $column_nb;
+        $column_nb = $column_nb < 1 ? 1 : $column_nb;
+      }
+      $normalized_columns_by_device[$device] = $column_nb;
+  }
+
+
   $layout_class = 'list' === $main_settings['layout'] ? 'sek-list-layout' : 'sek-grid-layout';
-  $column_class = 'list' === $main_settings['layout'] ? '' : "sek-col-{$column_nb}";
+
   $shadow_class = true === sek_booleanize_checkbox_val( $main_settings['apply_shadow'] ) ? 'sek-shadow' : '';
   $haspostthumb = true === sek_booleanize_checkbox_val( $thumb_settings['show_thumb'] ) ? 'sek-has-thumb' : '';
 
@@ -136,7 +155,23 @@ if ( $post_collection->have_posts() ) {
   $mobile_breakpoint_class = true === sek_booleanize_checkbox_val( $main_settings['has_mobile_breakpoint'] ) ? 'sek-has-mobile-breakpoint' : '';
 
   $grid_wrapper_classes = implode(' ', [ $tablet_breakpoint_class, $mobile_breakpoint_class] );
-  $grid_items_classes = implode(' ', [ $layout_class, $column_class, $shadow_class, $haspostthumb , $has_thumb_custom_height ] );
+
+  $grid_items_classes = [ $layout_class, $shadow_class, $haspostthumb , $has_thumb_custom_height ];
+
+  if ( 'grid' === $main_settings['layout'] ) {
+    foreach ( $normalized_columns_by_device as $device => $column_nb ) {
+      if ( empty( $column_nb ) )
+        continue;
+      $grid_items_classes[] = "sek-{$device}-col-{$column_nb}";
+      if ( 'desktop' === $device ) {
+        $grid_items_classes[] = "sek-all-col-{$column_nb}";
+      }
+    }
+  }
+
+  $grid_items_classes = implode(' ', $grid_items_classes );
+
+  sek_error_log('JOIE ?', $grid_items_classes );
 
   // FILTER EXCERPT LENGTH
   add_filter( 'excerpt_length', '\Nimble\sek_pg_set_excerpt_length', 999 );

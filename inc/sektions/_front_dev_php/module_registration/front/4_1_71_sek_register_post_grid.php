@@ -42,6 +42,34 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
         'css_selectors' => array( '.sek-module-inner' ),
         'tmpl' => array(
             'item-inputs' => array(
+                'layout'  => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __( 'Layout', 'text_doma' ),
+                    'default'     => 'list',
+                    'choices'      => array('list' => __('List', 'text_doma'), 'grid' => __('Grid', 'text_doma') )
+                ),//null,
+                'columns'  => array(
+                    'input_type'  => 'range_simple_device_switcher',
+                    'title'       => __( 'Number of columns', 'text_doma' ),
+                    'default'     => array( 'desktop' => '2', 'tablet' => '1', 'mobile' => '1' ),
+                    'min'         => 1,
+                    'max'         => 4,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                ),//null,
+                'img_column_width' => array(
+                    'input_type'  => 'range_simple_device_switcher',
+                    'title'       => __( 'Width of the image\'s column (in percent)', 'text_doma' ),
+                    'default'     => array( 'desktop' => '30' ),
+                    'min'         => 1,
+                    'max'         => 100,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),//null,
                 'post_number'  => array(
                     'input_type'  => 'range_simple',
                     'title'       => __( 'Number of posts', 'text_doma' ),
@@ -69,67 +97,6 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                         'title_asc' => __('A &rarr; Z', 'text_doma'),
                         'title_desc' => __('Z &rarr; A', 'text_doma')
                     )
-                ),//null,
-
-                'layout'  => array(
-                    'input_type'  => 'simpleselect',
-                    'title'       => __( 'Layout', 'text_doma' ),
-                    'default'     => 'list',
-                    'choices'      => array('list' => __('List', 'text_doma'), 'grid' => __('Grid', 'text_doma') )
-                ),//null,
-                'img_column_width' => array(
-                    'input_type'  => 'range_simple',
-                    'title'       => __( 'Width of the image\'s column (in percent)', 'text_doma' ),
-                    'default'     => 30,
-                    'min'         => 1,
-                    'max'         => 100,
-                    'step'        => 1,
-                    'width-100'   => true,
-                    'title_width' => 'width-100',
-                    'refresh_markup' => false,
-                    'refresh_stylesheet' => true
-                ),//null,
-
-                'columns'  => array(
-                    'input_type'  => 'range_simple',
-                    'title'       => __( 'Number of columns', 'text_doma' ),
-                    'default'     => 2,
-                    'min'         => 1,
-                    'max'         => 4,
-                    'step'        => 1,
-                    'width-100'   => true,
-                ),//null,
-
-                'custom_grid_spaces' => array(
-                    'input_type'  => 'gutencheck',
-                    'title'       => __('Define custom spaces between columns and rows', 'text_doma'),
-                    'default'     => true,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                    'refresh_stylesheet' => true
-                ),
-                'column_gap'  => array(
-                    'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Space between columns', 'text_doma' ),
-                    'min' => 1,
-                    'max' => 100,
-                    'default'     => array( 'desktop' => '20px' ),
-                    'width-100'   => true,
-                    'title_width' => 'width-100',
-                    'refresh_markup' => false,
-                    'refresh_stylesheet' => true
-                ),//null,
-
-                'row_gap'  => array(
-                    'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Space between rows', 'text_doma' ),
-                    'min' => 1,
-                    'max' => 100,
-                    'default'     => array( 'desktop' => '25px' ),
-                    'width-100'   => true,
-                    'title_width' => 'width-100',
-                    'refresh_markup' => false,
-                    'refresh_stylesheet' => true
                 ),//null,
                 'show_title' => array(
                     'input_type'  => 'gutencheck',
@@ -177,7 +144,38 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                )
+                ),
+                'custom_grid_spaces' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Define custom spaces between columns and rows', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_stylesheet' => true
+                ),
+                'column_gap'  => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __( 'Space between columns', 'text_doma' ),
+                    'min' => 1,
+                    'max' => 100,
+                    'default'     => array( 'desktop' => '20px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),//null,
+
+                'row_gap'  => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __( 'Space between rows', 'text_doma' ),
+                    'min' => 1,
+                    'max' => 100,
+                    'default'     => array( 'desktop' => '25px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                )//null,
             )
         ),
         'render_tmpl_path' => '',
@@ -233,9 +231,9 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                     'refresh_stylesheet' => true
                 ),
                 'img_height' => array(
-                    'input_type'  => 'range_simple',
+                    'input_type'  => 'range_simple_device_switcher',
                     'title'       => __( 'Thumbnail height (in percent of the image container\'s width)', 'text_doma' ),
-                    'default'     => 50,
+                    'default'     =>  array( 'desktop' => '50' ),
                     'min'         => 1,
                     'max'         => 300,
                     'step'        => 1,
@@ -286,14 +284,14 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
                 'show_cats' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Display categories', 'text_doma'),
-                    'default'     => true,
+                    'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'show_comments' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Display comment number', 'text_doma'),
-                    'default'     => true,
+                    'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
@@ -647,14 +645,38 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     // IMG COLUMN WIDTH IN LIST
     // => only relevant when the thumbnail is displayed
     if ( 'list' === $main_settings['layout'] && true === sek_booleanize_checkbox_val( $thumb_settings['show_thumb'] ) ) {
-        $img_column_width = (int)$main_settings['img_column_width'];
-        $img_column_width = $img_column_width > 100 ? 100 : $img_column_width;
-        $img_column_width = $img_column_width < 1 ? 1 : $img_column_width;
-        $rules[] = array(
+        $img_column_width = $main_settings['img_column_width'];
+        $img_column_width = is_array( $img_column_width ) ? $img_column_width : array();
+        $img_column_width = wp_parse_args( $img_column_width, array(
+            'desktop' => '30%',
+            'tablet' => '',
+            'mobile' => ''
+        ));
+
+        $img_column_width_ready_value = $img_column_width;
+        foreach ($img_column_width as $device => $num_val ) {
+            $num_val = sek_extract_numeric_value( $num_val );
+            if ( ! empty( $num_val ) ) {
+                $num_val = $num_val > 100 ? 100 : $num_val;
+                $num_val = $num_val < 1 ? 1 : $num_val;
+                $img_column_width_ready_value[$device] = sprintf('%s 1fr;', $num_val . '%');
+            }
+        }
+        $rules = sek_set_mq_css_rules(array(
+            'value' => $img_column_width_ready_value,
+            'css_property' => 'grid-template-columns',
             'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout.sek-has-thumb article',
-            'css_rules' => 'grid-template-columns:' . sprintf('%s 1fr;', $img_column_width . '%'),
-            'mq' =>null
-        );
+            'is_important' => false
+        ), $rules );
+
+
+        // $img_column_width = $img_column_width > 100 ? 100 : $img_column_width;
+        // $img_column_width = $img_column_width < 1 ? 1 : $img_column_width;
+        // $rules[] = array(
+        //     'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout.sek-has-thumb article',
+        //     'css_rules' => 'grid-template-columns:' . sprintf('%s 1fr;', $img_column_width . '%'),
+        //     'mq' =>null
+        // );
     }
 
     // IMG HEIGHT
@@ -662,13 +684,28 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     // because padding and margin are relative to the width in CSS
     // @see https://www.w3.org/TR/2011/REC-CSS2-20110607/box.html#padding-properties
     if ( true === sek_booleanize_checkbox_val( $thumb_settings['img_has_custom_height'] ) ) {
-        $img_height = (int)$thumb_settings['img_height'];
-        $img_height = $img_height < 1 ? 1 : $img_height;
-        $rules[] = array(
+        $img_height = $thumb_settings['img_height'];
+        $img_height = is_array( $img_height ) ? $img_height : array();
+        $img_height = wp_parse_args( $img_height, array(
+            'desktop' => '50%',
+            'tablet' => '',
+            'mobile' => ''
+        ));
+
+        $img_height_ready_value = $img_height;
+        foreach ($img_height as $device => $num_val ) {
+            $num_val = sek_extract_numeric_value( $num_val );
+            if ( ! empty( $num_val ) ) {
+                $num_val = $num_val < 1 ? 1 : $num_val;
+                $img_height_ready_value[$device] = sprintf('%s;', $num_val .'%');
+            }
+        }
+        $rules = sek_set_mq_css_rules(array(
+            'value' => $img_height_ready_value,
+            'css_property' => 'padding-top',
             'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-thumb-custom-height figure a',
-            'css_rules' => 'padding-top:' . sprintf('%s;', $img_height .'%'),
-            'mq' =>null
-        );
+            'is_important' => false
+        ), $rules );
     }
 
     // COLUMN AND ROW GAP
@@ -687,7 +724,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               $numeric = sek_extract_numeric_value( $num_unit );
               if ( ! empty( $numeric ) ) {
                   $unit = sek_extract_unit( $num_unit );
-                  $ready_value[$device] = $numeric . $unit;
+                  $gap_ready_value[$device] = $numeric . $unit;
               }
           }
 
@@ -717,7 +754,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               $numeric = sek_extract_numeric_value( $num_unit );
               if ( ! empty( $numeric ) ) {
                   $unit = sek_extract_unit( $num_unit );
-                  $ready_value[$device] = $numeric . $unit;
+                  $v_gap_ready_value[$device] = $numeric . $unit;
               }
           }
 

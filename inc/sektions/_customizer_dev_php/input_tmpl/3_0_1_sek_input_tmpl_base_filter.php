@@ -60,6 +60,7 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id, $input_data );
         break;
         case 'range_simple' :
+        case 'range_simple_device_switcher' :
             sek_set_input_tmpl___range_simple( $input_id, $input_data );
         break;
         case 'borders' :
