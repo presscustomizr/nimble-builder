@@ -626,8 +626,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       item   = input.input_parent,
                       module = input.module,
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type );
-
-                  selectOptions = _.isUndefined( selectOptions ) ? inputRegistrationParams.choices : selectOptions;
+                  // use the provided selectOptions if any
+                  selectOptions = _.isEmpty( selectOptions ) ? inputRegistrationParams.choices : selectOptions;
 
                   if ( _.isEmpty( selectOptions ) || ! _.isObject( selectOptions ) ) {
                         api.errare( 'api.czr_sektions.setupSelectInput => missing select options for input id => ' + input.id + ' in image module');

@@ -10,10 +10,10 @@
       // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
             simpleselect : function( selectOptions ) {
-                  api.czr_sektions.setupSelectInput.call(this);
+                  api.czr_sektions.setupSelectInput.call( this, selectOptions );
             },
             multiselect : function( selectOptions ) {
-                  api.czr_sektions.setupSelectInput.call(this);
+                  api.czr_sektions.setupSelectInput.call( this, selectOptions );
             },
 
       });//$.extend( api.czrInputMap, {})
