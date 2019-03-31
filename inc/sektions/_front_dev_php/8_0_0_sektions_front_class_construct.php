@@ -83,7 +83,149 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         ];
         // introduced when implementing import/export feature
         // @see https://github.com/presscustomizr/nimble-builder/issues/411
-        public $img_import_errors = array();
+        public $img_import_errors = [];
+
+        // stores the active module collection
+        // @see populated in sek_get_contextually_active_module_list()
+        public $contextually_active_modules = [];
+
+        public static $ui_picker_modules = [
+          // UI CONTENT PICKER
+          'sek_content_type_switcher_module',
+          'sek_module_picker_module',
+
+          'sek_intro_sec_picker_module',
+          'sek_features_sec_picker_module',
+          'sek_contact_sec_picker_module',
+          'sek_column_layouts_sec_picker_module',
+          // 'sek_header_sec_picker_module',
+          // 'sek_footer_sec_picker_module',
+          'sek_my_sections_sec_picker_module'
+        ];
+
+        public static $ui_level_modules = [
+            // UI LEVEL MODULES
+          'sek_level_bg_module',
+          'sek_level_border_module',
+          //'sek_level_section_layout_module',<// deactivated for now. Replaced by sek_level_width_section
+          'sek_level_height_module',
+          'sek_level_spacing_module',
+          'sek_level_width_module',
+          'sek_level_width_section',
+          'sek_level_anchor_module',
+          'sek_level_visibility_module',
+          'sek_level_breakpoint_module'
+        ];
+
+        public static $ui_local_global_options_modules = [
+          // local skope options modules
+          'sek_local_template',
+          'sek_local_widths',
+          'sek_local_custom_css',
+          'sek_local_reset',
+          'sek_local_performances',
+          'sek_local_header_footer',
+          'sek_local_revisions',
+          'sek_local_imp_exp',
+
+          // global options modules
+          'sek_global_breakpoint',
+          'sek_global_widths',
+          'sek_global_performances',
+          'sek_global_header_footer',
+          'sek_global_recaptcha',
+          'sek_global_revisions',
+          'sek_global_reset',
+          'sek_global_beta_features'
+        ];
+
+        public static $ui_front_modules = [
+          // FRONT MODULES
+          'czr_simple_html_module',
+
+          'czr_tiny_mce_editor_module' => array(
+            'czr_tiny_mce_editor_module',
+            'czr_tinymce_child',
+            'czr_font_child'
+          ),
+
+          'czr_image_module' => array(
+            'czr_image_module',
+            'czr_image_main_settings_child',
+            'czr_image_borders_corners_child'
+          ),
+
+          //'czr_featured_pages_module',
+          'czr_heading_module'  => array(
+            'czr_heading_module',
+            'czr_heading_child',
+            'czr_heading_spacing_child',
+            'czr_font_child'
+          ),
+
+          'czr_spacer_module',
+          'czr_divider_module',
+
+          'czr_icon_module' => array(
+            'czr_icon_module',
+            'czr_icon_settings_child',
+            'czr_icon_spacing_border_child',
+          ),
+
+
+          'czr_map_module',
+
+          'czr_quote_module' => array(
+            'czr_quote_module',
+            'czr_quote_quote_child',
+            'czr_quote_cite_child',
+            'czr_quote_design_child',
+          ),
+
+          'czr_button_module' => array(
+            'czr_button_module',
+            'czr_btn_content_child',
+            'czr_btn_design_child',
+            'czr_font_child'
+          ),
+
+          // simple form father + children
+          'czr_simple_form_module' => array(
+            'czr_simple_form_module',
+            'czr_simple_form_fields_child',
+            'czr_simple_form_button_child',
+            'czr_simple_form_design_child',
+            'czr_simple_form_fonts_child',
+            'czr_simple_form_submission_child'
+          ),
+
+          'czr_post_grid_module' => array(
+            'czr_post_grid_module',
+            'czr_post_grid_main_child',
+            'czr_post_grid_thumb_child',
+            'czr_post_grid_metas_child',
+            'czr_post_grid_fonts_child'
+          )
+        ];
+
+        public static $ui_front_beta_modules = [
+          // pre-built sections for header and footer
+          'sek_header_sec_picker_module',
+          'sek_footer_sec_picker_module',
+
+          // modules for header and footer
+          'czr_menu_module' => array(
+            'czr_menu_module',
+            'czr_menu_content_child',
+            'czr_menu_mobile_options',
+            'czr_font_child'
+          ),
+
+
+          'czr_widget_area_module'
+          //'czr_menu_design_child',
+        ];
+
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>

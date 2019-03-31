@@ -167,7 +167,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
 
-                    'registeredModules' => CZR_Fmk_Base() -> registered_modules,
+                    'registeredModules' => CZR_Fmk_Base()->registered_modules,
                 )
             );
 
