@@ -94,6 +94,7 @@ function sek_register_modules() {
 
         'czr_post_grid_module',
         'czr_post_grid_main_child',
+        'czr_post_grid_thumb_child',
         'czr_post_grid_metas_child',
         'czr_post_grid_fonts_child'
     ];

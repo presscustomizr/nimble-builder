@@ -7,12 +7,15 @@ $model = Nimble_Manager() -> model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $main_settings = $value['grid_main'];
 $metas_settings = $value['grid_metas'];
-
+$thumb_settings = $value['grid_thumb'];
 
 if ( ! function_exists( 'Nimble\sek_render_post') ) {
-  function sek_render_post( $main_settings, $metas_settings ) {
+  function sek_render_post( $main_settings, $metas_settings, $thumb_settings ) {
     // thumb, title, excerpt visibility
-    foreach ( ['thumb', 'title', 'excerpt'] as $element ) {
+    foreach ( ['thumb'] as $element ) {
+        ${'show_' . $element} = sek_booleanize_checkbox_val( $thumb_settings["show_{$element}"] );
+    }
+    foreach ( ['title', 'excerpt'] as $element ) {
         ${'show_' . $element} = sek_booleanize_checkbox_val( $main_settings["show_{$element}"] );
     }
     // meta visibility
@@ -23,31 +26,45 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
       <article id="sek-pg-<?php the_ID(); ?>">
         <?php if ( $show_thumb ) : ?>
           <figure class="sek-pg-thumbnail">
-            <a href="<?php the_permalink(); ?>">
-              <?php the_post_thumbnail(); ?>
+            <?php // when title is not displayed, print it as an attribute of the image ?>
+            <?php if ( $show_title ) : ?>
+              <a href="<?php the_permalink(); ?>">
+            <?php else : ?>
+              <a href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>">
+            <?php endif; ?>
+              <?php
+                  if( has_post_thumbnail() ) {
+                      $img_html = wp_get_attachment_image( get_post_thumbnail_id(), empty( $thumb_settings['img_size'] ) ? 'medium' : $thumb_settings['img_size']);
+                      echo apply_filters( 'nimble_parse_for_smart_load', $img_html );
+                  } else if ( true === sek_booleanize_checkbox_val( $thumb_settings['use_post_thumb_placeholder'] ) ) {
+                      printf( '<img alt="default img" data-sek-smartload="false" src="%1$s"/>', NIMBLE_BASE_URL . '/assets/img/default-img.png'  );
+                  }
+              ?>
             </a>
           </figure>
         <?php endif; ?>
         <div class="sek-pg-content">
           <?php if ( $show_cats ) : ?>
-            <p class="sek-pg-category"><?php the_category(' / '); ?></p>
+            <div class="sek-pg-category"><?php the_category(' / '); ?></div>
           <?php endif; ?>
           <?php if ( $show_title ) : ?>
             <h2 class="sek-pg-title">
               <a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?></a>
             </h2><!--/.pg-title-->
           <?php endif; ?>
-          <aside class="sek-pg-metas">
-            <?php if ( $show_author ) : ?>
-              <span><?php the_author_posts_link(); ?></span>
-            <?php endif; ?>
-            <?php if ( $show_date ) : ?>
-              <span class="published updated"><?php echo get_the_date( get_option('date_format') ); ?></span>
-            <?php endif; ?>
-            <?php if ( $show_comments ) : ?>
-              <span><?php comments_number( '0', '1', '%' ); ?> <?php _e('comments', 'text_doma'); ?></span>
-            <?php endif; ?>
-          </aside><!--/.pg-meta-->
+          <?php if ( $show_author || $show_date || $show_comments ) : ?>
+            <aside class="sek-pg-metas">
+              <?php if ( $show_author ) : ?>
+                <span><?php the_author_posts_link(); ?></span>
+              <?php endif; ?>
+              <?php if ( $show_date ) : ?>
+                <span class="published updated"><?php echo get_the_date( get_option('date_format') ); ?></span>
+              <?php endif; ?>
+              <?php if ( $show_comments ) : ?>
+                <span><?php comments_number( '0', '1', '%' ); ?> <?php _e('comments', 'text_doma'); ?></span>
+              <?php endif; ?>
+            </aside><!--/.pg-meta-->
+          <?php endif; ?>
           <?php if ( $show_excerpt ) : ?>
             <div class="sek-excerpt">
               <?php the_excerpt(); ?>
@@ -56,6 +73,19 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
         </div><?php //.sek-pg-content ?>
       </article><!--/#sek-pg-->
     <?php
+  }
+}
+
+// filters @hook 'excerpt_length'
+if ( ! function_exists( 'Nimble\sek_pg_set_excerpt_length') ) {
+  function sek_pg_set_excerpt_length( $original_length ) {
+    $model = Nimble_Manager() -> model;
+    $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
+    $main_settings = $value['grid_main'];
+    $_custom = (int)$main_settings['excerpt_length'];
+    $_custom = $_custom < 1 ? 1 : $_custom;
+
+    return !is_numeric($_custom) ? $original_length : $_custom;
   }
 }
 
@@ -97,16 +127,26 @@ if ( $post_collection->have_posts() ) {
   $column_nb = $column_nb < 1 ? 1 : $column_nb;
   $layout_class = 'list' === $main_settings['layout'] ? 'sek-list-layout' : 'sek-grid-layout';
   $column_class = 'list' === $main_settings['layout'] ? '' : "sek-col-{$column_nb}";
-  $shadow_class = true === sek_booleanize_checkbox_val( $main_settings['apply_shadow'] ) ? '.sek-shadow' : '';
-  $breakpoint_class = true === sek_booleanize_checkbox_val( $main_settings['has_breakpoint'] ) ? '.sek-has-breakpoint' : '';
-  $grid_items_classes = implode(' ', [ $layout_class, $column_class, $shadow_class, $breakpoint_class ] );
+  $shadow_class = true === sek_booleanize_checkbox_val( $main_settings['apply_shadow'] ) ? 'sek-shadow' : '';
+  $haspostthumb = true === sek_booleanize_checkbox_val( $thumb_settings['show_thumb'] ) ? 'sek-has-thumb' : '';
+
+  $has_thumb_custom_height = true === sek_booleanize_checkbox_val( $thumb_settings['img_has_custom_height'] ) ? 'sek-thumb-custom-height' : '';
+
+  $tablet_breakpoint_class = true === sek_booleanize_checkbox_val( $main_settings['has_tablet_breakpoint'] ) ? 'sek-has-tablet-breakpoint' : '';
+  $mobile_breakpoint_class = true === sek_booleanize_checkbox_val( $main_settings['has_mobile_breakpoint'] ) ? 'sek-has-mobile-breakpoint' : '';
+
+  $grid_wrapper_classes = implode(' ', [ $tablet_breakpoint_class, $mobile_breakpoint_class] );
+  $grid_items_classes = implode(' ', [ $layout_class, $column_class, $shadow_class, $haspostthumb , $has_thumb_custom_height ] );
+
+  // FILTER EXCERPT LENGTH
+  add_filter( 'excerpt_length', '\Nimble\sek_pg_set_excerpt_length', 999 );
   ?>
-  <div class="sek-post-grid-wrapper">
+  <div class="sek-post-grid-wrapper <?php echo $grid_wrapper_classes; ?>">
     <div class="sek-grid-items <?php echo $grid_items_classes; ?>">
       <?php
         while ( $post_collection->have_posts() ) {
             $post_collection->the_post();
-            sek_render_post( $main_settings, $metas_settings );
+            sek_render_post( $main_settings, $metas_settings, $thumb_settings );
         }//while
         // After looping through a separate query, this function restores the $post global to the current post in the main query.
         wp_reset_postdata();
@@ -117,4 +157,7 @@ if ( $post_collection->have_posts() ) {
     </div><?php //.sek-grid-item ?>
   </div><?php //.sek-post-grid-wrapper ?>
   <?php
+
+  // REMOVE FILTER EXCERPT LENGTH
+  remove_filter( 'excerpt_length', '\Nimble\sek_pg_set_excerpt_length', 999 );
 }

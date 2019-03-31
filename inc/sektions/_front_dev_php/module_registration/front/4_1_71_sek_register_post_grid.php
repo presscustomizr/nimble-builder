@@ -10,6 +10,7 @@ function sek_get_module_params_for_czr_post_grid_module() {
         'is_father' => true,
         'children' => array(
             'grid_main'   => 'czr_post_grid_main_child',
+            'grid_thumb'  => 'czr_post_grid_thumb_child',
             'grid_metas'  => 'czr_post_grid_metas_child',
             'grid_fonts'  => 'czr_post_grid_fonts_child',
         ),
@@ -22,8 +23,6 @@ function sek_get_module_params_for_czr_post_grid_module() {
  *  CHILD MAIN GRID SETTINGS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_post_grid_main_child() {
-    $css_selectors = '.sek-btn';
-    $css_font_selectors = '.sek-btn';
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_main_child',
@@ -78,10 +77,9 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'default'     => 'list',
                     'choices'      => array('list' => __('List', 'text_doma'), 'grid' => __('Grid', 'text_doma') )
                 ),//null,
-
-                'img_width' => array(
+                'img_column_width' => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Thumbnail width (in percent)', 'text_doma' ),
+                    'title'       => __( 'Width of the image\'s column (in percent)', 'text_doma' ),
                     'default'     => 30,
                     'min'         => 1,
                     'max'         => 100,
@@ -91,7 +89,6 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true
                 ),//null,
-
 
                 'columns'  => array(
                     'input_type'  => 'range_simple',
@@ -103,20 +100,37 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'width-100'   => true,
                 ),//null,
 
-                'show_thumb' => array(
+                'custom_grid_spaces' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Display featured image', 'text_doma'),
+                    'title'       => __('Define custom spaces between columns and rows', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
+                    'refresh_stylesheet' => true
                 ),
-                'use_post_thumb_placeholder' => array(
-                    'input_type'  => 'gutencheck',
-                    'title'       => __('Use a placeholder image when no post thumbnail is set', 'text_doma'),
-                    'default'     => true,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                ),
+                'column_gap'  => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __( 'Space between columns', 'text_doma' ),
+                    'min' => 1,
+                    'max' => 100,
+                    'default'     => array( 'desktop' => '20px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),//null,
+
+                'row_gap'  => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __( 'Space between rows', 'text_doma' ),
+                    'min' => 1,
+                    'max' => 100,
+                    'default'     => array( 'desktop' => '25px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),//null,
                 'show_title' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Display the post title', 'text_doma'),
@@ -139,7 +153,10 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'max'         => 50,
                     'step'        => 1,
                     'width-100'   => true,
+                    'title_width' => 'width-100',
                 ),//0,
+
+
                 'apply_shadow' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Apply a shadow', 'text_doma'),
@@ -147,9 +164,91 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
-                'has_breakpoint' => array(
+                'has_tablet_breakpoint' => array(
                     'input_type'  => 'gutencheck',
-                    'title'       => __('Reorganize image and content vertically on mobile devices', 'text_doma'),
+                    'title'       => '<i class="material-icons sek-level-option-icon">tablet_mac</i>' . __('Reorganize image and content vertically on tablet devices', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'has_mobile_breakpoint' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => '<i class="material-icons sek-level-option-icon">phone_iphone</i>' . __('Reorganize image and content vertically on smartphones devices', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                )
+            )
+        ),
+        'render_tmpl_path' => '',
+    );
+}
+
+/* ------------------------------------------------------------------------- *
+ *  CHILD IMG SETTINGS
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_post_grid_thumb_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_post_grid_thumb_child',
+        'name' => __( 'Post thumbnail settings : size, design...', 'text_doma' ),
+        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        // 'starting_value' => array(
+        //     'button_text' => __('Click me','text_doma'),
+        //     'color_css'  => '#ffffff',
+        //     'bg_color_css' => '#020202',
+        //     'bg_color_hover' => '#151515', //lighten 15%,
+        //     'use_custom_bg_color_on_hover' => 0,
+        //     'border_radius_css' => '2',
+        //     'h_alignment_css' => 'center',
+        //     'use_box_shadow' => 1,
+        //     'push_effect' => 1
+        // ),
+        'css_selectors' => array( '.sek-module-inner' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                // IMAGE
+                'show_thumb' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display post thumbnail', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_stylesheet' => true,
+                    'notice_after' => __('This image can be set as "Featured image" when creating a post.', 'text_doma')
+                ),
+                'img_size' => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __('Select the image size', 'text_doma'),
+                    'default'     => 'medium',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-size' ),
+                    'notice_before' => __('Select a size for this image among those generated by WordPress.', 'text_doma' )
+                ),
+                'img_has_custom_height' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Apply a custom height to the thumbnail', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_stylesheet' => true
+                ),
+                'img_height' => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __( 'Thumbnail height (in percent of the image container\'s width)', 'text_doma' ),
+                    'default'     => 50,
+                    'min'         => 1,
+                    'max'         => 300,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'notice_after' => __('Tip : applying a height of 100% makes the image square.')
+                ),//null,
+
+                'use_post_thumb_placeholder' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Use a placeholder image when no post thumbnail is set', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -161,13 +260,10 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
 }
 
 
-
 /* ------------------------------------------------------------------------- *
  *  CHILD POST METAS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_post_grid_metas_child() {
-    $css_selectors = '.sek-btn';
-    $css_font_selectors = '.sek-btn';
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_metas_child',
@@ -546,17 +642,91 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     $value = $complete_modul_model['value'];
 
     $main_settings = $value['grid_main'];
+    $thumb_settings = $value['grid_thumb'];
 
-    // IMG SIZE IN LIST
-    if ( 'list' === $main_settings['layout'] ) {
-        $img_width = (int)$main_settings['img_width'];
-        $img_width = $img_width > 100 ? 100 : $img_width;
-        $img_width = $img_width < 1 ? 1 : $img_width;
+    // IMG COLUMN WIDTH IN LIST
+    // => only relevant when the thumbnail is displayed
+    if ( 'list' === $main_settings['layout'] && true === sek_booleanize_checkbox_val( $thumb_settings['show_thumb'] ) ) {
+        $img_column_width = (int)$main_settings['img_column_width'];
+        $img_column_width = $img_column_width > 100 ? 100 : $img_column_width;
+        $img_column_width = $img_column_width < 1 ? 1 : $img_column_width;
         $rules[] = array(
-            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout article',
-            'css_rules' => 'grid-template-columns:' . sprintf('%s 1fr;', $img_width . '%'),
+            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout.sek-has-thumb article',
+            'css_rules' => 'grid-template-columns:' . sprintf('%s 1fr;', $img_column_width . '%'),
             'mq' =>null
         );
+    }
+
+    // IMG HEIGHT
+    // we set the height of the image container ( <a> tag ), with the padding property
+    // because padding and margin are relative to the width in CSS
+    // @see https://www.w3.org/TR/2011/REC-CSS2-20110607/box.html#padding-properties
+    if ( true === sek_booleanize_checkbox_val( $thumb_settings['img_has_custom_height'] ) ) {
+        $img_height = (int)$thumb_settings['img_height'];
+        $img_height = $img_height < 1 ? 1 : $img_height;
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-thumb-custom-height figure a',
+            'css_rules' => 'padding-top:' . sprintf('%s;', $img_height .'%'),
+            'mq' =>null
+        );
+    }
+
+    // COLUMN AND ROW GAP
+    if ( true === sek_booleanize_checkbox_val( $main_settings['custom_grid_spaces'] ) ) {
+          // Horizontal Gap
+          $gap = $main_settings['column_gap'];
+          $gap = is_array( $gap ) ? $gap : array();
+          $gap = wp_parse_args( $gap, array(
+              'desktop' => '20px',
+              'tablet' => '',
+              'mobile' => ''
+          ));
+          // replace % by vh when needed
+          $gap_ready_value = $gap;
+          foreach ($gap as $device => $num_unit ) {
+              $numeric = sek_extract_numeric_value( $num_unit );
+              if ( ! empty( $numeric ) ) {
+                  $unit = sek_extract_unit( $num_unit );
+                  $ready_value[$device] = $numeric . $unit;
+              }
+          }
+
+          // for grid layout => gap between columns
+          // for list layout => gap between image and content
+          $rules = sek_set_mq_css_rules(array(
+              'value' => $gap_ready_value,
+              'css_property' => 'grid-column-gap',
+              'selector' => implode( ',', [
+                  '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-layout',
+                  '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout.sek-has-thumb article'
+              ] ),
+              'is_important' => false
+          ), $rules );
+
+          // Vertical Gap => common to list and grid layout
+          $v_gap = $main_settings['row_gap'];
+          $v_gap = is_array( $v_gap ) ? $v_gap : array();
+          $v_gap = wp_parse_args( $v_gap, array(
+              'desktop' => '25px',
+              'tablet' => '',
+              'mobile' => ''
+          ));
+          // replace % by vh when needed
+          $v_gap_ready_value = $v_gap;
+          foreach ($v_gap as $device => $num_unit ) {
+              $numeric = sek_extract_numeric_value( $num_unit );
+              if ( ! empty( $numeric ) ) {
+                  $unit = sek_extract_unit( $num_unit );
+                  $ready_value[$device] = $numeric . $unit;
+              }
+          }
+
+          $rules = sek_set_mq_css_rules(array(
+              'value' => $v_gap_ready_value,
+              'css_property' => 'grid-row-gap',
+              'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items',
+              'is_important' => false
+          ), $rules );
     }
 
 

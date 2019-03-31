@@ -820,7 +820,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
         // @filter nimble_parse_for_smart_load
-        // this filter is used in several modules : tiny_mce_editor, image module, ...
+        // this filter is used in several modules : tiny_mce_editor, image module, post grid
         // img smartload can be set globally with 'global-img-smart-load' and locally with 'local-img-smart-load'
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
         // @return html string
@@ -853,7 +853,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
 
             $img_extensions_pattern = sprintf( "(?:%s)", implode( '|', $allowed_image_extensions ) );
-            $pattern                = '#<img([^>]+?)src=[\'"]?([^\'"\s>]+\.'.$img_extensions_pattern.'[^\'"\s>]*)[\'"]?([^>]*)>#i';
+            $pattern = '#<img([^>]+?)src=[\'"]?([^\'"\s>]+\.'.$img_extensions_pattern.'[^\'"\s>]*)[\'"]?([^>]*)>#i';
 
             return preg_replace_callback( $pattern, '\Nimble\nimble_regex_callback', $html);
         }
