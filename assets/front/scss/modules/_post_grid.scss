@@ -172,7 +172,7 @@
     grid-column-gap: 20px;
   }
   // article has 2 columns when the thumbnail is displayed
-  .sek-list-layout.sek-has-thumb article {
+  .sek-list-layout article.sek-has-thumb {
     grid-template-columns: 30% minmax(0,1fr);
   }
 
@@ -298,21 +298,6 @@
 
 
 
-
-// @media (min-width:767px){
-//   .sek-post-grid-wrapper .sek-list-layout article:not(:last-child) {
-//       border-bottom: solid 1px #eee;
-//   }
-// }
-// @media (max-width:767px){
-//   .sek-post-grid-wrapper.sek-has-tablet-breakpoint .sek-list-layout article {
-//       grid-template-columns: minmax(0,1fr);
-//       grid-gap: 0;
-//   }
-//   .sek-post-grid-wrapper.sek-has-tablet-breakpoint .sek-grid-layout[class*="sek-col-"] {
-//       grid-template-columns: minmax(0,1fr);
-//   }
-// }
 // $grid-breakpoints: (
 //   xs: 0,
 //   sm: 576px,

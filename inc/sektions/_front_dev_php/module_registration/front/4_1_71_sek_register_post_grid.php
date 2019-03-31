@@ -288,13 +288,6 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
-                'show_comments' => array(
-                    'input_type'  => 'gutencheck',
-                    'title'       => __('Display comment number', 'text_doma'),
-                    'default'     => false,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                ),
                 'show_author' => array(
                     'input_type'  => 'gutencheck',
                     'title'       => __('Display author', 'text_doma'),
@@ -306,6 +299,13 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
                     'input_type'  => 'gutencheck',
                     'title'       => __('Display date', 'text_doma'),
                     'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'show_comments' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display comment number', 'text_doma'),
+                    'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
