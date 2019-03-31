@@ -66,7 +66,7 @@ function sek_enqueue_controls_js_css() {
 
                 //'presetSections' => sek_get_preset_sektions(), <= fetched on demand in ajax
 
-                'registeredModules' => CZR_Fmk_Base() -> registered_modules,
+                'registeredModules' => CZR_Fmk_Base()->registered_modules,
 
                 // Dnd
                 'preDropElementClass' => 'sortable-placeholder',
