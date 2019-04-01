@@ -1017,6 +1017,11 @@ credits : Gutenberg team @wordpress */
   max-width: 100%;
 }
 
+/* fixes https://github.com/presscustomizr/nimble-builder/issues/340 */
+.themes-panel-expanded #nimble-top-bar, .outer-section-open #nimble-top-bar {
+  display: none;
+}
+
 body.nimble-top-bar-visible #nimble-top-bar {
   /*visibility: inherit;*/
   opacity: 1;
