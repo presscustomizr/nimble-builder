@@ -77,7 +77,8 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'default'     => 'list',
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'html_before' => '<hr>'
+                    'html_before' => '<hr>',
+                    'refresh_stylesheet' => true //<= some CSS rules are layout dependant
                 ),//null,
                 'columns'  => array(
                     'input_type'  => 'range_simple_device_switcher',
@@ -142,6 +143,18 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'width-100'   => true,
                     'title_width' => 'width-100',
                 ),//0,
+                'space_between_el' => array(
+                    'input_type'  => 'range_with_unit_picker',
+                    'title'       => __('Space between content elements', 'text_doma'),
+                    'min' => 1,
+                    'max' => 100,
+                    //'unit' => 'px',
+                    'default' => '15px',
+                    'width-100'   => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'title_width' => 'width-100'
+                ),
 
                 'pg_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
@@ -360,7 +373,7 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
  *  FONTS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_post_grid_fonts_child() {
-    $pt_font_selectors = array( '.sek-pg-title a' );
+    $pt_font_selectors = array( '.sek-pg-title a', '.sek-pg-title' );
     $pe_font_selectors = array( '.sek-post-grid-wrapper .sek-excerpt *' );
     $cat_font_selectors = array( '.sek-pg-category a' );
     $metas_font_selectors = array( '.sek-pg-metas span', '.sek-pg-metas a');
@@ -404,7 +417,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             'pt_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Line height', 'text_doma' ),
-                                'default'     => '1.5em',
+                                'default'     => '1.3em',
                                 'min' => 0,
                                 'max' => 10,
                                 'step' => 0.1,
@@ -763,11 +776,31 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     if ( empty( $complete_modul_model['value'] ) )
       return $rules;
 
-    //sek_error_log( 'ALORS ????', $complete_modul_model );
     $value = $complete_modul_model['value'];
 
     $main_settings = $value['grid_main'];
     $thumb_settings = $value['grid_thumb'];
+
+    // SPACE BETWEEN CONTENT ELEMENTS
+    if ( '15px' !== $main_settings['space_between_el'] ) {
+        $margin_bottom = $main_settings['space_between_el'];
+        $numeric = sek_extract_numeric_value( $margin_bottom );
+        if ( ! empty( $numeric ) ) {
+            $unit = sek_extract_unit( $margin_bottom );
+            $unit = '%' === $unit ? 'vh' : $unit;
+            $margin_bottom = $numeric . $unit;
+            $rules[] = array(
+                'selector' => implode(',', array(
+                    '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items article .sek-pg-content > *:not(:last-child)',
+                    '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-list-layout article > *:not(:last-child):not(.sek-pg-thumbnail)',
+                    '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-grid-layout article > *:not(:last-child)'
+                )),
+                'css_rules' => 'margin-bottom:' . $margin_bottom . '!important;',
+                'mq' =>null
+            );
+        }
+    }
+
 
     // IMG COLUMN WIDTH IN LIST
     // => only relevant when the thumbnail is displayed

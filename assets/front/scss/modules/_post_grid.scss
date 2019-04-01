@@ -9,7 +9,12 @@
     grid-row-gap: 25px;
     article>*:not(:last-child) {
       margin-top: 0!important;
-      margin-bottom: .7rem;
+    }
+    &.sek-list-layout article>*:not(:last-child):not(.sek-pg-thumbnail){
+      margin-bottom: 15px;
+    }
+    &.sek-grid-layout article>*:not(:last-child){
+      margin-bottom: 15px;
     }
     article>:first-child {
       margin-top: 0!important;
@@ -20,7 +25,7 @@
 
     article .sek-pg-content>*:not(:last-child) {
       margin-top: 0!important;
-      margin-bottom: .7rem !important;
+      margin-bottom: 15px!important;
     }
     article .sek-pg-content>:first-child {
       margin-top: 0!important;
@@ -125,13 +130,13 @@
   .sek-pg-title {
     // reset theme and plugins value for h2
     font-size: 28px;
-    line-height: 1.5em;
+    line-height: 1.3em;
     a {
       text-decoration: none;
       color: #444;
       font-size: 28px;
       font-weight: 400;
-      line-height: 1.5em;
+      line-height: 1.3em;
       -ms-word-wrap: break-word;
       word-wrap: break-word;
     }
@@ -312,7 +317,7 @@
       grid-template-columns: minmax(0,1fr)!important;//<= important because this property can be customized by users for desktop
       grid-gap: 0;
       .sek-pg-thumbnail {
-        margin-bottom: .7rem;
+        margin-bottom: 15px;
       }
     }
     // .sek-grid-layout {
@@ -329,7 +334,7 @@
       grid-template-columns: minmax(0,1fr)!important;//<= important because this property can be customized by users for desktop
       grid-gap: 0;
       .sek-pg-thumbnail {
-        margin-bottom: .7rem;
+        margin-bottom: 15px;
       }
     }
     // .sek-grid-layout {
