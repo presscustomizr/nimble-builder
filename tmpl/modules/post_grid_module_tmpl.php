@@ -71,7 +71,11 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
             <?php endif; ?>
             <?php if ( $show_excerpt ) : ?>
               <div class="sek-excerpt">
-                <?php the_excerpt(); ?>
+                <?php
+                  // note : using add_filter( 'excerpt_length' ) do not work when using a custom excerpt
+                  // code inspired from WP core formatting.php
+                ?>
+                <?php echo wp_trim_words( get_the_excerpt(), sek_pg_get_excerpt_length( 55 ), ' ' . '[&hellip;]' ); ?>
               </div>
             <?php endif; ?>
           </div><?php //.sek-pg-content ?>
@@ -82,8 +86,8 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
 }
 
 // filters @hook 'excerpt_length'
-if ( ! function_exists( 'Nimble\sek_pg_set_excerpt_length') ) {
-  function sek_pg_set_excerpt_length( $original_length ) {
+if ( ! function_exists( 'Nimble\sek_pg_get_excerpt_length') ) {
+  function sek_pg_get_excerpt_length( $original_length ) {
     $model = Nimble_Manager() -> model;
     $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
     $main_settings = $value['grid_main'];
@@ -177,8 +181,6 @@ if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
 
   $grid_items_classes = implode(' ', $grid_items_classes );
 
-  // FILTER EXCERPT LENGTH
-  add_filter( 'excerpt_length', '\Nimble\sek_pg_set_excerpt_length', 999 );
   ?>
   <div class="sek-post-grid-wrapper <?php echo $grid_wrapper_classes; ?>">
     <div class="sek-grid-items <?php echo $grid_items_classes; ?>">
@@ -196,9 +198,6 @@ if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
     </div><?php //.sek-grid-item ?>
   </div><?php //.sek-post-grid-wrapper ?>
   <?php
-
-  // REMOVE FILTER EXCERPT LENGTH
-  remove_filter( 'excerpt_length', '\Nimble\sek_pg_set_excerpt_length', 999 );
 }//if ( $post_collection->have_posts() )
 else if ( skp_is_customizing() ) {
   ?>
