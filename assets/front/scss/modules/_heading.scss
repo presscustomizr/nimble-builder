@@ -1,21 +1,24 @@
 // synchronized with default on registration
-.#{$project-prefix}module-inner {
-    h1, h2, h3, h4, h5, h6 {
-        font-weight: 400;
-        line-height: 1.5em;
-    }
-    // hx font-size are inspired from the ones of the Customizr theme
-    h1 {font-size: 2.48em;}
-    h2 {font-size: 2.07em;}
-    h3 {font-size: 1.73em;}
-    h4 {font-size: 1.44em;}
-    h5 {font-size: 1.2em;}
-    h6 {font-size: 1em;}
+.sek-module-inner {
+  h1, h2, h3, h4, h5, h6 {
+      font-weight: 400;
+      line-height: 1.5em;
+  }
+  // hx font-size are inspired from the ones of the Customizr theme
+  h1 {font-size: 2.48em;}
+  h2 {font-size: 2.07em;}
+  h3 {font-size: 1.73em;}
+  h4 {font-size: 1.44em;}
+  h5 {font-size: 1.2em;}
+  h6 {font-size: 1em;}
+  .sek-heading {
+      text-align: center;//This should match the default on registration
+      // set a margin to fix https://github.com/presscustomizr/nimble-builder/issues/203
+      margin: 0.6em 0;//This should match the default on registration
+      > a {
+          color: inherit;
+          font-size: inherit;
+      }
+  }
 }
 // introduced when implementing https://github.com/presscustomizr/nimble-builder/issues/322
-.#{$project-prefix}heading {
-    > a {
-        color: inherit;
-        font-size: inherit;
-    }
-}

@@ -16,8 +16,7 @@ function sek_get_module_params_for_czr_heading_module() {
         'name' => __('Heading', 'text_doma'),
         'starting_value' => array(
             'main_settings' => array(
-                'heading_text' => 'This is a heading.',
-                'h_alignment_css' => array( 'desktop' => 'center')
+                'heading_text' => 'This is a heading.'
             )
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-heading' ),
@@ -66,7 +65,7 @@ function sek_get_module_params_for_czr_heading_child() {
                 'h_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
                     'title'       => __('Alignment', 'text_doma'),
-                    'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
+                    'default'     => array( 'desktop' => 'center'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'h_alignment',
@@ -128,7 +127,7 @@ function sek_get_module_params_for_czr_heading_spacing_child() {
                 'spacing_css'     => array(
                     'input_type'  => 'spacingWithDeviceSwitcher',
                     'title'       => __( 'Margin and padding', 'text_doma' ),
-                    'default'     => array( 'desktop' => array() ),
+                    'default'     => array('desktop' => array('margin-bottom' => '0.6', 'margin-top' => '0.6', 'unit' => 'em')),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'refresh_markup'     => false,
