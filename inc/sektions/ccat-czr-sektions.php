@@ -59,7 +59,7 @@ function sek_enqueue_controls_js_css() {
 
                 'userSavedSektions' => get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS),
 
-                'registeredModules' => CZR_Fmk_Base() -> registered_modules,
+                'registeredModules' => CZR_Fmk_Base()->registered_modules,
                 'preDropElementClass' => 'sortable-placeholder',
                 'dropSelectors' => implode(',', [
                     '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
@@ -438,9 +438,10 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
 
-            'Select an icon'     => __( 'Select an icon', 'text_doma' ),
-            'codeEditorSingular'   => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_doma' ),
-            'codeEditorPlural'     => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_doma' ),
+            'Select an icon' => __( 'Select an icon', 'text_doma' ),
+            'codeEditorSingular' => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_doma' ),
+            'codeEditorPlural' => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_doma' ),
+            'Cat #' => __( 'Cat #', 'text_doma' ),
             'Settings on desktops' => __('Settings on desktops', 'text_doma'),
             'Settings on tablets' => __('Settings on tablets', 'text_doma'),
             'Settings on mobiles' => __('Settings on mobiles', 'text_doma'),
@@ -2798,6 +2799,7 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id, $input_data );
         break;
         case 'range_simple' :
+        case 'range_simple_device_switcher' :
             sek_set_input_tmpl___range_simple( $input_id, $input_data );
         break;
         case 'borders' :
@@ -2823,6 +2825,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         break;
         case 'import_export' :
             sek_set_input_tmpl___imp_exp( $input_id, $input_data );
+        break;
+        case 'grid_layout' :
+            sek_set_input_tmpl___grid_layout( $input_id, $input_data );
         break;
     }
 }
@@ -3213,9 +3218,9 @@ function sek_set_input_tmpl___h_alignment( $input_id, $input_data ) {
         <div class="sek-h-align-wrapper">
           <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
           <div class="sek-align-icons">
-            <div data-sek-align="left" title="<?php _e('Align left','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_left</i></div>
-            <div data-sek-align="center" title="<?php _e('Align center','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_center</i></div>
-            <div data-sek-align="right" title="<?php _e('Align right','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_right</i></div>
+            <div data-sek-align="left" title="<?php _e('Align left','text_doma'); ?>"><i class="material-icons">format_align_left</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center','text_doma'); ?>"><i class="material-icons">format_align_center</i></div>
+            <div data-sek-align="right" title="<?php _e('Align right','text_doma'); ?>"><i class="material-icons">format_align_right</i></div>
           </div>
         </div><?php // sek-h-align-wrapper ?>
     <?php
@@ -3226,10 +3231,10 @@ function sek_set_input_tmpl___h_text_alignment( $input_id, $input_data ) {
         <div class="sek-h-align-wrapper">
           <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
           <div class="sek-align-icons">
-            <div data-sek-align="left" title="<?php _e('Align left','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_left</i></div>
-            <div data-sek-align="center" title="<?php _e('Align center','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_center</i></div>
-            <div data-sek-align="right" title="<?php _e('Align right','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_right</i></div>
-            <div data-sek-align="justify" title="<?php _e('Justified','text_domain_to_be_translated'); ?>"><i class="material-icons">format_align_justify</i></div>
+            <div data-sek-align="left" title="<?php _e('Align left','text_doma'); ?>"><i class="material-icons">format_align_left</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center','text_doma'); ?>"><i class="material-icons">format_align_center</i></div>
+            <div data-sek-align="right" title="<?php _e('Align right','text_doma'); ?>"><i class="material-icons">format_align_right</i></div>
+            <div data-sek-align="justify" title="<?php _e('Justified','text_doma'); ?>"><i class="material-icons">format_align_justify</i></div>
           </div>
         </div><?php // sek-h-align-wrapper ?>
     <?php
@@ -3243,9 +3248,9 @@ function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
         <div class="sek-v-align-wrapper">
           <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
           <div class="sek-align-icons">
-            <div data-sek-align="top" title="<?php _e('Align top','text_domain_to_be_translated'); ?>"><i class="material-icons">vertical_align_top</i></div>
-            <div data-sek-align="center" title="<?php _e('Align center','text_domain_to_be_translated'); ?>"><i class="material-icons">vertical_align_center</i></div>
-            <div data-sek-align="bottom" title="<?php _e('Align bottom','text_domain_to_be_translated'); ?>"><i class="material-icons">vertical_align_bottom</i></div>
+            <div data-sek-align="top" title="<?php _e('Align top','text_doma'); ?>"><i class="material-icons">vertical_align_top</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center','text_doma'); ?>"><i class="material-icons">vertical_align_center</i></div>
+            <div data-sek-align="bottom" title="<?php _e('Align bottom','text_doma'); ?>"><i class="material-icons">vertical_align_bottom</i></div>
           </div>
         </div><?php // sek-h-align-wrapper ?>
     <?php
@@ -3738,5 +3743,22 @@ function sek_set_input_tmpl___imp_exp( $input_id, $input_data ) {
       </div>
       <input data-czrtype="<?php echo $input_id; ?>" type="hidden" value="{{ data.value }}"/>
   <?php
+}
+?>
+<?php
+
+/* ------------------------------------------------------------------------- *
+ *  POST GRID LAYOUT PICKER
+/* ------------------------------------------------------------------------- */
+function sek_set_input_tmpl___grid_layout( $input_id, $input_data ) {
+    ?>
+        <div class="sek-grid-layout-wrapper">
+          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
+          <div class="sek-grid-icons">
+            <div data-sek-grid-layout="list" title="<?php _e('List layout','text_doma'); ?>"><i class="material-icons">view_list</i></div>
+            <div data-sek-grid-layout="grid" title="<?php _e('Grid layout','text_doma'); ?>"><i class="material-icons">view_module</i></div>
+          </div>
+        </div><?php // sek-h-align-wrapper ?>
+    <?php
 }
 ?>

@@ -256,7 +256,7 @@ function sek_page_uses_nimble_header_footer() {
  *  REGISTERED MODULES => GET PROPERTY
 /* ------------------------------------------------------------------------- */
 function sek_get_registered_module_type_property( $module_type, $property = '' ) {
-    $registered_modules = CZR_Fmk_Base() -> registered_modules;
+    $registered_modules = CZR_Fmk_Base()->registered_modules;
     if ( ! array_key_exists( $module_type, $registered_modules ) ) {
         sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
         return;
@@ -383,7 +383,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
     if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
         $input_list = $cached_input_lists[ $module_type ];
     } else {
-        $registered_modules = CZR_Fmk_Base() -> registered_modules;
+        $registered_modules = CZR_Fmk_Base()->registered_modules;
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $input_list;
@@ -1227,11 +1227,16 @@ function sek_get_module_collection() {
         ),
         array(
           'content-type' => 'module',
+          'content-id' => 'czr_post_grid_module',
+          'title' => __( 'Post grid', 'text_doma' ),
+          'icon' => 'Nimble_posts-list_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
           'content-id' => 'czr_map_module',
           'title' => __( 'Map', 'text_doma' ),
           'icon' => 'Nimble_map_icon.svg'
         ),
-
         array(
           'content-type' => 'preset_section',
           'content-id' => 'two_columns',
@@ -2561,93 +2566,30 @@ function sek_extract_numeric_value( $value ) {
 
 
 ?><?php
-add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
-function sek_register_modules() {
-    $modules = [
-        'sek_content_type_switcher_module',
-        'sek_module_picker_module',
-
-        'sek_intro_sec_picker_module',
-        'sek_features_sec_picker_module',
-        'sek_contact_sec_picker_module',
-        'sek_column_layouts_sec_picker_module',
-
-        'sek_my_sections_sec_picker_module',
-        'sek_level_bg_module',
-        'sek_level_border_module',
-        'sek_level_height_module',
-        'sek_level_spacing_module',
-        'sek_level_width_module',
-        'sek_level_width_section',
-        'sek_level_anchor_module',
-        'sek_level_visibility_module',
-        'sek_level_breakpoint_module',
-        'sek_local_template',
-        'sek_local_widths',
-        'sek_local_custom_css',
-        'sek_local_reset',
-        'sek_local_performances',
-        'sek_local_header_footer',
-        'sek_local_revisions',
-        'sek_local_imp_exp',
-        'sek_global_breakpoint',
-        'sek_global_widths',
-        'sek_global_performances',
-        'sek_global_header_footer',
-        'sek_global_recaptcha',
-        'sek_global_revisions',
-        'sek_global_reset',
-        'sek_global_beta_features',
-        'czr_simple_html_module',
-
-        'czr_tiny_mce_editor_module',
-        'czr_tinymce_child',
-
-        'czr_image_module',
-        'czr_image_main_settings_child',
-        'czr_image_borders_corners_child',
-        'czr_heading_module',
-        'czr_heading_child',
-        'czr_heading_spacing_child',
-
-        'czr_spacer_module',
-        'czr_divider_module',
-
-        'czr_icon_module',
-        'czr_icon_settings_child',
-        'czr_icon_spacing_border_child',
-
-        'czr_map_module',
-
-        'czr_quote_module',
-        'czr_quote_quote_child',
-        'czr_quote_cite_child',
-        'czr_quote_design_child',
-
-        'czr_button_module',
-        'czr_btn_content_child',
-        'czr_btn_design_child',
-        'czr_simple_form_module',
-        'czr_simple_form_fields_child',
-        'czr_simple_form_button_child',
-        'czr_simple_form_design_child',
-        'czr_simple_form_fonts_child',
-        'czr_simple_form_submission_child',
-        'czr_font_child'
-    ];
-    if ( sek_is_header_footer_enabled() ) {
-        $modules = array_merge( $modules, [
-            'sek_header_sec_picker_module',
-            'sek_footer_sec_picker_module',
-            'czr_menu_module',
-            'czr_menu_content_child',
-            'czr_menu_mobile_options',
-
-            'czr_widget_area_module'
-        ]);
+add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 );
+function sek_schedule_module_registration() {
+    if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
+        sek_register_modules();
+    } else {
+        add_action( 'wp', '\Nimble\sek_register_modules', PHP_INT_MAX );
     }
+}
 
-    foreach( $modules as $module_name ) {
+
+
+function sek_register_modules() {
+    $modules = apply_filters( 'nimble_pre_module_registration', array(), current_filter() );
+    $module_candidates = array();
+    foreach ($modules as $key => $value) {
+      if ( is_array( $value ) ) {
+          $module_candidates = array_merge( $module_candidates, $value );
+      } else {
+          $module_candidates[] = $value;
+      }
+    }
+    $module_candidates = array_unique( $module_candidates );
+
+    foreach ( $module_candidates as $module_name ) {
         $fn = "Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
             $params = $fn();
@@ -2661,6 +2603,60 @@ function sek_register_modules() {
         }
     }
 }//sek_register_modules()
+
+
+add_filter( 'nimble_pre_module_registration', '\Nimble\sek_filter_modules_to_register', 10, 2 );
+function sek_filter_modules_to_register( $modules, $hook ) {
+    if ( 'wp' !== $hook ) {
+        $modules = array_merge(
+            $modules,
+            SEK_Front_Construct::$ui_picker_modules,
+            SEK_Front_Construct::$ui_level_modules,
+            SEK_Front_Construct::$ui_local_global_options_modules,
+            SEK_Front_Construct::$ui_front_modules
+        );
+        if ( sek_is_header_footer_enabled() ) {
+            $modules = array_merge( $modules, SEK_Front_Construct::$ui_front_beta_modules );
+        }
+    } else {
+        sek_populate_contextually_active_module_list();
+
+        $contextually_actives = array();
+        $front_modules = SEK_Front_Construct::$ui_front_modules;
+        foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
+            if ( array_key_exists( $module_name, $front_modules ) ) {
+                $contextually_actives[] = $front_modules[ $module_name ];
+            }
+        }
+
+        $modules = array_merge(
+            $modules,
+            $contextually_actives,
+            SEK_Front_Construct::$ui_level_modules,
+            SEK_Front_Construct::$ui_local_global_options_modules
+        );
+    }
+    return $modules;
+}
+function sek_populate_contextually_active_module_list( $recursive_data = null ) {
+    if ( is_null( $recursive_data ) ) {
+        $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+        $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+        $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+        $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+        $recursive_data = array_merge( $local_collection, $global_collection );
+    }
+    foreach ( $recursive_data as $key => $value ) {
+        if ( is_array( $value ) ) {
+            sek_populate_contextually_active_module_list( $value );
+        }
+        if ( is_string( $key ) && 'module_type' === $key ) {
+            $module_collection = Nimble_Manager()->contextually_active_modules;
+            $module_collection[] = $value;
+            Nimble_Manager()->contextually_active_modules = array_unique( $module_collection );
+        }
+    }
+}
 function sek_get_select_options_for_input_id( $input_id ) {
     $options = array();
     switch( $input_id ) {
@@ -3039,7 +3035,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'refresh_markup' => true
                 ),
                 'bg-repeat' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Repeat', 'text_doma'),
                     'default'     => 'no-repeat',
                     'choices'     => array(
@@ -3053,7 +3049,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     )
                 ),
                 'bg-scale' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Scale', 'text_doma'),
                     'default'     => 'cover',
                     'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
@@ -3221,7 +3217,7 @@ function sek_get_module_params_for_sek_level_border_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'border-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Border shape', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' )
@@ -3328,7 +3324,7 @@ function sek_get_module_params_for_sek_level_height_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'height-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Height : auto or custom', 'text_doma'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'height-type' )
@@ -3559,7 +3555,7 @@ function sek_get_module_params_for_sek_level_width_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'width-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Width : 100% or custom', 'text_doma'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'width-type' )
@@ -3949,7 +3945,7 @@ function sek_get_module_params_for_sek_local_template() {
         'tmpl' => array(
             'item-inputs' => array(
                 'local_template' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select a template', 'text_doma'),
                     'default'     => 'default',
                     'width-100'   => true,
@@ -4164,7 +4160,7 @@ function sek_get_module_params_for_sek_local_performances() {
         'tmpl' => array(
             'item-inputs' => array(
                 'local-img-smart-load' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select how you want to load the images in the sections of this page.', 'text_doma'),
                     'default'     => 'inherit',
                     'choices'     => array(
@@ -4192,7 +4188,7 @@ function sek_get_module_params_for_sek_local_header_footer() {
         'tmpl' => array(
             'item-inputs' => array(
                 'header-footer' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select a header and a footer for this page', 'text_doma'),
                     'default'     => 'inherit',
                     'choices'     => array(
@@ -4498,7 +4494,7 @@ function sek_get_module_params_for_sek_global_header_footer() {
         'tmpl' => array(
             'item-inputs' => array(
                 'header-footer' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select a site wide header and footer', 'text_doma'),
                     'default'     => 'inherit',
                     'choices'     => array(
@@ -4790,14 +4786,14 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'default'     => ''
                 ),
                 'img-size' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select the image size', 'text_doma'),
                     'default'     => 'large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' ),
                     'notice_before' => __('Select a size for this image among those generated by WordPress.', 'text_doma' )
                 ),
                 'link-to' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Schedule an action on click or tap', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => array(
@@ -4877,7 +4873,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'default'     => 0,
                 ),
                 'img_hover_effect' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Mouse over effect', 'text_doma'),
                     'default'     => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'img_hover_effect' )
@@ -4905,7 +4901,7 @@ function sek_get_module_params_for_czr_image_borders_corners_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'border-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Border', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
@@ -5038,7 +5034,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
         'tmpl' => array(
             'pre-item' => array(
                 'img-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Display an image', 'text_doma'),
                     'default'     => 'featured',
                     'choices'     => sek_get_select_options_for_input_id( 'img-type' )
@@ -5051,7 +5047,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'default'     => ''
                 ),
                 'img-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Display an image', 'text_doma'),
                     'default'     => 'featured',
                     'choices'     => sek_get_select_options_for_input_id( 'img-type' )
@@ -5062,13 +5058,13 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'default'     => ''
                 ),
                 'img-size' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select the image size', 'text_doma'),
                     'default'     => 'large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
                 'content-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Display a text', 'text_doma'),
                     'default'     => 'page-excerpt',
                     'choices'     => sek_get_select_options_for_input_id( 'content-type' )
@@ -5150,7 +5146,7 @@ function sek_get_module_params_for_czr_heading_child() {
 
                 ),
                 'heading_tag' => array(
-                    'input_type'         => 'select',
+                    'input_type'         => 'simpleselect',
                     'title'              => __( 'Heading tag', 'text_doma' ),
                     'default'            => 'h1',
                     'choices'            => sek_get_select_options_for_input_id( 'heading_tag' )
@@ -5303,7 +5299,7 @@ function sek_get_module_params_for_czr_divider_module() {
                     'css_identifier' => 'border_top_width'
                 ),
                 'border_top_style_css' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Style', 'text_doma'),
                     'default' => 'solid',
                     'refresh_markup' => false,
@@ -5424,7 +5420,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                     'title'       => __('Select an Icon', 'text_doma'),
                 ),
                 'link-to' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Link to', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_select_options_for_input_id( 'link-to' )
@@ -5539,7 +5535,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'css_identifier' => 'background_color',
                 ),
                 'border-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Border', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
@@ -5822,7 +5818,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'css_selectors' => $quote_font_selectors,
                 ),//"#000000",
                 'quote_font_weight_css'     => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Font weight', 'text_doma' ),
                     'default'     => 400,
                     'refresh_markup' => false,
@@ -5832,7 +5828,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                 ),//null,
                 'quote_font_style_css'      => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Font style', 'text_doma' ),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
@@ -5842,7 +5838,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                 ),//null,
                 'quote_text_decoration_css' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Text decoration', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -5852,7 +5848,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                 ),//null,
                 'quote_text_transform_css'  => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Text transform', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -5985,7 +5981,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'css_selectors' => $cite_font_selectors,
                 ),//"#000000",
                 'cite_font_weight_css'     => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Font weight', 'text_doma' ),
                     'default'     => 'normal',
                     'refresh_markup' => false,
@@ -5995,7 +5991,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                 ),//null,
                 'cite_font_style_css'      => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Font style', 'text_doma' ),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
@@ -6005,7 +6001,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
                 ),//null,
                 'cite_text_decoration_css' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Text decoration', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -6015,7 +6011,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                 ),//null,
                 'cite_text_transform_css'  => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Text transform', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -6084,7 +6080,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'quote_design' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Design', 'text_doma' ),
                     'default'     => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'quote_design' )
@@ -6234,7 +6230,7 @@ function sek_get_module_params_for_czr_btn_content_child() {
                     'notice_after'       => __( 'Not previewable when customizing.', 'text_doma')
                 ),
                 'link-to' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Link to', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_select_options_for_input_id( 'link-to' )
@@ -6313,7 +6309,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                     'notice_after' => __( 'You can also customize the text color on mouseover in the group of text settings below.', 'text_doma')
                 ),
                 'border-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Border', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
@@ -6643,7 +6639,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                     'css_selectors'=> $css_selectors
                 ),
                 'border-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Fields border shape', 'text_doma'),
                     'default' => 'solid',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
@@ -6736,7 +6732,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                     'css_selectors'=> $css_selectors
                 ),
                 'border-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Border', 'text_doma'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
@@ -6904,7 +6900,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'css_selectors' => $fl_font_selectors,
                             ),//"#000000",
                             'fl_font_weight_css'     => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font weight', 'text_doma' ),
                                 'default'     => 400,
                                 'refresh_markup' => false,
@@ -6914,7 +6910,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'fl_font_style_css'      => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font style', 'text_doma' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
@@ -6924,7 +6920,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'fl_text_decoration_css' => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text decoration', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -6934,7 +6930,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'fl_text_transform_css'  => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text transform', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -7039,7 +7035,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'css_selectors' => $ft_font_selectors,
                             ),//"#000000",
                             'ft_font_weight_css'     => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font weight', 'text_doma' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
@@ -7049,7 +7045,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'ft_font_style_css'      => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font style', 'text_doma' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
@@ -7059,7 +7055,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'ft_text_decoration_css' => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text decoration', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -7069,7 +7065,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'ft_text_transform_css'  => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text transform', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -7174,7 +7170,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'css_selectors' => $btn_font_selectors,
                             ),//"#000000",
                             'btn_font_weight_css'     => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font weight', 'text_doma' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
@@ -7184,7 +7180,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                             ),//null,
                             'btn_font_style_css'      => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font style', 'text_doma' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
@@ -7194,7 +7190,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
                             ),//null,
                             'btn_text_decoration_css' => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text decoration', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -7204,7 +7200,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                             ),//null,
                             'btn_text_transform_css'  => array(
-                                'input_type'  => 'select',
+                                'input_type'  => 'simpleselect',
                                 'title'       => __( 'Text transform', 'text_doma' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
@@ -7317,7 +7313,7 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'refresh_markup' => false
                 ),
                 'recaptcha_enabled' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => sprintf( '%s %s',
                         '<i class="material-icons">security</i>',
                         __('Spam protection with Google reCAPTCHA', 'text_doma')
@@ -7418,6 +7414,833 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
 ?>
 <?php
 /* ------------------------------------------------------------------------- *
+ *  POST GRID MODULE
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_post_grid_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_post_grid_module',
+        'name' => __('Post Grid', 'text_doma'),
+        'is_father' => true,
+        'children' => array(
+            'grid_main'   => 'czr_post_grid_main_child',
+            'grid_thumb'  => 'czr_post_grid_thumb_child',
+            'grid_metas'  => 'czr_post_grid_metas_child',
+            'grid_fonts'  => 'czr_post_grid_fonts_child',
+        ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/post_grid_module_tmpl.php"
+    );
+}
+
+
+/* ------------------------------------------------------------------------- *
+ *  CHILD MAIN GRID SETTINGS
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_post_grid_main_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_post_grid_main_child',
+        'name' => __( 'Main grid settings : layout, number of posts, columns,...', 'text_doma' ),
+        'css_selectors' => array( '.sek-module-inner' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'post_number'  => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __( 'Number of posts', 'text_doma' ),
+                    'default'     => 3,
+                    'min'         => 1,
+                    'max'         => 50,
+                    'step'        => 1,
+                    'width-100'   => true
+                ),//0,
+                'categories'  => array(
+                    'input_type'  => 'category_picker',
+                    'title'       => __( 'Filter posts by category', 'text_doma' ),
+                    'default'     => array(),
+                    'choices'      => array(),
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'notice_before' => __('Use this control to filter posts by category. Multiple categories allowed.', 'text_doma')
+                ),//null,
+                'order_by'  => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __( 'Order posts by', 'text_doma' ),
+                    'default'     => 'date_desc',
+                    'choices'      => array(
+                        'date_desc' => __('Newest to oldest', 'text_doma'),
+                        'date_asc' => __('Oldest to newest', 'text_doma'),
+                        'title_asc' => __('A &rarr; Z', 'text_doma'),
+                        'title_desc' => __('Z &rarr; A', 'text_doma')
+                    )
+                ),//null,
+                'layout'  => array(
+                    'input_type'  => 'grid_layout',
+                    'title'       => __( 'Posts layout : list or grid', 'text_doma' ),
+                    'default'     => 'list',
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'html_before' => '<hr>'
+                ),//null,
+                'columns'  => array(
+                    'input_type'  => 'range_simple_device_switcher',
+                    'title'       => __( 'Number of columns', 'text_doma' ),
+                    'default'     => array( 'desktop' => '2', 'tablet' => '2', 'mobile' => '1' ),
+                    'min'         => 1,
+                    'max'         => 4,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                ),//null,
+                'img_column_width' => array(
+                    'input_type'  => 'range_simple_device_switcher',
+                    'title'       => __( 'Width of the image\'s column (in percent)', 'text_doma' ),
+                    'default'     => array( 'desktop' => '30' ),
+                    'min'         => 1,
+                    'max'         => 100,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),//null,
+                'has_tablet_breakpoint' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => '<i class="material-icons sek-input-title-icon">tablet_mac</i>' . __('Reorganize image and content vertically on tablet devices', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'has_mobile_breakpoint' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => '<i class="material-icons sek-input-title-icon">phone_iphone</i>' . __('Reorganize image and content vertically on smartphones devices', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+
+                'show_title' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display the post title', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'html_before' => '<hr>'
+                ),
+                'show_excerpt' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display the post excerpt', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'excerpt_length'  => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __( 'Excerpt length in words', 'text_doma' ),
+                    'default'     => 20,
+                    'min'         => 1,
+                    'max'         => 50,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                ),//0,
+
+                'pg_alignment_css' => array(
+                    'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
+                    'title'       => __('Alignment', 'text_doma'),
+                    'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'css_selectors' => array( '.sek-post-grid-wrapper .sek-pg-content' ),
+                    'html_before' => '<hr>'
+                ),
+
+                'apply_shadow' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Apply a shadow', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+
+                'custom_grid_spaces' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Define custom spaces between columns and rows', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_stylesheet' => true
+                ),
+                'column_gap'  => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __( 'Space between columns', 'text_doma' ),
+                    'min' => 1,
+                    'max' => 100,
+                    'default'     => array( 'desktop' => '20px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),//null,
+
+                'row_gap'  => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __( 'Space between rows', 'text_doma' ),
+                    'min' => 1,
+                    'max' => 100,
+                    'default'     => array( 'desktop' => '25px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                )//null,
+            )
+        ),
+        'render_tmpl_path' => '',
+    );
+}
+
+/* ------------------------------------------------------------------------- *
+ *  CHILD IMG SETTINGS
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_post_grid_thumb_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_post_grid_thumb_child',
+        'name' => __( 'Post thumbnail settings : size, design...', 'text_doma' ),
+        'css_selectors' => array( '.sek-module-inner' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'show_thumb' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display post thumbnail', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_stylesheet' => true,
+                    'notice_after' => __('This image can be set as "Featured image" when creating a post.', 'text_doma')
+                ),
+                'img_size' => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __('Select the source image size of the thumbnail', 'text_doma'),
+                    'title_width' => 'width-100',
+                    'default'     => 'medium',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-size' ),
+                    'notice_before' => __('This allows you to select a preferred image size among those generated by WordPress.', 'text_doma' ),
+                    'notice_after' => __('Note that Nimble Builder will let browsers choose the most appropriate size for better performances.', 'text_doma' )
+                ),
+                'img_has_custom_height' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Apply a custom height to the thumbnail', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_stylesheet' => true,
+                    'html_before' => '<hr>'
+                ),
+                'img_height' => array(
+                    'input_type'  => 'range_simple_device_switcher',
+                    'title'       => __( 'Thumbnail height', 'text_doma' ),
+                    'default'     =>  array( 'desktop' => '70' ),
+                    'min'         => 1,
+                    'max'         => 300,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'notice_before' => __('Tip : the height is in percent of the image container\'s width. Applying a height of 100% makes the image square.')
+                ),//null,
+                'border_radius_css'       => array(
+                    'input_type'  => 'border_radius',
+                    'title'       => __( 'Rounded corners', 'text_doma' ),
+                    'default' => array( '_all_' => '0px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'min'         => 0,
+                    'max'         => 500,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'border_radius',
+                    'css_selectors'=> '.sek-pg-thumbnail'
+                ),
+                'use_post_thumb_placeholder' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Use a placeholder image when no post thumbnail is set', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                )
+            )
+        ),
+        'render_tmpl_path' => '',
+    );
+}
+
+
+/* ------------------------------------------------------------------------- *
+ *  CHILD POST METAS
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_post_grid_metas_child() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_post_grid_metas_child',
+        'name' => __( 'Post metas : author, date, category, tags,...', 'text_doma' ),
+        'css_selectors' => array( '.sek-module-inner' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'show_cats' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display categories', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'show_author' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display author', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'show_date' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display date', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'show_comments' => array(
+                    'input_type'  => 'gutencheck',
+                    'title'       => __('Display comment number', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+            )
+        ),
+        'render_tmpl_path' => '',
+    );
+}
+
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  FONTS
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_post_grid_fonts_child() {
+    $pt_font_selectors = array( '.sek-pg-title a' );
+    $pe_font_selectors = array( '.sek-excerpt' );
+    $cat_font_selectors = array( '.sek-pg-category a' );
+    $metas_font_selectors = array( '.sek-pg-metas span', '.sek-pg-metas a');
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_post_grid_fonts_child',
+        'name' => __( 'Grid text settings : fonts, colors, ...', 'text_doma' ),
+        'css_selectors' => array( '.sek-module-inner .sek-post-grid-wrapper' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'tabs' => array(
+                    array(
+                        'title' => __( 'Post titles', 'text_doma' ),
+                        'inputs' => array(
+                            'pt_font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $pt_font_selectors,
+                            ),
+                            'pt_font_size_css'       => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'default'     => array( 'desktop' => '28px' ),
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Font size', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $pt_font_selectors,
+                            ),//16,//"14px",
+                            'pt_line_height_css'     => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_doma' ),
+                                'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $pt_font_selectors,
+                            ),//24,//"20px",
+                            'pt_color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '#444',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $pt_font_selectors,
+                            ),//"#000000",
+                            'pt_color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover',
+                                'css_selectors' => $pt_font_selectors,
+                            ),//"#000000",
+                            'pt_font_weight_css'     => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'default'     => 400,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight',
+                                'css_selectors' => $pt_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
+                            ),//null,
+                            'pt_font_style_css'      => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font style', 'text_doma' ),
+                                'default'     => 'inherit',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style',
+                                'css_selectors' => $pt_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
+                            ),//null,
+                            'pt_text_transform_css'  => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'default'     => 'none',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform',
+                                'css_selectors' => $pt_font_selectors,
+                                'choices'    => sek_get_select_options_for_input_id( 'text_transform_css' )
+                            )
+                        )
+                    ),
+                    array(
+                        'title' => __( 'Excerpt', 'text_doma' ),
+                        'inputs' => array(
+                            'pe_font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $pe_font_selectors,
+                            ),
+                            'pe_font_size_css'       => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'default'     => array( 'desktop' => '16px' ),
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Font size', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $pe_font_selectors,
+                            ),//16,//"14px",
+                            'pe_line_height_css'     => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_doma' ),
+                                'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $pe_font_selectors,
+                            ),//24,//"20px",
+                            'pe_color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '#494949',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $pe_font_selectors,
+                            ),//"#000000",
+                            'pe_color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover',
+                                'css_selectors' => $pe_font_selectors,
+                            ),//"#000000",
+                            'pe_font_weight_css'     => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'default'     => 'normal',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight',
+                                'css_selectors' => $pe_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
+                            ),//null,
+                            'pe_font_style_css'      => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font style', 'text_doma' ),
+                                'default'     => 'inherit',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style',
+                                'css_selectors' => $pe_font_selectors,
+                                'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
+                            ),
+                            'pe_text_transform_css'  => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'default'     => 'none',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform',
+                                'css_selectors' => $pe_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
+                            )
+                        ),//inputs
+                    ),//tab
+                    array(
+                        'title' => __( 'Categories', 'text_doma' ),
+                        'inputs' => array(
+                            'cat_font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $cat_font_selectors,
+                            ),
+                            'cat_font_size_css'       => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'default'     => array( 'desktop' => '14px' ),
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Font size', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $cat_font_selectors,
+                            ),//16,//"14px",
+                            'cat_line_height_css'     => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_doma' ),
+                                'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $cat_font_selectors,
+                            ),//24,//"20px",
+                            'cat_color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '#767676',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $cat_font_selectors,
+                            ),//"#000000",
+                            'cat_color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover',
+                                'css_selectors' => $cat_font_selectors,
+                            ),//"#000000",
+                            'cat_font_weight_css'     => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'default'     => 'normal',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight',
+                                'css_selectors' => $cat_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
+                            ),//null,
+                            'cat_font_style_css'      => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font style', 'text_doma' ),
+                                'default'     => 'inherit',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style',
+                                'css_selectors' => $cat_font_selectors,
+                                'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
+                            ),
+                            'cat_text_transform_css'  => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'default'     => 'uppercase',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform',
+                                'css_selectors' => $cat_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
+                            )
+                        ),//inputs
+                    ),//tab
+                    array(
+                        'title' => __( 'Metas', 'text_doma' ),
+                        'inputs' => array(
+                            'met_font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $metas_font_selectors,
+                            ),
+                            'met_font_size_css'       => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'default'     => array( 'desktop' => '14px' ),
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Font size', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $metas_font_selectors,
+                            ),//16,//"14px",
+                            'met_line_height_css'     => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_doma' ),
+                                'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $metas_font_selectors,
+                            ),//24,//"20px",
+                            'met_color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '#767676',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $metas_font_selectors,
+                            ),//"#000000",
+                            'met_color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover',
+                                'css_selectors' => $metas_font_selectors,
+                            ),//"#000000",
+                            'met_font_weight_css'     => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'default'     => 'normal',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight',
+                                'css_selectors' => $metas_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
+                            ),//null,
+                            'met_font_style_css'      => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font style', 'text_doma' ),
+                                'default'     => 'inherit',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style',
+                                'css_selectors' => $metas_font_selectors,
+                                'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
+                            ),
+                            'met_text_transform_css'  => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'default'     => 'uppercase',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform',
+                                'css_selectors' => $metas_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
+                            )
+                        ),//inputs
+                    )//tab
+                )//tabs
+            )//item-inputs
+        ),//tmpl
+        'render_tmpl_path' => '',
+    );
+}
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SCHEDULE CSS RULES FILTERING
+/* ------------------------------------------------------------------------- */
+add_filter( 'sek_add_css_rules_for_module_type___czr_post_grid_module', '\Nimble\sek_add_css_rules_for_czr_post_grid_module', 10, 2 );
+function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_model ) {
+    if ( empty( $complete_modul_model['value'] ) )
+      return $rules;
+    $value = $complete_modul_model['value'];
+
+    $main_settings = $value['grid_main'];
+    $thumb_settings = $value['grid_thumb'];
+    if ( 'list' === $main_settings['layout'] && true === sek_booleanize_checkbox_val( $thumb_settings['show_thumb'] ) ) {
+        $img_column_width = $main_settings['img_column_width'];
+        $img_column_width = is_array( $img_column_width ) ? $img_column_width : array();
+        $img_column_width = wp_parse_args( $img_column_width, array(
+            'desktop' => '30%',
+            'tablet' => '',
+            'mobile' => ''
+        ));
+
+
+
+        $img_column_width_ready_value = $img_column_width;
+        foreach ($img_column_width as $device => $num_val ) {
+            $num_val = sek_extract_numeric_value( $num_val );
+            if ( ! empty( $num_val ) ) {
+                $num_val = $num_val > 100 ? 100 : $num_val;
+                $num_val = $num_val < 1 ? 1 : $num_val;
+                $img_column_width_ready_value[$device] = sprintf('%s 1fr;', $num_val . '%');
+            }
+        }
+
+        $rules = sek_set_mq_css_rules(array(
+            'value' => $img_column_width_ready_value,
+            'css_property' => 'grid-template-columns',
+            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb',
+            'is_important' => false
+        ), $rules );
+    }
+    if ( true === sek_booleanize_checkbox_val( $thumb_settings['img_has_custom_height'] ) ) {
+        $img_height = $thumb_settings['img_height'];
+        $img_height = is_array( $img_height ) ? $img_height : array();
+        $img_height = wp_parse_args( $img_height, array(
+            'desktop' => '50%',
+            'tablet' => '',
+            'mobile' => ''
+        ));
+
+        $img_height_ready_value = $img_height;
+        foreach ($img_height as $device => $num_val ) {
+            $num_val = sek_extract_numeric_value( $num_val );
+            if ( ! empty( $num_val ) ) {
+                $num_val = $num_val < 1 ? 1 : $num_val;
+                $img_height_ready_value[$device] = sprintf('%s;', $num_val .'%');
+            }
+        }
+        $rules = sek_set_mq_css_rules(array(
+            'value' => $img_height_ready_value,
+            'css_property' => 'padding-top',
+            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-thumb-custom-height figure a',
+            'is_important' => false
+        ), $rules );
+    }
+    if ( true === sek_booleanize_checkbox_val( $main_settings['custom_grid_spaces'] ) ) {
+          $gap = $main_settings['column_gap'];
+          $gap = is_array( $gap ) ? $gap : array();
+          $gap = wp_parse_args( $gap, array(
+              'desktop' => '20px',
+              'tablet' => '',
+              'mobile' => ''
+          ));
+          $gap_ready_value = $gap;
+          foreach ($gap as $device => $num_unit ) {
+              $numeric = sek_extract_numeric_value( $num_unit );
+              if ( ! empty( $numeric ) ) {
+                  $unit = sek_extract_unit( $num_unit );
+                  $gap_ready_value[$device] = $numeric . $unit;
+              }
+          }
+          $rules = sek_set_mq_css_rules(array(
+              'value' => $gap_ready_value,
+              'css_property' => 'grid-column-gap',
+              'selector' => implode( ',', [
+                  '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-layout',
+                  '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb'
+              ] ),
+              'is_important' => false
+          ), $rules );
+          $v_gap = $main_settings['row_gap'];
+          $v_gap = is_array( $v_gap ) ? $v_gap : array();
+          $v_gap = wp_parse_args( $v_gap, array(
+              'desktop' => '25px',
+              'tablet' => '',
+              'mobile' => ''
+          ));
+          $v_gap_ready_value = $v_gap;
+          foreach ($v_gap as $device => $num_unit ) {
+              $numeric = sek_extract_numeric_value( $num_unit );
+              if ( ! empty( $numeric ) ) {
+                  $unit = sek_extract_unit( $num_unit );
+                  $v_gap_ready_value[$device] = $numeric . $unit;
+              }
+          }
+
+          $rules = sek_set_mq_css_rules(array(
+              'value' => $v_gap_ready_value,
+              'css_property' => 'grid-row-gap',
+              'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items',
+              'is_important' => false
+          ), $rules );
+    }
+
+    return $rules;
+}
+?><?php
+/* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER BUTTON MODULE
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_menu_module() {
@@ -7453,7 +8276,7 @@ function sek_get_module_params_for_czr_menu_content_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'menu-id' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select a menu', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_user_created_menus(),
@@ -7566,7 +8389,7 @@ function sek_get_module_params_for_czr_font_child() {
                     'css_identifier' => 'color_hover'
                 ),//"#000000",
                 'font_weight_css'     => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Font weight', 'text_doma'),
                     'default'     => 400,
                     'refresh_markup' => false,
@@ -7575,7 +8398,7 @@ function sek_get_module_params_for_czr_font_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                 ),//null,
                 'font_style_css'      => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Font style', 'text_doma'),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
@@ -7584,7 +8407,7 @@ function sek_get_module_params_for_czr_font_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                 ),//null,
                 'text_decoration_css' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Text decoration', 'text_doma'),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -7593,7 +8416,7 @@ function sek_get_module_params_for_czr_font_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                 ),//null,
                 'text_transform_css'  => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Text transform', 'text_doma'),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -7651,7 +8474,7 @@ function sek_get_module_params_for_czr_widget_area_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'widget-area-id' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select a widget area', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => array(),
@@ -9193,7 +10016,128 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'import_export' => 'sek_local_imp_exp',
             'local_revisions' => 'sek_local_revisions'
         ];
-        public $img_import_errors = array();
+        public $img_import_errors = [];
+        public $contextually_active_modules = [];
+
+        public static $ui_picker_modules = [
+          'sek_content_type_switcher_module',
+          'sek_module_picker_module',
+
+          'sek_intro_sec_picker_module',
+          'sek_features_sec_picker_module',
+          'sek_contact_sec_picker_module',
+          'sek_column_layouts_sec_picker_module',
+          'sek_my_sections_sec_picker_module'
+        ];
+
+        public static $ui_level_modules = [
+          'sek_level_bg_module',
+          'sek_level_border_module',
+          'sek_level_height_module',
+          'sek_level_spacing_module',
+          'sek_level_width_module',
+          'sek_level_width_section',
+          'sek_level_anchor_module',
+          'sek_level_visibility_module',
+          'sek_level_breakpoint_module'
+        ];
+
+        public static $ui_local_global_options_modules = [
+          'sek_local_template',
+          'sek_local_widths',
+          'sek_local_custom_css',
+          'sek_local_reset',
+          'sek_local_performances',
+          'sek_local_header_footer',
+          'sek_local_revisions',
+          'sek_local_imp_exp',
+          'sek_global_breakpoint',
+          'sek_global_widths',
+          'sek_global_performances',
+          'sek_global_header_footer',
+          'sek_global_recaptcha',
+          'sek_global_revisions',
+          'sek_global_reset',
+          'sek_global_beta_features'
+        ];
+
+        public static $ui_front_modules = [
+          'czr_simple_html_module',
+
+          'czr_tiny_mce_editor_module' => array(
+            'czr_tiny_mce_editor_module',
+            'czr_tinymce_child',
+            'czr_font_child'
+          ),
+
+          'czr_image_module' => array(
+            'czr_image_module',
+            'czr_image_main_settings_child',
+            'czr_image_borders_corners_child'
+          ),
+          'czr_heading_module'  => array(
+            'czr_heading_module',
+            'czr_heading_child',
+            'czr_heading_spacing_child',
+            'czr_font_child'
+          ),
+
+          'czr_spacer_module',
+          'czr_divider_module',
+
+          'czr_icon_module' => array(
+            'czr_icon_module',
+            'czr_icon_settings_child',
+            'czr_icon_spacing_border_child',
+          ),
+
+
+          'czr_map_module',
+
+          'czr_quote_module' => array(
+            'czr_quote_module',
+            'czr_quote_quote_child',
+            'czr_quote_cite_child',
+            'czr_quote_design_child',
+          ),
+
+          'czr_button_module' => array(
+            'czr_button_module',
+            'czr_btn_content_child',
+            'czr_btn_design_child',
+            'czr_font_child'
+          ),
+          'czr_simple_form_module' => array(
+            'czr_simple_form_module',
+            'czr_simple_form_fields_child',
+            'czr_simple_form_button_child',
+            'czr_simple_form_design_child',
+            'czr_simple_form_fonts_child',
+            'czr_simple_form_submission_child'
+          ),
+
+          'czr_post_grid_module' => array(
+            'czr_post_grid_module',
+            'czr_post_grid_main_child',
+            'czr_post_grid_thumb_child',
+            'czr_post_grid_metas_child',
+            'czr_post_grid_fonts_child'
+          )
+        ];
+
+        public static $ui_front_beta_modules = [
+          'sek_header_sec_picker_module',
+          'sek_footer_sec_picker_module',
+          'czr_menu_module' => array(
+            'czr_menu_module',
+            'czr_menu_content_child',
+            'czr_menu_mobile_options',
+            'czr_font_child'
+          ),
+
+
+          'czr_widget_area_module'
+        ];
         function __construct( $params = array() ) {
             $this->registered_locations = $this->default_locations;
             $this -> _schedule_front_ajax_actions();
@@ -9238,6 +10182,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             add_action( 'wp_ajax_sek_get_preset_sections', array( $this, 'sek_get_preset_sektions' ) );
             add_action( 'wp_ajax_sek_get_revision_history', array( $this, 'sek_get_revision_history' ) );
             add_action( 'wp_ajax_sek_get_single_revision', array( $this, 'sek_get_single_revision' ) );
+            add_action( 'wp_ajax_sek_get_post_categories', array( $this, 'sek_get_post_categories' ) );
             $this -> ajax_action_map = array(
                   'sek-add-section',
                   'sek-remove-section',
@@ -9260,6 +10205,32 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                   'sek-refresh-level'
             );
         }
+        function sek_do_ajax_pre_checks( $params = array() ) {
+            $params = wp_parse_args( $params, array( 'check_nonce' => true ) );
+            if ( $params['check_nonce'] ) {
+                $action = 'save-customize_' . get_stylesheet();
+                if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+                     wp_send_json_error( array(
+                        'code' => 'invalid_nonce',
+                        'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' => check_ajax_referer() failed.' ),
+                    ) );
+                }
+            }
+
+            if ( ! is_user_logged_in() ) {
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
+            }
+            if ( ! current_user_can( 'edit_theme_options' ) ) {
+              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
+            }
+            if ( ! current_user_can( 'customize' ) ) {
+                status_header( 403 );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
+            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+                status_header( 405 );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
+            }
+        }//sek_do_ajax_pre_checks()
         function _schedule_img_import_ajax_actions() {
             add_action( 'wp_ajax_sek_import_attachment', array( $this, 'sek_ajax_import_attachment' ) );
         }
@@ -9268,26 +10239,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             add_action( 'wp_ajax_sek_get_user_saved_sections', array( $this, 'sek_sek_get_user_saved_sections' ) );
         }
         function sek_get_preset_sektions() {
-            $action = 'save-customize_' . get_stylesheet();
-            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-                 wp_send_json_error( array(
-                    'code' => 'invalid_nonce',
-                    'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' => check_ajax_referer() failed.' ),
-                ) );
-            }
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks();
             $preset_sections = sek_get_preset_sektions();
             if ( empty( $preset_sections ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sektions()' );
@@ -9295,19 +10247,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             wp_send_json_success( $preset_sections );
         }
         function sek_get_level_content_for_injection( $params ) {
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
 
             if ( ! isset( $_POST['location_skope_id'] ) || empty( $_POST['location_skope_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
@@ -9476,19 +10416,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             }
         }
         function sek_ajax_import_attachment() {
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
+
             if ( !isset( $_POST['rel_path'] ) || !is_string($_POST['rel_path']) ) {
                 wp_send_json_error( 'missing_or_invalid_rel_path_when_importing_image');
             }
@@ -9504,26 +10433,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             }
         }
         function sek_ajax_save_section() {
-            $action = 'save-customize_' . get_stylesheet();
-            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-                 wp_send_json_error( array(
-                    'code' => 'invalid_nonce',
-                    'message' => __( 'sek_ajax_save_section => check_ajax_referer() failed.' ),
-                ) );
-            }
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
             if ( empty( $_POST['sek_title']) ) {
                 wp_send_json_error( __FUNCTION__ . ' => missing title' );
             }
@@ -9554,26 +10464,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             }
         }
         function sek_sek_get_user_saved_sections() {
-            $action = 'save-customize_' . get_stylesheet();
-            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-                 wp_send_json_error( array(
-                    'code' => 'invalid_nonce',
-                    'message' => __( 'sek_ajax_save_section => check_ajax_referer() failed.' ),
-                ) );
-            }
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
             if ( empty( $_POST['preset_section_id']) || ! is_string( $_POST['preset_section_id'] ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => missing or invalid preset_section_id' );
             }
@@ -9592,26 +10483,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             }
         }
         function sek_get_revision_history() {
-            $action = 'save-customize_' . get_stylesheet();
-            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-                 wp_send_json_error( array(
-                    'code' => 'invalid_nonce',
-                    'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' check_ajax_referer() failed.' ),
-                ) );
-            }
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
             if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
@@ -9622,32 +10494,26 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
 
         function sek_get_single_revision() {
-            $action = 'save-customize_' . get_stylesheet();
-            if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-                 wp_send_json_error( array(
-                    'code' => 'invalid_nonce',
-                    'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' check_ajax_referer() failed.' ),
-                ) );
-            }
-            if ( ! is_user_logged_in() ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-            }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
-            if ( ! current_user_can( 'customize' ) ) {
-                status_header( 403 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-                status_header( 405 );
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-            }
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
             if ( ! isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing revision_post_id' );
             }
             $revision = sek_get_single_post_revision( $_POST['revision_post_id'] );
             wp_send_json_success( $revision );
+        }
+        function sek_get_post_categories() {
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+            $raw_cats = get_categories();
+            $raw_cats = is_array( $raw_cats ) ? $raw_cats : array();
+            $cat_collection = array();
+            foreach( $raw_cats as $cat ) {
+                $cat_collection[] = array(
+                    'id' => $cat->term_id,
+                    'name' => sprintf( '%s (%s %s)', $cat->cat_name, $cat->count, __('posts', 'text_doma') )
+                );
+            }
+            wp_send_json_success( $cat_collection );
         }
         /*function sek_get_ui_content_for_injection( $params ) {
             if ( ! is_user_logged_in() ) {
@@ -9837,7 +10703,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
 
-                    'registeredModules' => CZR_Fmk_Base() -> registered_modules,
+                    'registeredModules' => CZR_Fmk_Base()->registered_modules,
                 )
             );
 
@@ -10653,7 +11519,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
 
             $img_extensions_pattern = sprintf( "(?:%s)", implode( '|', $allowed_image_extensions ) );
-            $pattern                = '#<img([^>]+?)src=[\'"]?([^\'"\s>]+\.'.$img_extensions_pattern.'[^\'"\s>]*)[\'"]?([^>]*)>#i';
+            $pattern = '#<img([^>]+?)src=[\'"]?([^\'"\s>]+\.'.$img_extensions_pattern.'[^\'"\s>]*)[\'"]?([^>]*)>#i';
 
             return preg_replace_callback( $pattern, '\Nimble\nimble_regex_callback', $html);
         }
