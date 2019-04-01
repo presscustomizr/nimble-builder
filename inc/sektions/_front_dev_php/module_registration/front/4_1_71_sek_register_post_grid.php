@@ -268,7 +268,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                 'img_height' => array(
                     'input_type'  => 'range_simple_device_switcher',
                     'title'       => __( 'Thumbnail height', 'text_doma' ),
-                    'default'     =>  array( 'desktop' => '70' ),
+                    'default'     =>  array( 'desktop' => '65' ),
                     'min'         => 1,
                     'max'         => 300,
                     'step'        => 1,
