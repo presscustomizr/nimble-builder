@@ -361,7 +361,7 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_post_grid_fonts_child() {
     $pt_font_selectors = array( '.sek-pg-title a' );
-    $pe_font_selectors = array( '.sek-excerpt' );
+    $pe_font_selectors = array( '.sek-post-grid-wrapper .sek-excerpt *' );
     $cat_font_selectors = array( '.sek-pg-category a' );
     $metas_font_selectors = array( '.sek-pg-metas span', '.sek-pg-metas a');
     return array(
