@@ -88,12 +88,21 @@ function sek_filter_modules_to_register( $modules, $hook ) {
         sek_populate_contextually_active_module_list();
 
         $contextually_actives = array();
-        $front_modules = SEK_Front_Construct::$ui_front_modules;
+        $front_modules = array_merge( SEK_Front_Construct::$ui_front_modules, SEK_Front_Construct::$ui_front_beta_modules );
+
         // we need to get all children when the module is a father.
         // This will be flatenized afterwards
         foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
+
+            // Parent module with children
             if ( array_key_exists( $module_name, $front_modules ) ) {
+                // get the list of childrent, includes the parent too.
+                // @see ::$ui_front_modules
                 $contextually_actives[] = $front_modules[ $module_name ];
+            }
+            // Simple module with no children
+            if ( in_array( $module_name, $front_modules ) ) {
+                $contextually_actives[] = $module_name;
             }
         }
 
