@@ -222,8 +222,8 @@
   }
   .sek-grid-layout.sek-all-col-4 {
     grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
-    grid-column-gap: 10px;
-    grid-row-gap: 10px;
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
   }
 }//.sek-post-grid-wrapper COLUMN LAYOUT
 
@@ -245,8 +245,8 @@
     }
     .sek-grid-layout.sek-desktop-col-4 {
       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
-      grid-column-gap: 10px;
-      grid-row-gap: 10px;
+      grid-column-gap: 15px;
+      grid-row-gap: 15px;
     }
   }
 }
@@ -268,8 +268,8 @@
     }
     .sek-grid-layout.sek-tablet-col-4 {
       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
-      grid-column-gap: 10px;
-      grid-row-gap: 10px;
+      grid-column-gap: 15px;
+      grid-row-gap: 15px;
     }
   }
 }
@@ -290,8 +290,8 @@
     }
     .sek-grid-layout.sek-mobile-col-4 {
       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
-      grid-column-gap: 10px;
-      grid-row-gap: 10px;
+      grid-column-gap: 15px;
+      grid-row-gap: 15px;
     }
   }
 }
@@ -315,11 +315,11 @@
         margin-bottom: .7rem;
       }
     }
-    .sek-grid-layout {
-      &[class*="sek-desktop-col-"] {
-        grid-template-columns: minmax(0,1fr);
-      }
-    }
+    // .sek-grid-layout {
+    //   &[class*="sek-desktop-col-"] {
+    //     grid-template-columns: minmax(0,1fr);
+    //   }
+    // }
   }
 }
 
@@ -332,10 +332,10 @@
         margin-bottom: .7rem;
       }
     }
-    .sek-grid-layout {
-      &[class*="sek-desktop-col-"] {
-        grid-template-columns: minmax(0,1fr);
-      }
-    }
+    // .sek-grid-layout {
+    //   &[class*="sek-desktop-col-"] {
+    //     grid-template-columns: minmax(0,1fr);
+    //   }
+    // }
   }
 }

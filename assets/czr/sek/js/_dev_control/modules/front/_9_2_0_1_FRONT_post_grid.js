@@ -46,13 +46,15 @@
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'layout' :
-                                            _.each( [ 'columns', 'img_column_width' ] , function( _inputId_ ) {
+                                            _.each( [ 'columns', 'img_column_width', 'has_tablet_breakpoint', 'has_mobile_breakpoint' ] , function( _inputId_ ) {
                                                   try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         var bool = false;
                                                         switch( _inputId_ ) {
                                                               case 'columns' :
                                                                     bool = 'grid' === input();
                                                               break;
+                                                              case 'has_tablet_breakpoint' :
+                                                              case 'has_mobile_breakpoint' :
                                                               case 'img_column_width' :
                                                                     bool = 'list' === input();
                                                               break;

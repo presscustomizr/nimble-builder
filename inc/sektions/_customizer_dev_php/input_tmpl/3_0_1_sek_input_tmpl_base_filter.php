@@ -87,6 +87,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         case 'import_export' :
             sek_set_input_tmpl___imp_exp( $input_id, $input_data );
         break;
+        case 'grid_layout' :
+            sek_set_input_tmpl___grid_layout( $input_id, $input_data );
+        break;
     }
 }
 ?>

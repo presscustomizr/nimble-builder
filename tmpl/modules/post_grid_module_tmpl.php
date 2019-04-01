@@ -65,7 +65,7 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
                   <span class="published updated"><?php echo get_the_date( get_option('date_format') ); ?></span>
                 <?php endif; ?>
                 <?php if ( $show_comments ) : ?>
-                  <span><?php comments_number( '0', '1', '%' ); ?> <?php _e('comments', 'text_doma'); ?></span>
+                  <span><?php comments_number( __('0 comments', 'text_doma'), __('1 comment', 'text_doma'), __('% comments', 'text_doma') ); ?></span>
                 <?php endif; ?>
               </aside><!--/.pg-meta-->
             <?php endif; ?>

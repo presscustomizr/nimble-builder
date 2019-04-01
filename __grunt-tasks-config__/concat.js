@@ -241,6 +241,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_6_imp_exp.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_7_selects_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_8_category_picker_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_9_grid_layout_input.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
@@ -463,6 +464,7 @@ module.exports = {
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_8_sek_input_tmpl_revision_history.php',
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_9_sek_input_tmpl_tinymce_editors.php',
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_2_0_sek_input_tmpl_imp_exp.php',
+        '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_2_1_sek_input_tmpl_grid_layout.php'
       ],
       dest: '<%= paths.sektions %>ccat-czr-sektions.php',
   },
