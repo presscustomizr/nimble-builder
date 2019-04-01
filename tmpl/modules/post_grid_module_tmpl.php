@@ -111,21 +111,27 @@ if ( !empty( $main_settings['order_by'] ) && is_string( $main_settings['order_by
     }
 }
 
-// Query featured entries
-$post_collection = new \WP_Query(
-  array(
-    'no_found_rows'          => false,
-    'update_post_meta_cache' => false,
-    'update_post_term_cache' => false,
-    'ignore_sticky_posts'    => 1,
-    'posts_per_page'         => $main_settings['post_number'],
-    'cat'                    => $categories_in,
-    'order'                  => $order,
-    'orderby'                => $orderby
-  )
-);
+$post_nb = (int)$main_settings['post_number'];
+$post_nb = $post_nb < 0 ? 0 : $post_nb;
+$post_collection = null;
 
-if ( $post_collection->have_posts() ) {
+if ( $post_nb > 0 ) {
+  // Query featured entries
+  $post_collection = new \WP_Query(
+    array(
+      'no_found_rows'          => false,
+      'update_post_meta_cache' => false,
+      'update_post_term_cache' => false,
+      'ignore_sticky_posts'    => 1,
+      'posts_per_page'         => $main_settings['post_number'],
+      'cat'                    => $categories_in,
+      'order'                  => $order,
+      'orderby'                => $orderby
+    )
+  );
+}
+
+if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
   $columns_by_device = $main_settings['columns'];
   $columns_by_device = is_array( $columns_by_device ) ? $columns_by_device : array();
   $columns_by_device = wp_parse_args( $columns_by_device, array(
@@ -193,4 +199,9 @@ if ( $post_collection->have_posts() ) {
 
   // REMOVE FILTER EXCERPT LENGTH
   remove_filter( 'excerpt_length', '\Nimble\sek_pg_set_excerpt_length', 999 );
+}//if ( $post_collection->have_posts() )
+else if ( skp_is_customizing() ) {
+  ?>
+  <div class="sek-module-placeholder sek-post-grid"><i class="material-icons">view_list</i></div>
+  <?php
 }

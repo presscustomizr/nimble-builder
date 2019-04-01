@@ -1340,6 +1340,15 @@ html.no-js [id*=sek-slider-loader-wrapper] {
   line-height: 1.5rem;
 }
 
+/* PLACEHOLDER FOR POST GRID */
+.sek-module-placeholder.sek-post-grid {
+  font-size: 150px;
+}
+
+
+
+
+
 /* STYLE LINKS */
 .nimble-unclickable{cursor: not-allowed !important;}
 .nimble-shift-clickable{cursor: alias!important;}
