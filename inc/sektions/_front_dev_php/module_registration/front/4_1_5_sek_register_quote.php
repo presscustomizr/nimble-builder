@@ -152,7 +152,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'css_selectors' => $quote_font_selectors,
                 ),//"#000000",
                 'quote_font_weight_css'     => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Font weight', 'text_doma' ),
                     'default'     => 400,
                     'refresh_markup' => false,
@@ -162,7 +162,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                 ),//null,
                 'quote_font_style_css'      => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Font style', 'text_doma' ),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
@@ -172,7 +172,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
                 ),//null,
                 'quote_text_decoration_css' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Text decoration', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -182,7 +182,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                 ),//null,
                 'quote_text_transform_css'  => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Text transform', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -322,7 +322,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'css_selectors' => $cite_font_selectors,
                 ),//"#000000",
                 'cite_font_weight_css'     => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Font weight', 'text_doma' ),
                     'default'     => 'normal',
                     'refresh_markup' => false,
@@ -332,7 +332,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
                 ),//null,
                 'cite_font_style_css'      => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Font style', 'text_doma' ),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
@@ -342,7 +342,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
                 ),//null,
                 'cite_text_decoration_css' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Text decoration', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -352,7 +352,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'choices'            => sek_get_select_options_for_input_id( 'text_decoration_css' )
                 ),//null,
                 'cite_text_transform_css'  => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Text transform', 'text_doma' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
@@ -427,7 +427,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'quote_design' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __( 'Design', 'text_doma' ),
                     'default'     => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'quote_design' )

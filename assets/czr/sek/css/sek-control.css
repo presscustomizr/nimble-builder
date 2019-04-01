@@ -95,6 +95,7 @@ li[id*="__nimble__"].customize-control span.customize-control-title:first-child 
 /* When sections are displayed in the module picker. Typically the columns sections */
 li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   width: 29%;
+  height: 130px;
 }
 
 [data-sek-content-type="preset_section"] {
@@ -102,6 +103,7 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   height: 165px;
   position: relative
 }
+
 [data-sek-content-type="preset_section"] .sek-overlay {
     display: block;
     position: absolute;
@@ -488,7 +490,6 @@ div[data-sek-align] {
     border-radius: 4px;
     cursor: pointer;
 }
-horizAlignmentWithDeviceSwitcher
 div[data-input-type="horizTextAlignmentWithDeviceSwitcher"] .czr-input {
   text-align: center;
 }
@@ -516,6 +517,51 @@ div[data-sek-align].selected {
             box-shadow: none;
     background: #555d66;
 }
+
+/* POST GRID LAYOUT PICKER */
+div[data-sek-grid-layout] {
+    margin: 0 5px;
+    padding: 1px 3px 1px 1px;
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-align: end;
+        -ms-flex-align: end;
+            align-items: flex-end;
+    position: relative;
+    text-align: center;
+    /*width: 25px;
+    height: 24px;*/
+    /*top: -4px;*/
+    border-radius: 4px;
+    cursor: pointer;
+}
+div[data-sek-grid-layout] i {
+  font-size: 50px;
+}
+div[data-input-type="grid_layout"] .czr-input {
+  text-align: center;
+}
+div[data-input-type="grid_layout"] .sek-grid-layout-wrapper {
+  display: inline-block;
+}
+.sek-grid-layout-wrapper .sek-grid-icons {
+  float: right
+}
+
+div[data-sek-grid-layout]:hover {
+    -webkit-box-shadow: inset 0 0 0 1px #555d66, inset 0 0 0 2px #fff;
+            box-shadow: inset 0 0 0 1px #555d66, inset 0 0 0 2px #fff;
+}
+div[data-sek-grid-layout].selected {
+    outline: none;
+    color: #fff;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+    /*background: #555d66;*/
+    background: #33b3db;
+}
+
 
 
 /* Nimble Logo */
@@ -630,6 +676,11 @@ div[data-sek-align].selected {
     text-transform: uppercase;
 }
 
+
+/* CATEGORY PICKER */
+.customize-control select[data-czrtype="categories"] {
+    height: 28px;
+}
 
 
 
@@ -915,6 +966,10 @@ credits : Gutenberg team @wordpress */
   text-align: center;
 }
 
+.sek-input-title-icon {
+  position: relative;
+  top: 6px;
+}
 
 
 

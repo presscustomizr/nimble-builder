@@ -60,6 +60,7 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
             sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id, $input_data );
         break;
         case 'range_simple' :
+        case 'range_simple_device_switcher' :
             sek_set_input_tmpl___range_simple( $input_id, $input_data );
         break;
         case 'borders' :
@@ -85,6 +86,9 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
         break;
         case 'import_export' :
             sek_set_input_tmpl___imp_exp( $input_id, $input_data );
+        break;
+        case 'grid_layout' :
+            sek_set_input_tmpl___grid_layout( $input_id, $input_data );
         break;
     }
 }

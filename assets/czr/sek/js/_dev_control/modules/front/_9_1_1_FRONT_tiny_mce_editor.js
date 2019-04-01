@@ -26,10 +26,6 @@
                                 });
                           }
                           api.CZRInput.prototype.initialize.call( input, name, options );
-                    },
-
-                    setupSelect : function() {
-                          api.czr_sektions.setupSelectInput.call( this );
                     }
             },//CZRTextEditorInputMths
 

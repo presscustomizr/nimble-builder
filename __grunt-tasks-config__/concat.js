@@ -228,9 +228,10 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_5_font_picker_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_6_font_awesome_icon_picker.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_7_code_editor.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_8_range_simple.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_9_range_with_unit_picker.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_0_9_range_with_unit_picker_device_switcher.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_1_0_range_simple.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_1_1_range_simple_device_switcher.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_1_2_range_with_unit_picker.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_1_3_range_with_unit_picker_device_switcher.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_0_borders.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_1_border_radius.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_2_buttons_choice.js',
@@ -238,6 +239,9 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_4_revision_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_5_tiny_mce_editor.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_6_imp_exp.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_7_selects_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_8_category_picker_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_9_grid_layout_input.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
@@ -281,7 +285,8 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_7_FRONT_spacer.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_8_FRONT_map.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_9_FRONT_quote.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_2_0_FRONT_button.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_2_0_0_FRONT_button.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_2_0_1_FRONT_post_grid.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_2_1_FRONT_menu.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/simple_form/_9_2_11_FRONT_simple_form_fields.js',
@@ -391,10 +396,15 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_1_6_sek_register_button.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php',
+
+      '<%= paths.sektions %>_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php',
+
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_2_1_sek_register_widget_area.php',
+
+
 
       // PRO MODULES
       //'<%= paths.sektions %>_front_dev_php/module_registration/front/4_3_0_sek_register_nimble_special_image.php',
@@ -454,6 +464,7 @@ module.exports = {
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_8_sek_input_tmpl_revision_history.php',
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_1_9_sek_input_tmpl_tinymce_editors.php',
         '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_2_0_sek_input_tmpl_imp_exp.php',
+        '<%= paths.sektions %>_customizer_dev_php/input_tmpl/3_2_1_sek_input_tmpl_grid_layout.php'
       ],
       dest: '<%= paths.sektions %>ccat-czr-sektions.php',
   },

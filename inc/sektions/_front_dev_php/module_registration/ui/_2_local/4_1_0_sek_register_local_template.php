@@ -11,7 +11,7 @@ function sek_get_module_params_for_sek_local_template() {
         'tmpl' => array(
             'item-inputs' => array(
                 'local_template' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select a template', 'text_doma'),
                     'default'     => 'default',
                     'width-100'   => true,

@@ -37,7 +37,7 @@ function sek_get_module_params_for_czr_widget_area_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'widget-area-id' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select a widget area', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => array(),

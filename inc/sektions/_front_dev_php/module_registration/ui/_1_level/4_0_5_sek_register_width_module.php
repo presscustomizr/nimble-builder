@@ -10,7 +10,7 @@ function sek_get_module_params_for_sek_level_width_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'width-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Width : 100% or custom', 'text_doma'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'width-type' )

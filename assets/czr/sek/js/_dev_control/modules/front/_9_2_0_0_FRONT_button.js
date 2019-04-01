@@ -9,15 +9,8 @@
               initialize: function( id, options ) {
                       var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
+                      module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                       //SET THE CONTENT PICKER DEFAULT OPTIONS
                       //@see ::setupContentPicker()
@@ -43,7 +36,7 @@
               //////////////////////////////////////////////////////////
               /// ITEM CONSTRUCTOR
               //////////////////////////////////////////
-              CZRButtonItemConstructor : {
+              CZRItemConstructor : {
                     //overrides the parent ready
                     ready : function() {
                           var item = this;
@@ -145,15 +138,8 @@
               initialize: function( id, options ) {
                       var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
+                      module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                       // run the parent initialize
                       // Note : must be always invoked always after the input / item class extension
@@ -165,7 +151,7 @@
               //////////////////////////////////////////////////////////
               /// ITEM CONSTRUCTOR
               //////////////////////////////////////////
-              CZRButtonItemConstructor : {
+              CZRItemConstructor : {
                     //overrides the parent ready
                     ready : function() {
                           var item = this;

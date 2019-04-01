@@ -1,25 +1,6 @@
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
-      var Constructor = {
-              initialize: function( id, options ) {
-                      var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this, sektionsLocalizedData.registeredWidgetZones );
-                            }
-                      });
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                      api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-              },//initialize
-      };
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -31,7 +12,7 @@
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_widget_area_module : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_widget_area_module', 'name' ),
                   has_mod_opt : false,

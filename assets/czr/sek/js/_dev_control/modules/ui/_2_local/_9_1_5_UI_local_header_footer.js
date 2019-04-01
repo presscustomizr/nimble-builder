@@ -1,23 +1,6 @@
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var Constructor = {
-            initialize: function( id, options ) {
-                  var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-            }//initialize
-      };
-
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -29,7 +12,7 @@
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_header_footer : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_header_footer', 'name' ),
                   has_mod_opt : false,

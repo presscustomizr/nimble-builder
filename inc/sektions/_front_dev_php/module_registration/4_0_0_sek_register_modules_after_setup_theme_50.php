@@ -1,124 +1,47 @@
 <?php
 // The base fmk is loaded @after_setup_theme:10
-add_action( 'after_setup_theme', '\Nimble\sek_register_modules', 50 );
+add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 );
+
+// When not customizing, we don't need to register all modules
+function sek_schedule_module_registration() {
+    if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
+        sek_register_modules();
+    } else {
+        add_action( 'wp', '\Nimble\sek_register_modules', PHP_INT_MAX );
+    }
+}
+
+
+
 function sek_register_modules() {
-    $modules = [
-        // UI CONTENT PICKER
-        'sek_content_type_switcher_module',
-        'sek_module_picker_module',
+    $modules = apply_filters( 'nimble_pre_module_registration', array(), current_filter() );
+    $module_candidates = array();
 
-        'sek_intro_sec_picker_module',
-        'sek_features_sec_picker_module',
-        'sek_contact_sec_picker_module',
-        'sek_column_layouts_sec_picker_module',
-        // 'sek_header_sec_picker_module',
-        // 'sek_footer_sec_picker_module',
+    // flatten the array
+    // because can be formed this way after filter when including child
+    // [0] => Array
+    //     (
+    //         [0] => czr_post_grid_module
+    //         [1] => czr_post_grid_main_child
+    //         [2] => czr_post_grid_thumb_child
+    //         [3] => czr_post_grid_metas_child
+    //         [4] => czr_post_grid_fonts_child
+    //     )
 
-        'sek_my_sections_sec_picker_module',
-
-        // UI LEVEL MODULES
-        'sek_level_bg_module',
-        'sek_level_border_module',
-        //'sek_level_section_layout_module',<// deactivated for now. Replaced by sek_level_width_section
-        'sek_level_height_module',
-        'sek_level_spacing_module',
-        'sek_level_width_module',
-        'sek_level_width_section',
-        'sek_level_anchor_module',
-        'sek_level_visibility_module',
-        'sek_level_breakpoint_module',
-
-        // local skope options modules
-        'sek_local_template',
-        'sek_local_widths',
-        'sek_local_custom_css',
-        'sek_local_reset',
-        'sek_local_performances',
-        'sek_local_header_footer',
-        'sek_local_revisions',
-        'sek_local_imp_exp',
-
-        // global options modules
-        'sek_global_breakpoint',
-        'sek_global_widths',
-        'sek_global_performances',
-        'sek_global_header_footer',
-        'sek_global_recaptcha',
-        'sek_global_revisions',
-        'sek_global_reset',
-        'sek_global_beta_features',
-
-        // FRONT MODULES
-        'czr_simple_html_module',
-
-        'czr_tiny_mce_editor_module',
-        'czr_tinymce_child',
-
-        'czr_image_module',
-        'czr_image_main_settings_child',
-        'czr_image_borders_corners_child',
-
-        //'czr_featured_pages_module',
-        'czr_heading_module',
-        'czr_heading_child',
-        'czr_heading_spacing_child',
-
-        'czr_spacer_module',
-        'czr_divider_module',
-
-        'czr_icon_module',
-        'czr_icon_settings_child',
-        'czr_icon_spacing_border_child',
-
-        'czr_map_module',
-
-        'czr_quote_module',
-        'czr_quote_quote_child',
-        'czr_quote_cite_child',
-        'czr_quote_design_child',
-
-        'czr_button_module',
-        'czr_btn_content_child',
-        'czr_btn_design_child',
-
-        // simple form father + children
-        'czr_simple_form_module',
-        'czr_simple_form_fields_child',
-        'czr_simple_form_button_child',
-        'czr_simple_form_design_child',
-        'czr_simple_form_fonts_child',
-        'czr_simple_form_submission_child',
-
-        // GENERIC FRONT CHILD MODULES
-        'czr_font_child'
-    ];
-
-    // Header and footer have been introduced in v1.4.0 but not enabled by default
-    // The module menu and the widget area module are on hold until "header and footer" feature is released.
-    if ( sek_is_header_footer_enabled() ) {
-        $modules = array_merge( $modules, [
-            // pre-built sections for header and footer
-            'sek_header_sec_picker_module',
-            'sek_footer_sec_picker_module',
-
-            // modules for header and footer
-            'czr_menu_module',
-            'czr_menu_content_child',
-            'czr_menu_mobile_options',
-
-            'czr_widget_area_module'
-            //'czr_menu_design_child',
-        ]);
+    // [1] => sek_level_bg_module
+    // [2] => sek_level_border_module
+    foreach ($modules as $key => $value) {
+      if ( is_array( $value ) ) {
+          $module_candidates = array_merge( $module_candidates, $value );
+      } else {
+          $module_candidates[] = $value;
+      }
     }
 
-    // if ( sek_is_pro() ) {
-    //     $modules = array_merge( $modules, [
-    //         'czr_special_img_module',
-    //         'czr_special_img_main_settings_child'
-    //     ]);
-    // }
+    // remove duplicated modules, typically 'czr_font_child'
+    $module_candidates = array_unique( $module_candidates );
 
-    foreach( $modules as $module_name ) {
+    foreach ( $module_candidates as $module_name ) {
         // Was previously written "\Nimble\sek_get_module_params_for_{$module_name}";
         // But this syntax can lead to function_exists() return false even if the function exists
         // Probably due to a php version issue. Bug detected with php version 5.6.38
@@ -136,6 +59,76 @@ function sek_register_modules() {
         }
     }
 }//sek_register_modules()
+
+
+add_filter( 'nimble_pre_module_registration', '\Nimble\sek_filter_modules_to_register', 10, 2 );
+function sek_filter_modules_to_register( $modules, $hook ) {
+    if ( 'wp' !== $hook ) {
+        $modules = array_merge(
+            $modules,
+            SEK_Front_Construct::$ui_picker_modules,
+            SEK_Front_Construct::$ui_level_modules,
+            SEK_Front_Construct::$ui_local_global_options_modules,
+            SEK_Front_Construct::$ui_front_modules
+        );
+
+        // Header and footer have been introduced in v1.4.0 but not enabled by default
+        // The module menu and the widget area module are on hold until "header and footer" feature is released.
+        if ( sek_is_header_footer_enabled() ) {
+            $modules = array_merge( $modules, SEK_Front_Construct::$ui_front_beta_modules );
+        }
+        // if ( sek_is_pro() ) {
+        //     $modules = array_merge( $modules, [
+        //         'czr_special_img_module',
+        //         'czr_special_img_main_settings_child'
+        //     ]);
+        // }
+    } else {
+        //sniff the list of active modules in local and global location
+        sek_populate_contextually_active_module_list();
+
+        $contextually_actives = array();
+        $front_modules = SEK_Front_Construct::$ui_front_modules;
+        // we need to get all children when the module is a father.
+        // This will be flatenized afterwards
+        foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
+            if ( array_key_exists( $module_name, $front_modules ) ) {
+                $contextually_actives[] = $front_modules[ $module_name ];
+            }
+        }
+
+        $modules = array_merge(
+            $modules,
+            $contextually_actives,
+            SEK_Front_Construct::$ui_level_modules,
+            SEK_Front_Construct::$ui_local_global_options_modules
+        );
+    }
+    return $modules;
+}
+
+// @return void()
+// recursive helper => populates Nimble_Manager()->contextually_active_modules
+function sek_populate_contextually_active_module_list( $recursive_data = null ) {
+    if ( is_null( $recursive_data ) ) {
+        $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+        $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+        $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+        $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+        $recursive_data = array_merge( $local_collection, $global_collection );
+    }
+    foreach ( $recursive_data as $key => $value ) {
+        if ( is_array( $value ) ) {
+            sek_populate_contextually_active_module_list( $value );
+        }
+        // @see sek_get_module_params_for_czr_image_main_settings_child
+        if ( is_string( $key ) && 'module_type' === $key ) {
+            $module_collection = Nimble_Manager()->contextually_active_modules;
+            $module_collection[] = $value;
+            Nimble_Manager()->contextually_active_modules = array_unique( $module_collection );
+        }
+    }
+}
 
 
 // HELPERS

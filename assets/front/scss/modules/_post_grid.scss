@@ -1,0 +1,341 @@
+// @todo rtl
+
+// DESIGN SETTINGS FOR LIST AND GRID
+.sek-post-grid-wrapper {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  // Spacing
+  .sek-grid-items {
+    grid-row-gap: 25px;
+    article>*:not(:last-child) {
+      margin-top: 0!important;
+      margin-bottom: .7rem;
+    }
+    article>:first-child {
+      margin-top: 0!important;
+    }
+    article>:last-child {
+      margin-top: 0!important;
+    }
+
+    article .sek-pg-content>*:not(:last-child) {
+      margin-top: 0!important;
+      margin-bottom: .7rem !important;
+    }
+    article .sek-pg-content>:first-child {
+      margin-top: 0!important;
+    }
+    article .sek-pg-content>:last-child {
+      margin-top: 0!important;
+    }
+  }//.sek-grid-items
+
+  // POST THUMBNAIL
+  .sek-pg-thumbnail {
+    box-shadow: 0 5px 5px 0 rgba(18,63,82,.035), 0 0 0 1px rgba(176,181,193,.2);
+    background-color: #fff;
+    overflow: hidden;
+    //border-radius: 12px;
+    // padding: 60px 35px;
+    // --box-padding-vert: 60px;
+    // --box-padding-hori: 35px;
+    // padding: 0!important;
+    // margin-left: 0;
+    // margin-right: 0;
+    a {
+      display: block;
+      position: relative;
+    }
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }//.sek-pg-thumbnail
+
+  // POST THUMBNAIL WITH CUSTOM HEIGHT
+  // we set the height of the image container ( <a> tag ), with the padding property
+  // because padding and margin are relative to the width in CSS
+  // @see https://www.w3.org/TR/2011/REC-CSS2-20110607/box.html#padding-properties
+  // This is set dynamically by users in PHP sek_add_css_rules_for_czr_post_grid_module()
+  .sek-thumb-custom-height .sek-pg-thumbnail {
+    a {
+      height: 0;
+      padding-top: 50%;
+    }
+    img {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        max-height: none;
+        max-width: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        -o-object-fit: cover;
+        object-fit: cover;
+    }
+  }//.sek-thumb-custom-height .sek-pg-thumbnail
+
+
+  // Shadow
+  .sek-shadow article {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0;
+  }
+
+  // Metas
+  .sek-pg-metas > span:not(:last-child)::after {
+      content: "\B7";
+      vertical-align: middle;
+      margin: 0 5px;
+      line-height: 1;
+  }
+
+  // Content : title, excerpt, metas
+  .sek-pg-content {
+    @if ( true == $is_rtl ) { text-align: right; }
+    @else { text-align: left; }
+  }
+
+  // Excerpt
+  // => remove margin bottom after the last element in excerpt, typically a <p> tag
+  .sek-excerpt>:last-child {
+    margin-bottom: 0;
+  }
+
+}//.sek-post-grid-wrapper  DESIGN SETTINGS
+
+
+
+
+
+
+
+// FONTS
+.sek-post-grid-wrapper {
+  // Category font
+  .sek-pg-category a {
+    text-transform: uppercase;
+    font-size: 14px;
+    text-decoration: none;
+    color: #767676;
+  }
+  // Title
+  .sek-pg-title {
+    // reset theme and plugins value for h2
+    font-size: 28px;
+    line-height: 1.5em;
+    a {
+      text-decoration: none;
+      color: #444;
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1.5em;
+      -ms-word-wrap: break-word;
+      word-wrap: break-word;
+    }
+  }
+  // Metas font
+  .sek-pg-metas span, .sek-pg-metas a {
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #767676;
+  }
+  // Excerpt
+  .sek-pg-content p {
+    margin: 0 0 15px 0;
+    line-height: 1.5;
+    font-size: 16px;
+    color: #494949;
+  }
+}// .sek-post-grid-wrapper FONTS
+
+
+
+
+
+
+
+
+// LIST LAYOUT
+.sek-post-grid-wrapper {
+  .sek-list-layout {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+  }
+  .sek-list-layout article {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    grid-template-rows: 1fr;
+    grid-column-gap: 20px;
+  }
+  // article has 2 columns when the thumbnail is displayed
+  .sek-list-layout article.sek-has-thumb {
+    grid-template-columns: 30% minmax(0,1fr);
+  }
+
+  // .sek-post-grid-wrapper .sek-list-layout article:not(:last-child) {
+  //     margin-bottom: 5%;
+  //     padding-bottom: 5%;
+  // }
+  .sek-list-layout article .sek-pg-thumbnail {
+    margin-bottom: 0;
+    align-self: flex-start;
+  }
+}//.sek-post-grid-wrapper LIST LAYOUT
+
+
+
+
+
+
+// COLUMN LAYOUT
+.sek-post-grid-wrapper {
+  .sek-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-row-gap: 20px;
+    grid-column-gap: 20px;
+  }
+  // shadow needs padding
+  .sek-shadow.sek-grid-layout {
+    &.sek-all-col-1 article { padding: 20px; }
+    &.sek-all-col-2 article { padding: 15px; }
+    &.sek-all-col-3 article { padding: 12px; }
+    &.sek-all-col-4 article { padding: 10px; }
+  }
+  .sek-grid-layout.sek-all-col-1 {
+    grid-template-columns: minmax(0,1fr);
+  }
+  .sek-grid-layout.sek-all-col-2 {
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+  }
+  .sek-grid-layout.sek-all-col-3 {
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+  }
+  .sek-grid-layout.sek-all-col-4 {
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+  }
+}//.sek-post-grid-wrapper COLUMN LAYOUT
+
+
+@include media-breakpoint-up(md) {
+  .sek-post-grid-wrapper {
+    .sek-grid-layout.sek-desktop-col-1 {
+      grid-template-columns: minmax(0,1fr);
+    }
+    .sek-grid-layout.sek-desktop-col-2 {
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+      grid-column-gap: 20px;
+      grid-row-gap: 20px;
+    }
+    .sek-grid-layout.sek-desktop-col-3 {
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+      grid-column-gap: 15px;
+      grid-row-gap: 15px;
+    }
+    .sek-grid-layout.sek-desktop-col-4 {
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+      grid-column-gap: 15px;
+      grid-row-gap: 15px;
+    }
+  }
+}
+
+@include media-breakpoint-between(sm, sm) {
+  .sek-post-grid-wrapper {
+    .sek-grid-layout.sek-tablet-col-1 {
+      grid-template-columns: minmax(0,1fr)!important;
+    }
+    .sek-grid-layout.sek-tablet-col-2 {
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr)!important;
+      grid-column-gap: 20px;
+      grid-row-gap: 20px;
+    }
+    .sek-grid-layout.sek-tablet-col-3 {
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
+      grid-column-gap: 15px;
+      grid-row-gap: 15px;
+    }
+    .sek-grid-layout.sek-tablet-col-4 {
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
+      grid-column-gap: 15px;
+      grid-row-gap: 15px;
+    }
+  }
+}
+@include media-breakpoint-only(xs) {
+  .sek-post-grid-wrapper {
+    .sek-grid-layout.sek-mobile-col-1 {
+      grid-template-columns: minmax(0,1fr)!important;
+    }
+    .sek-grid-layout.sek-mobile-col-2 {
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr)!important;
+      grid-column-gap: 20px;
+      grid-row-gap: 20px;
+    }
+    .sek-grid-layout.sek-mobile-col-3 {
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
+      grid-column-gap: 15px;
+      grid-row-gap: 15px;
+    }
+    .sek-grid-layout.sek-mobile-col-4 {
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
+      grid-column-gap: 15px;
+      grid-row-gap: 15px;
+    }
+  }
+}
+
+
+
+// $grid-breakpoints: (
+//   xs: 0,
+//   sm: 576px,
+//   md: 768px,
+//   lg: 992px,
+//   xl: 1200px
+// ) !default;
+
+@include media-breakpoint-between(sm, sm) {
+  .sek-post-grid-wrapper.sek-has-tablet-breakpoint {
+    .sek-list-layout article {
+      grid-template-columns: minmax(0,1fr)!important;//<= important because this property can be customized by users for desktop
+      grid-gap: 0;
+      .sek-pg-thumbnail {
+        margin-bottom: .7rem;
+      }
+    }
+    // .sek-grid-layout {
+    //   &[class*="sek-desktop-col-"] {
+    //     grid-template-columns: minmax(0,1fr);
+    //   }
+    // }
+  }
+}
+
+@include media-breakpoint-only(xs) {
+  .sek-post-grid-wrapper.sek-has-mobile-breakpoint {
+    .sek-list-layout article {
+      grid-template-columns: minmax(0,1fr)!important;//<= important because this property can be customized by users for desktop
+      grid-gap: 0;
+      .sek-pg-thumbnail {
+        margin-bottom: .7rem;
+      }
+    }
+    // .sek-grid-layout {
+    //   &[class*="sek-desktop-col-"] {
+    //     grid-template-columns: minmax(0,1fr);
+    //   }
+    // }
+  }
+}

@@ -6555,27 +6555,67 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       item   = input.input_parent,
                       module = input.module,
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type );
-
-                  selectOptions = _.isUndefined( selectOptions ) ? inputRegistrationParams.choices : selectOptions;
+                  // use the provided selectOptions if any
+                  selectOptions = _.isEmpty( selectOptions ) ? inputRegistrationParams.choices : selectOptions;
 
                   if ( _.isEmpty( selectOptions ) || ! _.isObject( selectOptions ) ) {
                         api.errare( 'api.czr_sektions.setupSelectInput => missing select options for input id => ' + input.id + ' in image module');
                         return;
                   } else {
-                        //generates the options
-                        _.each( selectOptions , function( title, value ) {
-                              var _attributes = {
-                                        value : value,
-                                        html: title
-                                  };
-                              if ( value == input() ) {
-                                    $.extend( _attributes, { selected : "selected" } );
-                              } else if ( 'px' === value ) {
-                                    $.extend( _attributes, { selected : "selected" } );
-                              }
-                              $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
-                        });
-                        $( 'select[data-czrtype]', input.container ).selecter();
+                        switch( input.type ) {
+                              case 'simpleselect' :
+                                    //generates the options
+                                    _.each( selectOptions , function( title, value ) {
+                                          var _attributes = {
+                                                    value : value,
+                                                    html: title
+                                              };
+                                          if ( value == input() ) {
+                                                $.extend( _attributes, { selected : "selected" } );
+                                          } else if ( 'px' === value ) {
+                                                $.extend( _attributes, { selected : "selected" } );
+                                          }
+                                          $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                    });
+                                    $( 'select[data-czrtype]', input.container ).selecter();
+                              break;
+                              case 'multiselect' :
+                                    // when select is multiple, the value is an array
+                                    var input_value = input();
+                                    input_value = _.isString( input_value ) ? [ input_value ] : input_value;
+                                    input_value = !_.isArray( input_value ) ? [] : input_value;
+
+                                    //generates the options
+                                    _.each( selectOptions , function( title, value ) {
+                                          var _attributes = {
+                                                    value : value,
+                                                    html: title
+                                              };
+                                          if ( _.contains( input_value, value ) ) {
+                                                $.extend( _attributes, { selected : "selected" } );
+                                          }
+                                          $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                                    });
+                                    // see how the tmpl is rendered server side in PHP with ::ac_set_input_tmpl_content()
+                                    $( 'select[data-czrtype]', input.container ).czrSelect2({
+                                          closeOnSelect: true,
+                                          templateSelection: function czrEscapeMarkup(obj) {
+                                                //trim dashes
+                                                return obj.text.replace(/\u2013|\u2014/g, "");
+                                          }
+                                    });
+
+                                    //handle case when all choices become unselected
+                                    $( 'select[data-czrtype]', input.container ).on('change', function(){
+                                          if ( 0 === $(this).find("option:selected").length ) {
+                                                input([]);
+                                          }
+                                    });
+                              break;
+                              default :
+                                    api.errare( '::setupSelectInput => invalid input type => ' + input.type );
+                              break;
+                        }
                   }
             },
 
@@ -9010,6 +9050,135 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       // For example, a content picker can be given params to display only taxonomies
       // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
+            range_simple_device_switcher : function( params ) {
+                  var input = this,
+                      $wrapper = $('.sek-range-with-unit-picker-wrapper', input.container ),
+                      $numberInput = $wrapper.find( 'input[type="number"]'),
+                      $rangeInput = $wrapper.find( 'input[type="range"]'),
+                      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
+                      _extractNumericVal = function( _rawVal ) {
+                            return ( _.isEmpty( _rawVal ) || ! _.isString( _rawVal ) ) ? '16' : _rawVal.replace(/px|em|%/g,'');
+                      },
+                      inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      defaultVal = ( ! _.isEmpty( inputRegistrationParams ) && ! _.isEmpty( inputRegistrationParams.default ) ) ? inputRegistrationParams.default : {};
+
+                  // Recursive helper
+                  // return the value set for the currently previewed device if exists
+                  // OR
+                  // return the inherited value from the first parent device for which the value is set
+                  // OR
+                  // falls back on the module default
+                  var getCurrentDeviceActualOrInheritedValue = function( inputValues, currentDevice ) {
+                        var deviceHierarchy = [ 'mobile' , 'tablet', 'desktop' ];
+                        if ( _.has( inputValues, currentDevice ) ) {
+                              return inputValues[ currentDevice ];
+                        } else {
+                              var deviceIndex = _.findIndex( deviceHierarchy, function( _d_ ) { return currentDevice === _d_; });
+                              if ( ! _.isEmpty( currentDevice ) && deviceIndex < deviceHierarchy.length ) {
+                                    return getCurrentDeviceActualOrInheritedValue( inputValues, deviceHierarchy[ deviceIndex + 1 ] );
+                              } else {
+                                    var clonedDefault = $.extend( true, { desktop : '' }, defaultVal );
+                                    return clonedDefault[ 'desktop' ];
+                              }
+                        }
+                  };
+
+                  // Synchronizes on init + refresh on previewed device changes
+                  var syncWithPreviewedDevice = function( currentDevice ) {
+                        // initialize the number input with the current input val
+                        // for retro-compatibility, we must handle the case when the initial input val is a string instead of an array
+                        // in this case, the string value is assigned to the desktop device.
+                        var inputVal = input(), inputValues = {}, clonedDefault = $.extend( true, {}, defaultVal );
+                        inputValues = clonedDefault;
+                        if ( _.isObject( inputVal ) ) {
+                              inputValues = $.extend( true, {}, inputVal );
+                        } else if ( _.isString( inputVal ) && ! _.isEmpty( inputVal ) ) {
+                              inputValues = { desktop : inputVal };
+                        }
+                        //inputValues = _.extend( inputValues, clonedDefault );
+                        // do we have a val for the current device ?
+                        var _rawVal = getCurrentDeviceActualOrInheritedValue( inputValues, currentDevice ),
+                            _numberVal = _extractNumericVal( _rawVal );
+
+                        // update the numeric val
+                        $numberInput.val(  _numberVal  ).trigger('input', { previewed_device_switched : true });// We don't want to update the input()
+                  };
+
+                  // SETUP
+                  // setup the device switcher
+                  api.czr_sektions.maybeSetupDeviceSwitcherForInput.call( input );
+
+                  // Append a reset button
+                  // var resetButton = '<button type="button" class="button sek-reset-button sek-float-right">' + sektionsLocalizedData.i18n['Reset'] + '</button>';
+                  // input.container.find('.customize-control-title').append( resetButton );
+
+                  // SCHEDULE REACTIONS
+                  // synchronizes range input and number input
+                  // number is the master => sets the input() val
+                  $rangeInput.on('input', function( evt ) {
+                        $numberInput.val( $(this).val() ).trigger('input');
+                  });
+
+                  // Set the input val
+                  $numberInput.on('input', function( evt, params ) {
+                        var previewedDevice = api.previewedDevice() || 'desktop',
+                            changedNumberInputVal = $(this).val(),
+                            _newInputVal;
+
+                        _newInputVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                        _newInputVal[ previewedDevice ] = $.extend( true, {}, _newInputVal[ previewedDevice ] || {} );
+
+                        // Validates
+                        if ( ( _.isString( changedNumberInputVal ) && ! _.isEmpty( changedNumberInputVal ) ) ) {
+                              _newInputVal[ previewedDevice ]= changedNumberInputVal;
+                        }
+
+                        // update input if not previewed_device_switched
+                        if ( _.isEmpty( params ) || ( _.isObject( params ) && true !== params.previewed_device_switched ) ) {
+                              input( _newInputVal );
+                        }
+                        $rangeInput.val( $(this).val() );
+                  });
+
+                  // react to previewed device changes
+                  // input.previewedDevice is updated in api.czr_sektions.maybeSetupDeviceSwitcherForInput()
+                  input.previewedDevice.bind( function( currentDevice ) {
+                        try { syncWithPreviewedDevice( currentDevice ); } catch( er ) {
+                              api.errare('Error when firing syncWithPreviewedDevice for input type ' + input.type + ' for input id ' + input.id , er );
+                        }
+                  });
+
+                  // // Schedule the reset of the value for the currently previewed device
+                  // input.container.on( 'click', '.sek-reset-button', function( evt ) {
+                  //       var _currentDevice = api.previewedDevice(),
+                  //           _newVal = $.extend( true, {}, _.isObject( input() ) ? input() : {} );
+                  //       if ( !_.isEmpty( _newVal[ _currentDevice ] ) ) {
+                  //             _newVal = _.omit( _newVal, _currentDevice );
+                  //             input( _newVal );
+                  //             syncWithPreviewedDevice( api.previewedDevice() );
+                  //       }
+                  // });
+
+                  // trigger a change on init to sync the range input
+                  $rangeInput.val( $numberInput.val() || 0 );
+                  try { syncWithPreviewedDevice( api.previewedDevice() ); } catch( er ) {
+                        api.errare('Error when firing syncWithPreviewedDevice for input type ' + input.type + ' for input id ' + input.id , er );
+                  }
+            },
+
+      });//$.extend( api.czrInputMap, {})
+
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
             range_with_unit_picker : function( params ) {
                   var input = this,
                   $wrapper = $('.sek-range-with-unit-picker-wrapper', input.container ),
@@ -10793,6 +10962,186 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             }//import_export()
       });//$.extend( api.czrInputMap, {})
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            simpleselect : function( selectOptions ) {
+                  api.czr_sektions.setupSelectInput.call( this, selectOptions );
+            },
+            multiselect : function( selectOptions ) {
+                  api.czr_sektions.setupSelectInput.call( this, selectOptions );
+            },
+
+      });//$.extend( api.czrInputMap, {})
+
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            category_picker : function( params ) {
+                  var selectOptions,
+                      input = this,
+                      $selectEl = $( 'select[data-czrtype]', input.container );
+
+                  var getInputValue = function() {
+                        var inputValue = input();
+                        // when select is multiple, the value is an array
+                        inputValue = _.isString( inputValue ) ? [ inputValue ] : inputValue;
+                        return !_.isArray( inputValue ) ? [] : inputValue;
+                  };
+
+
+                  var _getCategoryCollection = function() {
+                        return $.Deferred( function( _dfd_ ) {
+                              if ( ! _.isEmpty( api.czr_sektions.post_categories ) ) {
+                                    _dfd_.resolve( api.czr_sektions.post_categories );
+                              } else {
+                                    wp.ajax.post( 'sek_get_post_categories', {
+                                          nonce: api.settings.nonce.save,
+                                    }).done( function( raw_cat_collection ) {
+                                          if ( !_.isArray( raw_cat_collection ) ) {
+                                                api.errare( input.id + ' => error => invalid category collection sent by server');
+                                          }
+                                          var catCollection = {};
+                                          // server sends
+                                          // [
+                                          //  0: {id: 2, name: "cat1"}
+                                          //  1: {id: 11, name: "cat10"}
+                                          //  ...
+                                          // ]
+                                          _.each( raw_cat_collection, function( cat_data ) {
+                                                catCollection[ cat_data.id ] = cat_data.name;
+                                          });
+                                          api.czr_sektions.post_categories = catCollection;
+                                          _dfd_.resolve( api.czr_sektions.post_categories );
+                                    }).fail( function( _r_ ) {
+                                          _dfd_.reject( _r_ );
+                                    });
+                              }
+                        });
+                  };
+
+                  // do
+                  var _fetchServerCatsAndInstantiateSelect2 = function( params ) {
+                        if ( true === input.catCollectionSet )
+                          return;
+                        $.when( _getCategoryCollection () ).done( function( _catCollection ) {
+                              _generateOptionsAndInstantiateSelect2(_catCollection);
+                              if ( params && true === params.open_on_init ) {
+                                    // let's open select2 after a delay ( because there's no 'ready' event with select2 )
+                                    _.delay( function() {
+                                          try{ $selectEl.czrSelect2('open'); } catch(er) {}
+                                    }, 100 );
+                              }
+                        }).fail( function( _r_ ) {
+                              api.errare( input.id + ' => fail response =>', _r_ );
+                        });
+                        input.catCollectionSet = true;
+                  };
+
+                  var _generateOptionsAndInstantiateSelect2 = function( selectOptions ) {
+                        //generates the options
+                        _.each( selectOptions , function( title, value ) {
+                              var _attributes = {
+                                        value : value,
+                                        html: title
+                                  };
+                              if ( _.contains( getInputValue(), value ) ) {
+                                    $.extend( _attributes, { selected : "selected" } );
+                              }
+                              $selectEl.append( $('<option>', _attributes) );
+                        });
+                        // see how the tmpl is rendered server side in PHP with ::ac_set_input_tmpl_content()
+                        $selectEl.czrSelect2({
+                              closeOnSelect: true,
+                              templateSelection: function czrEscapeMarkup(obj) {
+                                    //trim dashes
+                                    return obj.text.replace(/\u2013|\u2014/g, "");
+                              }
+                        });
+
+                        //handle case when all choices become unselected
+                        $selectEl.on('change', function(){
+                              if ( 0 === $(this).find("option:selected").length ) {
+                                    input([]);
+                              }
+                        });
+                  };// _generateOptionsAnd...()
+                  // schedule the catCollectionSet after a delay
+                  //_.delay( function() { _fetchServerCatsAndInstantiateSelect2( { open_on_init : false } );}, 1000 );
+
+                  // on init, instantiate select2 with the input() values only
+                  var selectOptionsOnInit = {};
+                  _.each( getInputValue(), function( _val ) {
+                        selectOptionsOnInit[ _val ] = [ sektionsLocalizedData.i18n['Cat #'], _val ].join('');
+                  });
+                  _generateOptionsAndInstantiateSelect2( selectOptionsOnInit );
+
+                  // re-generate select2 on click with the server collection
+                  input.container.on('click', function() {
+                        if ( true === input.catCollectionSet )
+                          return;
+                        // destroy the temporary instance
+                        $selectEl.czrSelect2('destroy');
+                        // destroy the temporary options
+                        $.when( $selectEl.find('option').remove() ).done( function() {
+                              _fetchServerCatsAndInstantiateSelect2( { open_on_init : true } );
+                        });
+                  });
+
+            }//category_picker()
+      });//$.extend( api.czrInputMap, {})
+
+
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      $.extend( api.czrInputMap, {
+            grid_layout : function( params ) {
+                  var input = this,
+                      $wrapper = $('.sek-grid-layout-wrapper', input.container ),
+                      $mainInput = $wrapper.find( 'input[type="hidden"]');
+
+                  // SETUP
+                  // Setup the initial state of the number input
+                  $mainInput.val( input() );
+
+                  // Schedule choice changes on button click
+                  $wrapper.on( 'click', '[data-sek-grid-layout]', function( evt, params ) {
+                        evt.stopPropagation();
+                        // handle the is-selected css class toggling
+                        $wrapper.find('[data-sek-grid-layout]').removeClass('selected').attr( 'aria-pressed', false );
+                        $(this).addClass('selected').attr( 'aria-pressed', true );
+                        var newChoice;
+                        try { newChoice = $(this).data('sek-grid-layout'); } catch( er ) {
+                              api.errare( input.type + ' => error when attaching click event', er );
+                        }
+                        input( newChoice );
+                  });
+
+
+                  // INITIALIZES
+                  // trigger a click on the initial unit
+                  $( '[data-sek-grid-layout="' + input() + '"]', $wrapper ).trigger('click');
+            }
+      });// $.extend( api.czrInputMap
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 /* ------------------------------------------------------------------------- *
@@ -11147,8 +11496,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //console.log('INITIALIZING SEKTION OPTIONS', id, options );
                   var module = this;
 
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
@@ -11156,12 +11503,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
-
-            CZRInputMths : {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRInputMths
 
             CZRItemConstructor : {
                   //overrides the parent ready
@@ -11300,21 +11641,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //console.log('INITIALIZING SEKTION OPTIONS', id, options );
                   var module = this;
 
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
-
-
-            CZRInputMths : {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRInputMths
 
             CZRItemConstructor : {
                   //overrides the parent ready
@@ -11385,23 +11717,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-            var Constructor = {
+      var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  // module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
-
-            // CZRInputMths : {
-            //       setupSelect : function() {
-            //             api.czr_sektions.setupSelectInput.call( this );
-            //       }
-            // },//CZRInputMths
 
             CZRItemConstructor : {
                   //overrides the parent ready
@@ -11470,20 +11794,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
-
-            CZRInputMths : {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRInputMths
 
             CZRItemConstructor : {
                   //overrides the parent ready
@@ -11583,20 +11899,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
-
-            CZRInputMths : {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRInputMths
 
             CZRItemConstructor : {
                   //overrides the parent ready
@@ -11670,20 +11978,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRInputMths || {} );
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
             },//initialize
-
-            CZRInputMths : {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRInputMths
 
             CZRItemConstructor : {
                   //overrides the parent ready
@@ -11783,23 +12083,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var Constructor = {
-            initialize: function( id, options ) {
-                  var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-            }//initialize
-      };
-
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -11811,7 +12094,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_template : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_template', 'name' ),
                   has_mod_opt : false,
@@ -11828,12 +12111,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
@@ -11963,22 +12240,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var Constructor = {
-            initialize: function( id, options ) {
-                  var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-            }//initialize
-      };
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -11990,7 +12251,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_performances : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_performances', 'name' ),
                   has_mod_opt : false,
@@ -12004,23 +12265,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var Constructor = {
-            initialize: function( id, options ) {
-                  var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-            }//initialize
-      };
-
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -12032,7 +12276,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_local_header_footer : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_local_header_footer', 'name' ),
                   has_mod_opt : false,
@@ -12099,12 +12343,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
@@ -12180,12 +12418,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
@@ -12288,23 +12520,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var Constructor = {
-            initialize: function( id, options ) {
-                  var module = this;
-                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-                  //run the parent initialize
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-            }//initialize
-      };
-
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -12316,7 +12531,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             sek_global_header_footer : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_header_footer', 'name' ),
                   has_mod_opt : false,
@@ -12333,12 +12548,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // // //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  // module.inputConstructor = api.CZRInput.extend({
-                  //       setupSelect : function() {
-                  //             api.czr_sektions.setupSelectInput.call( this );
-                  //       }
-                  // });
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
                   //run the parent initialize
@@ -12507,12 +12716,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
+
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
@@ -12674,12 +12878,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
             initialize: function( id, options ) {
                   var module = this;
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
+
                   // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
@@ -12796,10 +12995,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 });
                           }
                           api.CZRInput.prototype.initialize.call( input, name, options );
-                    },
-
-                    setupSelect : function() {
-                          api.czr_sektions.setupSelectInput.call( this );
                     }
             },//CZRTextEditorInputMths
 
@@ -12858,16 +13053,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //console.log('INITIALIZING FP MODULE', id, options );
                   var module = this;
 
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
-
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  module.itemConstructor = api.CZRItem.extend( module.CZRFPItemConstructor || {} );
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                   // run the parent initialize
                   // Note : must be always invoked always after the input / item class extension
@@ -12878,7 +13065,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //////////////////////////////////////////////////////////
             /// ITEM CONSTRUCTOR
             //////////////////////////////////////////
-            CZRFPItemConstructor : {
+            CZRItemConstructor : {
                   //overrides the parent ready
                   ready : function() {
                         var item = this;
@@ -12943,7 +13130,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   }
-            },//CZRFPItemConstructor
+            },//CZRItemConstructor
       };//FeaturedPagesConstruct
 
       //provides a description of each module
@@ -12977,16 +13164,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       //console.log('INITIALIZING IMAGE MODULE', id, options );
                       var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      module.itemConstructor = api.CZRItem.extend( module.CZRIconItemConstructor || {} );
-
+                      module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                       //SET THE CONTENT PICKER DEFAULT OPTIONS
                       //@see ::setupContentPicker()
@@ -13014,7 +13193,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               //////////////////////////////////////////////////////////
               /// ITEM CONSTRUCTOR
               //////////////////////////////////////////
-              CZRIconItemConstructor : {
+              CZRItemConstructor : {
                     //overrides the parent ready
                     ready : function() {
                           var item = this;
@@ -13077,7 +13256,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 }
                           });
                     }
-              },//CZRIconItemConstructor
+              },//CZRItemConstructor
 
       };//Constructor
 
@@ -13118,12 +13297,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               initialize: function( id, options ) {
                       var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
                       // EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
@@ -13214,10 +13387,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             initialize: function( id, options ) {
                   var module = this;
 
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
-
-
                   //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
@@ -13240,12 +13409,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return params;
                   });
             },//initialize
-
-            CZRHeadingInputMths: {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRHeadingsInputMths
 
             // _isChecked : function( v ) {
             //       return 0 !== v && '0' !== v && false !== v && 'off' !== v;
@@ -13340,32 +13503,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
  *  HEADING SPACING
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
-      //HEADING MODULE
-      var Constructor  = {
-            initialize: function( id, options ) {
-                  var module = this;
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
-
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-            },//initialize
-
-            CZRHeadingInputMths: {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRHeadingsInputMths
-      };//Constructor
-
-
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -13377,7 +13514,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_heading_spacing_child : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_spacing_child', 'name' ),
                   has_mod_opt : false,
@@ -13389,34 +13526,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //DIVIDER MODULE
-      var DividerModuleConstructor = {
-            initialize: function( id, options ) {
-                  //console.log('INITIALIZING IMAGE MODULE', id, options );
-                  var module = this;
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRDividerInputMths || {} );
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-            },//initialize
-
-
-            CZRDividerInputMths: {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRDividerInputMths
-      };//DividerModuleConstructor
-
-
-
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -13428,7 +13537,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_divider_module : {
-                  mthds : DividerModuleConstructor,
+                  //mthds : DividerModuleConstructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_divider_module', 'name' ),
                   has_mod_opt : false,
@@ -13495,13 +13604,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
@@ -13601,28 +13703,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
-      var Constructor = {
-              initialize: function( id, options ) {
-                      var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      //module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                      api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-              },//initialize
-      };
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -13634,7 +13714,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_quote_quote_child : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_quote_quote_child', 'name' ),
                   has_mod_opt : false,
@@ -13656,28 +13736,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
-      var Constructor = {
-              initialize: function( id, options ) {
-                      var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      //module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                      api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-              },//initialize
-      };
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -13689,7 +13747,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_quote_cite_child : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_quote_cite_child', 'name' ),
                   has_mod_opt : false,
@@ -13710,15 +13768,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               initialize: function( id, options ) {
                       var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
+                      module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                       //SET THE CONTENT PICKER DEFAULT OPTIONS
                       //@see ::setupContentPicker()
@@ -13744,7 +13795,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               //////////////////////////////////////////////////////////
               /// ITEM CONSTRUCTOR
               //////////////////////////////////////////
-              CZRButtonItemConstructor : {
+              CZRItemConstructor : {
                     //overrides the parent ready
                     ready : function() {
                           var item = this;
@@ -13846,15 +13897,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               initialize: function( id, options ) {
                       var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
+                      module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                       // run the parent initialize
                       // Note : must be always invoked always after the input / item class extension
@@ -13866,7 +13910,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               //////////////////////////////////////////////////////////
               /// ITEM CONSTRUCTOR
               //////////////////////////////////////////
-              CZRButtonItemConstructor : {
+              CZRItemConstructor : {
                     //overrides the parent ready
                     ready : function() {
                           var item = this;
@@ -13953,29 +13997,282 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_btn_design_child' )
             }
       });
-})( wp.customize , jQuery, _ );/* ------------------------------------------------------------------------- *
- *  MENU CONTENT
-/* ------------------------------------------------------------------------- */
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      var Constructor = {
+              initialize: function( id, options ) {
+                      var module = this;
+
+                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                      module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+
+                      // run the parent initialize
+                      // Note : must be always invoked always after the input / item class extension
+                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                      api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+              },//initialize
+
+              //////////////////////////////////////////////////////////
+              /// ITEM CONSTRUCTOR
+              //////////////////////////////////////////
+              CZRItemConstructor : {
+                    //overrides the parent ready
+                    ready : function() {
+                          var item = this;
+                          //wait for the input collection to be populated,
+                          //and then set the input visibility dependencies
+                          item.inputCollection.bind( function( col ) {
+                                if( _.isEmpty( col ) )
+                                  return;
+                                try { item.setInputVisibilityDeps(); } catch( er ) {
+                                      api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                                }
+                          });//item.inputCollection.bind()
+
+                          //fire the parent
+                          api.CZRItem.prototype.ready.call( item );
+                    },
+
+                    //Fired when the input collection is populated
+                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                    setInputVisibilityDeps : function() {
+                          var item = this,
+                              module = item.module;
+
+                          //Internal item dependencies
+                          item.czr_Input.each( function( input ) {
+                                switch( input.id ) {
+                                      case 'layout' :
+                                            _.each( [ 'columns', 'img_column_width', 'has_tablet_breakpoint', 'has_mobile_breakpoint' ] , function( _inputId_ ) {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        var bool = false;
+                                                        switch( _inputId_ ) {
+                                                              case 'columns' :
+                                                                    bool = 'grid' === input();
+                                                              break;
+                                                              case 'has_tablet_breakpoint' :
+                                                              case 'has_mobile_breakpoint' :
+                                                              case 'img_column_width' :
+                                                                    bool = 'list' === input();
+                                                              break;
+                                                        }
+                                                        return bool;
+                                                  }); } catch( er ) {
+                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
+                                      case 'custom_grid_spaces' :
+                                            _.each( [ 'column_gap', 'row_gap' ] , function( _inputId_ ) {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        return input();
+                                                  }); } catch( er ) {
+                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
+                                      case 'show_excerpt' :
+                                            _.each( [ 'excerpt_length' ] , function( _inputId_ ) {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        return input();
+                                                  }); } catch( er ) {
+                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
+                                }
+                          });
+                    }
+              }
+      };
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_post_grid_main_child : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_post_grid_main_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_post_grid_main_child' )
+            }
+      });
+})( wp.customize , jQuery, _ );
+
+
+
+
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-                       //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      //module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
-                       // run the parent initialize
+
+                      //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                      module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+
+                      // run the parent initialize
                       // Note : must be always invoked always after the input / item class extension
                       // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                       api.CZRDynModule.prototype.initialize.call( module, id, options );
-               },//initialize
-      };// Constructor
+
+              },//initialize
+
+              //////////////////////////////////////////////////////////
+              /// ITEM CONSTRUCTOR
+              //////////////////////////////////////////
+              CZRItemConstructor : {
+                    //overrides the parent ready
+                    ready : function() {
+                          var item = this;
+                          //wait for the input collection to be populated,
+                          //and then set the input visibility dependencies
+                          item.inputCollection.bind( function( col ) {
+                                if( _.isEmpty( col ) )
+                                  return;
+                                try { item.setInputVisibilityDeps(); } catch( er ) {
+                                      api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                                }
+                          });//item.inputCollection.bind()
+
+                          //fire the parent
+                          api.CZRItem.prototype.ready.call( item );
+                    },
+
+                    //Fired when the input collection is populated
+                    //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                    setInputVisibilityDeps : function() {
+                          var item = this,
+                              module = item.module;
+
+                          //Internal item dependencies
+                          item.czr_Input.each( function( input ) {
+                                switch( input.id ) {
+                                      case 'show_thumb' :
+                                            _.each( [ 'img_size', 'img_has_custom_height', 'img_height', 'use_post_thumb_placeholder' ] , function( _inputId_ ) {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        var bool = false;
+                                                        switch( _inputId_ ) {
+                                                              case 'img_height' :
+                                                                    bool = input() && item.czr_Input('img_has_custom_height')();
+                                                              break;
+                                                              default :
+                                                                    bool = input();
+                                                              break;
+                                                        }
+                                                        return bool;
+                                                  }); } catch( er ) {
+                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
+                                      case 'img_has_custom_height' :
+                                            _.each( [ 'img_height' ] , function( _inputId_ ) {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        return input() && item.czr_Input('show_thumb')();
+                                                  }); } catch( er ) {
+                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
+                                }
+                          });
+                    }
+              }
+      };
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_post_grid_thumb_child : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_post_grid_thumb_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_post_grid_thumb_child' )
+            }
+      });
+})( wp.customize , jQuery, _ );
+
+
+
+
+//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_post_grid_metas_child : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_post_grid_metas_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_post_grid_metas_child' )
+            }
+      });
+})( wp.customize , jQuery, _ );
+
+
+
+
+//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_post_grid_fonts_child : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_post_grid_fonts_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_post_grid_fonts_child' )
+            }
+      });
+})( wp.customize , jQuery, _ );/* ------------------------------------------------------------------------- *
+ *  MENU CONTENT
+/* ------------------------------------------------------------------------- */
+//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -13987,7 +14284,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_menu_content_child : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_menu_content_child', 'name' ),
                   has_mod_opt : false,
@@ -14032,13 +14329,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
@@ -14147,13 +14437,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               initialize: function( id, options ) {
                       var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
@@ -14234,13 +14517,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       var Constructor = {
               initialize: function( id, options ) {
                       var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
 
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                       module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
@@ -14336,25 +14612,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
-      var Constructor = {
-              initialize: function( id, options ) {
-                      var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                      api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-              },//initialize
-      };
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -14366,7 +14623,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_simple_form_fonts_child: {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_fonts_child', 'name' ),
                   has_mod_opt : false,
@@ -14378,68 +14635,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      var Constructor = {
-            initialize: function( id, options ) {
-                  var module = this;
-                  // EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend({
-                        setupSelect : function() {
-                              api.czr_sektions.setupSelectInput.call( this );
-                        }
-                  });
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  // module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-            },//initialize
-
-            //////////////////////////////////////////////////////////
-            /// ITEM CONSTRUCTOR
-            //////////////////////////////////////////
-            // CZRItemConstructor : {
-            //       //overrides the parent ready
-            //       ready : function() {
-            //             var item = this;
-            //             //wait for the input collection to be populated,
-            //             //and then set the input visibility dependencies
-            //             item.inputCollection.bind( function( col ) {
-            //                   if( _.isEmpty( col ) )
-            //                     return;
-            //                   try { item.setInputVisibilityDeps(); } catch( er ) {
-            //                         api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
-            //                   }
-            //             });//item.inputCollection.bind()
-
-            //             //fire the parent
-            //             api.CZRItem.prototype.ready.call( item );
-            //       },
-
-            //       //Fired when the input collection is populated
-            //       //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
-            //       setInputVisibilityDeps : function() {
-            //             var item = this,
-            //                 module = item.module;
-            //             //Internal item dependencies
-            //             item.czr_Input.each( function( input ) {
-            //                   switch( input.id ) {
-            //                         case 'recaptcha_enabled' :
-            //                               _.each( [ 'recaptcha_badge' ] , function( _inputId_ ) {
-            //                                     try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-            //                                           return 'inherit' === input();
-            //                                     }); } catch( er ) {
-            //                                           api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
-            //                                     }
-            //                               });
-            //                         break;
-            //                   }
-            //             });
-            //       }
-            // }
-      };
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -14451,7 +14646,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_simple_form_submission_child: {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_simple_form_submission_child', 'name' ),
                   has_mod_opt : false,
@@ -14468,15 +14663,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               initialize: function( id, options ) {
                       var module = this;
 
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this );
-                            }
-                      });
-
                       //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                      module.itemConstructor = api.CZRItem.extend( module.CZRButtonItemConstructor || {} );
+                      module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
                       // run the parent initialize
                       // Note : must be always invoked always after the input / item class extension
@@ -14488,7 +14676,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               //////////////////////////////////////////////////////////
               /// ITEM CONSTRUCTOR
               //////////////////////////////////////////
-              CZRButtonItemConstructor : {
+              CZRItemConstructor : {
                     //overrides the parent ready
                     ready : function() {
                           var item = this;
@@ -14584,25 +14772,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
-      //BUTTON MODULE
-      var Constructor = {
-              initialize: function( id, options ) {
-                      var module = this;
-
-                      //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                      module.inputConstructor = api.CZRInput.extend({
-                            setupSelect : function() {
-                                  api.czr_sektions.setupSelectInput.call( this, sektionsLocalizedData.registeredWidgetZones );
-                            }
-                      });
-
-                      // run the parent initialize
-                      // Note : must be always invoked always after the input / item class extension
-                      // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                      api.CZRDynModule.prototype.initialize.call( module, id, options );
-
-              },//initialize
-      };
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -14614,7 +14783,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_widget_area_module : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_widget_area_module', 'name' ),
                   has_mod_opt : false,

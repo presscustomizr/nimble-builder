@@ -58,7 +58,7 @@ function sek_get_module_params_for_czr_heading_child() {
 
                 ),
                 'heading_tag' => array(
-                    'input_type'         => 'select',
+                    'input_type'         => 'simpleselect',
                     'title'              => __( 'Heading tag', 'text_doma' ),
                     'default'            => 'h1',
                     'choices'            => sek_get_select_options_for_input_id( 'heading_tag' )

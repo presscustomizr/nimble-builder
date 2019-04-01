@@ -21,7 +21,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 //     'title'       => __('Pick a page', 'text_doma')
                 // ),
                 'img-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Display an image', 'text_doma'),
                     'default'     => 'featured',
                     'choices'     => sek_get_select_options_for_input_id( 'img-type' )
@@ -33,7 +33,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
             //     //     'title'       => __('Pick a page', 'text_doma')
             //     // ),
             //     'mod_opt_test' => array(
-            //         'input_type'  => 'select',
+            //         'input_type'  => 'simpleselect',
             //         'title'       => __('Display an image', 'text_doma'),
             //         'default'     => 'featured'
             //     ),
@@ -45,7 +45,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'default'     => ''
                 ),
                 'img-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Display an image', 'text_doma'),
                     'default'     => 'featured',
                     'choices'     => sek_get_select_options_for_input_id( 'img-type' )
@@ -56,13 +56,13 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'default'     => ''
                 ),
                 'img-size' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select the image size', 'text_doma'),
                     'default'     => 'large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' )
                 ),
                 'content-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Display a text', 'text_doma'),
                     'default'     => 'page-excerpt',
                     'choices'     => sek_get_select_options_for_input_id( 'content-type' )

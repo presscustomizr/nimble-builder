@@ -9,10 +9,6 @@
             initialize: function( id, options ) {
                   var module = this;
 
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
-
-
                   //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
@@ -35,12 +31,6 @@
                         return params;
                   });
             },//initialize
-
-            CZRHeadingInputMths: {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRHeadingsInputMths
 
             // _isChecked : function( v ) {
             //       return 0 !== v && '0' !== v && false !== v && 'off' !== v;
@@ -135,32 +125,6 @@
  *  HEADING SPACING
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
-      //HEADING MODULE
-      var Constructor  = {
-            initialize: function( id, options ) {
-                  var module = this;
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR INPUT
-                  module.inputConstructor = api.CZRInput.extend( module.CZRHeadingInputMths || {} );
-
-
-                  //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
-                  //module.itemConstructor = api.CZRItem.extend( module.CZRItemMethods || {} );
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
-            },//initialize
-
-            CZRHeadingInputMths: {
-                  setupSelect : function() {
-                        api.czr_sektions.setupSelectInput.call( this );
-                  }
-            },//CZRHeadingsInputMths
-      };//Constructor
-
-
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -172,7 +136,7 @@
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
             czr_heading_spacing_child : {
-                  mthds : Constructor,
+                  //mthds : Constructor,
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( 'czr_heading_spacing_child', 'name' ),
                   has_mod_opt : false,

@@ -13,7 +13,7 @@ function sek_get_module_params_for_sek_level_height_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'height-type' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Height : auto or custom', 'text_doma'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'height-type' )

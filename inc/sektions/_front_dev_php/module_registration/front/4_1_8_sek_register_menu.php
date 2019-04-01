@@ -77,7 +77,7 @@ function sek_get_module_params_for_czr_menu_content_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'menu-id' => array(
-                    'input_type'  => 'select',
+                    'input_type'  => 'simpleselect',
                     'title'       => __('Select a menu', 'text_doma'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_user_created_menus(),

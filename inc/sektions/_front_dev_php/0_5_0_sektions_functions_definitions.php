@@ -341,7 +341,7 @@ function sek_page_uses_nimble_header_footer() {
 // Helper
 function sek_get_registered_module_type_property( $module_type, $property = '' ) {
     // registered modules
-    $registered_modules = CZR_Fmk_Base() -> registered_modules;
+    $registered_modules = CZR_Fmk_Base()->registered_modules;
     if ( ! array_key_exists( $module_type, $registered_modules ) ) {
         sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
         return;
@@ -562,7 +562,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
     if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
         $input_list = $cached_input_lists[ $module_type ];
     } else {
-        $registered_modules = CZR_Fmk_Base() -> registered_modules;
+        $registered_modules = CZR_Fmk_Base()->registered_modules;
         // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
         if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
@@ -1612,11 +1612,16 @@ function sek_get_module_collection() {
         ),
         array(
           'content-type' => 'module',
+          'content-id' => 'czr_post_grid_module',
+          'title' => __( 'Post grid', 'text_doma' ),
+          'icon' => 'Nimble_posts-list_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
           'content-id' => 'czr_map_module',
           'title' => __( 'Map', 'text_doma' ),
           'icon' => 'Nimble_map_icon.svg'
         ),
-
         array(
           'content-type' => 'preset_section',
           'content-id' => 'two_columns',
