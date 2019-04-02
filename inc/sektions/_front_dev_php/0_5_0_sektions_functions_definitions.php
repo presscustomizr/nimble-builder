@@ -1703,4 +1703,23 @@ function sek_get_module_collection() {
 
     );
 }
+
+// @return string theme name
+// always return the parent theme name
+function sek_get_parent_theme_slug() {
+    $theme_slug = get_option( 'stylesheet' );
+    // $_REQUEST['theme'] is set both in live preview and when we're customizing a non active theme
+    $theme_slug = isset($_REQUEST['theme']) ? $_REQUEST['theme'] : $theme_slug; //old wp versions
+    $theme_slug = isset($_REQUEST['customize_theme']) ? $_REQUEST['customize_theme'] : $theme_slug;
+
+    //gets the theme name (or parent if child)
+    $theme_data = wp_get_theme( $theme_slug );
+    if ( $theme_data -> parent() ) {
+        $theme_slug = $theme_data -> parent() -> Name;
+    }
+
+    return sanitize_file_name( strtolower( $theme_slug ) );
+}
+
+
 ?>

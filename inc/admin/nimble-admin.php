@@ -576,3 +576,213 @@ function sek_render_welcome_notice() {
 		</style>
 		<?php
 }
+
+
+// Register Dashboard Widgets.
+add_action( 'wp_dashboard_setup', '\Nimble\sek_register_dashboard_widgets' );
+function sek_register_dashboard_widgets() {
+    $theme_name = sek_get_parent_theme_slug();
+    $title = __( 'Nimble Builder Overview', 'text_doma' );
+    if ( in_array($theme_name, array('customizr', 'hueman') ) ) {
+        $title = sprintf( __( 'Nimble Builder & %s Overview', 'text_doma' ), ucfirst($theme_name) ) ;
+    }
+    wp_add_dashboard_widget(
+        'presscustomizr-dashboard',
+        $title,
+        '\Nimble\sek_nimble_dashboard_overview_widget'
+    );
+
+    // Move the widget top
+    global $wp_meta_boxes;
+
+    $dashboard = $wp_meta_boxes['dashboard']['normal']['core'];
+    $nimble_widget = [
+      'presscustomizr-dashboard' => $dashboard['presscustomizr-dashboard'],
+    ];
+
+    $wp_meta_boxes['dashboard']['normal']['core'] = array_merge( $nimble_widget, $dashboard ); // WPCS: override ok.
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ADMIN DASHBOARD */
+function sek_nimble_dashboard_overview_widget() {
+    $post_data = sek_get_latest_posts_data( false );
+    $theme_name = sek_get_parent_theme_slug();
+    //sek_error_log('$theme_name ??' . defined( strtoupper($theme_name).'_VER' ), strtoupper($theme_name).'_VER' );
+    ?>
+    <div class="nimble-db-wrapper">
+      <div class="nimble-db-header">
+        <div class="nimble-logo"><div class="sek-nimble-icon" title="Add sections in live preview with the Nimble Builder"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="Nimble Builder"></div></div>
+        <div class="nimble-version">
+          <span class="nimble-version-text"><?php _e('Nimble Builder', 'text_doma'); ?> v<?php echo NIMBLE_VERSION; ?></span>
+          <?php if ( in_array($theme_name, array('customizr', 'hueman') ) ) : ?>
+            <?php
+              $theme_data = wp_get_theme();
+              printf('<span class="nimble-version-text"> + %1$s theme v%2$s</span>', ucfirst($theme_name), $theme_data -> version );
+            ?>
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php if ( ! empty( $post_data ) ) : ?>
+        <div class="nimble-post-list">
+          <h3 class="nimble-post-list-title"><?php echo __( 'News & release notes', 'text_doma' ); ?></h3>
+          <ul class="nimble-collection">
+            <?php foreach ( $post_data as $single_post_data ) : ?>
+              <li class="nimble-single-post">
+                <a href="<?php echo esc_url( $single_post_data['url'] ); ?>" class="nimble-single-post-link" target="_blank">
+                  <?php echo esc_html( $single_post_data['title'] ); ?>
+                </a>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+      <?php endif; ?>
+      <?php
+        $footer_links = array(
+          'news' => array(
+            'title' => __( 'Blog', 'text_doma' ),
+            'link' => 'https://presscustomizr.com/blog/?ref=a&amp;utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=dashboard',
+          ),
+          'doc' => array(
+            'title' => __( 'Help', 'text_doma' ),
+            'link' => 'https://docs.presscustomizr.com/collection/334-nimble-builder/?ref=a&amp;utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=dashboard',
+          ),
+        );
+        $go_pro_link = array();
+        $theme_name = sek_get_parent_theme_slug();
+        if ( in_array($theme_name, array('customizr', 'hueman') ) ) {
+            $go_pro = sek_get_go_pro_message( $theme_name, false );
+            if ( !empty( $go_pro ) ) {
+              $additions_actions = array(
+                'go-pro' => array(
+                  'html' => $go_pro,
+                ),
+              );
+            }
+        }
+        $footer_links = array_merge($footer_links,$go_pro_link);
+      ?>
+      <div class="nimble-db-footer">
+          <?php foreach ( $footer_links as $link_id => $link_data ) : ?>
+            <div class="nimble-footer-link-<?php echo esc_attr( $link_id ); ?>">
+              <?php if ( !empty( $link_data['html'] ) ) : ?>
+                <?php echo $link_data['html']; ?>
+              <?php else : ?>
+              <a href="<?php echo esc_attr( $link_data['link'] ); ?>" target="_blank"><?php echo esc_html( $link_data['title'] ); ?> <span class="screen-reader-text"><?php echo __( '(opens in a new window)', 'text_doma' ); ?></span><span aria-hidden="true" class="dashicons dashicons-external"></span></a>
+              <?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+
+      </div>
+    </div>
+    <?php
+}
+
+
+
+
+if ( !defined( "NIMBLE_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_LIBRARY_OPT_NAME", 'nimble_api_library_data' ); }
+if ( !defined( "NIMBLE_NEWS_OPT_NAME" ) ) { define( "NIMBLE_NEWS_OPT_NAME", 'nimble_api_news_data' ); }
+if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https://presscustomizr.com/wp-json/nimble/v1/cravan' ); }
+
+
+/**
+ * Get info data.
+ * @param bool $force_update Optional. Whether to force the data retrieval or
+ *                                     not. Default is false.
+ * @return array|false Info data, or false.
+ */
+function sek_get_info_data( $force_update = false ) {
+  $cache_key = 'nimble_remote_info_api_data_' . NIMBLE_VERSION;
+
+  $info_data = get_transient( $cache_key );
+
+  // Refresh every 12 hours, unless force_update set to true
+  if ( $force_update || false === $info_data ) {
+    $timeout = ( $force_update ) ? 25 : 8;
+    $response = wp_remote_get( NIMBLE_DATA_API_URL, array(
+      'timeout' => $timeout,
+      'body' => [
+        // Which API version is used.
+        'api_version' => NIMBLE_VERSION,
+        // Which language to return.
+        'site_lang' => get_bloginfo( 'language' ),
+        'theme_name' => sek_get_parent_theme_slug()
+      ],
+    ) );
+
+    if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+      // HOUR_IN_SECONDS is a default WP constant
+      set_transient( $cache_key, [], 2 * HOUR_IN_SECONDS );
+      return false;
+    }
+
+    $info_data = json_decode( wp_remote_retrieve_body( $response ), true );
+
+    if ( empty( $info_data ) || ! is_array( $info_data ) ) {
+      set_transient( $cache_key, [], 2 * HOUR_IN_SECONDS );
+      return false;
+    }
+
+    if ( isset( $info_data['library'] ) ) {
+      update_option( NIMBLE_LIBRARY_OPT_NAME, $info_data['library'], 'no' );
+
+      unset( $info_data['library'] );
+    }
+
+    if ( isset( $info_data['latest_posts'] ) ) {
+      update_option( NIMBLE_NEWS_OPT_NAME, $info_data['latest_posts'], 'no' );
+
+      unset( $info_data['latest_posts'] );
+    }
+
+    set_transient( $cache_key, $info_data, 12 * HOUR_IN_SECONDS );
+  }//if ( $force_update || false === $info_data ) {
+
+  return $info_data;
+}
+
+
+
+function sek_get_latest_posts_data( $force_update = false ) {
+    sek_get_info_data( $force_update );
+    $latest_posts = get_option( NIMBLE_NEWS_OPT_NAME );
+    if ( empty( $latest_posts ) ) {
+      return [];
+    }
+    return $latest_posts;
+}
+
+function sek_get_go_pro_message( $theme_name, $force_update = false ) {
+    $info_data = sek_get_info_data( $force_update );
+    if ( !in_array($theme_name, array('customizr', 'hueman') ) || ! is_array( $info_data ) ) {
+        return '';
+    }
+    $message = '';
+    $go_pro_data = isset( $info_data['go_pro'] ) ? $info_data['go_pro'] : null;
+    $fn = 'customizr' === $theme_name ? 'czr_fn_user_started_before_version' : 'hu_user_started_before_version';
+    if ( function_exists($fn) && !is_null($go_pro_data) && isset( $go_pro_data['started_before'] ) && call_user_func_array( $fn, array( $go_pro_data['started_before'] ) ) ) {
+        $message = !empty( $go_pro_data['html'] ) ? $go_pro_data['html'] : '';
+    }
+    return $message;
+}
+
+add_action( 'after_switch_theme', '\Nimble\sek_refresh_nimble_api_data');
+function sek_refresh_nimble_api_data() {
+    // Refresh data on theme switch
+    // => so the posts and message are up to date
+    sek_get_info_data(true);
+}
