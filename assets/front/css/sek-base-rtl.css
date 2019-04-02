@@ -501,7 +501,12 @@ button.sek-btn,
   font-size: 1em;
 }
 
-.sek-heading > a {
+.sek-module-inner .sek-heading {
+  text-align: center;
+  margin: 0.6em 0;
+}
+
+.sek-module-inner .sek-heading > a {
   color: inherit;
   font-size: inherit;
 }
@@ -1497,7 +1502,7 @@ button.sek-btn,
 
 .sek-post-grid-wrapper .sek-thumb-custom-height .sek-pg-thumbnail a {
   height: 0;
-  padding-top: 50%;
+  padding-top: 65%;
 }
 
 .sek-post-grid-wrapper .sek-thumb-custom-height .sek-pg-thumbnail img {

@@ -3009,7 +3009,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'title_width' => 'width-100',
                 ),
                 'bg-attachment' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Fixed background', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3017,7 +3017,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'default'     => 0
                 ),
                 'bg-parallax' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Parallax effect on scroll', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3058,7 +3058,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
                 ),
                 'bg-apply-overlay' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Apply a background overlay', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3246,7 +3246,7 @@ function sek_get_module_params_for_sek_level_border_module() {
                     'max'         => 500,
                 ),
                 'shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Apply a shadow', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -3343,7 +3343,7 @@ function sek_get_module_params_for_sek_level_height_module() {
                     'notice_before' => 'Note that when using a custom height, the inner content can be larger than the parent container, in particular on mobile devices. To prevent this problem, preview your page with the device switcher icons. You can also activate the overflow hidden option below.'
                 ),
                 'overflow_hidden' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Overflow hidden', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -3672,7 +3672,7 @@ function sek_get_module_params_for_sek_level_width_section() {
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-outer-width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define a custom outer width for this section', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -3690,7 +3690,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'title_width' => 'width-100'
                 ),
                 'use-custom-inner-width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define a custom inner width for this section', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -3824,7 +3824,7 @@ function sek_get_module_params_for_sek_level_visibility_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'desktops' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">desktop_mac</i> %1$s', __('Visible on desktop devices', 'text_doma') ),
                     'default'     => 1,
                     'title_width' => 'width-80',
@@ -3833,7 +3833,7 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                     'refresh_stylesheet' => false
                 ),
                 'tablets' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">tablet_mac</i> %1$s', __('Visible on tablet devices', 'text_doma') ),
                     'default'     => 1,
                     'title_width' => 'width-80',
@@ -3842,7 +3842,7 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                     'refresh_stylesheet' => false
                 ),
                 'mobiles' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">phone_iphone</i> %1$s', __('Visible on mobile devices', 'text_doma') ),
                     'default'     => 1,
                     'title_width' => 'width-80',
@@ -3866,7 +3866,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
         'tmpl' => array(
             'item-inputs' => array(
                   'use-custom-breakpoint' => array(
-                      'input_type'  => 'gutencheck',
+                      'input_type'  => 'nimblecheck',
                       'title'       => __('Use a custom breakpoint for the vertical reorganization of columns', 'text_doma'),
                       'default'     => 0,
                       'title_width' => 'width-80',
@@ -3888,7 +3888,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                       'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default breakpoint is 768px.', 'text_doma')
                   ),//0,
                   'reverse-col-at-breakpoint' => array(
-                      'input_type'  => 'gutencheck',
+                      'input_type'  => 'nimblecheck',
                       'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'text_doma'),
                       'default'     => 0,
                       'title_width' => 'width-80',
@@ -3972,7 +3972,7 @@ function sek_get_module_params_for_sek_local_widths() {
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-outer-width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define a custom outer width for the sections of this page', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4000,7 +4000,7 @@ function sek_get_module_params_for_sek_local_widths() {
                     'notice_after' => __('This option will be inherited by all Nimble sections of the currently previewed page, unless for sections with a specific width option.')
                 ),
                 'use-custom-inner-width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define a custom inner width for the sections of this page', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4254,7 +4254,7 @@ function sek_get_module_params_for_sek_local_imp_exp() {
                     'title_width' => 'width-100',
                 ),
                 'keep_existing_sections' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Combine the imported sections with the current ones.', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4277,7 +4277,7 @@ function sek_get_module_params_for_sek_global_breakpoint() {
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-breakpoint' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Use a global custom breakpoint for the vertical reorganization of columns', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4321,7 +4321,7 @@ function sek_get_module_params_for_sek_global_widths() {
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-outer-width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define a custom outer width for the sections site wide', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4347,7 +4347,7 @@ function sek_get_module_params_for_sek_global_widths() {
                     'notice_after' => __('This option will be inherited by all Nimble sections of your site, unless for pages or sections with specific width options.')
                 ),
                 'use-custom-inner-width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define a custom inner width for the sections site wide', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4473,7 +4473,7 @@ function sek_get_module_params_for_sek_global_performances() {
         'tmpl' => array(
             'item-inputs' => array(
                 'global-img-smart-load' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Load images on scroll', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4527,7 +4527,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
         'tmpl' => array(
             'item-inputs' => array(
                 'enable' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => sprintf( '<img height="20" width="20" src="%1$s"/> %2$s', NIMBLE_BASE_URL . '/assets/img/recaptcha_32.png', __('Activate Google reCAPTCHA on your forms', 'text_doma') ),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4566,7 +4566,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                     'refresh_markup' => false
                 ),//0,
                 'show_failure_message' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Show a failure message', 'text_doma' ),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4582,7 +4582,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                     'refresh_markup' => false
                 ),
                 'badge' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Show the reCAPTCHA badge at the bottom of your page', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4626,7 +4626,7 @@ function sek_get_module_params_for_sek_global_beta_features() {
         'tmpl' => array(
             'item-inputs' => array(
                 'beta-enabled' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Enable beta features', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -4643,6 +4643,7 @@ function sek_get_module_params_for_sek_global_beta_features() {
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER SIMPLE HTML MODULE
 /* ------------------------------------------------------------------------- */
+
 function sek_get_module_params_for_czr_simple_html_module() {
     return array(
         'dynamic_registration' => true,
@@ -4730,7 +4731,7 @@ function sek_get_module_params_for_czr_tinymce_child() {
                     'width-100'   => true,
                 ),
                 'autop' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Automatically convert text into paragraph', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -4821,7 +4822,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'default'     => ''
                 ),
                 'link-target' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -4838,7 +4839,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'width-100'   => true,
                 ),
                 'use_custom_title_attr' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Set the text displayed when the mouse is held over', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -4853,7 +4854,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'width-100'         => true
                 ),
                 'use_custom_width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Custom image width', 'text_doma' ),
                     'default'     => 0,
                     'refresh_stylesheet' => true
@@ -4871,7 +4872,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'refresh_stylesheet' => true
                 ),
                 'use_box_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 0,
                 ),
@@ -5078,7 +5079,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'default'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
                 ),
                 'btn-display' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display a call to action button', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -5113,8 +5114,7 @@ function sek_get_module_params_for_czr_heading_module() {
         'name' => __('Heading', 'text_doma'),
         'starting_value' => array(
             'main_settings' => array(
-                'heading_text' => 'This is a heading.',
-                'h_alignment_css' => array( 'desktop' => 'center')
+                'heading_text' => 'This is a heading.'
             )
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-heading' ),
@@ -5157,7 +5157,7 @@ function sek_get_module_params_for_czr_heading_child() {
                 'h_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
                     'title'       => __('Alignment', 'text_doma'),
-                    'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
+                    'default'     => array( 'desktop' => 'center'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'h_alignment',
@@ -5173,7 +5173,7 @@ function sek_get_module_params_for_czr_heading_child() {
                     'notice_after' => __('Not previewable during customization', 'text_domain_to')
                 ),
                 'link-to' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Turn into a link', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -5190,7 +5190,7 @@ function sek_get_module_params_for_czr_heading_child() {
                     'default'     => ''
                 ),
                 'link-target' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -5216,7 +5216,7 @@ function sek_get_module_params_for_czr_heading_spacing_child() {
                 'spacing_css'     => array(
                     'input_type'  => 'spacingWithDeviceSwitcher',
                     'title'       => __( 'Margin and padding', 'text_doma' ),
-                    'default'     => array( 'desktop' => array() ),
+                    'default'     => array('desktop' => array('margin-bottom' => '0.6', 'margin-top' => '0.6', 'unit' => 'em')),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'refresh_markup'     => false,
@@ -5251,6 +5251,7 @@ function validate_callback__czr_heading_module( $value ) {
  *  LOAD AND REGISTER SPACER MODULE
 /* ------------------------------------------------------------------------- */
 
+
 function sek_get_module_params_for_czr_spacer_module() {
     return array(
         'dynamic_registration' => true,
@@ -5282,6 +5283,7 @@ function sek_get_module_params_for_czr_spacer_module() {
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER DIVIDER MODULE
 /* ------------------------------------------------------------------------- */
+
 function sek_get_module_params_for_czr_divider_module() {
     return array(
         'dynamic_registration' => true,
@@ -5374,6 +5376,7 @@ function sek_get_module_params_for_czr_divider_module() {
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER ICON MODULE
 /* ------------------------------------------------------------------------- */
+
 function sek_get_module_params_for_czr_icon_module() {
     return array(
         'dynamic_registration' => true,
@@ -5439,7 +5442,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                     'default'     => ''
                 ),
                 'link-target' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -5478,7 +5481,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                     'css_identifier' => 'color'
                 ),
                 'use_custom_color_on_hover' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Set a custom icon color on mouse hover', 'text_doma' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -5571,7 +5574,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                     'css_identifier' => 'border_radius',
                 ),
                 'use_box_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 0,
                 ),
@@ -5639,6 +5642,7 @@ function sek_add_css_rules_for_icon_front_module( $rules, $complete_modul_model 
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER MAP MODULE
 /* ------------------------------------------------------------------------- */
+
 function sek_get_module_params_for_czr_map_module() {
     return array(
         'dynamic_registration' => true,
@@ -5680,7 +5684,7 @@ function sek_get_module_params_for_czr_map_module() {
                     'css_identifier' => 'height'
                 ),
                 'lazyload' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Lazy load', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -5699,6 +5703,7 @@ function sek_get_module_params_for_czr_map_module() {
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER QUOTE MODULE
 /* ------------------------------------------------------------------------- */
+
 function sek_get_module_params_for_czr_quote_module() {
     return array(
         'dynamic_registration' => true,
@@ -5873,7 +5878,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'width-100'   => true,
                 ),//0,
                 'quote___flag_important'       => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                     'default'     => 0,
                     'refresh_markup' => false,
@@ -6036,7 +6041,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'width-100'   => true,
                 ),//0,
                 'cite___flag_important'       => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                     'default'     => 0,
                     'refresh_markup' => false,
@@ -6164,6 +6169,7 @@ function sanitize_callback__czr_quote_module( $value ) {
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER BUTTON MODULE
 /* ------------------------------------------------------------------------- */
+
 function sek_get_module_params_for_czr_button_module() {
     $css_selectors = '.sek-btn';
     $css_font_selectors = '.sek-btn';
@@ -6249,7 +6255,7 @@ function sek_get_module_params_for_czr_btn_content_child() {
                     'default'     => ''
                 ),
                 'link-target' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -6294,7 +6300,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                     'css_identifier' => 'background_color',
                 ),
                 'use_custom_bg_color_on_hover' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Set a custom background color on mouse hover', 'text_doma' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -6373,14 +6379,14 @@ function sek_get_module_params_for_czr_btn_design_child() {
                     'css_selectors'=> '.sek-module-inner .sek-btn'
                 ),
                 'use_box_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'push_effect' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Push visual effect', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
@@ -6461,6 +6467,7 @@ function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_mode
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER SIMPLE FORM MODULES
 /* ------------------------------------------------------------------------- */
+
 function sek_get_module_params_for_czr_simple_form_module() {
     $css_selectors = '.sek-btn';
     $css_font_selectors = '.sek-btn';
@@ -6531,7 +6538,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'show_name_field' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display name field', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -6544,7 +6551,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'default'     => __('Name', 'translate')
                 ),
                 'name_field_required' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Name field is required', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -6552,7 +6559,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 ),
 
                 'show_subject_field' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display subject field', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -6565,7 +6572,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'default'     => __('Subject', 'translate')
                 ),
                 'subject_field_required' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Subject field is required', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -6573,7 +6580,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 ),
 
                 'show_message_field' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display message field', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -6586,7 +6593,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'default'     => __('Message', 'translate')
                 ),
                 'message_field_required' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Message field is required', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -6676,12 +6683,12 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                     'css_selectors'=> $css_selectors
                 ),
                 'use_inset_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply an inset shadow', 'text_doma' ),
                     'default'     => 1,
                 ),
                 'use_outset_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply an outset shadow', 'text_doma' ),
                     'default'     => 0,
                 )
@@ -6717,7 +6724,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                       'css_selectors'=> $css_selectors
                 ),
                 'use_custom_bg_color_on_hover' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Set a custom background color on mouse hover', 'text_doma' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -6797,14 +6804,14 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                     'css_selectors'=> $css_selectors,//'.sek-module-inner .sek-btn'
                 ),
                 'use_box_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'push_effect' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Push visual effect', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
@@ -6955,7 +6962,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'width-100'   => true,
                             ),//0,
                             'fl___flag_important'       => array(
-                                'input_type'  => 'gutencheck',
+                                'input_type'  => 'nimblecheck',
                                 'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
@@ -7090,7 +7097,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'width-100'   => true,
                             ),//0,
                             'ft___flag_important'       => array(
-                                'input_type'  => 'gutencheck',
+                                'input_type'  => 'nimblecheck',
                                 'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
@@ -7225,7 +7232,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'width-100'   => true,
                             ),//0,
                             'btn___flag_important'       => array(
-                                'input_type'  => 'gutencheck',
+                                'input_type'  => 'nimblecheck',
                                 'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
@@ -7508,14 +7515,14 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'refresh_stylesheet' => true
                 ),//null,
                 'has_tablet_breakpoint' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => '<i class="material-icons sek-input-title-icon">tablet_mac</i>' . __('Reorganize image and content vertically on tablet devices', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
                 'has_mobile_breakpoint' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => '<i class="material-icons sek-input-title-icon">phone_iphone</i>' . __('Reorganize image and content vertically on smartphones devices', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -7523,7 +7530,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
 
                 'show_title' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display the post title', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -7531,7 +7538,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'html_before' => '<hr>'
                 ),
                 'show_excerpt' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display the post excerpt', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -7573,7 +7580,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
 
                 'apply_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Apply a shadow', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -7581,7 +7588,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
 
                 'custom_grid_spaces' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define custom spaces between columns and rows', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -7629,7 +7636,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'show_thumb' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display post thumbnail', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -7647,7 +7654,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                     'notice_after' => __('Note that Nimble Builder will let browsers choose the most appropriate size for better performances.', 'text_doma' )
                 ),
                 'img_has_custom_height' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Apply a custom height to the thumbnail', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -7658,7 +7665,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                 'img_height' => array(
                     'input_type'  => 'range_simple_device_switcher',
                     'title'       => __( 'Thumbnail height', 'text_doma' ),
-                    'default'     =>  array( 'desktop' => '70' ),
+                    'default'     =>  array( 'desktop' => '65' ),
                     'min'         => 1,
                     'max'         => 300,
                     'step'        => 1,
@@ -7682,7 +7689,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                     'css_selectors'=> '.sek-pg-thumbnail'
                 ),
                 'use_post_thumb_placeholder' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Use a placeholder image when no post thumbnail is set', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -7707,28 +7714,28 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'show_cats' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display categories', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'show_author' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display author', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'show_date' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display date', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'show_comments' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display comment number', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -8277,6 +8284,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER BUTTON MODULE
 /* ------------------------------------------------------------------------- */
+
 function sek_get_module_params_for_czr_menu_module() {
     $css_selectors = '.sek-btn';
     $css_font_selectors = '.sek-btn';
@@ -8349,7 +8357,7 @@ function sek_get_module_params_for_czr_menu_mobile_options() {
         'tmpl' => array(
             'item-inputs' => array(
                 'expand_below' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => sprintf('%s %s', '<i class="material-icons sek-level-option-icon">devices</i>', __('On mobile devices, expand the menu in full width below the menu hamburger icon.', 'text_doma') ),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -8471,7 +8479,7 @@ function sek_get_module_params_for_czr_font_child() {
                     'width-100'   => true,
                 ),//0,
                 'fonts___flag_important'  => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Apply the style options in priority (uses !important).', 'text_doma'),
                     'default'     => 0,
                     'refresh_markup' => false,
@@ -8500,6 +8508,7 @@ function sek_get_module_params_for_czr_font_child() {
 /* ------------------------------------------------------------------------- *
  *  LOAD AND REGISTER WIDGET ZONE MODULE
 /* ------------------------------------------------------------------------- */
+
 function sek_get_module_params_for_czr_widget_area_module() {
     return array(
         'dynamic_registration' => true,
