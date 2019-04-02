@@ -75,7 +75,7 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
                   // note : using add_filter( 'excerpt_length' ) do not work when using a custom excerpt
                   // code inspired from WP core formatting.php
                 ?>
-                <?php echo wp_trim_words( get_the_excerpt(), sek_pg_get_excerpt_length( 55 ), ' ' . '[&hellip;]' ); ?>
+                <?php echo apply_filters( 'the_excerpt', wp_trim_words( get_the_excerpt(), sek_pg_get_excerpt_length( 55 ), ' ' . '[&hellip;]' ) ); ?>
               </div>
             <?php endif; ?>
           </div><?php //.sek-pg-content ?>
