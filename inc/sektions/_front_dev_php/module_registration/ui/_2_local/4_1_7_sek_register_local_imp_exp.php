@@ -24,7 +24,7 @@ function sek_get_module_params_for_sek_local_imp_exp() {
                     // 'notice_after' => __('Select a revision from the drop-down list to preview it. You can then restore it by clicking the Publish button at the top of the page.', 'text_doma')
                 ),
                 'keep_existing_sections' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Combine the imported sections with the current ones.', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',

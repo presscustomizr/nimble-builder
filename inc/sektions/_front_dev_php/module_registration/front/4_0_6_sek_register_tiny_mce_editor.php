@@ -65,7 +65,7 @@ function sek_get_module_params_for_czr_tinymce_child() {
                     'width-100'   => true,
                 ),
                 'autop' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Automatically convert text into paragraph', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',

@@ -73,7 +73,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                     'default'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
                 ),
                 'btn-display' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display a call to action button', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',

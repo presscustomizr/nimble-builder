@@ -30,7 +30,7 @@ function sek_get_module_params_for_sek_level_height_module() {
                 ),
                 // implemented to fix https://github.com/presscustomizr/nimble-builder/issues/365
                 'overflow_hidden' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Overflow hidden', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',

@@ -13,7 +13,7 @@ function sek_get_module_params_for_sek_global_performances() {
         'tmpl' => array(
             'item-inputs' => array(
                 'global-img-smart-load' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Load images on scroll', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',

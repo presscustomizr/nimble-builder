@@ -14,7 +14,7 @@ function sek_get_module_params_for_sek_local_widths() {
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-outer-width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define a custom outer width for the sections of this page', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -42,7 +42,7 @@ function sek_get_module_params_for_sek_local_widths() {
                     'notice_after' => __('This option will be inherited by all Nimble sections of the currently previewed page, unless for sections with a specific width option.')
                 ),
                 'use-custom-inner-width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define a custom inner width for the sections of this page', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',

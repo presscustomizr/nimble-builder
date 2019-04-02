@@ -488,7 +488,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
 // then verify is the provided input_id is part of the list of input that should be set to important => 'important_input_list'
 // Example of a *_flag_important input:
 // 'quote___flag_important'       => array(
-//     'input_type'  => 'gutencheck',
+//     'input_type'  => 'nimblecheck',
 //     'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
 //     'default'     => 0,
 //     'refresh_markup' => false,

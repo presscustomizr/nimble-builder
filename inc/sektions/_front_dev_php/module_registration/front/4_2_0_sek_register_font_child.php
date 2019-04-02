@@ -126,7 +126,7 @@ function sek_get_module_params_for_czr_font_child() {
                 ),//0,
                 // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                 'fonts___flag_important'  => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Apply the style options in priority (uses !important).', 'text_doma'),
                     'default'     => 0,
                     'refresh_markup' => false,

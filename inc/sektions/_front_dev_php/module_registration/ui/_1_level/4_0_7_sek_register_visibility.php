@@ -10,7 +10,7 @@ function sek_get_module_params_for_sek_level_visibility_module() {
         'tmpl' => array(
             'item-inputs' => array(
                 'desktops' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">desktop_mac</i> %1$s', __('Visible on desktop devices', 'text_doma') ),
                     'default'     => 1,
                     'title_width' => 'width-80',
@@ -19,7 +19,7 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                     'refresh_stylesheet' => false
                 ),
                 'tablets' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">tablet_mac</i> %1$s', __('Visible on tablet devices', 'text_doma') ),
                     'default'     => 1,
                     'title_width' => 'width-80',
@@ -28,7 +28,7 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                     'refresh_stylesheet' => false
                 ),
                 'mobiles' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => sprintf('<i class="material-icons" style="font-size: 1.2em;">phone_iphone</i> %1$s', __('Visible on mobile devices', 'text_doma') ),
                     'default'     => 1,
                     'title_width' => 'width-80',

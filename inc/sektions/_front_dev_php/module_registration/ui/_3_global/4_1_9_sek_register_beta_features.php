@@ -13,7 +13,7 @@ function sek_get_module_params_for_sek_global_beta_features() {
         'tmpl' => array(
             'item-inputs' => array(
                 'beta-enabled' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Enable beta features', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',

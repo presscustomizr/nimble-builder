@@ -103,7 +103,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'refresh_stylesheet' => true
                 ),//null,
                 'has_tablet_breakpoint' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => '<i class="material-icons sek-input-title-icon">tablet_mac</i>' . __('Reorganize image and content vertically on tablet devices', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -111,7 +111,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     //'html_before' => '<hr>'
                 ),
                 'has_mobile_breakpoint' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => '<i class="material-icons sek-input-title-icon">phone_iphone</i>' . __('Reorganize image and content vertically on smartphones devices', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -119,7 +119,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
 
                 'show_title' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display the post title', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -127,7 +127,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'html_before' => '<hr>'
                 ),
                 'show_excerpt' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display the post excerpt', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -170,7 +170,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
 
                 'apply_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Apply a shadow', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -178,7 +178,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
 
                 'custom_grid_spaces' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define custom spaces between columns and rows', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -239,7 +239,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
             'item-inputs' => array(
                 // IMAGE
                 'show_thumb' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display post thumbnail', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -257,7 +257,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                     'notice_after' => __('Note that Nimble Builder will let browsers choose the most appropriate size for better performances.', 'text_doma' )
                 ),
                 'img_has_custom_height' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Apply a custom height to the thumbnail', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -292,7 +292,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                     'css_selectors'=> '.sek-pg-thumbnail'
                 ),
                 'use_post_thumb_placeholder' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Use a placeholder image when no post thumbnail is set', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -329,28 +329,28 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'show_cats' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display categories', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'show_author' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display author', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'show_date' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display date', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'show_comments' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display comment number', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',

@@ -11,7 +11,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
         'tmpl' => array(
             'item-inputs' => array(
                   'use-custom-breakpoint' => array(
-                      'input_type'  => 'gutencheck',
+                      'input_type'  => 'nimblecheck',
                       'title'       => __('Use a custom breakpoint for the vertical reorganization of columns', 'text_doma'),
                       'default'     => 0,
                       'title_width' => 'width-80',
@@ -34,7 +34,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                       'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default breakpoint is 768px.', 'text_doma')
                   ),//0,
                   'reverse-col-at-breakpoint' => array(
-                      'input_type'  => 'gutencheck',
+                      'input_type'  => 'nimblecheck',
                       'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'text_doma'),
                       'default'     => 0,
                       'title_width' => 'width-80',

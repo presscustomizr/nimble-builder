@@ -3,29 +3,7 @@
  *  LOAD AND REGISTER SIMPLE FORM MODULES
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-//Availabe input types
-// $.extend( api.czrInputMap, {
-//       text      : '',
-//       textarea  : '',
-//       check     : 'setupIcheck',
-//       gutencheck : 'setupGutenCheck',
-//       select    : 'setupSelect',
-//       radio     : 'setupRadio',
-//       number    : 'setupStepper',
-//       upload    : 'setupImageUploaderSaveAsId',
-//       upload_url : 'setupImageUploaderSaveAsUrl',
-//       color     : 'setupColorPicker',
-//       wp_color_alpha : 'setupColorPickerAlpha',
-//       wp_color  : 'setupWPColorPicker',//not used for the moment
-//       content_picker : 'setupContentPicker',
-//       tiny_mce_editor : 'setupTinyMceEditor',
-//       password : '',
-//       range : 'setupSimpleRange',
-//       range_slider : 'setupRangeSlider',
-//       hidden : '',
-//       h_alignment : 'setupHAlignement',
-//       h_text_alignment : 'setupHAlignement'
-// });
+
 function sek_get_module_params_for_czr_simple_form_module() {
     $css_selectors = '.sek-btn';
     $css_font_selectors = '.sek-btn';
@@ -109,7 +87,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
         'tmpl' => array(
             'item-inputs' => array(
                 'show_name_field' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display name field', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -122,7 +100,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'default'     => __('Name', 'translate')
                 ),
                 'name_field_required' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Name field is required', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -130,7 +108,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 ),
 
                 'show_subject_field' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display subject field', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -143,7 +121,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'default'     => __('Subject', 'translate')
                 ),
                 'subject_field_required' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Subject field is required', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -151,7 +129,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 ),
 
                 'show_message_field' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Display message field', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -164,7 +142,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'default'     => __('Message', 'translate')
                 ),
                 'message_field_required' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Message field is required', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
@@ -266,12 +244,12 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                     'css_selectors'=> $css_selectors
                 ),
                 'use_inset_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply an inset shadow', 'text_doma' ),
                     'default'     => 1,
                 ),
                 'use_outset_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply an outset shadow', 'text_doma' ),
                     'default'     => 0,
                 )
@@ -319,7 +297,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                       'css_selectors'=> $css_selectors
                 ),
                 'use_custom_bg_color_on_hover' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Set a custom background color on mouse hover', 'text_doma' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -400,14 +378,14 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                     'css_selectors'=> $css_selectors,//'.sek-module-inner .sek-btn'
                 ),
                 'use_box_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'push_effect' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Push visual effect', 'text_doma' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
@@ -562,7 +540,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//0,
                             // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                             'fl___flag_important'       => array(
-                                'input_type'  => 'gutencheck',
+                                'input_type'  => 'nimblecheck',
                                 'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
@@ -701,7 +679,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//0,
                             // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                             'ft___flag_important'       => array(
-                                'input_type'  => 'gutencheck',
+                                'input_type'  => 'nimblecheck',
                                 'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
@@ -840,7 +818,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//0,
                             // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                             'btn___flag_important'       => array(
-                                'input_type'  => 'gutencheck',
+                                'input_type'  => 'nimblecheck',
                                 'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,

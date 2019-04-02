@@ -13,7 +13,7 @@ function sek_get_module_params_for_sek_global_breakpoint() {
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-breakpoint' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Use a global custom breakpoint for the vertical reorganization of columns', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',

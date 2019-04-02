@@ -3,29 +3,7 @@
  *  LOAD AND REGISTER BUTTON MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
-//Availabe input types
-// $.extend( api.czrInputMap, {
-//       text      : '',
-//       textarea  : '',
-//       check     : 'setupIcheck',
-//       gutencheck : 'setupGutenCheck',
-//       select    : 'setupSelect',
-//       radio     : 'setupRadio',
-//       number    : 'setupStepper',
-//       upload    : 'setupImageUploaderSaveAsId',
-//       upload_url : 'setupImageUploaderSaveAsUrl',
-//       color     : 'setupColorPicker',
-//       wp_color_alpha : 'setupColorPickerAlpha',
-//       wp_color  : 'setupWPColorPicker',//not used for the moment
-//       content_picker : 'setupContentPicker',
-//       tiny_mce_editor : 'setupTinyMceEditor',
-//       password : '',
-//       range : 'setupSimpleRange',
-//       range_slider : 'setupRangeSlider',
-//       hidden : '',
-//       h_alignment : 'setupHAlignement',
-//       h_text_alignment : 'setupHAlignement'
-// });
+
 function sek_get_module_params_for_czr_menu_module() {
     $css_selectors = '.sek-btn';
     $css_font_selectors = '.sek-btn';
@@ -118,7 +96,7 @@ function sek_get_module_params_for_czr_menu_mobile_options() {
         'tmpl' => array(
             'item-inputs' => array(
                 'expand_below' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => sprintf('%s %s', '<i class="material-icons sek-level-option-icon">devices</i>', __('On mobile devices, expand the menu in full width below the menu hamburger icon.', 'text_doma') ),
                     'default'     => true,
                     'title_width' => 'width-80',

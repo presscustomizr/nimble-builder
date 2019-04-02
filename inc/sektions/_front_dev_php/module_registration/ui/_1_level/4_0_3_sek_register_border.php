@@ -45,7 +45,7 @@ function sek_get_module_params_for_sek_level_border_module() {
                     //'css_selectors'=> $css_selectors
                 ),
                 'shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Apply a shadow', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',

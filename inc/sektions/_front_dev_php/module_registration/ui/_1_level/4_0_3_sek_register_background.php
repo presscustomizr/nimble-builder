@@ -38,11 +38,11 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'title_width' => 'width-100',
                 ),
                 // 'bg-parallax' => array(
-                //     'input_type'  => 'gutencheck',
+                //     'input_type'  => 'nimblecheck',
                 //     'title'       => __('Parallax scrolling', 'text_doma')
                 // ),
                 'bg-attachment' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Fixed background', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -50,7 +50,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'default'     => 0
                 ),
                 'bg-parallax' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Parallax effect on scroll', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -97,7 +97,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                 //     'default'     => ''
                 // ),
                 'bg-apply-overlay' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Apply a background overlay', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',

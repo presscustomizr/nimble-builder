@@ -91,7 +91,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'default'     => ''
                 ),
                 'link-target' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Open link in a new page', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -108,7 +108,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'width-100'   => true,
                 ),
                 'use_custom_title_attr' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Set the text displayed when the mouse is held over', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
@@ -123,7 +123,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'width-100'         => true
                 ),
                 'use_custom_width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Custom image width', 'text_doma' ),
                     'default'     => 0,
                     'refresh_stylesheet' => true
@@ -142,7 +142,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'refresh_stylesheet' => true
                 ),
                 'use_box_shadow' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 0,
                 ),

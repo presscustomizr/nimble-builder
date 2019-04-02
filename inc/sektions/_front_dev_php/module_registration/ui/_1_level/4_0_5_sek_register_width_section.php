@@ -14,7 +14,7 @@ function sek_get_module_params_for_sek_level_width_section() {
         'tmpl' => array(
             'item-inputs' => array(
                 'use-custom-outer-width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define a custom outer width for this section', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -32,7 +32,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'title_width' => 'width-100'
                 ),
                 'use-custom-inner-width' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Define a custom inner width for this section', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',

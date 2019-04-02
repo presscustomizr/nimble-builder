@@ -13,7 +13,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
         'tmpl' => array(
             'item-inputs' => array(
                 'enable' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => sprintf( '<img height="20" width="20" src="%1$s"/> %2$s', NIMBLE_BASE_URL . '/assets/img/recaptcha_32.png', __('Activate Google reCAPTCHA on your forms', 'text_doma') ),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -52,7 +52,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                     'refresh_markup' => false
                 ),//0,
                 'show_failure_message' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __( 'Show a failure message', 'text_doma' ),
                     'default'     => 0,
                     'title_width' => 'width-80',
@@ -68,7 +68,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                     'refresh_markup' => false
                 ),
                 'badge' => array(
-                    'input_type'  => 'gutencheck',
+                    'input_type'  => 'nimblecheck',
                     'title'       => __('Show the reCAPTCHA badge at the bottom of your page', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
