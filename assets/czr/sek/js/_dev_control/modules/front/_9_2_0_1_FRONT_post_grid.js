@@ -161,7 +161,7 @@
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'show_thumb' :
-                                            _.each( [ 'img_size', 'img_has_custom_height', 'img_height', 'use_post_thumb_placeholder' ] , function( _inputId_ ) {
+                                            _.each( [ 'img_size', 'img_has_custom_height', 'img_height', 'border_radius_css', 'use_post_thumb_placeholder' ] , function( _inputId_ ) {
                                                   try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         var bool = false;
                                                         switch( _inputId_ ) {

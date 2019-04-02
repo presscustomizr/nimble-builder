@@ -245,7 +245,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_stylesheet' => true,
-                    'notice_after' => __('This image can be set as "Featured image" when creating a post.', 'text_doma')
+                    'notice_after' => __('The post thumbnail can be set as "Featured image" when creating a post.', 'text_doma')
                 ),
                 'img_size' => array(
                     'input_type'  => 'simpleselect',
