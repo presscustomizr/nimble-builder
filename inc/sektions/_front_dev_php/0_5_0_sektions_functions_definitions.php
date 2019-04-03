@@ -1613,7 +1613,7 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'module',
           'content-id' => 'czr_post_grid_module',
-          'title' => __( 'Post grid', 'text_doma' ),
+          'title' => __( 'Post Grid', 'text_doma' ),
           'icon' => 'Nimble_posts-list_icon.svg'
         ),
         array(

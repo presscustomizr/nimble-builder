@@ -1228,7 +1228,7 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'module',
           'content-id' => 'czr_post_grid_module',
-          'title' => __( 'Post grid', 'text_doma' ),
+          'title' => __( 'Post Grid', 'text_doma' ),
           'icon' => 'Nimble_posts-list_icon.svg'
         ),
         array(
@@ -1304,6 +1304,19 @@ function sek_get_module_collection() {
 
     );
 }
+function sek_get_parent_theme_slug() {
+    $theme_slug = get_option( 'stylesheet' );
+    $theme_slug = isset($_REQUEST['theme']) ? $_REQUEST['theme'] : $theme_slug; //old wp versions
+    $theme_slug = isset($_REQUEST['customize_theme']) ? $_REQUEST['customize_theme'] : $theme_slug;
+    $theme_data = wp_get_theme( $theme_slug );
+    if ( $theme_data -> parent() ) {
+        $theme_slug = $theme_data -> parent() -> Name;
+    }
+
+    return sanitize_file_name( strtolower( $theme_slug ) );
+}
+
+
 ?><?php
 add_action( 'admin_bar_menu', '\Nimble\sek_add_customize_link', 1000 );
 function sek_add_customize_link() {
@@ -2555,6 +2568,7 @@ function sek_hex_invert( $hex, $make_prop_value = true )  {
 }
 function sek_extract_unit( $value ) {
     $unit = preg_replace('/[0-9]|\.|,/', '', $value );
+    $unit = preg_replace('/(\W)+/', '', $unit);
     return  0 === preg_match( "/(px|em|%)/i", $unit ) ? 'px' : $unit;
 }
 function sek_extract_numeric_value( $value ) {
@@ -7470,8 +7484,15 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'choices'      => array(),
                     'title_width' => 'width-100',
                     'width-100'   => true,
-                    'notice_before' => __('Use this control to filter posts by category. Multiple categories allowed.', 'text_doma')
+                    'notice_before' => __('Display posts that have these categories. Multiple categories allowed.', 'text_doma')
                 ),//null,
+                'must_have_all_cats' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Display posts that have "all" of these categories', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
                 'order_by'  => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __( 'Order posts by', 'text_doma' ),
@@ -7598,7 +7619,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 'column_gap'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Space between columns', 'text_doma' ),
-                    'min' => 1,
+                    'min' => 0,
                     'max' => 100,
                     'default'     => array( 'desktop' => '20px' ),
                     'width-100'   => true,
@@ -7610,7 +7631,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 'row_gap'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Space between rows', 'text_doma' ),
-                    'min' => 1,
+                    'min' => 0,
                     'max' => 100,
                     'default'     => array( 'desktop' => '25px' ),
                     'width-100'   => true,
@@ -7642,7 +7663,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_stylesheet' => true,
-                    'notice_after' => __('This image can be set as "Featured image" when creating a post.', 'text_doma')
+                    'notice_after' => __('The post thumbnail can be set as "Featured image" when creating a post.', 'text_doma')
                 ),
                 'img_size' => array(
                     'input_type'  => 'simpleselect',
@@ -7759,7 +7780,7 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_post_grid_fonts_child() {
     $pt_font_selectors = array( '.sek-pg-title a', '.sek-pg-title' );
-    $pe_font_selectors = array( '.sek-post-grid-wrapper .sek-excerpt *' );
+    $pe_font_selectors = array( '.sek-post-grid-wrapper .sek-excerpt', '.sek-post-grid-wrapper .sek-excerpt *' );
     $cat_font_selectors = array( '.sek-pg-category a' );
     $metas_font_selectors = array( '.sek-pg-metas span', '.sek-pg-metas a');
     return array(
@@ -8180,21 +8201,21 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     if ( 'list' === $main_settings['layout'] && true === sek_booleanize_checkbox_val( $thumb_settings['show_thumb'] ) ) {
         $img_column_width = $main_settings['img_column_width'];
         $img_column_width = is_array( $img_column_width ) ? $img_column_width : array();
-        $img_column_width = wp_parse_args( $img_column_width, array(
-            'desktop' => '30%',
+        $defaults = array(
+            'desktop' => '30%',// <= this value matches the static CSS rule for the module
             'tablet' => '',
             'mobile' => ''
-        ));
-
-
+        );
+        $img_column_width = wp_parse_args( $img_column_width, $defaults );
 
         $img_column_width_ready_value = $img_column_width;
         foreach ($img_column_width as $device => $num_val ) {
             $num_val = sek_extract_numeric_value( $num_val );
-            if ( ! empty( $num_val ) ) {
+            $img_column_width_ready_value[$device] = '';
+            if ( ! empty( $num_val ) && $num_val.'%' !== $defaults[$device].'' ) {
                 $num_val = $num_val > 100 ? 100 : $num_val;
                 $num_val = $num_val < 1 ? 1 : $num_val;
-                $img_column_width_ready_value[$device] = sprintf('%s 1fr;', $num_val . '%');
+                $img_column_width_ready_value[$device] = sprintf('%s minmax(0,1fr);', $num_val . '%');
             }
         }
 
@@ -8208,16 +8229,18 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     if ( true === sek_booleanize_checkbox_val( $thumb_settings['img_has_custom_height'] ) ) {
         $img_height = $thumb_settings['img_height'];
         $img_height = is_array( $img_height ) ? $img_height : array();
-        $img_height = wp_parse_args( $img_height, array(
-            'desktop' => '50%',
+        $defaults = array(
+            'desktop' => '65%',// <= this value matches the static CSS rule for the module
             'tablet' => '',
             'mobile' => ''
-        ));
+        );
+        $img_height = wp_parse_args( $img_height, $defaults );
 
         $img_height_ready_value = $img_height;
-        foreach ($img_height as $device => $num_val ) {
+        foreach ( $img_height as $device => $num_val ) {
             $num_val = sek_extract_numeric_value( $num_val );
-            if ( ! empty( $num_val ) ) {
+            $img_height_ready_value[$device] = '';
+            if ( ! empty( $num_val && $num_val.'%' !== $defaults[$device].'' ) ) {
                 $num_val = $num_val < 1 ? 1 : $num_val;
                 $img_height_ready_value[$device] = sprintf('%s;', $num_val .'%');
             }
@@ -8232,15 +8255,18 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     if ( true === sek_booleanize_checkbox_val( $main_settings['custom_grid_spaces'] ) ) {
           $gap = $main_settings['column_gap'];
           $gap = is_array( $gap ) ? $gap : array();
-          $gap = wp_parse_args( $gap, array(
-              'desktop' => '20px',
+          $defaults = array(
+              'desktop' => '20px',// <= this value matches the static CSS rule for the module
               'tablet' => '',
               'mobile' => ''
-          ));
+          );
+          $gap = wp_parse_args( $gap, $defaults );
           $gap_ready_value = $gap;
           foreach ($gap as $device => $num_unit ) {
               $numeric = sek_extract_numeric_value( $num_unit );
-              if ( ! empty( $numeric ) ) {
+              $numeric = $numeric < 0 ? '0' : $numeric;
+              $gap_ready_value[$device] = '';
+              if ( ! empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
                   $unit = sek_extract_unit( $num_unit );
                   $gap_ready_value[$device] = $numeric . $unit;
               }
@@ -8256,15 +8282,18 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
           ), $rules );
           $v_gap = $main_settings['row_gap'];
           $v_gap = is_array( $v_gap ) ? $v_gap : array();
-          $v_gap = wp_parse_args( $v_gap, array(
-              'desktop' => '25px',
+          $defaults = array(
+              'desktop' => '25px',// <= this value matches the static CSS rule for the module
               'tablet' => '',
               'mobile' => ''
-          ));
+          );
+          $v_gap = wp_parse_args( $v_gap, $defaults );
           $v_gap_ready_value = $v_gap;
           foreach ($v_gap as $device => $num_unit ) {
               $numeric = sek_extract_numeric_value( $num_unit );
-              if ( ! empty( $numeric ) ) {
+              $numeric = $numeric < 0 ? 0 : $numeric;
+              $v_gap_ready_value[$device] = '';
+              if ( ! empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
                   $unit = sek_extract_unit( $num_unit );
                   $v_gap_ready_value[$device] = $numeric . $unit;
               }
@@ -8277,7 +8306,6 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               'is_important' => false
           ), $rules );
     }
-
     return $rules;
 }
 ?><?php
@@ -10553,6 +10581,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             foreach( $raw_cats as $cat ) {
                 $cat_collection[] = array(
                     'id' => $cat->term_id,
+                    'slug' => $cat->slug,
                     'name' => sprintf( '%s (%s %s)', $cat->cat_name, $cat->count, __('posts', 'text_doma') )
                 );
             }

@@ -441,7 +441,6 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Select an icon' => __( 'Select an icon', 'text_doma' ),
             'codeEditorSingular' => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_doma' ),
             'codeEditorPlural' => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_doma' ),
-            'Cat #' => __( 'Cat #', 'text_doma' ),
             'Settings on desktops' => __('Settings on desktops', 'text_doma'),
             'Settings on tablets' => __('Settings on tablets', 'text_doma'),
             'Settings on mobiles' => __('Settings on mobiles', 'text_doma'),

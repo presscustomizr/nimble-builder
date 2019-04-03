@@ -11020,12 +11020,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           var catCollection = {};
                                           // server sends
                                           // [
-                                          //  0: {id: 2, name: "cat1"}
-                                          //  1: {id: 11, name: "cat10"}
+                                          //  0: {id: 2, slug:'my-category', name: "My category"}
+                                          //  1: {id: 11, slug:'my-category', name: "cat10"}
                                           //  ...
                                           // ]
                                           _.each( raw_cat_collection, function( cat_data ) {
-                                                catCollection[ cat_data.id ] = cat_data.name;
+                                                if ( _.isEmpty( cat_data.slug ) || _.isEmpty( cat_data.name ) ) {
+                                                      _dfd_.reject( 'missing slug or name for at least one category' );
+                                                } else {
+                                                      catCollection[ cat_data.slug ] = cat_data.name;
+                                                }
+
                                           });
                                           api.czr_sektions.post_categories = catCollection;
                                           _dfd_.resolve( api.czr_sektions.post_categories );
@@ -11040,7 +11045,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var _fetchServerCatsAndInstantiateSelect2 = function( params ) {
                         if ( true === input.catCollectionSet )
                           return;
-                        $.when( _getCategoryCollection () ).done( function( _catCollection ) {
+                        $.when( _getCategoryCollection() ).done( function( _catCollection ) {
                               _generateOptionsAndInstantiateSelect2(_catCollection);
                               if ( params && true === params.open_on_init ) {
                                     // let's open select2 after a delay ( because there's no 'ready' event with select2 )
@@ -11049,7 +11054,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }, 100 );
                               }
                         }).fail( function( _r_ ) {
-                              api.errare( input.id + ' => fail response =>', _r_ );
+                              api.errare( input.id + ' => fail response when _getCategoryCollection()', _r_ );
                         });
                         input.catCollectionSet = true;
                   };
@@ -11088,7 +11093,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // on init, instantiate select2 with the input() values only
                   var selectOptionsOnInit = {};
                   _.each( getInputValue(), function( _val ) {
-                        selectOptionsOnInit[ _val ] = [ sektionsLocalizedData.i18n['Cat #'], _val ].join('');
+                        selectOptionsOnInit[ _val ] = ( _val + '' ).replace( /-/g, ' ');
                   });
                   _generateOptionsAndInstantiateSelect2( selectOptionsOnInit );
 
@@ -14064,6 +14069,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                   }
                                             });
                                       break;
+                                      case 'categories' :
+                                            _.each( [ 'must_have_all_cats' ] , function( _inputId_ ) {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        var input_val = input();
+                                                        return _.isArray( input_val ) && input_val.length>1;
+                                                  }); } catch( er ) {
+                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
                                       case 'custom_grid_spaces' :
                                             _.each( [ 'column_gap', 'row_gap' ] , function( _inputId_ ) {
                                                   try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
@@ -14160,7 +14175,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
                                       case 'show_thumb' :
-                                            _.each( [ 'img_size', 'img_has_custom_height', 'img_height', 'use_post_thumb_placeholder' ] , function( _inputId_ ) {
+                                            _.each( [ 'img_size', 'img_has_custom_height', 'img_height', 'border_radius_css', 'use_post_thumb_placeholder' ] , function( _inputId_ ) {
                                                   try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                         var bool = false;
                                                         switch( _inputId_ ) {

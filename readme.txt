@@ -2,11 +2,11 @@
 Contributors: nikeo, d4z_c0nf
 Author URI: https://nimblebuilder.com
 Plugin URI: https://wordpress.org/plugins/nimble-builder/
-Tags: page builder, visual editor, customizer, drag and drop, header, footer, landing page, contact form
+Tags: page builder, visual editor, customizer, drag and drop, header, footer, landing page, contact form, grid, post grid
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.6.1-tau
+Stable tag: 1.6.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -31,6 +31,7 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * **Works in any WordPress contexts** : home, pages, posts, custom post types, archives, author pages, search page, ...
 * Create content, style, move / duplicate / remove elements **in real-time preview**.
 * **Includes many content modules** : classic text editor, image, column layouts, contact form, button, icons, map, html code, WordPress widget area, menu, and more.
+* **Create engaging grids of posts** in live preview, looking great on desktop and mobile devices.
 * Add image background to your sections, and **[enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
 * **Easily [customize your content specifically for mobile devices](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** : change the responsive breakpoint, adapt font-size, spacing, alignment, column layouts, in real-time preview.
 * **Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
@@ -95,10 +96,17 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.6.0 =
-Added Export / Import feature. Improved navigation in changelog history.
+= 1.6.1 =
+Added Post Grid module. Updated the customizer UI with a new checkbox design. Improved code performance.
 
 == Changelog ==
+= 1.6.1 : April 3rd 2019 =
+* fixed : nimble top bar not hidden when searching theme or saving a draft
+* fixed : apply a default margin top and bottom to headings, in order to avoid theme stylesheet breaking vertical centering
+* improved : customizer UI with a new checkbox design
+* improved : PHP code performance on front by registering only the contextually active modules
+* added : a Post Grid module
+
 = 1.6.0 : March 27th 2019 =
 * improved : navigation in changelog history
 * added : Export / Import feature
