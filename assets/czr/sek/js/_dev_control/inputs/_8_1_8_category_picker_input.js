@@ -35,12 +35,17 @@
                                           var catCollection = {};
                                           // server sends
                                           // [
-                                          //  0: {id: 2, name: "cat1"}
-                                          //  1: {id: 11, name: "cat10"}
+                                          //  0: {id: 2, slug:'my-category', name: "My category"}
+                                          //  1: {id: 11, slug:'my-category', name: "cat10"}
                                           //  ...
                                           // ]
                                           _.each( raw_cat_collection, function( cat_data ) {
-                                                catCollection[ cat_data.id ] = cat_data.name;
+                                                if ( _.isEmpty( cat_data.slug ) || _.isEmpty( cat_data.name ) ) {
+                                                      _dfd_.reject( 'missing slug or name for at least one category' );
+                                                } else {
+                                                      catCollection[ cat_data.slug ] = cat_data.name;
+                                                }
+
                                           });
                                           api.czr_sektions.post_categories = catCollection;
                                           _dfd_.resolve( api.czr_sektions.post_categories );
@@ -55,7 +60,7 @@
                   var _fetchServerCatsAndInstantiateSelect2 = function( params ) {
                         if ( true === input.catCollectionSet )
                           return;
-                        $.when( _getCategoryCollection () ).done( function( _catCollection ) {
+                        $.when( _getCategoryCollection() ).done( function( _catCollection ) {
                               _generateOptionsAndInstantiateSelect2(_catCollection);
                               if ( params && true === params.open_on_init ) {
                                     // let's open select2 after a delay ( because there's no 'ready' event with select2 )
@@ -64,7 +69,7 @@
                                     }, 100 );
                               }
                         }).fail( function( _r_ ) {
-                              api.errare( input.id + ' => fail response =>', _r_ );
+                              api.errare( input.id + ' => fail response when _getCategoryCollection()', _r_ );
                         });
                         input.catCollectionSet = true;
                   };
@@ -103,7 +108,7 @@
                   // on init, instantiate select2 with the input() values only
                   var selectOptionsOnInit = {};
                   _.each( getInputValue(), function( _val ) {
-                        selectOptionsOnInit[ _val ] = [ sektionsLocalizedData.i18n['Cat #'], _val ].join('');
+                        selectOptionsOnInit[ _val ] = ( _val + '' ).replace( /-/g, ' ');
                   });
                   _generateOptionsAndInstantiateSelect2( selectOptionsOnInit );
 

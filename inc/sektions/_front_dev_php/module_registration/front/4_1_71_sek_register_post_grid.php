@@ -58,8 +58,16 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'choices'      => array(),
                     'title_width' => 'width-100',
                     'width-100'   => true,
-                    'notice_before' => __('Use this control to filter posts by category. Multiple categories allowed.', 'text_doma')
+                    'notice_before' => __('Display posts that have these categories. Multiple categories allowed.', 'text_doma')
                 ),//null,
+                'must_have_all_cats' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Display posts that have "all" of these categories', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                    //'html_before' => '<hr>'
+                ),
                 'order_by'  => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __( 'Order posts by', 'text_doma' ),

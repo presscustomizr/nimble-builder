@@ -101,7 +101,8 @@ if ( ! function_exists( 'Nimble\sek_pg_get_excerpt_length') ) {
 $categories_in = '';
 if ( is_array( $main_settings['categories'] ) ) {
     // https://codex.wordpress.org/Class_Reference/WP_Query#Category_Parameters
-    $categories_in = implode(',', $main_settings['categories'] );
+    $glue = true === sek_booleanize_checkbox_val( $main_settings['must_have_all_cats'] ) ? '+':',';
+    $categories_in = implode( $glue, $main_settings['categories'] );
 }
 $order = 'DESC';
 $orderby = 'title';
@@ -128,7 +129,8 @@ if ( $post_nb > 0 ) {
       'update_post_term_cache' => false,
       'ignore_sticky_posts'    => 1,
       'posts_per_page'         => $main_settings['post_number'],
-      'cat'                    => $categories_in,
+      //@see https://codex.wordpress.org/Class_Reference/WP_Query#Category_Parameters
+      'category_name'          => $categories_in,
       'order'                  => $order,
       'orderby'                => $orderby
     )

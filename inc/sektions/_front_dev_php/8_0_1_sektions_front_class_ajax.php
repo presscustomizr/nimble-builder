@@ -487,6 +487,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             foreach( $raw_cats as $cat ) {
                 $cat_collection[] = array(
                     'id' => $cat->term_id,
+                    'slug' => $cat->slug,
                     'name' => sprintf( '%s (%s %s)', $cat->cat_name, $cat->count, __('posts', 'text_doma') )
                 );
             }

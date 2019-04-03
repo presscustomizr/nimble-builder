@@ -65,6 +65,16 @@
                                                   }
                                             });
                                       break;
+                                      case 'categories' :
+                                            _.each( [ 'must_have_all_cats' ] , function( _inputId_ ) {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        var input_val = input();
+                                                        return _.isArray( input_val ) && input_val.length>1;
+                                                  }); } catch( er ) {
+                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
                                       case 'custom_grid_spaces' :
                                             _.each( [ 'column_gap', 'row_gap' ] , function( _inputId_ ) {
                                                   try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
