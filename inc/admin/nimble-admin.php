@@ -658,22 +658,22 @@ function sek_nimble_dashboard_overview_widget() {
           ),
           'doc' => array(
             'title' => __( 'Help', 'text_doma' ),
-            'link' => 'https://docs.presscustomizr.com/collection/334-nimble-builder/?ref=a&amp;utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=dashboard',
+            'link' => 'https://docs.presscustomizr.com/?ref=a&amp;utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=dashboard',
           ),
         );
-        $go_pro_link = array();
+        $cta_link = array();
         $theme_name = sek_get_parent_theme_slug();
         if ( in_array($theme_name, array('customizr', 'hueman') ) ) {
-            $go_pro = sek_get_go_pro_message( $theme_name, false );
-            if ( !empty( $go_pro ) ) {
-              $additions_actions = array(
-                'go-pro' => array(
-                  'html' => $go_pro,
+            $cta = sek_get_cta_message( $theme_name, false );
+            if ( !empty( $cta ) ) {
+              $cta_link = array(
+                'cta' => array(
+                  'html' => $cta,
                 ),
               );
             }
         }
-        $footer_links = array_merge($footer_links,$go_pro_link);
+        $footer_links = array_merge($footer_links,$cta_link);
       ?>
       <div class="nimble-db-footer">
           <?php foreach ( $footer_links as $link_id => $link_data ) : ?>
@@ -706,10 +706,8 @@ if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https
  * @return array|false Info data, or false.
  */
 function sek_get_info_data( $force_update = false ) {
-  $cache_key = 'nimble_remote_info_api_data_' . NIMBLE_VERSION;
-
-  $info_data = get_transient( $cache_key );
-
+  $api_data_transient_name = 'nimble_api_data_' . NIMBLE_VERSION;
+  $info_data = get_transient( $api_data_transient_name );
   // Refresh every 12 hours, unless force_update set to true
   if ( $force_update || false === $info_data ) {
     $timeout = ( $force_update ) ? 25 : 8;
@@ -726,30 +724,28 @@ function sek_get_info_data( $force_update = false ) {
 
     if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
       // HOUR_IN_SECONDS is a default WP constant
-      set_transient( $cache_key, [], 2 * HOUR_IN_SECONDS );
+      set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
       return false;
     }
 
     $info_data = json_decode( wp_remote_retrieve_body( $response ), true );
 
     if ( empty( $info_data ) || ! is_array( $info_data ) ) {
-      set_transient( $cache_key, [], 2 * HOUR_IN_SECONDS );
+      set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
       return false;
     }
 
     if ( isset( $info_data['library'] ) ) {
       update_option( NIMBLE_LIBRARY_OPT_NAME, $info_data['library'], 'no' );
-
       unset( $info_data['library'] );
     }
 
     if ( isset( $info_data['latest_posts'] ) ) {
       update_option( NIMBLE_NEWS_OPT_NAME, $info_data['latest_posts'], 'no' );
-
       unset( $info_data['latest_posts'] );
     }
 
-    set_transient( $cache_key, $info_data, 12 * HOUR_IN_SECONDS );
+    set_transient( $api_data_transient_name, $info_data, 12 * HOUR_IN_SECONDS );
   }//if ( $force_update || false === $info_data ) {
 
   return $info_data;
@@ -766,16 +762,17 @@ function sek_get_latest_posts_data( $force_update = false ) {
     return $latest_posts;
 }
 
-function sek_get_go_pro_message( $theme_name, $force_update = false ) {
+function sek_get_cta_message( $theme_name, $force_update = false ) {
     $info_data = sek_get_info_data( $force_update );
     if ( !in_array($theme_name, array('customizr', 'hueman') ) || ! is_array( $info_data ) ) {
         return '';
     }
     $message = '';
-    $go_pro_data = isset( $info_data['go_pro'] ) ? $info_data['go_pro'] : null;
+    $cta_data = isset( $info_data['cta'] ) ? $info_data['cta'] : null;
+
     $fn = 'customizr' === $theme_name ? 'czr_fn_user_started_before_version' : 'hu_user_started_before_version';
-    if ( function_exists($fn) && !is_null($go_pro_data) && isset( $go_pro_data['started_before'] ) && call_user_func_array( $fn, array( $go_pro_data['started_before'] ) ) ) {
-        $message = !empty( $go_pro_data['html'] ) ? $go_pro_data['html'] : '';
+    if ( function_exists($fn) && !is_null($cta_data) && isset( $cta_data['started_before'] ) && call_user_func_array( $fn, array( $cta_data['started_before'] ) ) ) {
+        $message = !empty( $cta_data['html'] ) ? $cta_data['html'] : '';
     }
     return $message;
 }
