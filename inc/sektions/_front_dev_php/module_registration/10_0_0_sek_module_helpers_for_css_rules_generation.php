@@ -701,8 +701,8 @@ function sek_hex_invert( $hex, $make_prop_value = true )  {
 function sek_extract_unit( $value ) {
     // remove numbers, dot, comma
     $unit = preg_replace('/[0-9]|\.|,/', '', $value );
-    // remove all non-alphanumeric and space characters
-    $unit = preg_replace('/(\W)+/', '', $unit);
+    // remove hyphens
+    $unit = str_replace('-', '', $unit );
     return  0 === preg_match( "/(px|em|%)/i", $unit ) ? 'px' : $unit;
 }
 
