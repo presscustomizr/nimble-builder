@@ -2568,7 +2568,7 @@ function sek_hex_invert( $hex, $make_prop_value = true )  {
 }
 function sek_extract_unit( $value ) {
     $unit = preg_replace('/[0-9]|\.|,/', '', $value );
-    $unit = preg_replace('/(\W)+/', '', $unit);
+    $unit = str_replace('-', '', $unit );
     return  0 === preg_match( "/(px|em|%)/i", $unit ) ? 'px' : $unit;
 }
 function sek_extract_numeric_value( $value ) {
