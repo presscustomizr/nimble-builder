@@ -196,7 +196,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 'column_gap'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Space between columns', 'text_doma' ),
-                    'min' => 1,
+                    'min' => 0,
                     'max' => 100,
                     'default'     => array( 'desktop' => '20px' ),
                     'width-100'   => true,
@@ -208,7 +208,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 'row_gap'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Space between rows', 'text_doma' ),
-                    'min' => 1,
+                    'min' => 0,
                     'max' => 100,
                     'default'     => array( 'desktop' => '25px' ),
                     'width-100'   => true,
@@ -895,11 +895,12 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
           $gap_ready_value = $gap;
           foreach ($gap as $device => $num_unit ) {
               $numeric = sek_extract_numeric_value( $num_unit );
+              $numeric = $numeric < 0 ? '0' : $numeric;
               $gap_ready_value[$device] = '';
               // Leave the device value empty if === to default
               // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
               // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-              if ( ! empty( $numeric ) && $numeric.'px' !== $defaults[$device].'' ) {
+              if ( ! empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
                   $unit = sek_extract_unit( $num_unit );
                   $gap_ready_value[$device] = $numeric . $unit;
               }
@@ -930,11 +931,12 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
           $v_gap_ready_value = $v_gap;
           foreach ($v_gap as $device => $num_unit ) {
               $numeric = sek_extract_numeric_value( $num_unit );
+              $numeric = $numeric < 0 ? 0 : $numeric;
               $v_gap_ready_value[$device] = '';
               // Leave the device value empty if === to default
               // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
               // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-              if ( ! empty( $numeric ) && $numeric.'px' !== $defaults[$device].'' ) {
+              if ( ! empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
                   $unit = sek_extract_unit( $num_unit );
                   $v_gap_ready_value[$device] = $numeric . $unit;
               }
