@@ -1472,7 +1472,7 @@ button.sek-btn,
 
 .sek-post-grid-wrapper .sek-grid-items article .sek-pg-content > *:not(:last-child) {
   margin-top: 0 !important;
-  margin-bottom: 15px !important;
+  margin-bottom: 15px;
 }
 
 .sek-post-grid-wrapper .sek-grid-items article .sek-pg-content > :first-child {

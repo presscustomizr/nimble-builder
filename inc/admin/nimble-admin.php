@@ -602,7 +602,6 @@ function sek_register_dashboard_widgets() {
 function sek_nimble_dashboard_callback_fn() {
     $post_data = sek_get_latest_posts_data( false );
     $theme_name = sek_get_parent_theme_slug();
-    //sek_error_log('$theme_name ??' . defined( strtoupper($theme_name).'_VER' ), strtoupper($theme_name).'_VER' );
     ?>
     <div class="nimble-db-wrapper">
       <div class="nimble-db-header">
@@ -738,7 +737,7 @@ function sek_get_info_data( $force_update = false ) {
       return false;
     }
 
-    if ( isset( $info_data['library'] ) ) {
+    if ( !empty( $info_data['library'] ) ) {
       update_option( NIMBLE_LIBRARY_OPT_NAME, $info_data['library'], 'no' );
       unset( $info_data['library'] );
     }
