@@ -152,12 +152,12 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'title_width' => 'width-100',
                 ),//0,
                 'space_between_el' => array(
-                    'input_type'  => 'range_with_unit_picker',
-                    'title'       => __('Space between content elements', 'text_doma'),
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __('Space between text blocks', 'text_doma'),
                     'min' => 1,
                     'max' => 100,
                     //'unit' => 'px',
-                    'default' => '15px',
+                    'default' => array( 'desktop' => '15px' ),
                     'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -785,29 +785,42 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
       return $rules;
 
     $value = $complete_modul_model['value'];
-
     $main_settings = $value['grid_main'];
     $thumb_settings = $value['grid_thumb'];
 
+
     // SPACE BETWEEN CONTENT ELEMENTS
-    if ( '15px' !== $main_settings['space_between_el'] ) {
-        $margin_bottom = $main_settings['space_between_el'];
-        $numeric = sek_extract_numeric_value( $margin_bottom );
-        if ( ! empty( $numeric ) ) {
-            $unit = sek_extract_unit( $margin_bottom );
-            $unit = '%' === $unit ? 'vh' : $unit;
-            $margin_bottom = $numeric . $unit;
-            $rules[] = array(
-                'selector' => implode(',', array(
-                    '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items article .sek-pg-content > *:not(:last-child)',
-                    '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-list-layout article > *:not(:last-child):not(.sek-pg-thumbnail)',
-                    '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-grid-layout article > *:not(:last-child)'
-                )),
-                'css_rules' => 'margin-bottom:' . $margin_bottom . '!important;',
-                'mq' =>null
-            );
+    $margin_bottom = $main_settings['space_between_el'];
+    $margin_bottom = is_array( $margin_bottom ) ? $margin_bottom : array();
+    $defaults = array(
+        'desktop' => '15px',// <= this value matches the static CSS rule and the input default for the module
+        'tablet' => '',
+        'mobile' => ''
+    );
+    $margin_bottom = wp_parse_args( $margin_bottom, $defaults );
+    $margin_bottom_ready_val = $margin_bottom;
+    foreach ($margin_bottom as $device => $num_val ) {
+        $num_val = sek_extract_numeric_value( $num_val );
+        $margin_bottom_ready_val[$device] = '';
+        // Leave the device value empty if === to default
+        // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
+        // fixes https://github.com/presscustomizr/nimble-builder/issues/419
+        if ( ! empty( $num_val ) && $num_val.'px' !== $defaults[$device].'' ) {
+            $num_val = $num_val < 0 ? 0 : $num_val;
+            $margin_bottom_ready_val[$device] = $num_val . 'px';
         }
     }
+    $rules = sek_set_mq_css_rules( array(
+        'value' => $margin_bottom_ready_val,
+        'css_property' => 'margin-bottom',
+        'selector' => implode(',', array(
+            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items article .sek-pg-content > *:not(:last-child)',
+            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-list-layout article > *:not(:last-child):not(.sek-pg-thumbnail)',
+            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-grid-layout article > *:not(:last-child)'
+        )),
+        'is_important' => false
+    ), $rules );
+
 
 
     // IMG COLUMN WIDTH IN LIST
@@ -818,12 +831,11 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         $img_column_width = $main_settings['img_column_width'];
         $img_column_width = is_array( $img_column_width ) ? $img_column_width : array();
         $defaults = array(
-            'desktop' => '30%',// <= this value matches the static CSS rule for the module
+            'desktop' => '30%',// <= this value matches the static CSS rule and the input default for the module
             'tablet' => '',
             'mobile' => ''
         );
         $img_column_width = wp_parse_args( $img_column_width, $defaults );
-
         $img_column_width_ready_value = $img_column_width;
         foreach ($img_column_width as $device => $num_val ) {
             $num_val = sek_extract_numeric_value( $num_val );
@@ -854,7 +866,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         $img_height = $thumb_settings['img_height'];
         $img_height = is_array( $img_height ) ? $img_height : array();
         $defaults = array(
-            'desktop' => '65%',// <= this value matches the static CSS rule for the module
+            'desktop' => '65%',// <= this value matches the static CSS rule and the input default for the module
             'tablet' => '',
             'mobile' => ''
         );
@@ -886,7 +898,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
           $gap = $main_settings['column_gap'];
           $gap = is_array( $gap ) ? $gap : array();
           $defaults = array(
-              'desktop' => '20px',// <= this value matches the static CSS rule for the module
+              'desktop' => '20px',// <= this value matches the static CSS rule and the input default for the module
               'tablet' => '',
               'mobile' => ''
           );
@@ -922,7 +934,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
           $v_gap = $main_settings['row_gap'];
           $v_gap = is_array( $v_gap ) ? $v_gap : array();
           $defaults = array(
-              'desktop' => '25px',// <= this value matches the static CSS rule for the module
+              'desktop' => '25px',// <= this value matches the static CSS rule and the input default for the module
               'tablet' => '',
               'mobile' => ''
           );

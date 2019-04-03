@@ -683,7 +683,13 @@ div[data-sek-grid-layout].selected {
 }
 
 
-
+/* RESET BUTTON */
+.wp-core-ui .button.sek-reset-button {
+  font-size: 11px;
+  padding: 0 5px 1px;
+  line-height: 18px;
+  height: 25px;
+}
 
 /* DEVICE SWITCHER */
 .sek-input-device-switcher .sek-switcher:before {
