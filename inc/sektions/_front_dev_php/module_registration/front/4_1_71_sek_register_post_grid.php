@@ -879,7 +879,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             // Leave the device value empty if === to default
             // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
             // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-            if ( ! empty( $num_val && $num_val.'%' !== $defaults[$device].'' ) ) {
+            if ( ! empty( $num_val ) && $num_val.'%' !== $defaults[$device].'' ) {
                 $num_val = $num_val < 1 ? 1 : $num_val;
                 $img_height_ready_value[$device] = sprintf('%s;', $num_val .'%');
             }
