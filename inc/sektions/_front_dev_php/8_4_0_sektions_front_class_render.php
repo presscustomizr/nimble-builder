@@ -925,16 +925,23 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
         // fired @hook 'template_redirect'
+        // fired by sek_maybe_set_local_nimble_footer() @get_footer()
+        // fired by sek_maybe_set_local_nimble_header() @get_header()
         // @return void()
         // set the value of the properties
         // has_local_header_footer
         // has_global_header_footer
         function sek_maybe_set_nimble_header_footer() {
+            if ( !did_action('nimble_front_classes_ready') || !did_action('wp') ) {
+                sek_error_log( __FUNCTION__ . ' has been invoked too early at hook ' . current_filter() );
+                return;
+            }
             if ( '_not_cached_yet_' === $this->has_local_header_footer || '_not_cached_yet_' === $this->has_global_header_footer ) {
                 //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
                 $local_header_footer_data = sek_get_local_option_value('local_header_footer');
                 $global_header_footer_data = sek_get_global_option_value('global_header_footer');
-                $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
+
+                $apply_local_option = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
 
                 $this->has_global_header_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
 

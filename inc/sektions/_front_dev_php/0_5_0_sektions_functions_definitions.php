@@ -327,6 +327,8 @@ function sek_get_level_skope_id( $level_id = '' ) {
 /* ------------------------------------------------------------------------- *
  *  HEADER FOOTER
 /* ------------------------------------------------------------------------- */
+// fired by sek_maybe_set_local_nimble_footer() @get_footer()
+// fired by sek_maybe_set_local_nimble_header() @get_header()
 function sek_page_uses_nimble_header_footer() {
     // cache the properties if not done yet
     Nimble_Manager()->sek_maybe_set_nimble_header_footer();
