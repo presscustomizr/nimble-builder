@@ -629,8 +629,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // use the provided selectOptions if any
                   selectOptions = _.isEmpty( selectOptions ) ? inputRegistrationParams.choices : selectOptions;
 
+                  // allow selectOptions to be filtrable remotely when the options are not passed on registration for example
+                  // @see widget are module in initialize() for example
+                  var filtrable = { params : selectOptions };
+                  input.module.trigger( 'nimble-set-select-input-options', filtrable );
+                  selectOptions = filtrable.params;
+
                   if ( _.isEmpty( selectOptions ) || ! _.isObject( selectOptions ) ) {
-                        api.errare( 'api.czr_sektions.setupSelectInput => missing select options for input id => ' + input.id + ' in image module');
+                        api.errare( 'api.czr_sektions.setupSelectInput => missing select options for input id => ' + input.id + ' in module ' + input.module.module_type );
                         return;
                   } else {
                         switch( input.type ) {
