@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.6.3
+Stable tag: 1.6.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -17,6 +17,10 @@ Powerful drag and drop page builder using the native WordPress customizer.
 = What is the Nimble Page Builder ? =
 **[Nimble Page Builder](https://nimblebuilder.com/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** is a powerful yet easy to use page builder plugin for WordPress. Nimble Builder uses the live customizer which is the native WordPress interface for real-time design.
 The plugin allows you to drag-and-drop modules like text-editor, images, contact forms, maps, icons, or beautiful pre-built sections with a [parallax background](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), into any page of your site. You can edit your sections in real-time, and then click "publish" when you are happy with the result, or save for later.
+
+Watch the video below to see how this [demo page](https://demo.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) has been built !
+
+[vimeo https://vimeo.com/328473405]
 
 = Works in any page of your site and with all WordPress themes =
 Nimble Builder allows you to insert sections in any context of your site : home page, single post or page, category or tag page, even search results or [404 pages](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link). No only that, but you can also decide to [start designing from a blank page](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) in any page of your site, and even create a custom header and footer. Nimble Builder uses native WordPress action hooks, which makes it compatible with all WordPress themes.
@@ -96,10 +100,14 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.6.3 =
+= 1.6.4 =
 Fixed widget options not displayed when customizing the WP Widget Module. Fixed PHP error.
 
 == Changelog ==
+= 1.6.4 : April 4th 2019 =
+* fixed : PHP Undefined index: header-footer when using the Customizr theme
+* fixed : CSS unit not properly set for some controls
+
 = 1.6.3 : April 4th 2019 =
 * fixed : WP Widget Module => no options in select
 * fixed : wrong syntax for conditional statement leading to PHP error when using PHP version < 5.6

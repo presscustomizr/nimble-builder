@@ -7599,7 +7599,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
 
                 'pg_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_doma'),
+                    'title'       => __('Text blocks alignment', 'text_doma'),
                     'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -7610,12 +7610,23 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'html_before' => '<hr>'
                 ),
 
-                'apply_shadow' => array(
+                'apply_shadow_on_hover' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply a shadow', 'text_doma'),
+                    'title'       => __('Apply a shadow effect on hover', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
-                    'input_width' => 'width-20',
+                    'input_width' => 'width-20'
+                ),
+                'content_padding' => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __('Content blocks padding', 'text_doma'),
+                    'min' => 1,
+                    'max' => 100,
+                    'default' => array( 'desktop' => '0px' ),
+                    'width-100'   => true,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'title_width' => 'width-100'
                 ),
 
                 'custom_grid_spaces' => array(
@@ -7624,7 +7635,8 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'refresh_stylesheet' => true
+                    'refresh_stylesheet' => true,
+                    'html_before' => '<hr>'
                 ),
                 'column_gap'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -8198,12 +8210,13 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     );
     $margin_bottom = wp_parse_args( $margin_bottom, $defaults );
     $margin_bottom_ready_val = $margin_bottom;
-    foreach ($margin_bottom as $device => $num_val ) {
-        $num_val = sek_extract_numeric_value( $num_val );
+    foreach ($margin_bottom as $device => $num_unit ) {
+        $num_val = sek_extract_numeric_value( $num_unit );
         $margin_bottom_ready_val[$device] = '';
-        if ( ! empty( $num_val ) && $num_val.'px' !== $defaults[$device].'' ) {
+        if ( ! empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
+            $unit = sek_extract_unit( $num_unit );
             $num_val = $num_val < 0 ? 0 : $num_val;
-            $margin_bottom_ready_val[$device] = $num_val . 'px';
+            $margin_bottom_ready_val[$device] = $num_val . $unit;
         }
     }
     $rules = sek_set_mq_css_rules( array(
@@ -8214,6 +8227,30 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-list-layout article > *:not(:last-child):not(.sek-pg-thumbnail)',
             '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-grid-layout article > *:not(:last-child)'
         )),
+        'is_important' => false
+    ), $rules );
+    $content_padding = $main_settings['content_padding'];
+    $content_padding = is_array( $content_padding ) ? $content_padding : array();
+    $defaults = array(
+        'desktop' => '0px',// <= this value matches the static CSS rule and the input default for the module
+        'tablet' => '',
+        'mobile' => ''
+    );
+    $content_padding = wp_parse_args( $content_padding, $defaults );
+    $content_padding_ready_val = $content_padding;
+    foreach ($content_padding as $device => $num_unit ) {
+        $num_val = sek_extract_numeric_value( $num_unit );
+        $content_padding_ready_val[$device] = '';
+        if ( ! empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
+            $unit = sek_extract_unit( $num_unit );
+            $num_val = $num_val < 0 ? 0 : $num_val;
+            $content_padding_ready_val[$device] = $num_val . $unit;
+        }
+    }
+    $rules = sek_set_mq_css_rules( array(
+        'value' => $content_padding_ready_val,
+        'css_property' => 'padding',
+        'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items article .sek-pg-content',
         'is_important' => false
     ), $rules );
     if ( 'list' === $main_settings['layout'] && true === sek_booleanize_checkbox_val( $thumb_settings['show_thumb'] ) ) {
@@ -11656,10 +11693,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             return $template;
         }
         function sek_maybe_set_nimble_header_footer() {
+            if ( !did_action('nimble_front_classes_ready') || !did_action('wp') ) {
+                sek_error_log( __FUNCTION__ . ' has been invoked too early at hook ' . current_filter() );
+                return;
+            }
             if ( '_not_cached_yet_' === $this->has_local_header_footer || '_not_cached_yet_' === $this->has_global_header_footer ) {
                 $local_header_footer_data = sek_get_local_option_value('local_header_footer');
                 $global_header_footer_data = sek_get_global_option_value('global_header_footer');
-                $apply_local_option = !is_null( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
+
+                $apply_local_option = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
 
                 $this->has_global_header_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
 
