@@ -1575,18 +1575,29 @@ button.sek-btn,
 }
 
 .sek-post-grid-wrapper .sek-list-layout {
+  display: -ms-grid;
   display: grid;
+  -ms-grid-columns: minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr);
 }
 
 .sek-post-grid-wrapper .sek-list-layout article {
+  display: -ms-grid;
   display: grid;
+  -ms-grid-columns: minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr);
+  -ms-grid-rows: 1fr;
   grid-template-rows: 1fr;
   grid-column-gap: 20px;
 }
 
+.sek-post-grid-wrapper .sek-list-layout article > *:nth-child(1) {
+  -ms-grid-row: 1;
+  -ms-grid-column: 1;
+}
+
 .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb {
+  -ms-grid-columns: 30% minmax(0, 1fr);
   grid-template-columns: 30% minmax(0, 1fr);
 }
 
@@ -1597,11 +1608,24 @@ button.sek-btn,
 }
 
 .sek-post-grid-wrapper .sek-grid-layout {
+  display: -ms-grid;
   display: grid;
+  -ms-grid-columns: 1fr 20px 1fr;
   grid-template-columns: 1fr 1fr;
+  -ms-grid-rows: 1fr;
   grid-template-rows: 1fr;
   grid-row-gap: 20px;
   grid-column-gap: 20px;
+}
+
+.sek-post-grid-wrapper .sek-grid-layout > *:nth-child(1) {
+  -ms-grid-row: 1;
+  -ms-grid-column: 1;
+}
+
+.sek-post-grid-wrapper .sek-grid-layout > *:nth-child(2) {
+  -ms-grid-row: 1;
+  -ms-grid-column: 3;
 }
 
 .sek-post-grid-wrapper .sek-shadow.sek-grid-layout.sek-all-col-1 article {
@@ -1621,22 +1645,26 @@ button.sek-btn,
 }
 
 .sek-post-grid-wrapper .sek-grid-layout.sek-all-col-1 {
+  -ms-grid-columns: minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr);
 }
 
 .sek-post-grid-wrapper .sek-grid-layout.sek-all-col-2 {
+  -ms-grid-columns: minmax(0, 1fr) 20px minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-column-gap: 20px;
   grid-row-gap: 20px;
 }
 
 .sek-post-grid-wrapper .sek-grid-layout.sek-all-col-3 {
+  -ms-grid-columns: minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   grid-column-gap: 15px;
   grid-row-gap: 15px;
 }
 
 .sek-post-grid-wrapper .sek-grid-layout.sek-all-col-4 {
+  -ms-grid-columns: minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   grid-column-gap: 15px;
   grid-row-gap: 15px;
@@ -1644,19 +1672,23 @@ button.sek-btn,
 
 @media (min-width: 768px) {
   .sek-post-grid-wrapper .sek-grid-layout.sek-desktop-col-1 {
+    -ms-grid-columns: minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr);
   }
   .sek-post-grid-wrapper .sek-grid-layout.sek-desktop-col-2 {
+    -ms-grid-columns: minmax(0, 1fr) 20px minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-column-gap: 20px;
     grid-row-gap: 20px;
   }
   .sek-post-grid-wrapper .sek-grid-layout.sek-desktop-col-3 {
+    -ms-grid-columns: minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
     grid-column-gap: 15px;
     grid-row-gap: 15px;
   }
   .sek-post-grid-wrapper .sek-grid-layout.sek-desktop-col-4 {
+    -ms-grid-columns: minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
     grid-column-gap: 15px;
     grid-row-gap: 15px;
@@ -1665,19 +1697,23 @@ button.sek-btn,
 
 @media (min-width: 576px) and (max-width: 767.98px) {
   .sek-post-grid-wrapper .sek-grid-layout.sek-tablet-col-1 {
+    -ms-grid-columns: minmax(0, 1fr) !important;
     grid-template-columns: minmax(0, 1fr) !important;
   }
   .sek-post-grid-wrapper .sek-grid-layout.sek-tablet-col-2 {
+    -ms-grid-columns: minmax(0, 1fr) 20px minmax(0, 1fr) !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
     grid-column-gap: 20px;
     grid-row-gap: 20px;
   }
   .sek-post-grid-wrapper .sek-grid-layout.sek-tablet-col-3 {
+    -ms-grid-columns: minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr) !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
     grid-column-gap: 15px;
     grid-row-gap: 15px;
   }
   .sek-post-grid-wrapper .sek-grid-layout.sek-tablet-col-4 {
+    -ms-grid-columns: minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr) !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
     grid-column-gap: 15px;
     grid-row-gap: 15px;
@@ -1686,19 +1722,23 @@ button.sek-btn,
 
 @media (max-width: 575.98px) {
   .sek-post-grid-wrapper .sek-grid-layout.sek-mobile-col-1 {
+    -ms-grid-columns: minmax(0, 1fr) !important;
     grid-template-columns: minmax(0, 1fr) !important;
   }
   .sek-post-grid-wrapper .sek-grid-layout.sek-mobile-col-2 {
+    -ms-grid-columns: minmax(0, 1fr) 20px minmax(0, 1fr) !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
     grid-column-gap: 20px;
     grid-row-gap: 20px;
   }
   .sek-post-grid-wrapper .sek-grid-layout.sek-mobile-col-3 {
+    -ms-grid-columns: minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr) !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
     grid-column-gap: 15px;
     grid-row-gap: 15px;
   }
   .sek-post-grid-wrapper .sek-grid-layout.sek-mobile-col-4 {
+    -ms-grid-columns: minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr) 15px minmax(0, 1fr) !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
     grid-column-gap: 15px;
     grid-row-gap: 15px;
@@ -1707,6 +1747,7 @@ button.sek-btn,
 
 @media (min-width: 576px) and (max-width: 767.98px) {
   .sek-post-grid-wrapper.sek-has-tablet-breakpoint .sek-list-layout article {
+    -ms-grid-columns: minmax(0, 1fr) !important;
     grid-template-columns: minmax(0, 1fr) !important;
     grid-gap: 0;
   }
@@ -1717,6 +1758,7 @@ button.sek-btn,
 
 @media (max-width: 575.98px) {
   .sek-post-grid-wrapper.sek-has-mobile-breakpoint .sek-list-layout article {
+    -ms-grid-columns: minmax(0, 1fr) !important;
     grid-template-columns: minmax(0, 1fr) !important;
     grid-gap: 0;
   }

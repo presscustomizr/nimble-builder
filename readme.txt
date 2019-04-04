@@ -103,6 +103,7 @@ Fixed widget options not displayed when customizing the WP Widget Module. Fixed 
 = 1.6.3 : April 4th 2019 =
 * fixed : WP Widget Module => no options in select
 * fixed : wrong syntax for conditional statement leading to PHP error when using PHP version < 5.6
+* fixed : ie11 compatibility => added missing "-ms" vendor prefix to grid* properties
 
 = 1.6.2 : April 3rd 2019 =
 * fixed : bug when a section width is set in percent

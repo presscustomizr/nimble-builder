@@ -2204,9 +2204,19 @@ function sek_set_mq_css_rules( $params, $rules ) {
             continue;
         }
         if ( ! empty(  $val ) ) {
+            $css_property = $params['css_property'];
+            if ( is_array( $css_property ) ) {
+                $css_rules_array = array();
+                foreach ( $css_property as $property ) {
+                    $css_rules_array[] = sprintf( '%1$s:%2$s%3$s;', $property, $val, $params['is_important'] ? '!important' : '' );
+                }
+                $css_rules = implode( '', $css_rules_array );
+            } else {
+                $css_rules = sprintf( '%1$s:%2$s%3$s;', $css_property, $val, $params['is_important'] ? '!important' : '' );
+            }
             $rules[] = array(
                 'selector' => $params['selector'],
-                'css_rules' => sprintf( '%1$s:%2$s%3$s;', $params['css_property'], $val, $params['is_important'] ? '!important' : '' ),
+                'css_rules' => $css_rules,
                 'mq' => $_font_size_mq[ $device ]
             );
         }
@@ -8228,7 +8238,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
 
         $rules = sek_set_mq_css_rules(array(
             'value' => $img_column_width_ready_value,
-            'css_property' => 'grid-template-columns',
+            'css_property' => array( 'grid-template-columns', '-ms-grid-columns' ),
             'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb',
             'is_important' => false
         ), $rules );
