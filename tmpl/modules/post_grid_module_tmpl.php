@@ -159,16 +159,16 @@ if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
 
   $layout_class = 'list' === $main_settings['layout'] ? 'sek-list-layout' : 'sek-grid-layout';
 
-  $shadow_class = true === sek_booleanize_checkbox_val( $main_settings['apply_shadow'] ) ? 'sek-shadow' : '';
+  $shadow_class = true === sek_booleanize_checkbox_val( $main_settings['apply_shadow_on_hover'] ) ? 'sek-shadow-on-hover' : '';
 
   $has_thumb_custom_height = true === sek_booleanize_checkbox_val( $thumb_settings['img_has_custom_height'] ) ? 'sek-thumb-custom-height' : '';
 
   $tablet_breakpoint_class = true === sek_booleanize_checkbox_val( $main_settings['has_tablet_breakpoint'] ) ? 'sek-has-tablet-breakpoint' : '';
   $mobile_breakpoint_class = true === sek_booleanize_checkbox_val( $main_settings['has_mobile_breakpoint'] ) ? 'sek-has-mobile-breakpoint' : '';
 
-  $grid_wrapper_classes = implode(' ', [ $tablet_breakpoint_class, $mobile_breakpoint_class] );
+  $grid_wrapper_classes = implode(' ', [ $tablet_breakpoint_class, $mobile_breakpoint_class ] );
 
-  $grid_items_classes = [ $layout_class, $shadow_class, $has_thumb_custom_height ];
+  $grid_items_classes = [ $layout_class, $has_thumb_custom_height, $shadow_class ];
 
   if ( 'grid' === $main_settings['layout'] ) {
     foreach ( $normalized_columns_by_device as $device => $column_nb ) {

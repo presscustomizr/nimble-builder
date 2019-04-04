@@ -7,31 +7,50 @@
   // Spacing
   .sek-grid-items {
     grid-row-gap: 25px;
-    article>*:not(:last-child) {
-      margin-top: 0!important;
-    }
     &.sek-list-layout article>*:not(:last-child):not(.sek-pg-thumbnail){
       margin-bottom: 15px;
     }
     &.sek-grid-layout article>*:not(:last-child){
       margin-bottom: 15px;
     }
-    article>:first-child {
-      margin-top: 0!important;
-    }
-    article>:last-child {
-      margin-top: 0!important;
-    }
 
-    article .sek-pg-content>*:not(:last-child) {
-      margin-top: 0!important;
-      margin-bottom: 15px;
+    article {
+      >:first-child {
+        margin-top: 0!important;
+      }
+      >:last-child {
+        margin-top: 0!important;
+      }
+      >*:not(:last-child) {
+        margin-top: 0!important;
+      }
+
+      .sek-pg-content {
+        >*:not(:last-child) {
+          margin-top: 0!important;
+          margin-bottom: 15px;
+        }
+        >:first-child {
+          margin-top: 0!important;
+        }
+        >:last-child {
+          margin-top: 0!important;
+        }
+      }
     }
-    article .sek-pg-content>:first-child {
-      margin-top: 0!important;
-    }
-    article .sek-pg-content>:last-child {
-      margin-top: 0!important;
+    &.sek-shadow-on-hover article {
+      -webkit-box-shadow: 0 0 40px 0 rgba(0,0,0,.05);
+              box-shadow: 0 0 40px 0 rgba(0,0,0,.05);
+      -webkit-transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+           -o-transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+              transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+      &:hover {
+       -webkit-transform: translateY(-4px);
+           -ms-transform: translateY(-4px);
+               transform: translateY(-4px);
+       -webkit-box-shadow: 0 14px 28px rgba(0,0,0,0.18), 0 10px 10px rgba(0,0,0,0.15);
+               box-shadow: 0 14px 28px rgba(0,0,0,0.18), 0 10px 10px rgba(0,0,0,0.15);
+      }
     }
   }//.sek-grid-items
 
@@ -82,12 +101,6 @@
         object-fit: cover;
     }
   }//.sek-thumb-custom-height .sek-pg-thumbnail
-
-
-  // Shadow
-  .sek-shadow article {
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0;
-  }
 
   // Metas
   .sek-pg-metas > span:not(:last-child)::after {
@@ -232,13 +245,6 @@
     -ms-grid-column: 3;
   }
 
-  // shadow needs padding
-  .sek-shadow.sek-grid-layout {
-    &.sek-all-col-1 article { padding: 20px; }
-    &.sek-all-col-2 article { padding: 15px; }
-    &.sek-all-col-3 article { padding: 12px; }
-    &.sek-all-col-4 article { padding: 10px; }
-  }
   .sek-grid-layout.sek-all-col-1 {
     -ms-grid-columns: minmax(0,1fr);
     grid-template-columns: minmax(0,1fr);
