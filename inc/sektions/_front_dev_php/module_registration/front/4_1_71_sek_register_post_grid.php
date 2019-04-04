@@ -852,7 +852,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
 
         $rules = sek_set_mq_css_rules(array(
             'value' => $img_column_width_ready_value,
-            'css_property' => 'grid-template-columns',
+            'css_property' => array( 'grid-template-columns', '-ms-grid-columns' ),
             'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb',
             'is_important' => false
         ), $rules );

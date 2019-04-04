@@ -167,17 +167,29 @@
 // LIST LAYOUT
 .sek-post-grid-wrapper {
   .sek-list-layout {
+    display: -ms-grid;
     display: grid;
+    -ms-grid-columns: minmax(0,1fr);
     grid-template-columns: minmax(0,1fr);
   }
   .sek-list-layout article {
+    display: -ms-grid;
     display: grid;
+    -ms-grid-columns: minmax(0,1fr);
     grid-template-columns: minmax(0,1fr);
+    -ms-grid-rows: 1fr;
     grid-template-rows: 1fr;
     grid-column-gap: 20px;
   }
+  // The following has been added automatically when autoprefixing with https://autoprefixer.github.io/
+  // not sure why...
+  .sek-list-layout article > *:nth-child(1) {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+  }
   // article has 2 columns when the thumbnail is displayed
   .sek-list-layout article.sek-has-thumb {
+    -ms-grid-columns: 30% minmax(0,1fr);
     grid-template-columns: 30% minmax(0,1fr);
   }
 
@@ -187,7 +199,8 @@
   // }
   .sek-list-layout article .sek-pg-thumbnail {
     margin-bottom: 0;
-    align-self: flex-start;
+    -ms-flex-item-align: start;
+        align-self: flex-start;
   }
 }//.sek-post-grid-wrapper LIST LAYOUT
 
@@ -199,12 +212,26 @@
 // COLUMN LAYOUT
 .sek-post-grid-wrapper {
   .sek-grid-layout {
+    display: -ms-grid;
     display: grid;
+    -ms-grid-columns: 1fr 20px 1fr;
     grid-template-columns: 1fr 1fr;
+    -ms-grid-rows: 1fr;
     grid-template-rows: 1fr;
     grid-row-gap: 20px;
     grid-column-gap: 20px;
   }
+  // The following has been added automatically when autoprefixing with https://autoprefixer.github.io/
+  // not sure why...
+  .sek-grid-layout > *:nth-child(1) {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+  }
+  .sek-grid-layout > *:nth-child(2) {
+    -ms-grid-row: 1;
+    -ms-grid-column: 3;
+  }
+
   // shadow needs padding
   .sek-shadow.sek-grid-layout {
     &.sek-all-col-1 article { padding: 20px; }
@@ -213,19 +240,23 @@
     &.sek-all-col-4 article { padding: 10px; }
   }
   .sek-grid-layout.sek-all-col-1 {
+    -ms-grid-columns: minmax(0,1fr);
     grid-template-columns: minmax(0,1fr);
   }
   .sek-grid-layout.sek-all-col-2 {
+    -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
     grid-template-columns: minmax(0,1fr) minmax(0,1fr);
     grid-column-gap: 20px;
     grid-row-gap: 20px;
   }
   .sek-grid-layout.sek-all-col-3 {
+    -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
     grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
     grid-column-gap: 15px;
     grid-row-gap: 15px;
   }
   .sek-grid-layout.sek-all-col-4 {
+    -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
     grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
     grid-column-gap: 15px;
     grid-row-gap: 15px;
@@ -236,19 +267,23 @@
 @include media-breakpoint-up(md) {
   .sek-post-grid-wrapper {
     .sek-grid-layout.sek-desktop-col-1 {
+      -ms-grid-columns: minmax(0,1fr);
       grid-template-columns: minmax(0,1fr);
     }
     .sek-grid-layout.sek-desktop-col-2 {
+      -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
       grid-template-columns: minmax(0,1fr) minmax(0,1fr);
       grid-column-gap: 20px;
       grid-row-gap: 20px;
     }
     .sek-grid-layout.sek-desktop-col-3 {
+      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
       grid-column-gap: 15px;
       grid-row-gap: 15px;
     }
     .sek-grid-layout.sek-desktop-col-4 {
+      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
       grid-column-gap: 15px;
       grid-row-gap: 15px;
@@ -259,19 +294,23 @@
 @include media-breakpoint-between(sm, sm) {
   .sek-post-grid-wrapper {
     .sek-grid-layout.sek-tablet-col-1 {
+      -ms-grid-columns: minmax(0,1fr)!important;
       grid-template-columns: minmax(0,1fr)!important;
     }
     .sek-grid-layout.sek-tablet-col-2 {
+      -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr)!important;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr)!important;
       grid-column-gap: 20px;
       grid-row-gap: 20px;
     }
     .sek-grid-layout.sek-tablet-col-3 {
+      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
       grid-column-gap: 15px;
       grid-row-gap: 15px;
     }
     .sek-grid-layout.sek-tablet-col-4 {
+      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
       grid-column-gap: 15px;
       grid-row-gap: 15px;
@@ -281,19 +320,23 @@
 @include media-breakpoint-only(xs) {
   .sek-post-grid-wrapper {
     .sek-grid-layout.sek-mobile-col-1 {
+      -ms-grid-columns: minmax(0,1fr)!important;
       grid-template-columns: minmax(0,1fr)!important;
     }
     .sek-grid-layout.sek-mobile-col-2 {
+      -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr)!important;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr)!important;
       grid-column-gap: 20px;
       grid-row-gap: 20px;
     }
     .sek-grid-layout.sek-mobile-col-3 {
+      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
       grid-column-gap: 15px;
       grid-row-gap: 15px;
     }
     .sek-grid-layout.sek-mobile-col-4 {
+      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
       grid-column-gap: 15px;
       grid-row-gap: 15px;
@@ -314,6 +357,7 @@
 @include media-breakpoint-between(sm, sm) {
   .sek-post-grid-wrapper.sek-has-tablet-breakpoint {
     .sek-list-layout article {
+      -ms-grid-columns: minmax(0,1fr)!important;
       grid-template-columns: minmax(0,1fr)!important;//<= important because this property can be customized by users for desktop
       grid-gap: 0;
       .sek-pg-thumbnail {
@@ -331,6 +375,7 @@
 @include media-breakpoint-only(xs) {
   .sek-post-grid-wrapper.sek-has-mobile-breakpoint {
     .sek-list-layout article {
+      -ms-grid-columns: minmax(0,1fr)!important;
       grid-template-columns: minmax(0,1fr)!important;//<= important because this property can be customized by users for desktop
       grid-gap: 0;
       .sek-pg-thumbnail {
