@@ -275,7 +275,7 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
 // @params params(array). Example
 // array(
 //     'value' => $ready_value,(array)
-//     'css_property' => 'height',(string)
+//     'css_property' => 'height',(string or array of properties)
 //     'selector' => $selector,(string)
 //     'is_important' => $important,(bool)
 // )
@@ -311,15 +311,33 @@ function sek_set_mq_css_rules( $params, $rules ) {
     if ( ! empty( $params['value'][ 'mobile' ] ) ) {
         $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
     }
+    // $params['value'] looks like
+    // array(
+    //     'desktop' => '30px',
+    //     'tablet' => '',
+    //     'mobile' => ''
+    // );
     foreach ( $params['value'] as $device => $val ) {
         if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
             sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
             continue;
         }
         if ( ! empty(  $val ) ) {
+            // the css_property can be an array
+            // this is needed for example to write properties supporting several vendor prefixes
+            $css_property = $params['css_property'];
+            if ( is_array( $css_property ) ) {
+                $css_rules_array = array();
+                foreach ( $css_property as $property ) {
+                    $css_rules_array[] = sprintf( '%1$s:%2$s%3$s;', $property, $val, $params['is_important'] ? '!important' : '' );
+                }
+                $css_rules = implode( '', $css_rules_array );
+            } else {
+                $css_rules = sprintf( '%1$s:%2$s%3$s;', $css_property, $val, $params['is_important'] ? '!important' : '' );
+            }
             $rules[] = array(
                 'selector' => $params['selector'],
-                'css_rules' => sprintf( '%1$s:%2$s%3$s;', $params['css_property'], $val, $params['is_important'] ? '!important' : '' ),
+                'css_rules' => $css_rules,
                 'mq' => $_font_size_mq[ $device ]
             );
         }
