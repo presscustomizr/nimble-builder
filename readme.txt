@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -96,10 +96,14 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.6.2 =
-Added Post Grid module. Updated the customizer UI with a new checkbox design. Improved code performance.
+= 1.6.3 =
+Fixed widget options not displayed when customizing the WP Widget Module. Fixed PHP error.
 
 == Changelog ==
+= 1.6.3 : April 4th 2019 =
+* fixed : WP Widget Module => no options in select
+* fixed : wrong syntax for conditional statement leading to PHP error when using PHP version < 5.6
+
 = 1.6.2 : April 3rd 2019 =
 * fixed : bug when a section width is set in percent
 
@@ -109,6 +113,7 @@ Added Post Grid module. Updated the customizer UI with a new checkbox design. Im
 * improved : customizer UI with a new checkbox design
 * improved : PHP code performance on front by registering only the contextually active modules
 * added : a Post Grid module
+* added : a widget to the admin dashboard including latest news and links
 
 = 1.6.0 : March 27th 2019 =
 * improved : navigation in changelog history

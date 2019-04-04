@@ -716,9 +716,7 @@ function sek_get_info_data( $force_update = false ) {
     $response = wp_remote_get( NIMBLE_DATA_API_URL, array(
       'timeout' => $timeout,
       'body' => [
-        // Which API version is used.
         'api_version' => NIMBLE_VERSION,
-        // Which language to return.
         'site_lang' => get_bloginfo( 'language' ),
         'theme_name' => sek_maybe_get_presscustomizr_theme_name( sek_get_parent_theme_slug() )
       ],

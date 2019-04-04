@@ -8247,7 +8247,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         foreach ( $img_height as $device => $num_val ) {
             $num_val = sek_extract_numeric_value( $num_val );
             $img_height_ready_value[$device] = '';
-            if ( ! empty( $num_val && $num_val.'%' !== $defaults[$device].'' ) ) {
+            if ( ! empty( $num_val ) && $num_val.'%' !== $defaults[$device].'' ) {
                 $num_val = $num_val < 1 ? 1 : $num_val;
                 $img_height_ready_value[$device] = sprintf('%s;', $num_val .'%');
             }
