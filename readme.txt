@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.6.4
+Stable tag: 1.6.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -16,7 +16,7 @@ Powerful drag and drop page builder using the native WordPress customizer.
 == Description ==
 = What is the Nimble Page Builder ? =
 **[Nimble Page Builder](https://nimblebuilder.com/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** is a powerful yet easy to use page builder plugin for WordPress. Nimble Builder uses the live customizer which is the native WordPress interface for real-time design.
-The plugin allows you to drag-and-drop modules like text-editor, images, contact forms, maps, icons, or beautiful pre-built sections with a [parallax background](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), into any page of your site. You can edit your sections in real-time, and then click "publish" when you are happy with the result, or save for later.
+The plugin allows you to drag-and-drop modules like text-editor, post grids, images, contact forms, maps, icons, or beautiful pre-built sections with a [parallax background](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), into any page of your site. You can edit your sections in real-time, and then click "publish" when you are happy with the result, or save for later.
 
 Watch the video below to see how this [demo page](https://demo.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) has been built !
 
@@ -101,9 +101,12 @@ The Nimble builder works with any WordPress theme. If you experience any problem
 
 == Upgrade Notice ==
 = 1.6.4 =
-Fixed widget options not displayed when customizing the WP Widget Module. Fixed PHP error.
+Readme.txt update and checkbox styling improvements in the customizer.
 
 == Changelog ==
+= 1.6.5 : April 5th 2019 =
+* improved : Readme.txt update and checkbox styling improvement in the customizer
+
 = 1.6.4 : April 4th 2019 =
 * fixed : PHP Undefined index: header-footer when using the Customizr theme
 * fixed : CSS unit not properly set for some controls
