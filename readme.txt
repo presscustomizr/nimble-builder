@@ -100,7 +100,7 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 == Upgrade Notice ==
-= 1.6.4 =
+= 1.6.5 =
 Readme.txt update and checkbox styling improvements in the customizer.
 
 == Changelog ==
