@@ -346,6 +346,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             });
                         }, 2000 );//delay()
                   }
+
+                  // FEEDBACK UI
+                  self.setupFeedBackUI();
             },//doSektionThinksOnApiReady
 
 

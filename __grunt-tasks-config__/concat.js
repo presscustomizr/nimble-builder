@@ -200,6 +200,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_2_sektions_navigate_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_3_sektions_level_tree.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_sektions_save_ui.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_6_sektions_feedback_ui.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_8_sektions_revision_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_2_sektions_setup_collection_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_4_sektions_react_to_preview.js',
