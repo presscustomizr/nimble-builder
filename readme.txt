@@ -35,7 +35,7 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * **Works in any WordPress contexts** : home, pages, posts, custom post types, archives, author pages, search page, ...
 * Create content, style, move / duplicate / remove elements **in real-time preview**.
 * **Includes many content modules** : classic text editor, image, column layouts, contact form, button, icons, map, html code, WordPress widget area, menu, and more.
-* **Create engaging grids of posts** in live preview, looking great on desktop and mobile devices.
+* **Insert engaging [post grids](https://docs.presscustomizr.com/article/393-how-to-add-post-grids-to-any-wordpress-page-with-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** in any page, looking great on desktop and mobile devices.
 * Add image background to your sections, and **[enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
 * **Easily [customize your content specifically for mobile devices](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** : change the responsive breakpoint, adapt font-size, spacing, alignment, column layouts, in real-time preview.
 * **Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
