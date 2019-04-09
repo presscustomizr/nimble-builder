@@ -237,7 +237,7 @@ module.exports = {
       livereload : true
     },
     files : [
-      '<%= paths.czr_assets %>sek/czr/css/**/*.css'
+      '<%= paths.czr_assets %>sek/css/**/*.css'
     ],
     tasks : [],
   },
@@ -322,5 +322,17 @@ module.exports = {
     },
     files : [ 'nimble-builder.php' ],
     tasks : []
+  },
+
+  admin_css : {
+    options: {
+      spawn : false,
+      // Start a live reload server on the default port 35729
+      livereload : true
+    },
+    files : [
+      'assets/admin/css/*.css'
+    ],
+    tasks : [],
   },
 };
