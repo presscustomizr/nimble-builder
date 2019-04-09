@@ -578,6 +578,12 @@ function sek_render_welcome_notice() {
 }
 
 
+
+
+
+// /* ------------------------------------------------------------------------- *
+// *  DASHBOARD
+// /* ------------------------------------------------------------------------- */
 // Register Dashboard Widgets on top of the widgets
 add_action( 'wp_dashboard_setup', '\Nimble\sek_register_dashboard_widgets' );
 function sek_register_dashboard_widgets() {
@@ -605,16 +611,28 @@ function sek_nimble_dashboard_callback_fn() {
     ?>
     <div class="nimble-db-wrapper">
       <div class="nimble-db-header">
-        <div class="nimble-logo"><div class="sek-nimble-icon" title="Add sections in live preview with the Nimble Builder"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="Nimble Builder"></div></div>
-        <div class="nimble-version">
-          <span class="nimble-version-text"><?php _e('Nimble Builder', 'text_doma'); ?> v<?php echo NIMBLE_VERSION; ?></span>
-          <?php if ( sek_is_presscustomizr_theme( $theme_name ) ) : ?>
-            <?php
-              $theme_data = wp_get_theme();
-              printf('<span class="nimble-version-text"> + %1$s theme v%2$s</span>', ucfirst($theme_name), $theme_data -> version );
-            ?>
-          <?php endif; ?>
+        <div class="nimble-logo-version">
+          <div class="nimble-logo"><div class="sek-nimble-icon" title="Add sections in live preview with the Nimble Builder"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="Nimble Builder"></div></div>
+          <div class="nimble-version">
+            <span class="nimble-version-text"><?php _e('Nimble Builder', 'text_doma'); ?> v<?php echo NIMBLE_VERSION; ?></span>
+            <?php if ( sek_is_presscustomizr_theme( $theme_name ) ) : ?>
+              <?php
+                $theme_data = wp_get_theme();
+                printf('<span class="nimble-version-text"> + %1$s theme v%2$s</span>', ucfirst($theme_name), $theme_data -> version );
+              ?>
+            <?php endif; ?>
+          </div>
         </div>
+        <?php printf( '<a href="%1$s" class="button button-primary button-hero"><span class="dashicons dashicons-admin-appearance"></span> %2$s</a>',
+          esc_url( add_query_arg(
+              array(
+                array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
+                'return' => urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) )
+              ),
+              admin_url( 'customize.php' )
+          ) ),
+          __( 'Start building', 'nimble' )
+      ); ?>
       </div>
       <?php if ( ! empty( $post_data ) ) : ?>
         <div class="nimble-post-list">
@@ -700,6 +718,12 @@ function sek_maybe_get_presscustomizr_theme_name( $theme_name ) {
 }
 
 
+
+
+
+// /* ------------------------------------------------------------------------- *
+// *  NIMBLE API
+// /* ------------------------------------------------------------------------- */
 if ( !defined( "NIMBLE_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_LIBRARY_OPT_NAME", 'nimble_api_library_data' ); }
 if ( !defined( "NIMBLE_NEWS_OPT_NAME" ) ) { define( "NIMBLE_NEWS_OPT_NAME", 'nimble_api_news_data' ); }
 if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https://presscustomizr.com/wp-json/nimble/v1/cravan' ); }

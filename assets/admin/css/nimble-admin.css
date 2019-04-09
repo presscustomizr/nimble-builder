@@ -133,14 +133,32 @@ a.czr-rating-link:hover {
   align-items: center;
   /* flex-direction: column; */
   flex: 0 0 100%;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
   max-width: 100%;
   width: 100%;
   -webkit-box-shadow: 0 5px 8px rgba(0, 0, 0, 0.05);
           box-shadow: 0 5px 8px rgba(0, 0, 0, 0.05);
   margin: 0 -12px 8px;
   padding: 0 12px 12px;
-  }
-
+}
+#presscustomizr-dashboard .nimble-logo-version {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+#presscustomizr-dashboard .nimble-db-header .button-hero {
+  height: 34px;
+  line-height: 33px;
+  padding: 0 15px;
+}
 #presscustomizr-dashboard .nimble-logo {
   width: 30px;
 }
