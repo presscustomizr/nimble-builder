@@ -346,9 +346,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             });
                         }, 2000 );//delay()
                   }
-
-                  // FEEDBACK UI
-                  self.setupFeedBackUI();
             },//doSektionThinksOnApiReady
 
 
@@ -395,6 +392,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //       var $topPanelTitleElInner = $topPanelTitleEl.find('.panel-title');
                               //       $topPanelTitleElInner.html( logoHtml );
                               // }
+
+                              if ( sektionsLocalizedData.eligibleForReviewNotification ) {
+                                    _mainPanel_.expanded.bind( function( expanded ) {
+                                          if ( expanded && _.isUndefined( self.feedbackUIVisible ) ) {
+                                                // FEEDBACK UI
+                                                self.setupFeedBackUI();
+                                          }
+                                    });
+                              }
                         });
                   });
 

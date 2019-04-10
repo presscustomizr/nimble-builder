@@ -1138,7 +1138,7 @@ body.nimble-top-bar-visible #nimble-top-bar {
   top: 36px;
   right: 0;
   left: 0;
-  height: 100px;
+  height: 150px;
   overflow: auto;
   padding: 15px;
   z-index: 0;
@@ -1159,11 +1159,37 @@ body.nimble-top-bar-visible #nimble-top-bar {
   justify-content: center;
 }
 
-
 .nimble-feedback-ui-visible #customize-preview iframe {
-  top: 167px;
-  height: calc(100vh - 167px);
+  top: 217px;
+  height: calc(100vh - 217px);
 }
+
+/*#nimble-feedback .sek-main-feedback-heading {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}*/
+#nimble-feedback .sek-main-feedback-heading p {
+  margin:0;
+}
+
+#nimble-feedback .sek-feedback-step-three-thanks p { font-size: 17px;}
+
+.sek-feedback-nimble-icon {
+  height: 40px;
+  width: 40px;
+}
+.sek-feedback-nimble-icon.big {
+    height: 60px;
+    width: 60px;
+}
+
 .wp-core-ui #nimble-feedback .sek-feedback-btn {
     margin: 0 6px;
     -webkit-transition: background 200ms linear, color 200ms linear;
@@ -1192,7 +1218,7 @@ transition: background 200ms linear, color 200ms linear;
   background: #ffffff;
 }
 .wp-core-ui #nimble-feedback .sek-feedback-btn.sek-neg:hover, .wp-core-ui #nimble-feedback .sek-feedback-btn.sek-neg:focus {
-  color: #fff;
+  color: #ffffff;
   background: #f37656;
   border: 1px solid #f37656;
 }
@@ -1202,13 +1228,22 @@ transition: background 200ms linear, color 200ms linear;
   color: #00a0d2;
   font-weight:normal;
 }
+.wp-core-ui #nimble-feedback .sek-feedback-btn.sek-close-feedback-ui {
+  background: #ffffff;
+  border: none;
+  font-weight:normal;
+}
+.wp-core-ui #nimble-feedback .sek-feedback-btn.sek-close-feedback-ui:hover {
+  color:#f37656;
+}
+
 #nimble-feedback p {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5em;
   font-style: normal;
-  margin: 10px 0;
+  margin: 0 0 10px;
 }
-#nimble-feedback .sek-stars{color:#ffb900; cursor:pointer;}
+#nimble-feedback .sek-stars{color:#ffb900; cursor:pointer;font-size: 25px;}
 #nimble-feedback .sek-signature {
   font-size: 13px;
   font-style: italic;

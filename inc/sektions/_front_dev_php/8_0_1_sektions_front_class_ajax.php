@@ -14,7 +14,9 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             // Fetches the category collection to generate the options for a select input
             // @see api.czrInputMap.category_picker
             add_action( 'wp_ajax_sek_get_post_categories', array( $this, 'sek_get_post_categories' ) );
-            // hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
+
+            add_action( 'wp_ajax_sek_postpone_feedback', array( $this, 'sek_postpone_feedback_notification' ) );
+
 
             // This is the list of accepted actions
             $this -> ajax_action_map = array(
@@ -493,6 +495,27 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             }
             wp_send_json_success( $cat_collection );
         }
+
+
+
+
+
+        ////////////////////////////////////////////////////////////////
+        // POSTPONE FEEDBACK NOTIFICATION IN CUSTOMIZER
+        // INSPIRED FROM CORE DISMISS POINTER MECHANISM
+        // @see wp-admin/includes/ajax-actions.php
+        function sek_postpone_feedback_notification() {
+          $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+          if ( !isset( $_POST['transient_duration_in_days'] ) ||!is_numeric( $_POST['transient_duration_in_days'] ) ) {
+              $transient_duration = 7 * DAY_IN_SECONDS;
+          } else {
+              $transient_duration = $_POST['transient_duration_in_days'] * DAY_IN_SECONDS;
+          }
+          set_transient( NIMBLE_FEEDBACK_NOTICE_ID, 'maybe_later', $transient_duration );
+          wp_die( 1 );
+        }
+
 
 
         // hook : 'wp_ajax_sek_get_preview_ui_element'
