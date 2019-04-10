@@ -51,6 +51,7 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * [Image](https://docs.presscustomizr.com/article/381-how-to-enable-lightbox-on-your-images-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
 * Button
 * Icon
+* Post Grid
 * [Contact Form](https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
 * [Google Map](https://docs.presscustomizr.com/article/387-how-to-insert-google-maps-in-your-wordpress-pages-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
 * Divider
@@ -59,7 +60,6 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * Quote
 * Widget zone
 * Menu
-* Post Grid ( under development )
 * Image Slider ( under development )
 * Accordion ( under development )
 * ... and more to come !
