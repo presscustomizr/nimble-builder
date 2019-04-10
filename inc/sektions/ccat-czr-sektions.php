@@ -39,6 +39,7 @@ function sek_enqueue_controls_js_css() {
                 'nimbleVersion' => NIMBLE_VERSION,
                 'isDevMode' => sek_is_dev_mode(),
                 'baseUrl' => NIMBLE_BASE_URL,
+                'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                 'customizerURL'   => admin_url( 'customize.php' ),
                 'sektionsPanelId' => '__sektions__',
                 'addNewSektionId' => 'sek_add_new_sektion',
@@ -84,7 +85,9 @@ function sek_enqueue_controls_js_css() {
                 'tinyMceNimbleEditorStylesheetUrl' => sprintf( '%1$s/assets/czr/sek/css/sek-tinymce-content.css', NIMBLE_BASE_URL ),
                 'defaultToolbarBtns' => "formatselect,fontsizeselect,forecolor,bold,italic,underline,strikethrough,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,unlink,spellchecker,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo",
                 'basic_btns' => array('forecolor','bold','italic','underline','strikethrough','link','unlink'),
-                'basic_btns_nolink' => array('forecolor','bold','italic','underline','strikethrough')
+                'basic_btns_nolink' => array('forecolor','bold','italic','underline','strikethrough'),
+
+                'eligibleForReviewNotification' => sek_get_feedback_notif_status()
             )
         )
     );//wp_localize_script()
@@ -587,6 +590,58 @@ function sek_print_nimble_customizer_tmpl() {
           <button class="button sek-close-level-tree far fa-times-circle" type="button" title="<?php _e('Close', 'text_domain'); ?>">
             <?php _e('Close', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Close', 'text_domain'); ?></span>
           </button>
+      </div>
+    </script>
+
+    <script type="text/html" id="tmpl-nimble-feedback-ui">
+      <div id="nimble-feedback" data-sek-dismiss-pointer="<?php echo NIMBLE_FEEDBACK_NOTICE_ID; ?>">
+          <div class="sek-feedback-step-one">
+            <div class="sek-main-feedback-heading">
+              <img class="sek-feedback-nimble-icon big" src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_dom'); ?>"/>
+              <p>Congratulations! You have created sections on several pages of your website.</p>
+            </div>
+            <p>Are you enjoying Nimble Builder ?</p>
+            <button class="button sek-feedback-btn sek-neg" data-sek-feedback-action="not_enjoying" type="button">
+              <?php _e('Not really', 'text_domain'); ?>
+            </button>
+            <button class="button sek-feedback-btn sek-pos" data-sek-feedback-action="enjoying" type="button">
+              <?php _e('Yes !', 'text_domain'); ?>
+            </button>
+          </div>
+          <div class="sek-feedback-step-two-not-enjoying">
+            <p>Sorry to hear you are not enjoying designing with Nimble Builder. Your feedback would be very useful for us to improve.</p>
+            <p>Could you take a minute and let us know what we can do better ?</p>
+            <button class="button sek-feedback-btn sek-neg" data-sek-feedback-action="maybe_later" type="button">
+              <?php _e('No thanks, maybe later', 'text_domain'); ?>
+            </button>
+            <button class="button sek-feedback-btn sek-pos" data-sek-feedback-action="reporting_problem" data-problem-href="https://wordpress.org/support/plugin/nimble-builder/#new-post" type="button" title="<?php _e('Report a problem', 'text_domain'); ?>">
+              <?php _e('Report a problem', 'text_domain'); ?>
+            </button>
+            <button class="button sek-feedback-btn sek-already" data-sek-feedback-action="already_did" type="button">
+              <?php _e('I already did', 'text_domain'); ?>
+            </button>
+          </div>
+          <div class="sek-feedback-step-two-enjoying">
+            <span class="sek-stars" data-sek-feedback-action="go_review">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            <p>Awesome! Could you please leave a rating on WordPress.org ?<br/>
+            That would help other users discover Nimble Builder and help me improve the plugin. A huge thanks in advance!</p>
+            <p class="sek-signature">-Nicolas, Founder and Lead Developer of Nimble Builder</p>
+            <button class="button sek-feedback-btn sek-neg" data-sek-feedback-action="maybe_later" type="button">
+              <?php _e('No thanks, maybe later', 'text_domain'); ?>
+            </button>
+            <button class="button sek-feedback-btn sek-pos" data-sek-feedback-action="go_review" type="button">
+              <?php _e('OK, you deserve it', 'text_domain'); ?>
+            </button>
+             <button class="button sek-feedback-btn sek-already" data-sek-feedback-action="already_did" type="button">
+              <?php _e('I already did', 'text_domain'); ?>
+            </button>
+          </div>
+          <div class="sek-feedback-step-three-thanks">
+            <img class="sek-feedback-nimble-icon big" src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_dom'); ?>"/>
+            <p>&middot; Thank you! &middot;</p>
+          </div>
+
+          <button class="button sek-feedback-btn sek-close-feedback-ui far fa-times-circle" data-sek-feedback-action="dismiss" title="Dismiss" type="button"></button>
       </div>
     </script>
 
