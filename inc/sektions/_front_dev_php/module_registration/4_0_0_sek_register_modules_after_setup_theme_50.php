@@ -343,7 +343,7 @@ function sek_get_prebuilt_section_module_registration_params() {
                         'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
                         'width-100'   => true,
                         'title_width' => 'width-100',
-                        'section_types' => 'footer',
+                        'section_type' => 'footer',
                         'section_collection' => array(
                             array(
                                 'content-id' => 'footer_one',
