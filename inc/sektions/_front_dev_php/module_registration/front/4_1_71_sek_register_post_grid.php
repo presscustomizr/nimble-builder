@@ -179,7 +179,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
 
                 'apply_shadow_on_hover' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply a shadow effect on hover', 'text_doma'),
+                    'title'       => __('Apply a shadow effect when hovering with the cursor', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
