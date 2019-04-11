@@ -346,6 +346,12 @@ function sek_page_uses_nimble_header_footer() {
 /* ------------------------------------------------------------------------- */
 // Helper
 function sek_get_registered_module_type_property( $module_type, $property = '' ) {
+    // check introduced since https://github.com/presscustomizr/nimble-builder/issues/432
+    // may not be mandatory
+    if ( !class_exists('\Nimble\CZR_Fmk_Base') ) {
+        sek_error_log( __FUNCTION__ . ' => error => CZR_Fmk_Base not loaded' );
+        return;
+    }
     // registered modules
     $registered_modules = CZR_Fmk_Base()->registered_modules;
     if ( ! array_key_exists( $module_type, $registered_modules ) ) {
@@ -437,6 +443,13 @@ function sek_get_default_module_model( $module_type = '' ) {
     $default = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
       return $default;
+
+    // check introduced since https://github.com/presscustomizr/nimble-builder/issues/432
+    // may not be mandatory
+    if ( !class_exists('\Nimble\CZR_Fmk_Base') ) {
+        sek_error_log( __FUNCTION__ . ' => error => CZR_Fmk_Base not loaded' );
+        return $default;
+    }
 
     // Did we already cache it ?
     $default_models = Nimble_Manager()->default_models;
@@ -562,6 +575,13 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
     $input_list = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
       return $input_list;
+
+    // check introduced since https://github.com/presscustomizr/nimble-builder/issues/432
+    // may not be mandatory
+    if ( !class_exists('\Nimble\CZR_Fmk_Base') ) {
+        sek_error_log( __FUNCTION__ . ' => error => CZR_Fmk_Base not loaded' );
+        return $input_list;
+    }
 
     // Did we already cache it ?
     $cached_input_lists = Nimble_Manager()->cached_input_lists;
@@ -854,8 +874,12 @@ function sek_normalize_local_options_with_defaults( $option_name, $raw_module_va
     }
 
     // normalize with the defaults
-    if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
-        $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+    // class_exists check introduced since https://github.com/presscustomizr/nimble-builder/issues/432
+    // may not be mandatory
+    if ( class_exists('\Nimble\CZR_Fmk_Base') ) {
+        if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+            $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+        }
     }
     return $normalized_values;
 }
@@ -914,8 +938,14 @@ function sek_normalize_global_options_with_defaults( $option_name, $raw_module_v
     }
 
     // normalize with the defaults
-    if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
-        $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+    // class_exists check introduced since https://github.com/presscustomizr/nimble-builder/issues/432
+    // may not be mandatory
+    if ( class_exists('\Nimble\CZR_Fmk_Base') ) {
+        if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+            $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+        }
+    } else {
+        sek_error_log( __FUNCTION__ . ' => error => CZR_Fmk_Base not loaded' );
     }
     return $normalized_values;
 }
