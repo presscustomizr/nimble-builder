@@ -26,7 +26,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           if ( _r_.data && _r_.data.contents ) {
                                 html_content = _r_.data.contents;
                           } else {
-                                self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
+                                self.errare( 'SekPreviewPrototype::ajaxRefreshModulesAndNestedSections => ajax_response.data.contents is undefined ', _r_ );
+                                self.errare( 'params ?', params );
                           }
 
                           var $parentColumn = $('[data-sek-id="' + params.apiParams.in_column + '"]' );

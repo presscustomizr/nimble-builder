@@ -115,7 +115,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         if ( _r_.data && _r_.data.contents ) {
                                               html_content = _r_.data.contents;
                                         } else {
-                                              self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
+                                              self.errare( 'SekPreviewPrototype::sek-refresh-level => ajax_response.data.contents is undefined ', _r_ );
+                                              self.errare( 'params ?', params );
                                         }
                                         // _r_ is an array
                                         // @see SEK_Front_Ajax::sek_get_level_content_for_injection
