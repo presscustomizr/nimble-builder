@@ -5,18 +5,71 @@ add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 
 // When not customizing, we don't need to register all modules
 function sek_schedule_module_registration() {
     if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
-        sek_register_modules();
+        sek_register_modules_when_customizing_or_ajaxing();
+        // prebuilt sections are registered from a JSON since https://github.com/presscustomizr/nimble-builder/issues/431
+        sek_register_prebuilt_section_modules();
     } else {
-        add_action( 'wp', '\Nimble\sek_register_modules', PHP_INT_MAX );
+        add_action( 'wp', '\Nimble\sek_register_modules_when_not_customizing_and_not_ajaxing', PHP_INT_MAX );
     }
+}
+
+// @return void();
+// @hook 'after_setup_theme'
+function sek_register_modules_when_customizing_or_ajaxing() {
+    $modules = array_merge(
+        SEK_Front_Construct::$ui_picker_modules,
+        SEK_Front_Construct::$ui_level_modules,
+        SEK_Front_Construct::$ui_local_global_options_modules,
+        SEK_Front_Construct::$ui_front_modules
+    );
+
+    // Header and footer have been introduced in v1.4.0 but not enabled by default
+    // The module menu and the widget area module are on hold until "header and footer" feature is released.
+    if ( sek_is_header_footer_enabled() ) {
+        $modules = array_merge( $modules, SEK_Front_Construct::$ui_front_beta_modules );
+    }
+    sek_do_register_module_collection( $modules );
 }
 
 
 
-function sek_register_modules() {
-    $modules = apply_filters( 'nimble_pre_module_registration', array(), current_filter() );
-    $module_candidates = array();
+// @return void();
+// @hook 'wp'
+function sek_register_modules_when_not_customizing_and_not_ajaxing() {
+    //sniff the list of active modules in local and global location
+    sek_populate_contextually_active_module_list();
 
+    $contextually_actives = array();
+    $front_modules = array_merge( SEK_Front_Construct::$ui_front_modules, SEK_Front_Construct::$ui_front_beta_modules );
+
+    // we need to get all children when the module is a father.
+    // This will be flatenized afterwards
+    foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
+
+        // Parent module with children
+        if ( array_key_exists( $module_name, $front_modules ) ) {
+            // get the list of childrent, includes the parent too.
+            // @see ::$ui_front_modules
+            $contextually_actives[] = $front_modules[ $module_name ];
+        }
+        // Simple module with no children
+        if ( in_array( $module_name, $front_modules ) ) {
+            $contextually_actives[] = $module_name;
+        }
+    }
+
+    $modules = array_merge(
+        $contextually_actives,
+        SEK_Front_Construct::$ui_level_modules,
+        SEK_Front_Construct::$ui_local_global_options_modules
+    );
+    sek_do_register_module_collection( $modules );
+}
+
+
+// @return void();
+function sek_do_register_module_collection( $modules ) {
+    $module_candidates = array();
     // flatten the array
     // because can be formed this way after filter when including child
     // [0] => Array
@@ -40,7 +93,6 @@ function sek_register_modules() {
 
     // remove duplicated modules, typically 'czr_font_child'
     $module_candidates = array_unique( $module_candidates );
-
     foreach ( $module_candidates as $module_name ) {
         // Was previously written "\Nimble\sek_get_module_params_for_{$module_name}";
         // But this syntax can lead to function_exists() return false even if the function exists
@@ -58,62 +110,6 @@ function sek_register_modules() {
             error_log( __FUNCTION__ . ' missing params callback fn for module ' . $module_name );
         }
     }
-}//sek_register_modules()
-
-
-add_filter( 'nimble_pre_module_registration', '\Nimble\sek_filter_modules_to_register', 10, 2 );
-function sek_filter_modules_to_register( $modules, $hook ) {
-    if ( 'wp' !== $hook ) {
-        $modules = array_merge(
-            $modules,
-            SEK_Front_Construct::$ui_picker_modules,
-            SEK_Front_Construct::$ui_level_modules,
-            SEK_Front_Construct::$ui_local_global_options_modules,
-            SEK_Front_Construct::$ui_front_modules
-        );
-
-        // Header and footer have been introduced in v1.4.0 but not enabled by default
-        // The module menu and the widget area module are on hold until "header and footer" feature is released.
-        if ( sek_is_header_footer_enabled() ) {
-            $modules = array_merge( $modules, SEK_Front_Construct::$ui_front_beta_modules );
-        }
-        // if ( sek_is_pro() ) {
-        //     $modules = array_merge( $modules, [
-        //         'czr_special_img_module',
-        //         'czr_special_img_main_settings_child'
-        //     ]);
-        // }
-    } else {
-        //sniff the list of active modules in local and global location
-        sek_populate_contextually_active_module_list();
-
-        $contextually_actives = array();
-        $front_modules = array_merge( SEK_Front_Construct::$ui_front_modules, SEK_Front_Construct::$ui_front_beta_modules );
-
-        // we need to get all children when the module is a father.
-        // This will be flatenized afterwards
-        foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
-
-            // Parent module with children
-            if ( array_key_exists( $module_name, $front_modules ) ) {
-                // get the list of childrent, includes the parent too.
-                // @see ::$ui_front_modules
-                $contextually_actives[] = $front_modules[ $module_name ];
-            }
-            // Simple module with no children
-            if ( in_array( $module_name, $front_modules ) ) {
-                $contextually_actives[] = $module_name;
-            }
-        }
-
-        $modules = array_merge(
-            $modules,
-            $contextually_actives,
-            SEK_Front_Construct::$ui_level_modules,
-            SEK_Front_Construct::$ui_local_global_options_modules
-        );
-    }
-    return $modules;
 }
 
 // @return void()
@@ -138,6 +134,241 @@ function sek_populate_contextually_active_module_list( $recursive_data = null ) 
         }
     }
 }
+
+
+
+
+
+
+// SINGLE MODULE PARAMS STUCTURE
+// 'dynamic_registration' => true,
+// 'module_type' => 'sek_column_layouts_sec_picker_module',
+// 'name' => __('Empty sections with columns layout', 'text_doma'),
+// 'tmpl' => array(
+//     'item-inputs' => array(
+//         'sections' => array(
+//             'input_type'  => 'section_picker',
+//             'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+//             'width-100'   => true,
+//             'title_width' => 'width-100',
+//             'section_collection' => array(
+//                 array(
+//                     'content-id' => 'two_columns',
+//                     'title' => __('two columns layout', 'text-domain' ),
+//                     'thumb' => 'two_columns.jpg'
+//                 ),
+//                 array(
+//                     'content-id' => 'three_columns',
+//                     'title' => __('three columns layout', 'text-domain' ),
+//                     'thumb' => 'three_columns.jpg'
+//                 ),
+//                 array(
+//                     'content-id' => 'four_columns',
+//                     'title' => __('four columns layout', 'text-domain' ),
+//                     'thumb' => 'four_columns.jpg'
+//                 ),
+//             )
+//         )
+//     )
+// )
+// @return void();
+// @hook 'after_setup_theme'
+function sek_register_prebuilt_section_modules() {
+    $registration_params = sek_get_prebuilt_section_module_registration_params();
+    $defaults = array(
+        'dynamic_registration' => true,
+        'module_type' => '',
+        'name' => '',
+        'tmpl' => array()
+    );
+    foreach ( $registration_params as $module_name => $module_params ) {
+        CZR_Fmk_Base()->czr_pre_register_dynamic_module( wp_parse_args( $module_params, $defaults ) );
+    }
+
+}
+
+
+
+function sek_get_prebuilt_section_module_registration_params() {
+    return [
+        'sek_intro_sec_picker_module' => [
+            'module_type' => 'sek_intro_sec_picker_module',
+            'name' => __('Sections for an introduction', 'text_doma'),
+            'tmpl' => array(
+                'item-inputs' => array(
+                    'sections' => array(
+                        'input_type'  => 'section_picker',
+                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                        'width-100'   => true,
+                        'title_width' => 'width-100',
+                        'section_collection' => array(
+                            array(
+                                'content-id' => 'intro_three',
+                                'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
+                                'thumb' => 'intro_three.jpg'
+                            ),
+                            array(
+                                'content-id' => 'intro_one',
+                                'title' => __('1 column, full-width background', 'text-domain' ),
+                                'thumb' => 'intro_one.jpg'
+                            ),
+                            array(
+                                'content-id' => 'intro_two',
+                                'title' => __('2 columns, call to action, full-width background', 'text-domain' ),
+                                'thumb' => 'intro_two.jpg'
+                            )
+                        )
+                    )
+                )
+            )
+        ],
+        'sek_features_sec_picker_module' => [
+            'module_type' => 'sek_features_sec_picker_module',
+            'name' => __('Sections for services and features', 'text_doma'),
+            'tmpl' => array(
+                'item-inputs' => array(
+                    'sections' => array(
+                        'input_type'  => 'section_picker',
+                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                        'width-100'   => true,
+                        'title_width' => 'width-100',
+                        'section_collection' => array(
+                            array(
+                                'content-id' => 'features_one',
+                                'title' => __('3 columns with icon and call to action', 'text-domain' ),
+                                'thumb' => 'features_one.jpg',
+                                //'height' => '188px'
+                            ),
+                            array(
+                                'content-id' => 'features_two',
+                                'title' => __('3 columns with icon', 'text-domain' ),
+                                'thumb' => 'features_two.jpg',
+                                //'height' => '188px'
+                            )
+                        )
+                    )
+                )
+            )
+        ],
+        'sek_contact_sec_picker_module' => [
+            'module_type' => 'sek_contact_sec_picker_module',
+            'name' => __('Contact-us sections', 'text_doma'),
+            'tmpl' => array(
+                'item-inputs' => array(
+                    'sections' => array(
+                        'input_type'  => 'section_picker',
+                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                        'width-100'   => true,
+                        'title_width' => 'width-100',
+                        'section_collection' => array(
+                            array(
+                                'content-id' => 'contact_one',
+                                'title' => __('A contact form and a Google map', 'text-domain' ),
+                                'thumb' => 'contact_one.jpg',
+                                //'height' => '188px'
+                            ),
+                            array(
+                                'content-id' => 'contact_two',
+                                'title' => __('A contact form with an image background', 'text-domain' ),
+                                'thumb' => 'contact_two.jpg',
+                                //'height' => '188px'
+                            )
+                        )
+                    )
+                )
+            )
+        ],
+        'sek_column_layouts_sec_picker_module' => [
+            'module_type' => 'sek_column_layouts_sec_picker_module',
+            'name' => __('Empty sections with columns layout', 'text_doma'),
+            'tmpl' => array(
+                'item-inputs' => array(
+                    'sections' => array(
+                        'input_type'  => 'section_picker',
+                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                        'width-100'   => true,
+                        'title_width' => 'width-100',
+                        'section_collection' => array(
+                            array(
+                                'content-id' => 'two_columns',
+                                'title' => __('two columns layout', 'text-domain' ),
+                                'thumb' => 'two_columns.jpg'
+                            ),
+                            array(
+                                'content-id' => 'three_columns',
+                                'title' => __('three columns layout', 'text-domain' ),
+                                'thumb' => 'three_columns.jpg'
+                            ),
+                            array(
+                                'content-id' => 'four_columns',
+                                'title' => __('four columns layout', 'text-domain' ),
+                                'thumb' => 'four_columns.jpg'
+                            ),
+                        )
+                    )
+                )
+            )
+        ],
+        // pre-built sections for header and footer
+        'sek_header_sec_picker_module' => [
+            'module_type' => 'sek_header_sec_picker_module',
+            'name' => __('Header sections', 'text_doma'),
+            'tmpl' => array(
+                'item-inputs' => array(
+                    'sections' => array(
+                        'input_type'  => 'section_picker',
+                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                        'width-100'   => true,
+                        'title_width' => 'width-100',
+                        'section_type' => 'header',
+                        'section_collection' => array(
+                            array(
+                                'content-id' => 'header_one',
+                                'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
+                                'thumb' => 'header_one.jpg',
+                                'height' => '33px'
+                            )
+                        )
+                    )
+                )
+            )
+        ],
+        'sek_footer_sec_picker_module' => [
+            'module_type' => 'sek_footer_sec_picker_module',
+            'name' => __('Footer sections', 'text_doma'),
+            'tmpl' => array(
+                'item-inputs' => array(
+                    'sections' => array(
+                        'input_type'  => 'section_picker',
+                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                        'width-100'   => true,
+                        'title_width' => 'width-100',
+                        'section_types' => 'footer',
+                        'section_collection' => array(
+                            array(
+                                'content-id' => 'footer_one',
+                                'title' => __('simple footer with 3 columns and large bottom zone', 'text-domain' ),
+                                'thumb' => 'footer_one.jpg'
+                            )
+                        )
+                    )
+                )
+            )
+        ]
+    ];
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // HELPERS

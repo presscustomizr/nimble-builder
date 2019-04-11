@@ -110,7 +110,9 @@ function sek_enqueue_controls_js_css() {
                 'basic_btns' => array('forecolor','bold','italic','underline','strikethrough','link','unlink'),
                 'basic_btns_nolink' => array('forecolor','bold','italic','underline','strikethrough'),
 
-                'eligibleForReviewNotification' => sek_get_feedback_notif_status()
+                'eligibleForReviewNotification' => sek_get_feedback_notif_status(),
+
+                'presetSectionsModules' => array_keys( sek_get_prebuilt_section_module_registration_params() )
             )
         )
     );//wp_localize_script()
