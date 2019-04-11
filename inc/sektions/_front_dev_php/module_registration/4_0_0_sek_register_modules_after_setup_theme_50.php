@@ -175,14 +175,35 @@ function sek_populate_contextually_active_module_list( $recursive_data = null ) 
 // @hook 'after_setup_theme'
 function sek_register_prebuilt_section_modules() {
     $registration_params = sek_get_prebuilt_section_module_registration_params();
-    $defaults = array(
+    $default_module_params = array(
         'dynamic_registration' => true,
         'module_type' => '',
         'name' => '',
-        'tmpl' => array()
+        'tmpl' => array(
+            'item-inputs' => array(
+                'sections' => array(
+                    'input_type'  => 'section_picker',
+                    'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'section_collection' => array()
+                )
+            )
+        )
     );
-    foreach ( $registration_params as $module_name => $module_params ) {
-        CZR_Fmk_Base()->czr_pre_register_dynamic_module( wp_parse_args( $module_params, $defaults ) );
+
+    foreach ( $registration_params as $module_type => $module_params ) {
+        $module_params = wp_parse_args( $module_params, array(
+            'module_title' => '',
+            'section_collection' => array()
+        ));
+
+        // normalize the module params
+        $normalized_params = $default_module_params;
+        $normalized_params['module_type'] = $module_type;
+        $normalized_params['name'] = $module_params['module_title'];
+        $normalized_params['tmpl']['item-inputs']['sections']['section_collection'] = $module_params['section_collection'];
+        CZR_Fmk_Base()->czr_pre_register_dynamic_module( $normalized_params );
     }
 
 }
@@ -192,166 +213,98 @@ function sek_register_prebuilt_section_modules() {
 function sek_get_prebuilt_section_module_registration_params() {
     return [
         'sek_intro_sec_picker_module' => [
-            'module_type' => 'sek_intro_sec_picker_module',
-            'name' => __('Sections for an introduction', 'text_doma'),
-            'tmpl' => array(
-                'item-inputs' => array(
-                    'sections' => array(
-                        'input_type'  => 'section_picker',
-                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
-                        'width-100'   => true,
-                        'title_width' => 'width-100',
-                        'section_collection' => array(
-                            array(
-                                'content-id' => 'intro_three',
-                                'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
-                                'thumb' => 'intro_three.jpg'
-                            ),
-                            array(
-                                'content-id' => 'intro_one',
-                                'title' => __('1 column, full-width background', 'text-domain' ),
-                                'thumb' => 'intro_one.jpg'
-                            ),
-                            array(
-                                'content-id' => 'intro_two',
-                                'title' => __('2 columns, call to action, full-width background', 'text-domain' ),
-                                'thumb' => 'intro_two.jpg'
-                            )
-                        )
-                    )
+            'module_title' => __('Sections for an introduction', 'text_doma'),
+            'section_collection' => array(
+                array(
+                    'content-id' => 'intro_three',
+                    'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
+                    'thumb' => 'intro_three.jpg'
+                ),
+                array(
+                    'content-id' => 'intro_one',
+                    'title' => __('1 column, full-width background', 'text-domain' ),
+                    'thumb' => 'intro_one.jpg'
+                ),
+                array(
+                    'content-id' => 'intro_two',
+                    'title' => __('2 columns, call to action, full-width background', 'text-domain' ),
+                    'thumb' => 'intro_two.jpg'
                 )
             )
         ],
         'sek_features_sec_picker_module' => [
-            'module_type' => 'sek_features_sec_picker_module',
-            'name' => __('Sections for services and features', 'text_doma'),
-            'tmpl' => array(
-                'item-inputs' => array(
-                    'sections' => array(
-                        'input_type'  => 'section_picker',
-                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
-                        'width-100'   => true,
-                        'title_width' => 'width-100',
-                        'section_collection' => array(
-                            array(
-                                'content-id' => 'features_one',
-                                'title' => __('3 columns with icon and call to action', 'text-domain' ),
-                                'thumb' => 'features_one.jpg',
-                                //'height' => '188px'
-                            ),
-                            array(
-                                'content-id' => 'features_two',
-                                'title' => __('3 columns with icon', 'text-domain' ),
-                                'thumb' => 'features_two.jpg',
-                                //'height' => '188px'
-                            )
-                        )
-                    )
+            'module_title' => __('Sections for services and features', 'text_doma'),
+            'section_collection' => array(
+                array(
+                    'content-id' => 'features_one',
+                    'title' => __('3 columns with icon and call to action', 'text-domain' ),
+                    'thumb' => 'features_one.jpg',
+                    //'height' => '188px'
+                ),
+                array(
+                    'content-id' => 'features_two',
+                    'title' => __('3 columns with icon', 'text-domain' ),
+                    'thumb' => 'features_two.jpg',
+                    //'height' => '188px'
                 )
             )
         ],
         'sek_contact_sec_picker_module' => [
-            'module_type' => 'sek_contact_sec_picker_module',
-            'name' => __('Contact-us sections', 'text_doma'),
-            'tmpl' => array(
-                'item-inputs' => array(
-                    'sections' => array(
-                        'input_type'  => 'section_picker',
-                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
-                        'width-100'   => true,
-                        'title_width' => 'width-100',
-                        'section_collection' => array(
-                            array(
-                                'content-id' => 'contact_one',
-                                'title' => __('A contact form and a Google map', 'text-domain' ),
-                                'thumb' => 'contact_one.jpg',
-                                //'height' => '188px'
-                            ),
-                            array(
-                                'content-id' => 'contact_two',
-                                'title' => __('A contact form with an image background', 'text-domain' ),
-                                'thumb' => 'contact_two.jpg',
-                                //'height' => '188px'
-                            )
-                        )
-                    )
+            'module_title' => __('Contact-us sections', 'text_doma'),
+            'section_collection' => array(
+                array(
+                    'content-id' => 'contact_one',
+                    'title' => __('A contact form and a Google map', 'text-domain' ),
+                    'thumb' => 'contact_one.jpg',
+                    //'height' => '188px'
+                ),
+                array(
+                    'content-id' => 'contact_two',
+                    'title' => __('A contact form with an image background', 'text-domain' ),
+                    'thumb' => 'contact_two.jpg',
+                    //'height' => '188px'
                 )
             )
         ],
         'sek_column_layouts_sec_picker_module' => [
-            'module_type' => 'sek_column_layouts_sec_picker_module',
-            'name' => __('Empty sections with columns layout', 'text_doma'),
-            'tmpl' => array(
-                'item-inputs' => array(
-                    'sections' => array(
-                        'input_type'  => 'section_picker',
-                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
-                        'width-100'   => true,
-                        'title_width' => 'width-100',
-                        'section_collection' => array(
-                            array(
-                                'content-id' => 'two_columns',
-                                'title' => __('two columns layout', 'text-domain' ),
-                                'thumb' => 'two_columns.jpg'
-                            ),
-                            array(
-                                'content-id' => 'three_columns',
-                                'title' => __('three columns layout', 'text-domain' ),
-                                'thumb' => 'three_columns.jpg'
-                            ),
-                            array(
-                                'content-id' => 'four_columns',
-                                'title' => __('four columns layout', 'text-domain' ),
-                                'thumb' => 'four_columns.jpg'
-                            ),
-                        )
-                    )
-                )
+            'module_title' => __('Empty sections with columns layout', 'text_doma'),
+            'section_collection' => array(
+                array(
+                    'content-id' => 'two_columns',
+                    'title' => __('two columns layout', 'text-domain' ),
+                    'thumb' => 'two_columns.jpg'
+                ),
+                array(
+                    'content-id' => 'three_columns',
+                    'title' => __('three columns layout', 'text-domain' ),
+                    'thumb' => 'three_columns.jpg'
+                ),
+                array(
+                    'content-id' => 'four_columns',
+                    'title' => __('four columns layout', 'text-domain' ),
+                    'thumb' => 'four_columns.jpg'
+                ),
             )
         ],
         // pre-built sections for header and footer
         'sek_header_sec_picker_module' => [
-            'module_type' => 'sek_header_sec_picker_module',
-            'name' => __('Header sections', 'text_doma'),
-            'tmpl' => array(
-                'item-inputs' => array(
-                    'sections' => array(
-                        'input_type'  => 'section_picker',
-                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
-                        'width-100'   => true,
-                        'title_width' => 'width-100',
-                        'section_type' => 'header',
-                        'section_collection' => array(
-                            array(
-                                'content-id' => 'header_one',
-                                'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
-                                'thumb' => 'header_one.jpg',
-                                'height' => '33px'
-                            )
-                        )
-                    )
+            'module_title' => __('Header sections', 'text_doma'),
+            'section_collection' => array(
+                array(
+                    'content-id' => 'header_one',
+                    'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
+                    'thumb' => 'header_one.jpg',
+                    'height' => '33px'
                 )
             )
         ],
         'sek_footer_sec_picker_module' => [
-            'module_type' => 'sek_footer_sec_picker_module',
-            'name' => __('Footer sections', 'text_doma'),
-            'tmpl' => array(
-                'item-inputs' => array(
-                    'sections' => array(
-                        'input_type'  => 'section_picker',
-                        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
-                        'width-100'   => true,
-                        'title_width' => 'width-100',
-                        'section_type' => 'footer',
-                        'section_collection' => array(
-                            array(
-                                'content-id' => 'footer_one',
-                                'title' => __('simple footer with 3 columns and large bottom zone', 'text-domain' ),
-                                'thumb' => 'footer_one.jpg'
-                            )
-                        )
-                    )
+            'module_title' => __('Footer sections', 'text_doma'),
+            'section_collection' => array(
+                array(
+                    'content-id' => 'footer_one',
+                    'title' => __('simple footer with 3 columns and large bottom zone', 'text-domain' ),
+                    'thumb' => 'footer_one.jpg'
                 )
             )
         ]
