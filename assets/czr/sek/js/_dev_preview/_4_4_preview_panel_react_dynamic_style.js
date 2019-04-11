@@ -18,8 +18,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
                         if ( _r_.data && _r_.data.contents ) {
                               html_content = _r_.data.contents;
-                        } else {
-                              self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
                         }
                         self.appendDynStyleSheet( params.location_skope_id, html_content );
                         //=> 'sek-level-refreshed' is listened to clean the loader overlay in time
@@ -43,7 +41,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                 if ( 0 < $('head').find( _gfonts_id_ ).length ) {
                       $('head').find( _gfonts_id_ ).remove();
                 }
-                $('head').append( styleMarkup );
+                if ( !_.isEmpty( styleMarkup ) ) {
+                      $('head').append( styleMarkup );
+                }
                 // if we have something to print ( styleMarkup not empty ), there should be a dom element
                 if ( ! _.isEmpty( styleMarkup ) && 1 > $('head').find( _stylesheet_id_ ).length ) {
                       this.errare( 'sek-preview => problem when printing the dynamic inline style for : '+ _stylesheet_id_, styleMarkup );
