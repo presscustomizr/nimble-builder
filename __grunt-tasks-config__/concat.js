@@ -343,6 +343,7 @@ module.exports = {
   czr_sektions_front_php : {
     src: [
       '<%= paths.sektions %>_front_dev_php/0_5_0_sektions_functions_definitions.php',
+      '<%= paths.sektions %>_front_dev_php/0_5_1_sektions_nimble_remote_api.php',
       '<%= paths.sektions %>_front_dev_php/0_6_0_sektions_nimble_customize_link.php',
       '<%= paths.sektions %>_front_dev_php/0_7_0_sektions_retro_compatibilities.php',
       '<%= paths.sektions %>_front_dev_php/0_9_0_sektions_functions_seks_post_set_get.php',

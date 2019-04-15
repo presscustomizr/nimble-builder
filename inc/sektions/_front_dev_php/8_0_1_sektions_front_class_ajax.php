@@ -100,9 +100,9 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // hook : 'wp_ajax_sek_get_preset_sektions'
         function sek_get_preset_sektions() {
             $this->sek_do_ajax_pre_checks();
-            $preset_sections = sek_get_preset_sektions();
+            $preset_sections = sek_get_preset_sections_api_data();
             if ( empty( $preset_sections ) ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sektions()' );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sections_api_data()' );
             }
             wp_send_json_success( $preset_sections );
         }

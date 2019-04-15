@@ -66,7 +66,7 @@ function sek_enqueue_controls_js_css() {
 
                 'userSavedSektions' => get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS),
 
-                //'presetSections' => sek_get_preset_sektions(), <= fetched on demand in ajax
+                //'presetSections' => sek_get_preset_sections_api_data(), <= fetched on demand in ajax
 
                 'registeredModules' => CZR_Fmk_Base()->registered_modules,
 
@@ -112,7 +112,7 @@ function sek_enqueue_controls_js_css() {
 
                 'eligibleForReviewNotification' => sek_get_feedback_notif_status(),
 
-                'presetSectionsModules' => array_keys( sek_get_prebuilt_section_module_registration_params() )
+                'presetSectionsModules' => array_keys( sek_get_sections_registration_params_api_data() )
             )
         )
     );//wp_localize_script()
@@ -592,27 +592,6 @@ function add_sektion_values_to_skope_export( $skopes ) {
     return $new_skopes;
 }
 
-
-// @return array() of json decoded sections
-// used when js localizing the preset_sections for the customizer
-// the transient is refreshed
-function sek_get_preset_sektions() {
-    $transient_name = 'nimble_preset_sections_' . NIMBLE_VERSION;
-    $transient_data = get_transient( $transient_name );
-    if ( false == $transient_data || empty( $transient_data ) || sek_is_dev_mode() ) {
-        $preset_raw = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
-        if ( $preset_raw === false ) {
-          $preset_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
-        }
-
-        $presets_decoded = json_decode( $preset_raw, true );
-        set_transient( $transient_name , $presets_decoded , 60*60*24*30 );
-    }
-    else {
-        $presets_decoded = $transient_data;
-    }
-    return $presets_decoded;
-}
 
 
 add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_customizer_tmpl' );

@@ -1870,4 +1870,36 @@ function sek_feedback_notice_is_postponed() {
     return 'maybe_later' === get_transient( NIMBLE_FEEDBACK_NOTICE_ID );
 }
 
+
+
+// /* ------------------------------------------------------------------------- *
+// *  HELPERS FOR ADMIN AND API TO DETERMINE / CHECK CURRENT THEME NAME
+// /* ------------------------------------------------------------------------- */
+// @return bool
+function sek_is_presscustomizr_theme( $theme_name ) {
+  $bool = false;
+  if ( is_string( $theme_name ) ) {
+    foreach ( ['customizr', 'hueman'] as $pc_theme ) {
+      // handle the case when the theme name looks like customizr-4.1.29
+      if ( !$bool && $pc_theme === substr( $theme_name, 0, strlen($pc_theme) ) ) {
+          $bool = true;
+      }
+    }
+  }
+  return $bool;
+}
+
+// @return the theme name string, exact if customizr or hueman
+function sek_maybe_get_presscustomizr_theme_name( $theme_name ) {
+  if ( is_string( $theme_name ) ) {
+    foreach ( ['customizr', 'hueman'] as $pc_theme ) {
+      // handle the case when the theme name looks like customizr-4.1.29
+      if ( $pc_theme === substr( $theme_name, 0, strlen($pc_theme) ) ) {
+          $theme_name = $pc_theme;
+      }
+    }
+  }
+  return $theme_name;
+}
+
 ?>
