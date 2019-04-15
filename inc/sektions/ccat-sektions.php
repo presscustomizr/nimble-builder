@@ -2679,7 +2679,7 @@ function sek_extract_numeric_value( $value ) {
 ?><?php
 add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 );
 function sek_schedule_module_registration() {
-    if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
+    if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) || isset( $_POST['nimble_simple_cf'] ) ) {
         sek_register_modules();
     } else {
         add_action( 'wp', '\Nimble\sek_register_modules', PHP_INT_MAX );

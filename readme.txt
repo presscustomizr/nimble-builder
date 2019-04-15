@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.6.6
+Stable tag: 1.6.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -109,10 +109,13 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.6.6 =
-Added a button to the admin widget dashboard. Added a dismissable feedback UI in the customizer.
+= 1.6.7 =
+Fixed a contact form error on form submission.
 
 == Changelog ==
+= 1.6.7 : April 15th 2019 =
+* fixed : a contact form error on form submission.
+
 = 1.6.6 : April 10th 2019 =
 * added : a button to the admin widget dashboard
 * added : a dismissable feedback UI in the customizer
