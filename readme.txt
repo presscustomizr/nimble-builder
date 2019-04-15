@@ -14,8 +14,8 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Powerful drag and drop page builder using the native WordPress customizer.
 
 == Description ==
-= What is the Nimble Page Builder ? =
-**[Nimble Page Builder](https://nimblebuilder.com/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** is a powerful yet easy to use page builder plugin for WordPress. Nimble Builder uses the live customizer which is the native WordPress interface for real-time design.
+= What is Nimble Page Builder ? =
+**[Nimble Page Builder](https://nimblebuilder.com/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** is an easy to use yet powerful page builder plugin for WordPress. Nimble Builder uses the live customizer which is the native WordPress interface for real-time design.
 The plugin allows you to drag-and-drop modules like text-editor, post grids, images, contact forms, maps, icons, or beautiful pre-built sections with a [parallax background](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), into any page of your site. You can edit your sections in real-time, and then click "publish" when you are happy with the result, or save for later.
 
 Watch the video below to see how this [demo page](https://demo.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) has been built !
@@ -71,12 +71,12 @@ Once [installed](https://docs.presscustomizr.com/article/347-installing-the-nimb
 You'll find a growing online knowledge base for Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page).
 
 * [Getting started with Nimble Page Builder for WordPress](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin)
-* [Technical requirements for the Nimble Builder : server, browser, php version, WP version](https://docs.presscustomizr.com/article/355-technical-requirements-server-browser-php-version-wordpress-version)
+* [Technical requirements for Nimble Builder : server, browser, php version, WP version](https://docs.presscustomizr.com/article/355-technical-requirements-server-browser-php-version-wordpress-version)
 * [Designing for mobile devices with the WordPress Nimble Builder](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder)
 * [How to start building from a blank page with the WordPress Nimble Builder?](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder)
-* [How to build your WordPress header and footer with the Nimble Builder ?](https://docs.presscustomizr.com/article/358-building-your-header-and-footer-with-the-nimble-builder)
-* [How to set a parallax background for a section in WordPress with the Nimble Builder ?](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder)
-* [How to enable reCAPTCHA protection against spam in your forms with the Nimble Builder?](https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder)
+* [How to build your WordPress header and footer with Nimble Builder ?](https://docs.presscustomizr.com/article/358-building-your-header-and-footer-with-the-nimble-builder)
+* [How to set a parallax background for a section in WordPress with Nimble Builder ?](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder)
+* [How to enable reCAPTCHA protection against spam in your forms with Nimble Builder?](https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder)
 * [How to change the page template with Nimble Builder ?](https://docs.presscustomizr.com/article/339-changing-the-page-template)
 
 == Screenshots ==
@@ -95,9 +95,18 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 5. Drag a module from the left panel and drop it in a drop zone of the previewed page
 
 == Frequently Asked Questions ==
-= Can I use the Nimble Builder with any theme ? =
+= Can I use Nimble Builder with any theme ? =
 
-The Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
+Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
+
+= How to troubleshoot problems with Nimble Builder ? =
+1. **Use the latest software versions** : make sure WordPress, Nimble Builder and your theme are all up to date.
+2. **Documentation** : try to find a possible solution in our [documentation pages](https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page).
+3. **Search the forum** : use the search field on top of the topic list with keywords describing your issue. Another user may have had a similar problem already resolved.
+4. **Cache plugin** : if you use a server cache or cache plugin, please clear it’s cache content and disable caching via it’s settings. It is recommended to disable your cache plugin when customizing your site.
+5. **Check for plugin conflict** : deactivate all of your plugins. If it fixes the issue, re-activate your plugins one by one, until you identify the plugin in conflict.
+6. **Browser** : [clear your browser's cache / history](https://docs.presscustomizr.com/article/309-how-to-clear-your-browsers-cache-cookies-and-history/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page). Switch to another browser if needed. Make sure you do not use a browser extension that conflicts with the plugin.
+7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
 = 1.6.6 =
@@ -199,7 +208,7 @@ Added a button to the admin widget dashboard. Added a dismissable feedback UI in
 = 1.4.6 : February 1st, 2019 =
 * fixed : when no stylesheet file has been generated on front, the fallback hook to print the inline stylesheet is not defined.
 * added : [Image module] implement a simple lightbox option
-* added : an admin bar "quick link" to edit a page, post or term with the Nimble Builder
+* added : an admin bar "quick link" to edit a page, post or term with Nimble Builder
 
 = 1.4.5 : January 26th, 2019 =
 * fixed : Dynamic CSS : the font-size input should not have a default value
@@ -352,7 +361,7 @@ Added a button to the admin widget dashboard. Added a dismissable feedback UI in
 = 1.1.0 : October 5th, 2018 =
 * This version includes major improvements. Many new modules and pre-designed sections are now available to create your pages.
 * New modules : heading, icon, button, Google map, Html content, quote, spacer, divider, contact form.
-* The user interface has been enhanced with a non intrusive top bar, including do/undo buttons, and global settings for the Nimble builder.
+* The user interface has been enhanced with a non intrusive top bar, including do/undo buttons, and global settings for Nimble builder.
 
 = 1.0.4 : June 14th, 2018 =
 * fixed : when margins and paddings are not defined ( number field emptied ), no related CSS properties should be printed.
