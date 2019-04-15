@@ -87,7 +87,9 @@ function sek_enqueue_controls_js_css() {
                 'basic_btns' => array('forecolor','bold','italic','underline','strikethrough','link','unlink'),
                 'basic_btns_nolink' => array('forecolor','bold','italic','underline','strikethrough'),
 
-                'eligibleForReviewNotification' => sek_get_feedback_notif_status()
+                'eligibleForReviewNotification' => sek_get_feedback_notif_status(),
+
+                'presetSectionsModules' => array_keys( sek_get_sections_registration_params_api_data() )
             )
         )
     );//wp_localize_script()
@@ -504,23 +506,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
 
     return $new_skopes;
 }
-function sek_get_preset_sektions() {
-    $transient_name = 'nimble_preset_sections_' . NIMBLE_VERSION;
-    $transient_data = get_transient( $transient_name );
-    if ( false == $transient_data || empty( $transient_data ) || sek_is_dev_mode() ) {
-        $preset_raw = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
-        if ( $preset_raw === false ) {
-          $preset_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
-        }
 
-        $presets_decoded = json_decode( $preset_raw, true );
-        set_transient( $transient_name , $presets_decoded , 60*60*24*30 );
-    }
-    else {
-        $presets_decoded = $transient_data;
-    }
-    return $presets_decoded;
-}
 
 
 add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_customizer_tmpl' );
@@ -2963,116 +2949,21 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
         <div class="sek-content-type-wrapper">
           <?php
-            $content_collection = array();
-            switch( $input_id ) {
-                case 'intro_sections' :
-                    $content_collection = array(
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'intro_three',
-                            'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
-                            'thumb' => 'intro_three.jpg'
-                        ),
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'intro_one',
-                            'title' => __('1 column, full-width background', 'text-domain' ),
-                            'thumb' => 'intro_one.jpg'
-                        ),
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'intro_two',
-                            'title' => __('2 columns, call to action, full-width background', 'text-domain' ),
-                            'thumb' => 'intro_two.jpg'
-                        )
-                    );
-                break;
-                case 'features_sections' :
-                    $content_collection = array(
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'features_one',
-                            'title' => __('3 columns with icon and call to action', 'text-domain' ),
-                            'thumb' => 'features_one.jpg',
-                        ),
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'features_two',
-                            'title' => __('3 columns with icon', 'text-domain' ),
-                            'thumb' => 'features_two.jpg',
-                        )
-                    );
-                break;
-                case 'contact_sections' :
-                    $content_collection = array(
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'contact_one',
-                            'title' => __('A contact form and a Google map', 'text-domain' ),
-                            'thumb' => 'contact_one.jpg',
-                        ),
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'contact_two',
-                            'title' => __('A contact form with an image background', 'text-domain' ),
-                            'thumb' => 'contact_two.jpg',
-                        )
-                    );
-                break;
-                case 'layout_sections' :
-                    $content_collection = array(
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'two_columns',
-                            'title' => __('two columns layout', 'text-domain' ),
-                            'thumb' => 'two_columns.jpg'
-                        ),
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'three_columns',
-                            'title' => __('three columns layout', 'text-domain' ),
-                            'thumb' => 'three_columns.jpg'
-                        ),
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'four_columns',
-                            'title' => __('four columns layout', 'text-domain' ),
-                            'thumb' => 'four_columns.jpg'
-                        ),
-                    );
-                break;
-                case 'header_sections' :
-                    $content_collection = array(
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'header_one',
-                            'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
-                            'thumb' => 'header_one.jpg',
-                            'height' => '33px'
-                        )
-                    );
-                break;
-                case 'footer_sections' :
-                    $content_collection = array(
-                        array(
-                            'content-type' => 'preset_section',
-                            'content-id' => 'footer_one',
-                            'title' => __('simple footer with 3 columns and large bottom zone', 'text-domain' ),
-                            'thumb' => 'footer_one.jpg'
-                        )
-                    );
-                break;
+            if ( !is_array( $input_data['section_collection'] ) || empty( $input_data['section_collection'] ) ) {
+                $current_module = is_array( CZR_Fmk_Base()->current_module_params_when_ajaxing ) ? CZR_Fmk_Base()->current_module_params_when_ajaxing['module_type'] : 'undefined';
+                sek_error_log( __FUNCTION__ . ' => missing section_collection param for module ' . $current_module );
+                return;
             }
+            $content_collection = $input_data['section_collection'];
+
             foreach( $content_collection as $_params) {
                 $section_type = 'content';
-                if ( false !== strpos($_params['content-id'], 'header_') ) {
-                    $section_type = 'header';
-                } else if ( false !== strpos($_params['content-id'], 'footer_') ) {
-                    $section_type = 'footer';
+                if ( !empty($input_data['section_type']) ) {
+                    $section_type = $input_data['section_type'];
                 }
 
                 printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s" data-sek-section-type="%5$s"><div class="sek-overlay"></div></div>',
-                    $_params['content-type'],
+                    'preset_section',
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
                         NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'] . '?ver=' . NIMBLE_VERSION,
@@ -3083,7 +2974,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                 );
             }
           ?>
-        </div>
+        </div><?php //class="sek-content-type-wrapper" ?>
   <?php
 }
 

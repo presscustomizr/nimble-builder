@@ -259,6 +259,10 @@ function sek_page_uses_nimble_header_footer() {
  *  REGISTERED MODULES => GET PROPERTY
 /* ------------------------------------------------------------------------- */
 function sek_get_registered_module_type_property( $module_type, $property = '' ) {
+    if ( !class_exists('\Nimble\CZR_Fmk_Base') ) {
+        sek_error_log( __FUNCTION__ . ' => error => CZR_Fmk_Base not loaded' );
+        return;
+    }
     $registered_modules = CZR_Fmk_Base()->registered_modules;
     if ( ! array_key_exists( $module_type, $registered_modules ) ) {
         sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
@@ -312,6 +316,10 @@ function sek_get_default_module_model( $module_type = '' ) {
     $default = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
       return $default;
+    if ( !class_exists('\Nimble\CZR_Fmk_Base') ) {
+        sek_error_log( __FUNCTION__ . ' => error => CZR_Fmk_Base not loaded' );
+        return $default;
+    }
     $default_models = Nimble_Manager()->default_models;
     if ( ! empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
@@ -382,6 +390,10 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
     $input_list = array();
     if ( empty( $module_type ) || is_null( $module_type ) )
       return $input_list;
+    if ( !class_exists('\Nimble\CZR_Fmk_Base') ) {
+        sek_error_log( __FUNCTION__ . ' => error => CZR_Fmk_Base not loaded' );
+        return $input_list;
+    }
     $cached_input_lists = Nimble_Manager()->cached_input_lists;
     if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
         $input_list = $cached_input_lists[ $module_type ];
@@ -582,8 +594,10 @@ function sek_normalize_local_options_with_defaults( $option_name, $raw_module_va
     } else {
         $module_type = $local_option_map[$option_name];
     }
-    if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
-        $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+    if ( class_exists('\Nimble\CZR_Fmk_Base') ) {
+        if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+            $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+        }
     }
     return $normalized_values;
 }
@@ -625,8 +639,12 @@ function sek_normalize_global_options_with_defaults( $option_name, $raw_module_v
     } else {
         $module_type = $global_option_map[$option_name];
     }
-    if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
-        $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+    if ( class_exists('\Nimble\CZR_Fmk_Base') ) {
+        if( CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+            $normalized_values = _sek_normalize_single_module_values( $normalized_values, $module_type );
+        }
+    } else {
+        sek_error_log( __FUNCTION__ . ' => error => CZR_Fmk_Base not loaded' );
     }
     return $normalized_values;
 }
@@ -1402,6 +1420,125 @@ function sek_feedback_notice_is_dismissed() {
 }
 function sek_feedback_notice_is_postponed() {
     return 'maybe_later' === get_transient( NIMBLE_FEEDBACK_NOTICE_ID );
+}
+function sek_is_presscustomizr_theme( $theme_name ) {
+  $bool = false;
+  if ( is_string( $theme_name ) ) {
+    foreach ( ['customizr', 'hueman'] as $pc_theme ) {
+      if ( !$bool && $pc_theme === substr( $theme_name, 0, strlen($pc_theme) ) ) {
+          $bool = true;
+      }
+    }
+  }
+  return $bool;
+}
+function sek_maybe_get_presscustomizr_theme_name( $theme_name ) {
+  if ( is_string( $theme_name ) ) {
+    foreach ( ['customizr', 'hueman'] as $pc_theme ) {
+      if ( $pc_theme === substr( $theme_name, 0, strlen($pc_theme) ) ) {
+          $theme_name = $pc_theme;
+      }
+    }
+  }
+  return $theme_name;
+}
+
+?><?php
+namespace Nimble;
+if ( !defined( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME", 'nimble_api_prebuilt_sections_data' ); }
+if ( !defined( "NIMBLE_NEWS_OPT_NAME" ) ) { define( "NIMBLE_NEWS_OPT_NAME", 'nimble_api_news_data' ); }
+if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https://api.nimblebuilder.com/wp-json/nimble/v1/cravan' ); }
+function sek_get_nimble_api_data( $force_update = false ) {
+    $api_data_transient_name = 'nimble_api_data_' . NIMBLE_VERSION;
+    $info_data = get_transient( $api_data_transient_name );
+
+    $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
+    if ( $force_update || false === $info_data ) {
+        $timeout = ( $force_update ) ? 25 : 8;
+        $response = wp_remote_get( NIMBLE_DATA_API_URL, array(
+          'timeout' => $timeout,
+          'body' => [
+            'api_version' => NIMBLE_VERSION,
+            'site_lang' => get_bloginfo( 'language' ),
+            'theme_name' => sek_maybe_get_presscustomizr_theme_name( sek_get_parent_theme_slug() )
+          ],
+        ) );
+
+        if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+            set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
+            return false;
+        }
+
+        $info_data = json_decode( wp_remote_retrieve_body( $response ), true );
+
+        if ( empty( $info_data ) || ! is_array( $info_data ) ) {
+            set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
+            return false;
+        }
+
+        if ( !empty( $info_data['library'] ) ) {
+            if ( !empty( $info_data['library']['sections'] ) ) {
+                update_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME, $info_data['library']['sections'], 'no' );
+            }
+            unset( $info_data['library'] );
+        }
+
+        if ( isset( $info_data['latest_posts'] ) ) {
+            update_option( NIMBLE_NEWS_OPT_NAME, $info_data['latest_posts'], 'no' );
+            unset( $info_data['latest_posts'] );
+        }
+
+        set_transient( $api_data_transient_name, $info_data, 12 * HOUR_IN_SECONDS );
+    }//if ( $force_update || false === $info_data ) {
+
+    return $info_data;
+}
+function sek_get_sections_registration_params_api_data( $force_update = false ) {
+    sek_get_nimble_api_data( $force_update );
+    $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
+    if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['registration_params'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => no section registration params' );
+        return array();
+    }
+    return $sections_data['registration_params'];
+}
+
+function sek_get_preset_sections_api_data( $force_update = false ) {
+    sek_get_nimble_api_data( $force_update );
+    $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
+    if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['json_collection'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => no json_collection' );
+        return array();
+    }
+    return $sections_data['json_collection'];
+}
+function sek_get_latest_posts_api_data( $force_update = false ) {
+    sek_get_nimble_api_data( $force_update );
+    $latest_posts = get_option( NIMBLE_NEWS_OPT_NAME );
+    if ( empty( $latest_posts ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => no latest_posts' );
+        return array();
+    }
+    return $latest_posts;
+}
+function sek_get_cta_message_from_api( $theme_name, $force_update = false ) {
+    $info_data = sek_get_nimble_api_data( $force_update );
+    if ( !sek_is_presscustomizr_theme( $theme_name ) || ! is_array( $info_data ) ) {
+        return '';
+    }
+    $message = '';
+    $cta_data = isset( $info_data['cta'] ) ? $info_data['cta'] : null;
+
+    $fn = 'customizr' === sek_maybe_get_presscustomizr_theme_name( $theme_name ) ? 'czr_fn_user_started_before_version' : 'hu_user_started_before_version';
+    if ( function_exists($fn) && !is_null($cta_data) && isset( $cta_data['started_before'] ) && call_user_func_array( $fn, array( $cta_data['started_before'] ) ) ) {
+        $message = !empty( $cta_data['html'] ) ? $cta_data['html'] : '';
+    }
+    return $message;
+}
+
+add_action( 'after_switch_theme', '\Nimble\sek_refresh_nimble_api_data');
+function sek_refresh_nimble_api_data() {
+    sek_get_nimble_api_data(true);
 }
 
 ?><?php
@@ -2680,16 +2817,46 @@ function sek_extract_numeric_value( $value ) {
 add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 );
 function sek_schedule_module_registration() {
     if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
-        sek_register_modules();
+        sek_register_modules_when_customizing_or_ajaxing();
+        sek_register_prebuilt_section_modules();
     } else {
-        add_action( 'wp', '\Nimble\sek_register_modules', PHP_INT_MAX );
+        add_action( 'wp', '\Nimble\sek_register_modules_when_not_customizing_and_not_ajaxing', PHP_INT_MAX );
     }
 }
+function sek_register_modules_when_customizing_or_ajaxing() {
+    $modules = array_merge(
+        SEK_Front_Construct::$ui_picker_modules,
+        SEK_Front_Construct::$ui_level_modules,
+        SEK_Front_Construct::$ui_local_global_options_modules,
+        SEK_Front_Construct::$ui_front_modules
+    );
+    if ( sek_is_header_footer_enabled() ) {
+        $modules = array_merge( $modules, SEK_Front_Construct::$ui_front_beta_modules );
+    }
+    sek_do_register_module_collection( $modules );
+}
+function sek_register_modules_when_not_customizing_and_not_ajaxing() {
+    sek_populate_contextually_active_module_list();
 
+    $contextually_actives = array();
+    $front_modules = array_merge( SEK_Front_Construct::$ui_front_modules, SEK_Front_Construct::$ui_front_beta_modules );
+    foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
+        if ( array_key_exists( $module_name, $front_modules ) ) {
+            $contextually_actives[] = $front_modules[ $module_name ];
+        }
+        if ( in_array( $module_name, $front_modules ) ) {
+            $contextually_actives[] = $module_name;
+        }
+    }
 
-
-function sek_register_modules() {
-    $modules = apply_filters( 'nimble_pre_module_registration', array(), current_filter() );
+    $modules = array_merge(
+        $contextually_actives,
+        SEK_Front_Construct::$ui_level_modules,
+        SEK_Front_Construct::$ui_local_global_options_modules
+    );
+    sek_do_register_module_collection( $modules );
+}
+function sek_do_register_module_collection( $modules ) {
     $module_candidates = array();
     foreach ($modules as $key => $value) {
       if ( is_array( $value ) ) {
@@ -2699,7 +2866,6 @@ function sek_register_modules() {
       }
     }
     $module_candidates = array_unique( $module_candidates );
-
     foreach ( $module_candidates as $module_name ) {
         $fn = "Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
@@ -2713,44 +2879,6 @@ function sek_register_modules() {
             error_log( __FUNCTION__ . ' missing params callback fn for module ' . $module_name );
         }
     }
-}//sek_register_modules()
-
-
-add_filter( 'nimble_pre_module_registration', '\Nimble\sek_filter_modules_to_register', 10, 2 );
-function sek_filter_modules_to_register( $modules, $hook ) {
-    if ( 'wp' !== $hook ) {
-        $modules = array_merge(
-            $modules,
-            SEK_Front_Construct::$ui_picker_modules,
-            SEK_Front_Construct::$ui_level_modules,
-            SEK_Front_Construct::$ui_local_global_options_modules,
-            SEK_Front_Construct::$ui_front_modules
-        );
-        if ( sek_is_header_footer_enabled() ) {
-            $modules = array_merge( $modules, SEK_Front_Construct::$ui_front_beta_modules );
-        }
-    } else {
-        sek_populate_contextually_active_module_list();
-
-        $contextually_actives = array();
-        $front_modules = array_merge( SEK_Front_Construct::$ui_front_modules, SEK_Front_Construct::$ui_front_beta_modules );
-        foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
-            if ( array_key_exists( $module_name, $front_modules ) ) {
-                $contextually_actives[] = $front_modules[ $module_name ];
-            }
-            if ( in_array( $module_name, $front_modules ) ) {
-                $contextually_actives[] = $module_name;
-            }
-        }
-
-        $modules = array_merge(
-            $modules,
-            $contextually_actives,
-            SEK_Front_Construct::$ui_level_modules,
-            SEK_Front_Construct::$ui_local_global_options_modules
-        );
-    }
-    return $modules;
 }
 function sek_populate_contextually_active_module_list( $recursive_data = null ) {
     if ( is_null( $recursive_data ) ) {
@@ -2770,6 +2898,38 @@ function sek_populate_contextually_active_module_list( $recursive_data = null ) 
             Nimble_Manager()->contextually_active_modules = array_unique( $module_collection );
         }
     }
+}
+function sek_register_prebuilt_section_modules() {
+    $registration_params = sek_get_sections_registration_params_api_data();
+    $default_module_params = array(
+        'dynamic_registration' => true,
+        'module_type' => '',
+        'name' => '',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'sections' => array(
+                    'input_type'  => 'section_picker',
+                    'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'section_collection' => array()
+                )
+            )
+        )
+    );
+
+    foreach ( $registration_params as $module_type => $module_params ) {
+        $module_params = wp_parse_args( $module_params, array(
+            'module_title' => '',
+            'section_collection' => array()
+        ));
+        $normalized_params = $default_module_params;
+        $normalized_params['module_type'] = $module_type;
+        $normalized_params['name'] = $module_params['module_title'];
+        $normalized_params['tmpl']['item-inputs']['sections']['section_collection'] = $module_params['section_collection'];
+        CZR_Fmk_Base()->czr_pre_register_dynamic_module( $normalized_params );
+    }
+
 }
 function sek_get_select_options_for_input_id( $input_id ) {
     $options = array();
@@ -2985,108 +3145,6 @@ function sek_get_module_params_for_sek_module_picker_module() {
 /* ------------------------------------------------------------------------- *
  *  SEKTION PICKER MODULES
 /* ------------------------------------------------------------------------- */
-function sek_get_default_section_input_params() {
-    return array(
-        'input_type'  => 'section_picker',
-        'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
-        'width-100'   => true,
-        'title_width' => 'width-100'
-    );
-
-}
-function sek_get_module_params_for_sek_intro_sec_picker_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'sek_intro_sec_picker_module',
-        'name' => __('Sections for an introduction', 'text_doma'),
-        'tmpl' => array(
-            'item-inputs' => array(
-                'intro_sections' => sek_get_default_section_input_params()
-            )
-        )
-    );
-}
-function sek_get_module_params_for_sek_features_sec_picker_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'sek_features_sec_picker_module',
-        'name' => __('Sections for services and features', 'text_doma'),
-        'tmpl' => array(
-            'item-inputs' => array(
-                'features_sections' => sek_get_default_section_input_params()
-            )
-        )
-    );
-}
-
-function sek_get_module_params_for_sek_contact_sec_picker_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'sek_contact_sec_picker_module',
-        'name' => __('Contact-us sections', 'text_doma'),
-        'tmpl' => array(
-            'item-inputs' => array(
-                'contact_sections' => sek_get_default_section_input_params()
-            )
-        )
-    );
-}
-
-function sek_get_module_params_for_sek_column_layouts_sec_picker_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'sek_column_layouts_sec_picker_module',
-        'name' => __('Empty sections with columns layout', 'text_doma'),
-        'tmpl' => array(
-            'item-inputs' => array(
-                'layout_sections' => sek_get_default_section_input_params()
-            )
-        )
-    );
-}
-
-function sek_get_module_params_for_sek_header_sec_picker_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'sek_header_sec_picker_module',
-        'name' => __('Header sections', 'text_doma'),
-        'tmpl' => array(
-            'item-inputs' => array(
-                'header_sections' => sek_get_default_section_input_params()
-            )
-        )
-    );
-}
-function sek_get_module_params_for_sek_footer_sec_picker_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'sek_footer_sec_picker_module',
-        'name' => __('Footer sections', 'text_doma'),
-        'tmpl' => array(
-            'item-inputs' => array(
-                'footer_sections' => sek_get_default_section_input_params()
-            )
-        )
-    );
-}
-
-
-
-
-
-
-function sek_get_module_params_for_sek_my_sections_sec_picker_module() {
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'sek_my_sections_sec_picker_module',
-        'name' => __('My sections', 'text_doma'),
-        'tmpl' => array(
-            'item-inputs' => array(
-                'my_sections' => sek_get_default_section_input_params()
-            )
-        )
-    );
-}
 ?><?php
 function sek_get_module_params_for_sek_level_bg_module() {
     return array(
@@ -7699,7 +7757,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
 
                 'apply_shadow_on_hover' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply a shadow effect on hover', 'text_doma'),
+                    'title'       => __('Apply a shadow effect when hovering with the cursor', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
@@ -10233,13 +10291,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
 
         public static $ui_picker_modules = [
           'sek_content_type_switcher_module',
-          'sek_module_picker_module',
-
-          'sek_intro_sec_picker_module',
-          'sek_features_sec_picker_module',
-          'sek_contact_sec_picker_module',
-          'sek_column_layouts_sec_picker_module',
-          'sek_my_sections_sec_picker_module'
+          'sek_module_picker_module'
         ];
 
         public static $ui_level_modules = [
@@ -10338,8 +10390,6 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         ];
 
         public static $ui_front_beta_modules = [
-          'sek_header_sec_picker_module',
-          'sek_footer_sec_picker_module',
           'czr_menu_module' => array(
             'czr_menu_module',
             'czr_menu_content_child',
@@ -10454,9 +10504,9 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         }
         function sek_get_preset_sektions() {
             $this->sek_do_ajax_pre_checks();
-            $preset_sections = sek_get_preset_sektions();
+            $preset_sections = sek_get_preset_sections_api_data();
             if ( empty( $preset_sections ) ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sektions()' );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sections_api_data()' );
             }
             wp_send_json_success( $preset_sections );
         }
