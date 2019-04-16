@@ -1902,4 +1902,87 @@ function sek_maybe_get_presscustomizr_theme_name( $theme_name ) {
   return $theme_name;
 }
 
+
+
+
+
+// /* ------------------------------------------------------------------------- *
+// *  IMPORT IMAGE IF NOT ALREADY IN MEDIA LIB
+// /* ------------------------------------------------------------------------- */
+// @return attachment id or WP_Error
+// this method uses download_url()
+// it first checks if the media already exists in the media library
+function sek_sideload_img_and_return_attachment_id( $img_url ) {
+    // Set variables for storage, fix file filename for query strings.
+    preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $img_url, $matches );
+    $filename = basename( $matches[0] );
+    // prefix with nimble_asset_ if not done yet
+    // for example, when importing a file, the img might already have the nimble_asset_ prefix if it's been uploaded by Nimble
+    if ( 'nimble_asset_' !== substr($filename, 0, strlen('nimble_asset_') ) ) {
+        $filename = 'nimble_asset_' . $filename;
+    }
+
+    // remove the extension
+    $img_title = preg_replace( '/\.[^.]+$/', '', trim( $filename ) );
+
+    //sek_error_log( __FUNCTION__ . ' ALORS img_title?', preg_replace( '/\.[^.]+$/', '', trim( $img_title ) ) );
+
+    // Make sure this img has not already been uploaded
+    // Meta query on the alt property, better than the title
+    // because of https://github.com/presscustomizr/nimble-builder/issues/435
+    $args = array(
+        'posts_per_page' => 1,
+        'post_type' => 'attachment',
+        'post_status' => 'inherit',
+        //'name' => $img_title,
+        'meta_query' => array(
+          array(
+            'key'     => '_wp_attachment_image_alt',
+            'value'   => $img_title,
+            'compare' => '='
+          ),
+        ),
+    );
+    $get_attachment = new \WP_Query( $args );
+
+    //error_log( print_r( $get_attachment->posts, true ) );
+    if ( is_array( $get_attachment->posts ) && array_key_exists(0, $get_attachment->posts) ) {
+        //wp_send_json_error( __CLASS__ . '::' . __CLASS__ . '::' . __FUNCTION__ . ' => file already uploaded : ' . $relative_path );
+        $img_id_already_uploaded = $get_attachment->posts[0] -> ID;
+    }
+    // stop now and return the id if the attachment was already uploaded
+    if ( isset($img_id_already_uploaded) ) {
+        //sek_error_log( __FUNCTION__ . ' ALREADY UPLOADED ?', $img_id_already_uploaded );
+        return $img_id_already_uploaded;
+    }
+
+    // Insert the media
+    // Prepare the file_array that we will pass to media_handle_sideload()
+    $file_array = array();
+    $file_array['name'] = $filename;
+
+    // Download file to temp location.
+    $file_array['tmp_name'] = download_url( $img_url );
+
+    // If error storing temporarily, return the error.
+    if ( is_wp_error( $file_array['tmp_name'] ) ) {
+        return $file_array['tmp_name'];
+    }
+
+    // Do the validation and storage stuff.
+    $id = media_handle_sideload( $file_array, 0 );
+
+    // If error storing permanently, unlink.
+    if ( is_wp_error( $id ) ) {
+        @unlink( $file_array['tmp_name'] );
+    } else {
+        // Store the title as image alt property
+        // so we can identify it uniquely next time when checking if already uploaded
+        // of course, if the alt property has been manually modified meanwhile, the image will be loaded again
+        // fixes https://github.com/presscustomizr/nimble-builder/issues/435
+        add_post_meta( $id, '_wp_attachment_image_alt', $img_title, true );
+    }
+
+    return $id;
+}
 ?>
