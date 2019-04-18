@@ -1376,7 +1376,7 @@ function sek_get_feedback_notif_status() {
       return;
 
     $modules_used = array_unique($modules_used);
-    return $customized_pages > 1 && $nb_section_created > 3 && count($modules_used) > 3;
+    return $customized_pages > 0 && $nb_section_created > 3 && count($modules_used) > 3;
 }
 function sek_count_not_empty_sections_in_page( $seks_data, $count = 0 ) {
     if ( ! is_array( $seks_data ) ) {
