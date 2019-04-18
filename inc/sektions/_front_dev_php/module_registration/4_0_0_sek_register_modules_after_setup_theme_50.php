@@ -4,7 +4,15 @@ add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 
 
 // When not customizing, we don't need to register all modules
 function sek_schedule_module_registration() {
-    if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
+    // we load all modules when :
+    // 1) customizing
+    // 2) doing ajax <=> customizing
+    // 3) isset( $_POST['nimble_simple_cf'] ) <= when a contact form is submitted.
+    // Note about 3) => We should in fact load the necessary modules that we can determined with the posted skope_id. To be improved.
+    // 3 fixes https://github.com/presscustomizr/nimble-builder/issues/433
+    if ( isset( $_POST['nimble_simple_cf'] ) ) {
+        sek_register_modules_when_customizing_or_ajaxing();
+    } else if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
         sek_register_modules_when_customizing_or_ajaxing();
         // prebuilt sections are registered from a JSON since https://github.com/presscustomizr/nimble-builder/issues/431
         sek_register_prebuilt_section_modules();
