@@ -110,7 +110,7 @@ function sek_enqueue_controls_js_css() {
                 'basic_btns' => array('forecolor','bold','italic','underline','strikethrough','link','unlink'),
                 'basic_btns_nolink' => array('forecolor','bold','italic','underline','strikethrough'),
 
-                'eligibleForReviewNotification' => sek_get_feedback_notif_status(),
+                'eligibleForFeedbackNotification' => sek_get_feedback_notif_status(),
 
                 'presetSectionsModules' => array_keys( sek_get_sections_registration_params_api_data() )
             )
@@ -669,7 +669,7 @@ function sek_print_nimble_customizer_tmpl() {
           <div class="sek-feedback-step-one">
             <div class="sek-main-feedback-heading">
               <img class="sek-feedback-nimble-icon big" src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_dom'); ?>"/>
-              <p>Congratulations! You have created sections on several pages of your website.</p>
+              <p>Congratulations! You have created several sections with Nimble Builder on your website.</p>
             </div>
             <p>Are you enjoying Nimble Builder ?</p>
             <button class="button sek-feedback-btn sek-neg" data-sek-feedback-action="not_enjoying" type="button">
@@ -695,7 +695,7 @@ function sek_print_nimble_customizer_tmpl() {
           <div class="sek-feedback-step-two-enjoying">
             <span class="sek-stars" data-sek-feedback-action="go_review">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
             <p>Awesome! Could you please leave a rating on WordPress.org ?<br/>
-            That would help other users discover Nimble Builder and help me improve the plugin. A huge thanks in advance!</p>
+            This would encourage other users to discover Nimble Builder and help me improve the plugin. A huge thanks in advance!</p>
             <p class="sek-signature">-Nicolas, Founder and Lead Developer of Nimble Builder</p>
             <button class="button sek-feedback-btn sek-neg" data-sek-feedback-action="maybe_later" type="button">
               <?php _e('No thanks, maybe later', 'text_domain'); ?>

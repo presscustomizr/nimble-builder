@@ -393,7 +393,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //       $topPanelTitleElInner.html( logoHtml );
                               // }
 
-                              if ( sektionsLocalizedData.eligibleForReviewNotification ) {
+                              if ( sektionsLocalizedData.eligibleForFeedbackNotification ) {
                                     _mainPanel_.expanded.bind( function( expanded ) {
                                           if ( expanded && _.isUndefined( self.feedbackUIVisible ) ) {
                                                 // FEEDBACK UI
