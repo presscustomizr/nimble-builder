@@ -1377,7 +1377,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-            // Walk the column collection of a preset section, and replace '::img-path::*' pattern by image ids that we get from ajax calls
+            // Walk the column collection of a preset section, and replace '__img_url__*' pattern by image ids that we get from ajax calls
             // Is designed to handle multiple ajax calls in parallel if the preset_section includes several images
             // @return a promise()
             preparePresetSectionForInjection : function( columnCollection ) {
@@ -1391,11 +1391,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       _.each( data, function( val, key ) {
                             if ( _.isObject( val ) || _.isArray( val ) ) {
                                   _sniffImg( val );
-                            } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) ) {
+                            } else if ( _.isString( val ) && -1 != val.indexOf( '__img_url__' ) ) {
                                   // scenario when a section uses an image more than once.
                                   // => we don't need to fire a new ajax request for an image already sniffed
                                   if ( ! _.has( deferreds, val ) ) {
-                                        deferreds[ val ] = self.importAttachment( val.replace( '::img-path::', '' ) );
+                                        deferreds[ val ] = self.importAttachment( val.replace( '__img_url__', '' ) );
                                   }
                             }
                       });
@@ -1404,14 +1404,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                 // walk the column collection and populates the deferreds object recursively
                 // imdList is formed this way :
-                // ::img-path::/assets/img/1.jpg : {id: 2547, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_1.jpg"}
-                // ::img-path::/assets/img/2.jpg : {id: 2548, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_2.jpg"}
-                // ::img-path::/assets/img/3.jpg : {id: 2549, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_3.jpg"}
+                // __img_url__/assets/img/1.jpg : {id: 2547, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_1.jpg"}
+                // __img_url__/assets/img/2.jpg : {id: 2548, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_2.jpg"}
+                // __img_url__/assets/img/3.jpg : {id: 2549, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_3.jpg"}
                 var _replaceImgPlaceholderById = function( data, imgList) {
                       _.each( data, function( val, key ) {
                             if ( _.isObject( val ) || _.isArray( val ) ) {
                                   _replaceImgPlaceholderById( val, imgList );
-                            } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) && _.has( imgList, val ) && _.isObject( imgList[ val ] ) ) {
+                            } else if ( _.isString( val ) && -1 != val.indexOf( '__img_url__' ) && _.has( imgList, val ) && _.isObject( imgList[ val ] ) ) {
                                   data[ key ] = imgList[ val ].id;
                             }
                       });

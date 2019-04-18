@@ -3476,7 +3476,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_intro_sec_picker_module',
                               controlLabel :  sektionsLocalizedData.i18n['Sections for an introduction'],
                               content_type : 'section',
-                              expandAndFocusOnInit : true,
+                              expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
@@ -5989,7 +5989,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-            // Walk the column collection of a preset section, and replace '::img-path::*' pattern by image ids that we get from ajax calls
+            // Walk the column collection of a preset section, and replace '__img_url__*' pattern by image ids that we get from ajax calls
             // Is designed to handle multiple ajax calls in parallel if the preset_section includes several images
             // @return a promise()
             preparePresetSectionForInjection : function( columnCollection ) {
@@ -6003,11 +6003,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       _.each( data, function( val, key ) {
                             if ( _.isObject( val ) || _.isArray( val ) ) {
                                   _sniffImg( val );
-                            } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) ) {
+                            } else if ( _.isString( val ) && -1 != val.indexOf( '__img_url__' ) ) {
                                   // scenario when a section uses an image more than once.
                                   // => we don't need to fire a new ajax request for an image already sniffed
                                   if ( ! _.has( deferreds, val ) ) {
-                                        deferreds[ val ] = self.importAttachment( val.replace( '::img-path::', '' ) );
+                                        deferreds[ val ] = self.importAttachment( val.replace( '__img_url__', '' ) );
                                   }
                             }
                       });
@@ -6016,14 +6016,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                 // walk the column collection and populates the deferreds object recursively
                 // imdList is formed this way :
-                // ::img-path::/assets/img/1.jpg : {id: 2547, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_1.jpg"}
-                // ::img-path::/assets/img/2.jpg : {id: 2548, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_2.jpg"}
-                // ::img-path::/assets/img/3.jpg : {id: 2549, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_3.jpg"}
+                // __img_url__/assets/img/1.jpg : {id: 2547, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_1.jpg"}
+                // __img_url__/assets/img/2.jpg : {id: 2548, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_2.jpg"}
+                // __img_url__/assets/img/3.jpg : {id: 2549, url: "http://customizr-dev.test/wp-content/uploads/2018/09/nimble_asset_3.jpg"}
                 var _replaceImgPlaceholderById = function( data, imgList) {
                       _.each( data, function( val, key ) {
                             if ( _.isObject( val ) || _.isArray( val ) ) {
                                   _replaceImgPlaceholderById( val, imgList );
-                            } else if ( _.isString( val ) && -1 != val.indexOf( '::img-path::' ) && _.has( imgList, val ) && _.isObject( imgList[ val ] ) ) {
+                            } else if ( _.isString( val ) && -1 != val.indexOf( '__img_url__' ) && _.has( imgList, val ) && _.isObject( imgList[ val ] ) ) {
                                   data[ key ] = imgList[ val ].id;
                             }
                       });
@@ -6973,7 +6973,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return fn && typeof fn.then === 'function' && String( $.Deferred().then ) === String( fn.then );
             },
 
-            // @param deferreds = { '::img-path::/assets/img/tests/1.jpg' : 'dfd1', '::img-path::/assets/img/tests/2.jpg' : dfd2, ..., '::img-path::/assets/img/tests/n.jpg' : dfdn }
+            // @param deferreds = { '__img_url__/assets/img/tests/1.jpg' : 'dfd1', '__img_url__/assets/img/tests/2.jpg' : dfd2, ..., '__img_url__/assets/img/tests/n.jpg' : dfdn }
             whenAllPromisesInParallel : function ( deferreds ) {
                 var self = this,
                     mainDfd = $.Deferred(),
@@ -7030,16 +7030,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
-            // @param relpath = string : '/assets/img/41883.jpg'
+            // @param attachment_url = string : '/assets/img/41883.jpg'
             // @return a promise
-            importAttachment : function( relpath ) {
+            importAttachment : function( attachment_url ) {
                   // @see php wp_ajax_sek_import_attachment
                   return wp.ajax.post( 'sek_import_attachment', {
-                        rel_path : relpath,
+                        img_url : attachment_url,
                         nonce: api.settings.nonce.save//<= do we need to set a specific nonce to fetch the attachment
                   })
                   .fail( function( _er_ ) {
-                        api.errare( 'sek_import_attachment ajax action failed for image ' +  relpath, _er_ );
+                        api.errare( 'sek_import_attachment ajax action failed for image ' +  attachment_url, _er_ );
                   });
                   // .done( function( data) {
                   //       api.infoLog('relpath and DATA ' + relpath , data );
@@ -11501,16 +11501,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
-      var section_modules = [
-            'sek_intro_sec_picker_module',
-            'sek_features_sec_picker_module',
-            'sek_contact_sec_picker_module',
-            'sek_column_layouts_sec_picker_module'
-      ];
+      // var section_modules = [
+      //       'sek_intro_sec_picker_module',
+      //       'sek_features_sec_picker_module',
+      //       'sek_contact_sec_picker_module',
+      //       'sek_column_layouts_sec_picker_module',
+      //       'sek_header_sec_picker_module',
+      //       'sek_footer_sec_picker_module'
+      // ];
+
+      var section_modules = sektionsLocalizedData.presetSectionsModules;
+      if ( ! _.isArray( section_modules ) || _.isEmpty( section_modules ) ) {
+            api.errare( 'api.czrModuleMap => error when adding section modules');
+            return;
+      }
+
       // Header and footer have been introduced in v1.4.0 but not enabled by default
       // The header and footer preset sections are on hold until "header and footer" feature is released.
-      if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-            section_modules = _.union( section_modules, [ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ] );
+      if ( !sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+            section_modules = _.filter( section_modules, function( mod ) {
+                  return !_.contains([ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ], mod );
+            });
       }
       _.each( section_modules, function( module_type ) {
             api.czrModuleMap[ module_type ] = {
@@ -11518,7 +11529,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( module_type, 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( module_type )
@@ -11630,7 +11642,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         crud : false,
                         name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
                         has_mod_opt : false,
-                        ready_on_section_expanded : true,
+                        ready_on_section_expanded : false,
+                        ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                         defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
                   },
             });

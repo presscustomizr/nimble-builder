@@ -10,19 +10,74 @@ function sek_schedule_module_registration() {
     // 3) isset( $_POST['nimble_simple_cf'] ) <= when a contact form is submitted.
     // Note about 3) => We should in fact load the necessary modules that we can determined with the posted skope_id. To be improved.
     // 3 fixes https://github.com/presscustomizr/nimble-builder/issues/433
-    if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) || isset( $_POST['nimble_simple_cf'] ) ) {
-        sek_register_modules();
+    if ( isset( $_POST['nimble_simple_cf'] ) ) {
+        sek_register_modules_when_customizing_or_ajaxing();
+    } else if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
+        sek_register_modules_when_customizing_or_ajaxing();
+        // prebuilt sections are registered from a JSON since https://github.com/presscustomizr/nimble-builder/issues/431
+        sek_register_prebuilt_section_modules();
     } else {
-        add_action( 'wp', '\Nimble\sek_register_modules', PHP_INT_MAX );
+        add_action( 'wp', '\Nimble\sek_register_modules_when_not_customizing_and_not_ajaxing', PHP_INT_MAX );
     }
+}
+
+// @return void();
+// @hook 'after_setup_theme'
+function sek_register_modules_when_customizing_or_ajaxing() {
+    $modules = array_merge(
+        SEK_Front_Construct::$ui_picker_modules,
+        SEK_Front_Construct::$ui_level_modules,
+        SEK_Front_Construct::$ui_local_global_options_modules,
+        SEK_Front_Construct::$ui_front_modules
+    );
+
+    // Header and footer have been introduced in v1.4.0 but not enabled by default
+    // The module menu and the widget area module are on hold until "header and footer" feature is released.
+    if ( sek_is_header_footer_enabled() ) {
+        $modules = array_merge( $modules, SEK_Front_Construct::$ui_front_beta_modules );
+    }
+    sek_do_register_module_collection( $modules );
 }
 
 
 
-function sek_register_modules() {
-    $modules = apply_filters( 'nimble_pre_module_registration', array(), current_filter() );
-    $module_candidates = array();
+// @return void();
+// @hook 'wp'
+function sek_register_modules_when_not_customizing_and_not_ajaxing() {
+    //sniff the list of active modules in local and global location
+    sek_populate_contextually_active_module_list();
 
+    $contextually_actives = array();
+    $front_modules = array_merge( SEK_Front_Construct::$ui_front_modules, SEK_Front_Construct::$ui_front_beta_modules );
+
+    // we need to get all children when the module is a father.
+    // This will be flatenized afterwards
+    foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
+
+        // Parent module with children
+        if ( array_key_exists( $module_name, $front_modules ) ) {
+            // get the list of childrent, includes the parent too.
+            // @see ::$ui_front_modules
+            $contextually_actives[] = $front_modules[ $module_name ];
+        }
+        // Simple module with no children
+        if ( in_array( $module_name, $front_modules ) ) {
+            $contextually_actives[] = $module_name;
+        }
+    }
+
+    $modules = array_merge(
+        $contextually_actives,
+        SEK_Front_Construct::$ui_level_modules,
+        SEK_Front_Construct::$ui_local_global_options_modules
+    );
+    sek_do_register_module_collection( $modules );
+}
+
+
+// @return void();
+function sek_do_register_module_collection( $modules ) {
+    $module_candidates = array();
     // flatten the array
     // because can be formed this way after filter when including child
     // [0] => Array
@@ -46,7 +101,6 @@ function sek_register_modules() {
 
     // remove duplicated modules, typically 'czr_font_child'
     $module_candidates = array_unique( $module_candidates );
-
     foreach ( $module_candidates as $module_name ) {
         // Was previously written "\Nimble\sek_get_module_params_for_{$module_name}";
         // But this syntax can lead to function_exists() return false even if the function exists
@@ -64,62 +118,6 @@ function sek_register_modules() {
             error_log( __FUNCTION__ . ' missing params callback fn for module ' . $module_name );
         }
     }
-}//sek_register_modules()
-
-
-add_filter( 'nimble_pre_module_registration', '\Nimble\sek_filter_modules_to_register', 10, 2 );
-function sek_filter_modules_to_register( $modules, $hook ) {
-    if ( 'wp' !== $hook ) {
-        $modules = array_merge(
-            $modules,
-            SEK_Front_Construct::$ui_picker_modules,
-            SEK_Front_Construct::$ui_level_modules,
-            SEK_Front_Construct::$ui_local_global_options_modules,
-            SEK_Front_Construct::$ui_front_modules
-        );
-
-        // Header and footer have been introduced in v1.4.0 but not enabled by default
-        // The module menu and the widget area module are on hold until "header and footer" feature is released.
-        if ( sek_is_header_footer_enabled() ) {
-            $modules = array_merge( $modules, SEK_Front_Construct::$ui_front_beta_modules );
-        }
-        // if ( sek_is_pro() ) {
-        //     $modules = array_merge( $modules, [
-        //         'czr_special_img_module',
-        //         'czr_special_img_main_settings_child'
-        //     ]);
-        // }
-    } else {
-        //sniff the list of active modules in local and global location
-        sek_populate_contextually_active_module_list();
-
-        $contextually_actives = array();
-        $front_modules = array_merge( SEK_Front_Construct::$ui_front_modules, SEK_Front_Construct::$ui_front_beta_modules );
-
-        // we need to get all children when the module is a father.
-        // This will be flatenized afterwards
-        foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
-
-            // Parent module with children
-            if ( array_key_exists( $module_name, $front_modules ) ) {
-                // get the list of childrent, includes the parent too.
-                // @see ::$ui_front_modules
-                $contextually_actives[] = $front_modules[ $module_name ];
-            }
-            // Simple module with no children
-            if ( in_array( $module_name, $front_modules ) ) {
-                $contextually_actives[] = $module_name;
-            }
-        }
-
-        $modules = array_merge(
-            $modules,
-            $contextually_actives,
-            SEK_Front_Construct::$ui_level_modules,
-            SEK_Front_Construct::$ui_local_global_options_modules
-        );
-    }
-    return $modules;
 }
 
 // @return void()
@@ -144,6 +142,83 @@ function sek_populate_contextually_active_module_list( $recursive_data = null ) 
         }
     }
 }
+
+
+
+
+
+
+// SINGLE MODULE PARAMS STUCTURE
+// 'dynamic_registration' => true,
+// 'module_type' => 'sek_column_layouts_sec_picker_module',
+// 'name' => __('Empty sections with columns layout', 'text_doma'),
+// 'tmpl' => array(
+//     'item-inputs' => array(
+//         'sections' => array(
+//             'input_type'  => 'section_picker',
+//             'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+//             'width-100'   => true,
+//             'title_width' => 'width-100',
+//             'section_collection' => array(
+//                 array(
+//                     'content-id' => 'two_columns',
+//                     'title' => __('two columns layout', 'text-domain' ),
+//                     'thumb' => 'two_columns.jpg'
+//                 ),
+//                 array(
+//                     'content-id' => 'three_columns',
+//                     'title' => __('three columns layout', 'text-domain' ),
+//                     'thumb' => 'three_columns.jpg'
+//                 ),
+//                 array(
+//                     'content-id' => 'four_columns',
+//                     'title' => __('four columns layout', 'text-domain' ),
+//                     'thumb' => 'four_columns.jpg'
+//                 ),
+//             )
+//         )
+//     )
+// )
+// @return void();
+// @hook 'after_setup_theme'
+function sek_register_prebuilt_section_modules() {
+    $registration_params = sek_get_sections_registration_params_api_data();
+    $default_module_params = array(
+        'dynamic_registration' => true,
+        'module_type' => '',
+        'name' => '',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'sections' => array(
+                    'input_type'  => 'section_picker',
+                    'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'section_collection' => array()
+                )
+            )
+        )
+    );
+
+    foreach ( $registration_params as $module_type => $module_params ) {
+        $module_params = wp_parse_args( $module_params, array(
+            'module_title' => '',
+            'section_collection' => array()
+        ));
+
+        // normalize the module params
+        $normalized_params = $default_module_params;
+        $normalized_params['module_type'] = $module_type;
+        $normalized_params['name'] = $module_params['module_title'];
+        $normalized_params['tmpl']['item-inputs']['sections']['section_collection'] = $module_params['section_collection'];
+        CZR_Fmk_Base()->czr_pre_register_dynamic_module( $normalized_params );
+    }
+
+}
+
+
+
+
 
 
 // HELPERS

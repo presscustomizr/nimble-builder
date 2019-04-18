@@ -606,7 +606,7 @@ function sek_register_dashboard_widgets() {
 // @return void()
 // callback of wp_add_dashboard_widget()
 function sek_nimble_dashboard_callback_fn() {
-    $post_data = sek_get_latest_posts_data( false );
+    $post_data = sek_get_latest_posts_api_data( false );
     $theme_name = sek_get_parent_theme_slug();
     ?>
     <div class="nimble-db-wrapper">
@@ -663,7 +663,7 @@ function sek_nimble_dashboard_callback_fn() {
         $theme_name = sek_get_parent_theme_slug();
 
         if ( sek_is_presscustomizr_theme( $theme_name ) ) {
-            $cta = sek_get_cta_message( $theme_name, false );
+            $cta = sek_get_cta_message_from_api( $theme_name, false );
             if ( !empty( $cta ) ) {
               $cta_link = array(
                 'cta' => array(
@@ -688,123 +688,4 @@ function sek_nimble_dashboard_callback_fn() {
       </div>
     </div>
     <?php
-}
-
-// @return bool
-function sek_is_presscustomizr_theme( $theme_name ) {
-  $bool = false;
-  if ( is_string( $theme_name ) ) {
-    foreach ( ['customizr', 'hueman'] as $pc_theme ) {
-      // handle the case when the theme name looks like customizr-4.1.29
-      if ( !$bool && $pc_theme === substr( $theme_name, 0, strlen($pc_theme) ) ) {
-          $bool = true;
-      }
-    }
-  }
-  return $bool;
-}
-
-// @return the theme name string, exact if customizr or hueman
-function sek_maybe_get_presscustomizr_theme_name( $theme_name ) {
-  if ( is_string( $theme_name ) ) {
-    foreach ( ['customizr', 'hueman'] as $pc_theme ) {
-      // handle the case when the theme name looks like customizr-4.1.29
-      if ( $pc_theme === substr( $theme_name, 0, strlen($pc_theme) ) ) {
-          $theme_name = $pc_theme;
-      }
-    }
-  }
-  return $theme_name;
-}
-
-
-
-
-
-// /* ------------------------------------------------------------------------- *
-// *  NIMBLE API
-// /* ------------------------------------------------------------------------- */
-if ( !defined( "NIMBLE_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_LIBRARY_OPT_NAME", 'nimble_api_library_data' ); }
-if ( !defined( "NIMBLE_NEWS_OPT_NAME" ) ) { define( "NIMBLE_NEWS_OPT_NAME", 'nimble_api_news_data' ); }
-if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https://presscustomizr.com/wp-json/nimble/v1/cravan' ); }
-
-
-
-// @return array|false Info data, or false.
-function sek_get_info_data( $force_update = false ) {
-  $api_data_transient_name = 'nimble_api_data_' . NIMBLE_VERSION;
-  $info_data = get_transient( $api_data_transient_name );
-  // Refresh every 12 hours, unless force_update set to true
-  if ( $force_update || false === $info_data ) {
-    $timeout = ( $force_update ) ? 25 : 8;
-    $response = wp_remote_get( NIMBLE_DATA_API_URL, array(
-      'timeout' => $timeout,
-      'body' => [
-        'api_version' => NIMBLE_VERSION,
-        'site_lang' => get_bloginfo( 'language' ),
-        'theme_name' => sek_maybe_get_presscustomizr_theme_name( sek_get_parent_theme_slug() )
-      ],
-    ) );
-
-    if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
-      // HOUR_IN_SECONDS is a default WP constant
-      set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
-      return false;
-    }
-
-    $info_data = json_decode( wp_remote_retrieve_body( $response ), true );
-
-    if ( empty( $info_data ) || ! is_array( $info_data ) ) {
-      set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
-      return false;
-    }
-
-    if ( !empty( $info_data['library'] ) ) {
-      update_option( NIMBLE_LIBRARY_OPT_NAME, $info_data['library'], 'no' );
-      unset( $info_data['library'] );
-    }
-
-    if ( isset( $info_data['latest_posts'] ) ) {
-      update_option( NIMBLE_NEWS_OPT_NAME, $info_data['latest_posts'], 'no' );
-      unset( $info_data['latest_posts'] );
-    }
-
-    set_transient( $api_data_transient_name, $info_data, 12 * HOUR_IN_SECONDS );
-  }//if ( $force_update || false === $info_data ) {
-
-  return $info_data;
-}
-
-
-// @return array of posts
-function sek_get_latest_posts_data( $force_update = false ) {
-    sek_get_info_data( $force_update );
-    $latest_posts = get_option( NIMBLE_NEWS_OPT_NAME );
-    if ( empty( $latest_posts ) ) {
-      return array();
-    }
-    return $latest_posts;
-}
-
-// @return html string
-function sek_get_cta_message( $theme_name, $force_update = false ) {
-    $info_data = sek_get_info_data( $force_update );
-    if ( !sek_is_presscustomizr_theme( $theme_name ) || ! is_array( $info_data ) ) {
-        return '';
-    }
-    $message = '';
-    $cta_data = isset( $info_data['cta'] ) ? $info_data['cta'] : null;
-
-    $fn = 'customizr' === sek_maybe_get_presscustomizr_theme_name( $theme_name ) ? 'czr_fn_user_started_before_version' : 'hu_user_started_before_version';
-    if ( function_exists($fn) && !is_null($cta_data) && isset( $cta_data['started_before'] ) && call_user_func_array( $fn, array( $cta_data['started_before'] ) ) ) {
-        $message = !empty( $cta_data['html'] ) ? $cta_data['html'] : '';
-    }
-    return $message;
-}
-
-add_action( 'after_switch_theme', '\Nimble\sek_refresh_nimble_api_data');
-function sek_refresh_nimble_api_data() {
-    // Refresh data on theme switch
-    // => so the posts and message are up to date
-    sek_get_info_data(true);
 }

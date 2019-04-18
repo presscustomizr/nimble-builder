@@ -847,7 +847,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return fn && typeof fn.then === 'function' && String( $.Deferred().then ) === String( fn.then );
             },
 
-            // @param deferreds = { '::img-path::/assets/img/tests/1.jpg' : 'dfd1', '::img-path::/assets/img/tests/2.jpg' : dfd2, ..., '::img-path::/assets/img/tests/n.jpg' : dfdn }
+            // @param deferreds = { '__img_url__/assets/img/tests/1.jpg' : 'dfd1', '__img_url__/assets/img/tests/2.jpg' : dfd2, ..., '__img_url__/assets/img/tests/n.jpg' : dfdn }
             whenAllPromisesInParallel : function ( deferreds ) {
                 var self = this,
                     mainDfd = $.Deferred(),
@@ -904,16 +904,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
-            // @param relpath = string : '/assets/img/41883.jpg'
+            // @param attachment_url = string : '/assets/img/41883.jpg'
             // @return a promise
-            importAttachment : function( relpath ) {
+            importAttachment : function( attachment_url ) {
                   // @see php wp_ajax_sek_import_attachment
                   return wp.ajax.post( 'sek_import_attachment', {
-                        rel_path : relpath,
+                        img_url : attachment_url,
                         nonce: api.settings.nonce.save//<= do we need to set a specific nonce to fetch the attachment
                   })
                   .fail( function( _er_ ) {
-                        api.errare( 'sek_import_attachment ajax action failed for image ' +  relpath, _er_ );
+                        api.errare( 'sek_import_attachment ajax action failed for image ' +  attachment_url, _er_ );
                   });
                   // .done( function( data) {
                   //       api.infoLog('relpath and DATA ' + relpath , data );

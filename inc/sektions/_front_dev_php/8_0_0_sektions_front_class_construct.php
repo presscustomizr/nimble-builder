@@ -92,15 +92,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public static $ui_picker_modules = [
           // UI CONTENT PICKER
           'sek_content_type_switcher_module',
-          'sek_module_picker_module',
-
-          'sek_intro_sec_picker_module',
-          'sek_features_sec_picker_module',
-          'sek_contact_sec_picker_module',
-          'sek_column_layouts_sec_picker_module',
-          // 'sek_header_sec_picker_module',
-          // 'sek_footer_sec_picker_module',
-          'sek_my_sections_sec_picker_module'
+          'sek_module_picker_module'
         ];
 
         public static $ui_level_modules = [
@@ -209,10 +201,6 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         ];
 
         public static $ui_front_beta_modules = [
-          // pre-built sections for header and footer
-          'sek_header_sec_picker_module',
-          'sek_footer_sec_picker_module',
-
           // modules for header and footer
           'czr_menu_module' => array(
             'czr_menu_module',

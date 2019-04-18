@@ -53,16 +53,23 @@ jQuery(function($){
       $('[data-sek-bg-parallax="true"]').each( function() {
             $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
       });
+      var _setParallaxWhenCustomizing = function() {
+            $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
+            // hack => always trigger a 'resize' event with a small delay to make sure bg positions are ok
+            setTimeout( function() {
+                 $('body').trigger('resize');
+            }, 500 );
+      };
       // When previewing, react to level refresh
       // This can occur to any level. We listen to the bubbling event on 'body' tag
       // and salmon up to maybe instantiate any missing candidate
       // Example : when a preset_section is injected
       $('body').on('sek-level-refreshed sek-section-added', function( evt ){
             if ( "true" === $(this).data('sek-bg-parallax') ) {
-                  $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
+                  _setParallaxWhenCustomizing.call(this);
             } else {
                   $(this).find('[data-sek-bg-parallax="true"]').each( function() {
-                        $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
+                        _setParallaxWhenCustomizing.call(this);
                   });
             }
       });

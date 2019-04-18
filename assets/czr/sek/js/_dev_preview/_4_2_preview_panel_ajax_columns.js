@@ -24,7 +24,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         if ( _r_.data && _r_.data.contents ) {
                               html_content = _r_.data.contents;
                         } else {
-                              self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
+                              self.errare( 'SekPreviewPrototype::ajaxRefreshColumns => ajax_response.data.contents is undefined ', _r_ );
+                              self.errare( 'params ?', params );
                         }
 
                         var $parentSektion = $( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' );
@@ -72,7 +73,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         if ( _r_.data && _r_.data.contents ) {
                               html_content = _r_.data.contents;
                         } else {
-                              self.errare( 'SekPreviewPrototype => ajax_response.data.contents is undefined ', _r_ );
+                              self.errare( 'SekPreviewPrototype::ajaxResizeColumns => ajax_response.data.contents is undefined ', _r_ );
+                              self.errare( 'params ?', params );
                         }
                         //self.errare('sek-preview => resize-column ajax response => ', html_content );
                         // Reset the automatic default resizable inline styling

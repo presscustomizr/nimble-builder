@@ -149,16 +149,27 @@
       //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
-      var section_modules = [
-            'sek_intro_sec_picker_module',
-            'sek_features_sec_picker_module',
-            'sek_contact_sec_picker_module',
-            'sek_column_layouts_sec_picker_module'
-      ];
+      // var section_modules = [
+      //       'sek_intro_sec_picker_module',
+      //       'sek_features_sec_picker_module',
+      //       'sek_contact_sec_picker_module',
+      //       'sek_column_layouts_sec_picker_module',
+      //       'sek_header_sec_picker_module',
+      //       'sek_footer_sec_picker_module'
+      // ];
+
+      var section_modules = sektionsLocalizedData.presetSectionsModules;
+      if ( ! _.isArray( section_modules ) || _.isEmpty( section_modules ) ) {
+            api.errare( 'api.czrModuleMap => error when adding section modules');
+            return;
+      }
+
       // Header and footer have been introduced in v1.4.0 but not enabled by default
       // The header and footer preset sections are on hold until "header and footer" feature is released.
-      if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-            section_modules = _.union( section_modules, [ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ] );
+      if ( !sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
+            section_modules = _.filter( section_modules, function( mod ) {
+                  return !_.contains([ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ], mod );
+            });
       }
       _.each( section_modules, function( module_type ) {
             api.czrModuleMap[ module_type ] = {
@@ -166,7 +177,8 @@
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( module_type, 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( module_type )
@@ -278,7 +290,8 @@
                         crud : false,
                         name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
                         has_mod_opt : false,
-                        ready_on_section_expanded : true,
+                        ready_on_section_expanded : false,
+                        ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                         defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
                   },
             });
