@@ -49,6 +49,8 @@
                                           '<span>',
                                             '<strong>',
                                             sektionsLocalizedData.i18n['Reset failed'],
+                                            '<br/>',
+                                            '<i>' + response + '</i>',
                                             '</strong>',
                                           '</span>'
                                     ].join('')
