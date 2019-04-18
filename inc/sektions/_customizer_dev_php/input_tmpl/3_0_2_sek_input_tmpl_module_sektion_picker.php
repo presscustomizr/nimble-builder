@@ -103,7 +103,8 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
                         // v1.4.2 : added the ?ver param to make sure we always display the latest shot of the section
-                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'] . '?ver=' . NIMBLE_VERSION,
+                        //NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'] . '?ver=' . NIMBLE_VERSION,
+                        $_params['thumb'] . '?ver=' . NIMBLE_VERSION,
                         isset( $_params['height'] ) ? 'height:'.$_params['height'] : ''
                     ),
                     $_params['title'],

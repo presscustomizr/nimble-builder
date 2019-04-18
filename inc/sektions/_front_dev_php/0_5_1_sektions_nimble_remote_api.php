@@ -28,7 +28,7 @@ if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https
 function sek_get_nimble_api_data( $force_update = false ) {
     $api_data_transient_name = 'nimble_api_data_' . NIMBLE_VERSION;
     $info_data = get_transient( $api_data_transient_name );
-
+    // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
 
     // Refresh every 12 hours, unless force_update set to true

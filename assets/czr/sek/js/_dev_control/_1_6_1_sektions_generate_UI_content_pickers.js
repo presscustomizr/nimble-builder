@@ -40,7 +40,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_intro_sec_picker_module',
                               controlLabel :  sektionsLocalizedData.i18n['Sections for an introduction'],
                               content_type : 'section',
-                              expandAndFocusOnInit : true,
+                              expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },

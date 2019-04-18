@@ -343,13 +343,13 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function sek_ajax_import_attachment() {
             $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
 
-            if ( !isset( $_POST['rel_path'] ) || !is_string($_POST['rel_path']) ) {
-                wp_send_json_error( 'missing_or_invalid_rel_path_when_importing_image');
+            if ( !isset( $_POST['img_url'] ) || !is_string($_POST['img_url']) ) {
+                wp_send_json_error( 'missing_or_invalid_img_url_when_importing_image');
             }
 
-            $id = sek_sideload_img_and_return_attachment_id( NIMBLE_BASE_URL . $_POST['rel_path'] );
+            $id = sek_sideload_img_and_return_attachment_id( $_POST['img_url'] );
             if ( is_wp_error( $id ) ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . $_POST['rel_path'] );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . $_POST['img_url'] . ' | SERVER ERROR => ' . json_encode( $id ) );
             } else {
                 wp_send_json_success([
                   'id' => $id,

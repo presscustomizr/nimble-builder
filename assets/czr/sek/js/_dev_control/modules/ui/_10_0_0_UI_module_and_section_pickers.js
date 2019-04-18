@@ -177,7 +177,8 @@
                   crud : false,
                   name : api.czr_sektions.getRegisteredModuleProperty( module_type, 'name' ),
                   has_mod_opt : false,
-                  ready_on_section_expanded : true,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( module_type )
@@ -289,7 +290,8 @@
                         crud : false,
                         name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
                         has_mod_opt : false,
-                        ready_on_section_expanded : true,
+                        ready_on_section_expanded : false,
+                        ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                         defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
                   },
             });
