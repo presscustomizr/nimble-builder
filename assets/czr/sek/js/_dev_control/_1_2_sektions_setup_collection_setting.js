@@ -305,18 +305,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
                         throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
-                  var _collectionSettingId_ = 'global' === scope ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
-
-                  if ( _.isEmpty( _collectionSettingId_ ) ) {
-                        throw new Error( 'resetCollectionSetting => the collectionSettingId is invalid' );
-                  }
-                  var clonedDefaultSetting = $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) ),
-                      currentSetting = api( _collectionSettingId_ )(),
-                      clonedSetting;
-
-                  clonedSetting = _.isObject( currentSetting ) ? $.extend( true, {}, currentSetting ) : clonedDefaultSetting;
-                  clonedSetting.collection = $.extend( true, [], clonedDefaultSetting.collection );
-                  return clonedSetting;
+                  return $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) );
             }
       });//$.extend()
 })( wp.customize, jQuery );
