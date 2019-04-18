@@ -2741,39 +2741,6 @@ function sek_is_img_url( $url = '' ) {
     }
     return false;
 }
-function sek_sideload_img_and_return_attachment_id( $img_url ) {
-    preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $img_url, $matches );
-    $filename = basename( $matches[0] );
-    if ( 'nimble_asset_' !== substr($filename, 0, strlen('nimble_asset_') ) ) {
-        $filename = 'nimble_asset_' . $filename;
-    }
-    $img_title = preg_replace( '/\.[^.]+$/', '', trim( $filename ) );
-    $args = array(
-        'posts_per_page' => 1,
-        'post_type' => 'attachment',
-        'name' => $img_title
-    );
-    $get_attachment = new \WP_Query( $args );
-    if ( is_array( $get_attachment->posts ) && array_key_exists(0, $get_attachment->posts) ) {
-        $img_id_already_uploaded = $get_attachment->posts[0] -> ID;
-    }
-    if ( isset($img_id_already_uploaded) ) {
-        return $img_id_already_uploaded;
-    }
-    $file_array = array();
-    $file_array['name'] = $filename;
-    $file_array['tmp_name'] = download_url( $img_url );
-    if ( is_wp_error( $file_array['tmp_name'] ) ) {
-        return $file_array['tmp_name'];
-    }
-    $id = media_handle_sideload( $file_array, 0 );
-    if ( is_wp_error( $id ) ) {
-      @unlink( $file_array['tmp_name'] );
-    }
-    return $id;
-}
-
-
 
 ?><?php
 add_action( 'customize_save_validation_before', '\Nimble\sek_remove_callback_wp_targeted_link_rel' );
@@ -2966,7 +2933,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     'preset_section',
                     $_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
-                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'] . '?ver=' . NIMBLE_VERSION,
+                        $_params['thumb'] . '?ver=' . NIMBLE_VERSION,
                         isset( $_params['height'] ) ? 'height:'.$_params['height'] : ''
                     ),
                     $_params['title'],

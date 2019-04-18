@@ -1442,7 +1442,47 @@ function sek_maybe_get_presscustomizr_theme_name( $theme_name ) {
   }
   return $theme_name;
 }
+function sek_sideload_img_and_return_attachment_id( $img_url ) {
+    preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $img_url, $matches );
+    $filename = basename( $matches[0] );
+    if ( 'nimble_asset_' !== substr($filename, 0, strlen('nimble_asset_') ) ) {
+        $filename = 'nimble_asset_' . $filename;
+    }
+    $img_title = preg_replace( '/\.[^.]+$/', '', trim( $filename ) );
+    $args = array(
+        'posts_per_page' => 1,
+        'post_type' => 'attachment',
+        'post_status' => 'inherit',
+        'meta_query' => array(
+          array(
+            'key'     => '_wp_attachment_image_alt',
+            'value'   => $img_title,
+            'compare' => '='
+          ),
+        ),
+    );
+    $get_attachment = new \WP_Query( $args );
+    if ( is_array( $get_attachment->posts ) && array_key_exists(0, $get_attachment->posts) ) {
+        $img_id_already_uploaded = $get_attachment->posts[0] -> ID;
+    }
+    if ( isset($img_id_already_uploaded) ) {
+        return $img_id_already_uploaded;
+    }
+    $file_array = array();
+    $file_array['name'] = $filename;
+    $file_array['tmp_name'] = download_url( $img_url );
+    if ( is_wp_error( $file_array['tmp_name'] ) ) {
+        return $file_array['tmp_name'];
+    }
+    $id = media_handle_sideload( $file_array, 0 );
+    if ( is_wp_error( $id ) ) {
+        @unlink( $file_array['tmp_name'] );
+    } else {
+        add_post_meta( $id, '_wp_attachment_image_alt', $img_title, true );
+    }
 
+    return $id;
+}
 ?><?php
 namespace Nimble;
 if ( !defined( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME", 'nimble_api_prebuilt_sections_data' ); }
@@ -1451,7 +1491,6 @@ if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https
 function sek_get_nimble_api_data( $force_update = false ) {
     $api_data_transient_name = 'nimble_api_data_' . NIMBLE_VERSION;
     $info_data = get_transient( $api_data_transient_name );
-
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
     if ( $force_update || false === $info_data ) {
         $timeout = ( $force_update ) ? 25 : 8;
@@ -2816,7 +2855,9 @@ function sek_extract_numeric_value( $value ) {
 ?><?php
 add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 );
 function sek_schedule_module_registration() {
-    if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
+    if ( isset( $_POST['nimble_simple_cf'] ) ) {
+        sek_register_modules_when_customizing_or_ajaxing();
+    } else if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
         sek_register_modules_when_customizing_or_ajaxing();
         sek_register_prebuilt_section_modules();
     } else {
@@ -10682,13 +10723,13 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function sek_ajax_import_attachment() {
             $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
 
-            if ( !isset( $_POST['rel_path'] ) || !is_string($_POST['rel_path']) ) {
-                wp_send_json_error( 'missing_or_invalid_rel_path_when_importing_image');
+            if ( !isset( $_POST['img_url'] ) || !is_string($_POST['img_url']) ) {
+                wp_send_json_error( 'missing_or_invalid_img_url_when_importing_image');
             }
 
-            $id = sek_sideload_img_and_return_attachment_id( NIMBLE_BASE_URL . $_POST['rel_path'] );
+            $id = sek_sideload_img_and_return_attachment_id( $_POST['img_url'] );
             if ( is_wp_error( $id ) ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . $_POST['rel_path'] );
+                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . $_POST['img_url'] . ' | SERVER ERROR => ' . json_encode( $id ) );
             } else {
                 wp_send_json_success([
                   'id' => $id,
