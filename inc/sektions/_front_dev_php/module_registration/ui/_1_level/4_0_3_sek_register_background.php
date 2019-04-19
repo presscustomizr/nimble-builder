@@ -71,6 +71,12 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'notice_after' => __('Customize the magnitude of the visual effect when scrolling.', 'text_doma'),
                     'refresh_markup' => true
                 ),
+                'bg-scale' => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __('Scale', 'text_doma'),
+                    'default'     => 'cover',
+                    'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
+                ),
                 'bg-repeat' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Repeat', 'text_doma'),
@@ -84,12 +90,6 @@ function sek_get_module_params_for_sek_level_bg_module() {
                         'round' => __('Round', 'text_dom'),
                         'space' => __('Space', 'text_dom'),
                     )
-                ),
-                'bg-scale' => array(
-                    'input_type'  => 'simpleselect',
-                    'title'       => __('Scale', 'text_doma'),
-                    'default'     => 'cover',
-                    'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
                 ),
                 // 'bg-video' => array(
                 //     'input_type'  => 'text',
