@@ -51,7 +51,7 @@ function sek_get_module_params_for_czr_quote_module() {
  *  QUOTE CONTENT AND FONT
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_quote_quote_child() {
-    $quote_font_selectors = array( '.sek-quote-content', '.sek-quote-content p', '.sek-quote-content ul', '.sek-quote-content ol', '.sek-quote-content a' );
+    $quote_font_selectors = array( '.sek-quote .sek-quote-content', '.sek-quote .sek-quote-content *');
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_quote_child',
