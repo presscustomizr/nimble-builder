@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -109,10 +109,15 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.7.0 =
-Improved the way Nimble Builder loads assets for the pre-built sections.
+= 1.7.1 =
+Improved the column resizing UI. Fixed a minor bug of the quote module.
 
 == Changelog ==
+= 1.7.1 : April 24th 2019 =
+* fixed : when resizing columns, the text "Drag and drop or double-click the content that you want to insert here" is breaking the layout
+* fixed : column resizing => remove handler on the right of the last column
+* fixed : quote module => font-size selector for quote content not specific enough
+
 = 1.7.0 : April 18th 2019 =
 * fixed : check if class_exists('\Nimble\CZR_Fmk_Base').
 * fixed : don't append anything to head when the dynamic stylesheet is empty

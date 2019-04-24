@@ -3247,6 +3247,12 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'notice_after' => __('Customize the magnitude of the visual effect when scrolling.', 'text_doma'),
                     'refresh_markup' => true
                 ),
+                'bg-scale' => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __('Scale', 'text_doma'),
+                    'default'     => 'cover',
+                    'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
+                ),
                 'bg-repeat' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Repeat', 'text_doma'),
@@ -3260,12 +3266,6 @@ function sek_get_module_params_for_sek_level_bg_module() {
                         'round' => __('Round', 'text_dom'),
                         'space' => __('Space', 'text_dom'),
                     )
-                ),
-                'bg-scale' => array(
-                    'input_type'  => 'simpleselect',
-                    'title'       => __('Scale', 'text_doma'),
-                    'default'     => 'cover',
-                    'choices'     => sek_get_select_options_for_input_id( 'bg-scale' )
                 ),
                 'bg-apply-overlay' => array(
                     'input_type'  => 'nimblecheck',
@@ -5960,7 +5960,7 @@ function sek_get_module_params_for_czr_quote_module() {
  *  QUOTE CONTENT AND FONT
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_quote_quote_child() {
-    $quote_font_selectors = array( '.sek-quote-content', '.sek-quote-content p', '.sek-quote-content ul', '.sek-quote-content ol', '.sek-quote-content a' );
+    $quote_font_selectors = array( '.sek-quote .sek-quote-content', '.sek-quote .sek-quote-content *');
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_quote_child',

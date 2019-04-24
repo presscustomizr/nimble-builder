@@ -719,7 +719,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   if ( 2 > $directColumnChildren.length )
                     return;
 
-                  $directColumnChildren.each( function() {
+                  var $lastCol = $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).last();
+
+                  $directColumnChildren.not($lastCol).each( function() {
                         $(this).resizable({
                                 // handles: { 'e': '.ui-resizable-e', 'w': '.ui-resizable-w' },
                                 resize : function( event, ui ) {
