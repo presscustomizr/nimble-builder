@@ -1533,8 +1533,12 @@ function sek_get_nimble_api_data( $force_update = false ) {
     return $info_data;
 }
 function sek_get_sections_registration_params_api_data( $force_update = false ) {
-    sek_get_nimble_api_data( $force_update );
     $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
+    if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['registration_params'] ) ) {
+        sek_get_nimble_api_data( true );//<= true for "force_update"
+        $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
+    }
+
     if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['registration_params'] ) ) {
         sek_error_log( __FUNCTION__ . ' => error => no section registration params' );
         return array();
@@ -1543,8 +1547,12 @@ function sek_get_sections_registration_params_api_data( $force_update = false ) 
 }
 
 function sek_get_preset_sections_api_data( $force_update = false ) {
-    sek_get_nimble_api_data( $force_update );
     $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
+    if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['json_collection'] ) ) {
+        sek_get_nimble_api_data( true );//<= true for "force_update"
+        $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
+    }
+
     if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['json_collection'] ) ) {
         sek_error_log( __FUNCTION__ . ' => error => no json_collection' );
         return array();
@@ -1574,8 +1582,8 @@ function sek_get_cta_message_from_api( $theme_name, $force_update = false ) {
     }
     return $message;
 }
-
 add_action( 'after_switch_theme', '\Nimble\sek_refresh_nimble_api_data');
+add_action( 'upgrader_process_complete', '\Nimble\sek_refresh_nimble_api_data');
 function sek_refresh_nimble_api_data() {
     sek_get_nimble_api_data(true);
 }
