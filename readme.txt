@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.1.1
-Stable tag: 1.7.2
+Stable tag: 1.7.3-beta
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -109,10 +109,14 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.7.2 =
-Improved live customizer load time.
+= 1.7.3 =
+Fixes heading alignment issues in some themes. Fixes br and p tags added by WordPress when adding section before content.
 
 == Changelog ==
+= 1.7.3 : May 7th 2019 =
+* fixed : possible alignment issue for the heading module
+* fixed : br and p tags potentially added by WordPress when adding section before content
+
 = 1.7.2 : April 30th 2019 =
 * fixed : avoid api connection slowing down the loading of the customizer,
 make sure api data are refreshed on installation and plugin update
