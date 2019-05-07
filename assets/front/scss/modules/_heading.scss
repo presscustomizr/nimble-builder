@@ -15,6 +15,7 @@
       text-align: center;//This should match the default on registration
       // set a margin to fix https://github.com/presscustomizr/nimble-builder/issues/203
       margin: 0.6em 0;//This should match the default on registration
+      display: block;//<=fixes https://github.com/presscustomizr/nimble-builder/issues/442
       > a {
           color: inherit;
           font-size: inherit;
