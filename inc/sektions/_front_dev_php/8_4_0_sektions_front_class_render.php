@@ -36,6 +36,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 // FOOTER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
                 add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
             }
+
+            // INCLUDE NIMBLE CONTENT IN SEARCH RESULTS
+            add_action( 'wp_head', array( $this, 'sek_maybe_include_nimble_content_in_search_results' ) );
         }//_schedule_front_rendering()
 
 
@@ -1009,6 +1012,82 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 ob_get_clean();
             }
         }//sek_maybe_set_local_nimble_footer
+
+
+        // @hook wp_head
+        // Elements of decisions for this implementation :
+        // The problem to solve here is to add the post ( or pages ) where user has created Nimble sections for which the content matches the search term.
+        // 1) we need a way to find the matches
+        // 2) then to "map" the Nimble post to its related post or page
+        // 3) then include the related post / page to the list of search result.
+        // This can't be done by filtering the WP core query params, because Nimble sections are saved as separate posts, not post metas.
+        // That's why the posts are added to the array of posts of the main query.
+        //
+        // fixes https://github.com/presscustomizr/nimble-builder/issues/439
+        //
+        // May 2019 => note that this implementation won't include Nimble sections created in other contexts than page or post.
+        // This could be added in the future.
+        //
+        // partially inspired by https://stackoverflow.com/questions/24195818/add-results-into-wordpress-search-results
+        function sek_maybe_include_nimble_content_in_search_results(){
+            if ( !is_search() )
+              return;
+            global $wp_query;
+
+            $query_vars = $wp_query->query_vars;
+            if ( ! is_array( $query_vars ) || empty( $query_vars['s'] ) )
+              return;
+
+            // Search query on Nimble CPT
+            $sek_post_query_vars = array(
+                'post_type'              => NIMBLE_CPT,
+                'post_status'            => get_post_stati(),
+                'posts_per_page'         => -1,
+                'no_found_rows'          => true,
+                'cache_results'          => true,
+                'update_post_meta_cache' => false,
+                'update_post_term_cache' => false,
+                'lazy_load_term_meta'    => false,
+                's' => $query_vars['s']
+            );
+            $query = new \WP_Query( $sek_post_query_vars );
+
+            // The search string has been found in a set of Nimble posts
+            if ( is_array( $query->posts ) ) {
+                foreach ( $query->posts as $post_object ) {
+                    // The related WP object ( == skope ) is written in the title of Nimble CPT
+                    // ex : nimble___skp__post_post_114
+                    if ( preg_match('(post_page|post_post)', $post_object->post_title ) ) {
+                        $post_number = preg_replace('/[^0-9]/', '', $post_object->post_title );
+                        $post_number = intval($post_number);
+
+                        $post_candidate = get_post( $post_number );
+
+                        if ( is_object( $post_candidate ) ) {
+                            // Merge Nimble posts to WP posts
+                            array_push( $wp_query->posts, $post_candidate );
+                        }
+                    }
+                }
+            }
+
+            // Maybe clean duplicated posts
+            $maybe_includes_duplicated = $wp_query->posts;
+            $without_duplicated = array();
+            $post_ids = array();
+
+            foreach ( $maybe_includes_duplicated as $post_obj ) {
+                if ( in_array( $post_obj->ID, $post_ids ) )
+                  continue;
+                $post_ids[] = $post_obj->ID;
+                $without_duplicated[] = $post_obj;
+            }
+            $wp_query->posts = $without_duplicated;
+
+            // Make sure the post_count and found_posts are updated
+            $wp_query->post_count = count($wp_query->posts);
+            $wp_query->found_posts = $wp_query->post_count > 0;
+        }// sek_maybe_include_nimble_content_in_search_results
 
     }//class
 endif;
