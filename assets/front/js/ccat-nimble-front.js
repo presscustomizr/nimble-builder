@@ -2269,16 +2269,15 @@ jQuery( function($){
     };
 
     var $root = $('html, body');
-    // animate menu item to Nimble anchors
-    $('body').find('.menu-item' ).on( 'click', 'a', function( evt ){
+    var maybeScrollToAnchor = function( evt ){
           // problem to solve : users want to define anchor links that work inside a page, but also from other pages.
           // @see https://github.com/presscustomizr/nimble-builder/issues/413
-          var menuItemUrl = $(this).attr('href');
-          if ( '' === menuItemUrl || null === menuItemUrl || 'string' !== typeof( menuItemUrl ) || -1 === menuItemUrl.indexOf('#') )
+          var clickedItemUrl = $(this).attr('href');
+          if ( '' === clickedItemUrl || null === clickedItemUrl || 'string' !== typeof( clickedItemUrl ) || -1 === clickedItemUrl.indexOf('#') )
             return;
 
           // an anchor link looks like this : http://mysite.com/contact/#anchor
-          var itemURLObject = new parseURL( menuItemUrl ),
+          var itemURLObject = new parseURL( clickedItemUrl ),
               _currentPageUrl = new parseURL( window.document.location.href );
 
           if( itemURLObject.pathname !== _currentPageUrl.pathname )
@@ -2291,7 +2290,14 @@ jQuery( function($){
 
           evt.preventDefault();
           $root.animate({ scrollTop : $nimbleTargetCandidate.offset().top - 150 }, 400 );
-    });
+    };
+
+    // animate menu item to Nimble anchors
+    $('body').find('.menu-item' ).on( 'click', 'a', maybeScrollToAnchor );
+
+    // animate an anchor link inside Nimble sections
+    // fixes https://github.com/presscustomizr/nimble-builder/issues/443
+    $('[data-sek-level="location"]' ).on( 'click', 'a', maybeScrollToAnchor );
 });
 
 

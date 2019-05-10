@@ -11216,6 +11216,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
                 add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
             }
+            add_action( 'wp_head', array( $this, 'sek_maybe_include_nimble_content_in_search_results' ) );
         }//_schedule_front_rendering()
         function sek_wrap_wp_content( $html ) {
             if ( ! skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) )
@@ -11942,6 +11943,54 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 ob_get_clean();
             }
         }//sek_maybe_set_local_nimble_footer
+        function sek_maybe_include_nimble_content_in_search_results(){
+            if ( !is_search() )
+              return;
+            global $wp_query;
+
+            $query_vars = $wp_query->query_vars;
+            if ( ! is_array( $query_vars ) || empty( $query_vars['s'] ) )
+              return;
+            $sek_post_query_vars = array(
+                'post_type'              => NIMBLE_CPT,
+                'post_status'            => get_post_stati(),
+                'posts_per_page'         => -1,
+                'no_found_rows'          => true,
+                'cache_results'          => true,
+                'update_post_meta_cache' => false,
+                'update_post_term_cache' => false,
+                'lazy_load_term_meta'    => false,
+                's' => $query_vars['s']
+            );
+            $query = new \WP_Query( $sek_post_query_vars );
+            if ( is_array( $query->posts ) ) {
+                foreach ( $query->posts as $post_object ) {
+                    if ( preg_match('(post_page|post_post)', $post_object->post_title ) ) {
+                        $post_number = preg_replace('/[^0-9]/', '', $post_object->post_title );
+                        $post_number = intval($post_number);
+
+                        $post_candidate = get_post( $post_number );
+
+                        if ( is_object( $post_candidate ) ) {
+                            array_push( $wp_query->posts, $post_candidate );
+                        }
+                    }
+                }
+            }
+            $maybe_includes_duplicated = $wp_query->posts;
+            $without_duplicated = array();
+            $post_ids = array();
+
+            foreach ( $maybe_includes_duplicated as $post_obj ) {
+                if ( in_array( $post_obj->ID, $post_ids ) )
+                  continue;
+                $post_ids[] = $post_obj->ID;
+                $without_duplicated[] = $post_obj;
+            }
+            $wp_query->posts = $without_duplicated;
+            $wp_query->post_count = count($wp_query->posts);
+            $wp_query->found_posts = $wp_query->post_count > 0;
+        }// sek_maybe_include_nimble_content_in_search_results
 
     }//class
 endif;

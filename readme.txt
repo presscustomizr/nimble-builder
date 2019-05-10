@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: page builder, visual editor, customizer, drag and drop, header, footer, landing page, contact form, grid, post grid
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.1.1
-Stable tag: 1.7.3
+Tested up to: 5.2.0
+Stable tag: 1.7.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -109,10 +109,15 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.7.3 =
-Fixes heading alignment issues in some themes. Fixes br and p tags added by WordPress when adding section before content.
+= 1.7.4 =
+Now pages and posts that have Nimble sections are included in the search results when a match is found with the textual content created with Nimble Builder.
 
 == Changelog ==
+= 1.7.4 : May 10th 2019 =
+* improved : pages and posts that have Nimble sections are included in the search results
+* improved : anchor links => allow scroll animations between sections
+* improved : addition of new 'wp_body_open' hook introduced in WP 5.2
+
 = 1.7.3 : May 7th 2019 =
 * fixed : possible alignment issue for the heading module
 * fixed : br and p tags potentially added by WordPress when adding section before content
