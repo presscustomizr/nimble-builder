@@ -13,6 +13,13 @@ if ( ! defined( 'ABSPATH' ) ) {
     <?php wp_head(); ?>
   </head>
   <body <?php body_class(); ?>>
+    <?php
+    if ( function_exists( 'wp_body_open' ) ) {
+      wp_body_open();
+    } else {
+      do_action( 'wp_body_open' );
+    }
+    ?>
     <div id="nimble-page" class="">
       <a class="sek-skip-link sek-screen-reader-text" href="#nimble-page"><?php _e( 'Skip to content', 'text_domain_to_replace' ); ?></a>
       <?php do_action('before_nimble_header'); ?>
