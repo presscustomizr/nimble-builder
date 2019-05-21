@@ -182,7 +182,7 @@ function sek_populate_contextually_active_module_list( $recursive_data = null ) 
 // @return void();
 // @hook 'after_setup_theme'
 function sek_register_prebuilt_section_modules() {
-    $registration_params = sek_get_sections_registration_params_api_data();
+    $registration_params = sek_get_sections_registration_params();
     $default_module_params = array(
         'dynamic_registration' => true,
         'module_type' => '',

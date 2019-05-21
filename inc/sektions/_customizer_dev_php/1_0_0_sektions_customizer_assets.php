@@ -112,7 +112,10 @@ function sek_enqueue_controls_js_css() {
 
                 'eligibleForFeedbackNotification' => sek_get_feedback_notif_status(),
 
-                'presetSectionsModules' => array_keys( sek_get_sections_registration_params_api_data() )
+                // May 21st, v1.7.5 => back to the local data
+                // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
+                //'presetSectionsModules' => array_keys( sek_get_sections_registration_params_api_data() )
+                'presetSectionsModules' => array_keys( sek_get_sections_registration_params() )
             )
         )
     );//wp_localize_script()

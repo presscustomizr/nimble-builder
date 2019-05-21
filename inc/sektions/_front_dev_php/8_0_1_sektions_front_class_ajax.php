@@ -100,7 +100,10 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // hook : 'wp_ajax_sek_get_preset_sektions'
         function sek_get_preset_sektions() {
             $this->sek_do_ajax_pre_checks();
-            $preset_sections = sek_get_preset_sections_api_data();
+            // May 21st => back to the local data
+            // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
+            //$preset_sections = sek_get_preset_sections_api_data();
+            $preset_sections = sek_get_preset_section_collection_from_json();
             if ( empty( $preset_sections ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sections_api_data()' );
             }
