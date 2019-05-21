@@ -5,8 +5,11 @@ namespace Nimble;
 // /* ------------------------------------------------------------------------- */
 if ( !defined( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME", 'nimble_api_prebuilt_sections_data' ); }
 if ( !defined( "NIMBLE_NEWS_OPT_NAME" ) ) { define( "NIMBLE_NEWS_OPT_NAME", 'nimble_api_news_data' ); }
-if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https://api.nimblebuilder.com/wp-json/nimble/v1/cravan' ); }
-
+// NIMBLE_DATA_API_URL_V2 SINCE MAY 21ST 2019
+// after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
+// DOES NOT RETURN THE DATA FOR PRESET SECTIONS
+// if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https://api.nimblebuilder.com/wp-json/nimble/v1/cravan' ); }
+if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2", 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan' ); }
 
 // Nimble api returns a set of value structured as follow
 // return array(
@@ -34,7 +37,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
     // Refresh every 12 hours, unless force_update set to true
     if ( $force_update || false === $info_data ) {
         $timeout = ( $force_update ) ? 25 : 8;
-        $response = wp_remote_get( NIMBLE_DATA_API_URL, array(
+        $response = wp_remote_get( NIMBLE_DATA_API_URL_V2, array(
           'timeout' => $timeout,
           'body' => [
             'api_version' => NIMBLE_VERSION,
@@ -56,12 +59,14 @@ function sek_get_nimble_api_data( $force_update = false ) {
             return false;
         }
 
-        if ( !empty( $info_data['library'] ) ) {
-            if ( !empty( $info_data['library']['sections'] ) ) {
-                update_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME, $info_data['library']['sections'], 'no' );
-            }
-            unset( $info_data['library'] );
-        }
+        // on May 21st 2019 => back to the local data for preset sections
+        // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
+        // if ( !empty( $info_data['library'] ) ) {
+        //     if ( !empty( $info_data['library']['sections'] ) ) {
+        //         update_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME, $info_data['library']['sections'], 'no' );
+        //     }
+        //     unset( $info_data['library'] );
+        // }
 
         if ( isset( $info_data['latest_posts'] ) ) {
             update_option( NIMBLE_NEWS_OPT_NAME, $info_data['latest_posts'], 'no' );
