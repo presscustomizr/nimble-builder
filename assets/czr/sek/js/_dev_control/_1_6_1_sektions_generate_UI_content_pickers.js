@@ -244,7 +244,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // Fetch the presetSectionCollection from the server now, so we save a few milliseconds when injecting the first preset_section
                         // it populates api.sek_presetSections
-                        self._maybeFetchSectionsFromServer();
+                        //
+                        // updated in v1.7.5, may 21st : performance improvements on customizer load
+                        // inserting preset sections is not on all Nimble sessions => let's only fetch when user inserts the first section
+                        // self._maybeFetchSectionsFromServer();
                   });
                   return dfd;
             }
