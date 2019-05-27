@@ -694,6 +694,7 @@ function sek_nimble_dashboard_callback_fn() {
 
 // /* ------------------------------------------------------------------------- *
 // *  EDIT WITH NIMBLE BUILDER
+// Introduced for https://github.com/presscustomizr/nimble-builder/issues/449
 // /* ------------------------------------------------------------------------- */
 // When using classic editor
 add_action( 'edit_form_after_title', '\Nimble\sek_print_edit_with_nimble_btn_for_classic_editor' );

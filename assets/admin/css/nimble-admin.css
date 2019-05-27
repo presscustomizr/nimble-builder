@@ -269,7 +269,9 @@ a.czr-rating-link:hover {
 }
 
 
-/* BUTTON "EDIT WITH NIMBLE" when editing posts and pages */
+/* BUTTON "EDIT WITH NIMBLE" when editing posts and pages
+Introduced for https://github.com/presscustomizr/nimble-builder/issues/449
+*/
 /* Gutenberg editor style */
 body .block-editor #sek-edit-with-nimble {
   margin: 2px;
@@ -281,11 +283,12 @@ body .block-editor #sek-edit-with-nimble {
 body .block-editor #sek-edit-with-nimble .sek-nimble-icon img {
   width: 24px;
   top: 3px;
+  left: 8px;
   position: absolute;
 }
 
 body .block-editor .sek-nimble-admin-bar-title {
-  padding-left: 25px;
+  padding-left: 22px;
 }
 /* Classic editor style */
 #sek-edit-with-nimble .sek-nimble-icon img {
