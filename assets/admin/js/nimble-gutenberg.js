@@ -9,6 +9,7 @@
                 $('#editor').find('.edit-post-header-toolbar').append( html );
                 button_printed = true;
                 // unsubscribe the listener
+                // documented here : https://developer.wordpress.org/block-editor/packages/packages-data/#subscribe
                 wp.data.subscribe(_callback)();
             }
         };

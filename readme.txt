@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.1
-Stable tag: 1.7.5
+Stable tag: 1.7.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -109,10 +109,13 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.7.5 =
-Performance improvements for the live customizer part of Nimble Builder.
+= 1.7.6 =
+Implemented a new button "Add sections with Nimble Builder" when editing posts and pages.
 
 == Changelog ==
+= 1.7.6 : May 27th 2019 =
+* added : Implemented a new button "Add sections with Nimble Builder" when editing posts and pages.
+
 = 1.7.5 : May 21st 2019 =
 * improved : performance improvements on the first load of the live customizer
 

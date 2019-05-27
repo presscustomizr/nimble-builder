@@ -2316,8 +2316,7 @@ function sek_add_customize_link() {
         if ( !is_admin_bar_showing() )
             return;
 
-        $return_customize_url = add_query_arg( 'return', urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) ), wp_customize_url() );
-        $customize_url = sek_get_customize_url_when_is_admin( $return_customize_url );
+        $customize_url = sek_get_customize_url_when_is_admin();
     } else {
         global $wp_customize;
         // Don't show if the user cannot edit a given customize_changeset post currently being previewed.
@@ -2348,7 +2347,7 @@ function sek_add_customize_link() {
       'title'  => sprintf( '<span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%4$s</span></span>',
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
           __('Nimble Builder','text_domain_to_replace'),
-          __('Add sections in live preview with the Nimble Builder', 'text_domain'),
+          __('Add sections in live preview with Nimble Builder', 'text_domain'),
           __( 'Nimble Builder', 'text_domain' )
       ),
       'href'   => $customize_url,
@@ -2360,7 +2359,7 @@ function sek_add_customize_link() {
 
 // returns a customize link when is_admin() for posts and terms
 // inspired from wp-includes/admin-bar.php#wp_admin_bar_edit_menu()
-function sek_get_customize_url_when_is_admin( $return_customize_url ) {
+function sek_get_customize_url_when_is_admin( $ajax_server_request_uri = '') {
     global $tag, $user_id;
 
     $customize_url = '';
@@ -2403,11 +2402,14 @@ function sek_get_customize_url_when_is_admin( $return_customize_url ) {
     {
         $customize_url = $view_link;
     }
+
     if ( ! empty( $customize_url ) ) {
+        $return_customize_url = add_query_arg( 'return', urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) ), wp_customize_url() );
         $customize_url = add_query_arg( 'url', urlencode( $customize_url ), $return_customize_url );
     }
     return $customize_url;
 }
+
 ?><?php
 // fired @wp_loaded
 // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
@@ -12893,6 +12895,11 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
             add_action( 'wp_ajax_sek_postpone_feedback', array( $this, 'sek_postpone_feedback_notification' ) );
 
+            // Returns the customize url for the edit button when using Gutenberg editor
+            // implemented for https://github.com/presscustomizr/nimble-builder/issues/449
+            // @see assets/admin/js/nimble-gutenberg.js
+            add_action( 'wp_ajax_sek_get_customize_url_for_nimble_edit_button', array( $this, 'sek_get_customize_url_for_nimble_edit_button' ) );
+
 
             // This is the list of accepted actions
             $this -> ajax_action_map = array(
@@ -13384,18 +13391,50 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // INSPIRED FROM CORE DISMISS POINTER MECHANISM
         // @see wp-admin/includes/ajax-actions.php
         function sek_postpone_feedback_notification() {
-          $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
-          if ( !isset( $_POST['transient_duration_in_days'] ) ||!is_numeric( $_POST['transient_duration_in_days'] ) ) {
-              $transient_duration = 7 * DAY_IN_SECONDS;
-          } else {
-              $transient_duration = $_POST['transient_duration_in_days'] * DAY_IN_SECONDS;
-          }
-          set_transient( NIMBLE_FEEDBACK_NOTICE_ID, 'maybe_later', $transient_duration );
-          wp_die( 1 );
+            if ( !isset( $_POST['transient_duration_in_days'] ) ||!is_numeric( $_POST['transient_duration_in_days'] ) ) {
+                $transient_duration = 7 * DAY_IN_SECONDS;
+            } else {
+                $transient_duration = $_POST['transient_duration_in_days'] * DAY_IN_SECONDS;
+            }
+            set_transient( NIMBLE_FEEDBACK_NOTICE_ID, 'maybe_later', $transient_duration );
+            wp_die( 1 );
         }
 
 
+        ////////////////////////////////////////////////////////////////
+        // USED TO PRINT THE BUTTON EDIT WITH NIMBLE ON POSTS AND PAGES
+        // when using Gutenberg editor
+        // implemented for https://github.com/presscustomizr/nimble-builder/issues/449
+        function sek_get_customize_url_for_nimble_edit_button() {
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
+
+            if ( ! isset( $_POST['nimble_edit_post_id'] ) || empty( $_POST['nimble_edit_post_id'] ) ) {
+                wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing post_id' );
+            }
+
+            $post_id = $_POST['nimble_edit_post_id'];
+
+            // Build customize_url
+            // @see function sek_get_customize_url_when_is_admin()
+            $ajax_server_request_uri = "/wp-admin/post.php?post={$post_id}&action=edit";
+            $customize_url = get_permalink( $post_id );
+            $return_customize_url = add_query_arg(
+                'return',
+                urlencode(
+                    remove_query_arg( wp_removable_query_args(), wp_unslash( $ajax_server_request_uri ) )
+                ),
+                wp_customize_url()
+            );
+            $customize_url = add_query_arg( 'url', urlencode( $customize_url ), $return_customize_url );
+            $customize_url = add_query_arg(
+                array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
+                $customize_url
+            );
+
+            wp_send_json_success( $customize_url );
+        }
 
         // hook : 'wp_ajax_sek_get_preview_ui_element'
         /*function sek_get_ui_content_for_injection( $params ) {
