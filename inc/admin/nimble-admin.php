@@ -612,7 +612,7 @@ function sek_nimble_dashboard_callback_fn() {
     <div class="nimble-db-wrapper">
       <div class="nimble-db-header">
         <div class="nimble-logo-version">
-          <div class="nimble-logo"><div class="sek-nimble-icon" title="Add sections in live preview with the Nimble Builder"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="Nimble Builder"></div></div>
+          <div class="nimble-logo"><div class="sek-nimble-icon" title="<?php _e('Add sections in live preview with Nimble Builder', 'text_doma' );?>"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="Nimble Builder"></div></div>
           <div class="nimble-version">
             <span class="nimble-version-text"><?php _e('Nimble Builder', 'text_doma'); ?> v<?php echo NIMBLE_VERSION; ?></span>
             <?php if ( sek_is_presscustomizr_theme( $theme_name ) ) : ?>
@@ -689,3 +689,149 @@ function sek_nimble_dashboard_callback_fn() {
     </div>
     <?php
 }
+
+
+
+// /* ------------------------------------------------------------------------- *
+// *  EDIT WITH NIMBLE BUILDER
+// /* ------------------------------------------------------------------------- */
+// When using classic editor
+add_action( 'edit_form_after_title', '\Nimble\sek_print_edit_with_nimble_btn_for_classic_editor' );
+// @hook 'edit_form_after_title'
+function sek_print_edit_with_nimble_btn_for_classic_editor( $post ) {
+  // Only print html button when Gutenberg editor is NOT enabled
+  if ( did_action( 'enqueue_block_editor_assets' ) ) {
+    return;
+  }
+  // And if user can edit the post
+  if ( ! sek_current_user_can_edit( $post->ID ) ) {
+    return;
+  }
+  sek_print_nb_btn_edit_with_nimble( 'classic' );
+}
+
+
+// When using gutenberg editor
+add_action( 'enqueue_block_editor_assets', '\Nimble\sek_enqueue_js_asset_for_gutenberg_edit_button');
+function sek_enqueue_js_asset_for_gutenberg_edit_button() {
+    wp_enqueue_script(
+      'nb-gutenberg',
+      sprintf(
+            '%1$s/assets/admin/js/%2$s' ,
+            NIMBLE_BASE_URL,
+            'nimble-gutenberg.js'
+      ),
+      array('jquery'),
+      NIMBLE_ASSETS_VERSION,
+      true
+    );
+}
+
+// Handle both classic and gutenberg editors
+add_action( 'admin_footer', '\Nimble\sek_print_js_for_nimble_edit_btn' );
+// @hook 'admin_footer'
+// If Gutenberg editor is active :
+// => print the button as a js template
+//
+// If Classic editor, print the javascript listener to open the customizer url
+// @see assets/admin/js/nimble-gutenberg.js
+function sek_print_js_for_nimble_edit_btn() {
+  // Only print when Gutenberg editor is enabled
+  ?>
+  <?php if ( did_action( 'enqueue_block_editor_assets' ) ) : ?>
+    <?php // Only printed when Gutenberg editor is enabled ?>
+    <script id="sek-edit-with-nb" type="text/html">
+      <?php sek_print_nb_btn_edit_with_nimble( 'gutenberg' ); ?>
+    </script>
+  <?php else : ?>
+    <?php // Only printed when Gutenberg editor is NOT enabled ?>
+      <script type="text/javascript">
+      (function ($) {
+          // Attach event listener with delegation
+          $('body').on( 'click', '#sek-edit-with-nimble', function(evt) {
+              evt.preventDefault();
+              var _url = $(this).data('cust-url');
+
+              if ( _.isEmpty( _url ) ) {
+                  // for new post, the url is empty, let's generate it server side with an ajax call
+                  var post_id = $('#post_ID').val();
+                  wp.ajax.post( 'sek_get_customize_url_for_nimble_edit_button', {
+                      nimble_edit_post_id : post_id
+                  }).done( function( resp ) {
+                      location.href = resp;
+                  }).fail( function( resp ) {
+                      // If the ajax request fails, let's save the draft with a Nimble Builder title, and refresh the page, so the url is generated server side on next load.
+                      // var $postTitle = $('#title');
+                      //     post_title = $postTitle.val();
+                      // if ( !post_title ) {
+                      //     $postTitle.val( 'Nimble Builder #' + post_id );
+                      // }
+                      // if (wp.autosave) {
+                      //   wp.autosave.server.triggerSave();
+                      // }
+                      _.delay(function () {
+                          // off the javascript pop up warning if post not saved yet
+                          $( window ).off( 'beforeunload' );
+                          location.href = location.href; //wp-admin/post.php?post=70&action=edit
+                      }, 300 );
+                  });
+              } else {
+                  location.href = _url;
+              }
+          });
+      })(jQuery);
+    </script>
+  <?php endif; ?>
+  <?php
+}
+
+
+// Utility used to print html and js template
+// => when using the classical editor, the html is printed with add_action( 'edit_form_after_title', ... )
+// => when using gutenberg, we render the button with a js template @see assets/admin/js/nimble-gutenberg.js
+function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
+    $customize_url = sek_get_customize_url_when_is_admin();
+    if ( ! empty( $customize_url ) ) {
+        $customize_url = add_query_arg(
+            array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
+            $customize_url
+        );
+    }
+    $btn_css_classes = 'classic' === $editor_type ? 'button button-primary button-hero classic-ed' : 'button button-primary button-large guten-ed';
+    ?>
+    <button id="sek-edit-with-nimble" type="button" class="<?php echo $btn_css_classes; ?>" data-cust-url="<?php echo esc_url( $customize_url ); ?>">
+      <?php //_e( 'Edit with Nimble Builder', 'text_doma' ); ?>
+      <?php printf( '<span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%2$s</span></span>',
+          NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
+          __('Add sections with Nimble Builder','text_domain'),
+          __('Add sections in live preview with Nimble Builder', 'text_domain')
+      ); ?>
+    </button>
+    <?php
+}
+
+
+//@return bool
+function sek_current_user_can_edit( $post_id = 0 ) {
+    $post = get_post( $post_id );
+
+    if ( ! $post ) {
+      return false;
+    }
+    if ( 'trash' === get_post_status( $post_id ) ) {
+      return false;
+    }
+    $post_type_object = get_post_type_object( $post->post_type );
+
+    if ( ! isset( $post_type_object->cap->edit_post ) ) {
+      return false;
+    }
+    $edit_cap = $post_type_object->cap->edit_post;
+    if ( ! current_user_can( $edit_cap, $post_id ) ) {
+      return false;
+    }
+    if ( get_option( 'page_for_posts' ) === $post_id ) {
+      return false;
+    }
+    return true;
+  }

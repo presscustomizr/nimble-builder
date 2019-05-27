@@ -267,3 +267,34 @@ a.czr-rating-link:hover {
   color: #fff;
   background: #e99723;
 }
+
+
+/* BUTTON "EDIT WITH NIMBLE" when editing posts and pages */
+/* Gutenberg editor style */
+body .block-editor #sek-edit-with-nimble {
+  margin: 2px;
+  height: 33px;
+  font-size: 13px;
+  line-height: 1;
+  position: relative;
+}
+body .block-editor #sek-edit-with-nimble .sek-nimble-icon img {
+  width: 24px;
+  top: 3px;
+  position: absolute;
+}
+
+body .block-editor .sek-nimble-admin-bar-title {
+  padding-left: 25px;
+}
+/* Classic editor style */
+#sek-edit-with-nimble .sek-nimble-icon img {
+    width: 28px;
+    position: relative;
+    top: 8px;
+    /*left: 8px;*/
+}
+#sek-edit-with-nimble.classic-ed {
+  position: relative;
+  padding: 0 15px!important;
+}

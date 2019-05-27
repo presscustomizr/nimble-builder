@@ -324,15 +324,15 @@ module.exports = {
     tasks : []
   },
 
-  admin_css : {
+  admin_css_js : {
     options: {
       spawn : false,
       // Start a live reload server on the default port 35729
       livereload : true
     },
     files : [
-      'assets/admin/css/*.css'
+      'assets/admin/css/*.css','assets/admin/js/*.js'
     ],
     tasks : [],
-  },
+  }
 };
