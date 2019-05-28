@@ -700,12 +700,16 @@ function sek_nimble_dashboard_callback_fn() {
 add_action( 'edit_form_after_title', '\Nimble\sek_print_edit_with_nimble_btn_for_classic_editor' );
 // @hook 'edit_form_after_title'
 function sek_print_edit_with_nimble_btn_for_classic_editor( $post ) {
+  // Void if ( 'post' != $current_screen->base ) <= only printed when editing posts, CPTs, and pages
+  $current_screen = get_current_screen();
+  if ( 'post' !== $current_screen->base )
+    return;
   // Only print html button when Gutenberg editor is NOT enabled
   if ( did_action( 'enqueue_block_editor_assets' ) ) {
     return;
   }
-  // And if user can edit the post
-  if ( ! sek_current_user_can_edit( $post->ID ) ) {
+  // Void if user can't edit the post or can't customize
+  if ( ! sek_current_user_can_edit( $post->ID ) || ! current_user_can( 'customize' ) ) {
     return;
   }
   sek_print_nb_btn_edit_with_nimble( 'classic' );
@@ -715,6 +719,15 @@ function sek_print_edit_with_nimble_btn_for_classic_editor( $post ) {
 // When using gutenberg editor
 add_action( 'enqueue_block_editor_assets', '\Nimble\sek_enqueue_js_asset_for_gutenberg_edit_button');
 function sek_enqueue_js_asset_for_gutenberg_edit_button() {
+    // Void if ( 'post' != $current_screen->base ) <= only printed when editing posts, CPTs, and pages
+    $current_screen = get_current_screen();
+    if ( 'post' !== $current_screen->base )
+      return;
+    $post = get_post();
+    // Void if user can't edit the post or can't customize
+    if ( ! sek_current_user_can_edit( $post->ID ) || ! current_user_can( 'customize' ) ) {
+      return;
+    }
     wp_enqueue_script(
       'nb-gutenberg',
       sprintf(
@@ -737,6 +750,16 @@ add_action( 'admin_footer', '\Nimble\sek_print_js_for_nimble_edit_btn' );
 // If Classic editor, print the javascript listener to open the customizer url
 // @see assets/admin/js/nimble-gutenberg.js
 function sek_print_js_for_nimble_edit_btn() {
+  // Void if ( 'post' != $current_screen->base ) <= only printed when editing posts, CPTs, and pages
+  $current_screen = get_current_screen();
+  if ( 'post' !== $current_screen->base )
+    return;
+
+  $post = get_post();
+  // Void if user can't edit the post or can't customize
+  if ( ! sek_current_user_can_edit( $post->ID ) || ! current_user_can( 'customize' ) ) {
+    return;
+  }
   // Only print when Gutenberg editor is enabled
   ?>
   <?php if ( did_action( 'enqueue_block_editor_assets' ) ) : ?>
