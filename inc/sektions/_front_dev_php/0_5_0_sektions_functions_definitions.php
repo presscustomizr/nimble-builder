@@ -1579,12 +1579,12 @@ add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
 // December 2018 => preparation of the header / footer feature
 // The beta features can be control by a constant
 // and by a global option
-function sek_is_header_footer_enabled() {
+function sek_are_beta_features_enabled() {
     $global_beta_feature = sek_get_global_option_value( 'beta_features');
     if ( is_array( $global_beta_feature ) && array_key_exists('beta-enabled', $global_beta_feature ) ) {
           return (bool)$global_beta_feature['beta-enabled'];
     }
-    return NIMBLE_HEADER_FOOTER_ENABLED;
+    return NIMBLE_BETA_FEATURES_ENABLED;
 }
 
 /* ------------------------------------------------------------------------- *
@@ -1711,15 +1711,15 @@ function sek_get_module_collection() {
           'content-type' => 'module',
           'content-id' => 'czr_widget_area_module',
           'title' => __( 'WordPress widget area', 'text_doma' ),
-          'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
-          'active' => sek_is_header_footer_enabled()
+          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
+          //'active' => sek_are_beta_features_enabled()
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_menu_module',
           'title' => __( 'Menu', 'text_doma' ),
-          'font_icon' => '<i class="material-icons">menu</i>',
-          'active' => sek_is_header_footer_enabled()
+          'font_icon' => '<i class="material-icons">menu</i>'
+          //'active' => sek_are_beta_features_enabled()
         ),
 
         // array(

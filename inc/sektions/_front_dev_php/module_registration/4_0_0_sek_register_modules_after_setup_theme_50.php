@@ -31,9 +31,8 @@ function sek_register_modules_when_customizing_or_ajaxing() {
         SEK_Front_Construct::$ui_front_modules
     );
 
-    // Header and footer have been introduced in v1.4.0 but not enabled by default
-    // The module menu and the widget area module are on hold until "header and footer" feature is released.
-    if ( sek_is_header_footer_enabled() ) {
+    // widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
+    if ( sek_are_beta_features_enabled() ) {
         $modules = array_merge( $modules, SEK_Front_Construct::$ui_front_beta_modules );
     }
     sek_do_register_module_collection( $modules );

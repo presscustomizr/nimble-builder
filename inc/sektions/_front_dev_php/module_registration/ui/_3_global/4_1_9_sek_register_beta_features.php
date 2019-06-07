@@ -18,7 +18,10 @@ function sek_get_module_params_for_sek_global_beta_features() {
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_before_title' => __( 'Check this option to try the upcoming features of the Nimble Builder. Available beta features as of December 2018 : header and footer customization, menu module, widget area module.', 'text_doma'),
+                    'notice_before_title' => sprintf( '%1$s <strong>%2$s</strong>',
+                        __( 'Check this option to try the upcoming features of Nimble Builder.', 'text_doma') ,
+                        __('There are currently no available beta features to test.', 'text_doma')
+                    ),
                     'notice_after' => __( 'Be sure to refresh the customizer before you start using the beta features.', 'text_doma')
                 ),
             )

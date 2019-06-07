@@ -18,7 +18,7 @@ function sek_get_module_params_for_sek_global_header_footer() {
                     'default'     => 'inherit',
                     'choices'     => array(
                         'theme' => __('Use the active theme\'s header and footer', 'text_domain' ),
-                        'nimble_global' => __('Nimble site wide header and footer ( beta )', 'text_domain' )
+                        'nimble_global' => __('Nimble site wide header and footer', 'text_domain' )
                     ),
                     //'refresh_preview' => true,
                     'notice_before_title' => sprintf( __( 'The Nimble Builder allows you to build your own header and footer, or to use your theme\'s ones. This option can be overriden in the %1$s.', 'text_doma'),

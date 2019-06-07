@@ -29,13 +29,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template' ) );
 
             // HEADER FOOTER
-            if ( sek_is_header_footer_enabled() ) {
-                add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
-                // HEADER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
-                add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
-                // FOOTER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
-                add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
-            }
+            // Header/footer, widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
+            add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
+            // HEADER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+            add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
+            // FOOTER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+            add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
 
             // INCLUDE NIMBLE CONTENT IN SEARCH RESULTS
             add_action( 'wp_head', array( $this, 'sek_maybe_include_nimble_content_in_search_results' ) );

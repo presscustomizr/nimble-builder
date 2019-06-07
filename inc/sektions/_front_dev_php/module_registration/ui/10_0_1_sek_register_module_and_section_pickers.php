@@ -23,11 +23,10 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
                             __('use the Nimble page template', 'nimble-builder'),
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})"
                         ),
-                        // Header and footer have been introduced in v1.4.0 but not enabled by default
-                        sek_is_header_footer_enabled() ? sprintf('<a href="#" onclick="%2$s" title="%1$s">%1$s</a>',
+                        sprintf('<a href="#" onclick="%2$s" title="%1$s">%1$s</a>',
                             __('header and footer', 'nimble-builder'),
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })"
-                        ) : __('header and footer', 'nimble-builder')
+                        )
                     )
                 )
             )

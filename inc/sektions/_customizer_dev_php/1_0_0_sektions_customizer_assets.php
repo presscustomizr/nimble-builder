@@ -87,7 +87,7 @@ function sek_enqueue_controls_js_css() {
                 ]),
 
                 'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true,
-                'isNimbleHeaderFooterEnabled' => sek_is_header_footer_enabled(),
+                'areBetaFeaturesEnabled' => sek_are_beta_features_enabled(),
 
                 'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() ),
 

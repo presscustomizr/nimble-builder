@@ -70,33 +70,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
+
+                        // Header/footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
+                        sek_header_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_header_sec_picker_module',
+                              controlLabel : sektionsLocalizedData.i18n['Header sections'],// sektionsLocalizedData.i18n['Header sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
+                        sek_footer_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_footer_sec_picker_module',
+                              controlLabel : sektionsLocalizedData.i18n['Footer sections'],// sektionsLocalizedData.i18n['Header sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         }
                   });
 
-                  // Header and footer have been introduced in v1.4.0 but not enabled by default
-                  // The header and footer preset sections are on hold until "header and footer" feature is released.
-                  if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                        $.extend( registrationParams, {
-                              sek_header_sec_picker_module : {
-                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                                    module_type : 'sek_header_sec_picker_module',
-                                    controlLabel : sektionsLocalizedData.i18n['Header sections'],// sektionsLocalizedData.i18n['Header sections'],
-                                    content_type : 'section',
-                                    expandAndFocusOnInit : false,
-                                    priority : 10,
-                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                              },
-                              sek_footer_sec_picker_module : {
-                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                                    module_type : 'sek_footer_sec_picker_module',
-                                    controlLabel : sektionsLocalizedData.i18n['Footer sections'],// sektionsLocalizedData.i18n['Header sections'],
-                                    content_type : 'section',
-                                    expandAndFocusOnInit : false,
-                                    priority : 10,
-                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                              }
-                        });
-                  }
+                  // Beta features to merge here ?
+                  // if ( sektionsLocalizedData.areBetaFeaturesEnabled ) {
+                  //       $.extend( registrationParams, {});
+                  // }
 
                   if ( sektionsLocalizedData.isSavedSectionEnabled ) {
                         $.extend( registrationParams, {

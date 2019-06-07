@@ -55,16 +55,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
                                     };
                               break;
-                              // Header and footer have been introduced in v1.4.0 but not enabled by default.
+                              // Header and footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
                               case 'local_header_footer':
-                                    if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                                          self.localOptionsRegistrationParams[ opt_name ] = {
-                                                settingControlId : _id_ + '__local_header_footer',
-                                                module_type : mod_type,
-                                                controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
-                                                icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                                          };
-                                    }
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__local_header_footer',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
+                                          icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                                    };
                               break;
                               case 'widths' :
                                     self.localOptionsRegistrationParams[ opt_name ] = {

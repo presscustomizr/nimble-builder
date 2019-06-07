@@ -197,11 +197,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'czr_post_grid_thumb_child',
             'czr_post_grid_metas_child',
             'czr_post_grid_fonts_child'
-          )
-        ];
+          ),
 
-        public static $ui_front_beta_modules = [
-          // modules for header and footer
+          // widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
           'czr_menu_module' => array(
             'czr_menu_module',
             'czr_menu_content_child',
@@ -213,6 +211,11 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
           'czr_widget_area_module'
           //'czr_menu_design_child',
         ];
+
+        // Is merged with front module when sek_is_header_footer_enabled() === true
+        // @see sek_register_modules_when_customizing_or_ajaxing
+        // and sek_register_modules_when_not_customizing_and_not_ajaxing
+        public static $ui_front_beta_modules = [];
 
 
         /////////////////////////////////////////////////////////////////
@@ -240,11 +243,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         }//__construct
 
         // @fired @hook 'widgets_init'
+        // Creates 10 widget zones
         public function sek_nimble_widgets_init() {
-            // Header and footer have been introduced in v1.4.0 but not enabled by default
-            // The Nimble widget areas registration is on hold until "header and footer" feature is released.
-            if ( ! sek_is_header_footer_enabled() )
-              return;
+            // Header/footer, widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
             $defaults = array(
                 'name'          => '',
                 'id'            => '',

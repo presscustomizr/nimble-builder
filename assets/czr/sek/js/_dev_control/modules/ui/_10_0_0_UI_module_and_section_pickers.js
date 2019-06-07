@@ -164,13 +164,6 @@
             return;
       }
 
-      // Header and footer have been introduced in v1.4.0 but not enabled by default
-      // The header and footer preset sections are on hold until "header and footer" feature is released.
-      if ( !sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-            section_modules = _.filter( section_modules, function( mod ) {
-                  return !_.contains([ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ], mod );
-            });
-      }
       _.each( section_modules, function( module_type ) {
             api.czrModuleMap[ module_type ] = {
                   //mthds : SectionPickerModuleConstructor,

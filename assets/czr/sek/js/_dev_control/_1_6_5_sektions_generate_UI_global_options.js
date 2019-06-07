@@ -32,16 +32,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Populate the registration params
                   _.each( sektionsLocalizedData.globalOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
-                              // Header and footer have been introduced in v1.4.0 but not enabled by default.
+                              // Header and footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
                               case 'global_header_footer':
-                                    if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                                          registrationParams[ opt_name ] = {
-                                                settingControlId : _id_ + '__header_footer',
-                                                module_type : mod_type,
-                                                controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
-                                                icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                                          };
-                                    }
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__header_footer',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
+                                          icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                                    };
                               break;
                               case 'breakpoint' :
                                     registrationParams[ opt_name ] = {

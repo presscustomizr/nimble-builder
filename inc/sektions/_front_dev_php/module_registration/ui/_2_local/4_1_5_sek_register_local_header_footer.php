@@ -19,8 +19,8 @@ function sek_get_module_params_for_sek_local_header_footer() {
                     'choices'     => array(
                         'inherit' => __('Inherit the site wide option', 'text_domain' ),
                         'theme' => __('Use the active theme\'s header and footer', 'text_domain' ),
-                        'nimble_global' => __('Nimble site wide header and footer ( beta )', 'text_domain' ),
-                        'nimble_local' => __('Nimble specific header and footer for this page ( beta )', 'text_domain' )
+                        'nimble_global' => __('Nimble site wide header and footer', 'text_domain' ),
+                        'nimble_local' => __('Nimble specific header and footer for this page', 'text_domain' )
                     ),
                     'refresh_preview' => true,
                     'width-100'   => true,
