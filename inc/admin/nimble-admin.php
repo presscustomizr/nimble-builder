@@ -392,7 +392,7 @@ function sek_may_be_display_update_notice() {
           <?php
           // printf(
           //   __( 'If you like %1$s please leave us a %2$s rating. A huge thanks in advance!', 'text_doma' ),
-          //   sprintf( '<strong>%s</strong>', esc_html__( 'the Nimble Builder', 'text_doma' ) ),
+          //   sprintf( '<strong>%s</strong>', esc_html__( 'Nimble Builder', 'text_doma' ) ),
           //   sprintf( '<a href="%1$s" target="_blank" class="czr-rating-link">&#9733;&#9733;&#9733;&#9733;&#9733;</a>', esc_url( 'wordpress.org/support/plugin/nimble-builder/reviews/?filter=5#new-post') )
           // );
           ?>
@@ -496,8 +496,8 @@ function sek_render_welcome_notice() {
       <div class="nimble-welcome-icon-holder">
         <img class="nimble-welcome-icon" src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_banner.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php esc_html_e( 'Nimble Builder', 'nimble' ); ?>" />
       </div>
-      <h1><?php echo apply_filters( 'nimble_update_notice', __('Welcome to the Nimble Builder for WordPress :D', 'nimble' ) ); ?></h1>
-      <h3><?php _e( 'The Nimble Builder takes the native WordPress customizer to a level you\'ve never seen before.', 'nimble' ); ?></h3>
+      <h1><?php echo apply_filters( 'nimble_update_notice', __('Welcome to Nimble Builder for WordPress :D', 'nimble' ) ); ?></h1>
+      <h3><?php _e( 'Nimble Builder takes the native WordPress customizer to a level you\'ve never seen before.', 'nimble' ); ?></h3>
       <h3><?php _e( 'Nimble allows you to drag and drop content modules, or pre-built section templates, into <u>any context</u> of your site, including search results or 404 pages. You can edit your pages in <i>real time</i> from the live customizer, and then publish when you are happy of the result, or save for later.', 'nimble' ); ?></h3>
       <h3><?php _e( 'The plugin automatically creates fluid and responsive sections for a pixel-perfect rendering on smartphones and tablets, without the need to add complex code.', 'nimble' ); ?></h3>
       <?php printf( '<a href="%1$s" target="_blank" class="button button-primary button-hero"><span class="dashicons dashicons-admin-appearance"></span> %2$s</a>',

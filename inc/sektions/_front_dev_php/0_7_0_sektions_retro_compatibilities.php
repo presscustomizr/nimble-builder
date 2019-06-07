@@ -31,7 +31,7 @@ function sek_maybe_do_version_mapping() {
 // It's related to a modification of the skope_id when home is a static page
 // Was skp__post_page_home
 // Now is skp__post_page_{$static_home_page_id}
-// This was introduced to facilitate the compatibility of the Nimble Builder with multilanguage plugins like polylang
+// This was introduced to facilitate the compatibility of Nimble Builder with multilanguage plugins like polylang
 // => Allows user to create a different home page for each languages
 //
 // If the current home page is not a static page, we don't have to do anything
