@@ -1774,8 +1774,8 @@ function sek_get_feedback_notif_status() {
     $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
     //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
-    // Bail if user did not start before 1.6.0
-    if ( ! version_compare( $start_version, '1.7.0', '<=' ) )
+    // Bail if user did not start before 1.7.4, May 10th 2019
+    if ( ! version_compare( $start_version, '1.7.4', '<=' ) )
       return;
 
     $sek_post_query_vars = array(
