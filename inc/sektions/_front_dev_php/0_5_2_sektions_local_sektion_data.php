@@ -100,8 +100,15 @@ function sek_get_raw_registration_params() {
             'section_collection' => array(
                 array(
                     'content-id' => 'header_one',
-                    'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
+                    'title' => __('simple header with a logo on the left and a menu on the right', 'text-domain' ),
                     'thumb' => 'header_one.jpg',
+                    'height' => '33px',
+                    'section_type' => 'header'
+                ),
+                array(
+                    'content-id' => 'header_two',
+                    'title' => __('simple header with a logo on the right and a menu on the left', 'text-domain' ),
+                    'thumb' => 'header_two.jpg',
                     'height' => '33px',
                     'section_type' => 'header'
                 )
