@@ -1579,12 +1579,12 @@ add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
 // December 2018 => preparation of the header / footer feature
 // The beta features can be control by a constant
 // and by a global option
-function sek_is_header_footer_enabled() {
+function sek_are_beta_features_enabled() {
     $global_beta_feature = sek_get_global_option_value( 'beta_features');
     if ( is_array( $global_beta_feature ) && array_key_exists('beta-enabled', $global_beta_feature ) ) {
           return (bool)$global_beta_feature['beta-enabled'];
     }
-    return NIMBLE_HEADER_FOOTER_ENABLED;
+    return NIMBLE_BETA_FEATURES_ENABLED;
 }
 
 /* ------------------------------------------------------------------------- *
@@ -1711,15 +1711,15 @@ function sek_get_module_collection() {
           'content-type' => 'module',
           'content-id' => 'czr_widget_area_module',
           'title' => __( 'WordPress widget area', 'text_doma' ),
-          'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
-          'active' => sek_is_header_footer_enabled()
+          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
+          //'active' => sek_are_beta_features_enabled()
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_menu_module',
           'title' => __( 'Menu', 'text_doma' ),
-          'font_icon' => '<i class="material-icons">menu</i>',
-          'active' => sek_is_header_footer_enabled()
+          'font_icon' => '<i class="material-icons">menu</i>'
+          //'active' => sek_are_beta_features_enabled()
         ),
 
         // array(
@@ -1774,8 +1774,8 @@ function sek_get_feedback_notif_status() {
     $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
     //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
-    // Bail if user did not start before 1.6.0
-    if ( ! version_compare( $start_version, '1.6.0', '<=' ) )
+    // Bail if user did not start before 1.7.4, May 10th 2019
+    if ( ! version_compare( $start_version, '1.7.4', '<=' ) )
       return;
 
     $sek_post_query_vars = array(
@@ -1816,7 +1816,7 @@ function sek_get_feedback_notif_status() {
     // sek_error_log('$modules_used ?? ' . count($modules_used), $modules_used );
     // sek_error_log('$customized_pages ??', $customized_pages );
     //version_compare( $this->wp_version, '4.1', '>=' )
-    return $customized_pages > 0 && $nb_section_created > 3 && count($modules_used) > 3;
+    return $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 3;
 }
 
 // recursive helper to count the number of sections in a given set of sections data
@@ -2246,9 +2246,17 @@ function sek_get_raw_registration_params() {
             'section_collection' => array(
                 array(
                     'content-id' => 'header_one',
-                    'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
+                    'title' => __('simple header with a logo on the left and a menu on the right', 'text-domain' ),
                     'thumb' => 'header_one.jpg',
-                    'height' => '33px'
+                    'height' => '33px',
+                    'section_type' => 'header'
+                ),
+                array(
+                    'content-id' => 'header_two',
+                    'title' => __('simple header with a logo on the right and a menu on the left', 'text-domain' ),
+                    'thumb' => 'header_two.jpg',
+                    'height' => '33px',
+                    'section_type' => 'header'
                 )
             )
         ],
@@ -2258,7 +2266,8 @@ function sek_get_raw_registration_params() {
                 array(
                     'content-id' => 'footer_one',
                     'title' => __('simple footer with 3 columns and large bottom zone', 'text-domain' ),
-                    'thumb' => 'footer_one.jpg'
+                    'thumb' => 'footer_one.jpg',
+                    'section_type' => 'footer'
                 )
             )
         ]
@@ -2443,7 +2452,7 @@ function sek_maybe_do_version_mapping() {
 // It's related to a modification of the skope_id when home is a static page
 // Was skp__post_page_home
 // Now is skp__post_page_{$static_home_page_id}
-// This was introduced to facilitate the compatibility of the Nimble Builder with multilanguage plugins like polylang
+// This was introduced to facilitate the compatibility of Nimble Builder with multilanguage plugins like polylang
 // => Allows user to create a different home page for each languages
 //
 // If the current home page is not a static page, we don't have to do anything
@@ -3963,9 +3972,8 @@ function sek_register_modules_when_customizing_or_ajaxing() {
         SEK_Front_Construct::$ui_front_modules
     );
 
-    // Header and footer have been introduced in v1.4.0 but not enabled by default
-    // The module menu and the widget area module are on hold until "header and footer" feature is released.
-    if ( sek_is_header_footer_enabled() ) {
+    // widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
+    if ( sek_are_beta_features_enabled() ) {
         $modules = array_merge( $modules, SEK_Front_Construct::$ui_front_beta_modules );
     }
     sek_do_register_module_collection( $modules );
@@ -4350,11 +4358,10 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
                             __('use the Nimble page template', 'nimble-builder'),
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})"
                         ),
-                        // Header and footer have been introduced in v1.4.0 but not enabled by default
-                        sek_is_header_footer_enabled() ? sprintf('<a href="#" onclick="%2$s" title="%1$s">%1$s</a>',
+                        sprintf('<a href="#" onclick="%2$s" title="%1$s">%1$s</a>',
                             __('header and footer', 'nimble-builder'),
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })"
-                        ) : __('header and footer', 'nimble-builder')
+                        )
                     )
                 )
             )
@@ -5634,8 +5641,8 @@ function sek_get_module_params_for_sek_local_template() {
                         'nimble_template' => __('Nimble Builder template','text_doma')
                     ),
                     'refresh_preview' => true,
-                    'notice_before_title' => __('Use the Nimble Builder template to display content created only with the Nimble Builder on this page. Your theme\'s default template will be overriden','text_doma')
-                    //'notice_after' => __('When you select the Nimble Builder template, only the Nimble sections are displayed.')
+                    'notice_before_title' => __('Use Nimble Builder\'s template to display content created only with Nimble Builder on this page. Your theme\'s default template will be overriden','text_doma')
+                    //'notice_after' => __('When you select Nimble Builder\'s template, only the Nimble sections are displayed.')
                 )
             )
         )//tmpl
@@ -5955,8 +5962,8 @@ function sek_get_module_params_for_sek_local_header_footer() {
                     'choices'     => array(
                         'inherit' => __('Inherit the site wide option', 'text_domain' ),
                         'theme' => __('Use the active theme\'s header and footer', 'text_domain' ),
-                        'nimble_global' => __('Nimble site wide header and footer ( beta )', 'text_domain' ),
-                        'nimble_local' => __('Nimble specific header and footer for this page ( beta )', 'text_domain' )
+                        'nimble_global' => __('Nimble site wide header and footer', 'text_domain' ),
+                        'nimble_local' => __('Nimble specific header and footer for this page', 'text_domain' )
                     ),
                     'refresh_preview' => true,
                     'width-100'   => true,
@@ -6339,10 +6346,10 @@ function sek_get_module_params_for_sek_global_header_footer() {
                     'default'     => 'inherit',
                     'choices'     => array(
                         'theme' => __('Use the active theme\'s header and footer', 'text_domain' ),
-                        'nimble_global' => __('Nimble site wide header and footer ( beta )', 'text_domain' )
+                        'nimble_global' => __('Nimble site wide header and footer', 'text_domain' )
                     ),
                     //'refresh_preview' => true,
-                    'notice_before_title' => sprintf( __( 'The Nimble Builder allows you to build your own header and footer, or to use your theme\'s ones. This option can be overriden in the %1$s.', 'text_doma'),
+                    'notice_before_title' => sprintf( __( 'Nimble Builder allows you to build your own header and footer, or to use your theme\'s ones. This option can be overriden in the %1$s.', 'text_doma'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
                             __('current page options', 'text_doma')
@@ -6376,7 +6383,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => sprintf( __('The Nimble Builder can activate the %1$s service to protect your forms against spambots. You need to %2$s.'),
+                    'notice_after' => sprintf( __('Nimble Builder can activate the %1$s service to protect your forms against spambots. You need to %2$s.'),
                         sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'text_doma') ),
                         sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://www.google.com/recaptcha/admin#list', __('get your domain API keys from Google', 'text_doma') )
                     )
@@ -6487,7 +6494,10 @@ function sek_get_module_params_for_sek_global_beta_features() {
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_before_title' => __( 'Check this option to try the upcoming features of the Nimble Builder. Available beta features as of December 2018 : header and footer customization, menu module, widget area module.', 'text_doma'),
+                    'notice_before_title' => sprintf( '%1$s <strong>%2$s</strong>',
+                        __( 'Check this option to try the upcoming features of Nimble Builder.', 'text_doma') ,
+                        __('There are currently no available beta features to test.', 'text_doma')
+                    ),
                     'notice_after' => __( 'Be sure to refresh the customizer before you start using the beta features.', 'text_doma')
                 ),
             )
@@ -9449,7 +9459,7 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     ),
                     'refresh_preview'  => false,
                     'refresh_markup' => false,
-                    'notice_after' => sprintf( __('The Nimble Builder can activate the %1$s service to protect your forms against spam. You need to %2$s.'),
+                    'notice_after' => sprintf( __('Nimble Builder can activate the %1$s service to protect your forms against spam. You need to %2$s.'),
                         sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'text_doma') ),
                         sprintf('<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
@@ -12808,11 +12818,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'czr_post_grid_thumb_child',
             'czr_post_grid_metas_child',
             'czr_post_grid_fonts_child'
-          )
-        ];
+          ),
 
-        public static $ui_front_beta_modules = [
-          // modules for header and footer
+          // widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
           'czr_menu_module' => array(
             'czr_menu_module',
             'czr_menu_content_child',
@@ -12824,6 +12832,11 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
           'czr_widget_area_module'
           //'czr_menu_design_child',
         ];
+
+        // Is merged with front module when sek_is_header_footer_enabled() === true
+        // @see sek_register_modules_when_customizing_or_ajaxing
+        // and sek_register_modules_when_not_customizing_and_not_ajaxing
+        public static $ui_front_beta_modules = [];
 
 
         /////////////////////////////////////////////////////////////////
@@ -12851,11 +12864,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         }//__construct
 
         // @fired @hook 'widgets_init'
+        // Creates 10 widget zones
         public function sek_nimble_widgets_init() {
-            // Header and footer have been introduced in v1.4.0 but not enabled by default
-            // The Nimble widget areas registration is on hold until "header and footer" feature is released.
-            if ( ! sek_is_header_footer_enabled() )
-              return;
+            // Header/footer, widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
             $defaults = array(
                 'name'          => '',
                 'id'            => '',
@@ -13871,13 +13882,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'template_include', array( $this, 'sek_maybe_set_local_nimble_template' ) );
 
             // HEADER FOOTER
-            if ( sek_is_header_footer_enabled() ) {
-                add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
-                // HEADER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
-                add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
-                // FOOTER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
-                add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
-            }
+            // Header/footer, widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
+            add_action( 'template_redirect', array( $this, 'sek_maybe_set_nimble_header_footer' ) );
+            // HEADER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+            add_filter( 'get_header', array( $this, 'sek_maybe_set_local_nimble_header') );
+            // FOOTER : USE THE DEFAULT WP TEMPLATE OR A CUSTOM NIMBLE ONE
+            add_filter( 'get_footer', array( $this, 'sek_maybe_set_local_nimble_footer') );
 
             // INCLUDE NIMBLE CONTENT IN SEARCH RESULTS
             add_action( 'wp_head', array( $this, 'sek_maybe_include_nimble_content_in_search_results' ) );

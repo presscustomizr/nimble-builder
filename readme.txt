@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: page builder, visual editor, customizer, drag and drop, header, footer, landing page, contact form, grid, post grid
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.2.1
-Stable tag: 1.7.7
+Tested up to: 5.2.2
+Stable tag: 1.8.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -60,7 +60,6 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * Quote
 * Widget zone
 * Menu
-* Image Slider ( under development )
 * Accordion ( under development )
 * ... and more to come !
 
@@ -109,10 +108,17 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.7.7 =
-Fixed capability checks missing for new edit button in admin. Now checking if user can 'edit post' and 'customize'.
+= 1.8.0 =
+Header / footer, widget module, menu module are now part of Nimble Builder's core features, after a few monthes of beta tests.
 
 == Changelog ==
+= 1.8.0 : June 11th 2019 =
+* fixed : bug preventing dropping of a pre-built section in header and footer location
+* fixed : reset action broken when used from the customizer notification zone
+* fixed : resizable not re-instantiated when moving columns
+* added : Header / footer, widget module, menu module are now part of Nimble Builder's core features, after a few monthes of beta tests
+* added : a new pre-built header section
+
 = 1.7.7 : May 28th 2019 =
 * fixed : capability checks missing for new edit button. Now checking if user can 'edit post' and 'customize'
 * improved : only print and enqueue js assets of the edit button when editing a post, a CPT or a page

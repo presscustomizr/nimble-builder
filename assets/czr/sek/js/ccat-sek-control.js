@@ -206,7 +206,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Schedule a reset
                   $('#customize-notifications-area').on( 'click', '[data-sek-reset="true"]', function() {
-                        self.resetCollectionSetting();
+                        api.previewer.trigger('sek-reset-collection', { scope : 'local' } );
                   });
 
 
@@ -1825,6 +1825,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           //       }
                                           // );
 
+                                          // console.log('MAIN SETTING CHANGED', params );
+                                          // console.log('NEW MAIN SETTING VALUE', newSektionSettingValue );
+
+
                                           // Track changes, if not already navigating the logs
                                           if ( !_.isObject( params ) || true !== params.navigatingHistoryLogs ) {
                                                 try { self.trackHistoryLog( sektionSetInstance, params ); } catch(er) {
@@ -2695,6 +2699,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             'sek-notify' : function( params ) {
                                   sendToPreview = false;
                                   var notif_id = params.notif_id || 'sek-notify';
+
+                                  // Make sure we clean the last printed notification
+                                  if ( self.lastNimbleNotificationId ) {
+                                        api.notifications.remove( self.lastNimbleNotificationId );
+                                  }
+
                                   return $.Deferred(function() {
                                         api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                               api.notifications.add( new api.Notification( notif_id, {
@@ -2702,6 +2712,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     message:  params.message,
                                                     dismissible: true
                                               }));
+
+                                              self.lastNimbleNotificationId = notif_id;
 
                                               // Removed if not dismissed after 5 seconds
                                               _.delay( function() {
@@ -2763,7 +2775,35 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               is_global_location : self.isGlobalLocation( params )
                                         });
                                   });
-                            }
+                            },
+
+
+                            // RESET
+                            'sek-reset-collection' : {
+                                  callback : function( params ) {
+                                        sendToPreview = false;//<= when the level is refreshed when complete, we don't need to send to preview.
+                                        uiParams = {};
+                                        apiParams = params;
+                                        apiParams.action = 'sek-reset-collection';
+                                        apiParams.scope = params.scope;
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        api.previewer.refresh();
+                                        api.previewer.trigger('sek-notify', {
+                                              notif_id : 'reset-success',
+                                              type : 'success',
+                                              duration : 8000,
+                                              message : [
+                                                    '<span>',
+                                                      '<strong>',
+                                                      sektionsLocalizedData.i18n['Reset complete'],
+                                                      '</strong>',
+                                                    '</span>'
+                                              ].join('')
+                                        });
+                                  }
+                            },
                       };//msgCollection
 
                   // Schedule the reactions
@@ -3199,6 +3239,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( true === refresh_preview ) {
                                           api.previewer.refresh();
                                     }
+                              })
+                              .fail( function( er ) {
+                                    api.errare( '::updateAPISettingAndExecutePreviewActions=> api setting not updated', er );
+                                    api.errare( '::updateAPISettingAndExecutePreviewActions=> api setting not updated => params ', params );
                               });//self.updateAPISetting()
                         }
                   };//_doUpdateWithRequestedAction
@@ -3495,33 +3539,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
+
+                        // Header/footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
+                        sek_header_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_header_sec_picker_module',
+                              controlLabel : sektionsLocalizedData.i18n['Header sections'],// sektionsLocalizedData.i18n['Header sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
+                        sek_footer_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_footer_sec_picker_module',
+                              controlLabel : sektionsLocalizedData.i18n['Footer sections'],// sektionsLocalizedData.i18n['Header sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         }
                   });
 
-                  // Header and footer have been introduced in v1.4.0 but not enabled by default
-                  // The header and footer preset sections are on hold until "header and footer" feature is released.
-                  if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                        $.extend( registrationParams, {
-                              sek_header_sec_picker_module : {
-                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                                    module_type : 'sek_header_sec_picker_module',
-                                    controlLabel : sektionsLocalizedData.i18n['Header sections'],// sektionsLocalizedData.i18n['Header sections'],
-                                    content_type : 'section',
-                                    expandAndFocusOnInit : false,
-                                    priority : 10,
-                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                              },
-                              sek_footer_sec_picker_module : {
-                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                                    module_type : 'sek_footer_sec_picker_module',
-                                    controlLabel : sektionsLocalizedData.i18n['Footer sections'],// sektionsLocalizedData.i18n['Header sections'],
-                                    content_type : 'section',
-                                    expandAndFocusOnInit : false,
-                                    priority : 10,
-                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                              }
-                        });
-                  }
+                  // Beta features to merge here ?
+                  // if ( sektionsLocalizedData.areBetaFeaturesEnabled ) {
+                  //       $.extend( registrationParams, {});
+                  // }
 
                   if ( sektionsLocalizedData.isSavedSectionEnabled ) {
                         $.extend( registrationParams, {
@@ -4214,16 +4258,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">check_box_outline_blank</i>'
                                     };
                               break;
-                              // Header and footer have been introduced in v1.4.0 but not enabled by default.
+                              // Header and footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
                               case 'local_header_footer':
-                                    if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                                          self.localOptionsRegistrationParams[ opt_name ] = {
-                                                settingControlId : _id_ + '__local_header_footer',
-                                                module_type : mod_type,
-                                                controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
-                                                icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                                          };
-                                    }
+                                    self.localOptionsRegistrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__local_header_footer',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Page header and footer'],
+                                          icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                                    };
                               break;
                               case 'widths' :
                                     self.localOptionsRegistrationParams[ opt_name ] = {
@@ -4426,16 +4468,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Populate the registration params
                   _.each( sektionsLocalizedData.globalOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
-                              // Header and footer have been introduced in v1.4.0 but not enabled by default.
+                              // Header and footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
                               case 'global_header_footer':
-                                    if ( sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-                                          registrationParams[ opt_name ] = {
-                                                settingControlId : _id_ + '__header_footer',
-                                                module_type : mod_type,
-                                                controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
-                                                icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                                          };
-                                    }
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__header_footer',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
+                                          icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                                    };
                               break;
                               case 'breakpoint' :
                                     registrationParams[ opt_name ] = {
@@ -5268,7 +5308,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'sek-set-module-value' :
                                     moduleCandidate = self.getLevelModel( params.id, newSetValue.collection );
 
-                                    var _value_ = {};
+                                    var _modValueCandidate = {};
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
                                     _.each( params.value || {}, function( _val_, _key_ ) {
@@ -5276,7 +5316,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // that's why we need to cast the _val_ to a string when using _.isEmpty()
                                           if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
                                             return;
-                                          _value_[ _key_ ] = _val_;
+                                          _modValueCandidate[ _key_ ] = _val_;
                                     });
                                     if ( 'no_match' == moduleCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no module matched', params );
@@ -5293,10 +5333,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // If yes, the module value is structured by option group, each option group being updated by a child module
                                     // If no, the default option type is : '__no_option_group_to_be_updated_by_children_modules__'
                                     if ( '__no_option_group_to_be_updated_by_children_modules__' === params.options_type ) {
-                                          moduleCandidate.value = _value_;
+                                          moduleCandidate.value = _modValueCandidate;
                                     } else {
-                                          moduleCandidate.value = _.isEmpty( moduleCandidate.value ) ? {} : moduleCandidate.value;
-                                          moduleCandidate.value[ params.options_type ] = _value_;
+                                          // start from a deep cloned object
+                                          // prevents issues like https://github.com/presscustomizr/nimble-builder/issues/455
+                                          var _new_module_values = $.extend( true, {}, _.isEmpty( moduleCandidate.value ) ? {} : moduleCandidate.value );
+                                          _new_module_values[ params.options_type ] = _modValueCandidate;
+                                          moduleCandidate.value = _new_module_values;
                                     }
 
                               break;
@@ -5312,12 +5355,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'sek-generate-level-options-ui' :
                                     var _candidate_ = self.getLevelModel( params.id, newSetValue.collection ),
                                         _valueCandidate = {};
+
                                     if ( 'no_match'=== _candidate_ ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
-                                    _candidate_.options = _candidate_.options || {};
+                                    // start from a deep cloned object
+                                    // important => fixes https://github.com/presscustomizr/nimble-builder/issues/455
+                                    var _new_options_values = $.extend( true, {}, _candidate_.options || {} );
 
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
@@ -5328,10 +5374,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             return;
                                           _valueCandidate[ _key_ ] = _val_;
                                     });
+
                                     if ( _.isEmpty( params.options_type ) ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
                                     }
-                                    _candidate_.options[ params.options_type ] = _valueCandidate;
+
+                                    _new_options_values[ params.options_type ] = _valueCandidate;
+                                    _candidate_.options = _new_options_values;
                               break;
 
 
@@ -5784,7 +5833,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // at this point it should have been.
                         if ( 'pending' == __updateAPISettingDeferred__.state() ) {
                               var mayBeUpdateSektionsSetting = function() {
-                                    if ( _.isEqual( currentSetValue, newSetValue ) ) {
+
+                                    // When a sektion setting is changed, "from" and "to" are passed to the .settingParams property
+                                    // settingParams : {
+                                    //       to : to,
+                                    //       from : from,
+                                    //       args : args
+                                    // }
+                                    // @see for example ::generateUIforFrontModules or ::generateUIforLevelOptions
+                                    var isSettingValueChangeCase = params.settingParams && params.settingParams.from && params.settingParams.to;
+                                    // in a setting value change case, the from and to must be different
+                                    // implemented when fixing https://github.com/presscustomizr/nimble-builder/issues/455
+                                    if ( isSettingValueChangeCase && _.isEqual( params.settingParams.from, params.settingParams.to ) ) {
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
+                                    } else if ( ! isSettingValueChangeCase && _.isEqual( currentSetValue, newSetValue ) ) {
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
                                           if ( null !== self.validateSettingValue( newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
@@ -7545,7 +7607,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             dnd_canDrop : function( params ) {
                   params = _.extend( { targetEl : {}, evt : {} }, params || {} );
                   var self = this, $dropTarget = params.targetEl;
+
                   if ( ! _.isObject( $dropTarget ) || 1 > $dropTarget.length )
+                    return false;
+
+                  // stop here if the drop target is not a child of a location
+                  if ( $dropTarget.closest('[data-sek-level="location"]').length < 1 )
                     return false;
 
                   var isSectionDropZone   = $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' ),
@@ -7567,7 +7634,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
-                        msg = isHeaderLocation ? sektionsLocalizedData.i18n['The header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['The footer location only accepts modules and pre-built footer sections'];
+                        msg = isHeaderLocation ? sektionsLocalizedData.i18n['Header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['Footer location only accepts modules and pre-built footer sections'];
                         maybePrintErrorMessage( msg );
                         return false;
                   }
@@ -10207,21 +10274,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               action : 'sek-reset-collection',
                               scope : scope,//<= will determine which setting will be updated,
                               // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
-                        }).done( function() {
-                              //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
-                              api.previewer.refresh();
-                              api.previewer.trigger('sek-notify', {
-                                    notif_id : 'reset-success',
-                                    type : 'success',
-                                    duration : 8000,
-                                    message : [
-                                          '<span>',
-                                            '<strong>',
-                                            sektionsLocalizedData.i18n['Reset complete'],
-                                            '</strong>',
-                                          '</span>'
-                                    ].join('')
-                              });
                         }).fail( function( response ) {
                               api.errare( 'reset_button input => error when firing ::updateAPISetting', response );
                               api.previewer.trigger('sek-notify', {
@@ -11510,13 +11562,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             return;
       }
 
-      // Header and footer have been introduced in v1.4.0 but not enabled by default
-      // The header and footer preset sections are on hold until "header and footer" feature is released.
-      if ( !sektionsLocalizedData.isNimbleHeaderFooterEnabled ) {
-            section_modules = _.filter( section_modules, function( mod ) {
-                  return !_.contains([ 'sek_header_sec_picker_module','sek_footer_sec_picker_module' ], mod );
-            });
-      }
       _.each( section_modules, function( module_type ) {
             api.czrModuleMap[ module_type ] = {
                   //mthds : SectionPickerModuleConstructor,

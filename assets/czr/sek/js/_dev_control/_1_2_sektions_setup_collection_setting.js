@@ -50,6 +50,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           //       }
                                           // );
 
+                                          // console.log('MAIN SETTING CHANGED', params );
+                                          // console.log('NEW MAIN SETTING VALUE', newSektionSettingValue );
+
+
                                           // Track changes, if not already navigating the logs
                                           if ( !_.isObject( params ) || true !== params.navigatingHistoryLogs ) {
                                                 try { self.trackHistoryLog( sektionSetInstance, params ); } catch(er) {

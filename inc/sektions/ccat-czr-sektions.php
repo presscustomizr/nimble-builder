@@ -87,7 +87,7 @@ function sek_enqueue_controls_js_css() {
                 ]),
 
                 'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true,
-                'isNimbleHeaderFooterEnabled' => sek_is_header_footer_enabled(),
+                'areBetaFeaturesEnabled' => sek_are_beta_features_enabled(),
 
                 'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() ),
 
@@ -412,8 +412,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_doma'),
             'Select a content type' => __('Select a content type', 'text_doma'),
 
-            'The header location only accepts modules and pre-built header sections' => __('The header location only accepts modules and pre-built header sections', 'text_doma'),
-            'The footer location only accepts modules and pre-built footer sections' => __('The footer location only accepts modules and pre-built footer sections', 'text_doma'),
+            'Header location only accepts modules and pre-built header sections' => __('Header location only accepts modules and pre-built header sections', 'text_doma'),
+            'Footer location only accepts modules and pre-built footer sections' => __('Footer location only accepts modules and pre-built footer sections', 'text_doma'),
             'You can\'t drop a header section in the footer location' => __('You can\'t drop a header section in the footer location', 'text_doma'),
             'You can\'t drop a footer section in the header location' => __('You can\'t drop a footer section in the header location', 'text_doma'),
 
@@ -3151,11 +3151,11 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
             $content_collection = sek_get_module_collection();
 
             $i = 0;
-            foreach( $content_collection as $_params ) {
+            foreach( $content_collection as $_module_params ) {
                 // if ( $i % 2 == 0 ) {
                 //   //printf('<div class="sek-module-raw"></div');
                 // }
-                $_params = wp_parse_args( $_params, array(
+                $_module_params = wp_parse_args( $_module_params, array(
                     'content-type' => 'module',
                     'content-id' => '',
                     'title' => '',
@@ -3165,21 +3165,21 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
                 ));
 
                 $icon_img_html = '<i style="color:red">Missing Icon</i>';
-                if ( !empty( $_params['icon'] ) ) {
-                    $icon_img_src = NIMBLE_MODULE_ICON_PATH . $_params['icon'];
-                    $icon_img_html = '<img draggable="false" title="'. $_params['title'] . '" alt="'. $_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>';
-                } else if ( !empty( $_params['font_icon'] ) ) {
-                    $icon_img_html = $_params['font_icon'];
+                if ( !empty( $_module_params['icon'] ) ) {
+                    $icon_img_src = NIMBLE_MODULE_ICON_PATH . $_module_params['icon'];
+                    $icon_img_html = '<img draggable="false" title="'. $_module_params['title'] . '" alt="'. $_module_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>';
+                } else if ( !empty( $_module_params['font_icon'] ) ) {
+                    $icon_img_html = $_module_params['font_icon'];
                 }
 
                 printf('<div draggable="%7$s" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><div class="sek-module-icon %6$s">%3$s</div><div class="sek-module-title"><div class="sek-centered-module-title">%4$s</div></div></div>',
-                      $_params['content-type'],
-                      $_params['content-id'],
+                      $_module_params['content-type'],
+                      $_module_params['content-id'],
                       $icon_img_html,
-                      $_params['title'],
-                      true === $_params['active'] ? __('Drag and drop or double-click to insert in your chosen target element.', 'text_doma' ) : __('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'),
-                      !empty( $_params['font_icon'] ) ? 'is-font-icon' : '',
-                      true === $_params['active'] ? 'true' : 'false'
+                      $_module_params['title'],
+                      true === $_module_params['active'] ? __('Drag and drop or double-click to insert in your chosen target element.', 'text_doma' ) : __('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'),
+                      !empty( $_module_params['font_icon'] ) ? 'is-font-icon' : '',
+                      true === $_module_params['active'] ? 'true' : 'false'
                 );
             }
           ?>
@@ -3213,26 +3213,27 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
             }
             $content_collection = $input_data['section_collection'];
 
-            foreach( $content_collection as $_params ) {
+            foreach( $content_collection as $_section_params ) {
                 $section_type = 'content';
                 // Section type has to be specified for header and footer sections
-                if ( !empty($input_data['section_type']) ) {
-                    $section_type = $input_data['section_type'];
+                // Otherwise bug : https://github.com/presscustomizr/nimble-builder/issues/454
+                if ( !empty($_section_params['section_type']) ) {
+                    $section_type = $_section_params['section_type'];
                 }
 
                 printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s" data-sek-section-type="%5$s"><div class="sek-overlay"></div></div>',
                     'preset_section',
-                    $_params['content-id'],
+                    $_section_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
                         // v1.4.2 : added the ?ver param to make sure we always display the latest shot of the section
                         // May 21st, v1.7.5 => back to the local data
                         // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
-                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_params['thumb'] . '?ver=' . NIMBLE_VERSION,
+                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_section_params['thumb'] . '?ver=' . NIMBLE_VERSION,
 
-                        //$_params['thumb'] . '?ver=' . NIMBLE_VERSION,
-                        isset( $_params['height'] ) ? 'height:'.$_params['height'] : ''
+                        //$_section_params['thumb'] . '?ver=' . NIMBLE_VERSION,
+                        isset( $_section_params['height'] ) ? 'height:'.$_section_params['height'] : ''
                     ),
-                    $_params['title'],
+                    $_section_params['title'],
                     $section_type
                 );
             }
@@ -4043,7 +4044,7 @@ function sek_set_input_tmpl___imp_exp( $input_id, $input_data ) {
       <div class="sek-import-btn-wrap">
         <div class="customize-control-title width-100"><?php _e('IMPORT', 'text_doma'); ?></div>
         <span class="czr-notice"><?php _e('Select the file to import and click on Import button.', 'text_doma' ); ?></span>
-        <span class="czr-notice"><?php _e('Be sure to import a file generated with the Nimble Builder export system.', 'text_doma' ); ?></span>
+        <span class="czr-notice"><?php _e('Be sure to import a file generated with Nimble Builder export system.', 'text_doma' ); ?></span>
         <div class="czr-import-dialog notice notice-info">
             <div class="czr-import-message"><?php _e('Some of the imported sections need a location that is not active on this page. Sections in missing locations will not be rendered. You can continue importing or assign those sections to a contextually active location.', 'text_doma' ); ?></div>
             <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-import-as-is"><?php _e('Import without modification', 'text_doma' ); ?></button>

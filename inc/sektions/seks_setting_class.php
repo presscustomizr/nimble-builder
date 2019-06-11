@@ -138,7 +138,9 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
       if ( ! is_array( $seks_collection ) ) {
           $seks_collection = array();
       }
-      //error_log( __CLASS__. ' in update => ' . $this->skope_id );
+      // sek_error_log( __CLASS__. ' in update => ' . $this->skope_id );
+      // sek_error_log( __CLASS__. ' $seks_collection' , $seks_collection );
+
       if ( empty( $this->skope_id ) || ! is_string( $this->skope_id ) ) {
           throw new Exception( 'Nimble_Customizer_Setting => update => invalid skope id' );
       }
