@@ -306,6 +306,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( true === refresh_preview ) {
                                           api.previewer.refresh();
                                     }
+                              })
+                              .fail( function( er ) {
+                                    api.errare( '::updateAPISettingAndExecutePreviewActions=> api setting not updated', er );
+                                    api.errare( '::updateAPISettingAndExecutePreviewActions=> api setting not updated => params ', params );
                               });//self.updateAPISetting()
                         }
                   };//_doUpdateWithRequestedAction

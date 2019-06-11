@@ -664,7 +664,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'sek-set-module-value' :
                                     moduleCandidate = self.getLevelModel( params.id, newSetValue.collection );
 
-                                    var _value_ = {};
+                                    var _modValueCandidate = {};
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
                                     _.each( params.value || {}, function( _val_, _key_ ) {
@@ -672,7 +672,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // that's why we need to cast the _val_ to a string when using _.isEmpty()
                                           if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
                                             return;
-                                          _value_[ _key_ ] = _val_;
+                                          _modValueCandidate[ _key_ ] = _val_;
                                     });
                                     if ( 'no_match' == moduleCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no module matched', params );
@@ -689,10 +689,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // If yes, the module value is structured by option group, each option group being updated by a child module
                                     // If no, the default option type is : '__no_option_group_to_be_updated_by_children_modules__'
                                     if ( '__no_option_group_to_be_updated_by_children_modules__' === params.options_type ) {
-                                          moduleCandidate.value = _value_;
+                                          moduleCandidate.value = _modValueCandidate;
                                     } else {
-                                          moduleCandidate.value = _.isEmpty( moduleCandidate.value ) ? {} : moduleCandidate.value;
-                                          moduleCandidate.value[ params.options_type ] = _value_;
+                                          // start from a deep cloned object
+                                          // prevents issues like https://github.com/presscustomizr/nimble-builder/issues/455
+                                          var _new_module_values = $.extend( true, {}, _.isEmpty( moduleCandidate.value ) ? {} : moduleCandidate.value );
+                                          _new_module_values[ params.options_type ] = _modValueCandidate;
+                                          moduleCandidate.value = _new_module_values;
                                     }
 
                               break;
@@ -708,12 +711,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'sek-generate-level-options-ui' :
                                     var _candidate_ = self.getLevelModel( params.id, newSetValue.collection ),
                                         _valueCandidate = {};
+
                                     if ( 'no_match'=== _candidate_ ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
-                                    _candidate_.options = _candidate_.options || {};
+                                    // start from a deep cloned object
+                                    // important => fixes https://github.com/presscustomizr/nimble-builder/issues/455
+                                    var _new_options_values = $.extend( true, {}, _candidate_.options || {} );
 
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
@@ -724,10 +730,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             return;
                                           _valueCandidate[ _key_ ] = _val_;
                                     });
+
                                     if ( _.isEmpty( params.options_type ) ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
                                     }
-                                    _candidate_.options[ params.options_type ] = _valueCandidate;
+
+                                    _new_options_values[ params.options_type ] = _valueCandidate;
+                                    _candidate_.options = _new_options_values;
                               break;
 
 
@@ -1180,7 +1189,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // at this point it should have been.
                         if ( 'pending' == __updateAPISettingDeferred__.state() ) {
                               var mayBeUpdateSektionsSetting = function() {
-                                    if ( _.isEqual( currentSetValue, newSetValue ) ) {
+
+                                    // When a sektion setting is changed, "from" and "to" are passed to the .settingParams property
+                                    // settingParams : {
+                                    //       to : to,
+                                    //       from : from,
+                                    //       args : args
+                                    // }
+                                    // @see for example ::generateUIforFrontModules or ::generateUIforLevelOptions
+                                    var isSettingValueChangeCase = params.settingParams && params.settingParams.from && params.settingParams.to;
+                                    // in a setting value change case, the from and to must be different
+                                    // implemented when fixing https://github.com/presscustomizr/nimble-builder/issues/455
+                                    if ( isSettingValueChangeCase && _.isEqual( params.settingParams.from, params.settingParams.to ) ) {
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
+                                    } else if ( ! isSettingValueChangeCase && _.isEqual( currentSetValue, newSetValue ) ) {
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
                                           if ( null !== self.validateSettingValue( newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
