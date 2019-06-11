@@ -380,6 +380,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     from_sektion : from_sektion,
                                     to_sektion : to_sektion
                               });
+
+                              // inform the parent section that it's been refreshed
+                              //=> will be listened to by columns to re-instantiate sortable, resizable
+                              $('div[data-sek-id="' + from_sektion + '"]' ).trigger('sek-level-refreshed');
+                              if ( from_sektion !== to_sektion ) {
+                                  $('div[data-sek-id="' + to_sektion + '"]' ).trigger('sek-level-refreshed');
+                              }
+
                         }
                   }));
             },//self.makeColumnsSortableInSektion
