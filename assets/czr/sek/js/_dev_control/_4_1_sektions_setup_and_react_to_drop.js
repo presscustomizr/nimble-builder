@@ -463,7 +463,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             dnd_canDrop : function( params ) {
                   params = _.extend( { targetEl : {}, evt : {} }, params || {} );
                   var self = this, $dropTarget = params.targetEl;
+
                   if ( ! _.isObject( $dropTarget ) || 1 > $dropTarget.length )
+                    return false;
+
+                  // stop here if the drop target is not a child of a location
+                  if ( $dropTarget.closest('[data-sek-level="location"]').length < 1 )
                     return false;
 
                   var isSectionDropZone   = $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' ),
@@ -485,7 +490,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
-                        msg = isHeaderLocation ? sektionsLocalizedData.i18n['The header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['The footer location only accepts modules and pre-built footer sections'];
+                        msg = isHeaderLocation ? sektionsLocalizedData.i18n['Header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['Footer location only accepts modules and pre-built footer sections'];
                         maybePrintErrorMessage( msg );
                         return false;
                   }

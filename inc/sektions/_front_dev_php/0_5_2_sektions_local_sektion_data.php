@@ -102,7 +102,8 @@ function sek_get_raw_registration_params() {
                     'content-id' => 'header_one',
                     'title' => __('simple header with a logo on the right, menu on the left', 'text-domain' ),
                     'thumb' => 'header_one.jpg',
-                    'height' => '33px'
+                    'height' => '33px',
+                    'section_type' => 'header'
                 )
             )
         ],
@@ -112,7 +113,8 @@ function sek_get_raw_registration_params() {
                 array(
                     'content-id' => 'footer_one',
                     'title' => __('simple footer with 3 columns and large bottom zone', 'text-domain' ),
-                    'thumb' => 'footer_one.jpg'
+                    'thumb' => 'footer_one.jpg',
+                    'section_type' => 'footer'
                 )
             )
         ]
