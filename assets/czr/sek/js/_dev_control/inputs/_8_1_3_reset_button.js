@@ -24,21 +24,6 @@
                               action : 'sek-reset-collection',
                               scope : scope,//<= will determine which setting will be updated,
                               // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
-                        }).done( function() {
-                              //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
-                              api.previewer.refresh();
-                              api.previewer.trigger('sek-notify', {
-                                    notif_id : 'reset-success',
-                                    type : 'success',
-                                    duration : 8000,
-                                    message : [
-                                          '<span>',
-                                            '<strong>',
-                                            sektionsLocalizedData.i18n['Reset complete'],
-                                            '</strong>',
-                                          '</span>'
-                                    ].join('')
-                              });
                         }).fail( function( response ) {
                               api.errare( 'reset_button input => error when firing ::updateAPISetting', response );
                               api.previewer.trigger('sek-notify', {

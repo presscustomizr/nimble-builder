@@ -610,6 +610,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             'sek-notify' : function( params ) {
                                   sendToPreview = false;
                                   var notif_id = params.notif_id || 'sek-notify';
+
+                                  // Make sure we clean the last printed notification
+                                  if ( self.lastNimbleNotificationId ) {
+                                        api.notifications.remove( self.lastNimbleNotificationId );
+                                  }
+
                                   return $.Deferred(function() {
                                         api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                               api.notifications.add( new api.Notification( notif_id, {
@@ -617,6 +623,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     message:  params.message,
                                                     dismissible: true
                                               }));
+
+                                              self.lastNimbleNotificationId = notif_id;
 
                                               // Removed if not dismissed after 5 seconds
                                               _.delay( function() {
@@ -678,7 +686,35 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               is_global_location : self.isGlobalLocation( params )
                                         });
                                   });
-                            }
+                            },
+
+
+                            // RESET
+                            'sek-reset-collection' : {
+                                  callback : function( params ) {
+                                        sendToPreview = false;//<= when the level is refreshed when complete, we don't need to send to preview.
+                                        uiParams = {};
+                                        apiParams = params;
+                                        apiParams.action = 'sek-reset-collection';
+                                        apiParams.scope = params.scope;
+                                        return self.updateAPISetting( apiParams );
+                                  },
+                                  complete : function( params ) {
+                                        api.previewer.refresh();
+                                        api.previewer.trigger('sek-notify', {
+                                              notif_id : 'reset-success',
+                                              type : 'success',
+                                              duration : 8000,
+                                              message : [
+                                                    '<span>',
+                                                      '<strong>',
+                                                      sektionsLocalizedData.i18n['Reset complete'],
+                                                      '</strong>',
+                                                    '</span>'
+                                              ].join('')
+                                        });
+                                  }
+                            },
                       };//msgCollection
 
                   // Schedule the reactions

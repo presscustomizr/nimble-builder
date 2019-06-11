@@ -206,7 +206,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Schedule a reset
                   $('#customize-notifications-area').on( 'click', '[data-sek-reset="true"]', function() {
-                        self.resetCollectionSetting();
+                        api.previewer.trigger('sek-reset-collection', { scope : 'local' } );
                   });
 
 
