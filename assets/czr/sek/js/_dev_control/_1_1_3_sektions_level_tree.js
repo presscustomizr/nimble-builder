@@ -85,7 +85,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var $el = $(evt.target),
                             $closestLevel = $el.closest('[data-nimb-level]');
                         api.previewer.send('sek-animate-to-level', { id : $closestLevel.data('nimb-id') });
-                        api.previewer.send('sek-display-level-ui', { id : $closestLevel.data('nimb-id') });
+                        api.previewer.send('sek-clean-level-uis');
+                        _.delay( function() {
+                              api.previewer.send('sek-display-level-ui', { id : $closestLevel.data('nimb-id') });
+                        }, 100 );
+
                   });
 
                   $('body').on('click', '#nimble-level-tree .sek-remove-level', function(evt) {
