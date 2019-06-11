@@ -1942,6 +1942,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   }
                             },
 
+
+                            // LEVEL UI's
+                            'sek-clean-level-uis' : function( params ) {
+                                  $('.sek-dyn-ui-wrapper').each( function() {
+                                        $(this).remove();
+                                  });
+                            },
+
                             'sek-display-level-ui' : function( params ) {
                                   var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
                                   if ( $elToFocusOn.length > 0 ) {
