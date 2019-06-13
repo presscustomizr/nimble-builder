@@ -83,6 +83,63 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
+            // @params = { id : '', level : '' }
+            // Recursively walk the level tree until a match is found
+            // @return the level model object
+            getColNumberInParentSectionFromColumnId : function( id, collection ) {
+                  var self = this, _col_number_ = 'no_match',
+                      // @param id mandatory
+                      // @param collection mandatory
+                      // @param collectionSettingId optional
+                      // @param localOrGlobal optional
+                      _walk_ = function( id, collection, collectionSettingId, localOrGlobal ) {
+                            // do we have a collection ?
+                            // if not, let's use the root one
+                            if ( _.isUndefined( collection ) ) {
+                                  var currentSektionSettingValue = api( collectionSettingId )();
+                                  var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
+                                  collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
+                            }
+                            _.each( collection, function( levelData ) {
+                                  // did we found a match recursively ?
+                                  if ( 'no_match' != _col_number_ )
+                                    return;
+
+                                  var colCandidate;
+                                  if ( 'section' == levelData.level ) {
+                                        colCandidate = _.findWhere( levelData.collection, { id : id });
+                                  }
+                                  if ( ! _.isEmpty( colCandidate ) ) {
+                                        // we found our column in this section
+                                        _col_number_ = _.size( levelData.collection );
+                                  } else {
+                                        if ( _.isArray( levelData.collection ) ) {
+                                              _walk_( id, levelData.collection, collectionSettingId, localOrGlobal );
+                                        }
+                                  }
+                            });
+                            return _col_number_;
+                      };
+
+                  // if a collection has been provided in the signature, let's walk it.
+                  // Otherwise, let's walk the local and global ones until a match is found.
+                  if ( ! _.isEmpty( collection ) ) {
+                        _walk_( id, collection );
+                  } else {
+                        _.each( {
+                              local : self.localSectionsSettingId(),
+                              global : self.getGlobalSectionsSettingId()
+                        }, function( collectionSettingId, localOrGlobal ) {
+                              if ( 'no_match' === _col_number_ ) {
+                                    _walk_( id, collection, collectionSettingId, localOrGlobal );
+                              }
+                        });
+                  }
+
+                  return _col_number_;
+            },
+
+
             // used in react to preview or update api settings
             // @params is an object {
             //

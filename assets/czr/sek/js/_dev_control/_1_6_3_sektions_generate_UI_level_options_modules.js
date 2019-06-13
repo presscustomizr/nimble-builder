@@ -94,6 +94,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   }
+                  if ( 'column' === params.level ) {
+                        $.extend( modulesRegistrationParams, {
+                              width : {
+                                    settingControlId : params.id + '__width_options',
+                                    module_type : 'sek_level_width_column',
+                                    controlLabel : sektionsLocalizedData.i18n['Width settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                                    icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
+                              }
+                        });
+                  }
                   if ( 'module' === params.level ) {
                         $.extend( modulesRegistrationParams, {
                               width : {
