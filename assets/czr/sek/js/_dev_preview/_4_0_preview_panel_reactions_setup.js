@@ -408,11 +408,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         $(this).remove();
                                   });
                             },
-
+                            // triggered when navigating the level tree
                             'sek-display-level-ui' : function( params ) {
                                   var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
                                   if ( $elToFocusOn.length > 0 ) {
-                                        $elToFocusOn.trigger('click');
+                                        //$elToFocusOn.trigger('click'); //<= the click is not needed anymore since June 2019, we trigger the generation of the level options on 'click' in the level tree
                                         self.printLevelUI($elToFocusOn);
                                   }
                             },

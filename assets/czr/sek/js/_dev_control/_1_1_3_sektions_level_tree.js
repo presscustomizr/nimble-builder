@@ -86,10 +86,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             $closestLevel = $el.closest('[data-nimb-level]');
                         api.previewer.send('sek-animate-to-level', { id : $closestLevel.data('nimb-id') });
                         api.previewer.send('sek-clean-level-uis');
+                        // Display the level ui in the preview
+                        // and expand the level options in the customizer control panel
                         _.delay( function() {
                               api.previewer.send('sek-display-level-ui', { id : $closestLevel.data('nimb-id') });
-                        }, 100 );
 
+                              var _id = $closestLevel.data('nimb-id'),
+                                  _level = $closestLevel.data('nimb-level');
+
+                              if ( 'column' === _level || 'section' === _level ) {
+                                    api.previewer.trigger('sek-edit-options', { id : _id, level : _level });
+                              } else if ( 'module' === _level ) {
+                                    api.previewer.trigger('sek-edit-module', { id : _id, level : _level });
+                              }
+                        }, 100 );
                   });
 
                   $('body').on('click', '#nimble-level-tree .sek-remove-level', function(evt) {
