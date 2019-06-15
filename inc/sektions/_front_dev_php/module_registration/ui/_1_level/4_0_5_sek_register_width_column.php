@@ -14,20 +14,21 @@ function sek_get_module_params_for_sek_level_width_column() {
                     'title'       => __('Column width in percent', 'text_doma'),
                     'min' => 0,
                     'max' => 100,
-                    'default'     => 100,
+                    'default'     => '_not_set_',
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                ),
-                'h_alignment' => array(
-                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Horizontal alignment', 'text_doma'),
-                    'default'     => array( 'desktop' => 'center' ),
-                    'refresh_markup' => false,
-                    'refresh_stylesheet' => true,
-                    'css_identifier' => 'h_alignment',
-                    'title_width' => 'width-100',
-                    'width-100'   => true,
+                    'refresh_stylesheet' => true
                 )
+                // 'h_alignment' => array(
+                //     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
+                //     'title'       => __('Horizontal alignment', 'text_doma'),
+                //     'default'     => array( 'desktop' => 'center' ),
+                //     'refresh_markup' => false,
+                //     'refresh_stylesheet' => true,
+                //     'css_identifier' => 'h_alignment',
+                //     'title_width' => 'width-100',
+                //     'width-100'   => true,
+                // )
             )
         )//tmpl
     );

@@ -535,9 +535,11 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'File successfully imported' => __('File successfully imported', 'text_doma'),
             'Import failed, invalid file content' => __('Import failed, invalid file content', 'text_doma'),
             'Import failed, file problem' => __('Import failed, file problem', 'text_doma'),
-            'Some image(s) could not be imported' => __('Some image(s) could not be imported', 'text_doma')
+            'Some image(s) could not be imported' => __('Some image(s) could not be imported', 'text_doma'),
             // 'Module' => __('Module', 'text_doma'),
-            //
+
+            // Column width
+            'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'text_doma')
 
         )//array()
     )//array()

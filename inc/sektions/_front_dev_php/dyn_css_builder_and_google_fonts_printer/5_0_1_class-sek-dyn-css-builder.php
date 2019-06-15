@@ -400,6 +400,7 @@ class Sek_Dyn_CSS_Builder {
 
 
     // hook : sek_add_css_rules_for_level_options
+    // fired this class constructor
     public function sek_add_rules_for_column_width( $rules, $column ) {
         if ( ! is_array( $column ) )
           return $rules;
@@ -407,7 +408,24 @@ class Sek_Dyn_CSS_Builder {
         if ( empty( $column['level'] ) || 'column' !== $column['level'] || empty( $column['id'] ) )
           return $rules;
 
-        $width   = empty( $column[ 'width' ] ) || !is_numeric( $column[ 'width' ] ) ? '' : $column['width'];
+        $width = null;
+        // First try to find a width value in options, then look in the previous width property for backward compatibility
+        // After implementing https://github.com/presscustomizr/nimble-builder/issues/279
+        $column_options = isset( $column['options'] ) ? $column['options'] : array();
+        sek_error_log( 'COLUMN MODEL WHEN ADDING RULES ?', $column );
+
+        if ( !empty( $column_options['width'] ) && !empty( $column_options['width']['custom-width'] ) ) {
+            $width_candidate = (float)$column_options['width']['custom-width'];
+            if ( $width_candidate < 0 || $width_candidate > 100 ) {
+                sek_error_log( __FUNCTION__ . ' => invalid width valude for column id : ' . $column['id'] );
+            } else {
+                $width = $width_candidate;
+            }
+        } else {
+            // Backward compat since June 2019
+            // After implementing https://github.com/presscustomizr/nimble-builder/issues/279
+            $width = empty( $column[ 'width' ] ) || !is_numeric( $column[ 'width' ] ) ? '' : $column['width'];
+        }
 
         // width
         if ( empty( $width ) )

@@ -33,33 +33,135 @@
                               $numberInput = $wrapper.find( 'input[type="number"]'),
                               $rangeInput = $wrapper.find( 'input[type="range"]');
 
+                          // Get the moduleRegistration Params
+                          var moduleRegistrationParams;
+                          try{ moduleRegistrationParams = input.module.control.params.sek_registration_params; } catch( er ) {
+                                api.errare('Error when getting the module registration params', er  );
+                                return;
+                          }
+                          if ( _.isUndefined( moduleRegistrationParams.level_id ) ) {
+                                api.errare('Error : missing column id', er  );
+                                return;
+                          }
+
+                          // Get the column id and model,
+                          // the parent section model
+                          // and calculate the number of columns in the parent section
+                          input.columnId = moduleRegistrationParams.level_id;
+                          input.columnModel = $.extend( true, {}, api.czr_sektions.getLevelModel( input.columnId ) );
+                          input.parentSectionModel = api.czr_sektions.getParentSectionFromColumnId( input.columnId );
+
+                          if ( 'no_match' == input.columnModel ) {
+                                api.errare( 'sek_level_width_column module => invalid column model' );
+                                return;
+                          }
+                          if ( 'no_match' == input.parentSectionModel ) {
+                                api.errare( 'sek_level_width_column module => invalid parent section model' );
+                                return;
+                          }
+
+                          // Calculate the column number in the parent section
+                          input.colNb = _.size( input.parentSectionModel.collection );
+
+                          // Add the column id identifier, so we can communicate with it and update its value when the column gets resized from user
+                          // @see update api setting, 'sek-resize-columns' case
+                          $numberInput.attr('data-sek-width-range-column-id', input.columnId );
+
+                          // For single column section, we don't want to display this module
+                          if ( 1 === input.colNb ) {
+                                input.container.html( ['<p>', sektionsLocalizedData.i18n['This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.']].join('') );
+                          } else {
+                                input.container.show();
+                          }
+
+                          // Always get the value from the model instead of relying on the setting val.
+                          // => because the column width is an exception, its value is not only set from the customizer input, but also from the preview when resizing manually
+                          var currentColumnModelValue = api.czr_sektions.getLevelModel( input.columnId ),
+                              currentColumnWidthValueFromModel = '_not_set_',
+                              columnWidthInPercent;
+                          if ( 'no_match' !== currentColumnModelValue && currentColumnModelValue.options && currentColumnModelValue.options.width && currentColumnModelValue.options.width['custom-width'] && _.isNumber( currentColumnModelValue.options.width['custom-width'] ) ) {
+                                currentColumnWidthValueFromModel = currentColumnModelValue.options.width['custom-width'];
+                          }
+
+                          if ( '_not_set_' !== currentColumnWidthValueFromModel ) {
+                                columnWidthInPercent = currentColumnWidthValueFromModel;
+                          }
+                          // The default width is "_not_set_"
+                          // @see php sek_get_module_params_for_sek_level_width_column()
+                          // If not set, calculate the column width in percent based on the number of columns of the parent section
+                          else if ( '_not_set_' === input() ) {
+                                //$rangeInput.val( $numberInput.val() || 0 );
+                                columnWidthInPercent = Math.floor( 100/input.colNb );
+                          } else {
+                                columnWidthInPercent = input();
+                          }
+
+                          // Cast to a number
+                          columnWidthInPercent = +parseFloat(columnWidthInPercent).toFixed(3)*1;
+
+                          // Make sure we have a number between 0 and 100
+                          if ( ! _.isNumber( columnWidthInPercent ) || 100 < columnWidthInPercent || 0 > columnWidthInPercent ) {
+                                api.errare( 'Error => invalid column width', columnWidthInPercent );
+                                columnWidthInPercent = 50;
+                          }
+
+
                           // synchronizes range input and number input
                           // number is the master => sets the input() val
-                          $rangeInput.on('input', function( evt ) {
+                          $rangeInput.on('input', function( evt, params ) {
                                 $numberInput.val( $(this).val() ).trigger('input');
                           });
-                          $numberInput.on('input', function( evt ) {
+                          $numberInput.on('input', function( evt, params ) {
                                 input( $(this).val() );
                                 $rangeInput.val( $(this).val() );
                           });
 
-                          // trigger a change on init to sync the range input
-                          $rangeInput.val( 30 ).trigger('input');
-                          //$rangeInput.val( $numberInput.val() || 0 );
-                          var moduleRegistrationParam;
-                          try{ moduleRegistrationParam = input.module.control.params.sek_registration_params; } catch( er ) {
-                                api.errare('Error when getting the module registration params', er  );
-                                return;
-                          }
-                          if ( _.isUndefined( moduleRegistrationParam.level_id ) ) {
-                                api.errare('Error : missing column id', er  );
-                                return;
-                          }
-                          var columnId = moduleRegistrationParam.level_id;
+                          // say it to the api, so we can regenerate the columns width for all columns.
+                          // consistently with the action triggered when resizing the column manually
 
-                          var colNb = api.czr_sektions.getColNumberInParentSectionFromColumnId( columnId );
-                          console.log('SO ?? ', input.module.control.params.sek_registration_params, colNb );
+                          // Make sure that we don't react to the event sent when resizing column in update api setting, case 'sek-resize-columns'
+                          // where we do $('body').find('[data-sek-width-range-column-id="'+ _candidate_.id +'"]').val( newWidthValue ).trigger('input', { is_resize_column_trigger : true } );
+                          // => otherwise it will create an infinite loop
+                          //
+                          // Debounce to avoid server hammering
+                          $numberInput.on( 'input', _.debounce( function( evt, params ) {
+                                if ( _.isEmpty( params ) || true !== params.is_resize_column_trigger ) {
+                                      input.sayItToApi( $(this).val() );
+                                }
+                          }, 100 ) );
+                          // trigger a change on init to sync the range input
+                          $rangeInput.val( columnWidthInPercent ).trigger('input');
                     },
+
+
+                    sayItToApi : function( columnWidthInPercent, _val  ) {
+                          var input = this;
+                          // Get the sister column id
+                          // If parent section has at least 2 columns, the sister column is the one on the right if not in last position. On the left if last.
+                          var indexOfResizedColumn = _.findIndex( input.parentSectionModel.collection, {id : input.columnId} ),
+                              isLastColumn = indexOfResizedColumn + 1 == input.colNb,
+                              sisterColumnIndex = isLastColumn ? indexOfResizedColumn - 1 : indexOfResizedColumn + 1,
+                              sisterColumnModel = _.find( input.parentSectionModel.collection, function( _val, _key ) { return sisterColumnIndex === _key; });
+
+                          if ( 'no_match' === sisterColumnModel ) {
+                                api.errare( 'sek_level_width_column module => invalid sister column model' );
+                          }
+
+                          api.previewer.trigger( 'sek-resize-columns', {
+                                action : 'sek-resize-columns',
+                                level : 'column',
+                                in_sektion : input.parentSectionModel.id,
+                                id : input.columnId,
+
+                                resized_column : input.columnId,
+                                sister_column : sisterColumnModel.id ,
+
+                                resizedColumnWidthInPercent : columnWidthInPercent,
+
+                                col_number : input.colNb
+                          });
+                    }
+
             },//CZRTextEditorInputMths
             // CZRItemConstructor : {
             //       //overrides the parent ready

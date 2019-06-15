@@ -31,11 +31,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                       parentSektionWidth,
                       $resizedColumn,
                       resizedColumnWidthInPercent,
-
                       //calculate the number of column in this section, excluding the columns inside nested sections if any
                       colNumber,
                       $sisterColumn,
-
                       isLastColumn;
 
                   // We won't fire resizable for single column sektions

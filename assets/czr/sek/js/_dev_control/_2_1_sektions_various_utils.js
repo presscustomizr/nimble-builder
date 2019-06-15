@@ -86,8 +86,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @params = { id : '', level : '' }
             // Recursively walk the level tree until a match is found
             // @return the level model object
-            getColNumberInParentSectionFromColumnId : function( id, collection ) {
-                  var self = this, _col_number_ = 'no_match',
+            getParentSectionFromColumnId : function( id, collection ) {
+                  var self = this, _section_model_ = 'no_match',
                       // @param id mandatory
                       // @param collection mandatory
                       // @param collectionSettingId optional
@@ -102,7 +102,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             }
                             _.each( collection, function( levelData ) {
                                   // did we found a match recursively ?
-                                  if ( 'no_match' != _col_number_ )
+                                  if ( 'no_match' != _section_model_ )
                                     return;
 
                                   var colCandidate;
@@ -111,14 +111,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   }
                                   if ( ! _.isEmpty( colCandidate ) ) {
                                         // we found our column in this section
-                                        _col_number_ = _.size( levelData.collection );
+                                        _section_model_ = levelData;
                                   } else {
                                         if ( _.isArray( levelData.collection ) ) {
                                               _walk_( id, levelData.collection, collectionSettingId, localOrGlobal );
                                         }
                                   }
                             });
-                            return _col_number_;
+                            return _section_model_;
                       };
 
                   // if a collection has been provided in the signature, let's walk it.
@@ -130,13 +130,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               local : self.localSectionsSettingId(),
                               global : self.getGlobalSectionsSettingId()
                         }, function( collectionSettingId, localOrGlobal ) {
-                              if ( 'no_match' === _col_number_ ) {
+                              if ( 'no_match' === _section_model_ ) {
                                     _walk_( id, collection, collectionSettingId, localOrGlobal );
                               }
                         });
                   }
 
-                  return _col_number_;
+                  return _section_model_;
             },
 
 
