@@ -75,7 +75,7 @@
                           }
 
                           // Always get the value from the model instead of relying on the setting val.
-                          // => because the column width is an exception, its value is not only set from the customizer input, but also from the preview when resizing manually
+                          // => because the column width value is not only set from the customizer input, but also from the preview when resizing manually, this is an exception
                           var currentColumnModelValue = api.czr_sektions.getLevelModel( input.columnId ),
                               currentColumnWidthValueFromModel = '_not_set_',
                               columnWidthInPercent;
@@ -109,12 +109,15 @@
                           // synchronizes range input and number input
                           // number is the master => sets the input() val
                           $rangeInput.on('input', function( evt, params ) {
-                                $numberInput.val( $(this).val() ).trigger('input');
+                                $numberInput.val( $(this).val() ).trigger('input', params );
                           });
-                          $numberInput.on('input', function( evt, params ) {
-                                input( $(this).val() );
+                          // debounced to avoid a intermediate state of visual disorder of the columns
+                          $numberInput.on('input', _.debounce(function( evt, params ) {
                                 $rangeInput.val( $(this).val() );
-                          });
+                                if ( params && params.is_init )
+                                  return;
+                                input( $(this).val() );
+                          }, 300 ) );
 
                           // say it to the api, so we can regenerate the columns width for all columns.
                           // consistently with the action triggered when resizing the column manually
@@ -125,12 +128,12 @@
                           //
                           // Debounce to avoid server hammering
                           $numberInput.on( 'input', _.debounce( function( evt, params ) {
-                                if ( _.isEmpty( params ) || true !== params.is_resize_column_trigger ) {
-                                      input.sayItToApi( $(this).val() );
-                                }
-                          }, 100 ) );
+                                if ( params && ( params.is_init || params.is_resize_column_trigger ) )
+                                  return;
+                                input.sayItToApi( $(this).val() );
+                          }, 300 ) );
                           // trigger a change on init to sync the range input
-                          $rangeInput.val( columnWidthInPercent ).trigger('input');
+                          $rangeInput.val( columnWidthInPercent ).trigger('input', { is_init : true } );
                     },
 
 
