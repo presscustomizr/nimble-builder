@@ -416,7 +416,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           return _width;
                                     };
 
-                                    ///
                                     var _setColumnWidth = function( _candidate_, newWidthValue ) {
                                           // start from a deep cloned object
                                           // important => fixes https://github.com/presscustomizr/nimble-builder/issues/455

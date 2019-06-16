@@ -1,15 +1,23 @@
-
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
             initialize: function() {
                   var self = this;
+
+                  // Set the skope_id
                   try { this.skope_id = _.findWhere( _wpCustomizeSettings.czr_new_skopes, { skope : 'local' }).skope_id; } catch( _er_ ) {
                         this.errare('Preview => error when storing the skope_id', _er_ );
                         return;
                   }
+
+                  // Active UI
                   this.scheduleHighlightActiveLevel();
+
+                  // The loading icon when a level is refreshed
                   self.setupLoader();
+
+                  // DOM READY
                   $( function() {
                         self.setupSortable();
                         self.setupResizable();
@@ -18,12 +26,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         self.schedulePanelMsgReactions();
                   });
+
+                  // Make sure we don't force a minimum height to empty columns when a section has at least one module
+                  // => allow a better previewing experience and more realistic spacing adjustments
+                  // The css class .sek-has-modules is also printed server side
+                  // @see php SEK_Front_Render::render()
                   $('body').on('sek-columns-refreshed sek-modules-refreshed', function( evt, params ) {
                         if ( !_.isUndefined( params ) && !_.isUndefined( params.in_sektion ) && $('[data-sek-id="' + params.in_sektion +'"]').length > 0 ) {
                               var $updatedSektion = $('[data-sek-id="' + params.in_sektion +'"]');
                               $updatedSektion.toggleClass( 'sek-has-modules', $updatedSektion.find('[data-sek-level="module"]').length > 0 );
                         }
                   });
+
+                  // Deactivates the links
                   self.deactivateLinks();
 
                   $('body').on([
@@ -35,6 +50,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   ].join(' '), function( evt ) {
                         self.deactivateLinks(evt);
                   });
+
+
+                  // Send the contextually active locations
+                  // 1) on init
+                  // 2) and when requested by the control panel
+                  // introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
                   var sendActiveLocations = function() {
                         var active_locs = [];
                         $('[data-sek-level="location"]').each( function() {
@@ -45,12 +66,20 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   api.preview.bind('sek-request-active-locations', sendActiveLocations );
                   sendActiveLocations();
             },
+
+            // Fired on initialize()
+            // and on user generated events
             deactivateLinks : function( evt ) {
                   evt = evt || {};
                   var _doSafe_ = function() {
                           if ( "yes" === $(this).data('sek-unlinked') )
                             return;
+                          // Several cases :
+                          // 1- internal link ( <=> api.isLinkPreviewable(... ) = true ) : we allow navigation with shift + click
+                          // 2- extenal link => navigation is disabled.
+                          // 3- server disabled links, with href attribute set to "javascript:void(0)", this case is checked isJavascriptProtocol
                           var isJavascriptProtocol = _.isString( $(this)[0].protocol ) && -1 !== $(this)[0].protocol.indexOf('javascript');
+                          // the check on isJavascriptProtocol fixes issue https://github.com/presscustomizr/nimble-builder/issues/255
                           if ( ! isJavascriptProtocol && api.isLinkPreviewable( $(this)[0] ) ) {
                                 $(this).addClass('nimble-shift-clickable');
                                 $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', 'javascript:void(0)');
@@ -85,8 +114,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   });
             },
+
+            // Hightlight the currently level in the preview, corresponding to the active ui in the panel
+            //
+            // When a new ui is generated, the activeLevelUI is set @see ::schedulePanelMsgReactions()
+            // When the level options are modidied ( 'sek-refresh-stylesheet', 'sek-refresh-level' ),
             scheduleHighlightActiveLevel : function() {
                   var self = this;
+                  // Stores the currently edited level
                   this.activeLevelUI = new api.Value('');
                   this.activeUIChangedRecently = new api.Value( false );
 
@@ -101,13 +136,25 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         }
                         self.activeUIChangedRecently( Date.now() );
                   });
+
+                  // apiParams : {
+                  //       action : 'sek-refresh-level',
+                  //       id : params.uiParams.id,
+                  //       level : params.uiParams.level
+                  // },
+                  // skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
                   _.each( [ 'sek-refresh-stylesheet', 'sek-refresh-level' ], function( msgId ) {
                         api.preview.bind( msgId, function( params ) {
                               self.activeUIChangedRecently( Date.now() );
                         });
                   });
+
+
+                  // This api.Value() is updated with Date.now() when something just happened and false after 3000 ms of inactivity
+                  // so we can always react to changes, and refresh the timeOut
                   this.activeUIChangedRecently.bind( function( hasChangedRecently ) {
                         var $newActiveLevel = $('[data-sek-id="' + self.activeLevelUI() +'"]');
+                        // remove the highlight class if it was previously set to another level
                         if ( $('.sek-highlight-active-ui').length ) {
                               $('.sek-highlight-active-ui').removeClass('sek-highlight-active-ui');
                         }
@@ -126,38 +173,57 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            // Fired on Dom Ready, in ::initialize()
             setupSortable: function() {
                   var self = this;
                   this.sortableDefaultParams = {
+                        //forcePlaceholderSize: true,
+                        //handle: '.fa-arrows-alt',<= set by level
                         placeholder: "sortable-placeholder",
                         over: function( event, ui ) {},
                         cursorAt: { top:0, left: 0 },//@fixes https://github.com/presscustomizr/nimble-builder/issues/114
                         tolerance: "pointer",//@fixes https://github.com/presscustomizr/nimble-builder/issues/114
                   };
+
+                  // SEKTIONS
+                  // On dom ready
                   $('[data-sek-level="location"]').each( function() {
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
+
+                  // Schedule with delegation
                   $( 'body').on( 'sek-section-added sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
+
+
+                  // COLUMNS
+                  // On dom ready
                   $('[data-sek-level="location"]').each( function() {
                         $(this).find( '[data-sek-level="section"]' ).each( function() {
                               self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                         });
                   });
+                  // Schedule with delegation
                   $('body').on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
                         self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                   });
+                  // this case occurs when moving a section from one location to another for example
                   $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="section"]' ).each( function() {
                               self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                         });
                   });
+
+
+                  // MODULES
+                  // On dom ready
                   $('[data-sek-level="location"]').each( function() {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
+                  // Schedule with delegation
                   $('body').on( 'sek-modules-refreshed', '[data-sek-level="column"]', function() {
                         self.makeModulesSortableInColumn( $(this).data('sek-id') );
                   });
@@ -166,6 +232,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
+                  // this case occurs when moving a section from one location to another for example
                   $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
@@ -176,6 +243,43 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
+
+                  // NESTED SEKTIONS
+                  // $('.sek-column-inner', '[data-sek-level="section"]').children( '[data-sek-level="section"]' ).each( function() {
+                  //       defaults = $.extend( true, {}, self.sortableDefaultParams );
+                  //       $(this).sortable( _.extend( defaults, {
+                  //           handle : '.sek-move-nested-section',
+                  //           connectWith: ".sek-column-inner, [data-sek-level="location"]",
+                  //           start: function( event, ui ) {
+                  //               // store the startOrder
+                  //               $('[data-sek-level="location"]').children( '[data-sek-level="section"]' ).each( function() {
+                  //                     startOrder.push( $(this).data('sek-id') );
+                  //               });
+                  //               //console.log('column moved from', from_sektion, ui );
+                  //           },
+                  //           stop : function( event, ui ) {
+                  //               newOrder = [];
+                  //               // Restrict to the direct children
+                  //               $('[data-sek-level="location"]').children( '[data-sek-level="section"]' ).each( function() {
+                  //                     newOrder.push( $(this).data('sek-id') );
+                  //               });
+
+                  //               // api.preview.send( 'sek-move', {
+                  //               //       id : ui.item.data('sek-id'),
+                  //               //       level : 'section',
+                  //               //       newOrder : newOrder
+                  //               // });
+                  //           }
+                  //       }));
+                  // });
+
+
+                  // <SORTABLE>
+                  // $('.sek-sektion-inner').each( function() {
+                  //     $(this).sortable({
+                  //         connectWith: ".sek-sektion-inner"
+                  //     }).disableSelection();
+                  // });
 
                   return this;
             },//setupSortable()
@@ -190,6 +294,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         defaults = $.extend( true, {}, self.sortableDefaultParams );
                         $(this).sortable( _.extend( defaults, {
+                              //handle : '.sek-move-section, .sek-section-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
                               handle : '.sek-move-section',
                               connectWith : '[data-sek-is-global-location="false"]',
                               placeholder: {
@@ -204,6 +309,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     $('body').addClass('sek-moving-section');
                                     $sourceLocation = ui.item.closest('[data-sek-level="location"]');
                                     from_location = $sourceLocation.data('sek-id');
+
+                                    // store the startOrder
                                     $sourceLocation.children( '[data-sek-level="section"]' ).each( function() {
                                           startOrder.push( $(this).data('sek-id') );
                                     });
@@ -214,6 +321,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     newOrder = [];
                                     $targetLocation = ui.item.closest('[data-sek-level="location"]');
                                     to_location = $targetLocation.data('sek-id');
+
+                                    // Restrict to the direct children
                                     $targetLocation.children( '[data-sek-level="section"]' ).each( function() {
                                           newOrder.push( $(this).data('sek-id') );
                                     });
@@ -235,6 +344,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         }));
                   });
             },//makeSektionsSortableInLocation
+
+
+
+
+
+
+
+            // Instantiate sortable for a given column Id
+            // Columns are a little more complex because we want to emulate the future layouts when moving a column from section to section
+            // for that, we need to compute the number of columns and play with css classes.
+            // During this process, we use two $.data to store informations :
+            //    'sek-is-sender' => tells us if this is the sektion from which we started to drag a column
+            //    '_sortable_columns_css_classes_' => stores the current and future css classes
             makeColumnsSortableInSektion : function( sektionId ) {
                   var self = this,
                       defaults = $.extend( true, {}, self.sortableDefaultParams ),
@@ -254,12 +376,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                 $columnsInTargetSektion = $targetSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ),
                                 currentColnumber        = $columnsInTargetSektion.length,
                                 currentColCSSSuffix     = Math.floor( 100/currentColnumber );
+
+                            // the future columns number is different for the source and target sektions.
                             var nextColNumber;
                             if ( true === args.forTarget ) {
                                   nextColNumber = 12 < ( currentColnumber + 1 ) ? 12 : currentColnumber + 1;
                             } else {
                                   nextColNumber = 1 > ( currentColnumber - 1 ) ? 1 : currentColnumber -1;
                             }
+
+                            // this css suffix is consistent with the one written server side
+                            // @see SEK_Front_Render::render() case 'column'
                             var nextColCSSSuffix        = Math.floor( 100/nextColNumber ),
                                 current_columns_css_class = 'sek-col-' + currentColCSSSuffix,
                                 next_columns_css_class = 'sek-col-' + nextColCSSSuffix,
@@ -273,8 +400,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     $(this).data( 'sek-is-sender', null ).data('_sortable_columns_css_classes_', null );
                             });
                       };
+                  // if ( $sortableCandidate.children('[data-sek-level="column"]').length > 11 ) {
+                  //       self.errare('12 COLUMNS');
+                  //       return;
+                  // }
 
                   $sortableCandidate.sortable( _.extend( defaults, {
+                        //handle : '.sek-move-column, .sek-column-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
                         handle : '.sek-move-column',
                         connectWith: ".sek-sektion-inner",
                         over : function( event, ui ) {
@@ -326,6 +458,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               var _isCrossSkope = is_global_from_location !== is_global_to_location,
                                   _isCrossLocation = to_location != from_location,
                                   _isGlobalToGlobal = true === is_global_from_location && true === is_global_to_location;
+
+                              // Not possible to drag from a local location to a global
+                              // Not possible to drag from a global header to a global footer
                               if ( _isCrossSkope || ( _isGlobalToGlobal && _isCrossLocation ) ) {
                                     api.preview.send( 'sek-notify', {
                                           message : sekPreviewLocalized.i18n["Moving elements between global and local sections is not allowed."]
@@ -344,12 +479,20 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                         },
                         start: function( event, ui ) {
+                              // Store the following for the "remove" callback
                               $fromLocation = ui.item.closest('[data-sek-level="location"]');
                               from_location = $fromLocation.data( 'sek-id');
                               is_global_from_location = true === $fromLocation.data('sek-is-global-location');
+
+                              // Always reset startOrder and newOrder
                               startOrder = [];
                               newOrder = [];
+
+                              //$('.sek-column-inner').css( {'min-height' : '20px'});
+                              // Set source
                               from_sektion = ui.item.closest('[data-sek-level="section"]').data( 'sek-id');
+
+                              // store the startOrder
                               ui.item.closest('[data-sek-level="section"]').find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).each( function() {
                                     startOrder.push( $(this).data('sek-id') );
                               });
@@ -362,6 +505,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         },
 
                         stop : function( event, ui ) {
+                              // set destination
                               $targetSektion = ui.item.closest('[data-sek-level="section"]');
                               to_sektion = $targetSektion.data( 'sek-id');
                               $targetSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).each( function() {
@@ -392,6 +536,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     self.errare( 'column sortable =>  newOrder should not be empty' );
                                     return;
                               }
+
+                              // don't send anything if the source and target columns are the same, and the order is unchanged
                               if ( _.isEqual( newOrder, startOrder ) && to_sektion === from_sektion ) {
                                     if ( sekPreviewLocalized.isDevMode ) {
                                           self.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
@@ -405,6 +551,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     from_sektion : from_sektion,
                                     to_sektion : to_sektion
                               });
+
+                              // inform the parent section that it's been refreshed
+                              //=> will be listened to by columns to re-instantiate sortable, resizable
                               $('div[data-sek-id="' + from_sektion + '"]' ).trigger('sek-level-refreshed');
                               if ( from_sektion !== to_sektion ) {
                                   $('div[data-sek-id="' + to_sektion + '"]' ).trigger('sek-level-refreshed');
@@ -413,6 +562,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         }
                   }));
             },//self.makeColumnsSortableInSektion
+
+
+
+
+
+
+
+
+
+
+            // Instantiate sortable for a given column Id
             makeModulesSortableInColumn : function( columnId ) {
                   var from_sektion,
                       to_sektion,
@@ -430,10 +590,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   var self = this;
                   defaults = $.extend( true, {}, self.sortableDefaultParams );
+                  // Restrict to the .sek-column-inner for this very column id with first()
                   $( '[data-sek-id="' + columnId + '"]').find('.sek-column-inner').first().sortable( _.extend( defaults, {
+                        //handle : '.sek-move-module, .sek-module-dyn-ui > .sek-dyn-ui-location-type .sek-dyn-ui-level-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
                         handle : '.sek-move-module',
                         connectWith: ".sek-column-inner",
                         over : function( event, ui ) {
+                              // Hide the module placeholder while overing, when the column is empty
+                              // @see css rule .sek-sortable-overing > .sek-no-modules-column { display: none; }
                               $('[data-sek-level="location"]').find('.sek-sortable-overing').each( function() {
                                     $(this).removeClass('sek-sortable-overing');
                               });
@@ -447,6 +611,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               var _isCrossSkope = is_global_from_location !== is_global_to_location,
                                   _isCrossLocation = to_location != from_location,
                                   _isGlobalToGlobal = true === is_global_from_location && true === is_global_to_location;
+
+                              // Not possible to drag from a local location to a global
+                              // Not possible to drag from a global header to a global footer
                               if ( _isCrossSkope || ( _isGlobalToGlobal && _isCrossLocation ) ) {
                                     api.preview.send( 'sek-notify', {
                                           message : sekPreviewLocalized.i18n["Moving elements between global and local sections is not allowed."]
@@ -457,15 +624,21 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                         },
                         start: function( event, ui ) {
+                              // Store the following for the "remove" callback
                               $fromLocation = ui.item.closest('[data-sek-level="location"]');
                               from_location = $fromLocation.data( 'sek-id');
                               is_global_from_location = true === $fromLocation.data('sek-is-global-location');
+
+                              // Always reset startOrder and newOrder
                               startOrder = [];
                               newOrder = [];
 
                               $('body').addClass( 'sek-dragging-element' );
+                              //$('.sek-column-inner').css( {'min-height' : '20px'});
+                              // Set source
                               from_column = ui.item.closest('[data-sek-level="column"]').data( 'sek-id');
                               from_sektion = ui.item.closest('[data-sek-level="section"]').data( 'sek-id');
+                              // store the startOrder
                               ui.item.closest('[data-sek-level="column"]').find('.sek-column-inner').first().children( '[data-sek-level="module"]' ).each( function() {
                                     startOrder.push( $(this).data('sek-id') );
                               });
@@ -476,6 +649,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         },
 
                         stop : function( event, ui ) {
+                              // set destination
                               $targetColumn = ui.item.closest('[data-sek-level="column"]');
                               to_column = $targetColumn.data( 'sek-id');
 
@@ -486,6 +660,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     self.errare( 'makeModulesSortableInColumn => newOrder should not be empty' );
                                     return;
                               }
+
+                              // don't send anything if the source and target columns are the same, and the order is unchanged
                               if ( _.isEqual( newOrder, startOrder ) && to_column === from_column ) {
                                     self.errare( 'preview => makeModulesSortableInColumn => start and stop positions are identical' );
                                     return;
@@ -499,6 +675,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     from_sektion : from_sektion,
                                     to_sektion : ui.item.closest('[data-sek-level="section"]').data( 'sek-id')
                               });
+
+                              // Clean some css classes
                               $('body').removeClass( 'sek-dragging-element' );
                         }
                   }));
@@ -508,11 +686,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            // Fired on Dom Ready, in ::initialize()
             setupResizable : function() {
                   var self = this;
                   $('.sektion-wrapper').find( 'div[data-sek-level="section"]' ).each( function() {
                         self.maybeMakeColumnResizableInSektion.call( this );
                   });
+                  // Delegate instantiation when a level markup is refreshed
+                  // Let the event bubble up to the location, and then visit all children section to maybe re-instantiate resizable
+                  // @fixes https://github.com/presscustomizr/nimble-builder/issues/165
                   $('body').on(
                         'sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added',
                         '[data-sek-level="location"]',
@@ -524,6 +706,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   );
                   return this;
             },//setupResizable()
+
+            // this is the parent section jQuery object
             maybeMakeColumnResizableInSektion : function() {
                   var self = this,
                       $parentSektion,
@@ -531,9 +715,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                       parentSektionWidth,
                       $resizedColumn,
                       resizedColumnWidthInPercent,
+                      //calculate the number of column in this section, excluding the columns inside nested sections if any
                       colNumber,
                       $sisterColumn,
                       isLastColumn;
+
+                  // We won't fire resizable for single column sektions
                   var $directColumnChildren = $(this).find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' );
                   if ( 2 > $directColumnChildren.length )
                     return;
@@ -542,6 +729,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   $directColumnChildren.not($lastCol).each( function() {
                         $(this).resizable({
+                                // handles: { 'e': '.ui-resizable-e', 'w': '.ui-resizable-w' },
                                 resize : function( event, ui ) {
                                       $('.sektion-wrapper').data('sek-resizing-columns', true );
                                 },
@@ -549,7 +737,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                       $parentSektion = ui.element.closest('div[data-sek-level="section"]');
                                       parentSektionId = $parentSektion.data('sek-id');
                                       parentSektionWidth = $parentSektion.find('.sek-sektion-inner')[0].getBoundingClientRect().width;
+                                      //calculate the number of column in this section, excluding the columns inside nested sections if any
                                       colNumber = $parentSektion.find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length;
+
+                                      // Resizable should not have been instantiated anyway
                                       if ( 2 > colNumber )
                                         return;
 
@@ -559,19 +750,32 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                       }
 
                                       isLastColumn = $resizedColumn.index() + 1 == colNumber;
+
+                                      // Assomption : RTL user. LTR should be implemented also.
+                                      // If parent section has at least 2 columns, the sister column is the one on the right if not in last position. On the left if last.
                                       $sisterColumn = isLastColumn ? $resizedColumn.prev() : $resizedColumn.next();
+
+                                      // Implement a global state value()
                                       $('.sektion-wrapper').data('sek-resizing-columns', true );
+
+                                      // auto set to false after a moment.
                                       _.delay( function() {
                                             $('.sektion-wrapper').data('sek-resizing-columns', false );
                                       }, 3000 );
                                 },
                                 stop : function( event, ui ) {
+                                      // console.log('ON RESIZE STOP', event, ui, $resizedColumn );
+                                      // console.log('colNumber', colNumber, '[data-sek-id="' + parentSektionId +'"] > .sek-sektion-inner' );
+                                      // Skip the case when there's only one column
+                                      // Resizable should not have been instantiated anyway
                                       if ( 2 > colNumber )
                                         return;
 
                                       if ( 1 > $resizedColumn.length ) {
                                           throw new Error( 'ERROR => resizable => No valid level dom element found' );
                                       }
+
+                                      // Reset the automatic inline style
                                       $resizedColumn.css({
                                             width : '',
                                             height: ''
@@ -598,6 +802,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                 helper: "ui-resizable-helper",
                                 handles :'e'
                         });//$(this).resizable({})
+
+                        // Add a resizable icon in the handle
+                        // revealed on section hovering @see sek-preview.css
                         var $column = $(this);
                         _.delay( function() {
                               var $resizableHandle = $column.find('.ui-resizable-handle');
@@ -611,6 +818,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
       });//$.extend()
 })( wp.customize, jQuery, _ );
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
@@ -624,16 +832,23 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.errare('sekPreview::printeLevelUI => invalid level element => ', $el );
                   }
                   level = $el.data('sek-level');
+                  // we don't print a ui for locations
                   if ( 'location' == level )
                     return;
 
                   $levelEl = $el;
+
+                  // stop here if the .sek-dyn-ui-wrapper is already printed for this level AND is not being faded out.
+                  // if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 && true !== $levelEl.data( 'UIisFadingOut' ) )
+                  //   return;
 
                   if ( $levelEl.children('.sek-dyn-ui-wrapper').length > 0 )
                     return;
 
                   var levelRect = $levelEl[0].getBoundingClientRect(),
                       levelType = $levelEl.data('sek-level');
+
+                  // Adapt the size of the UI icons and text in narrow containers
                   $levelEl.toggleClass( 'sek-shrink-my-ui', levelRect.width && levelRect.width < ( 'section' === levelType ? 350 : ( 'column' === levelType ? 300 : 200 ) ) );
 
                   params = {
@@ -642,12 +857,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   };
                   switch ( level ) {
                         case 'section' :
+                              //$el = $('.sektion-wrapper').find('[data-sek-id="' + id + '"]');
+                              // Let's prepare the is_last and is_first params that we are going to send to the js template
+                              // => this will determine which up / down arrow to display in the UI menu for moving a section
                               var $parentLocation = $levelEl.closest('div[data-sek-level="location"]'),
                                   $parentColumn = $levelEl.closest('div[data-sek-level="column"]'),
                                   $sectionCollection,
                                   _is_last_section,
                                   _is_first_section,
                                   _is_nested =  true === $levelEl.data('sek-is-nested');
+
+                              // information about first and last section is used when rendering the up / down moving arrows
                               if ( _is_nested ) {
                                     if ( $parentColumn.length > 0 ) {
                                           $sectionCollection = $parentColumn.find('.sek-column-inner').first().children( 'div[data-sek-level]' );
@@ -687,6 +907,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               });
                         break;
                   }
+                  // don't display the column and module ui when resizing columns
                   if ( true === $('.sektion-wrapper').data('sek-resizing-columns') && _.contains( ['column', 'module'], level ) ) {
                         return;
                   }
@@ -699,6 +920,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         } );
                   });
             },//printLevelUI()
+
+            // Fired on Dom Ready, in ::initialize()
             setupUiHoverVisibility : function() {
                   var self = this;
                   var tmpl,
@@ -710,8 +933,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         $levelEl = $(this);
                         if ( $levelEl.children('.sek-dyn-ui-wrapper').length < 1 )
                           return;
+                        // when PHP constant NIMBLE_IS_PREVIEW_UI_DEBUG_MODE is true, the levels UI in the preview are not being auto removed, so we can inspect the markup and CSS
                         if ( sekPreviewLocalized.isPreviewUIDebugMode )
                           return;
+
+                        //stores the status of 200 ms fading out. => will let us know if we can print again when moving the mouse fast back and forth between two levels.
                         $levelEl.data( 'UIisFadingOut', true );//<= we need to store a fadingOut status to not miss a re-print in case of a fast moving mouse
 
                         $levelEl.children('.sek-dyn-ui-wrapper').stop( true, true ).fadeOut( {
@@ -722,6 +948,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                         });
                   };//removeLevelUI
+
+
+
+
+                  // UI MENU
+                  // React to click and mouse actions. Uses delegation.
+                  // + schedule auto collapse after n seconds of ui inactivity
                   var autoCollapser = function() {
                         var $menu = $(this);
                         clearTimeout( $menu.data('_toggle_ui_menu_') );
@@ -746,12 +979,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   $('body').on( 'click', '.sek-dyn-ui-location-inner', function( evt )  {
                         var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper'),
                             $parentSection = $(this).closest('[data-sek-level="section"]');
+                        // Close all other expanded ui menu of the column
                         $parentSection.find('.sek-dyn-ui-hamb-menu-wrapper').each( function() {
                               setClassesAndVisibilities.call( $(this) );
                         });
+                        // expand the ui menu of the clicked level
                         setClassesAndVisibilities.call( $menu, true );
+                        // schedule autocollapsing
                         autoCollapser.call( $menu );
                   });
+                  // maintain expanded as long as it's being hovered
                   $('body').on( 'mouseenter mouseover mouseleave', '.sek-dyn-ui-wrapper', _.throttle( function( evt )  {
                         var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper');
                         if ( _.isUndefined( $menu.data('_toggle_ui_menu_') ) || $menu.hasClass('sek-collapsed') )
@@ -760,12 +997,26 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               autoCollapser.call( $menu );
                         }
                   }, 50 ) );
+
+                  // minimize on click
+                  // solves the problem of a level ui on top of another one
+                  // @ee https://github.com/presscustomizr/nimble-builder/issues/138
                   $('body').on( 'click', '.sek-minimize-ui', function( evt )  {
                         $(this).closest('.sek-dyn-ui-location-type').slideToggle('fast');
                   });
+
+
+
+
+
+
+                  // Ui for the WP content.
+                  // Generated when is_singular() only
+                  // @see SEK_Front::render()
                   var $wpContentEl;
                   $('body').on( 'mouseenter', '.sek-wp-content-wrapper', function( evt ) {
                         $wpContentEl = $(this);
+                        // stop here if the .sek-dyn-ui-wrapper is already printed for this level AND is not being faded out.
                         if ( $wpContentEl.children('.sek-dyn-ui-wrapper').length > 0 && true !== $wpContentEl.data( 'UIisFadingOut' ) )
                           return;
 
@@ -787,6 +1038,21 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                         });
                   });
+
+
+
+                  // ADD SECTION BUTTONS
+                  // Add content button between sections
+                  // <script type="text/html" id="sek-tmpl-add-content-button">
+                  //     <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
+                  //       <div class="sek-add-content-button-wrapper">
+                  //         <button data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:60px;">
+                  //           <span title="<?php _e('Add Content', 'text_doma' ); ?>" class="sek-click-on-button-icon fas fa-plus-circle sek-click-on"></span><span class="action-button-text"><?php _e('Add Content', 'text_doma' ); ?></span>
+                  //         </button>
+                  //       </div>
+                  //     </div>
+                  // </script>
+                  // fired on mousemove and scroll, every 50ms
                   var _printAddContentButtons = function() {
                         var _location, _is_global_location;
                         $('body').find( 'div[data-sek-level="location"]' ).each( function() {
@@ -795,6 +1061,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               var $btn_el;
                               _location = $(this).data('sek-id');
                               _is_global_location = true === $(this).data('sek-is-global-location');
+
+                              // nested sections are not included
                               $sectionCollection.each( function() {
                                     if ( $(this).find('.sek-add-content-button').length > 0 )
                                       return;
@@ -809,6 +1077,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           }
                                           $btn_el.fadeIn( 300 );
                                     });
+                                    //console.log('$sectionCollection.length', $sectionCollection.length, $(this).index() + 1 );
+                                    //if is last section, append also
+                                    //console.log('IS LAST ? => ', $sectionCollection.length, $(this).index() );
                                     if ( $sectionCollection.length == $(this).index() + 1 ) {
                                           $.when( $(this).append( tmpl({
                                                 is_last : true,
@@ -824,6 +1095,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     }
                               });//$sectionCollection.each( function() )
                         });//$( 'div[data-sek-level="location"]' ).each( function() {})
+
+
+
+                        // .sek-empty-location-placeholder container is printed when the location has no section yet in its collection
                         $('.sek-empty-location-placeholder').each( function() {
                               if ( $(this).find('.sek-add-content-button').length > 0 )
                                 return;
@@ -841,6 +1116,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               });
                         });
                   };//_printAddContentButtons
+
+                  // fired on mousemove and scroll, every 50ms
                   var _sniffAndRevealButtons = function( position ) {
                         $( 'body').find('.sek-add-content-button').each( function() {
                               var btnWrapperRect = $(this)[0].getBoundingClientRect(),
@@ -856,12 +1133,22 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   isInHorizontally = xPos <= btnWrapperRect.right && btnWrapperRect.left <= xPos,
                                   isInVertically = yPos >= btnWrapperRect.top && btnWrapperRect.bottom >= yPos;
 
+                              // var html = '';
+                              // html += ' | mouseToBottom : ' + mouseToBottom + ' | mouseToTop : ' + mouseToTop;
+                              // html += ' isCloseVertically : ' + isCloseVertically + ' | isInVertically : ' + isInVertically;
+                              // $(this).html( '<span style="font-size:12px">' + html + '</span>');
+
                               $(this).toggleClass(
                                     'sek-mouse-is-close',
                                     ( isCloseVertically || isInVertically ) && ( isCloseHorizontally || isInHorizontally )
                               );
                         });
                   };
+
+                  // Print / remove ui according to the mouse position
+                  // The mouse position is provided by self.mouseMovedRecently()
+                  // If the ui is expanded, remove after a delay to let user access all ui buttons, even those outside the $level.
+                  // => the ui can be "outside" ( <=> out vertically and horizontally ) when columns are narrow.
                   var _sniffLevelsAndPrintUI = function( position, $candidateForRemoval ) {
                         var $levelsToWalk, sniffCase;
                         if ( _.isUndefined( $candidateForRemoval ) || $candidateForRemoval.length < 1 ) {
@@ -897,6 +1184,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                       } else {
                                                             _.delay( function() {
                                                                   if ( true === $levelEl.data('sek-ui-removal-scheduled') ) {
+                                                                        // using the latest self.mouseMovedRecently(), instead of the initial "position" param, makes sure we don't miss the latest mouse movements
                                                                         _sniffLevelsAndPrintUI( self.mouseMovedRecently(), $levelEl );
                                                                   }
                                                             }, 3500 );
@@ -907,13 +1195,23 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                         });
                   };
+
+
+                  // SCHEDULE
+                  // - the printing / removal of the add content button
+                  // - the printing of the level's UI
                   self.mouseMovedRecently = new api.Value( {} );
                   self.mouseMovedRecently.bind( function( position ) {
                         if ( ! _.isEmpty( position) ) {
+                              // print the buttons ( display:none)
                               _printAddContentButtons();
+                              // sniff sections around pointer and reveal add content button for the collection of candidates
                               _sniffAndRevealButtons( position );
+                              // sniff levels and print UI
                               _sniffLevelsAndPrintUI( position );
                         } else {
+                              // Mouse didn't move recently?
+                              // => remove all UIs
                               $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
                                     $(this).fadeOut( {
                                           duration : 200,
@@ -921,12 +1219,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     });
                               });
                               $('body').stop( true, true ).find('[data-sek-level]').each( function() {
+                                    // preserve if the ui menu is expanded, otherwise remove
                                     if ( $(this).children('.sek-dyn-ui-wrapper').find('.sek-is-expanded').length < 1 ) {
                                           removeLevelUI.call( $(this) );
                                     }
                               });
                         }
                   });
+                  // @return void()
                   var resetMouseMoveTrack = function() {
                         clearTimeout( $(window).data('_scroll_move_timer_') );
                         self.mouseMovedRecently.set({});
@@ -939,6 +1239,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.mouseMovedRecently.set({});
                         }, 4000 ) );
                   }, 50 ) );
+
+                  // Always reset the move timer and the mouseMove Value when
+                  // - a dragging action is started
+                  // - a section is added <= fixes the addition of multiple "Add Section" button in the same location
                   api.preview.bind( 'sek-drag-start', function() {
                         resetMouseMoveTrack();
                   });
@@ -952,13 +1256,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
       });//$.extend()
 })( wp.customize, jQuery, _ );
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            //Fired on Dom ready in initialize()
             scheduleUiClickReactions : function() {
                   var self = this;
 
                   $('body').on('click', function( evt ) {
+                        // First clean any currently highlighted target drop zone
+                        // implemented for double-click insertion https://github.com/presscustomizr/nimble-builder/issues/317
                         api.preview.send( 'sek-clean-target-drop-zone' );
 
                         var clickedOn = '',
@@ -1029,6 +1337,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     });
                               break;
                               case 'moduleWrapper' :
+                                    // stop here if the ui icons block was clicked
                                     if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
                                       return;
 
@@ -1039,6 +1348,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     });
                               break;
                               case 'noModulesColumn' :
+                                    // stop here if the ui icons block was clicked
                                     if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
                                       return;
 
@@ -1070,6 +1380,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     });
                               break;
                               case 'editWpContent' :
+                                    // note : the edit url is printed as a data attribute to prevent being automatically parsed by wp when customizing and turned into a changeset url
                                     var edit_url = $el.closest('[data-sek-wp-edit-link]').data('sek-wp-edit-link');
                                     if ( ! _.isEmpty( edit_url ) ) {
                                           window.open( edit_url,'_blank' );
@@ -1078,14 +1389,18 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               break;
                               case 'inactiveZone' :
                                     api.preview.send( 'sek-click-on-inactive-zone');//<= for example, collapses the tinyMce editor if expanded
+                                    //self._send_( $el, { action : 'pick-content' } );
                               break;
                         }
+
+                        //console.log('CLICKED ?', clickedOn );
                   });//$('body').on('click', function( evt ) {}
 
             },//scheduleUserReactions()
 
 
             _send_ : function( $el, params ) {
+                  //console.log('IN _send_', $el, params );
                   var clonedParams = $.extend( true, {}, params ),
                       syncedTinyMceInputId = '',
                       $moduleWrapper = $el.closest('div[data-sek-level="module"]'),
@@ -1107,17 +1422,25 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         clicked_input_type : $el.closest('div[data-sek-input-type]').length > 0 ? $el.closest('div[data-sek-input-type]').data('sek-input-type') : '',
                         clicked_input_id : $el.closest('div[data-sek-input-id]').length > 0 ? $el.closest('div[data-sek-input-id]').data('sek-input-id') : '',
                         was_triggered : params.was_triggered,
+                        // the syncedTinyMceInputId is used in the control::setupTinyMceEditor()
+                        // Fixes : https://github.com/presscustomizr/nimble-builder/issues/251
                         syncedTinyMceInputId : syncedTinyMceInputId
                   }, clonedParams ) );
             }
       });//$.extend()
 })( wp.customize, jQuery, _ );
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            //Fired in ::initialize()
             setupLoader : function() {
                   var self = this;
+                  // Cache our loader
                   this._css_loader_html = '<div class="sek-css-loader sek-mr-loader" style="display:none"><div></div><div></div><div></div></div>';
+
+                  // Loader Cleaning <= the element printed when refreshing a level
+                  // @see ::mayBePrintLoader
                   $( 'body').on([
                         'sek-modules-refreshed',
                         'sek-columns-refreshed',
@@ -1129,6 +1452,23 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.cleanLoader();
                   });
             },
+
+            // @return void()
+            // Insert a clone ( same dimensions ) div element of a level currently being refreshed, including a centered loading animation
+            // + adds a .sek-refreshing css class to the element being refreshed
+            //
+            // Invoked when
+            // - user click on an icon action in the preview that trigger a partial reflush of the DOM. For example, adding a column, duplicating a module, etc.
+            // - a module / section is dropped in the preview
+            // - a module is being edited
+            // - a column is resized
+            // - on 'sek-maybe-print-loader'
+            // @params {
+            //    element : $(),
+            //    action : '',
+            //    level,
+            //    loader_located_in_level_id
+            // }
             mayBePrintLoader : function( params ) {
                   var self = this,
                       levelIdForTheLoader = params.loader_located_in_level_id;
@@ -1137,14 +1477,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         var $levelElementForTheLoader = $('[data-sek-id="' + levelIdForTheLoader +'"]');
                         if ( $levelElementForTheLoader.length > 0 && 1 > $('.sek-level-clone ').length ) {
                               $levelClone = $('<div>', { class : 'sek-level-clone' });
+                              // blur all children levels
                               $levelElementForTheLoader.find('[data-sek-level]').each( function() {
                                     $(this).addClass('sek-refreshing');
                               });
+
+                              // print the absolute positionned clone on top
                               $levelElementForTheLoader.prepend( $levelClone );
                               $levelClone.css({
                                     width : $levelElementForTheLoader.outerWidth() +'px',
                                     height : $levelElementForTheLoader.outerHeight() + 'px'
                               }).append( self._css_loader_html ).find('.sek-css-loader').fadeIn( 'fast' );
+
+                              // Start the countdown for auto-cleaning
                               clearTimeout( $.data( this, '_nimble_loader_active_timer_') );
                               $.data( this, '_nimble_loader_active_timer_', setTimeout(function() {
                                     self.cleanLoader();
@@ -1155,15 +1500,25 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         var $loaderWrapper = $('<div>', { id : 'nimble-full-page-loader-wrapper', class: 'white-loader'} );
                         $('body').append($loaderWrapper);
                         $loaderWrapper.fadeIn('fast').append( self._css_loader_html ).find('.sek-css-loader').fadeIn( 'fast' );
+                        // Blur locations
                         $('[data-sek-level="location"]').each( function() {
                               $(this).addClass('sek-blur');
                         });
+
+                        // Start the countdown for auto-cleaning
                         clearTimeout( $.data( this, '_nimble_full_page_loader_active_timer_') );
                         $.data( this, '_nimble_full_page_loader_active_timer_', setTimeout(function() {
                               self.cleanLoader( { cleanFullPageLoader : true });
                         }, 6000 ) );
                   }
             },
+
+            // scheduled in ::initialize(), on 'sek-modules-refreshed sek-columns-refreshed sek-section-added sek-refresh-level'
+            // invoked in ::mayBePrintLoader() in an auto-clean scenario
+            // or on wp.customize.send('sek-clean-loader', { cleanFullPageLoader : true })
+            // {
+            //  cleanFullPageLoader : true
+            // }
             cleanLoader : function( params ) {
                   var self = this;
                   $('.sek-level-clone').remove();
@@ -1172,6 +1527,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
                   params = params || {};
                   if ( true === params.cleanFullPageLoader ) {
+                        // Unblur locations
                         $('[data-sek-level="location"]').each( function() {
                               $(this).removeClass('sek-blur');
                         });
@@ -1181,14 +1537,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
       });//$.extend()
 })( wp.customize, jQuery, _ );
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            // Fired in ::initialize()
             schedulePanelMsgReactions : function() {
                   var self = this,
                       apiParams = {},
                       uiParams = {},
                       msgCollection = {
+                            // DOM MODIFICATION CASES
                             'sek-add-section' : 'ajaxAddSektion',
                             'sek-add-content-in-new-sektion' : 'ajaxAddSektion',
                             'sek-add-content-in-new-nested-sektion' : 'ajaxAddSektion',
@@ -1214,6 +1573,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                       dfd;
                                   switch ( params.apiParams.action ) {
                                         case 'sek-remove-section' :
+                                              // will be cleaned on ajax.done()
+                                              // @see ::scheduleTheLoaderCleaning
                                               self.mayBePrintLoader({
                                                     loader_located_in_level_id : params.apiParams.location
                                               });
@@ -1224,8 +1585,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                           self.errare( 'reactToPanelMsg => sek-remove => invalid candidate id => ', removeCandidateId );
                                                     }
                                                     $('body').find( $candidateEl ).remove();
+                                                    // say it
+                                                    // listened to clean the loader just in time
                                                     $('[data-sek-id="' + params.apiParams.location + '"]').trigger( 'sek-level-refreshed');
                                               }
+                                              //self.ajaxRefreshModulesAndNestedSections( params );
                                         break;
                                         case 'sek-remove-column' :
                                               dfd = self.ajaxRefreshColumns( params );
@@ -1236,6 +1600,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         default :
                                         break;
                                   }
+                                  // We should always return a promise
                                   return _.isEmpty( dfd ) ? $.Deferred( function() { this.resolve(); } ) : dfd;
                             },
 
@@ -1243,21 +1608,33 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   var dfd;
                                   switch ( params.apiParams.action ) {
                                         case 'sek-duplicate-section' :
+                                              // replace the original id by the new cloneId registered in the main setting, and sent by the panel
                                               params.apiParams.id = params.cloneId;
                                               dfd = self.ajaxAddSektion( params );
                                         break;
                                         case 'sek-duplicate-column' :
+                                              // replace the original id by the new cloneId registered in the main setting, and sent by the panel
                                               params.apiParams.id = params.cloneId;
                                               dfd = self.ajaxRefreshColumns( params );
                                         break;
                                         case 'sek-duplicate-module' :
+                                              // replace the original id by the new cloneId registered in the main setting, and sent by the panel
                                               params.apiParams.id = params.cloneId;
                                               dfd = self.ajaxRefreshModulesAndNestedSections( params );
                                         break;
                                   }
                                   return dfd;
                             },
+
+                            // Re-print a level
+                            // Can be invoked when setting the section layout option boxed / wide, when we need to add a css class server side
+                            // @params {
+                            //   action : 'sek-refresh-level',
+                            //   level : params.level,
+                            //   id : params.id
+                            // }
                             'sek-refresh-level' : function( params ) {
+                                  // will be cleaned on 'sek-module-refreshed'
                                   self.mayBePrintLoader({
                                         loader_located_in_level_id : params.apiParams.id
                                   });
@@ -1273,12 +1650,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         $( '[data-sek-id="' + params.apiParams.id + '"]' ).trigger( 'sek-ajax-error' );
                                   }).done( function( _r_ ) {
                                         var html_content = '';
+                                        //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
                                         if ( _r_.data && _r_.data.contents ) {
                                               html_content = _r_.data.contents;
                                         } else {
                                               self.errare( 'SekPreviewPrototype::sek-refresh-level => ajax_response.data.contents is undefined ', _r_ );
                                               self.errare( 'params ?', params );
                                         }
+                                        // _r_ is an array
+                                        // @see SEK_Front_Ajax::sek_get_level_content_for_injection
+                                        // _r_ = array(
+                                        //     'contents' => $html,
+                                        //     'setting_validities' => $exported_setting_validities
+                                        // );
                                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.id + '"></span>',
                                             $currentLevelEl = $( 'div[data-sek-id="' + params.apiParams.id + '"]' );
                                         if ( $currentLevelEl.length < 1 ) {
@@ -1297,15 +1681,60 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         }
 
                                         $placeHolder.remove();
+
+                                        //=> 'sek-level-refreshed' is listened to ( for example ) clean the loader overlay in time
                                         $( '[data-sek-id="' + params.apiParams.id + '"]' ).trigger( 'sek-level-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                                   });
                             },
+
+
+
+
+
+
+                            // EDITING MODULE AND OPTIONS
                             'sek-move' : function( params ) {
                                   switch ( params.apiParams.action ) {
+                                        // case 'sek-move-section' :
+                                        //       //always re-render the source sektion and target sektion if different
+                                        //       //=> this will ensure a reset of the column's widths
+                                        //       if ( params.apiParams.from_location != params.apiParams.to_location ) {
+                                        //             var paramsForSourceSektion = $.extend( true, {}, params );
+                                        //             var paramsForTargetSektion = $.extend( true, {}, params );
+
+                                        //             // SOURCE SEKTION
+                                        //             // if the source sektion has been emptied, let's populate it with a new column
+                                        //             if ( $('[data-sek-id="' + params.apiParams.from_sektion +'"]', '.sektion-wrapper').find('div[data-sek-level="column"]').length < 1 ) {
+                                        //                   api.preview.send( 'sek-add-column', {
+                                        //                         in_sektion : params.apiParams.from_sektion,
+                                        //                         autofocus:false//<= because we want to focus on the column that has been moved away from the section
+                                        //                   });
+                                        //             } else {
+                                        //                   paramsForSourceSektion.apiParams =  _.extend( paramsForSourceSektion.apiParams, {
+                                        //                         in_sektion : params.apiParams.from_sektion,
+                                        //                         action : 'sek-refresh-columns-in-sektion'
+                                        //                   });
+                                        //                   self.ajaxRefreshColumns( paramsForSourceSektion );
+                                        //             }
+
+                                        //             // TARGET SEKTION
+                                        //             paramsForTargetSektion.apiParams =  _.extend( paramsForTargetSektion.apiParams, {
+                                        //                   in_sektion : params.apiParams.to_sektion,
+                                        //                   action : 'sek-refresh-columns-in-sektion'
+                                        //             });
+                                        //             self.ajaxRefreshColumns( paramsForTargetSektion );
+
+                                        //       }
+                                        // break;
                                         case 'sek-move-column' :
+                                              //always re-render the source sektion and target sektion if different
+                                              //=> this will ensure a reset of the column's widths
                                               if ( params.apiParams.from_sektion != params.apiParams.to_sektion ) {
                                                     var paramsForSourceSektion = $.extend( true, {}, params );
                                                     var paramsForTargetSektion = $.extend( true, {}, params );
+
+                                                    // SOURCE SEKTION
+                                                    // if the source sektion has been emptied, let's populate it with a new column
                                                     if ( $('[data-sek-id="' + params.apiParams.from_sektion +'"]', '.sektion-wrapper').find('div[data-sek-level="column"]').length < 1 ) {
                                                           api.preview.send( 'sek-add-column', {
                                                                 in_sektion : params.apiParams.from_sektion,
@@ -1318,6 +1747,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                           });
                                                           self.ajaxRefreshColumns( paramsForSourceSektion );
                                                     }
+
+                                                    // TARGET SEKTION
                                                     paramsForTargetSektion.apiParams =  _.extend( paramsForTargetSektion.apiParams, {
                                                           in_sektion : params.apiParams.to_sektion,
                                                           action : 'sek-refresh-columns-in-sektion'
@@ -1329,6 +1760,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         case 'sek-move-module' :
                                               var paramsForSourceColumn = $.extend( true, {}, params ),
                                                   paramsForTargetColumn = $.extend( true, {}, params );
+                                              // SOURCE COLUMN
+                                              //always re-render the source column if different than the target column
+                                              //=> this will ensure that we have the drop-zone placeholder printed for a no-module column
+                                              //+ will refresh the sortable()
                                               if ( paramsForSourceColumn.apiParams.from_column != paramsForSourceColumn.apiParams.to_column ) {
                                                     paramsForSourceColumn.apiParams = _.extend( paramsForSourceColumn.apiParams, {
                                                           in_column : paramsForSourceColumn.apiParams.from_column,
@@ -1337,24 +1772,70 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                     });
                                                     self.ajaxRefreshModulesAndNestedSections( paramsForSourceColumn );
                                               }
+
+                                              // TARGET COLUMN
                                               params.apiParams = _.extend( paramsForTargetColumn.apiParams, {
                                                     in_column : paramsForTargetColumn.apiParams.to_column,
                                                     in_sektion : paramsForTargetColumn.apiParams.to_sektion,
                                                     action : 'sek-refresh-modules-in-column'
                                               });
                                               self.ajaxRefreshModulesAndNestedSections( paramsForTargetColumn );
+
+                                              // Re-instantiate sortable for the target column
                                               $('[data-sek-id="' + params.apiParams.to_column +'"]', '.sektion-wrapper').find('.sek-column-inner').sortable( "refresh" );
                                         break;
                                   }
                             },
 
+
+
+
+
+                            // GENERATE UI ELEMENTS
+                            // when the options ui has been generated in the panel for a level, we receive back this msg
+                            // 'sek-generate-level-options-ui' : function( params ) {
+                            //       api.infoLog('PANEL REACT? ', 'sek-generate-level-options-ui', params );
+                            // },
+
                             'sek-edit-options' : function( params ) {
+                                  // ::activeLevelUI is declared in ::initialized()
                                   self.activeLevelUI( params.uiParams.id );
                             },
                             'sek-edit-module' : function( params ) {
+                                  // ::activeLevelUI is declared in ::initialized()
                                   self.activeLevelUI( params.uiParams.id );
                             },
+
+
+
+
+
+
+
+
+
+                            // @params =  {
+                            //   location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                            //   apiParams : apiParams,
+                            //   uiParams : uiParams
+                            // }
+                            // uiParams = {
+                            //       action : 'sek-edit-module',
+                            //       level : params.level,
+                            //       id : params.id,
+                            //       in_sektion : params.in_sektion,
+                            //       in_column : params.in_column,
+                            //       options : params.options || []
+                            // };
+                            //
+                            // when the module ui has been generated in the panel, we receive back this msg
+                            //'sek-generate-module-ui' : function( params ) {},
+
+                            //@params {
+                            //    type : module || preset_section,
+                            // }
                             'sek-drag-start' : function( params ) {
+                                  // append the drop zones between sections
                                   var i = 1, previousSectionIsEmpty = false;
                                   $('[data-sek-level="location"]').children('[data-sek-level="section"]').each( function() {
                                         var sectionId = $(this).data('sek-id'),
@@ -1362,11 +1843,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                             moduleNb = $(this).find('[data-sek-level="module"]').length,
                                             isEmptySection = columnNb < 2 && moduleNb < 1,
                                             canPrintBefore = ! previousSectionIsEmpty && ! isEmptySection;
+
+                                        // Print a dropzone before if the previous section and current section are not empty.
                                         if ( canPrintBefore && $('[data-drop-zone-before-section="' + sectionId +'"]').length < 1 ) {
                                               $(this).before(
                                                 '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + sectionId +'"></div>'
                                               );
                                         }
+                                        // After the last one
                                         if ( ! isEmptySection && i == $('.sektion-wrapper').children('[data-sek-level="section"]').length ) {
                                               $(this).after(
                                                 '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + sectionId +'"></div>'
@@ -1375,24 +1859,32 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         i++;
                                         previousSectionIsEmpty = isEmptySection;
                                   });
+
+                                  // Append the drop zone in empty locations
                                   $('.sek-empty-location-placeholder').each( function() {
                                         $.when( $(this).append(
                                               '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="in-empty-location"></div>'
                                         ));
                                   });
+
+                                  // Append a drop zone between modules and nested sections in columns
                                   if ( 'module' ==  params.type ) {
                                         $('[data-sek-level="column"]').each( function() {
+                                              // Our candidates are the modules and nested section which are direct children of this column
+                                              // We don't want to include the modules inserted in the columns of a nested section.
                                               var $modules_and_nested_sections = $(this).children('.sek-column-inner').children( '[data-sek-level="module"]' );
                                               var $nested_sections = $(this).children('.sek-column-inner').children( '[data-sek-is-nested="true"]' );
                                               $modules_and_nested_sections = $modules_and_nested_sections.add( $nested_sections );
 
                                               var j = 1;
                                               $modules_and_nested_sections.each( function() {
+                                                    // Always before
                                                     if ( $('[data-drop-zone-before-module-or-nested-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
                                                           $(this).before(
                                                               '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules-and-nested-sections" data-drop-zone-before-module-or-nested-section="' + $(this).data('sek-id') +'"></div>'
                                                           );
                                                     }
+                                                    // After the last one
                                                     if (  j == $modules_and_nested_sections.length && $('[data-drop-zone-after-module-or-nested-section="' + $(this).data('sek-id') +'"]').length < 1 ) {
                                                           $(this).after(
                                                             '<div class="sek-content-module-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-modules-and-nested-sections" data-drop-zone-after-module-or-nested-section="' + $(this).data('sek-id') +'"></div>'
@@ -1402,17 +1894,43 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                               });
                                         });
                                   }
+
+
+                                  // toggle a parent css classes controlling some css rules @see preview.css
                                   $('body').addClass('sek-dragging');
+
+                                  // Reveal all dynamic dropzones after a delay
                                   _.delay( function() {
                                         $('.sek-dynamic-drop-zone').css({ opacity : 1 });
                                   }, 100 );
 
                             },
+                            // is sent on dragend and drop
                             'sek-drag-stop' : function( params ) {
                                   $('body').removeClass('sek-dragging');
+                                  // Clean any remaining placeholder
                                   $('.sortable-placeholder').remove();
+
+                                  // Remove the drop zone dynamically add on sek-drag-start
                                   $('.sek-dynamic-drop-zone').remove();
                             },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            // FOCUS
+                            // Sent from the panel when duplicating a section level for example
                             'sek-animate-to-level' : function( params ) {
                                   var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
                                   if ( $elToFocusOn.length > 0 ) {
@@ -1421,18 +1939,29 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         }, 200 );
                                   }
                             },
+
+
+                            // LEVEL UI's
                             'sek-clean-level-uis' : function( params ) {
                                   $('.sek-dyn-ui-wrapper').each( function() {
                                         $(this).remove();
                                   });
                             },
+                            // triggered when navigating the level tree
                             'sek-display-level-ui' : function( params ) {
                                   var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
                                   if ( $elToFocusOn.length > 0 ) {
+                                        //$elToFocusOn.trigger('click'); //<= the click is not needed anymore since June 2019, we trigger the generation of the level options on 'click' in the level tree
                                         self.printLevelUI($elToFocusOn);
                                   }
                             },
+
+
+                            // DOUBLE CLICK INSERTION => HIGHLIGHTED TARGET
+                            // implemented for double-click insertion
+                            // https://github.com/presscustomizr/nimble-builder/issues/317
                             'sek-set-double-click-target' : function( params ) {
+                                  // First clean any other highlighted target
                                   $('.sek-target-for-double-click-insertion').removeClass('sek-target-for-double-click-insertion');
 
                                   if ( _.isObject( params ) && params.id ) {
@@ -1445,6 +1974,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             'sek-reset-double-click-target' : function( params ) {
                                   $('.sek-target-for-double-click-insertion').removeClass('sek-target-for-double-click-insertion');
                             },
+
+                            // introduced for https://github.com/presscustomizr/nimble-builder/issues/403
                             'sek-update-html-in-selector' : function( params ) {
                                   var $level_el = $('[data-sek-id="' + params.id + '"]' ),
                                       $target_el = $(params.selector, $level_el);
@@ -1466,7 +1997,18 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   uiParams : {}
                               }, params || {} );
 
+                              // If the ajax response is an array formed this way ( @see sek-refresh-level case ) :
+                              // @see SEK_Front_Ajax::sek_get_level_content_for_injection
+                              // _ajaxResponse_ = array(
+                              //     'contents' => $html,
+                              //     'setting_validities' => $exported_setting_validities
+                              // );
+                              // Then we send an additional setting-validity message to the control panel
+                              // This is the same mechanism used by WP to handle the setting validity of the partial refresh
+
                               var sendSuccessDataToPanel = function( _ajaxResponse_ ) {
+                                    // always send back the {msgId}_done message, so the control panel can fire the "complete" callback.
+                                    // @see api.czr_sektions::reactToPreviewMsg
                                     api.preview.send( [ msgId, 'done'].join('_'), params );
                                     if ( _.isUndefined( _ajaxResponse_ ) )
                                       return;
@@ -1475,6 +2017,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           api.preview.send( 'selective-refresh-setting-validities', _ajaxResponse_.data.setting_validities );
                                     }
                               };
+                              // the action being processed is added as a css class to the body of the preview
+                              // it's used to enable/disable specific css properties during the action
+                              // for example, we don't want css transitions while duplicating or removing a column
                               $('body').addClass( msgId );
                               try {
                                     $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) )
@@ -1499,11 +2044,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             }//schedulePanelMsgReactions()
       });//$.extend()
 })( wp.customize, jQuery, _ );
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            // this method is used when creating or duplicating a sektion
+            // @return a promise()
             ajaxAddSektion : function( params ) {
                   var self = this;
+                  // will be cleaned on ajax.done()
+                  // @see ::scheduleTheLoaderCleaning
                   self.mayBePrintLoader({
                         loader_located_in_level_id : params.apiParams.location
                   });
@@ -1518,12 +2068,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         is_nested : params.apiParams.is_nested
                   }).done( function( _r_ ) {
                         var html_content = '';
+                        //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
                         if ( _r_.data && _r_.data.contents ) {
                               html_content = _r_.data.contents;
                         } else {
                               self.errare( 'SekPreviewPrototype::ajaxAddSektion => ajax_response.data.contents is undefined ', _r_ );
                               self.errare( 'params ?', params );
                         }
+
+                        // Embed
+                        // is it a nested sektion ?
                         var $parentColumn;
                         if ( params.apiParams.is_nested ) {
                               $parentColumn = $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_column + '"]' );
@@ -1532,14 +2086,21 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                               var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.in_column + '"></span>';
                               $parentColumn.before( placeholderHtml );
+                              // remove and re-render the entire column
                               $parentColumn.remove();
                               $( '.sektion-wrapper').find( '.sek-placeholder' ).after( html_content );
                               $( '.sektion-wrapper').find( '.sek-placeholder' ).remove();
                         } else {
+                              // DUPLICATE CASE
+                              // Insert the clone section right after its cloned sister
                               if ( 'sek-duplicate-section' == params.apiParams.action && ! _.isEmpty( params.cloneId ) ) {
                                     $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).after( html_content );
                               }
+                              // GENERATED WHEN ADDING A MODULE
                               else {
+                                    // When a section has been created by adding a module ( @see sek-add-content-in-new-sektion )
+                                    // we need to append it to a specific location
+                                    // otherwise, we append it at the end of the section collection
                                     $beforeCandidate = $( '.sektion-wrapper[data-sek-id="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.before_section + '"]' );
                                     $afterCandidate = $( '.sektion-wrapper[data-sek-id="' + params.apiParams.location + '"]').find( 'div[data-sek-id="' + params.apiParams.after_section + '"]' );
 
@@ -1552,17 +2113,26 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     }
                               }
                         }
+
+                        // When a section is duplicated, fire sortable for the inner-column modules
                         if ( 'sek-duplicate-section' == params.apiParams.action ) {
+                              // re-instantiate sortable in the refreshed columns of the section
+                              // + make columns resizable
                               $( 'div[data-sek-id="' + params.cloneId + '"]', '.sektion-wrapper').each( function() {
                                     $(this).trigger('sek-columns-refreshed');
                               });
                         }
+
+                        // refresh sortable for the inner column if nested sektion case
                         if ( params.apiParams.is_nested ) {
                               self.makeModulesSortableInColumn( params.apiParams.in_column );
                               $( '.sektion-wrapper').find( 'div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).each( function() {
                                     self.maybeMakeColumnResizableInSektion.call( this );
                               });
                         }
+
+                        // say it to the parent sektion
+                        //=> will be listened to clean the loader overlay just in time
                         if ( params.cloneId ) {
                               $( 'div[data-sek-id="' + params.cloneId + '"]' ).trigger('sek-section-added', params );
                         }
@@ -1576,11 +2146,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
       });//$.extend()
 })( wp.customize, jQuery, _ );
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            // refresh column is used to
+            // 1) Add a new column
+            // 2) re-render the column collection in a sektion
             ajaxRefreshColumns : function( params ) {
                   var self = this;
+                  // will be cleaned on 'sek-columns-refreshed'
                   self.mayBePrintLoader({
                         loader_located_in_level_id : params.apiParams.in_sektion
                   });
@@ -1593,6 +2168,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         sek_action : params.apiParams.action// sek-add-column || sek-remove-column
                   }).done( function( _r_ ) {
                         var html_content = '';
+                        //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
                         if ( _r_.data && _r_.data.contents ) {
                               html_content = _r_.data.contents;
                         } else {
@@ -1606,10 +2182,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         }
                         var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.in_sektion + '"></span>';
                         $parentSektion.before( placeholderHtml );
+                        // remove and re-render the entire sektion
                         $parentSektion.remove();
                         $( '.sektion-wrapper').find( '.sek-placeholder' ).after( html_content );
                         $( '.sektion-wrapper').find( '.sek-placeholder' ).remove();
+
+                        // re-generate the stylesheet => this will take into account the reset width of each column
                         api.preview.trigger( 'sek-refresh-stylesheet', params );
+
+                        // say it to the parent sektion
+                        //=> will be listened to by the column to re-instantiate sortable, resizable
+                        //=> also listened to clean the loader overalay in time
                         $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed', { in_sektion : params.apiParams.in_sektion } );
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-add-column => ' , _r_ );
@@ -1621,6 +2204,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
             ajaxResizeColumns : function( params ) {
                   var self = this;
+                  // will be cleaned on 'sek-module-refreshed'
                   self.mayBePrintLoader({
                         loader_located_in_level_id : params.apiParams.in_sektion
                   });
@@ -1633,17 +2217,25 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         sek_action : 'sek-resize-columns'
                   }).done( function( _r_ ) {
                         var html_content = '';
+                        //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
                         if ( _r_.data && _r_.data.contents ) {
                               html_content = _r_.data.contents;
                         } else {
                               self.errare( 'SekPreviewPrototype::ajaxResizeColumns => ajax_response.data.contents is undefined ', _r_ );
                               self.errare( 'params ?', params );
                         }
+                        //self.errare('sek-preview => resize-column ajax response => ', html_content );
+                        // Reset the automatic default resizable inline styling
                         $( '[data-sek-id="' + params.apiParams.resized_column + '"]' ).css({
                               width : '',
                               height: ''
                         });
+
+                        //Append
                         self.appendDynStyleSheet( params.location_skope_id, html_content );
+
+                        // say it
+                        // listened to clean the loader just in time
                         $('div[data-sek-id="' + params.apiParams.in_sektion + '"]' ).trigger('sek-columns-refreshed');
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR reactToPanelMsg => sek-resize-columns => ' , _r_ );
@@ -1653,11 +2245,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             }
       });//$.extend()
 })( wp.customize, jQuery, _ );
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+              // refresh module is used to
+              // 1) Add a new module
+              // 2) re-render the module collection in a column, typically after a sortable move, or a module removal
               ajaxRefreshModulesAndNestedSections : function( params ) {
                     var self = this;
+                    // will be cleaned on 'sek-module-refreshed'
                     self.mayBePrintLoader({
                           loader_located_in_level_id : params.apiParams.in_column
                     });
@@ -1672,6 +2269,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           is_nested : params.apiParams.is_nested
                     }).done( function( _r_ ) {
                           var html_content = '';
+                          //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
                           if ( _r_.data && _r_.data.contents ) {
                                 html_content = _r_.data.contents;
                           } else {
@@ -1685,9 +2283,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           }
                           var placeholderHtml = '<span class="sek-placeholder" data-sek-placeholder-for="' + params.apiParams.in_column + '"></span>';
                           $parentColumn.before( placeholderHtml );
+                          // remove and re-render the entire column
                           $parentColumn.remove();
                           $( '[data-sek-placeholder-for="' + params.apiParams.in_column + '"]' ).after( html_content );
                           $( '[data-sek-placeholder-for="' + params.apiParams.in_column + '"]' ).remove();
+
+                          // say it to the column
+                          //=> will be listened to by the column to re-instantiate sortable, resizable and fittext
                           $( '[data-sek-id="' + params.apiParams.in_column + '"]' ).trigger('sek-modules-refreshed', { in_column : params.apiParams.in_column, in_sektion : params.apiParams.in_sektion });
 
                     }).fail( function( _r_ ) {
@@ -1698,11 +2300,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
               }//ajaxRefreshModulesAndNestedSections()
       });//$.extend()
 })( wp.customize, jQuery, _ );
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
             ajaxRefreshStylesheet : function( params ) {
                   var self = this;
+                  // will be cleaned on 'sek-module-refreshed'
                   self.mayBePrintLoader({
                         loader_located_in_level_id : params.apiParams.id
                   });
@@ -1713,10 +2317,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         sek_action : 'sek-refresh-stylesheet'
                   }).done( function( _r_ ) {
                         var html_content = '';
+                        //@see php SEK_Front_Ajax::sek_get_level_content_for_injection
                         if ( _r_.data && _r_.data.contents ) {
                               html_content = _r_.data.contents;
                         }
                         self.appendDynStyleSheet( params.location_skope_id, html_content );
+                        //=> 'sek-level-refreshed' is listened to clean the loader overlay in time
                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
                               .trigger( 'sek-stylesheet-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
                   }).fail( function( _r_ ) {
@@ -1729,6 +2335,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             appendDynStyleSheet : function( location_skope_id, styleMarkup ) {
                 var _stylesheet_id_ = '#sek-' + location_skope_id,//@see php Sek_Dyn_CSS_Handler
                     _gfonts_id_ = '#sek-gfonts-' + location_skope_id;//@see php Sek_Dyn_CSS_Handler
+
+                // Remove a dynamic inline stylesheet if already printed
                 if ( 0 < $('head').find( _stylesheet_id_ ).length ) {
                       $('head').find( _stylesheet_id_ ).remove();
                 }
@@ -1738,6 +2346,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                 if ( !_.isEmpty( styleMarkup ) ) {
                       $('head').append( styleMarkup );
                 }
+                // if we have something to print ( styleMarkup not empty ), there should be a dom element
                 if ( ! _.isEmpty( styleMarkup ) && 1 > $('head').find( _stylesheet_id_ ).length ) {
                       this.errare( 'sek-preview => problem when printing the dynamic inline style for : '+ _stylesheet_id_, styleMarkup );
                 } else {
@@ -1746,12 +2355,20 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             }//appendDynStyleSheet()
       });//$.extend()
 })( wp.customize, jQuery, _ );
+//global sekPreviewLocalized
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            // inspired from wp.template in wp-includes/js/wp-util.js
             parseTemplate : _.memoize(function ( id ) {
                   var self = this;
                   var compiled,
+                    //
+                    // Underscore's default ERB-style templates are incompatible with PHP
+                    // when asp_tags is enabled, so WordPress uses Mustache-inspired templating syntax.
+                    //
+                    // @see trac ticket #22344.
+                    //
                     options = {
                           evaluate:    /<#([\s\S]+?)#>/g,
                           interpolate: /\{\{\{([\s\S]+?)\}\}\}/g,
@@ -1770,6 +2387,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         return compiled( data );
                   };
             }),
+
+
+
+            //@return [] for console method
+            //@bgCol @textCol are hex colors
+            //@arguments : the original console arguments
             _prettyPrintLog : function( args ) {
                   var _defaults = {
                         bgCol : '#5ed1f5',
@@ -1784,6 +2407,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               return '';
                             return string.length > 300 ? string.substr( 0, 299 ) + '...' : string;
                       };
+
+                  //if the array to print is not composed exclusively of strings, then let's stringify it
+                  //else join(' ')
                   if ( ! _.isEmpty( _.filter( _toArr, function( it ) { return ! _.isString( it ); } ) ) ) {
                         _toArr =  JSON.stringify( _toArr.join(' ') );
                   } else {
@@ -1796,6 +2422,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             },
 
             _wrapLogInsideTags : function( title, msg, bgColor ) {
+                  //fix for IE, because console is only defined when in F12 debugging mode in IE
                   if ( ( _.isUndefined( console ) && typeof window.console.log != 'function' ) )
                     return;
                   if ( sekPreviewLocalized.isDevMode ) {
@@ -1813,8 +2440,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
             errare : function( title, msg ) { this._wrapLogInsideTags( title, msg, '#ffd5a0' ); },
             infoLog : function( title, msg ) { this._wrapLogInsideTags( title, msg, '#5ed1f5' ); },
+
+            //encapsulates a WordPress ajax request in a normalize method
+            //@param queryParams = {}
             doAjax : function( queryParams ) {
                   var self = this;
+                  //do we have a queryParams ?
                   queryParams = queryParams || ( _.isObject( queryParams ) ? queryParams : {} );
 
                   var ajaxUrl = queryParams.ajaxUrl || sekPreviewLocalized.ajaxUrl,//the ajaxUrl can be specified when invoking doAjax
@@ -1826,13 +2457,19 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             },
                             queryParams
                       );
+
+                  // HTTP ajaxurl when site is HTTPS causes Access-Control-Allow-Origin failure in Desktop and iOS Safari
                   if ( "https:" == document.location.protocol ) {
                         ajaxUrl = ajaxUrl.replace( "http://", "https://" );
                   }
+
+                  //check if we're good
                   if ( _.isEmpty( _query_.action ) || ! _.isString( _query_.action ) ) {
                         self.errare( 'self.doAjax : unproper action provided' );
                         return dfd.resolve().promise();
                   }
+                  //setup nonce
+                  //Note : the nonce might be checked server side ( not in all cases, only when writing in db )  with check_ajax_referer( 'hu-front-nonce', 'HuFrontNonce' )
                   _query_[ nonce.id ] = nonce.handle;
                   if ( ! _.isObject( nonce ) || _.isUndefined( nonce.id ) || _.isUndefined( nonce.handle ) ) {
                         self.errare( 'self.doAjax : unproper nonce' );
@@ -1841,6 +2478,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   $.post( ajaxUrl, _query_ )
                         .done( function( _r ) {
+                              // Check if the user is logged out.
                               if ( '0' === _r ||  '-1' === _r || false === _r.success ) {
                                     self.errare( 'self.doAjax : done ajax error for action : ' + _query_.action , _r );
                                     dfd.reject( _r );
@@ -1852,23 +2490,41 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.errare( 'self.doAjax : failed ajax error for : ' + _query_.action, _r );
                               dfd.reject( _r );
                         });
+                        //.always( function( _r ) { dfd.resolve( _r ); });
                   return dfd.promise();
             },//doAjax
+
+
+
+
+
+
+            // @return boolean
             isModuleRegistered : function( moduleType ) {
                   return sekPreviewLocalized.registeredModules && ! _.isUndefined( sekPreviewLocalized.registeredModules[ moduleType ] );
             },
+
+
+            //@return mixed
             getRegisteredModuleProperty : function( moduleType, property ) {
                   if ( ! this.isModuleRegistered( moduleType ) ) {
                         return 'not_set';
                   }
                   return sekPreviewLocalized.registeredModules[ moduleType ][ property ];
             },
+
+            // @params = { id : '', level : '' }
+            // Recursively walk the level tree until a match is found
+            // @return the level model object
             getLevelModel : function( id, collection ) {
                   var self = this, _data_ = 'no_match';
+                  // do we have a collection ?
+                  // if not, let's use the root one
                   if ( _.isUndefined( collection ) ) {
                         self.errare( 'getLevelModel => a collection must be provided' );
                   }
                   _.each( collection, function( levelData ) {
+                        // did we have a match recursively ?
                         if ( 'no_match' != _data_ )
                           return;
                         if ( id === levelData.id ) {
