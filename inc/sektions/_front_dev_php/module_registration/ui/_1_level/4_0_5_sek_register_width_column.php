@@ -48,37 +48,37 @@ function sek_add_css_rules_for_column_width( $rules, $column ) {
     $width_options = is_array( $options[ 'width' ] ) ? $options[ 'width' ] : array();
 
     // ALIGNMENT BY DEVICE
-    if ( ! empty( $width_options[ 'h_alignment' ] ) ) {
-        if ( ! is_array( $width_options[ 'h_alignment' ] ) ) {
-            sek_error_log( __FUNCTION__ . ' => error => the h_alignment option should be an array( {device} => {alignment} )');
-        }
-        $h_alignment_value = is_array( $width_options[ 'h_alignment' ] ) ? $width_options[ 'h_alignment' ] : array();
-        $h_alignment_value = wp_parse_args( $h_alignment_value, array(
-            'desktop' => '',
-            'tablet' => '',
-            'mobile' => ''
-        ));
-        $mapped_values = array();
-        foreach ( $h_alignment_value as $device => $align_val ) {
-            switch ( $align_val ) {
-                case 'left' :
-                    $mapped_values[$device] = "flex-start";
-                break;
-                case 'center' :
-                    $mapped_values[$device] = "center";
-                break;
-                case 'right' :
-                    $mapped_values[$device] = "flex-end";
-                break;
-            }
-        }
+    // if ( ! empty( $width_options[ 'h_alignment' ] ) ) {
+    //     if ( ! is_array( $width_options[ 'h_alignment' ] ) ) {
+    //         sek_error_log( __FUNCTION__ . ' => error => the h_alignment option should be an array( {device} => {alignment} )');
+    //     }
+    //     $h_alignment_value = is_array( $width_options[ 'h_alignment' ] ) ? $width_options[ 'h_alignment' ] : array();
+    //     $h_alignment_value = wp_parse_args( $h_alignment_value, array(
+    //         'desktop' => '',
+    //         'tablet' => '',
+    //         'mobile' => ''
+    //     ));
+    //     $mapped_values = array();
+    //     foreach ( $h_alignment_value as $device => $align_val ) {
+    //         switch ( $align_val ) {
+    //             case 'left' :
+    //                 $mapped_values[$device] = "flex-start";
+    //             break;
+    //             case 'center' :
+    //                 $mapped_values[$device] = "center";
+    //             break;
+    //             case 'right' :
+    //                 $mapped_values[$device] = "flex-end";
+    //             break;
+    //         }
+    //     }
 
-        $rules = sek_set_mq_css_rules( array(
-            'value' => $mapped_values,
-            'css_property' => 'align-self',
-            'selector' => '[data-sek-id="'.$column['id'].'"]'
-        ), $rules );
-    }
+    //     $rules = sek_set_mq_css_rules( array(
+    //         'value' => $mapped_values,
+    //         'css_property' => 'align-self',
+    //         'selector' => '[data-sek-id="'.$column['id'].'"]'
+    //     ), $rules );
+    // }
 
 
     // CUSTOM WIDTH

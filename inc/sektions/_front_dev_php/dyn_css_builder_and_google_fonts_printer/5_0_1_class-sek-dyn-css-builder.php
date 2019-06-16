@@ -412,7 +412,7 @@ class Sek_Dyn_CSS_Builder {
         // First try to find a width value in options, then look in the previous width property for backward compatibility
         // After implementing https://github.com/presscustomizr/nimble-builder/issues/279
         $column_options = isset( $column['options'] ) ? $column['options'] : array();
-        sek_error_log( 'COLUMN MODEL WHEN ADDING RULES ?', $column );
+        //sek_error_log( 'COLUMN MODEL WHEN ADDING RULES ?', $column_options );
 
         if ( !empty( $column_options['width'] ) && !empty( $column_options['width']['custom-width'] ) ) {
             $width_candidate = (float)$column_options['width']['custom-width'];
