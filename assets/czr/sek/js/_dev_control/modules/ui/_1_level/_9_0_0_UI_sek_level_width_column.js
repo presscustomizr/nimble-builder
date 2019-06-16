@@ -79,9 +79,21 @@
                           var currentColumnModelValue = api.czr_sektions.getLevelModel( input.columnId ),
                               currentColumnWidthValueFromModel = '_not_set_',
                               columnWidthInPercent;
-                          if ( 'no_match' !== currentColumnModelValue && currentColumnModelValue.options && currentColumnModelValue.options.width && currentColumnModelValue.options.width['custom-width'] && _.isNumber( currentColumnModelValue.options.width['custom-width'] ) ) {
+
+                          if ( 'no_match' == currentColumnModelValue ) {
+                                api.errare( 'sek_level_width_column module => invalid column model' );
+                                return;
+                          }
+
+                          if ( currentColumnModelValue.options && currentColumnModelValue.options.width && currentColumnModelValue.options.width['custom-width'] && _.isNumber( currentColumnModelValue.options.width['custom-width'] ) ) {
                                 currentColumnWidthValueFromModel = currentColumnModelValue.options.width['custom-width'];
                           }
+                          // For retrocompat, use the former width property when exists.
+                          // Deprecated in June 2019. See https://github.com/presscustomizr/nimble-builder/issues/279
+                          else if ( currentColumnModelValue && currentColumnModelValue.width && _.isNumber( +currentColumnModelValue.width ) ) {
+                                currentColumnWidthValueFromModel = currentColumnModelValue.width;
+                          }
+
 
                           if ( '_not_set_' !== currentColumnWidthValueFromModel ) {
                                 columnWidthInPercent = currentColumnWidthValueFromModel;
