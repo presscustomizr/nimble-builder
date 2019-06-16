@@ -72,9 +72,24 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
             $col_suffix = floor( $col_width_in_percent );
             //sek_error_log('$parent_section', $parent_section );
 
-            // Do we have a custom width for the column ?
+            // DO WE HAVE A COLUMN WIDTH FOR THE COLUMN ?
             // if not, let's get the col suffix from the parent section
-            $custom_width   = ( ! empty( $level[ 'width' ] ) && is_numeric( $level[ 'width' ] ) ) ? $level['width'] : null;
+            // First try to find a width value in options, then look in the previous width property for backward compatibility
+            // After implementing https://github.com/presscustomizr/nimble-builder/issues/279
+            $column_options = isset( $level['options'] ) ? $level['options'] : array();
+            if ( !empty( $column_options['width'] ) && !empty( $column_options['width']['custom-width'] ) ) {
+                $width_candidate = (float)$column_options['width']['custom-width'];
+                if ( $width_candidate < 0 || $width_candidate > 100 ) {
+                    sek_error_log( __FUNCTION__ . ' => invalid width valude for column id : ' . $column['id'] );
+                } else {
+                    $custom_width = $width_candidate;
+                }
+            } else {
+                // Backward compat since June 2019
+                // After implementing https://github.com/presscustomizr/nimble-builder/issues/279
+                $custom_width   = ( ! empty( $level[ 'width' ] ) && is_numeric( $level[ 'width' ] ) ) ? $level['width'] : null;
+            }
+
             if ( ! is_null( $custom_width ) ) {
                 $col_width_in_percent = $custom_width;
             }
@@ -106,6 +121,8 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
                 $breakpoint = $global_custom_breakpoint;
             }
 
+            // Format width in percent with 3 digits after decimal
+            $col_width_in_percent = number_format( $col_width_in_percent, 3 );
             $responsive_css_rules = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', $col_width_in_percent, $total_horizontal_margin_with_unit );
 
             // we need to override the rule defined in : Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
