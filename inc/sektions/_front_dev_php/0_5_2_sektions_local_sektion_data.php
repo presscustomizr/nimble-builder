@@ -57,6 +57,17 @@ function sek_get_raw_registration_params() {
                 )
             )
         ],
+        'sek_about_sec_picker_module' => [
+            'module_title' => __('Contact-us sections', 'text_doma'),
+            'section_collection' => array(
+                array(
+                    'content-id' => 'about_one',
+                    'title' => __('A simple about us section with 2 columns', 'text-domain' ),
+                    'thumb' => 'about_one.jpg',
+                    //'height' => '188px'
+                )
+            )
+        ],
         'sek_contact_sec_picker_module' => [
             'module_title' => __('Contact-us sections', 'text_doma'),
             'section_collection' => array(
