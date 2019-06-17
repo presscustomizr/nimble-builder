@@ -3536,6 +3536,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
+                        sek_about_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_about_sec_picker_module',
+                              controlLabel :  sektionsLocalizedData.i18n['About us sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
                         sek_contact_sec_picker_module : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_contact_sec_picker_module',
@@ -12450,12 +12459,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 return;
                           }
 
-                          if ( currentColumnModelValue.options && currentColumnModelValue.options.width && currentColumnModelValue.options.width['custom-width'] && _.isNumber( currentColumnModelValue.options.width['custom-width'] ) ) {
+                          var hasCustomWidth = currentColumnModelValue.options && currentColumnModelValue.options.width && currentColumnModelValue.options.width['custom-width'] && _.isNumber( +currentColumnModelValue.options.width['custom-width'] );
+
+                          if ( hasCustomWidth ) {
                                 currentColumnWidthValueFromModel = currentColumnModelValue.options.width['custom-width'];
                           }
                           // For retrocompat, use the former width property when exists.
                           // Deprecated in June 2019. See https://github.com/presscustomizr/nimble-builder/issues/279
-                          else if ( currentColumnModelValue && currentColumnModelValue.width && _.isNumber( +currentColumnModelValue.width ) ) {
+                          else if ( ! hasCustomWidth && currentColumnModelValue.width && _.isNumber( +currentColumnModelValue.width ) ) {
                                 currentColumnWidthValueFromModel = currentColumnModelValue.width;
                           }
 
@@ -12493,7 +12504,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 $rangeInput.val( $(this).val() );
                                 if ( params && params.is_init )
                                   return;
-                                input( $(this).val() );
+                                input( +parseFloat( $(this).val() ).toFixed(3) );
                           }, 300 ) );
 
                           // say it to the api, so we can regenerate the columns width for all columns.

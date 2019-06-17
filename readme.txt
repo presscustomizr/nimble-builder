@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.1
+Stable tag: 1.8.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -108,10 +108,14 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.1 =
-Introduction of a new customizer control to set a column width in percent, synchronized with the manual resize action in preview.
+= 1.8.2 =
+Introduction of a new "About us" pre-built section.
 
 == Changelog ==
+= 1.8.2 : June 17th 2019 =
+* fixed : column width option could be locked to a the previous value if set before v1.8.1
+* added : a new "About us" pre-built section
+
 = 1.8.1 : June 16th 2019 =
 * added : a new customizer control to set a column width in percent, synchronized with the manual resize action in preview.
 
