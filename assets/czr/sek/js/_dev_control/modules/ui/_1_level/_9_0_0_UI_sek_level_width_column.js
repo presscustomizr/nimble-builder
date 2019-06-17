@@ -85,12 +85,14 @@
                                 return;
                           }
 
-                          if ( currentColumnModelValue.options && currentColumnModelValue.options.width && currentColumnModelValue.options.width['custom-width'] && _.isNumber( currentColumnModelValue.options.width['custom-width'] ) ) {
+                          var hasCustomWidth = currentColumnModelValue.options && currentColumnModelValue.options.width && currentColumnModelValue.options.width['custom-width'] && _.isNumber( +currentColumnModelValue.options.width['custom-width'] );
+
+                          if ( hasCustomWidth ) {
                                 currentColumnWidthValueFromModel = currentColumnModelValue.options.width['custom-width'];
                           }
                           // For retrocompat, use the former width property when exists.
                           // Deprecated in June 2019. See https://github.com/presscustomizr/nimble-builder/issues/279
-                          else if ( currentColumnModelValue && currentColumnModelValue.width && _.isNumber( +currentColumnModelValue.width ) ) {
+                          else if ( ! hasCustomWidth && currentColumnModelValue.width && _.isNumber( +currentColumnModelValue.width ) ) {
                                 currentColumnWidthValueFromModel = currentColumnModelValue.width;
                           }
 
@@ -128,7 +130,7 @@
                                 $rangeInput.val( $(this).val() );
                                 if ( params && params.is_init )
                                   return;
-                                input( $(this).val() );
+                                input( +parseFloat( $(this).val() ).toFixed(3) );
                           }, 300 ) );
 
                           // say it to the api, so we can regenerate the columns width for all columns.
