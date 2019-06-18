@@ -503,7 +503,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         id : sektionsLocalizedData.optNameForGlobalOptions,
                         dirty : false,
                         value : sektionsLocalizedData.globalOptionDBValues,
-                        transport : 'refresh',//'refresh',//// ,
+                        transport : 'postMessage',//'refresh',//// ,
                         type : 'option'
                   });
 

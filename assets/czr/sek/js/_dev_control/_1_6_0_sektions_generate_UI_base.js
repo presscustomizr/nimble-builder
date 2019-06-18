@@ -114,6 +114,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 1) mono-items and multi-items module => input change
             // 2) crud multi item => item added or removed => in this case some args are not passed, like params.settingParams.args.inputRegistrationParams
             updateAPISettingAndExecutePreviewActions : function( params ) {
+
+                  console.log('SOOO ??', params );
                   if ( _.isEmpty( params.settingParams ) || ! _.has( params.settingParams, 'to' ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.to. The api main setting can not be updated', params );
                         return;
@@ -183,6 +185,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   if ( ! _.isUndefined( input_id ) ) {
                         inputRegistrationParams = self.getInputRegistrationParams( input_id, parentModuleType );
+                        console.log('INPUT REGISTRATION PARAMS ?', inputRegistrationParams );
                         if ( ! _.isUndefined( inputRegistrationParams.refresh_stylesheet ) ) {
                               refresh_stylesheet = Boolean( inputRegistrationParams.refresh_stylesheet );
                         }
@@ -227,6 +230,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // Set it
                               api( sektionsLocalizedData.optNameForGlobalOptions )( clonedGlobalOptions );
+
+                              // REFRESH THE PREVIEW ?
+                              if ( false !== refresh_preview ) {
+                                    api.previewer.refresh();
+                              }
                         } else {
                               // LEVEL OPTION CASE => LOCAL
                               return self.updateAPISetting({
