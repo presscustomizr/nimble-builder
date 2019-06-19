@@ -139,7 +139,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
 
     $rules = array();
     // SELECTORS
-    $default_text_selector = '.sektion-wrapper [data-sek-level], [data-sek-level] p, [data-sek-level] .sek-btn';
+    $default_text_selector = '.sektion-wrapper [data-sek-level], [data-sek-level] p, [data-sek-level] .sek-btn, [data-sek-level] button, [data-sek-level] input, [data-sek-level] select, [data-sek-level] optgroup, [data-sek-level] textarea';
     $links_selector = '.sektion-wrapper [data-sek-level] a';
     $links_hover_selector = '.sektion-wrapper [data-sek-level] a:hover';
     $headings_selector = '.sektion-wrapper [data-sek-level] h1, .sektion-wrapper [data-sek-level] h2, .sektion-wrapper [data-sek-level] h3, .sektion-wrapper [data-sek-level] h4, .sektion-wrapper [data-sek-level] h5, .sektion-wrapper [data-sek-level] h6';

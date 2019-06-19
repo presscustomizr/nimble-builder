@@ -394,10 +394,10 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
  *  FONTS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_post_grid_fonts_child() {
-    $pt_font_selectors = array( '.sek-pg-title a', '.sek-pg-title' );
-    $pe_font_selectors = array( '.sek-post-grid-wrapper .sek-excerpt', '.sek-post-grid-wrapper .sek-excerpt *' );
-    $cat_font_selectors = array( '.sek-pg-category a' );
-    $metas_font_selectors = array( '.sek-pg-metas span', '.sek-pg-metas a');
+    $pt_font_selectors = array( '.sek-module-inner .sek-post-grid-wrapper .sek-pg-title a', '.sek-module-inner .sek-post-grid-wrapper .sek-pg-title' );
+    $pe_font_selectors = array( '.sek-module-inner  .sek-post-grid-wrapper .sek-excerpt', '.sek-module-inner  .sek-post-grid-wrapper .sek-excerpt *' );
+    $cat_font_selectors = array( '.sek-module-inner .sek-pg-category a' );
+    $metas_font_selectors = array( '.sek-module-inner .sek-pg-metas span', '.sek-module-inner .sek-pg-metas a');
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_fonts_child',

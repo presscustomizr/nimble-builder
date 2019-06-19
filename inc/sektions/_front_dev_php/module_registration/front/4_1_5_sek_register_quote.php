@@ -220,7 +220,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
  *  CITE CONTENT AND FONT
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_quote_cite_child() {
-    $cite_font_selectors  = array( '.sek-quote-design .sek-cite', '.sek-quote-design .sek-cite a' );
+    $cite_font_selectors  = array( '.sek-cite', '.sek-cite *');
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_cite_child',

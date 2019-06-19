@@ -36,7 +36,8 @@ function sek_get_module_params_for_czr_simple_form_module() {
                 'push_effect' => 1
             ),
             'form_fonts' => array(
-                'fl_font_family_css' => '[cfont]Lucida Console,Monaco,monospace',
+                // 'fl_font_family_css' => '[cfont]Lucida Console,Monaco,monospace',
+                'fl_font_weight_css' => 'bold',
                 'btn_color_css' => '#ffffff'
             ),
             'form_submission' => array(
@@ -489,7 +490,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             'fl_font_weight_css'     => array(
                                 'input_type'  => 'simpleselect',
                                 'title'       => __( 'Font weight', 'text_doma' ),
-                                'default'     => 400,
+                                'default'     => 'bold',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'font_weight',
