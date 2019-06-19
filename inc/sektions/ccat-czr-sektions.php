@@ -3,10 +3,6 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-
-
-
-// ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
 add_action ( 'customize_controls_enqueue_scripts', '\Nimble\sek_enqueue_controls_js_css', 20 );
 function sek_enqueue_controls_js_css() {
     wp_enqueue_style(
@@ -24,7 +20,6 @@ function sek_enqueue_controls_js_css() {
 
     wp_enqueue_script(
         'czr-sektions',
-        //dev / debug mode mode?
         sprintf(
             '%1$s/assets/czr/sek/js/%2$s' ,
             NIMBLE_BASE_URL,
@@ -44,7 +39,6 @@ function sek_enqueue_controls_js_css() {
                 'nimbleVersion' => NIMBLE_VERSION,
                 'isDevMode' => sek_is_dev_mode(),
                 'baseUrl' => NIMBLE_BASE_URL,
-                //ajaxURL is not mandatory because is normally available in the customizer window.ajaxurl
                 'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                 'customizerURL'   => admin_url( 'customize.php' ),
                 'sektionsPanelId' => '__sektions__',
@@ -66,23 +60,11 @@ function sek_enqueue_controls_js_css() {
 
                 'userSavedSektions' => get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS),
 
-                //'presetSections' => sek_get_preset_sections_api_data(), <= fetched on demand in ajax
-
                 'registeredModules' => CZR_Fmk_Base()->registered_modules,
-
-                // Dnd
                 'preDropElementClass' => 'sortable-placeholder',
                 'dropSelectors' => implode(',', [
-                    // 'module' type
-                    //'.sek-module-drop-zone-for-first-module',//the drop zone when there's no module or nested sektion in the column
-                    //'[data-sek-level="location"]',
-                    //'.sek-not-empty-col',// the drop zone when there is at least one module
-                    //'.sek-column > .sek-column-inner sek-section',// the drop zone when there is at least one nested section
-                    //'.sek-content-module-drop-zone',//between sections
                     '.sek-drop-zone', //This is the selector for all eligible drop zones printed statically or dynamically on dragstart
                     'body',// body will not be eligible for drop, but setting the body as drop zone allows us to fire dragenter / dragover actions, like toggling the "approaching" or "close" css class to real drop zone
-
-                    // 'preset_section' type
                     '.sek-content-preset_section-drop-zone'//between sections
                 ]),
 
@@ -95,26 +77,17 @@ function sek_enqueue_controls_js_css() {
                 'localOptionsMap' => SEK_Front_Construct::$local_options_map,
 
                 'registeredLocations' => sek_get_locations(),
-                // added for the module tree #359
                 'moduleCollection' => sek_get_module_collection(),
                 'moduleIconPath' => NIMBLE_MODULE_ICON_PATH,
 
                 'hasActiveCachePlugin' => sek_has_active_cache_plugin(),
-
-                // Tiny MCE
                 'idOfDetachedTinyMceTextArea' => NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID,
                 'tinyMceNimbleEditorStylesheetUrl' => sprintf( '%1$s/assets/czr/sek/css/sek-tinymce-content.css', NIMBLE_BASE_URL ),
-                // defaultToolbarBtns is used for the detached tinymce editor
                 'defaultToolbarBtns' => "formatselect,fontsizeselect,forecolor,bold,italic,underline,strikethrough,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,unlink,spellchecker,hr,pastetext,removeformat,charmap,outdent,indent,undo,redo",
-                // basic btns are used for the heading, the quote content and quote cite
                 'basic_btns' => array('forecolor','bold','italic','underline','strikethrough','link','unlink'),
                 'basic_btns_nolink' => array('forecolor','bold','italic','underline','strikethrough'),
 
                 'eligibleForFeedbackNotification' => sek_get_feedback_notif_status(),
-
-                // May 21st, v1.7.5 => back to the local data
-                // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
-                //'presetSectionsModules' => array_keys( sek_get_sections_registration_params_api_data() )
                 'presetSectionsModules' => array_keys( sek_get_sections_registration_params() )
             )
         )
@@ -190,7 +163,6 @@ function nimble_get_code_editor_settings( $args ) {
             'outline-none' => true,
         ),
         'jshint' => array(
-            // The following are copied from <https://github.com/WordPress/wordpress-develop/blob/4.8.1/.jshintrc>.
             'boss' => true,
             'curly' => true,
             'eqeqeq' => true,
@@ -236,8 +208,6 @@ function nimble_get_code_editor_settings( $args ) {
 
     if ( isset( $args['type'] ) ) {
         $type = $args['type'];
-
-        // Remap MIME types to ones that CodeMirror modes will recognize.
         if ( 'application/x-patch' === $type || 'text/x-patch' === $type ) {
             $type = 'text/x-diff';
         }
@@ -353,8 +323,6 @@ function nimble_get_code_editor_settings( $args ) {
     if ( ! empty( $settings['codemirror']['lint'] ) ) {
         $settings['codemirror']['gutters'][] = 'CodeMirror-lint-markers';
     }
-
-    // Let settings supplied via args override any defaults.
     foreach ( wp_array_slice_assoc( $args, array( 'codemirror', 'csslint', 'jshint', 'htmlhint' ) ) as $key => $value ) {
         $settings[ $key ] = array_merge(
             $settings[ $key ],
@@ -402,11 +370,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Reset' => __('Reset', 'text_doma'),
             'Reset complete' => __('Reset complete', 'text_doma'),
             'Reset failed' => __('Reset failed', 'text_doma'),
-
-            // Header button title text
             'Drag and drop content' => __('Drag and drop content', 'text_doma'),
-
-            // Generated UI
             'Content Picker' => __('Content Picker', 'text_doma'),
             'Pick a module' => __('Pick a module', 'text_doma'),
             'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_doma'),
@@ -440,8 +404,6 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_doma'),
 
             'Settings for the' => __('Settings for the', 'text_doma'),//section / column / module
-
-            // UI global and local options
             'Current page options' => __( 'Current page options', 'text_doma'),
             'Page template' => __( 'Page template', 'text_doma'),
             'This page uses a custom template.' => __( 'This page uses a custom template.', 'text_doma'),
@@ -452,6 +414,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Reset the sections displayed in global locations' => __( 'Reset the sections displayed in global locations', 'text_doma'),
             'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
 
+            'Global text options for Nimble sections' => __('Global text options for Nimble sections', 'text_doma'),
             'Site wide header and footer' => __( 'Site wide header and footer', 'text_doma'),
             'Site wide breakpoint for Nimble sections' => __( 'Site wide breakpoint for Nimble sections', 'text_doma'),
             'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'text_doma'),
@@ -459,33 +422,20 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Site wide page speed optimizations' => __( 'Site wide page speed optimizations', 'text_doma'),
             'Beta features' => __( 'Beta features', 'text_doma'),
             'Protect your contact forms with Google reCAPTCHA' => __( 'Protect your contact forms with Google reCAPTCHA', 'text_doma'),
-
-            // DEPRECATED
             'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_doma'),
             'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_doma'),
-            //
 
             'Site wide options' => __( 'Site wide options', 'text_doma'),
-
-
-            // Levels
             'location' => __('location', 'text_doma'),
             'section' => __('section', 'text_doma'),
             'nested section' => __('nested section', 'text_doma'),
             'column' => __('column', 'text_doma'),
             'module' => __('module', 'text_doma'),
-
-            // DRAG n DROP
             'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_doma'),
             'You first need to click on a target ( with a + icon ) in the preview.' => __('You first need to click on a target ( with a + icon ) in the preview.', 'text_doma'),
             'Insert here' => __('Insert here', 'text_doma'),
             'Insert in a new section' => __('Insert in a new section', 'text_doma'),
             'Insert a new section here' => __('Insert a new section here', 'text_doma'),
-
-            // DOUBLE CLICK INSERTION
-
-
-            // MODULES
             'Select a font family' => __('Select a font family', 'text_doma'),
             'Web Safe Fonts' => __('Web Safe Fonts', 'text_doma'),
             'Google Fonts' => __('Google Fonts', 'text_doma'),
@@ -495,27 +445,15 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
 
             'Select an icon' => __( 'Select an icon', 'text_doma' ),
-
-            // Code Editor
             'codeEditorSingular' => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_doma' ),
             'codeEditorPlural' => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_doma' ),
-
-            // Various
             'Settings on desktops' => __('Settings on desktops', 'text_doma'),
             'Settings on tablets' => __('Settings on tablets', 'text_doma'),
             'Settings on mobiles' => __('Settings on mobiles', 'text_doma'),
-
-            // Level Tree
             'No sections to navigate' => __('No sections to navigate', 'text_dom'),
             'Remove this element' => __('Remove this element', 'text_dom'),
-
-            // Cache plugin warning
-            // @see https://github.com/presscustomizr/nimble-builder/issues/395
             'You seem to be using a cache plugin.' => __('You seem to be using a cache plugin.', 'text_dom'),
             'It is recommended to disable your cache plugin when customizing your website.' => __('It is recommended to disable your cache plugin when customizing your website.', 'text_dom'),
-
-            // Revision history
-            // @see https://github.com/presscustomizr/nimble-builder/issues/392
             'Revision history of local sections' => __('Revision history of local sections', 'text_doma'),
             'Revision history of global sections' => __('Revision history of global sections', 'text_doma'),
             'The revision could not be restored.' => __('The revision could not be restored.', 'text_doma'),
@@ -524,8 +462,6 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'No revision history available for the moment.' => __('No revision history available for the moment.', 'text_doma'),
             'This is the current version.' => __('This is the current version.', 'text_doma'),
             '(currently published version)' => __('(currently published version)','text_doma'),
-
-            // Import / export
             'You need to publish before exporting.' => __( 'Nimble Builder : you need to publish before exporting.', 'text_doma'),
             'Export / Import' => __('Export / Import', 'text_doma'),
             'Export failed' => __('Export failed', 'text_doma'),
@@ -537,23 +473,12 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Import failed, invalid file content' => __('Import failed, invalid file content', 'text_doma'),
             'Import failed, file problem' => __('Import failed, file problem', 'text_doma'),
             'Some image(s) could not be imported' => __('Some image(s) could not be imported', 'text_doma'),
-            // 'Module' => __('Module', 'text_doma'),
-
-            // Column width
             'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'text_doma')
 
         )//array()
     )//array()
     );//array_merge
 }//'nimble_add_i18n_localized_control_params'
-
-
-
-
-
-
-
-// ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
 add_filter( 'skp_json_export_ready_skopes', '\Nimble\add_sektion_values_to_skope_export' );
 function add_sektion_values_to_skope_export( $skopes ) {
     if ( ! is_array( $skopes ) ) {
@@ -578,22 +503,8 @@ function add_sektion_values_to_skope_export( $skopes ) {
             'db_values' => sek_get_skoped_seks( $skope_id ),
             'setting_id' => sek_get_seks_setting_id( $skope_id )//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
         );
-        // foreach( [
-        //     'loop_start',
-        //     'loop_end',
-        //     'before_content',
-        //     'after_content',
-        //     'global'
-        //     ] as $location ) {
-        //     $skp_data[ 'sektions' ][ $location ] = array(
-        //         'db_values' => sek_get_skoped_seks( $skope_id, $location ),
-        //         'setting_id' => sek_get_seks_setting_id( $skope_id, $location )//nimble___loop_start[skp__post_page_home]
-        //     );
-        // }
         $new_skopes[] = $skp_data;
     }
-
-    // sek_error_log( '//////////////////// => new_skopes', $new_skopes);
 
     return $new_skopes;
 }
@@ -731,8 +642,6 @@ function sek_print_nimble_customizer_tmpl() {
       </div>
       <!-- <textarea style="height:250px;width:100%" id="czr-customize-content_editor"></textarea> -->
       <?php
-        // the textarea id for the detached editor is 'czr-customize-content_editor'
-        // this function generates the <textarea> markup
         sek_setup_nimble_editor( '', NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID , array(
             '_content_editor_dfw' => false,
             'drag_drop_upload' => true,
@@ -750,11 +659,6 @@ function sek_print_nimble_customizer_tmpl() {
     </div>
     <?php
 }
-
-
-
-
-// Introduced for https://github.com/presscustomizr/nimble-builder/issues/395
 function sek_has_active_cache_plugin() {
     $cache_plugins = array(
         'WP Fastest Cache' => 'wp-fastest-cache/wpFastestCache.php',
@@ -815,7 +719,6 @@ function sek_is_plugin_active_for_network( $plugin ) {
 /* ------------------------------------------------------------------------- *
  *  SETUP DYNAMIC SERVER REGISTRATION FOR SETTING
 /* ------------------------------------------------------------------------- */
-// Fired @'after_setup_theme:20'
 if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
     class SEK_CZR_Dyn_Register {
         static $instance;
@@ -828,32 +731,22 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         }
 
         function __construct( $params = array() ) {
-            // Schedule the loading the skoped settings class
             add_action( 'customize_register', array( $this, 'load_nimble_setting_class' ) );
 
             add_filter( 'customize_dynamic_setting_args', array( $this, 'set_dyn_setting_args' ), 10, 2 );
             add_filter( 'customize_dynamic_setting_class', array( $this, 'set_dyn_setting_class') , 10, 3 );
         }//__construct
-
-        //@action 'customize_register'
         function load_nimble_setting_class() {
             require_once(  NIMBLE_BASE_PATH . '/inc/sektions/seks_setting_class.php' );
         }
-
-        //@filter 'customize_dynamic_setting_args'
         function set_dyn_setting_args( $setting_args, $setting_id ) {
-            // shall start with "nimble___" or "__nimble_options__"
             if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) ) {
-                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
                     'type' => 'option',
                     'default' => array(),
-                    //'sanitize_callback'    => array( $this, 'sanitize_callback' )
-                    //'validate_callback'    => array( $this, 'validate_callback' )
                 );
             } else if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) ) {
-                //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
                     'type' => '_nimble_ui_',//won't be saved as is,
@@ -863,21 +756,12 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                 );
             }
             return $setting_args;
-            //return wp_parse_args( array( 'default' => array() ), $setting_args );
         }
-
-
-        //@filter 'customize_dynamic_setting_class'
         function set_dyn_setting_class( $class, $setting_id, $args ) {
-            // shall start with 'nimble___'
             if ( 0 !== strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
               return $class;
-            //sek_error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
             return '\Nimble\Nimble_Customizer_Setting';
         }
-
-
-        // Uses the sanitize_callback function specified on module registration if any
         function sanitize_callback( $setting_data, $setting_instance ) {
             if ( isset( $_POST['location_skope_id'] ) ) {
                 $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
@@ -894,12 +778,8 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     }
                 }
             }
-            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
             return $setting_data;
         }
-
-        // Uses the validate_callback function specified on module registration if any
-        // @return validity object
         function validate_callback( $validity, $setting_data, $setting_instance ) {
             $validated = true;
             if ( isset( $_POST['location_skope_id'] ) ) {
@@ -917,7 +797,6 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     }
                 }
             }
-            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
             if ( true !== $validated ) {
                 if ( is_wp_error( $validated ) ) {
                     $validation_msg = $validation_msg->get_error_message();
@@ -1025,7 +904,6 @@ final class _NIMBLE_Editors {
     $set = wp_parse_args(
       $settings,
       array(
-        // Disable autop if the current post has blocks in it.
         'wpautop'             => ! has_blocks(),
         'media_buttons'       => true,
         'default_editor'      => '',
@@ -1072,7 +950,6 @@ final class _NIMBLE_Editors {
     }
 
     if ( 'content' === $editor_id && empty( $set['tinymce']['wp_autoresize_on'] ) ) {
-      // A cookie (set when a user resizes the editor) overrides the height.
       $cookie = (int) get_user_setting( 'ed_size' );
 
       if ( $cookie ) {
@@ -1123,7 +1000,6 @@ final class _NIMBLE_Editors {
 
       if ( self::$this_quicktags ) {
         $default_editor = $set['default_editor'] ? $set['default_editor'] : wp_default_editor();
-        // 'html' is used for the "Text" editor tab.
         if ( 'html' !== $default_editor ) {
           $default_editor = 'tinymce';
         }
@@ -1208,8 +1084,6 @@ final class _NIMBLE_Editors {
       '<textarea' . $editor_class . $height . $tabindex . $autocomplete . ' cols="40" name="' . esc_attr( $set['textarea_name'] ) . '" ' .
       'id="' . $editor_id_attr . '">%s</textarea></div>'
     );
-
-    // Prepare the content for the Visual or Text editor, only when TinyMCE is used (back-compat).
     if ( self::$this_tinymce ) {
       add_filter( 'the_nimble_editor_content', 'format_for_editor', 10, 2 );
     }
@@ -1224,13 +1098,9 @@ final class _NIMBLE_Editors {
      *                               Either 'html' or 'tinymce'.
      */
     $content = apply_filters( 'the_nimble_editor_content', $content, $default_editor );
-
-    // Remove the filter as the next editor on the same page may not need it.
     if ( self::$this_tinymce ) {
       remove_filter( 'the_editor_content', 'format_for_editor' );
     }
-
-    // Back-compat for the `htmledit_pre` and `richedit_pre` filters
     if ( 'html' === $default_editor && has_filter( 'htmledit_pre' ) ) {
       /** This filter is documented in wp-includes/deprecated.php */
       $content = apply_filters_deprecated( 'htmledit_pre', array( $content ), '4.3.0', 'format_for_editor' );
@@ -1276,8 +1146,6 @@ final class _NIMBLE_Editors {
       }
 
       if ( empty( $qtInit['buttons'] ) ) {
-        //$qtInit['buttons'] = 'strong,em,link,block,del,ins,img,ul,ol,li,code,more,close';
-        //@nikeo modif
         $qtInit['buttons'] = 'strong,em,link,block,del,ins,img,ul,ol,li,code';
       }
 
@@ -1377,8 +1245,6 @@ final class _NIMBLE_Editors {
           $plugins = array_unique( apply_filters( 'nimble_tiny_mce_plugins', $plugins ) );
 
           if ( ( $key = array_search( 'spellchecker', $plugins ) ) !== false ) {
-            // Remove 'spellchecker' from the internal plugins if added with 'tiny_mce_plugins' filter to prevent errors.
-            // It can be added with 'mce_external_plugins'.
             unset( $plugins[ $key ] );
           }
 
@@ -1422,8 +1288,6 @@ final class _NIMBLE_Editors {
               $mce_external_plugins[ $name ] = $url;
               $plugurl                       = dirname( $url );
               $strings                       = '';
-
-              // Try to load langs/[locale].js and langs/[locale]_dlg.js
               if ( ! in_array( $name, $loaded_langs, true ) ) {
                 $path = str_replace( content_url(), '', $plugurl );
                 $path = WP_CONTENT_DIR . $path . '/langs/';
@@ -1481,7 +1345,6 @@ final class _NIMBLE_Editors {
         $editor_styles = get_editor_stylesheets();
 
         if ( ! empty( $editor_styles ) ) {
-          // Force urlencoding of commas.
           foreach ( $editor_styles as $key => $url ) {
             if ( strpos( $url, ',' ) !== false ) {
               $editor_styles[ $key ] = str_replace( ',', '%2C', $url );
@@ -1522,8 +1385,6 @@ final class _NIMBLE_Editors {
         $mce_buttons   = apply_filters( 'nimble_teeny_mce_buttons', array( 'bold', 'italic', 'underline', 'blockquote', 'strikethrough', 'bullist', 'numlist', 'alignleft', 'aligncenter', 'alignright', 'undo', 'redo', 'link', 'fullscreen' ), $editor_id );
         $mce_buttons_2 = $mce_buttons_3 = $mce_buttons_4 = array();
       } else {
-        //@nikeo modif
-        //$mce_buttons = array( 'formatselect', 'bold', 'italic', 'bullist', 'numlist', 'blockquote', 'alignleft', 'aligncenter', 'alignright', 'link', 'wp_more', 'spellchecker' );
         $mce_buttons = array( 'formatselect', 'bold', 'italic', 'bullist', 'numlist', 'blockquote', 'alignleft', 'aligncenter', 'alignright', 'link', 'spellchecker' );
 
         if ( ! wp_is_mobile() ) {
@@ -1547,11 +1408,6 @@ final class _NIMBLE_Editors {
         $mce_buttons = apply_filters( 'nimble_mce_buttons', $mce_buttons, $editor_id );
 
         $mce_buttons_2 = array( 'strikethrough', 'hr', 'forecolor', 'pastetext', 'removeformat', 'charmap', 'outdent', 'indent', 'undo', 'redo' );
-
-        // @nikeo modif
-        // if ( ! wp_is_mobile() ) {
-        //   $mce_buttons_2[] = 'wp_help';
-        // }
 
         /**
          * Filters the second-row list of TinyMCE buttons (Visual tab).
@@ -1624,8 +1480,6 @@ final class _NIMBLE_Editors {
         'tabfocus_elements' => $set['tabfocus_elements'],
         'body_class'        => $body_class,
       );
-
-      // Merge with the first part of the init array
       $mceInit = array_merge( self::$first_init, $mceInit );
 
       if ( is_array( $set['tinymce'] ) ) {
@@ -1756,14 +1610,11 @@ final class _NIMBLE_Editors {
    * @since 4.8.0
    */
   public static function enqueue_default_editor() {
-    // We are past the point where scripts can be enqueued properly.
     if ( did_action( 'wp_enqueue_editor' ) ) {
       return;
     }
 
     self::enqueue_scripts( true );
-
-    // Also add wp-includes/css/editor.css
     wp_enqueue_style( 'editor-buttons' );
 
     add_action( 'customize_controls_print_footer_scripts', array( __CLASS__, 'force_uncompressed_tinymce' ), 1 );
@@ -1791,10 +1642,6 @@ final class _NIMBLE_Editors {
       if ( is_rtl() ) {
         $settings['directionality'] = 'rtl';
       }
-
-      // In production all plugins are loaded (they are in wp-editor.js.gz).
-      // The 'wpview', 'wpdialogs', and 'media' TinyMCE plugins are not initialized by default.
-      // Can be added from js by using the 'wp-before-tinymce-init' event.
       $settings['plugins'] = implode(
         ',',
         array(
@@ -1936,8 +1783,6 @@ final class _NIMBLE_Editors {
       'resize'                       => 'vertical',
       'menubar'                      => false,
       'branding'                     => false,
-
-      // Limit the preview styles in the menu/toolbar
       'preview_styles'               => 'font-family font-size font-weight font-style text-decoration text-transform',
 
       'end_container_on_empty_block' => true,
@@ -1949,8 +1794,6 @@ final class _NIMBLE_Editors {
 
     $suffix  = SCRIPT_DEBUG ? '' : '.min';
     $version = 'ver=' . get_bloginfo( 'version' );
-
-    // Default stylesheets
     $settings['content_css'] = includes_url( "css/dashicons$suffix.css?$version" ) . ',' .
       includes_url( "js/tinymce/skins/wordpress/wp-content.css?$version" );
 
@@ -1960,7 +1803,6 @@ final class _NIMBLE_Editors {
   private static function get_translation() {
     if ( empty( self::$translation ) ) {
       self::$translation = array(
-        // Default TinyMCE strings
         'New document'                         => __( 'New document' ),
         'Formats'                              => _x( 'Formats', 'TinyMCE' ),
 
@@ -2024,16 +1866,12 @@ final class _NIMBLE_Editors {
         'Upper Alpha'                          => _x( 'Upper Alpha', 'list style' ),
         'Upper Roman'                          => _x( 'Upper Roman', 'list style' ),
         'Lower Roman'                          => _x( 'Lower Roman', 'list style' ),
-
-        // Anchor plugin
         'Name'                                 => _x( 'Name', 'Name of link anchor (TinyMCE)' ),
         'Anchor'                               => _x( 'Anchor', 'Link anchor (TinyMCE)' ),
         'Anchors'                              => _x( 'Anchors', 'Link anchors (TinyMCE)' ),
         'Id should start with a letter, followed only by letters, numbers, dashes, dots, colons or underscores.' =>
           __( 'Id should start with a letter, followed only by letters, numbers, dashes, dots, colons or underscores.' ),
         'Id'                                   => _x( 'Id', 'Id for link anchor (TinyMCE)' ),
-
-        // Fullpage plugin
         'Document properties'                  => __( 'Document properties' ),
         'Robots'                               => __( 'Robots' ),
         'Title'                                => __( 'Title' ),
@@ -2041,8 +1879,6 @@ final class _NIMBLE_Editors {
         'Encoding'                             => __( 'Encoding' ),
         'Description'                          => __( 'Description' ),
         'Author'                               => __( 'Author' ),
-
-        // Media, image plugins
         'Image'                                => __( 'Image' ),
         'Insert/edit image'                    => array( __( 'Insert/edit image' ), 'accessM' ),
         'General'                              => __( 'General' ),
@@ -2067,8 +1903,6 @@ final class _NIMBLE_Editors {
         'Paste your embed code below:'         => __( 'Paste your embed code below:' ),
         'Insert video'                         => __( 'Insert video' ),
         'Embed'                                => __( 'Embed' ),
-
-        // Each of these have a corresponding plugin
         'Special character'                    => __( 'Special character' ),
         'Right to left'                        => _x( 'Right to left', 'editor button' ),
         'Left to right'                        => _x( 'Left to right', 'editor button' ),
@@ -2085,8 +1919,6 @@ final class _NIMBLE_Editors {
         'Restore last draft'                   => __( 'Restore last draft' ),
         'Insert/edit link'                     => array( __( 'Insert/edit link' ), 'metaK' ),
         'Remove link'                          => array( __( 'Remove link' ), 'accessS' ),
-
-        // Link plugin
         'Link'                                 => __( 'Link' ),
         'Insert link'                          => __( 'Insert link' ),
         'Insert/edit link'                     => __( 'Insert/edit link' ),
@@ -2106,8 +1938,6 @@ final class _NIMBLE_Editors {
         'R'                                    => _x( 'R', 'Short for red in RGB' ),
         'G'                                    => _x( 'G', 'Short for green in RGB' ),
         'B'                                    => _x( 'B', 'Short for blue in RGB' ),
-
-        // Spelling, search/replace plugins
         'Could not find the specified string.' => __( 'Could not find the specified string.' ),
         'Replace'                              => _x( 'Replace', 'find/replace' ),
         'Next'                                 => _x( 'Next', 'find/replace' ),
@@ -2124,8 +1954,6 @@ final class _NIMBLE_Editors {
         'Ignore all'                           => _x( 'Ignore all', 'spellcheck' ),
         'Ignore'                               => _x( 'Ignore', 'spellcheck' ),
         'Add to Dictionary'                    => __( 'Add to Dictionary' ),
-
-        // TinyMCE tables
         'Insert table'                         => __( 'Insert table' ),
         'Delete table'                         => __( 'Delete table' ),
         'Table properties'                     => __( 'Table properties' ),
@@ -2198,8 +2026,6 @@ final class _NIMBLE_Editors {
           __( 'The changes you made will be lost if you navigate away from this page.' ),
         'Your browser doesn\'t support direct access to the clipboard. Please use the Ctrl+X/C/V keyboard shortcuts instead.' =>
           __( 'Your browser does not support direct access to the clipboard. Please use keyboard shortcuts or your browser&#8217;s edit menu instead.' ),
-
-        // TinyMCE menus
         'Insert'                               => _x( 'Insert', 'TinyMCE menu' ),
         'File'                                 => _x( 'File', 'TinyMCE menu' ),
         'Edit'                                 => _x( 'Edit', 'TinyMCE menu' ),
@@ -2207,8 +2033,6 @@ final class _NIMBLE_Editors {
         'View'                                 => _x( 'View', 'TinyMCE menu' ),
         'Table'                                => _x( 'Table', 'TinyMCE menu' ),
         'Format'                               => _x( 'Format', 'TinyMCE menu' ),
-
-        // WordPress strings
         'Toolbar Toggle'                       => array( __( 'Toolbar Toggle' ), 'accessZ' ),
         'Insert Read More tag'                 => array( __( 'Insert Read More tag' ), 'accessT' ),
         'Insert Page Break tag'                => array( __( 'Insert Page Break tag' ), 'accessP' ),
@@ -2223,8 +2047,6 @@ final class _NIMBLE_Editors {
         'Visual'                               => _x( 'Visual', 'Name for the Visual editor tab' ), // Editor switch tab label
         'Text'                                 => _x( 'Text', 'Name for the Text editor tab (formerly HTML)' ), // Editor switch tab label
         'Add Media'                            => array( __( 'Add Media' ), 'accessM' ), // Tooltip for the 'Add Media' button in the Block Editor Classic block
-
-        // Shortcuts help modal
         'Keyboard Shortcuts'                   => array( __( 'Keyboard Shortcuts' ), 'accessH' ),
         'Classic Block Keyboard Shortcuts'     => __( 'Classic Block Keyboard Shortcuts' ),
         'Default shortcuts,'                   => __( 'Default shortcuts,' ),
@@ -2309,7 +2131,6 @@ final class _NIMBLE_Editors {
     $mce_translation = apply_filters( 'wp_mce_translation', $mce_translation, $mce_locale );
 
     foreach ( $mce_translation as $key => $value ) {
-      // Remove strings that are not translated.
       if ( $key === $value ) {
         unset( $mce_translation[ $key ] );
         continue;
@@ -2319,8 +2140,6 @@ final class _NIMBLE_Editors {
         $mce_translation[ $key ] = html_entity_decode( $value, ENT_QUOTES, 'UTF-8' );
       }
     }
-
-    // Set direction
     if ( is_rtl() ) {
       $mce_translation['_dir'] = 'rtl';
     }
@@ -2462,7 +2281,6 @@ final class _NIMBLE_Editors {
       self::print_tinymce_scripts();
 
       if ( self::$ext_plugins ) {
-        // Load the old-format English strings to prevent unsightly labels in old style popups
         echo "<script type='text/javascript' src='{$baseurl}/langs/wp-langs-en.js?$version'></script>\n";
       }
     }
@@ -2591,12 +2409,8 @@ final class _NIMBLE_Editors {
      * @param array $query An array of WP_Query arguments.
      */
     $query = apply_filters( 'wp_link_query_args', $query );
-
-    // Do main query.
     $get_posts = new WP_Query;
     $posts     = $get_posts->query( $query );
-
-    // Build results.
     $results = array();
     foreach ( $posts as $post ) {
       if ( 'post' == $post->post_type ) {
@@ -2646,14 +2460,11 @@ final class _NIMBLE_Editors {
    * @since 3.1.0
    */
   public static function wp_link_dialog() {
-    // Run once
     if ( self::$link_dialog_printed ) {
       return;
     }
 
     self::$link_dialog_printed = true;
-
-    // display: none is required here, see #WP27605
     ?>
     <div id="wp-link-backdrop" style="display: none"></div>
     <div id="wp-link-wrap" class="wp-core-ui" style="display: none" role="dialog" aria-labelledby="link-modal-title">
@@ -2726,8 +2537,6 @@ function sek_catch_export_action( $wp_customize ) {
         }
     }
 }
-
-// fire from sek_catch_export_action() @hook 'customize_register'
 function sek_maybe_export() {
     $nonce = 'save-customize_' . get_stylesheet();
     if ( ! isset( $_REQUEST['sek_export_nonce'] ) ) {
@@ -2755,47 +2564,26 @@ function sek_maybe_export() {
         return;
     }
     $seks_data = sek_get_skoped_seks( $_REQUEST['skope_id'] );
-
-    //sek_error_log('EXPORT BEFORE FILTER ? ' . $_REQUEST['skope_id'] , $seks_data );
-    // the filter 'nimble_pre_export' is used to :
-    // replace image id by the absolute url
-    // clean level ids and replace them with a placeholder string
     $seks_data = apply_filters( 'nimble_pre_export', $seks_data );
     $theme_name = sanitize_title_with_dashes( get_stylesheet() );
-
-    //sek_error_log('EXPORT AFTER FILTER ?', $seks_data );
     $export = array(
         'data' => $seks_data,
         'metas' => array(
             'skope_id' => $_REQUEST['skope_id'],
             'version' => NIMBLE_VERSION,
-            // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
             'active_locations' => is_string( $_REQUEST['active_locations'] ) ? explode( ',', $_REQUEST['active_locations'] ) : array(),
             'date' => date("Y-m-d"),
             'theme' => $theme_name
         )
     );
-    // sek_error_log('$_REQUEST ?', $_REQUEST );
-    //sek_error_log('$export ?', $export );
 
     $skope_id = str_replace('skp__', '',  $_REQUEST['skope_id'] );
     $filename = $theme_name . '_' . $skope_id . '.nimblebuilder';
-
-    // Set the download headers.
     header( 'Content-disposition: attachment; filename=' . $filename );
     header( 'Content-Type: application/octet-stream; charset=' . get_option( 'blog_charset' ) );
-
-    // Serialize the export data.
-    //echo serialize( $export );
     echo wp_json_encode( $export );
-
-    // Start the download.
     die();
 }
-
-// Ajax action before processing the export
-// control that all required fields are there
-// This is to avoid a white screen when generating the download window afterwards
 add_action( 'wp_ajax_sek_pre_export_checks', '\Nimble\sek_ajax_pre_export_checks' );
 function sek_ajax_pre_export_checks() {
     $action = 'save-customize_' . get_stylesheet();
@@ -2823,19 +2611,8 @@ function sek_ajax_pre_export_checks() {
     }
     wp_send_json_success();
 }
-
-
-
-
-
-
-
-// fetch the content from a user imported file
 add_action( 'wp_ajax_sek_get_imported_file_content', '\Nimble\sek_ajax_get_imported_file_content' );
 function sek_ajax_get_imported_file_content() {
-    // sek_error_log(__FUNCTION__ . ' AJAX $_POST ?', $_POST );
-    // sek_error_log(__FUNCTION__ . ' AJAX $_FILES ?', $_FILES );
-    // sek_error_log(__FUNCTION__ . ' AJAX $_REQUEST ?', $_REQUEST );
 
     $action = 'save-customize_' . get_stylesheet();
     if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
@@ -2860,15 +2637,9 @@ function sek_ajax_get_imported_file_content() {
     if ( ! isset( $_POST['skope'] ) || empty( $_POST['skope'] ) ) {
         wp_send_json_error( 'missing_skope' );
     }
-
-    // load WP upload if not done yet
     if ( ! function_exists( 'wp_handle_upload' ) ) {
         require_once( ABSPATH . 'wp-admin/includes/file.php' );
     }
-
-    // @see https://codex.wordpress.org/Function_Reference/wp_handle_upload
-    // Important => always run unlink( $file['file'] ) before sending the json success or error
-    // otherwise WP will write the file in the /wp-content folder
     $file = wp_handle_upload(
         $_FILES['file_candidate'],
         array(
@@ -2876,14 +2647,11 @@ function sek_ajax_get_imported_file_content() {
             'test_type' => false,
             'mimes' => array(
                 'text' => 'text/plain',
-                //'nimblebuilder' => 'text/plain',
                 'json' => 'application/json',
                 'nimblebuilder' => 'application/json'
             )
         )
     );
-
-    // Make sure we have an uploaded file.
     if ( isset( $file['error'] ) ) {
         unlink( $file['file'] );
         wp_send_json_error( 'import_file_error' );
@@ -2894,41 +2662,18 @@ function sek_ajax_get_imported_file_content() {
         wp_send_json_error( 'import_file_do_not_exist' );
         return;
     }
-
-    // Get the upload data.
     $raw = file_get_contents( $file['file'] );
-    //$raw_unserialized_data = @unserialize( $raw );
     $raw_unserialized_data = json_decode( $raw, true );
-
-    // VALIDATE IMPORTED CONTENT
-    // data structure :
-    // $raw_unserialized_data = array(
-    //     'data' => $seks_data,
-    //     'metas' => array(
-    //         'skope_id' => $_REQUEST['skope_id'],
-    //         'version' => NIMBLE_VERSION,
-    //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-    //         'active_locations' => is_string( $_REQUEST['active_locations'] ) ? explode( ',', $_REQUEST['active_locations'] ) : array(),
-    //         'date' => date("Y-m-d")
-    //     )
-    // );
-    // check import structure
     if ( ! is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
         unlink( $file['file'] );
         wp_send_json_error(  'invalid_import_content' );
         return;
     }
-    // check version
-    // => current Nimble Version must be at least import version
     if ( !empty( $raw_unserialized_data['metas']['version'] ) && version_compare( NIMBLE_VERSION, $raw_unserialized_data['metas']['version'], '<' ) ) {
         unlink( $file['file'] );
         wp_send_json_error( 'nimble_builder_needs_update' );
         return;
     }
-
-    //sek_error_log('IMPORT BEFORE FILTER ?', $raw_unserialized_data );
-
-    // in a pre-import-check context, we don't need to sniff and upload images
     if ( isset( $_POST['pre_import_check'] ) && true == $_POST['pre_import_check'] ) {
         remove_filter( 'nimble_pre_import', '\Nimble\sek_sniff_imported_img_url' );
     }
@@ -2936,24 +2681,11 @@ function sek_ajax_get_imported_file_content() {
     $imported_content = array(
         'data' => apply_filters( 'nimble_pre_import', $raw_unserialized_data['data'] ),
         'metas' => $raw_unserialized_data['metas'],
-        // the image import errors won't block the import
-        // they are used when notifying user in the customizer
         'img_errors' => !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array()
     );
-
-    // Remove the uploaded file
-    // Important => always run unlink( $file['file'] ) before sending the json success or error
-    // otherwise WP will write the file in the /wp-content folder
     unlink( $file['file'] );
-    // Send
     wp_send_json_success( $imported_content );
 }
-
-
-
-
-
-// EXPORT FILTER
 add_filter( 'nimble_pre_export', '\Nimble\sek_parse_img_and_clean_id' );
 function sek_parse_img_and_clean_id( $seks_data ) {
     $new_seks_data = array();
@@ -2979,8 +2711,6 @@ function sek_parse_img_and_clean_id( $seks_data ) {
     }
     return $new_seks_data;
 }
-
-// IMPORT FILTER
 add_filter( 'nimble_pre_import', '\Nimble\sek_sniff_imported_img_url' );
 function sek_sniff_imported_img_url( $seks_data ) {
     $new_seks_data = array();
@@ -2990,7 +2720,6 @@ function sek_sniff_imported_img_url( $seks_data ) {
         } else {
             if ( is_string( $value ) && false !== strpos( $value, '__img_url__' ) && sek_is_img_url( $value ) ) {
                 $url = str_replace( '__img_url__', '', $value );
-                //sek_error_log( __FUNCTION__ . ' URL?', $url );
                 $id = sek_sideload_img_and_return_attachment_id( $url );
                 if ( is_wp_error( $id ) ) {
                     $value = null;
@@ -3006,8 +2735,6 @@ function sek_sniff_imported_img_url( $seks_data ) {
     }
     return $new_seks_data;
 }
-
-// @return bool
 function sek_is_img_url( $url = '' ) {
     if ( is_string( $url ) ) {
       if ( preg_match( '/\.(jpg|jpeg|png|gif)/i', $url ) ) {
@@ -3018,10 +2745,6 @@ function sek_is_img_url( $url = '' ) {
 }
 
 ?><?php
-// WP 5.0.0 compat. until the bug is fixed
-// this hook fires before the customize changeset is inserter / updated in database
-// Removing the wp_targeted_link_rel callback from the 'content_save_pre' filter prevents corrupting the changeset JSON
-// more details in this ticket : https://core.trac.wordpress.org/ticket/45292
 add_action( 'customize_save_validation_before', '\Nimble\sek_remove_callback_wp_targeted_link_rel' );
 function sek_remove_callback_wp_targeted_link_rel( $wp_customize ) {
     if ( false !== has_filter( 'content_save_pre', 'wp_targeted_link_rel' ) ) {
@@ -3030,18 +2753,12 @@ function sek_remove_callback_wp_targeted_link_rel( $wp_customize ) {
 };
 
 ?><?php
-// Set input content
-// the default input type templates are declared in inc/czr-base-fmk/_dev_php/0_3_czr-base-fmk-tmpl_builder.php
-// the template of input specific to Nimble are declared here
 add_action( 'czr_set_input_tmpl_content', '\Nimble\sek_set_input_tmpl_content', 10, 3 );
 function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
-    // error_log( print_r( $input_data, true ) );
-    // error_log('$input_type' . $input_type );
     if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
          wp_send_json_error( 'sek_set_input_tmpl_content => missing input type for input id : ' . $input_id );
     }
     switch( $input_type ) {
-        // Content picker group
         case 'content_type_switcher' :
             sek_set_input_tmpl___content_type_switcher( $input_id, $input_data );
         break;
@@ -3128,7 +2845,6 @@ function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  CONTENT TYPE SWITCHER INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___content_type_switcher( $input_id, $input_data ) {
     ?>
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
@@ -3145,7 +2861,6 @@ function sek_set_input_tmpl___content_type_switcher( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  MODULE PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
     ?>
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
@@ -3155,9 +2870,6 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
 
             $i = 0;
             foreach( $content_collection as $_module_params ) {
-                // if ( $i % 2 == 0 ) {
-                //   //printf('<div class="sek-module-raw"></div');
-                // }
                 $_module_params = wp_parse_args( $_module_params, array(
                     'content-type' => 'module',
                     'content-id' => '',
@@ -3201,10 +2913,7 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  SECTION PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
-    //sek_error_log('$input_data ? for input_id ' . $input_id, $input_data );
-    //sek_error_log('CURRENT MODULE PARAMS ?', CZR_Fmk_Base()->current_module_params_when_ajaxing );
     ?>
         <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
         <div class="sek-content-type-wrapper">
@@ -3218,8 +2927,6 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
 
             foreach( $content_collection as $_section_params ) {
                 $section_type = 'content';
-                // Section type has to be specified for header and footer sections
-                // Otherwise bug : https://github.com/presscustomizr/nimble-builder/issues/454
                 if ( !empty($_section_params['section_type']) ) {
                     $section_type = $_section_params['section_type'];
                 }
@@ -3228,12 +2935,7 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
                     'preset_section',
                     $_section_params['content-id'],
                     sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
-                        // v1.4.2 : added the ?ver param to make sure we always display the latest shot of the section
-                        // May 21st, v1.7.5 => back to the local data
-                        // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
                         NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_section_params['thumb'] . '?ver=' . NIMBLE_VERSION,
-
-                        //$_section_params['thumb'] . '?ver=' . NIMBLE_VERSION,
                         isset( $_section_params['height'] ) ? 'height:'.$_section_params['height'] : ''
                     ),
                     $_section_params['title'],
@@ -3250,7 +2952,6 @@ function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  SPACING INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
     ?>
     <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
@@ -3329,7 +3030,6 @@ function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  BACKGROUND POSITION INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___bg_position( $input_id, $input_data ) {
     ?>
         <div class="sek-bg-pos-wrapper">
@@ -3424,11 +3124,9 @@ function sek_set_input_tmpl___bg_position( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  HORIZONTAL ALIGNMENT INPUT
 /* ------------------------------------------------------------------------- */
-// AND
 /* ------------------------------------------------------------------------- *
  *  HORIZONTAL ALIGNMENT INPUT FOR TEXT => includes the 'justify' icon
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___h_alignment( $input_id, $input_data ) {
     ?>
         <div class="sek-h-align-wrapper">
@@ -3459,7 +3157,6 @@ function sek_set_input_tmpl___h_text_alignment( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  VERTICAL ALIGNMENT INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
     ?>
         <div class="sek-v-align-wrapper">
@@ -3477,24 +3174,12 @@ function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  FONT AWESOME ICON PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___fa_icon_picker( $input_id, $input_data ) {
     ?>
         <select data-czrtype="<?php echo $input_id; ?>"></select>
     <?php
 }
-
-
-// this dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
-// It allows us to populate the server response with the relevant module html template
-// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
 add_filter( "ac_set_ajax_czr_tmpl___fa_icon_picker_input", '\Nimble\sek_get_fa_icon_list_tmpl', 10, 3 );
-// hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
-// this dynamic filter is declared on wp_ajax_ac_get_template
-// It allows us to populate the server response with the relevant module html template
-// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
-//
-// For czr_tiny_mce_editor_module, we request the font_list tmpl
 function sek_get_fa_icon_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
     if ( empty( $requested_tmpl ) ) {
         wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
@@ -3504,15 +3189,7 @@ function sek_get_fa_icon_list_tmpl( $html, $requested_tmpl = '', $posted_params 
         sek_retrieve_decoded_font_awesome_icons()
     );//will be sent by wp_send_json_success() in ::ac_set_ajax_czr_tmpl()
 }
-
-
-
-//retrieves faicons:
-// 1) from faicons.json if needed (transient doesn't exists, or is new version => set in TC_wfc ) and decodes them
-// otherwise
-// 2) from the transient set if it exists
 function sek_retrieve_decoded_font_awesome_icons() {
-    // this file must be generated with: https://github.com/presscustomizr/nimble-builder/issues/57
     $faicons_json_path      = NIMBLE_BASE_PATH . '/assets/faicons.json';
     $faicons_transient_name = 'sek_font_awesome_november_2018';
     if ( false == get_transient( $faicons_transient_name ) ) {
@@ -3541,20 +3218,12 @@ function sek_retrieve_decoded_font_awesome_icons() {
 /* ------------------------------------------------------------------------- *
  *  FONT PICKER INPUT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___font_picker( $input_id, $input_data ) {
     ?>
         <select data-czrtype="<?php echo $input_id; ?>"></select>
     <?php
 }
-
-
-// this dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
-// It allows us to populate the server response with the relevant module html template
-// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
 add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_list_tmpl', 10, 3 );
-// hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
-// For czr_tiny_mce_editor_module, we request the font_list tmpl
 function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
     if ( empty( $requested_tmpl ) ) {
         wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
@@ -3586,7 +3255,6 @@ function sek_get_cfonts() {
         'Verdana,Geneva,sans-serif',
     );
     foreach ( $raw_cfonts as $font ) {
-      //no subsets for cfonts => epty array()
       $cfonts[] = array(
           'name'    => $font ,
           'subsets'   => array()
@@ -3594,18 +3262,6 @@ function sek_get_cfonts() {
     }
     return apply_filters( 'sek_font_picker_cfonts', $cfonts );
 }
-
-
-//retrieves gfonts:
-// 1) from webfonts.json if needed (transient doesn't exists, or is new version => set in TC_wfc ) and decodes them
-// otherwise
-// 2) from the transiet set if it exists
-//
-// => Until June 2017, the webfonts have been stored in 'tc_gfonts' transient
-// => In June 2017, the Google Fonts have been updated with a new webfonts.json
-// generated from : https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyBID8gp8nBOpWyH5MrsF7doP4fczXGaHdA
-//
-// => The transient name is now : czr_gfonts_june_2017
 function sek_retrieve_decoded_gfonts() {
     if ( false == get_transient( 'sek_gfonts_may_2018' ) ) {
         $gfont_raw      = @file_get_contents( NIMBLE_BASE_PATH ."/assets/webfonts.json" );
@@ -3623,47 +3279,19 @@ function sek_retrieve_decoded_gfonts() {
 
     return $gfonts_decoded;
 }
-
-
-
-//@return the google fonts
 function sek_get_gfonts( $what = null ) {
-  //checks if transient exists or has expired
 
   $gfonts_decoded = sek_retrieve_decoded_gfonts();
   $gfonts = array();
-  //$subsets = array();
-
-  // $subsets['all-subsets'] = sprintf( '%1$s ( %2$s %3$s )',
-  //   __( 'All languages' , 'text_doma' ),
-  //   count($gfonts_decoded['items']) + count( $this -> get_cfonts() ),
-  //   __('fonts' , 'text_doma' )
-  // );
 
   foreach ( $gfonts_decoded['items'] as $font ) {
     foreach ( $font['variants'] as $variant ) {
       $name     = str_replace( ' ', '+', $font['family'] );
       $gfonts[]   = array(
           'name'    => $name . ':' .$variant
-          //'subsets'   => $font['subsets']
       );
     }
-    //generates subset list : subset => font number
-    // foreach ( $font['subsets'] as $sub ) {
-    //   $subsets[$sub] = isset($subsets[$sub]) ? $subsets[$sub]+1 : 1;
-    // }
   }
-
-  //finalizes the subset array
-  // foreach ( $subsets as $subset => $font_number ) {
-  //   if ( 'all-subsets' == $subset )
-  //     continue;
-  //   $subsets[$subset] = sprintf('%1$s ( %2$s %3$s )',
-  //     $subset,
-  //     $font_number,
-  //     __('fonts' , 'text_doma' )
-  //   );
-  // }
 
   return ('subsets' == $what) ? apply_filters( 'sek_font_picker_gfonts_subsets ', $subsets ) : apply_filters( 'sek_font_picker_gfonts', $gfonts )  ;
 }
@@ -3673,17 +3301,12 @@ function sek_get_gfonts( $what = null ) {
 /* ------------------------------------------------------------------------- *
  *  FONT SIZE
 /* ------------------------------------------------------------------------- */
-// AND
 /* ------------------------------------------------------------------------- *
  *  LINE HEIGHT INPUT TMPLS
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
     ?>
       <?php
-            // we save the int value + unit
-            // we want to keep only the numbers when printing the tmpl
-            // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
           ?>
           <#
             var value = data['<?php echo $input_id; ?>'],
@@ -3711,7 +3334,6 @@ function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  CODE EDITOR INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___code_editor( $input_id, $input_data ) {
     /*
     * Needed to form the correct params to pass to the code mirror editor, based on the code type
@@ -3728,13 +3350,9 @@ function sek_set_input_tmpl___code_editor( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  CODE EDITOR INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___range_simple( $input_id, $input_data ) {
     ?>
     <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <#
       var value = data['<?php echo $input_id; ?>'],
@@ -3767,13 +3385,9 @@ function sek_set_input_tmpl___range_simple( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  CODE EDITOR INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data ) {
     ?>
     <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <#
       var value = data['<?php echo $input_id; ?>'],
@@ -3810,13 +3424,9 @@ function sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  CODE EDITOR INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id, $input_data ) {
     ?>
     <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <#
       var value = data['<?php echo $input_id; ?>'],
@@ -3853,13 +3463,9 @@ function sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id,
 /* ------------------------------------------------------------------------- *
  *  BORDERS INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___borders( $input_id, $input_data ) {
     ?>
     <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <div class="sek-borders">
         <?php //<# //console.log( 'IN php::sek_set_input_tmpl___borders() => data range_slide => ', data ); #> ?>
@@ -3898,13 +3504,9 @@ function sek_set_input_tmpl___borders( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  BORDER RADIUS INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___border_radius( $input_id, $input_data ) {
     ?>
     <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
     ?>
     <div class="sek-borders">
         <?php //<# //console.log( 'IN php::sek_set_input_tmpl___border_radius() => data range_slide => ', data ); #> ?>
@@ -3940,7 +3542,6 @@ function sek_set_input_tmpl___border_radius( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  MULTIPLE BUTTON CHOICES INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___buttons_choice( $input_id, $input_data ) {
     ?>
       <?php //<# //console.log( 'IN php::sek_set_input_tmpl___buttons_choice() => data range_slide => ', data ); #> ?>
@@ -3970,7 +3571,6 @@ function sek_set_input_tmpl___buttons_choice( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  RESET BUTTON INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___reset_button( $input_id, $input_data ) {
     ?>
       <?php //<# //console.log( 'IN php::sek_set_input_tmpl___buttons_choice() => data range_slide => ', data ); #> ?>
@@ -3991,7 +3591,6 @@ function sek_set_input_tmpl___reset_button( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  RESET BUTTON INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___revision_history( $input_id, $input_data ) {
     ?>
       <?php //<# //console.log( 'IN php::sek_set_input_tmpl___buttons_choice() => data range_slide => ', data ); #> ?>
@@ -4009,7 +3608,6 @@ function sek_set_input_tmpl___revision_history( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  DETACHED WP EDITOR INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___detached_tinymce_editor( $input_id, $input_data ) {
     ?>
       <?php ////console.log( 'IN php::sek_set_input_tmpl___detached_tinymce_edito() => input data => ', data ); #> ?>
@@ -4023,8 +3621,6 @@ function sek_set_input_tmpl___detached_tinymce_editor( $input_id, $input_data ) 
  *  WP EDITOR INPUT TEMPLATE
 /* ------------------------------------------------------------------------- */
 function sek_set_input_tmpl___nimble_tinymce_editor( $input_id, $input_data ) {
-    // Added an id attribute for https://github.com/presscustomizr/nimble-builder/issues/403
-    // needed to instantiate wp.editor.initialize(...)
     ?>
     <?php //<# console.log( 'IN php::ac_get_default_input_tmpl() => data range_slide => ', data ); #> ?>
       <textarea id="textarea-{{ data.control_id }}" data-czrtype="<?php echo $input_id; ?>" class="width-100" name="textarea" rows="10" cols="">{{ data.value }}</textarea>
@@ -4035,7 +3631,6 @@ function sek_set_input_tmpl___nimble_tinymce_editor( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  IMPORT / EXPORT
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___imp_exp( $input_id, $input_data ) {
     ?>
       <?php //<# console.log( 'IN php::sek_set_input_tmpl___detached_tinymce_edito() => input data => ', data ); #> ?>
@@ -4069,7 +3664,6 @@ function sek_set_input_tmpl___imp_exp( $input_id, $input_data ) {
 /* ------------------------------------------------------------------------- *
  *  POST GRID LAYOUT PICKER
 /* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
 function sek_set_input_tmpl___grid_layout( $input_id, $input_data ) {
     ?>
         <div class="sek-grid-layout-wrapper">

@@ -35,7 +35,7 @@ function sek_get_module_params_for_czr_button_module() {
                 'color_css'  => '#ffffff',
             )
         ),
-        'css_selectors' => array( '.sek-btn' ),
+        'css_selectors' => array( '.sek-module-inner .sek-btn' ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/button_module_tmpl.php"
     );
 }

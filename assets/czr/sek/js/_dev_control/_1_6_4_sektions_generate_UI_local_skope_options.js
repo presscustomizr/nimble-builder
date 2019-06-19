@@ -139,7 +139,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
-                                                defaultPreviewAction : 'refresh',
+                                                defaultPreviewAction : 'refresh_preview',
                                                 uiParams : params,
                                                 options_type : optionType,
                                                 settingParams : {

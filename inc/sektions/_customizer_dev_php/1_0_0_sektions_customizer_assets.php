@@ -452,6 +452,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Reset the sections displayed in global locations' => __( 'Reset the sections displayed in global locations', 'text_doma'),
             'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
 
+            'Global text options for Nimble sections' => __('Global text options for Nimble sections', 'text_doma'),
             'Site wide header and footer' => __( 'Site wide header and footer', 'text_doma'),
             'Site wide breakpoint for Nimble sections' => __( 'Site wide breakpoint for Nimble sections', 'text_doma'),
             'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'text_doma'),

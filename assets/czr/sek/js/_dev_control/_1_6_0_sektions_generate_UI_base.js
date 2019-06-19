@@ -227,6 +227,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // Set it
                               api( sektionsLocalizedData.optNameForGlobalOptions )( clonedGlobalOptions );
+
+                              // REFRESH THE PREVIEW ?
+                              if ( false !== refresh_preview ) {
+                                    api.previewer.refresh();
+                              }
+
+                              // Refresh the font list now, before ajax stylesheet update
+                              // So that the .fonts collection is ready server side
+                              if ( true === refresh_fonts ) {
+                                    var newFontFamily = params.settingParams.args.input_value;
+                                    if ( ! _.isString( newFontFamily ) ) {
+                                          api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', newFontFamily );
+                                          return;
+                                    }
+
+                                    // add it only if gfont
+                                    if ( newFontFamily.indexOf('gfont') > -1 ) {
+                                          self.updateGlobalGFonts( newFontFamily );
+                                    }
+                              }
+
+                              // REFRESH THE STYLESHEET ?
+                              if ( true === refresh_stylesheet ) {
+                                    api.previewer.send( 'sek-refresh-stylesheet', {
+                                          local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                                          location_skope_id : sektionsLocalizedData.globalSkopeId
+                                    });
+                              }
                         } else {
                               // LEVEL OPTION CASE => LOCAL
                               return self.updateAPISetting({
@@ -326,27 +354,31 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // add it only if gfont
                         if ( newFontFamily.indexOf('gfont') > -1 ) {
-                              self.updateAPISetting({
-                                    action : 'sek-update-fonts',
-                                    font_family : newFontFamily,
-                                    is_global_location : self.isGlobalLocation( params.uiParams )
-                              })
-                              // we use always() instead of done here, because the api section setting might not be changed ( and therefore return a reject() promise ).
-                              // => this can occur when a user is setting a google font already picked elsewhere
-                              // @see case 'sek-update-fonts'
-                              .always( function() {
-                                    _doUpdateWithRequestedAction().then( function() {
-                                          // always refresh again after
-                                          // Why ?
-                                          // Because the first refresh was done before actually setting the new font family, so based on a previous set of fonts
-                                          // which leads to have potentially an additional google fonts that we don't need after the first refresh
-                                          // that's why this second refresh is required. It wont trigger any preview ajax actions. Simply refresh the root fonts property of the main api setting.
-                                          self.updateAPISetting({
-                                                action : 'sek-update-fonts',
-                                                is_global_location : self.isGlobalLocation( params.uiParams )
+                              if ( true === params.isGlobalOptions ) {
+                                    _doUpdateWithRequestedAction( newFontFamily );
+                              } else {
+                                    self.updateAPISetting({
+                                          action : 'sek-update-fonts',
+                                          font_family : newFontFamily,
+                                          is_global_location : self.isGlobalLocation( params.uiParams )
+                                    })
+                                    // we use always() instead of done here, because the api section setting might not be changed ( and therefore return a reject() promise ).
+                                    // => this can occur when a user is setting a google font already picked elsewhere
+                                    // @see case 'sek-update-fonts'
+                                    .always( function() {
+                                          _doUpdateWithRequestedAction().then( function() {
+                                                // always refresh again after
+                                                // Why ?
+                                                // Because the first refresh was done before actually setting the new font family, so based on a previous set of fonts
+                                                // which leads to have potentially an additional google fonts that we don't need after the first refresh
+                                                // that's why this second refresh is required. It wont trigger any preview ajax actions. Simply refresh the root fonts property of the main api setting.
+                                                self.updateAPISetting({
+                                                      action : 'sek-update-fonts',
+                                                      is_global_location : self.isGlobalLocation( params.uiParams )
+                                                });
                                           });
                                     });
-                              });
+                              }
                         } else {
                              _doUpdateWithRequestedAction();
                         }
@@ -357,10 +389,60 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+            // IMPORTANT => Updates the setting for global options
+            updateGlobalGFonts : function( newFontFamily ) {
+                  var self = this;
+                  //api( sektionsLocalizedData.optNameForGlobalOptions )() is registered on ::initialize();
+                  var rawGlobalOptions = api( sektionsLocalizedData.optNameForGlobalOptions )(),
+                      clonedGlobalOptions = $.extend( true, {}, _.isObject( rawGlobalOptions ) ? rawGlobalOptions : {} );
+
+                  // Get the gfonts from the level options and modules values
+                  var currentGfonts = self.sniffGlobalGFonts( clonedGlobalOptions );
+                  if ( ! _.contains( currentGfonts, newFontFamily ) ) {
+                        if ( newFontFamily.indexOf('gfont') < 0 ) {
+                              api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
+                              __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont');
+                              return;
+                        }
+                        currentGfonts.push( newFontFamily );
+                  }
+                  // update the global gfonts collection
+                  // this is then used server side in Sek_Dyn_CSS_Handler::sek_get_gfont_print_candidates to build the Google Fonts request
+                  clonedGlobalOptions.fonts = currentGfonts;
+
+                  // Set it
+                  api( sektionsLocalizedData.optNameForGlobalOptions )( clonedGlobalOptions );
+            },
 
 
+            // Walk the global option and populate an array of google fonts
+            // To be a candidate for sniffing, an input font value font should start with [gfont]
+            // @return array
+            sniffGlobalGFonts : function( _data_ ) {
+                  var self = this,
+                  gfonts = [],
+                  _snifff_ = function( _data_ ) {
+                        _.each( _data_, function( levelData, _key_ ) {
+                              // of course, don't sniff the already stored fonts
+                              if ( 'fonts' === _key_ )
+                                return;
+                              // example of input_id candidate 'font_family_css'
+                              if ( _.isString( _key_ ) && _key_.indexOf('font_family') > -1 ) {
+                                    if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
+                                          gfonts.push( levelData );
+                                    }
+                              }
 
-
+                              if ( _.isArray( levelData ) || _.isObject( levelData ) ) {
+                                    _snifff_( levelData );
+                              }
+                        });
+                  };
+                  if ( _.isArray( _data_ ) || _.isObject( _data_ ) ) {
+                        _snifff_( _data_ );
+                  }
+                  return gfonts;
+            },
 
 
 

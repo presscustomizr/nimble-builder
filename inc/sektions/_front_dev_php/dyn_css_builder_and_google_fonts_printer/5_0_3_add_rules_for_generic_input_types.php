@@ -223,22 +223,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
             $properties_to_render['align-items'] = $v_align_value;
         break;
         case 'font_family' :
-            $family = $value;
-            //sek_error_log( __FUNCTION__ . ' font-family', $value );
-            // Preprocess the selected font family
-            // font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
-            // special treatment for font-family
-            if ( false != strstr( $value, '[gfont]') ) {
-                $split = explode(":", $family);
-                $family = $split[0];
-                //only numbers for font-weight. 400 is default
-                $properties_to_render['font-weight']    = $split[1] ? preg_replace('/\D/', '', $split[1]) : '';
-                $properties_to_render['font-weight']    = empty($properties_to_render['font-weight']) ? 400 : $properties_to_render['font-weight'];
-                $properties_to_render['font-style']     = ( $split[1] && strstr($split[1], 'italic') ) ? 'italic' : 'normal';
-            }
-
-            $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
-            $properties_to_render['font-family'] = false != strstr( $value, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
+            $properties_to_render['font-family'] = sek_extract_css_font_family_from_customizer_option( $value );
         break;
 
         /* Spacer */

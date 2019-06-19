@@ -32,7 +32,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
             appendDynStyleSheet : function( location_skope_id, styleMarkup ) {
                 var _stylesheet_id_ = '#sek-' + location_skope_id,//@see php Sek_Dyn_CSS_Handler
-                    _gfonts_id_ = '#sek-gfonts-' + location_skope_id;//@see php Sek_Dyn_CSS_Handler
+                    _gfonts_id_ = '#sek-gfonts-local-and-global';//@see php Sek_Dyn_CSS_Handler
 
                 // Remove a dynamic inline stylesheet if already printed
                 if ( 0 < $('head').find( _stylesheet_id_ ).length ) {

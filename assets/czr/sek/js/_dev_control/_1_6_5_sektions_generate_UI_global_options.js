@@ -33,12 +33,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _.each( sektionsLocalizedData.globalOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
                               // Header and footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
-                              case 'global_header_footer':
+                              case 'global_text' :
                                     registrationParams[ opt_name ] = {
-                                          settingControlId : _id_ + '__header_footer',
+                                          settingControlId : _id_ + '__global_text',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
-                                          icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                                          controlLabel : sektionsLocalizedData.i18n['Global text options for Nimble sections'],
+                                          icon : '<i class="material-icons sek-level-option-icon">text_format</i>'
+                                    };
+                              break;
+                              case 'widths' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__widths',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site wide inner and outer sections widths'],
+                                          icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
                                     };
                               break;
                               case 'breakpoint' :
@@ -50,14 +58,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                                     };
                               break;
-                              case 'widths' :
+                              case 'global_header_footer':
                                     registrationParams[ opt_name ] = {
-                                          settingControlId : _id_ + '__widths',
+                                          settingControlId : _id_ + '__header_footer',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Site wide inner and outer sections widths'],
-                                          icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
+                                          controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
+                                          icon : '<i class="material-icons sek-level-option-icon">web</i>'
                                     };
                               break;
+
                               case 'performances' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__performances',
@@ -113,7 +122,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
                                                 isGlobalOptions : true,//<= indicates that we won't update the local skope setting id
-                                                defaultPreviewAction : 'refresh',
+                                                defaultPreviewAction : 'refresh_preview',
                                                 uiParams : params,
                                                 options_type : optionType,
                                                 settingParams : {

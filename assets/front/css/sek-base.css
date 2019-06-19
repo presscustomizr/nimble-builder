@@ -1559,19 +1559,19 @@ button.sek-btn,
   margin-bottom: 0;
 }
 
-.sek-post-grid-wrapper .sek-pg-category a {
+.sek-module-inner .sek-post-grid-wrapper .sek-pg-category a {
   text-transform: uppercase;
   font-size: 14px;
   text-decoration: none;
   color: #767676;
 }
 
-.sek-post-grid-wrapper .sek-pg-title {
+.sek-module-inner .sek-post-grid-wrapper .sek-pg-title {
   font-size: 28px;
   line-height: 1.3em;
 }
 
-.sek-post-grid-wrapper .sek-pg-title a {
+.sek-module-inner .sek-post-grid-wrapper .sek-pg-title a {
   text-decoration: none;
   color: #444;
   font-size: 28px;
@@ -1581,14 +1581,14 @@ button.sek-btn,
   word-wrap: break-word;
 }
 
-.sek-post-grid-wrapper .sek-pg-metas span, .sek-post-grid-wrapper .sek-pg-metas a {
+.sek-module-inner .sek-post-grid-wrapper .sek-pg-metas span, .sek-module-inner .sek-post-grid-wrapper .sek-pg-metas a {
   text-transform: uppercase;
   font-size: 14px;
   letter-spacing: 1px;
   color: #767676;
 }
 
-.sek-post-grid-wrapper .sek-pg-content p {
+.sek-module-inner .sek-post-grid-wrapper .sek-pg-content p {
   margin: 0 0 15px 0;
   line-height: 1.5;
   font-size: 16px;
@@ -1803,7 +1803,6 @@ button.sek-btn,
 }
 
 .sek-simple-form-wrapper label {
-  font-family: "Lucida Grande","Lucida Sans Unicode",Tahoma,sans-serif;
   color: #444444;
   font-weight: bold;
   text-align: left;

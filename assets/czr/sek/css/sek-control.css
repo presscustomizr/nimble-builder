@@ -821,7 +821,8 @@ credits : Gutenberg team @wordpress */
     width:100%;
     padding:0;
     -webkit-appearance:none;
-    background:transparent
+    background:transparent;
+    height: 26px;
 }
 .sek-range-input::-webkit-slider-thumb{
     -webkit-appearance:none;
@@ -1074,6 +1075,10 @@ body.nimble-top-bar-visible #nimble-top-bar {
 }
 #nimble-top-bar .sek-do-undo button:focus {
   outline: none;
+}
+#nimble-top-bar .sek-do-undo .icon:before {
+  top: -6px;
+  position: relative;
 }
 #nimble-top-bar .sek-do-undo .icon.undo:before {
   content:"\f171";
