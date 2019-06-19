@@ -268,6 +268,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_6_UI_local_revisions.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_7_UI_local_imp_exp.js',
 
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_0_UI_global_text.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_1_UI_global_breakpoint.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_2_UI_global_widths.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_3_UI_global_performances.js',
@@ -379,6 +380,7 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_2_local/4_1_6_sek_register_local_revisions.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_2_local/4_1_7_sek_register_local_imp_exp.php',
 
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_3_sek_register_global_reset.php',

@@ -10,6 +10,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
         // 1) on wp_enqueue_scripts or wp_head
         // 2) when ajaxing, for actions 'sek-resize-columns', 'sek-refresh-stylesheet'
         function print_or_enqueue_seks_style( $skope_id = null ) {
+            $google_fonts_print_candidates = '';
             // when this method is fired in a customize preview context :
             //    - the skope_id has to be built. Since we are after 'wp', this is not a problem.
             //    - the css rules are printed inline in the <head>
@@ -19,13 +20,19 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             //    - the skope_id must be passed as param
             //    - the css rules are printed inline in the <head>
             //    - we set the hook to ''
-            //
-            // in a front normal context, the css is enqueued from the already written file.
+
             // AJAX REQUESTED STYLESHEET
             if ( ( ! is_null( $skope_id ) && ! empty( $skope_id ) ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-                $this->_instantiate_css_handler( array( 'skope_id' => $skope_id, 'is_global_stylesheet' => NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) );
-            } else {
-                $skope_id = skp_build_skope_id();
+                if ( ! isset($_POST['local_skope_id']) ) {
+                    sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => error missing local_skope_id');
+                    return;
+                }
+                $local_skope_id = $_POST['local_skope_id'];
+                $css_handler_instance = $this->_instantiate_css_handler( array( 'skope_id' => $skope_id, 'is_global_stylesheet' => NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) );
+            }
+            // in a front normal context, the css is enqueued from the already written file.
+            else {
+                $local_skope_id = skp_build_skope_id();
                 // LOCAL SECTIONS STYLESHEET
                 $this->_instantiate_css_handler( array( 'skope_id' => skp_build_skope_id() ) );
                 // GLOBAL SECTIONS STYLESHEET
@@ -35,16 +42,84 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                     $this->_instantiate_css_handler( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) );
                 }
             }
+            $google_fonts_print_candidates = $this->sek_get_gfont_print_candidates( $local_skope_id );
+
+            // GOOGLE FONTS
+            if ( !empty( $google_fonts_print_candidates ) ) {
+                // When customizing
+                if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+                    $this -> sek_gfont_print( $google_fonts_print_candidates );
+                } else {
+                    if ( in_array( current_filter(), array( 'wp_footer', 'wp_head' ) ) ) {
+                        $this -> sek_gfont_print( $google_fonts_print_candidates );
+                    } else {
+                        wp_enqueue_style(
+                            'sek-gfonts-local-and-global',
+                            sprintf( '//fonts.googleapis.com/css?family=%s', $google_fonts_print_candidates ),
+                            array(),
+                            null,
+                            'all'
+                        );
+                    }
+                }
+            }
+
             if ( empty( $skope_id ) ) {
                 sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . ' =>the skope_id should not be empty' );
             }
         }//print_or_enqueue_seks_style
 
+        //@return string
+        // sek_model is passed when customizing in SEK_Front_Render_Css::print_or_enqueue_seks_style()
+        function sek_get_gfont_print_candidates( $local_skope_id ) {
+            // local sections
+            $local_seks = sek_get_skoped_seks( $local_skope_id );
+            // global sections
+            $global_seks = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+            // global options
+            $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+
+            $print_candidates = '';
+            $ffamilies = array();
+
+            // Let's build the collection of google fonts from local sections, global sections, global options
+            if ( is_array( $local_seks ) && !empty( $local_seks['fonts'] ) && is_array( $local_seks['fonts'] ) ) {
+                $ffamilies = $local_seks['fonts'];
+            }
+            if ( is_array( $global_seks ) && !empty( $global_seks['fonts'] ) && is_array( $global_seks['fonts'] ) ) {
+                $ffamilies = array_merge( $ffamilies, $global_seks['fonts'] );
+            }
+            if ( is_array( $global_options ) && !empty( $global_options['fonts'] ) && is_array( $global_options['fonts'] ) ) {
+                $ffamilies = array_merge( $ffamilies, $global_options['fonts'] );
+            }
+
+            // remove duplicate if any
+            $ffamilies = array_unique( $ffamilies );
+
+            if ( ! empty( $ffamilies ) ) {
+                $ffamilies = implode( "|", $ffamilies );
+                $print_candidates = str_replace( '|', '%7C', $ffamilies );
+                $print_candidates = str_replace( '[gfont]', '' , $print_candidates );
+            }
+            return $print_candidates;
+        }
+
+        // hook : wp_head
+        // or fired directly when ajaxing
+        // When ajaxing, the link#sek-gfonts-{$this->id} gets removed from the dom and replaced by this string
+        function sek_gfont_print( $print_candidates ) {
+           if ( ! empty( $print_candidates ) ) {
+                printf('<link rel="stylesheet" id="%1$s" href="%2$s">',
+                    'sek-gfonts-local-and-global',
+                    "//fonts.googleapis.com/css?family={$print_candidates}"
+                );
+            }
+        }
 
         // @param params = array( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) )
         private function _instantiate_css_handler( $params = array() ) {
             $params = wp_parse_args( $params, array( 'skope_id' => '', 'is_global_stylesheet' => false ) );
-            new Sek_Dyn_CSS_Handler( array(
+            $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
                 'id'             => $params['skope_id'],
                 'skope_id'       => $params['skope_id'],
                 // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
@@ -55,6 +130,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
                 'hook'           => ( ! defined( 'DOING_AJAX' ) && is_customize_preview() ) ? 'wp_head' : ''
             ));
+            return $css_handler_instance;
         }
 
     }//class

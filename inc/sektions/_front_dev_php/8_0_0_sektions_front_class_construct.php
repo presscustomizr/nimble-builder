@@ -60,9 +60,10 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         // option key as saved in db => module_type
         // is used in _1_6_5_sektions_generate_UI_global_options.js and when normalizing the global option in sek_normalize_global_options_with_defaults()
         public static $global_options_map = [
-            'global_header_footer' => 'sek_global_header_footer',
-            'breakpoint' => 'sek_global_breakpoint',
+            'global_text' => 'sek_global_text',
             'widths' => 'sek_global_widths',
+            'breakpoint' => 'sek_global_breakpoint',
+            'global_header_footer' => 'sek_global_header_footer',
             'performances' => 'sek_global_performances',
             'recaptcha' => 'sek_global_recaptcha',
             'global_revisions' => 'sek_global_revisions',
@@ -122,10 +123,11 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
           'sek_local_imp_exp',
 
           // global options modules
-          'sek_global_breakpoint',
+          'sek_global_text',
           'sek_global_widths',
-          'sek_global_performances',
+          'sek_global_breakpoint',
           'sek_global_header_footer',
+          'sek_global_performances',
           'sek_global_recaptcha',
           'sek_global_revisions',
           'sek_global_reset',

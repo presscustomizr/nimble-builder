@@ -733,5 +733,30 @@ function sek_extract_numeric_value( $value ) {
     return is_numeric( $numeric ) ? $numeric : null;
 }
 
+// Return a font family string, usable in a css stylesheet
+// [cfont]Helvetica Neue, Helvetica, Arial, sans-serif =>  Helvetica Neue, Helvetica, Arial, sans-serif
+// [gfont]Assistant:regular => Assistant
+function sek_extract_css_font_family_from_customizer_option( $family ) {
+    //sek_error_log( __FUNCTION__ . ' font-family', $value );
+    // Preprocess the selected font family
+    // font: [font-stretch] [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];
+    // special treatment for font-family
+    if ( false != strstr( $family, '[gfont]') ) {
+        $split = explode(":", $family);
+        $family = $split[0];
+        //only numbers for font-weight. 400 is default
+        $properties_to_render['font-weight']    = $split[1] ? preg_replace('/\D/', '', $split[1]) : '';
+        $properties_to_render['font-weight']    = empty($properties_to_render['font-weight']) ? 400 : $properties_to_render['font-weight'];
+        $properties_to_render['font-style']     = ( $split[1] && strstr($split[1], 'italic') ) ? 'italic' : 'normal';
+    }
+    if ( 'none' === $family ) {
+        $family = '';
+    } else {
+        $family = false != strstr( $family, '[cfont]') ? $family : "'" . str_replace( '+' , ' ' , $family ) . "'";
+        $family = str_replace( array( '[gfont]', '[cfont]') , '' , $family );
+    }
+
+    return $family;
+}
 
 ?>
