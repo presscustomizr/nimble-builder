@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.3-beta
+Stable tag: 1.8.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -108,10 +108,15 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.2 =
-Introduction of a new "About us" pre-built section.
+= 1.8.3 =
+Introduction of global text options for text content, links and headings, allowing user to set default font family, font size, color for Nimble sections site wide.
 
 == Changelog ==
+= 1.8.3 : June 20th 2019 =
+* fixed : customizer style => broken vertical aligment for range select
+* fixed : customizer style => broken vertical alignement for do-undo icons
+* added : global text options for text content, links and headings, allowing user to set default font family, font size, color for Nimble sections site wide
+
 = 1.8.2 : June 17th 2019 =
 * fixed : column width option could be locked to a the previous value if set before v1.8.1
 * added : a new "About us" pre-built section

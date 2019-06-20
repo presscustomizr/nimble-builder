@@ -2,7 +2,7 @@
 /**
 * Plugin Name: Nimble Page Builder
 * Description: Powerful drag and drop page builder using the native WordPress customizer.
-* Version: 1.8.3-beta
+* Version: 1.8.3
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://nimblebuilder.com/?utm_source=wp-plugins&utm_medium=wp-dashboard&utm_campaign=author-uri
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "1.8.3-beta";
+$current_version = "1.8.3";
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
 if ( !defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
@@ -26,8 +26,8 @@ if ( !defined( 'NIMBLE_PLUGIN_FILE' ) ) { define( 'NIMBLE_PLUGIN_FILE', __FILE__
 if ( !defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ) { define ( 'NIMBLE_SAVED_SECTIONS_ENABLED', false ); }
 if ( !defined( 'NIMBLE_BETA_FEATURES_ENABLED' ) ) { define ( 'NIMBLE_BETA_FEATURES_ENABLED', false ); }
 
-if ( !defined( 'NIMBLE_SHOW_UPDATE_NOTICE_FOR_VERSION' ) ) { define( 'NIMBLE_SHOW_UPDATE_NOTICE_FOR_VERSION', '1.7.4' ); }
-if ( !defined( 'NIMBLE_RELEASE_NOTE_URL' ) ) { define( 'NIMBLE_RELEASE_NOTE_URL', 'https://presscustomizr.com/nimble-builder-version-1-7-4-includes-nimble-created-content-in-search-results/' ); }
+if ( !defined( 'NIMBLE_SHOW_UPDATE_NOTICE_FOR_VERSION' ) ) { define( 'NIMBLE_SHOW_UPDATE_NOTICE_FOR_VERSION', '1.8.3' ); }
+if ( !defined( 'NIMBLE_RELEASE_NOTE_URL' ) ) { define( 'NIMBLE_RELEASE_NOTE_URL', 'https://presscustomizr.com/nimble-builder-introduces-a-new-about-us-pre-built-section-and-global-text-options/' ); }
 
 // when NIMBLE_IS_PREVIEW_UI_DEBUG_MODE or $_GET['preview_ui_debug'] is true, the levels UI in the preview are not being auto removed, so we can inspect the markup and CSS
 if ( !defined( 'NIMBLE_IS_PREVIEW_UI_DEBUG_MODE' ) ) { define ( 'NIMBLE_IS_PREVIEW_UI_DEBUG_MODE', false ); }

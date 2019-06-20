@@ -231,7 +231,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
         );
     }
 
-    sek_error_log('ALORS text_options ?', $text_options);
+    // sek_error_log('ALORS text_options ?', $text_options);
 
 
     $global_text_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
