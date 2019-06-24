@@ -1077,7 +1077,7 @@ body.nimble-top-bar-visible #nimble-top-bar {
   outline: none;
 }
 #nimble-top-bar .sek-do-undo .icon:before {
-  top: -6px;
+  /*top: -6px;*/
   position: relative;
 }
 #nimble-top-bar .sek-do-undo .icon.undo:before {
