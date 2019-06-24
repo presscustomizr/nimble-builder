@@ -6753,6 +6753,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return gfonts;
             },
 
+            // return an array of all fonts currently used in local sections, global sections and global options
+            sniffAllFonts : function() {
+                  var self = this,
+                      Allfonts = [],
+                      _snifff_ = function( collectionSettingId, level ) {
+                            if ( _.isUndefined( level ) ) {
+                                  var currentSektionSettingValue = api( collectionSettingId )();
+                                  level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
+                            }
+                            _.each( level, function( levelData, _key_ ) {
+                                  // example of input_id candidate 'font_family_css'
+                                  // if ( _.isString( _key_ ) && _.isString( levelData ) && ( levelData.indexOf('[gfont]') > -1 || levelData.indexOf('[cfont]') > -1 ) && ! _.contains( Allfonts, levelData ) ) {
+                                  //       Allfonts.push( levelData );
+                                  // }
+                                  if ( _.isString( _key_ ) && _.isString( levelData ) && ( levelData.indexOf('[gfont]') > -1 || levelData.indexOf('[cfont]') > -1 ) ) {
+                                        Allfonts.push( levelData );
+                                  }
+                                  if ( _.isArray( levelData ) || _.isObject( levelData ) ) {
+                                        _snifff_( collectionSettingId, levelData );
+                                  }
+                            });
+                      };
+
+                  _.each( [ self.localSectionsSettingId(), self.getGlobalSectionsSettingId(), sektionsLocalizedData.optNameForGlobalOptions ], function( setId ) {
+                        _snifff_( setId );
+                  });
+                  return Allfonts;
+            },
 
 
 
@@ -9054,14 +9082,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var _generateFontOptions = function( fontList, type ) {
                               var _html_ = '';
                               _.each( fontList , function( font_data ) {
-                                    var _value = font_data.name,
-                                        optionTitle = _.isString( _value ) ? _value.replace(/[+|:]/g, ' ' ) : _value,
-                                        _setFontTypePrefix = function( val, type ) {
+                                    var _value = _.isString( font_data.name ) ? font_data.name  : 'Undefined Font Family',
+                                        optionTitle = _value.replace(/[+|:]/g, ' ' ),
+                                        _maybeSetFontTypePrefix = function( val, type ) {
+                                              if ( _.isEmpty( type ) )
+                                                return val;
                                               return _.isString( val ) ? [ '[', type, ']', val ].join('') : '';//<= Example : [gfont]Aclonica:regular
                                         };
 
-                                    _value = _setFontTypePrefix( _value, type );
-
+                                    _value = _maybeSetFontTypePrefix( _value, type );
+                                    optionTitle = optionTitle.replace('[cfont]', '').replace('[gfont]', '');
                                     if ( _value == input() ) {
                                           _html_ += '<option selected="selected" value="' + _value + '">' + optionTitle + '</option>';
                                     } else {
@@ -9078,20 +9108,89 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               $fontSelectElement.append( '<option value="none">' + sektionsLocalizedData.i18n['Select a font family'] + '</option>' );
                         }
 
-
-                        // generate the cfont and gfont html
-                        _.each( [
+                        // declare the font list collection : most used, cfont, gfont
+                        var _fontCollection = [
                               {
-                                    title : sektionsLocalizedData.i18n['Web Safe Fonts'],
+                                    title : sektionsLocalizedData.i18n['Web safe fonts'],
                                     type : 'cfont',
                                     list : fontCollections.cfonts
                               },
                               {
-                                    title : sektionsLocalizedData.i18n['Google Fonts'],
+                                    title : sektionsLocalizedData.i18n['Google fonts'],
                                     type : 'gfont',
                                     list : fontCollections.gfonts//_googleFontsFilteredBySubset()
                               }
-                        ], function( fontData ) {
+                        ];
+
+                        // Server fonts are stored as an array of gfonts with duplicates no removed
+                        // 0: "[gfont]Raleway:800"
+                        // 1: "[gfont]Roboto:regular"
+                        // 2: "[gfont]Montserrat:regular"
+                        // 3: "[gfont]Exo+2:800italic"
+                        // 4: "[gfont]Raleway:800"
+                        // 5: "[gfont]Roboto:regular"
+
+
+                        //
+                        // SERVER FONTS is a merge of the uniq gfont array of all skopes. Because each skopes font are stored in the .fonts property of a section setting, each time a new font is used in the customizer.
+                        // The resulting SERVER FONTS array can have duplicatesd google fonts, if two skopes use the same font for example.
+                        //
+                        // How do we increase the weight of locally used gfont for the currently customized skope ?
+                        // => AllFontsInApi is a raw list of all fonts, web safe and google fonts, with duplicates not removed
+                        // those fonts are the one of the current skope + global sections fonts + global options fonts
+                        // Server and api fonts are merged
+                        // Since duplicates are not removed from api fonts, a frequently used local font can be quickly positionned on top of the list.
+                        var allFontsInApi = api.czr_sektions.sniffAllFonts();
+                        var allServerSentFonts = sektionsLocalizedData.alreadyUsedFonts;
+
+                        var _alreadyUsedFonts = [],
+                            _allFonts = [];
+
+                        if ( ! _.isEmpty( allServerSentFonts ) && _.isObject( allServerSentFonts ) ) {
+                              _.each( allServerSentFonts, function( _font ){
+                                    _allFonts.push( _font );
+                              });
+                        }
+
+                        if ( _.isArray( allFontsInApi ) ) {
+                              _.each( allFontsInApi, function( _font ) {
+                                    _allFonts.push( _font );
+                              });
+                        }
+
+                        if ( !_.isEmpty( _allFonts ) ) {
+                              // order fonts by number of occurences
+                              var _occurencesMap = {},
+                                  _fontsOrderedByOccurences = [];
+                              // Creates the occurence map
+                              _allFonts.forEach(function(i) { _occurencesMap[i] = (_occurencesMap[i]||0) + 1;});
+
+                              // isolate only the occurence number in an array
+                              var _occurences =  _.sortBy(_occurencesMap, function(num){ return num; });
+
+                              _.each( _occurences, function( nb ) {
+                                    _.each( _occurencesMap, function( nbOccurence, fontName ) {
+                                          if ( nb === nbOccurence && !_.contains( _fontsOrderedByOccurences, fontName ) ) {
+                                                // unshift because the occurencesMap is in ascending order, and we want the most used fonts at the beginning
+                                                _fontsOrderedByOccurences.unshift( fontName );
+                                          }
+                                    });
+                              });
+
+                              // normalizes the most used font collection, like other font collection [{name:'font1'}, {...}, ... ]
+                              _.each( _fontsOrderedByOccurences, function( fontName ){
+                                    _alreadyUsedFonts.push({name : fontName });
+                              });
+                              _fontCollection.unshift( {
+                                    title : sektionsLocalizedData.i18n['Already used fonts'],
+                                    type : null,//already set for Most used fonts
+                                    list : _alreadyUsedFonts
+                              });
+                        }//if ( !_.isEmpty( _allFonts ) )
+
+
+                        // generate the cfont and gfont html
+                        _.each( _fontCollection, function( fontData ) {
                               var $optGroup = $('<optgroup>', { label : fontData.title , html : _generateFontOptions( fontData.list, fontData.type ) });
                               $fontSelectElement.append( $optGroup );
                         });
