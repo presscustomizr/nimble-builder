@@ -64,7 +64,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 }
             }
 
-            if ( empty( $skope_id ) ) {
+            if ( defined( 'DOING_AJAX' ) && DOING_AJAX && empty( $skope_id ) ) {
                 sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . ' =>the skope_id should not be empty' );
             }
         }//print_or_enqueue_seks_style
