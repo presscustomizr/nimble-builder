@@ -206,8 +206,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 return;
             }
             $locationSettingValue = array();
+            $is_global_location = sek_is_global_location( $location_id );
             if ( empty( $location_data ) ) {
-                $skope_id = sek_is_global_location( $location_id )  ? NIMBLE_GLOBAL_SKOPE_ID : skp_build_skope_id();
+                $skope_id = $is_global_location ? NIMBLE_GLOBAL_SKOPE_ID : skp_build_skope_id();
                 $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );
             } else {
                 $locationSettingValue = $location_data;
@@ -226,6 +227,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                 add_filter('the_content', array( $this, 'sek_wrap_wp_content' ), NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY );
 
+                // inform Nimble Builder that a global section has been rendered
+                // introduced for https://github.com/presscustomizr/nimble-builder/issues/456
+                if ( $is_global_location ) {
+                    Nimble_Manager()->global_sections_rendered = true;
+                }
 
             } else {
                 error_log( __CLASS__ . ' :: ' . __FUNCTION__ .' => sek_get_skoped_seks() should always return an array().');

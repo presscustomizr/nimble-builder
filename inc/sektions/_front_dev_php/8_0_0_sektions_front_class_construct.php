@@ -220,6 +220,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         // and sek_register_modules_when_not_customizing_and_not_ajaxing
         public static $ui_front_beta_modules = [];
 
+        // introduced for https://github.com/presscustomizr/nimble-builder/issues/456
+        public $global_sections_rendered = false;
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
