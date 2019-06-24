@@ -4,6 +4,64 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+// Google Fonts => save the list of most used fonts in the site
+// so that they are appended in first position when building gfont collection for input in customizer control js
+// implemented for https://github.com/presscustomizr/nimble-builder/issues/418
+add_action('customize_save_after', '\Nimble\sek_update_most_used_gfonts');
+function sek_update_most_used_gfonts( $manager ) {
+    $skope_id = skp_get_skope_id();
+    $all_gfonts = sek_get_all_gfonts( $skope_id );
+    if ( is_array($all_gfonts) && !empty($all_gfonts) ) {
+        update_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS, $all_gfonts );
+    }
+}
+
+
+// @return array of all gfonts used in the site
+// the duplicates are not removed, because we order the fonts by number of occurences in javascript.
+// @see js control::font_picker in api.czrInputMap
+// implemented for https://github.com/presscustomizr/nimble-builder/issues/418
+function sek_get_all_gfonts() {
+    // First check if we have font defined globally. Implemented since https://github.com/presscustomizr/nimble-builder/issues/292
+    $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+    $ffamilies = array();
+    if ( is_array( $global_options ) && !empty( $global_options['fonts'] ) && is_array( $global_options['fonts'] ) ) {
+        $ffamilies = array_merge( $ffamilies, $global_options['fonts'] );
+    }
+
+    // Do a query on all NIMBLE_CPT and walk all skope ids, included the global skope ( for global sections )
+    $sek_post_query_vars = array(
+        'post_type'              => NIMBLE_CPT,
+        'post_status'            => get_post_stati(),
+        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        'posts_per_page'         => -1,
+        'no_found_rows'          => true,
+        'cache_results'          => true,
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
+        'lazy_load_term_meta'    => false,
+    );
+    $query = new \WP_Query( $sek_post_query_vars );
+    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+      return;
+
+    foreach ($query->posts as $post_object ) {
+        if ( $post_object ) {
+            $seks_data = maybe_unserialize( $post_object->post_content );
+        }
+        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        if ( empty( $seks_data ) )
+          continue;
+        if ( is_array( $seks_data ) && !empty( $seks_data['fonts'] ) && is_array( $seks_data['fonts'] ) ) {
+            $ffamilies = array_merge( $ffamilies, $seks_data['fonts'] );
+        }
+    }//foreach
+
+    // duplicates are kept for ordering
+    //$ffamilies = array_unique( $ffamilies );
+    return $ffamilies;
+}
+
 
 
 // ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
@@ -64,7 +122,7 @@ function sek_enqueue_controls_js_css() {
                 'settingIdForGlobalSections' => sek_get_seks_setting_id( NIMBLE_GLOBAL_SKOPE_ID ),
                 'globalSkopeId' => NIMBLE_GLOBAL_SKOPE_ID,
 
-                'userSavedSektions' => get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS),
+                //'userSavedSektions' => get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS),
 
                 //'presetSections' => sek_get_preset_sections_api_data(), <= fetched on demand in ajax
 
@@ -115,7 +173,17 @@ function sek_enqueue_controls_js_css() {
                 // May 21st, v1.7.5 => back to the local data
                 // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
                 //'presetSectionsModules' => array_keys( sek_get_sections_registration_params_api_data() )
-                'presetSectionsModules' => array_keys( sek_get_sections_registration_params() )
+                'presetSectionsModules' => array_keys( sek_get_sections_registration_params() ),
+
+                // array(
+                //     '[gfont]Trochut:700',
+                //     '[gfont]Sansita:900',
+                //     '[gfont]Josefin+Sans:100',
+                //     '[gfont]Poppins:regular',
+                //     '[cfont]Comic Sans MS,Comic Sans MS,cursive',
+                //     '[gfont]Covered+By+Your+Grace:regular'
+                // ),
+                'alreadyUsedFonts' => get_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS )
             )
         )
     );//wp_localize_script()
@@ -488,8 +556,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             // MODULES
             'Select a font family' => __('Select a font family', 'text_doma'),
-            'Web Safe Fonts' => __('Web Safe Fonts', 'text_doma'),
-            'Google Fonts' => __('Google Fonts', 'text_doma'),
+            'Web safe fonts' => __('Web safe fonts', 'text_doma'),
+            'Google fonts' => __('Google fonts', 'text_doma'),
+            'Already used fonts' => __( 'Already used fonts', 'text_doma'),
 
             'Set a custom url' => __('Set a custom url', 'text_doma'),
 

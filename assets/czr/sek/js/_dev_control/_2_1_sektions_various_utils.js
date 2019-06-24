@@ -399,6 +399,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return gfonts;
             },
 
+            // return an array of all fonts currently used in local sections, global sections and global options
+            sniffAllFonts : function() {
+                  var self = this,
+                      Allfonts = [],
+                      _snifff_ = function( collectionSettingId, level ) {
+                            if ( _.isUndefined( level ) ) {
+                                  var currentSektionSettingValue = api( collectionSettingId )();
+                                  level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
+                            }
+                            _.each( level, function( levelData, _key_ ) {
+                                  // example of input_id candidate 'font_family_css'
+                                  // if ( _.isString( _key_ ) && _.isString( levelData ) && ( levelData.indexOf('[gfont]') > -1 || levelData.indexOf('[cfont]') > -1 ) && ! _.contains( Allfonts, levelData ) ) {
+                                  //       Allfonts.push( levelData );
+                                  // }
+                                  if ( _.isString( _key_ ) && _.isString( levelData ) && ( levelData.indexOf('[gfont]') > -1 || levelData.indexOf('[cfont]') > -1 ) ) {
+                                        Allfonts.push( levelData );
+                                  }
+                                  if ( _.isArray( levelData ) || _.isObject( levelData ) ) {
+                                        _snifff_( collectionSettingId, levelData );
+                                  }
+                            });
+                      };
+
+                  _.each( [ self.localSectionsSettingId(), self.getGlobalSectionsSettingId(), sektionsLocalizedData.optNameForGlobalOptions ], function( setId ) {
+                        _snifff_( setId );
+                  });
+                  return Allfonts;
+            },
 
 
 
