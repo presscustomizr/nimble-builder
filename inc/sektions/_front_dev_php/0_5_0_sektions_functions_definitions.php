@@ -1662,6 +1662,12 @@ function sek_get_module_collection() {
           'icon' => 'Nimble_map_icon.svg'
         ),
         array(
+          'content-type' => 'module',
+          'content-id' => 'czr_social_icons_module',
+          'title' => __( 'Social Profiles', 'text_doma' ),
+          'icon' => 'Nimble_social_icon.svg'
+        ),
+        array(
           'content-type' => 'preset_section',
           'content-id' => 'two_columns',
           'title' => __( 'Two Columns', 'text_doma' ),
@@ -1723,8 +1729,7 @@ function sek_get_module_collection() {
           'title' => __( 'Menu', 'text_doma' ),
           'font_icon' => '<i class="material-icons">menu</i>'
           //'active' => sek_are_beta_features_enabled()
-        ),
-
+        )
         // array(
         //   'content-type' => 'module',
         //   'content-id' => 'czr_special_img_module',

@@ -209,10 +209,15 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'czr_menu_mobile_options',
             'czr_font_child'
           ),
-
-
-          'czr_widget_area_module'
           //'czr_menu_design_child',
+
+          'czr_widget_area_module',
+
+          'czr_social_icons_module' => array(
+            'czr_social_icons_module',
+            'czr_social_icons_settings_child',
+            'czr_social_icons_style_child',
+          ),
         ];
 
         // Is merged with front module when sek_is_header_footer_enabled() === true

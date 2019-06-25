@@ -302,6 +302,8 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_0_FRONT_font_child.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_1_FRONT_widget_area.js',
 
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_3_FRONT_social_icons.js'
+
       // PRO MODULES
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_2_FRONT_nimble_special_image.js'
     ],
@@ -394,6 +396,7 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_0_7_sek_register_image.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_0_8_sek_register_featured_pages.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_1_1_sek_register_spacer.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_1_2_sek_register_divider.php',
