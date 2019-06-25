@@ -40,6 +40,7 @@ function sek_get_module_params_for_czr_social_icons_settings_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_social_icons_settings_child',
+        'is_crud' => true,
         'name' => __( 'Icon settings', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
