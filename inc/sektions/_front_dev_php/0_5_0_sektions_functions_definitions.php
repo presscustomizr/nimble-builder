@@ -475,17 +475,31 @@ function sek_get_default_module_model( $module_type = '' ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
                 return $default;
             }
-            foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $mod_type ) {
-                if ( empty( $registered_modules[ $mod_type ][ 'tmpl' ] ) ) {
-                    sek_error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the father default model.' );
+
+            foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $child_mod_type ) {
+                if ( empty( $registered_modules[ $child_mod_type ][ 'tmpl' ] ) ) {
+                    sek_error_log( __FUNCTION__ . ' => ' . $child_mod_type . ' => missing "tmpl" property => impossible to build the father default model.' );
                     continue;
                 }
-                $default[$opt_group] = _sek_build_default_model( $registered_modules[ $mod_type ][ 'tmpl' ] );
+                // We don't build the default model for each item of a multi-item (crud) module
+                // this is an array.
+                if ( !empty( $registered_modules[ $child_mod_type ]['is_crud'] ) && true === $registered_modules[ $child_mod_type ]['is_crud'] ) {
+                    $default[$opt_group] = array();
+                } else {
+                    $default[$opt_group] = _sek_build_default_model( $registered_modules[ $child_mod_type ][ 'tmpl' ] );
+                }
             }
-        } else {
+        }
+        // Not father module case
+        else {
             if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
                 return $default;
+            }
+            // We don't build the default model for each item of a multi-item (crud) module
+            // this is an array.
+            if ( !empty( $registered_modules[ $module_type ]['is_crud'] ) && true === $registered_modules[ $module_type ]['is_crud'] ) {
+                return array();
             }
             // Build
             $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );
@@ -610,15 +624,15 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
                 return $input_list;
             }
             $temp = array();
-            foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $mod_type ) {
-                if ( empty( $registered_modules[ $mod_type ][ 'tmpl' ] ) ) {
-                    sek_error_log( __FUNCTION__ . ' => ' . $mod_type . ' => missing "tmpl" property => impossible to build the master input_list.' );
+            foreach ( $registered_modules[ $module_type ][ 'children' ] as $opt_group => $child_mod_type ) {
+                if ( empty( $registered_modules[ $child_mod_type ][ 'tmpl' ] ) ) {
+                    sek_error_log( __FUNCTION__ . ' => ' . $child_mod_type . ' => missing "tmpl" property => impossible to build the master input_list.' );
                     continue;
                 }
-                // $temp[$opt_group] = _sek_build_input_list( $registered_modules[ $mod_type ][ 'tmpl' ] );
+                // $temp[$opt_group] = _sek_build_input_list( $registered_modules[ $child_mod_type ][ 'tmpl' ] );
                 // $input_list = array_merge( $input_list, $temp[$opt_group] );
 
-                $input_list[$opt_group] = _sek_build_input_list( $registered_modules[ $mod_type ][ 'tmpl' ] );
+                $input_list[$opt_group] = _sek_build_input_list( $registered_modules[ $child_mod_type ][ 'tmpl' ] );
             }
         } else {
             if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
@@ -745,9 +759,9 @@ function sek_normalize_module_value_with_defaults( $raw_module_model ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
             return $default;
         }
-        foreach ( $children as $opt_group => $mod_type ) {
+        foreach ( $children as $opt_group => $child_mod_type ) {
             $children_value = ( ! empty( $raw_module_value[$opt_group] ) && is_array( $raw_module_value[$opt_group] ) ) ? $raw_module_value[$opt_group] : array();
-            $normalized_model['value'][ $opt_group ] = _sek_normalize_single_module_values( $children_value, $mod_type );
+            $normalized_model['value'][ $opt_group ] = _sek_normalize_single_module_values( $children_value, $child_mod_type );
         }
     } else {
         $normalized_model['value'] = _sek_normalize_single_module_values( $raw_module_value, $module_type );
