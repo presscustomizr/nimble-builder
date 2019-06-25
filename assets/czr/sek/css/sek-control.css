@@ -977,7 +977,8 @@ credits : Gutenberg team @wordpress */
   position: relative;
   top: 6px;
 }
-
+/* HIDE ADD NEW BUTTON IN MULTI-ITEM MODULES WHEN ACCORDION COLLAPSED */
+[data-sek-expanded="false"] > .czr-open-pre-add-new { display: none;}
 
 
 
