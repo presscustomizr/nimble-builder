@@ -210,13 +210,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // Setup the accordion only for section content type
                                           if ( 'section' === _control_.content_type ) {
                                                 // Hide the item wrapper
-                                                _control_.container.find('.czr-items-wrapper').hide();
+                                                // @see css
+                                                _control_.container.attr('data-sek-expanded', "false" );
                                                 // prepend the animated arrow
                                                 $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
                                                 // setup the initial state + initial click
                                                 _control_.container.attr('data-sek-expanded', "false" );
                                                 if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                                      _control_.container.find('.czr-items-wrapper').show();
+                                                      //_control_.container.find('.czr-items-wrapper').show();
                                                       $title.trigger('click');
                                                 }
                                           } else {

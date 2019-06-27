@@ -220,7 +220,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     // Hide the item wrapper
-                                    _control_.container.find('.czr-items-wrapper').hide();
+                                    // @see css
+                                    _control_.container.attr('data-sek-expanded', "false" );
+
                                     var $title = _control_.container.find('label > .customize-control-title'),
                                         _titleContent = $title.html();
                                     // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )

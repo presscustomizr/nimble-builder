@@ -203,7 +203,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // Implement the animated arrow markup, and the initial state of the module visibility
                                     api.control( optionData.settingControlId, function( _control_ ) {
                                           // Hide the item wrapper
-                                          _control_.container.find('.czr-items-wrapper').hide();
+                                          // @see css
+                                          _control_.container.attr('data-sek-expanded', "false" );
                                           var $title = _control_.container.find('label > .customize-control-title'),
                                               _titleContent = $title.html();
                                           // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
