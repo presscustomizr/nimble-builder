@@ -149,11 +149,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // The new module value can be a single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
                   if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
-                        moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( rawModuleValue, parentModuleType );
+                        moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( { item_value : rawModuleValue, parent_module_type : parentModuleType, is_multi_items : false } );
                   } else {
                         moduleValueCandidate = [];
                         _.each( rawModuleValue, function( item ) {
-                              moduleValueCandidate.push( self.normalizeAndSanitizeSingleItemInputValues( item, parentModuleType ) );
+                              moduleValueCandidate.push( self.normalizeAndSanitizeSingleItemInputValues( { item_value :item, parent_module_type : parentModuleType, is_multi_items : true } ) );
                         });
                   }
 
@@ -450,9 +450,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // @return a normalized and sanitized item value
             // What does this helper do ?
-            // 1) remove title and id properties, we don't need them in db
+            // 1) remove title and id properties for non multi-items modules, we don't need those properties in db
             // 2) don't write if is equal to default
-            normalizeAndSanitizeSingleItemInputValues : function( _item_, parentModuleType ) {
+            // @param params {
+            //    item_value : rawModuleValue,
+            //    parent_module_type : parentModuleType,
+            //    is_multi_items : false
+            // }
+            normalizeAndSanitizeSingleItemInputValues : function( params ) {
                   var itemNormalized = {},
                       itemNormalizedAndSanitized = {},
                       inputDefaultValue = null,
@@ -479,17 +484,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       };
 
                   // NORMALIZE
-                  // title, id and module_type don't need to be saved in database
+                  // title, id are always included in the defaultItemModel
                   // title and id are legacy entries that can be used in multi-items modules to identify and name the item
+                  // we need the id to target each item when generating the CSS => @see https://github.com/presscustomizr/nimble-builder/issues/78
+                  // For non multi-items modules, those properties don't need to be saved in database
                   // @see ::getDefaultItemModelFromRegisteredModuleData()
-                  _.each( _item_, function( _val, input_id ) {
-                        if ( _.contains( ['title', 'id' ], input_id ) )
+                  _.each( params.item_value, function( _val, input_id ) {
+                        if ( 'title' === input_id )
+                          return;
+                        if ( ! params.is_multi_items && 'id' === input_id )
                           return;
 
-                        if ( null !== parentModuleType ) {
-                              inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
+                        if ( null !== params.parent_module_type ) {
+                              inputDefaultValue = self.getInputDefaultValue( input_id, params.parent_module_type );
                               if ( 'no_default_value_specified' === inputDefaultValue ) {
-                                    api.infoLog( '::normalizeAndSanitizeSingleItemInputValues => missing default value for input ' + input_id + ' in module ' + parentModuleType );
+                                    api.infoLog( '::normalizeAndSanitizeSingleItemInputValues => missing default value for input ' + input_id + ' in module ' + params.parent_module_type );
                               }
                         }
                         if ( isEqualToDefault( _val, inputDefaultValue ) ) {
@@ -507,7 +516,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _.each( itemNormalized, function( _val, input_id ) {
                         // @see extend_api_base.js
                         // @see sektions::_7_0_sektions_add_inputs_to_api.js
-                        switch( self.getInputType( input_id, parentModuleType ) ) {
+                        switch( self.getInputType( input_id, params.parent_module_type ) ) {
                               case 'text' :
                               case 'textarea' :
                               case 'check' :
