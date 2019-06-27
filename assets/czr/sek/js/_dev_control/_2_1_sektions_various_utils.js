@@ -319,8 +319,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return;
                   }
                   var data = sektionsLocalizedData.registeredModules[ moduleType ].tmpl['item-inputs'],
-                      // title, id are always included in the defaultItemModel but those properties don't need to be saved in database
+                      // title, id are always included in the defaultItemModel
                       // title and id are legacy entries that can be used in multi-items modules to identify and name the item
+                      // For non multi-items modules, those properties don't need to be saved in database
+                      // @see : ::normalizeAndSanitizeSingleItemInputValues()
                       defaultItemModel = {
                             id : '',
                             title : ''
@@ -897,18 +899,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( $(this).attr( 'data-sek-accordion' ) )
                                 return;
                               $(this).attr('data-sek-expanded', "false" );
-                              $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 0 );
                         });
-                        $control.find('.czr-items-wrapper').stop( true, true ).slideToggle({
-                              duration : 0,
-                              start : function() {
-                                    $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
-                                    // this event 'sek-accordion-expanded', is used to defer the instantiation of the code editor
-                                    // @see api.czrInputMap['code_editor']
-                                    // @see https://github.com/presscustomizr/nimble-builder/issues/176
-                                    $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
-                              }
-                        });
+                        $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
+                        // this event 'sek-accordion-expanded', is used to defer the instantiation of the code editor
+                        // @see api.czrInputMap['code_editor']
+                        // @see https://github.com/presscustomizr/nimble-builder/issues/176
+                        $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
                   });
 
                   // Expand the first module if requested
@@ -916,8 +912,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var firstControl = _.first( _section_.controls() );
                         if ( _.isObject( firstControl ) && ! _.isEmpty( firstControl.id ) ) {
                               api.control( firstControl.id, function( _ctrl_ ) {
+                                    // this event is triggered by the control fmk in module.isReady.done( function() {} )
+                                    // we need to defer the revealing of the module content when item collection is ready, otherwise it's too early.
+                                    // because the item collection can be ready after the module.isReady() has been resolved.
+                                    // see also https://github.com/presscustomizr/themes-customizer-fmk/commit/1f9fb0045d12dd3af9f4fdd880210dc3183fd63a
+                                    _ctrl_.container.one('items-collection-populated', function() {
+                                          _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
+                                    });
+
+                                    // remotely request a module.ready()
+                                    // => then once module is ready and all items populated, the event 'items-collection-populated' is triggered on the control, and we can reveal the module content/.
                                     _ctrl_.container.trigger( 'sek-accordion-expanded' );
-                                    _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
                               });
                         }
                   }
