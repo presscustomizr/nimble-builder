@@ -3,8 +3,34 @@
 // $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
 // the rules are filtered if ( false !== strpos( $input_id_candidate, '_css') )
 // Example of input id candidate filtered : 'h_alignment_css'
-add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_css_sniffed_input_id', 10, 6 );
-function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, $registered_input_list, $parent_level, $module_level_css_selectors ) {
+// @see function sek_loop_on_input_candidates_and_maybe_generate_css_rules( $params ) {}
+add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_css_sniffed_input_id', 10, 1 );
+
+//@param = array()
+function sek_add_css_rules_for_css_sniffed_input_id( $params ) {
+    // normalize params
+    $default_params = array(
+        'all_css_rules' => array(),// <= the in-progress global array of css rules to be populated
+        'css_val' => '',//string or array(), //<= the css property value
+        'input_id' => '',//string// <= the unique input_id as it as been declared on module registration
+        'registered_input_list' => array(),// <= the full list of input for the module
+        'parent_module_level' => array(),// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+        'module_css_selector' => '',//<= a default set of css_selectors might have been specified on module registration
+        'is_multi_items' => false,// <= for multi-item modules, the input selectors will be made specific for each item-id. In module templates, we'll use data-sek-item-id="%5$s"
+        'item_id' => '' // <= a multi-item module has a unique id for each item
+    );
+
+    $params = wp_parse_args( $params, $default_params );
+
+    // map variables
+    $rules = $params['all_css_rules'];
+    $value = $params['css_val'];
+    $input_id = $params['input_id'];
+    $registered_input_list = $params['registered_input_list'];
+    $parent_level = $params['parent_module_level'];
+    $module_level_css_selectors = $params['module_css_selector'];
+    $is_multi_items = $params['is_multi_items'];
+    $item_id = $params['item_id'];
 
     if ( ! is_string( $input_id ) || empty( $input_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing input_id', $parent_level);
@@ -16,11 +42,18 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
     }
     $input_registration_params = $registered_input_list[ $input_id ];
     if ( ! is_string( $input_registration_params['css_identifier'] ) || empty( $input_registration_params['css_identifier'] ) ) {
-        sek_error_log( __FUNCTION__ . ' => missing css_identifier', $parent_level );
+        sek_error_log( __FUNCTION__ . ' => missing css_identifier for parent level', $parent_level );
+        sek_error_log('$registered_input_list', $registered_input_list );
         return $rules;
     }
 
-    $selector = '[data-sek-id="'.$parent_level['id'].'"]';
+    $selector = sprintf( '[data-sek-id="%1$s"]', $parent_level['id'] );
+    // for multi-items module, each item has a unique id allowing us to identify it
+    // implemented to allow CSS rules to be generated on a per-item basis
+    // for https://github.com/presscustomizr/nimble-builder/issues/78
+    if ( $is_multi_items ) {
+        $selector = sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"]', $parent_level['id'], $item_id );
+    }
     $css_identifier = $input_registration_params['css_identifier'];
 
     // SPECIFIC CSS SELECTOR AT MODULE LEVEL
@@ -464,7 +497,11 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $value, $input_id, 
         );
     }
     return $rules;
-}
+}//sek_add_css_rules_for_css_sniffed_input_id
+
+
+
+
 
 
 // @return boolean

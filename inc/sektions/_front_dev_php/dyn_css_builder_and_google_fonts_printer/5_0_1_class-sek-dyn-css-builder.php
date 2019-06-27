@@ -52,6 +52,16 @@ class Sek_Dyn_CSS_Builder {
     }
 
 
+
+
+
+
+
+
+
+
+
+
     // Fired in the constructor
     // Walk the level tree and build rules when needed
     // The rules are filtered when some conditions are met.
@@ -108,50 +118,38 @@ class Sek_Dyn_CSS_Builder {
                                   $child_css_selector = sek_get_registered_module_type_property( $child_mod_type, 'css_selectors' );
                                   $child_css_selector = empty( $child_css_selector ) ? $module_level_css_selectors : $child_css_selector;
 
-                                  foreach ( $input_candidates as $input_id_candidate => $_input_val ) {
-                                      // let's skip the $key that are reserved for the structure of the sektion tree
-                                      // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
-                                      // The generic rules must be suffixed with '_css'
-                                      if ( false !== strpos( $input_id_candidate, '_css') ) {
-                                          if ( is_array( $registered_input_list ) && is_array( $registered_input_list[ $opt_group_type ] )&& ! empty( $registered_input_list[ $opt_group_type ][ $input_id_candidate ] ) && ! empty( $registered_input_list[ $opt_group_type ][ $input_id_candidate ]['css_identifier'] ) ) {
-                                              $rules = apply_filters(
-                                                  "sek_add_css_rules_for_input_id",
-                                                  $rules,// <= the in-progress array of css rules to be populated
-                                                  $_input_val,// <= the css property value
-                                                  $input_id_candidate, // <= the unique input_id as it as been declared on module registration
-                                                  $registered_input_list[ $opt_group_type ],// <= the full list of input for the module
-                                                  $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
-                                                  $child_css_selector
-                                              );
-                                          } else {
-                                              sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering father module ' . $father_mod_type . ' for a css input candidate : ' . $input_id_candidate . ' in option group : ' . $opt_group_type, $parent_level );
-                                              sek_error_log('$registered_input_list', $registered_input_list );
-                                          }
-                                      }
-                                  }//foreach
-                              }//foreach
-                          } else {
-                              foreach ( $entry as $input_id_candidate => $_input_val ) {
-                                  // let's skip the $key that are reserved for the structure of the sektion tree
-                                  // ! in_array( $key, [ 'level', 'collection', 'id', 'module_type', 'options', 'value' ] )
-                                  // The generic rules must be suffixed with '_css'
-                                  if ( false !== strpos( $input_id_candidate, '_css') ) {
-                                      if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id_candidate ] ) && ! empty( $registered_input_list[ $input_id_candidate ]['css_identifier'] ) ) {
-                                          $rules = apply_filters(
-                                              "sek_add_css_rules_for_input_id",
-                                              $rules,// <= the in-progress array of css rules to be populated
-                                              $_input_val,// <= the css property value
-                                              $input_id_candidate, // <= the unique input_id as it as been declared on module registration
-                                              $registered_input_list,// <= the full list of input for the module
-                                              $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
-                                              $module_level_css_selectors // <= if the parent is a module, a default set of css_selectors might have been specified on module registration
-                                          );
-                                      } else {
-                                          sek_error_log( __FUNCTION__ . ' => missing the css_identifier param when registering module ' . $parent_level['module_type'] . ' for a css input candidate : ' . $input_id_candidate, $parent_level );
-                                          sek_error_log('$registered_input_list', $registered_input_list );
+                                  // Is is a multi-item module ?
+                                  $is_multi_items_module = true === sek_get_registered_module_type_property( $child_mod_type, 'is_crud' );
+
+                                  if ( $is_multi_items_module ) {
+                                      foreach ( $input_candidates as $item_input_list ) {
+                                          $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( array(
+                                              'input_list' => $item_input_list,
+                                              'all_css_rules' => $rules,// <= the in-progress global array of css rules to be populated
+                                              'registered_input_list' => $registered_input_list[ $opt_group_type ],// <= the full list of input for the module
+                                              'parent_module_level' => $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                              'module_css_selector' => $child_css_selector, //a default set of css_se
+                                              'is_multi_items' => $is_multi_items_module
+                                          ) );
                                       }
                                   }
+
+                                  $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( array(
+                                      'input_list' => $input_candidates,
+                                      'all_css_rules' => $rules,// <= the in-progress global array of css rules to be populated
+                                      'registered_input_list' => $registered_input_list[ $opt_group_type ],// <= the full list of input for the module
+                                      'parent_module_level' => $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                      'module_css_selector' => $child_css_selector //a default set of css_selectors might have been specified on module registration
+                                  ));
                               }//foreach
+                          } else {
+                              $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( array(
+                                  'input_list' => $entry,
+                                  'all_css_rules' => $rules,// <= the in-progress global array of css rules to be populated
+                                  'registered_input_list' => $registered_input_list,// <= the full list of input for the module
+                                  'parent_module_level' => $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                  'module_css_selector' => $module_level_css_selectors //a default set of css_selectors might have been specified on module registration
+                              ));
                           }//if is_father
                     }//if
                 }//if
@@ -219,6 +217,70 @@ class Sek_Dyn_CSS_Builder {
 
         }//foreach
     }//sek_css_rules_sniffer_walker()
+
+
+
+
+    // @param = array()
+    // @return array of css rules*
+    // The input ids prefixed with '_css' are eligible for automaric CSS rules generation.
+    // @see add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_css_sniffed_input_id', 10, 1 );
+    function sek_loop_on_input_candidates_and_maybe_generate_css_rules( $params ) {
+        // normalize params
+        $default_params = array(
+            'input_list' => array(),
+            'all_css_rules' => array(),// <= the in-progress global array of css rules to be populated
+            'registered_input_list' => array(),// <= the full list of input for the module
+            'parent_module_level' => array(),// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+            'module_css_selector' => '',//a default set of css_selectors might have been specified on module registration
+            'is_multi_items' => false
+        );
+        $params = wp_parse_args( $params, $default_params );
+
+        // FOR MULTI-ITEM MODULES=> add the item-id
+        // a multi-item module has a unique id for each item
+        // An item looks like :
+        // Array
+        // (
+        //     [id] => 34913f6eef98
+        //     [icon] => fab fa-accusoft
+        //     [color_css] => #dd9933
+        // )
+        $item_id = null;
+        if ( $params['is_multi_items'] ) {
+            if ( !is_array( $params['input_list'] ) || !isset($params['input_list']['id']) ) {
+                sek_error_log( __FUNCTION__ . ' => Error => eact item of a multi-item module must have an id', $params );
+            } else {
+                $item_id = $params['input_list']['id'];
+            }
+        }
+
+        foreach( $params['input_list'] as $input_id_candidate => $_input_val ) {
+              if ( false !== strpos( $input_id_candidate, '_css') ) {
+                  $params['all_css_rules'] = apply_filters( 'sek_add_css_rules_for_input_id', array(
+                      'all_css_rules' => $params['all_css_rules'],// <= the in-progress global array of css rules to be populated
+                      'css_val' => $_input_val,//string or array(), //<= the css property value
+                      'input_id' => $input_id_candidate,//string// <= the unique input_id as it as been declared on module registration
+                      'registered_input_list' => $params['registered_input_list'],// <= the full list of input for the module
+                      'parent_module_level' => $params['parent_module_level'],// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                      'module_css_selector' => $params['module_css_selector'],// <= a default set of css_selectors might have been specified on module registration
+                      'is_multi_items' => $params['is_multi_items'],// <= for multi-item modules, the input selectors will be made specific for each item-id. In module templates, we'll use data-sek-item-id="%5$s"
+                      // implemented to allow CSS rules to be generated on a per-item basis
+                      // for https://github.com/presscustomizr/nimble-builder/issues/78
+                      'item_id' => $item_id // <= a multi-item module has a unique id for each item
+                  ));
+              }
+        }
+        return $params['all_css_rules'];
+    }
+
+
+
+
+
+
+
+
 
 
 
