@@ -35,6 +35,51 @@
                     return api.czr_sektions.guid();
             },
 
+            // Overrides the default fmk method, to disable the default preview refresh
+            _makeItemsSortable : function(obj) {
+                  if ( wp.media.isTouchDevice || ! $.fn.sortable )
+                    return;
+                  var module = this;
+                  $( '.' + module.control.css_attr.items_wrapper, module.container ).sortable( {
+                        handle: '.' + module.control.css_attr.item_sort_handle,
+                        start: function() {},
+                        update: function( event, ui ) {
+                              var _sortedCollectionReact = function() {
+                                    if ( _.has(module, 'preItem') ) {
+                                          module.preItemExpanded.set(false);
+                                    }
+
+                                    module.closeAllItems().closeRemoveDialogs();
+                                    // var refreshPreview = function() {
+                                    //       api.previewer.refresh();
+                                    // };
+                                    // //refreshes the preview frame  :
+                                    // //1) only needed if transport is postMessage, because is triggered by wp otherwise
+                                    // //2) only needed when : add, remove, sort item(s).
+                                    // //var isItemUpdate = ( _.size(from) == _.size(to) ) && ! _.isEmpty( _.difference(from, to) );
+                                    // if ( 'postMessage' == api(module.control.id).transport  && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                                    //       refreshPreview = _.debounce( refreshPreview, 500 );//500ms are enough
+                                    //       refreshPreview();
+                                    // }
+
+                                    module.trigger( 'item-collection-sorted' );
+                              };
+                              module._getSortedDOMItemCollection()
+                                    .done( function( _collection_ ) {
+                                          module.itemCollection.set( _collection_ );
+                                    })
+                                    .then( function() {
+                                          _sortedCollectionReact();
+                                    });
+                              //refreshes the preview frame, only if the associated setting is a postMessage transport one, with no partial refresh
+                              // if ( 'postMessage' == api( module.control.id ).transport && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                              //         _.delay( function() { api.previewer.refresh(); }, 100 );
+                              // }
+                        }//update
+                      }
+                  );
+            },//_makeItemsSortable
+
 
             //////////////////////////////////////////////////////////
             /// ITEM CONSTRUCTOR
