@@ -1867,6 +1867,31 @@ button.sek-btn,
   text-decoration: underline;
 }
 
+[data-sek-module-type="czr_social_icons_module"] .sek-module-inner .sek-social-icons-wrapper {
+  margin: 10px 0;
+}
+
+.sek-module-inner .sek-social-icons-wrapper {
+  text-align: center;
+}
+
+.sek-module-inner .sek-social-icons-wrapper > *:not(:last-child) {
+  padding-right: 8px;
+}
+
+.sek-module-inner .sek-social-icons-wrapper > li {
+  display: inline-block;
+}
+
+.sek-module-inner .sek-social-icons-wrapper > li .sek-social-icon {
+  font-size: 28px;
+  line-height: 1.5em;
+}
+
+.sek-module-inner .sek-social-icons-wrapper > li .sek-social-icon {
+  transition: all 0.2s ease-in-out;
+}
+
 .sek-module-inner {
   line-height: 1.5em;
 }

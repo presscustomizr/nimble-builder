@@ -1901,22 +1901,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // walk the collections tree and verify it passes the various consistency checks
                   var _errorDetected_ = function( msg ) {
                         api.errare( msg , valCandidate );
-                        api.previewer.trigger('sek-notify', {
-                              type : 'error',
-                              duration : 60000,
-                              message : [
-                                    '<span style="font-size:0.95em">',
-                                      '<strong>' + msg + '</strong>',
-                                      '<br>',
-                                      sektionsLocalizedData.i18n['If this problem locks Nimble Builder, you can try resetting the sections of this page.'],
-                                      '<br>',
-                                      '<span style="text-align:center;display:block">',
-                                        '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
-                                      '</span>',
-                                    '</span>'
-                              ].join('')
+                        if ( sektionsLocalizedData.isDevMode ) {
+                              api.previewer.trigger('sek-notify', {
+                                    type : 'error',
+                                    duration : 60000,
+                                    message : [
+                                          '<span style="font-size:0.95em">',
+                                            '<strong>' + msg + '</strong>',
+                                            '<br>',
+                                            sektionsLocalizedData.i18n['If this problem locks Nimble Builder, you can try resetting the sections of this page.'],
+                                            '<br>',
+                                            '<span style="text-align:center;display:block">',
+                                              '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
+                                            '</span>',
+                                          '</span>'
+                                    ].join('')
 
-                        });
+                              });
+                        }
                         errorDetected = true;
                   };
                   var _checkWalker_ = function( level ) {
@@ -2872,22 +2874,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           //             api.notifications.remove( 'sek-react-to-preview' );
                                           //       }, 5000 );
                                           // });
-                                          api.previewer.trigger('sek-notify', {
-                                                type : 'error',
-                                                duration : 30000,
-                                                message : [
-                                                      '<span style="font-size:0.95em">',
-                                                        '<strong>' + er + '</strong>',
-                                                        '<br>',
-                                                        sektionsLocalizedData.i18n['If this problem locks Nimble Builder, you can try resetting the sections of this page.'],
-                                                        '<br>',
-                                                        '<span style="text-align:center;display:block">',
-                                                          '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
-                                                        '</span>',
-                                                      '</span>'
-                                                ].join('')
-
-                                          });
+                                          if ( sektionsLocalizedData.isDevMode ) {
+                                                api.previewer.trigger('sek-notify', {
+                                                      type : 'error',
+                                                      duration : 30000,
+                                                      message : [
+                                                            '<span style="font-size:0.95em">',
+                                                              '<strong>' + er + '</strong>',
+                                                              '<br>',
+                                                              sektionsLocalizedData.i18n['If this problem locks Nimble Builder, you can try resetting the sections of this page.'],
+                                                              '<br>',
+                                                              '<span style="text-align:center;display:block">',
+                                                                '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
+                                                              '</span>',
+                                                            '</span>'
+                                                      ].join('')
+                                                });
+                                          }//if ( sektionsLocalizedData.isDevMode ) {
                                     }); } catch( _er_ ) {
                                           api.errare( 'reactToPreviewMsg => error when receiving ' + msgId, _er_ );
                                     }
@@ -3096,11 +3099,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // The new module value can be a single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
                   if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
-                        moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( rawModuleValue, parentModuleType );
+                        moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( { item_value : rawModuleValue, parent_module_type : parentModuleType, is_multi_items : false } );
                   } else {
                         moduleValueCandidate = [];
                         _.each( rawModuleValue, function( item ) {
-                              moduleValueCandidate.push( self.normalizeAndSanitizeSingleItemInputValues( item, parentModuleType ) );
+                              moduleValueCandidate.push( self.normalizeAndSanitizeSingleItemInputValues( { item_value :item, parent_module_type : parentModuleType, is_multi_items : true } ) );
                         });
                   }
 
@@ -3397,9 +3400,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // @return a normalized and sanitized item value
             // What does this helper do ?
-            // 1) remove title and id properties, we don't need them in db
+            // 1) remove title and id properties for non multi-items modules, we don't need those properties in db
             // 2) don't write if is equal to default
-            normalizeAndSanitizeSingleItemInputValues : function( _item_, parentModuleType ) {
+            // @param params {
+            //    item_value : rawModuleValue,
+            //    parent_module_type : parentModuleType,
+            //    is_multi_items : false
+            // }
+            normalizeAndSanitizeSingleItemInputValues : function( params ) {
                   var itemNormalized = {},
                       itemNormalizedAndSanitized = {},
                       inputDefaultValue = null,
@@ -3426,17 +3434,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       };
 
                   // NORMALIZE
-                  // title, id and module_type don't need to be saved in database
+                  // title, id are always included in the defaultItemModel
                   // title and id are legacy entries that can be used in multi-items modules to identify and name the item
+                  // we need the id to target each item when generating the CSS => @see https://github.com/presscustomizr/nimble-builder/issues/78
+                  // For non multi-items modules, those properties don't need to be saved in database
                   // @see ::getDefaultItemModelFromRegisteredModuleData()
-                  _.each( _item_, function( _val, input_id ) {
-                        if ( _.contains( ['title', 'id' ], input_id ) )
+                  _.each( params.item_value, function( _val, input_id ) {
+                        if ( 'title' === input_id )
+                          return;
+                        if ( ! params.is_multi_items && 'id' === input_id )
                           return;
 
-                        if ( null !== parentModuleType ) {
-                              inputDefaultValue = self.getInputDefaultValue( input_id, parentModuleType );
-                              if ( 'no_default_value_specified' === inputDefaultValue ) {
-                                    api.infoLog( '::normalizeAndSanitizeSingleItemInputValues => missing default value for input ' + input_id + ' in module ' + parentModuleType );
+                        if ( null !== params.parent_module_type ) {
+                              // Skip if the key is an "id" => specific to multi-item module, for which we have an id added in the js api and not registered in php.
+                              if ( 'id' !== input_id ) {
+                                    inputDefaultValue = self.getInputDefaultValue( input_id, params.parent_module_type );
+                                    if ( 'no_default_value_specified' === inputDefaultValue ) {
+                                          api.infoLog( '::normalizeAndSanitizeSingleItemInputValues => missing default value for input ' + input_id + ' in module ' + params.parent_module_type );
+                                    }
                               }
                         }
                         if ( isEqualToDefault( _val, inputDefaultValue ) ) {
@@ -3454,7 +3469,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _.each( itemNormalized, function( _val, input_id ) {
                         // @see extend_api_base.js
                         // @see sektions::_7_0_sektions_add_inputs_to_api.js
-                        switch( self.getInputType( input_id, parentModuleType ) ) {
+                        switch( self.getInputType( input_id, params.parent_module_type ) ) {
                               case 'text' :
                               case 'textarea' :
                               case 'check' :
@@ -3775,13 +3790,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // Setup the accordion only for section content type
                                           if ( 'section' === _control_.content_type ) {
                                                 // Hide the item wrapper
-                                                _control_.container.find('.czr-items-wrapper').hide();
+                                                // @see css
+                                                _control_.container.attr('data-sek-expanded', "false" );
                                                 // prepend the animated arrow
                                                 $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
                                                 // setup the initial state + initial click
                                                 _control_.container.attr('data-sek-expanded', "false" );
                                                 if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                                      _control_.container.find('.czr-items-wrapper').show();
+                                                      //_control_.container.find('.czr-items-wrapper').show();
                                                       $title.trigger('click');
                                                 }
                                           } else {
@@ -3978,8 +3994,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.control( optionData.settingControlId ).focus({
                                           completeCallback : function() {}
                                     });
+
                                     // Hide the item wrapper
-                                    _control_.container.find('.czr-items-wrapper').hide();
+                                    // @see css
+                                    _control_.container.attr('data-sek-expanded', "false" );
+
                                     var $title = _control_.container.find('label > .customize-control-title'),
                                         _titleContent = $title.html();
 
@@ -4257,7 +4276,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     // Hide the item wrapper
-                                    _control_.container.find('.czr-items-wrapper').hide();
+                                    // @see css
+                                    _control_.container.attr('data-sek-expanded', "false" );
+
                                     var $title = _control_.container.find('label > .customize-control-title'),
                                         _titleContent = $title.html();
                                     // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
@@ -4521,7 +4542,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // Implement the animated arrow markup, and the initial state of the module visibility
                                     api.control( optionData.settingControlId, function( _control_ ) {
                                           // Hide the item wrapper
-                                          _control_.container.find('.czr-items-wrapper').hide();
+                                          // @see css
+                                          _control_.container.attr('data-sek-expanded', "false" );
                                           var $title = _control_.container.find('label > .customize-control-title'),
                                               _titleContent = $title.html();
                                           // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
@@ -4738,7 +4760,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // Implement the animated arrow markup, and the initial state of the module visibility
                                     api.control( optionData.settingControlId, function( _control_ ) {
                                           // Hide the item wrapper
-                                          _control_.container.find('.czr-items-wrapper').hide();
+                                          // @see css
+                                          _control_.container.attr('data-sek-expanded', "false" );
                                           var $title = _control_.container.find('label > .customize-control-title'),
                                               _titleContent = $title.html();
                                           // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
@@ -5236,7 +5259,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     _setColumnWidth( sistercolumn, parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) ) );
                                     // api.infoLog('otherColumnsWidth', otherColumnsWidth );
                                     // api.infoLog("sistercolumn.width", sistercolumn.width );
-                                    // api.infoLog( "sistercolumn.width + otherColumnsWidth" , Number( sistercolumn.width ) + Number( otherColumnsWidth ) );
+                                    // api.infoLog( "parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) )" , parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) ) );
                                     //api.infoLog('COLLECTION AFTER UPDATE ', parentSektion.collection );
                               break;
 
@@ -6000,10 +6023,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // }
                                     // @see for example ::generateUIforFrontModules or ::generateUIforLevelOptions
                                     var isSettingValueChangeCase = params.settingParams && params.settingParams.from && params.settingParams.to;
+
+
                                     // in a setting value change case, the from and to must be different
                                     // implemented when fixing https://github.com/presscustomizr/nimble-builder/issues/455
                                     if ( isSettingValueChangeCase && _.isEqual( params.settingParams.from, params.settingParams.to ) ) {
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => main sektion setting change => the new setting value is unchanged when firing action : ' + params.action );
                                     } else if ( ! isSettingValueChangeCase && _.isEqual( currentSetValue, newSetValue ) ) {
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
@@ -6673,8 +6698,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return;
                   }
                   var data = sektionsLocalizedData.registeredModules[ moduleType ].tmpl['item-inputs'],
-                      // title, id are always included in the defaultItemModel but those properties don't need to be saved in database
+                      // title, id are always included in the defaultItemModel
                       // title and id are legacy entries that can be used in multi-items modules to identify and name the item
+                      // For non multi-items modules, those properties don't need to be saved in database
+                      // @see : ::normalizeAndSanitizeSingleItemInputValues()
                       defaultItemModel = {
                             id : '',
                             title : ''
@@ -7251,18 +7278,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( $(this).attr( 'data-sek-accordion' ) )
                                 return;
                               $(this).attr('data-sek-expanded', "false" );
-                              $(this).find('.czr-items-wrapper').stop( true, true ).slideUp( 0 );
                         });
-                        $control.find('.czr-items-wrapper').stop( true, true ).slideToggle({
-                              duration : 0,
-                              start : function() {
-                                    $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
-                                    // this event 'sek-accordion-expanded', is used to defer the instantiation of the code editor
-                                    // @see api.czrInputMap['code_editor']
-                                    // @see https://github.com/presscustomizr/nimble-builder/issues/176
-                                    $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
-                              }
-                        });
+                        $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
+                        // this event 'sek-accordion-expanded', is used to defer the instantiation of the code editor
+                        // @see api.czrInputMap['code_editor']
+                        // @see https://github.com/presscustomizr/nimble-builder/issues/176
+                        $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
                   });
 
                   // Expand the first module if requested
@@ -7270,8 +7291,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var firstControl = _.first( _section_.controls() );
                         if ( _.isObject( firstControl ) && ! _.isEmpty( firstControl.id ) ) {
                               api.control( firstControl.id, function( _ctrl_ ) {
+                                    // this event is triggered by the control fmk in module.isReady.done( function() {} )
+                                    // we need to defer the revealing of the module content when item collection is ready, otherwise it's too early.
+                                    // because the item collection can be ready after the module.isReady() has been resolved.
+                                    // see also https://github.com/presscustomizr/themes-customizer-fmk/commit/1f9fb0045d12dd3af9f4fdd880210dc3183fd63a
+                                    _ctrl_.container.one('items-collection-populated', function() {
+                                          _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
+                                    });
+
+                                    // remotely request a module.ready()
+                                    // => then once module is ready and all items populated, the event 'items-collection-populated' is triggered on the control, and we can reveal the module content/.
                                     _ctrl_.container.trigger( 'sek-accordion-expanded' );
-                                    _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
                               });
                         }
                   }
@@ -15731,6 +15761,211 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   ready_on_section_expanded : false,
                   ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_widget_area_module' )
+            }
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  //console.log('INITIALIZING FP MODULE', id, options );
+                  var module = this;
+
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+
+                  // module.isReady.then( function() {
+                  //       if ( _.isUndefined( module.preItem ) )
+                  //         return;
+                  //       //specific update for the item preModel on social-icon change
+                  //       module.preItem.bind( function( to, from ) {
+                  //             if ( ! _.has(to, 'icon') )
+                  //               return;
+                  //             if ( _.isEqual( to['icon'], from['icon'] ) )
+                  //               return;
+                  //             module.updateItemModel( module.preItem, true );
+                  //       });
+                  // });
+
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+            },//initialize
+
+
+            // overrides the default fmk method which generates a too long id for each item, like : "czr_social_icons_settings_child_2"
+            // this method generates a uniq GUID id for each item
+            generateItemId : function() {
+                    return api.czr_sektions.guid();
+            },
+
+            // Overrides the default fmk method, to disable the default preview refresh
+            _makeItemsSortable : function(obj) {
+                  if ( wp.media.isTouchDevice || ! $.fn.sortable )
+                    return;
+                  var module = this;
+                  $( '.' + module.control.css_attr.items_wrapper, module.container ).sortable( {
+                        handle: '.' + module.control.css_attr.item_sort_handle,
+                        start: function() {},
+                        update: function( event, ui ) {
+                              var _sortedCollectionReact = function() {
+                                    if ( _.has(module, 'preItem') ) {
+                                          module.preItemExpanded.set(false);
+                                    }
+
+                                    module.closeAllItems().closeRemoveDialogs();
+                                    // var refreshPreview = function() {
+                                    //       api.previewer.refresh();
+                                    // };
+                                    // //refreshes the preview frame  :
+                                    // //1) only needed if transport is postMessage, because is triggered by wp otherwise
+                                    // //2) only needed when : add, remove, sort item(s).
+                                    // //var isItemUpdate = ( _.size(from) == _.size(to) ) && ! _.isEmpty( _.difference(from, to) );
+                                    // if ( 'postMessage' == api(module.control.id).transport  && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                                    //       refreshPreview = _.debounce( refreshPreview, 500 );//500ms are enough
+                                    //       refreshPreview();
+                                    // }
+
+                                    module.trigger( 'item-collection-sorted' );
+                              };
+                              module._getSortedDOMItemCollection()
+                                    .done( function( _collection_ ) {
+                                          module.itemCollection.set( _collection_ );
+                                    })
+                                    .then( function() {
+                                          _sortedCollectionReact();
+                                    });
+                              //refreshes the preview frame, only if the associated setting is a postMessage transport one, with no partial refresh
+                              // if ( 'postMessage' == api( module.control.id ).transport && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                              //         _.delay( function() { api.previewer.refresh(); }, 100 );
+                              // }
+                        }//update
+                      }
+                  );
+            },//_makeItemsSortable
+
+
+            //////////////////////////////////////////////////////////
+            /// ITEM CONSTRUCTOR
+            //////////////////////////////////////////
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+
+                        // //update the item model on social-icon change
+                        // item.bind('icon:changed', function(){
+                        //       console.log('MERDE ?');
+                        //       //item.module.updateItemModel( item );
+                        // });
+                        //fire the parent
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+
+                  //
+                  _buildTitle : function( title, icon, color ) {
+                          var item = this,
+                              module     = item.module;
+                          title = title || ( 'string' === typeof(icon) ? api.CZR_Helpers.capitalize( icon.replace( 'fa-', '') ) : '' );
+                          title = api.CZR_Helpers.truncate(title, 20);
+                          color = color || module.defaultSocialColor;
+
+                          return '<div><span class="' + icon + '" style="color:' + color + '"></span> ' + title + '</div>';
+                  },
+
+                  //overrides the default parent method by a custom one
+                  //at this stage, the model passed in the obj is up to date
+                  writeItemViewTitle : function( model ) {
+                          var item = this,
+                              module     = item.module,
+                              _model = model || item(),
+                              _title = ( _model['icon'] ? _model['icon'] : '' ).replace('fa-', '').replace('envelope', 'email').replace( 'far', '').replace( 'fab', '').replace( 'fas', '');
+
+                          $( '.' + module.control.css_attr.item_title , item.container ).html(
+                            item._buildTitle( _title, _model['icon'], _model['color_css'] )
+                          );
+                  },
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+
+                        //Internal item dependencies
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'use_custom_color_on_hover' :
+                                          _.each( [ 'social_color_hover' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                }); } catch( er ) {
+                                                      api.errare( 'Featured pages module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                              }
+                        });
+                  }
+            },//CZRItemConstructor
+      };//Constructor
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_social_icons_settings_child : {
+                  mthds : Constructor,
+                  crud : true,//api.czr_sektions.getRegisteredModuleProperty( 'czr_social_icons_settings_child', 'is_crud' ),
+                  hasPreItem : false,//a crud module has a pre item by default
+                  refresh_on_add_item : false,// the preview is refreshed on item add
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_social_icons_settings_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_social_icons_settings_child' )
+            },
+      });
+})( wp.customize , jQuery, _ );
+
+/* ------------------------------------------------------------------------- *
+ *  SOCIAL ICONS OPTIONS
+/* ------------------------------------------------------------------------- */
+( function ( api, $, _ ) {
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_social_icons_style_child : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_social_icons_style_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_social_icons_style_child' )
             }
       });
 })( wp.customize , jQuery, _ );

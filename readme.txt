@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.4
+Stable tag: 1.8.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -54,12 +54,13 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * Post Grid
 * [Contact Form](https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
 * [Google Map](https://docs.presscustomizr.com/article/387-how-to-insert-google-maps-in-your-wordpress-pages-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
+* Menu
+* Social Profiles
 * Divider
 * Spacer
 * Columns
 * Quote
 * Widget zone
-* Menu
 * Accordion ( under development )
 * ... and more to come !
 
@@ -108,10 +109,13 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.4 =
-Frequently used fonts are now suggested on top of the dropdown list when customizing.
+= 1.8.5 =
+Introduces a new module to display icons linked to your social profiles.
 
 == Changelog ==
+= 1.8.5 : June 28th 2019 =
+* added : a new module to display icons linked to your social profiles
+
 = 1.8.4 : June 24th 2019 =
 * improved : Google Fonts => save the list of most used fonts in the site + append those in first position when building gfont collection for input in the customizer control
 * fixed : do undo icon position broken in the customizer topbar
