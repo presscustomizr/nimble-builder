@@ -3,17 +3,6 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-$model = Nimble_Manager() -> model;
-$module_type = $model['module_type'];
-$value = array_key_exists( 'value', $model ) ? $model['value'] : array();
-
-$icons_collection = !empty($value['icons_collection']) ? $value['icons_collection'] : array();
-$icons_style = !empty($value['icons_style']) ? $value['icons_style'] : array();
-
-
-// sek_error_log('ALORS MODEL SOCIAL ICONS', $model );
-
-
 
 if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
   function sek_print_social_links( $icons_collection, $icons_style ) {
@@ -58,6 +47,10 @@ if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
   }
 }
 
+$model = Nimble_Manager() -> model;
+$value = array_key_exists( 'value', $model ) ? $model['value'] : array();
+$icons_collection = !empty($value['icons_collection']) ? $value['icons_collection'] : array();
+$icons_style = !empty($value['icons_style']) ? $value['icons_style'] : array();
 
 if ( !empty( $icons_collection ) ) {
     sek_print_social_links( $icons_collection, $icons_style );
