@@ -496,9 +496,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           return;
 
                         if ( null !== params.parent_module_type ) {
-                              inputDefaultValue = self.getInputDefaultValue( input_id, params.parent_module_type );
-                              if ( 'no_default_value_specified' === inputDefaultValue ) {
-                                    api.infoLog( '::normalizeAndSanitizeSingleItemInputValues => missing default value for input ' + input_id + ' in module ' + params.parent_module_type );
+                              // Skip if the key is an "id" => specific to multi-item module, for which we have an id added in the js api and not registered in php.
+                              if ( 'id' !== input_id ) {
+                                    inputDefaultValue = self.getInputDefaultValue( input_id, params.parent_module_type );
+                                    if ( 'no_default_value_specified' === inputDefaultValue ) {
+                                          api.infoLog( '::normalizeAndSanitizeSingleItemInputValues => missing default value for input ' + input_id + ' in module ' + params.parent_module_type );
+                                    }
                               }
                         }
                         if ( isEqualToDefault( _val, inputDefaultValue ) ) {
