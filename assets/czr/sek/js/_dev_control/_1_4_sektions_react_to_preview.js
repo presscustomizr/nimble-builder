@@ -769,22 +769,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           //             api.notifications.remove( 'sek-react-to-preview' );
                                           //       }, 5000 );
                                           // });
-                                          api.previewer.trigger('sek-notify', {
-                                                type : 'error',
-                                                duration : 30000,
-                                                message : [
-                                                      '<span style="font-size:0.95em">',
-                                                        '<strong>' + er + '</strong>',
-                                                        '<br>',
-                                                        sektionsLocalizedData.i18n['If this problem locks Nimble Builder, you can try resetting the sections of this page.'],
-                                                        '<br>',
-                                                        '<span style="text-align:center;display:block">',
-                                                          '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
-                                                        '</span>',
-                                                      '</span>'
-                                                ].join('')
-
-                                          });
+                                          if ( sektionsLocalizedData.isDevMode ) {
+                                                api.previewer.trigger('sek-notify', {
+                                                      type : 'error',
+                                                      duration : 30000,
+                                                      message : [
+                                                            '<span style="font-size:0.95em">',
+                                                              '<strong>' + er + '</strong>',
+                                                              '<br>',
+                                                              sektionsLocalizedData.i18n['If this problem locks Nimble Builder, you can try resetting the sections of this page.'],
+                                                              '<br>',
+                                                              '<span style="text-align:center;display:block">',
+                                                                '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
+                                                              '</span>',
+                                                            '</span>'
+                                                      ].join('')
+                                                });
+                                          }//if ( sektionsLocalizedData.isDevMode ) {
                                     }); } catch( _er_ ) {
                                           api.errare( 'reactToPreviewMsg => error when receiving ' + msgId, _er_ );
                                     }

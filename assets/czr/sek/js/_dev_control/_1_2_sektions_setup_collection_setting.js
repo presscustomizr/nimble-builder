@@ -112,22 +112,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // walk the collections tree and verify it passes the various consistency checks
                   var _errorDetected_ = function( msg ) {
                         api.errare( msg , valCandidate );
-                        api.previewer.trigger('sek-notify', {
-                              type : 'error',
-                              duration : 60000,
-                              message : [
-                                    '<span style="font-size:0.95em">',
-                                      '<strong>' + msg + '</strong>',
-                                      '<br>',
-                                      sektionsLocalizedData.i18n['If this problem locks Nimble Builder, you can try resetting the sections of this page.'],
-                                      '<br>',
-                                      '<span style="text-align:center;display:block">',
-                                        '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
-                                      '</span>',
-                                    '</span>'
-                              ].join('')
+                        if ( sektionsLocalizedData.isDevMode ) {
+                              api.previewer.trigger('sek-notify', {
+                                    type : 'error',
+                                    duration : 60000,
+                                    message : [
+                                          '<span style="font-size:0.95em">',
+                                            '<strong>' + msg + '</strong>',
+                                            '<br>',
+                                            sektionsLocalizedData.i18n['If this problem locks Nimble Builder, you can try resetting the sections of this page.'],
+                                            '<br>',
+                                            '<span style="text-align:center;display:block">',
+                                              '<button type="button" class="button" aria-label="' + sektionsLocalizedData.i18n.Reset + '" data-sek-reset="true">' + sektionsLocalizedData.i18n.Reset + '</button>',
+                                            '</span>',
+                                          '</span>'
+                                    ].join('')
 
-                        });
+                              });
+                        }
                         errorDetected = true;
                   };
                   var _checkWalker_ = function( level ) {

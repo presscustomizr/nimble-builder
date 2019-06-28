@@ -468,7 +468,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     _setColumnWidth( sistercolumn, parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) ) );
                                     // api.infoLog('otherColumnsWidth', otherColumnsWidth );
                                     // api.infoLog("sistercolumn.width", sistercolumn.width );
-                                    // api.infoLog( "sistercolumn.width + otherColumnsWidth" , Number( sistercolumn.width ) + Number( otherColumnsWidth ) );
+                                    // api.infoLog( "parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) )" , parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) ) );
                                     //api.infoLog('COLLECTION AFTER UPDATE ', parentSektion.collection );
                               break;
 
@@ -1232,10 +1232,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // }
                                     // @see for example ::generateUIforFrontModules or ::generateUIforLevelOptions
                                     var isSettingValueChangeCase = params.settingParams && params.settingParams.from && params.settingParams.to;
+
+
                                     // in a setting value change case, the from and to must be different
                                     // implemented when fixing https://github.com/presscustomizr/nimble-builder/issues/455
                                     if ( isSettingValueChangeCase && _.isEqual( params.settingParams.from, params.settingParams.to ) ) {
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => main sektion setting change => the new setting value is unchanged when firing action : ' + params.action );
                                     } else if ( ! isSettingValueChangeCase && _.isEqual( currentSetValue, newSetValue ) ) {
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
