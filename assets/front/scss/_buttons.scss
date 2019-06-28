@@ -21,6 +21,8 @@
   cursor: pointer;
   text-decoration: none;
   text-transform: none;
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
 
   // Share hover and focus styles
