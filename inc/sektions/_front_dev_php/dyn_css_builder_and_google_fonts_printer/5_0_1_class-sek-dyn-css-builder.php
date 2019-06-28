@@ -506,7 +506,7 @@ class Sek_Dyn_CSS_Builder {
         if ( !empty( $column_options['width'] ) && !empty( $column_options['width']['custom-width'] ) ) {
             $width_candidate = (float)$column_options['width']['custom-width'];
             if ( $width_candidate < 0 || $width_candidate > 100 ) {
-                sek_error_log( __FUNCTION__ . ' => invalid width valude for column id : ' . $column['id'] );
+                sek_error_log( __FUNCTION__ . ' => invalid width value for column id : ' . $column['id'] );
             } else {
                 $width = $width_candidate;
             }
