@@ -6,87 +6,65 @@ if ( ! defined( 'ABSPATH' ) ) {
 $model = Nimble_Manager() -> model;
 $module_type = $model['module_type'];
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
-/* $value looks like
-Array
-(
-    [icon] => fab fa-adversal
-    [link-to] => url
-    [link-pick-url] => Array
-        (
-            [id] => 3126
-            [type_label] => Page
-            [title] => Test foogallery
-            [object_type] => page
-            [url] => http://customizr-tests.wordpress.test/test-foogallery/
-        )
 
-    [link-custom-url] =>
-    [link-target] => 1
-    [font_size_css] => 15
-    [h_alignment_css] => right
-    [color_css] => #590505
-    [color_hover_css] => #590606
-)*/
-sek_error_log('ALORS MODEL SOCIAL ICONS', $model );
-
-// if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_html') ) {
-//     function sek_get_icon_module_icon_html( $value ) {
-//         $html = '';
-//         $icon_settings = $value['icon_settings'];
-//         $spacing_border = $value['spacing_border'];
-
-//         if ( ! empty( $icon_settings['icon'] ) ) {
-//             $html = sprintf( '<div class="sek-icon-wrapper"><i class="%1$s"></i></div>', $icon_settings[ 'icon' ] );
-//         } else {
-//             //falls back on an icon if previewing
-//             if ( skp_is_customizing() ) {
-//                 $html = Nimble_Manager() -> sek_get_input_placeholder_content( 'icon' );
-//             }
-//         }
-//         return $html;
-//     }
-// }
+$icons_collection = !empty($value['icons_collection']) ? $value['icons_collection'] : array();
+$icons_style = !empty($value['icons_style']) ? $value['icons_style'] : array();
 
 
-// if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_link' ) ) {
-//     function sek_get_icon_module_icon_link( $icon_settings ) {
-//         $link = 'javascript:void(0);';
-//         // if ( skp_is_customizing() ) {
-//         //     return $link;
-//         // }
-//         if ( 'url' == $icon_settings['link-to'] ) {
-//             if ( ! empty( $icon_settings['link-pick-url'] ) && ! empty( $icon_settings['link-pick-url']['id'] ) ) {
-//                 if ( '_custom_' == $icon_settings['link-pick-url']['id']  && ! empty( $icon_settings['link-custom-url'] ) ) {
-//                     $link = esc_url( $icon_settings['link-custom-url'] );
-//                 } else if ( ! empty( $icon_settings['link-pick-url']['url'] ) ) {
-//                     $link = esc_url( $icon_settings['link-pick-url']['url'] );
-//                 }
-//             }
-//         }
-//         return $link;
-//     }
-// }
+// sek_error_log('ALORS MODEL SOCIAL ICONS', $model );
 
-// $icon_settings = $value['icon_settings'];
-// $spacing_border = $value['spacing_border'];
 
-// $visual_effect_class = '';
-// //visual effect classes
-// if ( isset( $spacing_border['use_box_shadow'] ) && true === sek_booleanize_checkbox_val( $spacing_border['use_box_shadow'] ) ) {
-//     $visual_effect_class = 'box-shadow';
-// }
 
-// // Print
-// if ( 'no-link' === $icon_settings['link-to'] ) :
-//     printf('<div class="sek-icon %2$s">%1$s</div>',
-//         sek_get_icon_module_icon_html( $value ),
-//         $visual_effect_class
-//     );
-// else :
-//     printf('<a class="sek-icon %4$s" href="%1$s" %2$s>%3$s</a>',
-//         sek_get_icon_module_icon_link( $icon_settings ),
-//         true === sek_booleanize_checkbox_val( $icon_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-//         sek_get_icon_module_icon_html( $value ),
-//         $visual_effect_class
-//     );
-// endif;
+if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
+  function sek_print_social_links( $icons_collection, $icons_style ) {
+      echo '<ul class="sek-social-icons-wrapper">';
+          foreach( $icons_collection as $item ) {
+              // normalize
+              $item = !is_array( $item ) ? array() : $item;
+              $default_item = array(
+                  'id' => '',
+                  'icon' => '',
+                  'link' => '',
+                  'title_attr' => '',
+                  'link_target' => false,
+                  'color_css' => '',
+                  'use_custom_color_on_hover' => false,
+                  'color_hover' => ''
+              );
+
+              $item = wp_parse_args( $item, $default_item );
+
+              // links like tel:*** or skype:**** or call:**** should work
+              // implemented for https://github.com/presscustomizr/social-links-modules/issues/7
+              $social_link = 'javascript:void(0)';
+              if ( isset($item['link']) && ! empty( $item['link'] ) ) {
+                  if ( false !== strpos($item['link'], 'callto:') || false !== strpos($item['link'], 'tel:') || false !== strpos($item['link'], 'skype:') ) {
+                      $social_link = esc_attr( $item['link'] );
+                  } else {
+                      $social_link = esc_url( $item['link'] );
+                  }
+              }
+
+              // Put them together
+              printf( '<li data-sek-item-id="%5$s"><a rel="nofollow" title="%1$s" aria-label="%1$s" href="%2$s" %3$s>%4$s</a></li>',
+                  esc_attr( $item['title_attr'] ),
+                  $social_link,
+                  false != $item['link_target'] ? 'target="_blank"' : '',
+                  ( ( empty( $item['icon'] ) || ! is_string( $item['icon'] ) ) && skp_is_customizing() ) ? '<i class="material-icons">pan_tool</i>' : '<i class="sek-social-icon ' . $item['icon'] .'"></i>',
+                  $item['id']
+              );
+          }//foreach
+      echo '</ul>';
+  }
+}
+
+
+if ( !empty( $icons_collection ) ) {
+    sek_print_social_links( $icons_collection, $icons_style );
+} else {
+    if ( skp_is_customizing() ) {
+        printf( '<ul class="sek-social-icons-wrapper"><li class="sek-social-icons-placeholder"><span><i>%1$s</i></span></li></ul>',
+            __('Click to start adding social icons.', 'hueman')
+        );
+    }
+}

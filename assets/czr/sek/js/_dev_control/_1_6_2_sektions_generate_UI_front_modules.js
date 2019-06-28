@@ -92,7 +92,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // Make sure this setting is bound only once !
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
-                                          console.log('doUpdate ?', to, args );
                                           try { self.updateAPISettingAndExecutePreviewActions({
                                                 defaultPreviewAction : 'refresh_markup',
                                                 uiParams : _.extend( params, { action : 'sek-set-module-value' } ),

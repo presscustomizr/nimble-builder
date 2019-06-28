@@ -112,6 +112,7 @@ class Sek_Dyn_CSS_Builder {
                                       sek_error_log( 'Father module ' . $father_mod_type . ' has a invalid child for option group : '. $opt_group_type);
                                       continue;
                                   }
+                                  // The module type of the currently looped child
                                   $child_mod_type = $children[ $opt_group_type ];
 
                                   // If the child module has no css_selectors set, we fallback on the father css_selector
@@ -123,33 +124,60 @@ class Sek_Dyn_CSS_Builder {
 
                                   if ( $is_multi_items_module ) {
                                       foreach ( $input_candidates as $item_input_list ) {
-                                          $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( array(
+                                          $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( $rules, array(
                                               'input_list' => $item_input_list,
-                                              'all_css_rules' => $rules,// <= the in-progress global array of css rules to be populated
                                               'registered_input_list' => $registered_input_list[ $opt_group_type ],// <= the full list of input for the module
                                               'parent_module_level' => $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
                                               'module_css_selector' => $child_css_selector, //a default set of css_se
-                                              'is_multi_items' => $is_multi_items_module
+                                              'is_multi_items' => true
+                                          ) );
+
+                                          $rules = apply_filters( "sek_add_css_rules_for_single_item_in_module_type___{$child_mod_type}", $rules, array(
+                                              'input_list' => wp_parse_args( $item_input_list, sek_get_default_module_model( $child_mod_type ) ),
+                                              'parent_module_type' => $child_mod_type,// 'registered_input_list' => $registered_input_list[ $opt_group_type ],// <= the full list of input for the module
+                                              'parent_module_id' => $parent_level['id'],// <= the parent module level id, used to increase the CSS specificity
+                                              'module_css_selector' => $child_css_selector //a default set of css_se
                                           ) );
                                       }
+                                  } else {
+                                      $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( $rules, array(
+                                          'input_list' => $input_candidates,
+                                          'registered_input_list' => $registered_input_list[ $opt_group_type ],// <= the full list of input for the module
+                                          'parent_module_level' => $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                          'module_css_selector' => $child_css_selector //a default set of css_selectors might have been specified on module registration
+                                      ));
                                   }
-
-                                  $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( array(
-                                      'input_list' => $input_candidates,
-                                      'all_css_rules' => $rules,// <= the in-progress global array of css rules to be populated
-                                      'registered_input_list' => $registered_input_list[ $opt_group_type ],// <= the full list of input for the module
-                                      'parent_module_level' => $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
-                                      'module_css_selector' => $child_css_selector //a default set of css_selectors might have been specified on module registration
-                                  ));
                               }//foreach
-                          } else {
-                              $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( array(
-                                  'input_list' => $entry,
-                                  'all_css_rules' => $rules,// <= the in-progress global array of css rules to be populated
-                                  'registered_input_list' => $registered_input_list,// <= the full list of input for the module
-                                  'parent_module_level' => $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
-                                  'module_css_selector' => $module_level_css_selectors //a default set of css_selectors might have been specified on module registration
-                              ));
+                          } //if ( $is_father )
+                          else {
+                              // Is is a multi-item module ?
+                              $is_multi_items_module = true === sek_get_registered_module_type_property( $father_mod_type, 'is_crud' );
+
+                              if ( $is_multi_items_module ) {
+                                  foreach ( $entry as $item_input_list ) {
+                                      $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( $rules, array(
+                                          'input_list' => $item_input_list,
+                                          'registered_input_list' => $registered_input_list,// <= the full list of input for the module
+                                          'parent_module_level' => $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                          'module_css_selector' => $module_level_css_selectors, //a default set of css_se
+                                          'is_multi_items' => true
+                                      ) );
+
+                                      $rules = apply_filters( "sek_add_css_rules_for_multi_item_module_type___{$father_mod_type}", $rules, array(
+                                          'input_list' => wp_parse_args( $item_input_list, sek_get_default_module_model( $father_mod_type ) ),
+                                          'parent_module_type' => $father_mod_type,// <= the full list of input for the module
+                                          'parent_module_id' => $parent_level['id'],// <= the parent module level id, used to increase the CSS specificity
+                                          'module_css_selector' => $module_level_css_selectors, //a default set of css_se
+                                      ) );
+                                  }
+                              } else {
+                                  $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( $rules, array(
+                                      'input_list' => $entry,
+                                      'registered_input_list' => $registered_input_list,// <= the full list of input for the module
+                                      'parent_module_level' => $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                      'module_css_selector' => $module_level_css_selectors //a default set of css_selectors might have been specified on module registration
+                                  ));
+                              }
                           }//if is_father
                     }//if
                 }//if
@@ -221,15 +249,15 @@ class Sek_Dyn_CSS_Builder {
 
 
 
-    // @param = array()
+    // @param $rules // <= the in-progress global array of css rules to be populated
+    // @param $params= array()
     // @return array of css rules*
     // The input ids prefixed with '_css' are eligible for automaric CSS rules generation.
     // @see add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_css_sniffed_input_id', 10, 1 );
-    function sek_loop_on_input_candidates_and_maybe_generate_css_rules( $params ) {
+    function sek_loop_on_input_candidates_and_maybe_generate_css_rules( $rules, $params ) {
         // normalize params
         $default_params = array(
             'input_list' => array(),
-            'all_css_rules' => array(),// <= the in-progress global array of css rules to be populated
             'registered_input_list' => array(),// <= the full list of input for the module
             'parent_module_level' => array(),// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
             'module_css_selector' => '',//a default set of css_selectors might have been specified on module registration
@@ -257,8 +285,7 @@ class Sek_Dyn_CSS_Builder {
 
         foreach( $params['input_list'] as $input_id_candidate => $_input_val ) {
               if ( false !== strpos( $input_id_candidate, '_css') ) {
-                  $params['all_css_rules'] = apply_filters( 'sek_add_css_rules_for_input_id', array(
-                      'all_css_rules' => $params['all_css_rules'],// <= the in-progress global array of css rules to be populated
+                  $rules = apply_filters( 'sek_add_css_rules_for_input_id', $rules, array(
                       'css_val' => $_input_val,//string or array(), //<= the css property value
                       'input_id' => $input_id_candidate,//string// <= the unique input_id as it as been declared on module registration
                       'registered_input_list' => $params['registered_input_list'],// <= the full list of input for the module
@@ -271,7 +298,7 @@ class Sek_Dyn_CSS_Builder {
                   ));
               }
         }
-        return $params['all_css_rules'];
+        return $rules;
     }
 
 

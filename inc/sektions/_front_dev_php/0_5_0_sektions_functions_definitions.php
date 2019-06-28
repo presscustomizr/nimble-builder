@@ -481,13 +481,7 @@ function sek_get_default_module_model( $module_type = '' ) {
                     sek_error_log( __FUNCTION__ . ' => ' . $child_mod_type . ' => missing "tmpl" property => impossible to build the father default model.' );
                     continue;
                 }
-                // We don't build the default model for each item of a multi-item (crud) module
-                // this is an array.
-                if ( !empty( $registered_modules[ $child_mod_type ]['is_crud'] ) && true === $registered_modules[ $child_mod_type ]['is_crud'] ) {
-                    $default[$opt_group] = array();
-                } else {
-                    $default[$opt_group] = _sek_build_default_model( $registered_modules[ $child_mod_type ][ 'tmpl' ] );
-                }
+                $default[$opt_group] = _sek_build_default_model( $registered_modules[ $child_mod_type ][ 'tmpl' ] );
             }
         }
         // Not father module case
@@ -495,11 +489,6 @@ function sek_get_default_module_model( $module_type = '' ) {
             if ( empty( $registered_modules[ $module_type ][ 'tmpl' ] ) ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' => missing "tmpl" property => impossible to build the default model.' );
                 return $default;
-            }
-            // We don't build the default model for each item of a multi-item (crud) module
-            // this is an array.
-            if ( !empty( $registered_modules[ $module_type ]['is_crud'] ) && true === $registered_modules[ $module_type ]['is_crud'] ) {
-                return array();
             }
             // Build
             $default = _sek_build_default_model( $registered_modules[ $module_type ][ 'tmpl' ] );

@@ -1,0 +1,19 @@
+[data-sek-module-type="czr_social_icons_module"] .sek-module-inner .sek-social-icons-wrapper {
+  margin: 10px 0; //consistent with the 'spacing' default value on module registration
+}
+.sek-module-inner .sek-social-icons-wrapper {
+  text-align: center; //consistent with the 'h_alignment_css' default value on module registration
+  > *:not(:last-child) { padding-right: 8px; }
+  > li {
+    display: inline-block;
+    .sek-social-icon {
+      font-size: 28px;//<= same as in Hueman theme
+      line-height: 1.5em; //consistent with the default registration param
+    }
+    .sek-social-icon {
+      -webkit-transition: all 0.2s ease-in-out;
+      -o-transition: all 0.2s ease-in-out;
+      transition: all 0.2s ease-in-out;
+    }
+  }
+}

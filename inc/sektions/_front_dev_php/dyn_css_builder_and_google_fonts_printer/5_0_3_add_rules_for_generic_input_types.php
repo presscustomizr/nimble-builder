@@ -4,13 +4,13 @@
 // the rules are filtered if ( false !== strpos( $input_id_candidate, '_css') )
 // Example of input id candidate filtered : 'h_alignment_css'
 // @see function sek_loop_on_input_candidates_and_maybe_generate_css_rules( $params ) {}
-add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_css_sniffed_input_id', 10, 1 );
+add_filter( "sek_add_css_rules_for_input_id", '\Nimble\sek_add_css_rules_for_css_sniffed_input_id', 10, 2 );
 
-//@param = array()
-function sek_add_css_rules_for_css_sniffed_input_id( $params ) {
+//@param $params = array()
+//@param $rules <= the in-progress global array of css rules to be populated
+function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     // normalize params
     $default_params = array(
-        'all_css_rules' => array(),// <= the in-progress global array of css rules to be populated
         'css_val' => '',//string or array(), //<= the css property value
         'input_id' => '',//string// <= the unique input_id as it as been declared on module registration
         'registered_input_list' => array(),// <= the full list of input for the module
@@ -23,7 +23,6 @@ function sek_add_css_rules_for_css_sniffed_input_id( $params ) {
     $params = wp_parse_args( $params, $default_params );
 
     // map variables
-    $rules = $params['all_css_rules'];
     $value = $params['css_val'];
     $input_id = $params['input_id'];
     $registered_input_list = $params['registered_input_list'];

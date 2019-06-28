@@ -96,7 +96,7 @@
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use_custom_color_on_hover' :
-                                          _.each( [ 'color_hover' ] , function( _inputId_ ) {
+                                          _.each( [ 'social_color_hover' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return input();
                                                 }); } catch( er ) {
