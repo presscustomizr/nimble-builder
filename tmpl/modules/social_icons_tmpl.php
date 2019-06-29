@@ -6,6 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
   function sek_print_social_links( $icons_collection, $icons_style ) {
+      // Add more protocols to be allowed as safe urls. See: https://github.com/presscustomizr/nimble-builder/issues/461:wq
+      $allowed_protocols =  array_merge( (array) wp_allowed_protocols(), array( 'skype', 'callto' ) );
+
       echo '<ul class="sek-social-icons-wrapper">';
           foreach( $icons_collection as $item ) {
               // normalize
@@ -23,15 +26,9 @@ if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
 
               $item = wp_parse_args( $item, $default_item );
 
-              // links like tel:*** or skype:**** or call:**** should work
-              // implemented for https://github.com/presscustomizr/social-links-modules/issues/7
               $social_link = 'javascript:void(0)';
               if ( isset($item['link']) && ! empty( $item['link'] ) ) {
-                  if ( false !== strpos($item['link'], 'callto:') || false !== strpos($item['link'], 'tel:') || false !== strpos($item['link'], 'skype:') ) {
-                      $social_link = esc_attr( $item['link'] );
-                  } else {
-                      $social_link = esc_url( $item['link'] );
-                  }
+                  $social_link = esc_url( $item['link'], $allowed_protocols );
               }
 
               // Put them together
@@ -44,6 +41,7 @@ if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
               );
           }//foreach
       echo '</ul>';
+
   }
 }
 
