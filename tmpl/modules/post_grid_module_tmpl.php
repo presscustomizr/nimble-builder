@@ -128,6 +128,7 @@ if ( $post_nb > 0 ) {
       'update_post_meta_cache' => false,
       'update_post_term_cache' => false,
       'ignore_sticky_posts'    => 1,
+      'post_status'            => 'publish',// fixes https://github.com/presscustomizr/nimble-builder/issues/466
       'posts_per_page'         => $main_settings['post_number'],
       //@see https://codex.wordpress.org/Class_Reference/WP_Query#Category_Parameters
       'category_name'          => $categories_in,
@@ -136,6 +137,52 @@ if ( $post_nb > 0 ) {
     )
   );
 }
+
+// Copy of WP_Query::have_post(), without do_action_ref_array( 'loop_start', array( &$this ) );
+// implemented to fix https://github.com/presscustomizr/nimble-builder/issues/467
+if ( ! function_exists( 'Nimble\sek_pg_the_nimble_have_post') ) {
+  function sek_pg_the_nimble_have_post( $query ) {
+    if ( $query->current_post + 1 < $query->post_count ) {
+      return true;
+    } elseif ( $query->current_post + 1 == $query->post_count && $query->post_count > 0 ) {
+      /**
+       * Fires once the loop has ended.
+       *
+       * @since 2.0.0
+       *
+       * @param WP_Query $this The WP_Query instance (passed by reference).
+       */
+      //do_action_ref_array( 'loop_end', array( &$this ) );
+      // Do some cleaning up after the loop
+      $query->rewind_posts();
+    } elseif ( 0 === $query->post_count ) {
+      /**
+       * Fires if no results are found in a post query.
+       *
+       * @since 4.9.0
+       *
+       * @param WP_Query $this The WP_Query instance.
+       */
+      do_action( 'loop_no_results', $this );
+    }
+
+    $query->in_the_loop = false;
+    return false;
+  }
+}
+
+
+// Copy of WP_Query::the_post(), without do_action_ref_array( 'loop_start', array( &$this ) );
+// implemented to fix https://github.com/presscustomizr/nimble-builder/issues/467
+if ( ! function_exists( 'Nimble\sek_pg_the_nimble_post') ) {
+  function sek_pg_the_nimble_post( $query ) {
+    global $post;
+    $query->in_the_loop = true;
+    $post = $query->next_post();
+    $query->setup_postdata( $post );
+  }
+}
+
 
 if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
   $columns_by_device = $main_settings['columns'];
@@ -187,8 +234,9 @@ if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
   <div class="sek-post-grid-wrapper <?php echo $grid_wrapper_classes; ?>">
     <div class="sek-grid-items <?php echo $grid_items_classes; ?>">
       <?php
-        while ( $post_collection->have_posts() ) {
-            $post_collection->the_post();
+        // $post_collection->have_posts() fires 'loop_end', which we don't want
+        while ( sek_pg_the_nimble_have_post( $post_collection ) ) {
+            sek_pg_the_nimble_post( $post_collection );// implemented to fix https://github.com/presscustomizr/nimble-builder/issues/467 because when using core $post_collection->the_post(), the action 'loop_start' is fired
             sek_render_post( $main_settings, $metas_settings, $thumb_settings );
         }//while
         // After looping through a separate query, this function restores the $post global to the current post in the main query.
@@ -201,6 +249,7 @@ if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
   </div><?php //.sek-post-grid-wrapper ?>
   <?php
 }//if ( $post_collection->have_posts() )
+
 else if ( skp_is_customizing() ) {
   ?>
   <div class="sek-module-placeholder sek-post-grid"><i class="material-icons">view_list</i></div>
