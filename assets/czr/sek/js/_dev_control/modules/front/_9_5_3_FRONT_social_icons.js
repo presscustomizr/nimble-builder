@@ -151,7 +151,59 @@
                                     break;
                               }
                         });
-                  }
+                  },
+
+
+                  // Overrides the default fmk method, to disable the default preview refresh
+                  //fired on click dom event
+                  //for dynamic multi input modules
+                  //@return void()
+                  //@param params : { dom_el : {}, dom_event : {}, event : {}, model {} }
+                  removeItem : function( params ) {
+                        var item = this,
+                            module = this.module,
+                            _new_collection = _.clone( module.itemCollection() );
+
+                        //hook here
+                        module.trigger('pre_item_dom_remove', item() );
+
+                        //destroy the Item DOM el
+                        item._destroyView();
+
+                        //new collection
+                        //say it
+                        _new_collection = _.without( _new_collection, _.findWhere( _new_collection, {id: item.id }) );
+                        module.itemCollection.set( _new_collection );
+                        //hook here
+                        module.trigger('pre_item_api_remove', item() );
+
+                        var _item_ = $.extend( true, {}, item() );
+
+                        // <REMOVE THE ITEM FROM THE COLLECTION>
+                        module.czr_Item.remove( item.id );
+                        // </REMOVE THE ITEM FROM THE COLLECTION>
+
+                        //refresh the preview frame (only needed if transport is postMessage && has no partial refresh set )
+                        //must be a dom event not triggered
+                        //otherwise we are in the init collection case where the items are fetched and added from the setting in initialize
+                        if ( 'postMessage' == api(module.control.id).transport && _.has( params, 'dom_event') && ! _.has( params.dom_event, 'isTrigger' ) && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                              // api.previewer.refresh().done( function() {
+                              //       _dfd_.resolve();
+                              // });
+                              // It would be better to wait for the refresh promise
+                              // The following approach to bind and unbind when refreshing the preview is similar to the one coded in module::addItem()
+                              var triggerEventWhenPreviewerReady = function() {
+                                    api.previewer.unbind( 'ready', triggerEventWhenPreviewerReady );
+                                    module.trigger( 'item-removed', _item_ );
+                              };
+                              api.previewer.bind( 'ready', triggerEventWhenPreviewerReady );
+                              //api.previewer.refresh();
+                        } else {
+                              module.trigger( 'item-removed', _item_ );
+                              module.control.trigger( 'item-removed', _item_ );
+                        }
+
+                  },
             },//CZRItemConstructor
       };//Constructor
 
