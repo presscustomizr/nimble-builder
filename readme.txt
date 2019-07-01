@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.5
+Stable tag: 1.8.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -109,10 +109,15 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.5 =
-Introduces a new module to display icons linked to your social profiles.
+= 1.8.6 =
+Fixes minor problems in the social icons module and the grid module.
 
 == Changelog ==
+= 1.8.6 : July 1st 2019 =
+* fixed : the preview frame should not be refreshed when removing an item of the social icons module
+* fixed : Grid Module => when customizing, the post in "draft" status are showing up
+* fixed : Grid Module => loop_start and loop_end actions should be disabled for the custom WP query
+
 = 1.8.5 : June 28th 2019 =
 * added : a new module to display icons linked to your social profiles
 

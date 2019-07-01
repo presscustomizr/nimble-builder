@@ -163,7 +163,7 @@ if ( ! function_exists( 'Nimble\sek_pg_the_nimble_have_post') ) {
        *
        * @param WP_Query $this The WP_Query instance.
        */
-      do_action( 'loop_no_results', $this );
+      do_action( 'loop_no_results', $query );
     }
 
     $query->in_the_loop = false;
