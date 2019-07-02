@@ -247,7 +247,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         try {
                               _tmpl =  wp.template( 'nimble-level-tree' )( {} );
                         } catch( er ) {
-                              api.errare( 'Error when parsing the the nimble-level-tree template', er );
+                              api.errare( 'Error when parsing the nimble-level-tree template', er );
                               return false;
                         }
                         $( '#customize-preview' ).after( $( _tmpl ) );

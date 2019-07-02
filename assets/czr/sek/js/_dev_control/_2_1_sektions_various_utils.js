@@ -316,7 +316,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // This method should normally not be invoked for a father module type
                   if ( sektionsLocalizedData.registeredModules[moduleType].is_father ) {
                         api.errare( 'getDefaultItemModelFromRegisteredModuleData => Father modules should be treated specifically' );
-                        return;
+                        return {};
                   }
                   var data = sektionsLocalizedData.registeredModules[ moduleType ].tmpl['item-inputs'],
                       // title, id are always included in the defaultItemModel
