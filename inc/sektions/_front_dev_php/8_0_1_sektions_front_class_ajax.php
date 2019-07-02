@@ -15,6 +15,10 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             // @see api.czrInputMap.category_picker
             add_action( 'wp_ajax_sek_get_post_categories', array( $this, 'sek_get_post_categories' ) );
 
+            // Fetches the code editor params to generate the options for a textarea input
+            // @see api.czrInputMap.code_editor
+            add_action( 'wp_ajax_sek_get_code_editor_params', array( $this, 'sek_get_code_editor_params' ) );
+
             add_action( 'wp_ajax_sek_postpone_feedback', array( $this, 'sek_postpone_feedback_notification' ) );
 
             // Returns the customize url for the edit button when using Gutenberg editor
@@ -504,9 +508,17 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             wp_send_json_success( $cat_collection );
         }
 
-
-
-
+        ////////////////////////////////////////////////////////////////
+        // CODE EDITOR PARAMS => to be used in the code editor input
+        // Fired in __construct()
+        function sek_get_code_editor_params() {
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+            $code_type = isset( $_POST['code_type'] ) ? $_POST['code_type'] : 'text/html';
+            $editor_params = nimble_get_code_editor_settings( array(
+                'type' => $code_type
+            ));
+            wp_send_json_success( $editor_params );
+        }
 
         ////////////////////////////////////////////////////////////////
         // POSTPONE FEEDBACK NOTIFICATION IN CUSTOMIZER

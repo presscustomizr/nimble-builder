@@ -14,8 +14,8 @@
                       item           = input.input_parent(),
                       editorSettings = false,
                       $textarea      = input.container.find( 'textarea' ),
-                      $input_title   = input.container.find( '.customize-control-title' ),
-                      editor_params  = $textarea.data( 'editor-params' );
+                      $input_title   = input.container.find( '.customize-control-title' );
+                      //editor_params  = $textarea.data( 'editor-params' );
 
                   // // When using blocking notifications (type: error) the following block will append a checkbox to the
                   // // notification message block that once checked will allow to save and publish anyways
@@ -39,12 +39,47 @@
                   //             };
                   //       })( notification.render );
                   // } );
+                  var _getEditorParams = function() {
+                        return $.Deferred( function( _dfd_ ) {
+                              var code_type = _.isEmpty( $textarea.data('editor-code-type') ) ? 'text/html' : $textarea.data('editor-code-type');
+                              if ( api.czr_sektions.code_editor_params && api.czr_sektions.code_editor_params[ code_type ] ) {
+                                    _dfd_.resolve( api.czr_sektions.code_editor_params[ code_type ] );
+                              } else {
+                                    wp.ajax.post( 'sek_get_code_editor_params', {
+                                          nonce: api.settings.nonce.save,
+                                          code_type : code_type
+                                    }).done( function( code_editor_params ) {
+                                          if ( !_.isObject( code_editor_params ) ) {
+                                                api.errare( input.id + ' => error => invalid code editor params sent by server', code_editor_params );
+                                          }
+                                          api.czr_sektions.code_editor_params = {} || api.czr_sektions.code_editor_params;
+                                          api.czr_sektions.code_editor_params[ code_type ] = code_editor_params;
+                                          _dfd_.resolve( api.czr_sektions.code_editor_params[ code_type ] );
+                                    }).fail( function( _r_ ) {
+                                          _dfd_.reject( _r_ );
+                                    });
+                              }
+                        });
+                  };
 
-                  // Obtain editorSettings for instantiation.
-                  if ( wp.codeEditor  && ( _.isUndefined( editor_params ) || false !== editor_params )  ) {
-                        // Obtain this input editor settings (we don't have defaults).
-                        editorSettings = editor_params;
-                  }
+                  // do
+                  var _fetchEditorParamsAndInstantiate = function( params ) {
+                        if ( true === input.catCollectionSet )
+                          return;
+                        $.when( _getEditorParams() ).done( function( editorParams ) {
+                              _generateOptionsAndInstantiateSelect2(editorParams);
+                              if ( params && true === params.open_on_init ) {
+                                    // let's open select2 after a delay ( because there's no 'ready' event with select2 )
+                                    _.delay( function() {
+                                          try{ $selectEl.czrSelect2('open'); } catch(er) {}
+                                    }, 100 );
+                              }
+                        }).fail( function( _r_ ) {
+                              api.errare( input.id + ' => fail response when _getEditorParams()', _r_ );
+                        });
+                        input.catCollectionSet = true;
+                  };
+
 
                   input.isReady.done( function() {
                         var _doInstantiate = function( evt ) {
@@ -69,15 +104,27 @@
                                    $input_title.click();
                               }, 10 );
                         };
-                        // Try to instantiate now
-                        _doInstantiate.call(input);
 
-                        // the input should be visible otherwise the code mirror initializes wrongly:
-                        // e.g. bad ui (bad inline CSS maths), not visible content until click.
-                        // When the code_editor input is rendered in an accordion control ( @see CZRSeksPrototype.scheduleModuleAccordion ), we need to defer the instantiation when the control has been expanded.
-                        // fixes @see https://github.com/presscustomizr/nimble-builder/issues/176
-                        input.module.control.container.on('sek-accordion-expanded', function() {
-                              _doInstantiate.call( input );
+                        $.when( _getEditorParams() ).done( function( editorParams ) {
+                              //$textarea.attr( 'data-editor-params', editorParams );
+                              // Obtain editorSettings for instantiation.
+                              if ( wp.codeEditor  && ( _.isUndefined( editorParams ) || false !== editorParams )  ) {
+                                    // Obtain this input editor settings (we don't have defaults).
+                                    editorSettings = editorParams;
+                              }
+
+                              // Try to instantiate now
+                              _doInstantiate.call(input);
+
+                              // the input should be visible otherwise the code mirror initializes wrongly:
+                              // e.g. bad ui (bad inline CSS maths), not visible content until click.
+                              // When the code_editor input is rendered in an accordion control ( @see CZRSeksPrototype.scheduleModuleAccordion ), we need to defer the instantiation when the control has been expanded.
+                              // fixes @see https://github.com/presscustomizr/nimble-builder/issues/176
+                              input.module.control.container.on('sek-accordion-expanded', function() {
+                                    _doInstantiate.call( input );
+                              });
+                        }).fail( function(er) {
+                              api.errare( input.id + ' => error when getting the editor params from server');
                         });
                   });
 

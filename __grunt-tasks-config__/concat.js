@@ -195,6 +195,7 @@ module.exports = {
   //
   czr_sektions_customizer_control_js : {
     src: [
+      '<%= paths.czr_assets %>sek/js/_dev_control/_0_0_sektions_fmk_overrides.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_0_sektions_initialize.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_1_sektions_topbar.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_2_sektions_navigate_history.js',
@@ -448,6 +449,7 @@ module.exports = {
   czr_sektions_customizer_php : {
       src: [
         '<%= paths.sektions %>_customizer_dev_php/1_0_0_sektions_customizer_assets.php',
+        '<%= paths.sektions %>_customizer_dev_php/1_1_0_sektions_input_templates.php',
         '<%= paths.sektions %>_customizer_dev_php/2_0_0_sektions_customizer_dynamic_registration.php',
         '<%= paths.sektions %>_customizer_dev_php/7_0_0_sektions_detached_tinymce.php',
         '<%= paths.sektions %>_customizer_dev_php/8_0_0_sektions_customizer_import_export.php',

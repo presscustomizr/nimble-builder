@@ -610,7 +610,29 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // 'Module' => __('Module', 'text_doma'),
 
             // Column width
-            'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'text_doma')
+            'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'text_doma'),
+
+            // INPUT TEMPLATES
+            'unit' => __('unit', 'text_dom'),
+            'pixels' => __('pixels', 'text_dom'),
+            'percents' => __('percents', 'text_dom'),
+
+            'Edit' => __('Edit', 'text_doma' ),
+            'Hide editor' => __('Hide editor', 'text_doma' ),
+
+            'Align left' => __('Align left', 'text_doma' ),
+            'Align center' => __('Align center', 'text_doma' ),
+            'Align right' => __('Align right', 'text_doma' ),
+            'Justified' => __('Justified', 'text_doma' )
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+
 
         )//array()
     )//array()
