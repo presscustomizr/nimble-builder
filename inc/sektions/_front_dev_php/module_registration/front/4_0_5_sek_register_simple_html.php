@@ -14,7 +14,8 @@ function sek_get_module_params_for_czr_simple_html_module() {
             'item-inputs' => array(
                 'html_content' => array(
                     'input_type'  => 'code_editor',
-                    'title'       => __( 'HTML Content' , 'text_doma' )
+                    'title'       => __( 'HTML Content' , 'text_doma' ),
+                    'refresh_markup' => '.sek-module-inner'
                     //'code_type' => 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
                 )
             )
