@@ -64,7 +64,13 @@
                   // Initialize
                   // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
                   api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value( input() );
-                  _do_( api.czr_sektions.currentContentPickerType() );
+                  // This event is emitted by ::generateUIforDraggableContent()
+                  // this way we are sure that all controls for modules and sections are instantiated
+                  // and we can use _section_.controls() to set the visibility of module / section controls when switching
+                  api.bind('nimble-modules-and-sections-controls-registered', function() {
+                        _do_( api.czr_sektions.currentContentPickerType() );
+                  });
+
 
                   // Schedule a reaction to changes
                   api.czr_sektions.currentContentPickerType.bind( function( contentType ) {

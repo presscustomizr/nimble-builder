@@ -18,11 +18,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var registrationParams = {};
 
                   $.extend( registrationParams, {
+                        // The content type switcher has a priority lower than the other so it's printed on top
+                        // it's loaded last, because it needs to know the existence of all other
                         content_type_switcher : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_content_type_switcher_ui',
                               module_type : 'sek_content_type_switcher_module',
                               controlLabel :  sektionsLocalizedData.i18n['Select a content type'],
-                              priority : 0,
+                              priority : 10,
                               settingValue : { content_type : params.content_type }
                               //icon : '<i class="material-icons sek-level-option-icon">center_focus_weak</i>'
                         },
@@ -40,8 +42,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               module_type : 'sek_intro_sec_picker_module',
                               controlLabel :  sektionsLocalizedData.i18n['Sections for an introduction'],
                               content_type : 'section',
-                              expandAndFocusOnInit : false,
-                              priority : 10,
+                              expandAndFocusOnInit : true,
+                              priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
                         sek_features_sec_picker_module : {
@@ -50,7 +52,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel :  sektionsLocalizedData.i18n['Sections for services and features'],
                               content_type : 'section',
                               expandAndFocusOnInit : false,
-                              priority : 10,
+                              priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
                         sek_about_sec_picker_module : {
@@ -59,7 +61,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel :  sektionsLocalizedData.i18n['About us sections'],
                               content_type : 'section',
                               expandAndFocusOnInit : false,
-                              priority : 10,
+                              priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
                         sek_contact_sec_picker_module : {
@@ -68,7 +70,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel :  sektionsLocalizedData.i18n['Contact-us sections'],
                               content_type : 'section',
                               expandAndFocusOnInit : false,
-                              priority : 10,
+                              priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
                         sek_column_layouts_sec_picker_module : {
@@ -77,7 +79,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel :  sektionsLocalizedData.i18n['Empty sections with columns layout'],
                               content_type : 'section',
                               expandAndFocusOnInit : false,
-                              priority : 10,
+                              priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
 
@@ -88,7 +90,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel : sektionsLocalizedData.i18n['Header sections'],// sektionsLocalizedData.i18n['Header sections'],
                               content_type : 'section',
                               expandAndFocusOnInit : false,
-                              priority : 10,
+                              priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
                         sek_footer_sec_picker_module : {
@@ -97,7 +99,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               controlLabel : sektionsLocalizedData.i18n['Footer sections'],// sektionsLocalizedData.i18n['Header sections'],
                               content_type : 'section',
                               expandAndFocusOnInit : false,
-                              priority : 10,
+                              priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         }
                   });
@@ -207,6 +209,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }
 
                                           // ACCORDION
+
                                           // Setup the accordion only for section content type
                                           if ( 'section' === _control_.content_type ) {
                                                 // Hide the item wrapper
@@ -218,7 +221,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 _control_.container.attr('data-sek-expanded', "false" );
                                                 if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
                                                       //_control_.container.find('.czr-items-wrapper').show();
-                                                      $title.trigger('click');
+                                                      //$title.trigger('click');
+                                                      _control_.container.addClass('sek-expand-on-init');
                                                 }
                                           } else {
                                                 _control_.container.attr('data-sek-accordion', 'no');
@@ -227,6 +231,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               });
                         });//_.each
+
+                        api.trigger('nimble-modules-and-sections-controls-registered');
                   };//_do_register_
 
 
@@ -250,8 +256,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
 
                         // Schedule the accordion behaviour
-                        self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
-
+                        self.scheduleModuleAccordion.call( _section_, { expand_first_control : false } );
+                        _section_.container.find('.customize-control.sek-expand-on-init').find('label > .customize-control-title').trigger('click');
                         // Fetch the presetSectionCollection from the server now, so we save a few milliseconds when injecting the first preset_section
                         // it populates api.sek_presetSections
                         //
