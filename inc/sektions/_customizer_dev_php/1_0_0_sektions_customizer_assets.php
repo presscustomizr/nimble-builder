@@ -623,10 +623,33 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Align left' => __('Align left', 'text_doma' ),
             'Align center' => __('Align center', 'text_doma' ),
             'Align right' => __('Align right', 'text_doma' ),
-            'Justified' => __('Justified', 'text_doma' )
-            //'Remove this element' => __('Remove this element', 'text_dom'),
-            //'Remove this element' => __('Remove this element', 'text_dom'),
-            //'Remove this element' => __('Remove this element', 'text_dom'),
+            'Justified' => __('Justified', 'text_doma' ),
+            'Margin top' => __('Margin top', 'text_doma' ),
+            'Margin right' => __('Margin right', 'text_doma' ),
+            'Margin bottom' => __('Margin bottom', 'text_doma' ),
+            'Margin left' => __('Margin left', 'text_doma' ),
+            'Padding top' => __('Padding top', 'text_doma' ),
+            'Padding right' => __('Padding right', 'text_doma' ),
+            'Padding bottom' => __('Padding bottom', 'text_doma' ),
+            'Padding left' => __('Padding left', 'text_doma' ),
+
+            'All' => __('All', 'text_doma' ),
+            'Top' => __('Top', 'text_doma' ),
+            'Bottom' => __('Bottom', 'text_doma' ),
+            'Right' => __('Right', 'text_doma' ),
+            'Left' => __('Left', 'text_doma' ),
+
+            'Top left' => __('Top left', 'text_doma' ),
+            'Top right' => __('Top right', 'text_doma' ),
+            'Bottom left' => __('Bottom left', 'text_doma' ),
+            'Bottom right' => __('Bottom right', 'text_doma' ),
+
+            'Content type' => __('Content type', 'text_dom'),
+            'Pick a section' => __('Pick a section', 'text_dom'),
+            'Pick a module' => __('Pick a module', 'text_dom'),
+
+            'Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features' => __('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_dom'),
+            'Drag and drop or double-click to insert in your chosen target element.' => __('Drag and drop or double-click to insert in your chosen target element.', 'text_dom')
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),

@@ -1,20 +1,66 @@
 //global sektionsLocalizedData
 //global serverControlParams
 (function ( api, $ ) {
-      var getInputTemplateName = function( input_type ) {
+      api.CZR_Helpers.getInputSubTemplate = function( template_name ) {
+            if ( $('#tmpl-nimble-subtemplate___' + template_name ).length > 0 ) {
+                return wp.template( 'nimble-subtemplate___' + template_name );
+            } else {
+                api.errare( 'problem in api.czr_sektions.getInputSubTemplate(), missing js template in the DOM for template_name : ' + template_name );
+                return null;
+            }
+      };
+
+      var getInputTemplate = function( input_type ) {
             var template_name = input_type;
             switch( input_type ) {
+                  case 'czr_layouts' ://<= specific to the hueman theme
+                  case 'select' ://<= used in the customizr and hueman theme
+                  case 'simpleselect' ://<=used in Nimble Builder
+                  case 'fa_icon_picker' :
+                        template_name = 'simpleselect';
+                  break;
+
                   case 'h_alignment' :
                   case 'horizAlignmentWithDeviceSwitcher' :
                         template_name = 'h_alignment';
                   break;
+
                   case 'h_text_alignment' :
                   case 'horizTextAlignmentWithDeviceSwitcher' :
                         template_name = 'h_text_alignment';
                   break;
-            }
 
-            return wp.template( 'nimble-input___' + template_name );
+                  case 'font_size' :
+                  case 'line_height' :
+                        template_name = 'font_size_line_height';
+                  break;
+
+                  case 'range_simple' :
+                  case 'range_simple_device_switcher' :
+                        template_name = 'range_simple';
+                  break;
+
+                  case 'range_with_unit_picker' :
+                  case 'range_with_unit_picker_device_switcher' :
+                        template_name = 'range_with_unit_picker';
+                  break;
+
+                  case 'spacing' :
+                  case 'spacingWithDeviceSwitcher' :
+                        template_name = 'spacing';
+                  break;
+
+                  case 'upload' :
+                  case 'upload_url' :
+                        template_name = 'upload';
+                  break;
+            }
+            if ( $('#tmpl-nimble-input___' + template_name ).length > 0 ) {
+                return wp.template( 'nimble-input___' + template_name );
+            } else {
+                api.errare( 'problem in getInputTemplate(), missing js template in the DOM for input_type : ' + input_type );
+                return null;
+            }
       };
 
 
@@ -57,7 +103,10 @@
             /// TEMP !! ///
             // dfd.resolve();
             // return originalMethod( args );
-            if ( !_.contains( ['czr_spacer_module', 'czr_simple_html_module', 'czr_tinymce_child'], args.module_type ) ) {
+            if ( _.contains( [
+              // 'sek_content_type_switcher_module',
+              // 'sek_module_picker_module'
+            ], args.module_type ) ) {
                   dfd.resolve();
                   return originalMethod( args );
             }
@@ -98,7 +147,7 @@
                       input_data : input_data,
                       input_id : input_id,
                       item_model : item_model,
-                      input_tmpl : getInputTemplateName( input_type ),
+                      input_tmpl : getInputTemplate( input_type ),
                       control_id : args.control_id //<= needed for some modules like tiny_mce_editor
                   }); } catch( er ) {
                         api.errare( 'getModuleTmpl => Error when parsing the nimble-input-wrapper template', er );
