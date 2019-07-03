@@ -27,20 +27,20 @@ function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
         <div class="sek-content-type-wrapper">
           <?php
             $content_collection = sek_get_module_collection();
-
+            $defaults =  array(
+                'content-type' => 'module',
+                'content-id' => '',
+                'title' => '',
+                'icon' => '',
+                'font_icon' => '',
+                'active' => true
+            );
             $i = 0;
             foreach( $content_collection as $_module_params ) {
                 // if ( $i % 2 == 0 ) {
                 //   //printf('<div class="sek-module-raw"></div');
                 // }
-                $_module_params = wp_parse_args( $_module_params, array(
-                    'content-type' => 'module',
-                    'content-id' => '',
-                    'title' => '',
-                    'icon' => '',
-                    'font_icon' => '',
-                    'active' => true
-                ));
+                $_module_params = wp_parse_args( $_module_params, $defaults );
 
                 $icon_img_html = '<i style="color:red">Missing Icon</i>';
                 if ( !empty( $_module_params['icon'] ) ) {
