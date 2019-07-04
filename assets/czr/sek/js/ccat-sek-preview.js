@@ -1976,6 +1976,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             },
 
                             // introduced for https://github.com/presscustomizr/nimble-builder/issues/403
+                            // this is fired for module with postMessage refresh, like text editor
+                            // @see control::refreshMarkupWhenNeededForInput()
+                            // July 2019 => since the new UI rendering with JS template ( https://github.com/presscustomizr/nimble-builder/issues/465 ), this action is fired too early when inserting a new module with postMessage refresh
+                            // resulting in the target element not being rendered on first call
                             'sek-update-html-in-selector' : function( params ) {
                                   var $level_el = $('[data-sek-id="' + params.id + '"]' ),
                                       $target_el = $(params.selector, $level_el);

@@ -610,7 +610,15 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // 'Module' => __('Module', 'text_doma'),
 
             // Column width
-            'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'text_doma')
+            'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'text_doma'),
+
+
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+            //'Remove this element' => __('Remove this element', 'text_dom'),
+
 
         )//array()
     )//array()
@@ -878,6 +886,810 @@ function sek_is_plugin_active_for_network( $plugin ) {
 
   return false;
 }
+
+
+
+?><?php
+namespace Nimble;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_input_templates' );
+function sek_print_nimble_input_templates() {
+
+
+      // data structure :
+      // {
+      //     input_type : input_type,
+      //     input_data : input_data,
+      //     input_id : input_id,
+      //     item_model : item_model,
+      //     input_tmpl : wp.template( 'nimble-input___' + input_type )
+      // }
+      ?>
+      <script type="text/html" id="tmpl-nimble-input-wrapper">
+        <# var css_attr = serverControlParams.css_attr,
+            input_data = data.input_data,
+            input_type = input_data.input_type,
+            is_width_100 = true === input_data['width-100'];
+
+
+        // some inputs have a width of 100% even if not specified in the input_data
+        if ( _.contains( ['color', 'radio', 'textarea'], input_type ) ) {
+            is_width_100 = true;
+        }
+        var width_100_class = is_width_100 ? 'width-100' : '',
+            hidden_class = 'hidden' === input_type ? 'hidden' : '',
+            data_transport_attr = !_.isEmpty( input_data.transport ) ? 'data-transport="' + input_data.transport + '"' : '',
+            input_width = !_.isEmpty( input_data.input_width ) ? input_data.input_width : '';
+        #>
+
+        <div class="{{css_attr.sub_set_wrapper}} {{width_100_class}} {{hidden_class}}" data-input-type="{{input_type}}" {{data_transport_attr}}>
+          <# if ( input_data.html_before ) { #>
+            <div class="czr-html-before"><# print(input_data.html_before); #></div>
+          <# } #>
+          <# if ( input_data.notice_before_title ) { #>
+            <span class="czr-notice"><# print(input_data.notice_before_title); #></span><br/>
+          <# } #>
+          <# if ( 'hidden' !== input_type ) { #>
+            <# var title_width = ! _.isEmpty( input_data.title_width ) ? input_data.title_width : ''; #>
+            <div class="customize-control-title {{title_width}}"><# print( input_data.title ); #></div>
+          <# } #>
+          <# if ( input_data.notice_before ) { #>
+            <span class="czr-notice"><# print(input_data.notice_before); #></span>
+          <# } #>
+
+          <?php // nested template, see https://stackoverflow.com/questions/8938841/underscore-js-nested-templates#13649447 ?>
+          <?php // about print(), see https://underscorejs.org/#template ?>
+          <div class="czr-input {{input_width}}"><# if ( _.isFunction( data.input_tmpl ) ) { print( data.input_tmpl( data ) ); } #></div>
+
+          <# if ( input_data.notice_after ) { #>
+            <span class="czr-notice"><# print(input_data.notice_after); #></span>
+          <# } #>
+          <# if ( input_data.html_after ) { #>
+            <div class="czr-html-after"><# print(input_data.html_after); #></div>
+          <# } #>
+        </div><?php //css_attr.sub_set_wrapper ?>
+      </script>
+
+
+
+
+
+
+
+
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  SUBTEMPLATES
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-subtemplate___range_number">
+        <?php
+          // we save the int value + unit
+          // we want to keep only the numbers when printing the tmpl
+          // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
+        ?>
+        <#
+          var item_model = data.item_model,
+              input_id = data.input_id,
+              value = _.has( item_model, input_id ) ? item_model[input_id] : null,
+              unit;
+
+          value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
+          unit = _.isString( value ) ? value.replace(/[0-9]|\.|,/g, '') : 'px';
+          unit = _.isEmpty( unit ) ? 'px' : unit;
+          var _step = _.has( item_model, 'step' ) ? 'step="' + item_model.step + '"' : '',
+              _saved_unit = _.has( item_model, 'unit' ) ? 'data-unit="' + item_model.unit + '"' : '',
+              _min = _.has( item_model, 'min' ) ? 'min="' + item_model.min + '"': '',
+              _max = _.has( item_model, 'max' ) ? 'max="' + item_model.max + '"': '';
+        #>
+        <div class="sek-range-wrapper">
+          <input data-czrtype="{{input_id}}" type="hidden" data-sek-unit="{{unit}}"/>
+          <input class="sek-range-input" type="range" {{_step}} {{_saved_unit}} {{_min}} {{_max}}/>
+        </div>
+        <div class="sek-number-wrapper">
+            <input class="sek-pm-input" value="{{value}}" type="number"  >
+        </div>
+      </script>
+
+
+      <script type="text/html" id="tmpl-nimble-subtemplate___unit_picker">
+          <div class="sek-unit-wrapper">
+            <div aria-label="<?php _e('unit', 'text_doma'); ?>" class="sek-ui-button-group" role="group"><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_doma'); ?>" data-sek-unit="px">px</button><button type="button" aria-pressed="false" class="sek-ui-button" title="em" data-sek-unit="em">em</button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_doma'); ?>" data-sek-unit="%">%</button></div>
+          </div>
+      </script>
+
+
+
+
+
+
+
+
+
+
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       * CODE EDITOR
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <?php
+      // data structure :
+      // {
+      //     input_type : input_type,
+      //     input_data : input_data,
+      //     input_id : input_id,
+      //     item_model : item_model,
+      //     input_tmpl : wp.template( 'nimble-input___' + input_type )
+      // }
+      ?>
+
+      <script type="text/html" id="tmpl-nimble-input___code_editor">
+        <#
+          var item_model = data.item_model,
+              input_id = data.input_id,
+              value = _.has( item_model, input_id ) ? item_model[input_id] : null,
+              code_type = data.input_data.code_type;
+        #>
+        <textarea data-czrtype="{{input_id}}" data-editor-code-type="{{code_type}}" class="width-100" name="textarea" rows="10" cols="">{{ value }}</textarea>
+      </script>
+
+
+
+      <script type="text/html" id="tmpl-nimble-input___detached_tinymce_editor">
+        <#
+          var input_data = data.input_data,
+              item_model = data.item_model,
+              input_id = data.input_id,
+              value = _.has( item_model, input_id ) ? item_model[input_id] : null,
+              code_type = data.input_data.code_type;
+        #>
+        <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{input_id}}" data-czr-action="open-tinymce-editor"><?php _e('Edit', 'text_doma'); ?></button>&nbsp;
+        <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{input_id}}" data-czr-action="close-tinymce-editor"><?php _e('Hide editor', 'text_doma'); ?></button>
+        <input data-czrtype="{{input_id}}" type="hidden" value="{{value}}"/>
+      </script>
+
+      <script type="text/html" id="tmpl-nimble-input___nimble_tinymce_editor">
+        <?php
+        // Added an id attribute for https://github.com/presscustomizr/nimble-builder/issues/403
+        // needed to instantiate wp.editor.initialize(...)
+        ?>
+        <#
+          var item_model = data.item_model,
+              input_id = data.input_id,
+              value = _.has( item_model, input_id ) ? item_model[input_id] : null;
+        #>
+        <textarea id="textarea-{{data.control_id}}" data-czrtype="{{input_id}}" class="width-100" name="textarea" rows="10" cols="">{{value}}</textarea>
+      </script>
+
+
+
+      <script type="text/html" id="tmpl-nimble-input___h_alignment">
+        <#
+          var input_id = data.input_id;
+        #>
+        <div class="sek-h-align-wrapper">
+          <input data-czrtype="{{input_id}}" type="hidden"/>
+          <div class="sek-align-icons">
+            <div data-sek-align="left" title="<?php _e('Align left', 'text_doma'); ?>"><i class="material-icons">format_align_left</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center', 'text_doma'); ?>"><i class="material-icons">format_align_center</i></div>
+            <div data-sek-align="right" title="<?php _e('Align right', 'text_doma'); ?>"><i class="material-icons">format_align_right</i></div>
+          </div>
+        </div><?php // sek-h-align-wrapper ?>
+      </script>
+
+
+      <script type="text/html" id="tmpl-nimble-input___h_text_alignment">
+        <#
+          var input_id = data.input_id;
+        #>
+        <div class="sek-h-align-wrapper">
+          <input data-czrtype="{{input_id}}" type="hidden"/>
+          <div class="sek-align-icons">
+            <div data-sek-align="left" title="<?php _e('Align left', 'text_doma'); ?>"><i class="material-icons">format_align_left</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center', 'text_doma'); ?>"><i class="material-icons">format_align_center</i></div>
+            <div data-sek-align="right" title="<?php _e('Align right', 'text_doma'); ?>"><i class="material-icons">format_align_right</i></div>
+            <div data-sek-align="justify" title="<?php _e('Justified', 'text_doma'); ?>"><i class="material-icons">format_align_justify</i></div>
+          </div>
+        </div><?php // sek-h-align-wrapper ?>
+      </script>
+
+
+      <script type="text/html" id="tmpl-nimble-input___nimblecheck">
+        <#
+          var input_id = data.input_id,
+          item_model = data.item_model,
+          value = _.has( item_model, input_id ) ? item_model[input_id] : false,
+          _checked = ( false != value ) ? "checked=checked" : '',
+          _uniqueId = wp.customize.czr_sektions.guid();
+        #>
+        <div class="nimblecheck-wrap">
+          <input id="nimblecheck-{{_uniqueId}}" data-czrtype="{{input_id}}" type="checkbox" {{ _checked }} class="nimblecheck-input">
+          <label for="nimblecheck-{{_uniqueId}}" class="nimblecheck-label">{{sektionsLocalizedData.i18n['Switch']}}</label>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  FONT SIZE / LINE HEIGHT
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___font_size_line_height">
+        <?php
+          // we save the int value + unit
+          // we want to keep only the numbers when printing the tmpl
+          // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
+        ?>
+        <#
+          var item_model = data.item_model,
+              input_id = data.input_id,
+              value = _.has( item_model, input_id ) ? item_model[input_id] : null,
+              unit;
+
+          value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
+          unit = _.isString( value ) ? value.replace(/[0-9]|\.|,/g, '') : 'px';
+          unit = _.isEmpty( unit ) ? 'px' : unit;
+          var _step = _.has( item_model, 'step' ) ? 'step="' + item_model.step + '"' : '',
+              _saved_unit = _.has( item_model, 'unit' ) ? 'data-unit="' + item_model.unit + '"' : '',
+              _min = _.has( item_model, 'min' ) ? 'min="' + item_model.min + '"': '',
+              _max = _.has( item_model, 'max' ) ? 'max="' + item_model.max + '"': '';
+        #>
+        <div class="sek-font-size-line-height-wrapper">
+          <input data-czrtype="{{input_id}}" type="hidden" data-sek-unit="{{unit}}"/>
+          <div aria-label="<?php _e('unit', 'text_doma'); ?>" class="sek-ui-button-group sek-float-right" role="group">
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_doma'); ?>" data-sek-unit="px">px</button><button type="button" aria-pressed="false" class="sek-ui-button" title="em" data-sek-unit="em">em</button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_doma'); ?>" data-sek-unit="%">%</button></div>
+          </div>
+        </div>
+      </script>
+
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  ALPHA COLOR
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___wp_color_alpha">
+        <#
+          var item_model = data.item_model,
+              input_id = data.input_id,
+              value = _.has( item_model, input_id ) ? item_model[input_id] : null;
+        #>
+        <input data-czrtype="{{data.input_id}}" class="width-100"  data-alpha="true" type="text" value="{{value}}"></input>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  SIMPLE SELECT : USED FOR SELECT, FONT PICKER, ICON PICKER, ...
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___simpleselect">
+        <select data-czrtype="{{data.input_id}}"></select>
+      </script>
+
+
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  RANGE
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___range_simple">
+        <div class="sek-range-with-unit-picker-wrapper sek-no-unit-picker">
+          <#
+            var range_tmpl = wp.customize.CZR_Helpers.getInputSubTemplate( 'range_number' );
+            if ( _.isFunction( range_tmpl ) ) { print( range_tmpl( data ) ); }
+          #>
+        </div>
+      </script>
+
+
+      <script type="text/html" id="tmpl-nimble-input___range_with_unit_picker">
+        <div class="sek-range-with-unit-picker-wrapper">
+            <#
+              var range_tmpl = wp.customize.CZR_Helpers.getInputSubTemplate( 'range_number' );
+              if ( _.isFunction( range_tmpl ) ) { print( range_tmpl( data ) ); }
+              var unit_tmpl = wp.customize.CZR_Helpers.getInputSubTemplate( 'unit_picker' );
+              if ( _.isFunction( unit_tmpl ) ) { print( unit_tmpl( data ) ); }
+            #>
+        </div>
+      </script>
+
+
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  SPACING
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___spacing">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
+        <div class="sek-spacing-wrapper">
+            <div class="sek-pad-marg-inner">
+              <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
+                <div class="sek-flex-center-stretch" data-sek-spacing="margin-top" title="<?php _e('Margin top', 'text_doma'); ?>">
+                  <div class="sek-pm-input-parent">
+                    <input class="sek-pm-input" value="" type="number"  >
+                  </div>
+                </div>
+              </div>
+              <div class="sek-pm-middle-wrap sek-flex-justify-center">
+                <div class="sek-flex-center-stretch sek-pm-margin-left" data-sek-spacing="margin-left" title="<?php _e('Margin left', 'text_doma'); ?>">
+                  <div class="sek-pm-input-parent">
+                    <input class="sek-pm-input" value="" type="number"  >
+                  </div>
+                </div>
+
+                <div class="sek-pm-padding-wrapper">
+                  <div class="sek-flex-justify-center">
+                    <div class="sek-flex-center-stretch" data-sek-spacing="padding-top" title="<?php _e('Padding top', 'text_doma'); ?>">
+                      <div class="sek-pm-input-parent">
+                        <input class="sek-pm-input" value="" type="number"  >
+                      </div>
+                    </div>
+                  </div>
+                    <div class="sek-flex-justify-center sek-flex-space-between">
+                      <div class="sek-flex-center-stretch" data-sek-spacing="padding-left" title="<?php _e('Padding left', 'text_doma'); ?>">
+                        <div class="sek-pm-input-parent">
+                          <input class="sek-pm-input" value="" type="number"  >
+                        </div>
+                      </div>
+                      <div class="sek-flex-center-stretch" data-sek-spacing="padding-right" title="<?php _e('Padding right', 'text_doma'); ?>">
+                        <div class="sek-pm-input-parent">
+                          <input class="sek-pm-input" value="" type="number"  >
+                        </div>
+                      </div>
+                    </div>
+                  <div class="sek-flex-justify-center">
+                    <div class="sek-flex-center-stretch" data-sek-spacing="padding-bottom" title="<?php _e('Padding bottom', 'text_doma'); ?>">
+                      <div class="sek-pm-input-parent">
+                        <input class="sek-pm-input" value="" type="number"  >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sek-flex-center-stretch sek-pm-margin-right" data-sek-spacing="margin-right" title="<?php _e('Margin right', 'text_doma'); ?>">
+                  <div class="sek-pm-input-parent">
+                    <input class="sek-pm-input" value="" type="number"  >
+                  </div>
+                </div>
+              </div>
+
+              <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
+                <div class="sek-flex-center-stretch" data-sek-spacing="margin-bottom" title="<?php _e('Margin bottom', 'text_doma'); ?>">
+                  <div class="sek-pm-input-parent">
+                    <input class="sek-pm-input" value="" type="number"  >
+                  </div>
+                </div>
+              </div>
+            </div><?php //sek-pad-marg-inner ?>
+
+            <#
+              var unit_tmpl = wp.customize.CZR_Helpers.getInputSubTemplate( 'unit_picker' );
+              if ( _.isFunction( unit_tmpl ) ) { print( unit_tmpl( data ) ); }
+            #>
+            <div class="reset-spacing-wrap"><span class="sek-do-reset"><?php _e('Reset all spacing', 'text_doma' ); ?></span></div>
+
+        </div><?php // sek-spacing-wrapper ?>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  TEXT
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___text">
+        <# var input_data = data.input_data; #>
+        <input data-czrtype="{{data.input_id}}" type="text" value="" placeholder="{{input_data.placeholder}}"></input>
+      </script>
+
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  CONTENT PICKER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___content_picker">
+        <span data-czrtype="{{data.input_id}}"></span>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  UPLOAD
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___upload">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
+        <div class="{{serverControlParams.css_attr.img_upload_container}}"></div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  BORDERS
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___borders">
+        <div class="sek-borders">
+          <div class="sek-border-type-wrapper">
+            <div aria-label="unit" class="sek-ui-button-group" role="group"><button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('All', 'text_doma'); ?>" data-sek-border-type="_all_"><?php _e('All', 'text_doma'); ?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Left', 'text_doma'); ?>" data-sek-border-type="left"><?php _e('Left', 'text_doma'); ?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Top', 'text_doma'); ?>" data-sek-border-type="top"><?php _e('Top', 'text_doma'); ?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Right', 'text_doma'); ?>" data-sek-border-type="right"><?php _e('Right', 'text_doma'); ?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Bottom', 'text_doma'); ?>" data-sek-border-type="bottom"><?php _e('Bottom', 'text_doma'); ?></button></div>
+          </div>
+          <div class="sek-range-unit-wrapper">
+            <#
+              var range_tmpl = wp.customize.CZR_Helpers.getInputSubTemplate( 'range_number' );
+              if ( _.isFunction( range_tmpl ) ) { print( range_tmpl( data ) ); }
+              var unit_tmpl = wp.customize.CZR_Helpers.getInputSubTemplate( 'unit_picker' );
+              if ( _.isFunction( unit_tmpl ) ) { print( unit_tmpl( data ) ); }
+            #>
+          </div>
+          <div class="sek-color-wrapper">
+              <div class="sek-color-picker"><input class="sek-alpha-color-input" data-alpha="true" type="text" value=""/></div>
+              <div class="sek-reset-button"><button type="button" class="button sek-reset-button sek-float-right"><?php _e('Reset', 'text_doma'); ?></button></div>
+          </div>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  BORDER RADIUS
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___border_radius">
+        <div class="sek-borders">
+          <div class="sek-border-type-wrapper">
+            <div aria-label="unit" class="sek-ui-button-group sek-float-left" role="group"><button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('All', 'text_doma'); ?>" data-sek-radius-type="_all_"><?php _e('All', 'text_doma'); ?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Top left', 'text_doma'); ?>" data-sek-radius-type="top_left"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Top right', 'text_doma'); ?>" data-sek-radius-type="top_right"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Bottom right', 'text_doma'); ?>" data-sek-radius-type="bottom_right"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Bottom left', 'text_doma'); ?>" data-sek-radius-type="bottom_left"><i class="material-icons">border_style</i></button></div>
+            <div class="sek-reset-button"><button type="button" class="button sek-reset-button sek-float-right"><?php _e('Reset', 'text_doma'); ?></button></div>
+          </div>
+          <div class="sek-range-unit-wrapper">
+            <#
+              var range_tmpl = wp.customize.CZR_Helpers.getInputSubTemplate( 'range_number' );
+              if ( _.isFunction( range_tmpl ) ) { print( range_tmpl( data ) ); }
+              var unit_tmpl = wp.customize.CZR_Helpers.getInputSubTemplate( 'unit_picker' );
+              if ( _.isFunction( unit_tmpl ) ) { print( unit_tmpl( data ) ); }
+            #>
+          </div>
+        </div>
+      </script>
+
+
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  CONTENT SWITCHER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___content_type_switcher">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
+        <div class="sek-content-type-wrapper">
+            <div aria-label="<?php _e('Content type', 'text_doma'); ?>" class="sek-ui-button-group" role="group">
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a section', 'text_doma'); ?>" data-sek-content-type="section"><?php _e('Pick a section', 'text_doma'); ?></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a module', 'text_doma'); ?>" data-sek-content-type="module"><?php _e('Pick a module', 'text_doma'); ?></button>
+            </div>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  MODULE PICKER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___module_picker">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
+        <div class="sek-content-type-wrapper">
+            <#
+            var icon_img_html = '<i style="color:red">Missing Icon</i>', icon_img_src;
+
+            _.each( sektionsLocalizedData.moduleCollection, function( rawModData ) {
+                //normalizes the module params
+                var modData = $.extend( true, {}, rawModData ),
+                defaultModParams = {
+                  'content-type' : 'module',
+                  'content-id' : '',
+                  'title' : '',
+                  'icon' : '',
+                  'font_icon' : '',
+                  'active' : true
+                },
+                modData = $.extend( defaultModParams, modData );
+
+                if ( ! _.isEmpty( modData['icon'] ) ) {
+                    icon_img_src = sektionsLocalizedData.moduleIconPath + modData['icon'];
+                    icon_img_html = '<img draggable="false" title="' + modData['title'] + '" alt="' +  modData['title'] + '" class="nimble-module-icons" src="' + icon_img_src + '"/>';
+                } else if ( ! _.isEmpty( modData['font_icon'] ) ) {
+                    icon_img_html = modData['font_icon'];
+                }
+                var title_attr = "<?php _e('Drag and drop or double-click to insert in your chosen target element.', 'text_doma'); ?>",
+                    font_icon_class = !_.isEmpty( modData['font_icon'] ) ? 'is-font-icon' : '',
+                    is_draggable = true !== modData['active'] ? 'false' : 'true';
+                if ( true !== modData['active'] ) {
+                    title_attr = "<?php _e('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'); ?>";
+                }
+                #>
+                <div draggable="{{is_draggable}}" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div></div>
+                <#
+            });//_.each
+            #>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  SECTION PICKER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___section_picker">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
+        <div class="sek-content-type-wrapper">
+            <#
+            var section_collection = ( data.input_data && data.input_data.section_collection ) ? data.input_data.section_collection : [];
+            if ( _.isEmpty( section_collection ) ) {
+                wp.customize.errare('Error in js template tmpl-nimble-input___section_picker => missing section collection');
+                return;
+            }
+
+            _.each( section_collection, function( rawSecParams ) {
+                //normalizes the params
+                var section_type = 'content',
+                secParams = $.extend( true, {}, rawSecParams ),
+                defaultParams = {
+                  'content-id' : '',
+                  'thumb' : '',
+                  'title' : '',
+                  'section_type' : '',
+                  'height': ''
+                },
+                modData = $.extend( defaultParams, secParams );
+
+                if ( ! _.isEmpty( secParams['section_type'] ) ) {
+                    section_type = secParams['section_type'];
+                }
+
+                var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
+                styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
+                if ( !_.isEmpty(secParams['height']) ) {
+                    styleAttr = styleAttr + 'height:' + secParams['height'] + ';';
+                }
+
+                #>
+                <div draggable="true" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div></div>
+                <#
+            });//_.each
+            #>
+        </div>
+      </script>
+
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  BACKGROUND POSITION INPUT
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___bg_position">
+        <div class="sek-bg-pos-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="top_left">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M14.96 16v-1h-1v-1h-1v-1h-1v-1h-1v-1.001h-1V14h-1v-4-1h5v1h-3v.938h1v.999h1v1h1v1.001h1v1h1V16h-1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="top">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M14.969 12v-1h-1v-1h-1v7h-1v-7h-1v1h-1v1h-1v-1.062h1V9.937h1v-1h1V8h1v.937h1v1h1v1.001h1V12h-1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="top_right">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M9.969 16v-1h1v-1h1v-1h1v-1h1v-1.001h1V14h1v-4-1h-1-4v1h3v.938h-1v.999h-1v1h-1v1.001h-1v1h-1V16h1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="left">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M11.469 9.5h-1v1h-1v1h7v1h-7v1h1v1h1v1h-1.063v-1h-1v-1h-1v-1h-.937v-1h.937v-1h1v-1h1v-1h1.063v1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="center">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="right">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M12.469 14.5h1v-1h1v-1h-7v-1h7v-1h-1v-1h-1v-1h1.062v1h1v1h1v1h.938v1h-.938v1h-1v1h-1v1h-1.062v-1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="bottom_left">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M14.969 9v1h-1v1h-1v1h-1v1h-1v1.001h-1V11h-1v5h5v-1h-3v-.938h1v-.999h1v-1h1v-1.001h1v-1h1V9h-1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="bottom">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M9.969 13v1h1v1h1V8h1v7h1v-1h1v-1h1v1.063h-1v.999h-1v1.001h-1V17h-1v-.937h-1v-1.001h-1v-.999h-1V13h1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="bottom_right">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M9.969 9v1h1v1h1v1h1v1h1v1.001h1V11h1v5h-1-4v-1h3v-.938h-1v-.999h-1v-1h-1v-1.001h-1v-1h-1V9h1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+        </div><?php // sek-bg-pos-wrapper ?>
+      </script>
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  BUTTON CHOICE
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___buttons_choice">
+        <div class="sek-button-choice-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <div aria-label="<?php _e('unit', 'text_doma'); ?>" class="sek-ui-button-group sek-float-right" role="group">
+              <#
+                var input_data = data.input_data;
+                if ( _.isEmpty( input_data.choices ) || !_.isObject( input_data.choices ) ) {
+                    wp.customize.errare( 'Error in buttons_choice js tmpl => missing or invalid input_data.choices');
+                } else {
+                    _.each( input_data.choices, function( label, choice ) {
+                        #><button type="button" aria-pressed="false" class="sek-ui-button" title="{{label}}" data-sek-choice="{{choice}}">{{label}}</button><#
+                    });
+                }
+              #>
+          </div>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  MULTISELECT, CATEGORY PICKER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___multiselect">
+        <select multiple="multiple" data-czrtype="{{data.input_id}}"></select>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  GRID LAYOUT
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___grid_layout">
+        <div class="sek-grid-layout-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <div class="sek-grid-icons">
+            <div data-sek-grid-layout="list" title="<?php _e('List layout', 'text_doma'); ?>"><i class="material-icons">view_list</i></div>
+            <div data-sek-grid-layout="grid" title="<?php _e('Grid layout', 'text_doma'); ?>"><i class="material-icons">view_module</i></div>
+          </div>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  VERTICAL ALIGNMENT
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___v_alignment">
+        <div class="sek-v-align-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <div class="sek-align-icons">
+            <div data-sek-align="top" title="<?php _e('Align top', 'text_doma'); ?>"><i class="material-icons">vertical_align_top</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center', 'text_doma'); ?>"><i class="material-icons">vertical_align_center</i></div>
+            <div data-sek-align="bottom" title="<?php _e('Align bottom', 'text_doma'); ?>"><i class="material-icons">vertical_align_bottom</i></div>
+          </div>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  RESET BUTTON
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___reset_button">
+        <div class="sek-button-choice-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Reset', 'text_doma'); ?>" data-sek-reset-scope="{{data.input_data.scope}}"><?php _e('Reset', 'text_doma'); ?></button>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  REVISION HISTORY / HIDDEN
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___revision_history">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  IMPORT / EXPORT
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___import_export">
+        <div class="sek-export-btn-wrap">
+          <div class="customize-control-title width-100"><?php //_e('Export', 'text_doma'); ?></div>
+          <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-export"><?php _e('Export', 'text_doma' ); ?></button>
+        </div>
+        <div class="sek-import-btn-wrap">
+          <div class="customize-control-title width-100"><?php _e('IMPORT', 'text_doma'); ?></div>
+          <span class="czr-notice"><?php _e('Select the file to import and click on Import button.', 'text_doma' ); ?></span>
+          <span class="czr-notice"><?php _e('Be sure to import a file generated with Nimble Builder export system.', 'text_doma' ); ?></span>
+          <div class="czr-import-dialog notice notice-info">
+              <div class="czr-import-message"><?php _e('Some of the imported sections need a location that is not active on this page. Sections in missing locations will not be rendered. You can continue importing or assign those sections to a contextually active location.', 'text_doma' ); ?></div>
+              <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-import-as-is"><?php _e('Import without modification', 'text_doma' ); ?></button>
+              <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-import-assign"><?php _e('Import in existing locations', 'text_doma' ); ?></button>
+              <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-cancel-import"><?php _e('Cancel import', 'text_doma' ); ?></button>
+          </div>
+          <div class="sek-uploading"><?php _e( 'Uploading...', 'text_doma' ); ?></div>
+          <input type="file" name="sek-import-file" class="sek-import-file" />
+          <input type="hidden" name="sek-skope" value="{{data.input_data.scope}}" />
+          <button type="button" class="button disabled" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-pre-import"><?php _e('Import', 'text_doma' ); ?></button>
+
+        </div>
+        <input data-czrtype="{{data.input_id}}" type="hidden" value="{{data.value}}"/>
+      </script>
+      <?php
+}//sek_print_nimble_input_templates() @hook 'customize_controls_print_footer_scripts'
 
 
 
@@ -3099,1056 +3911,4 @@ function sek_remove_callback_wp_targeted_link_rel( $wp_customize ) {
     }
 };
 
-?><?php
-// Set input content
-// the default input type templates are declared in inc/czr-base-fmk/_dev_php/0_3_czr-base-fmk-tmpl_builder.php
-// the template of input specific to Nimble are declared here
-add_action( 'czr_set_input_tmpl_content', '\Nimble\sek_set_input_tmpl_content', 10, 3 );
-function sek_set_input_tmpl_content( $input_type, $input_id, $input_data ) {
-    // error_log( print_r( $input_data, true ) );
-    // error_log('$input_type' . $input_type );
-    if ( ! array_key_exists( 'input_type', $input_data ) || empty( $input_data[ 'input_type' ] ) ) {
-         wp_send_json_error( 'sek_set_input_tmpl_content => missing input type for input id : ' . $input_id );
-    }
-    switch( $input_type ) {
-        // Content picker group
-        case 'content_type_switcher' :
-            sek_set_input_tmpl___content_type_switcher( $input_id, $input_data );
-        break;
-        case 'module_picker' :
-            sek_set_input_tmpl___module_picker( $input_id, $input_data );
-        break;
-        case 'section_picker' :
-            sek_set_input_tmpl___section_picker( $input_id, $input_data );
-        break;
-
-        case 'spacing' :
-        case 'spacingWithDeviceSwitcher' :
-            sek_set_input_tmpl___spacing( $input_id, $input_data );
-        break;
-        case 'bg_position' :
-        case 'bgPositionWithDeviceSwitcher' :
-            sek_set_input_tmpl___bg_position( $input_id, $input_data );
-        break;
-        case 'h_alignment' :
-        case 'horizAlignmentWithDeviceSwitcher' :
-            sek_set_input_tmpl___h_alignment( $input_id, $input_data );
-        break;
-        case 'h_text_alignment' :
-        case 'horizTextAlignmentWithDeviceSwitcher' :
-            sek_set_input_tmpl___h_text_alignment( $input_id, $input_data );
-        break;
-        case 'verticalAlignWithDeviceSwitcher' :
-            sek_set_input_tmpl___v_alignment( $input_id, $input_data );
-        break;
-        case 'font_picker' :
-            sek_set_input_tmpl___font_picker( $input_id, $input_data );
-        break;
-        case 'fa_icon_picker' :
-            sek_set_input_tmpl___fa_icon_picker( $input_id, $input_data );
-        break;
-        case 'font_size' :
-        case 'line_height' :
-            sek_set_input_tmpl___font_size_line_height( $input_id, $input_data );
-        break;
-        case 'code_editor' :
-            sek_set_input_tmpl___code_editor( $input_id, $input_data );
-        break;
-        case 'range_with_unit_picker' :
-            sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data );
-        break;
-        case 'range_with_unit_picker_device_switcher' :
-            sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id, $input_data );
-        break;
-        case 'range_simple' :
-        case 'range_simple_device_switcher' :
-            sek_set_input_tmpl___range_simple( $input_id, $input_data );
-        break;
-        case 'borders' :
-            sek_set_input_tmpl___borders( $input_id, $input_data );
-        break;
-        case 'border_radius' :
-            sek_set_input_tmpl___border_radius( $input_id, $input_data );
-        break;
-        case 'buttons_choice' :
-            sek_set_input_tmpl___buttons_choice( $input_id, $input_data );
-        break;
-        case 'reset_button' :
-            sek_set_input_tmpl___reset_button( $input_id, $input_data );
-        break;
-        case 'revision_history' :
-            sek_set_input_tmpl___revision_history( $input_id, $input_data );
-        break;
-        case 'detached_tinymce_editor' :
-            sek_set_input_tmpl___detached_tinymce_editor( $input_id, $input_data );
-        break;
-        case 'nimble_tinymce_editor' :
-            sek_set_input_tmpl___nimble_tinymce_editor( $input_id, $input_data );
-        break;
-        case 'import_export' :
-            sek_set_input_tmpl___imp_exp( $input_id, $input_data );
-        break;
-        case 'grid_layout' :
-            sek_set_input_tmpl___grid_layout( $input_id, $input_data );
-        break;
-    }
-}
-?><?php
-
-/* ------------------------------------------------------------------------- *
- *  CONTENT TYPE SWITCHER INPUT
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___content_type_switcher( $input_id, $input_data ) {
-    ?>
-        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-        <div class="sek-content-type-wrapper">
-            <div aria-label="<?php _e( 'Content type', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a section', 'text_domain');?>" data-sek-content-type="section"><?php _e('Pick a section', 'text_domain');?></button>
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a module', 'text_domain');?>" data-sek-content-type="module"><?php _e('Pick a module', 'text_domain');?></button>
-            </div>
-        </div>
-  <?php
-}
-
-
-/* ------------------------------------------------------------------------- *
- *  MODULE PICKER INPUT
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___module_picker( $input_id, $input_data ) {
-    ?>
-        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-        <div class="sek-content-type-wrapper">
-          <?php
-            $content_collection = sek_get_module_collection();
-
-            $i = 0;
-            foreach( $content_collection as $_module_params ) {
-                // if ( $i % 2 == 0 ) {
-                //   //printf('<div class="sek-module-raw"></div');
-                // }
-                $_module_params = wp_parse_args( $_module_params, array(
-                    'content-type' => 'module',
-                    'content-id' => '',
-                    'title' => '',
-                    'icon' => '',
-                    'font_icon' => '',
-                    'active' => true
-                ));
-
-                $icon_img_html = '<i style="color:red">Missing Icon</i>';
-                if ( !empty( $_module_params['icon'] ) ) {
-                    $icon_img_src = NIMBLE_MODULE_ICON_PATH . $_module_params['icon'];
-                    $icon_img_html = '<img draggable="false" title="'. $_module_params['title'] . '" alt="'. $_module_params['title'] . '" class="nimble-module-icons" src="' . $icon_img_src .'"/>';
-                } else if ( !empty( $_module_params['font_icon'] ) ) {
-                    $icon_img_html = $_module_params['font_icon'];
-                }
-
-                printf('<div draggable="%7$s" data-sek-content-type="%1$s" data-sek-content-id="%2$s" title="%5$s"><div class="sek-module-icon %6$s">%3$s</div><div class="sek-module-title"><div class="sek-centered-module-title">%4$s</div></div></div>',
-                      $_module_params['content-type'],
-                      $_module_params['content-id'],
-                      $icon_img_html,
-                      $_module_params['title'],
-                      true === $_module_params['active'] ? __('Drag and drop or double-click to insert in your chosen target element.', 'text_doma' ) : __('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'),
-                      !empty( $_module_params['font_icon'] ) ? 'is-font-icon' : '',
-                      true === $_module_params['active'] ? 'true' : 'false'
-                );
-            }
-          ?>
-        </div>
-    <?php
-}
-
-
-
-
-
-
-
-
-
-/* ------------------------------------------------------------------------- *
- *  SECTION PICKER INPUT
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___section_picker( $input_id, $input_data ) {
-    //sek_error_log('$input_data ? for input_id ' . $input_id, $input_data );
-    //sek_error_log('CURRENT MODULE PARAMS ?', CZR_Fmk_Base()->current_module_params_when_ajaxing );
-    ?>
-        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-        <div class="sek-content-type-wrapper">
-          <?php
-            if ( !is_array( $input_data['section_collection'] ) || empty( $input_data['section_collection'] ) ) {
-                $current_module = is_array( CZR_Fmk_Base()->current_module_params_when_ajaxing ) ? CZR_Fmk_Base()->current_module_params_when_ajaxing['module_type'] : 'undefined';
-                sek_error_log( __FUNCTION__ . ' => missing section_collection param for module ' . $current_module );
-                return;
-            }
-            $content_collection = $input_data['section_collection'];
-
-            foreach( $content_collection as $_section_params ) {
-                $section_type = 'content';
-                // Section type has to be specified for header and footer sections
-                // Otherwise bug : https://github.com/presscustomizr/nimble-builder/issues/454
-                if ( !empty($_section_params['section_type']) ) {
-                    $section_type = $_section_params['section_type'];
-                }
-
-                printf('<div draggable="true" data-sek-content-type="%1$s" data-sek-content-id="%2$s" style="%3$s" title="%4$s" data-sek-section-type="%5$s"><div class="sek-overlay"></div></div>',
-                    'preset_section',
-                    $_section_params['content-id'],
-                    sprintf( 'background: url(%1$s) 50% 50% / cover no-repeat;%2$s',
-                        // v1.4.2 : added the ?ver param to make sure we always display the latest shot of the section
-                        // May 21st, v1.7.5 => back to the local data
-                        // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
-                        NIMBLE_BASE_URL . '/assets/img/section_assets/thumbs/' . $_section_params['thumb'] . '?ver=' . NIMBLE_VERSION,
-
-                        //$_section_params['thumb'] . '?ver=' . NIMBLE_VERSION,
-                        isset( $_section_params['height'] ) ? 'height:'.$_section_params['height'] : ''
-                    ),
-                    $_section_params['title'],
-                    $section_type
-                );
-            }
-          ?>
-        </div><?php //class="sek-content-type-wrapper" ?>
-  <?php
-}
-
-?><?php
-
-/* ------------------------------------------------------------------------- *
- *  SPACING INPUT
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___spacing( $input_id, $input_data ) {
-    ?>
-    <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-    <div class="sek-spacing-wrapper">
-        <div class="sek-pad-marg-inner">
-          <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
-            <div class="sek-flex-center-stretch" data-sek-spacing="margin-top" title="<?php _e('Margin top', 'text-domain'); ?>">
-              <div class="sek-pm-input-parent">
-                <input class="sek-pm-input" value="" type="number"  >
-              </div>
-            </div>
-          </div>
-          <div class="sek-pm-middle-wrap sek-flex-justify-center">
-            <div class="sek-flex-center-stretch sek-pm-margin-left" data-sek-spacing="margin-left" title="<?php _e('Margin left', 'text-domain'); ?>">
-              <div class="sek-pm-input-parent">
-                <input class="sek-pm-input" value="" type="number"  >
-              </div>
-            </div>
-
-            <div class="sek-pm-padding-wrapper">
-              <div class="sek-flex-justify-center">
-                <div class="sek-flex-center-stretch" data-sek-spacing="padding-top" title="<?php _e('Padding top', 'text-domain'); ?>">
-                  <div class="sek-pm-input-parent">
-                    <input class="sek-pm-input" value="" type="number"  >
-                  </div>
-                </div>
-              </div>
-                <div class="sek-flex-justify-center sek-flex-space-between">
-                  <div class="sek-flex-center-stretch" data-sek-spacing="padding-left" title="<?php _e('Padding left', 'text-domain'); ?>">
-                    <div class="sek-pm-input-parent">
-                      <input class="sek-pm-input" value="" type="number"  >
-                    </div>
-                  </div>
-                  <div class="sek-flex-center-stretch" data-sek-spacing="padding-right" title="<?php _e('Padding right', 'text-domain'); ?>">
-                    <div class="sek-pm-input-parent">
-                      <input class="sek-pm-input" value="" type="number"  >
-                    </div>
-                  </div>
-                </div>
-              <div class="sek-flex-justify-center">
-                <div class="sek-flex-center-stretch" data-sek-spacing="padding-bottom" title="<?php _e('Padding bottom', 'text-domain'); ?>">
-                  <div class="sek-pm-input-parent">
-                    <input class="sek-pm-input" value="" type="number"  >
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="sek-flex-center-stretch sek-pm-margin-right" data-sek-spacing="margin-right" title="<?php _e('Margin right', 'text-domain'); ?>">
-              <div class="sek-pm-input-parent">
-                <input class="sek-pm-input" value="" type="number"  >
-              </div>
-            </div>
-          </div>
-
-          <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
-            <div class="sek-flex-center-stretch" data-sek-spacing="margin-bottom" title="<?php _e('Margin bottom', 'text-domain'); ?>">
-              <div class="sek-pm-input-parent">
-                <input class="sek-pm-input" value="" type="number"  >
-              </div>
-            </div>
-          </div>
-        </div><?php //sek-pad-marg-inner ?>
-        <div class="sek-unit-wrapper">
-          <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_domain');?>" data-sek-unit="%"><?php _e('%', 'text_domain');?></button></div>
-        </div>
-        <div class="reset-spacing-wrap"><span class="sek-do-reset"><?php _e('Reset all spacing', 'text_doma' ); ?></span></div>
-
-    </div><?php // sek-spacing-wrapper ?>
-    <?php
-}
-
-?><?php
-
-/* ------------------------------------------------------------------------- *
- *  BACKGROUND POSITION INPUT
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___bg_position( $input_id, $input_data ) {
-    ?>
-        <div class="sek-bg-pos-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-          <label class="sek-bg-pos">
-            <input type="radio" name="sek-bg-pos" value="top_left">
-            <span>
-              <svg width="24" height="24">
-                <path id="sek-pth" fill-rule="evenodd" d="M14.96 16v-1h-1v-1h-1v-1h-1v-1h-1v-1.001h-1V14h-1v-4-1h5v1h-3v.938h1v.999h1v1h1v1.001h1v1h1V16h-1z" class="sek-svg-bg-pos">
-                </path>
-              </svg>
-            </span>
-          </label>
-          <label class="sek-bg-pos">
-            <input type="radio" name="sek-bg-pos" value="top">
-            <span>
-              <svg width="24" height="24">
-                <path id="sek-pth" fill-rule="evenodd" d="M14.969 12v-1h-1v-1h-1v7h-1v-7h-1v1h-1v1h-1v-1.062h1V9.937h1v-1h1V8h1v.937h1v1h1v1.001h1V12h-1z" class="sek-svg-bg-pos">
-                </path>
-              </svg>
-            </span>
-          </label>
-          <label class="sek-bg-pos">
-            <input type="radio" name="sek-bg-pos" value="top_right">
-            <span>
-              <svg width="24" height="24">
-                <path id="sek-pth" fill-rule="evenodd" d="M9.969 16v-1h1v-1h1v-1h1v-1h1v-1.001h1V14h1v-4-1h-1-4v1h3v.938h-1v.999h-1v1h-1v1.001h-1v1h-1V16h1z" class="sek-svg-bg-pos">
-                </path>
-              </svg>
-            </span>
-          </label>
-          <label class="sek-bg-pos">
-            <input type="radio" name="sek-bg-pos" value="left">
-            <span>
-              <svg width="24" height="24">
-                <path id="sek-pth" fill-rule="evenodd" d="M11.469 9.5h-1v1h-1v1h7v1h-7v1h1v1h1v1h-1.063v-1h-1v-1h-1v-1h-.937v-1h.937v-1h1v-1h1v-1h1.063v1z" class="sek-svg-bg-pos">
-                </path>
-              </svg>
-            </span>
-          </label>
-          <label class="sek-bg-pos">
-            <input type="radio" name="sek-bg-pos" value="center">
-            <span>
-              <svg width="24" height="24">
-                <path id="sek-pth" fill-rule="evenodd" d="M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" class="sek-svg-bg-pos">
-                </path>
-              </svg>
-            </span>
-          </label>
-          <label class="sek-bg-pos">
-            <input type="radio" name="sek-bg-pos" value="right">
-            <span>
-              <svg width="24" height="24">
-                <path id="sek-pth" fill-rule="evenodd" d="M12.469 14.5h1v-1h1v-1h-7v-1h7v-1h-1v-1h-1v-1h1.062v1h1v1h1v1h.938v1h-.938v1h-1v1h-1v1h-1.062v-1z" class="sek-svg-bg-pos">
-                </path>
-              </svg>
-            </span>
-          </label>
-          <label class="sek-bg-pos">
-            <input type="radio" name="sek-bg-pos" value="bottom_left">
-            <span>
-              <svg width="24" height="24">
-                <path id="sek-pth" fill-rule="evenodd" d="M14.969 9v1h-1v1h-1v1h-1v1h-1v1.001h-1V11h-1v5h5v-1h-3v-.938h1v-.999h1v-1h1v-1.001h1v-1h1V9h-1z" class="sek-svg-bg-pos">
-                </path>
-              </svg>
-            </span>
-          </label>
-          <label class="sek-bg-pos">
-            <input type="radio" name="sek-bg-pos" value="bottom">
-            <span>
-              <svg width="24" height="24">
-                <path id="sek-pth" fill-rule="evenodd" d="M9.969 13v1h1v1h1V8h1v7h1v-1h1v-1h1v1.063h-1v.999h-1v1.001h-1V17h-1v-.937h-1v-1.001h-1v-.999h-1V13h1z" class="sek-svg-bg-pos">
-                </path>
-              </svg>
-            </span>
-          </label>
-          <label class="sek-bg-pos">
-            <input type="radio" name="sek-bg-pos" value="bottom_right">
-            <span>
-              <svg width="24" height="24">
-                <path id="sek-pth" fill-rule="evenodd" d="M9.969 9v1h1v1h1v1h1v1h1v1.001h1V11h1v5h-1-4v-1h3v-.938h-1v-.999h-1v-1h-1v-1.001h-1v-1h-1V9h1z" class="sek-svg-bg-pos">
-                </path>
-              </svg>
-            </span>
-          </label>
-        </div><?php // sek-bg-pos-wrapper ?>
-    <?php
-}
-
-?><?php
-
-/* ------------------------------------------------------------------------- *
- *  HORIZONTAL ALIGNMENT INPUT
-/* ------------------------------------------------------------------------- */
-// AND
-/* ------------------------------------------------------------------------- *
- *  HORIZONTAL ALIGNMENT INPUT FOR TEXT => includes the 'justify' icon
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___h_alignment( $input_id, $input_data ) {
-    ?>
-        <div class="sek-h-align-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-          <div class="sek-align-icons">
-            <div data-sek-align="left" title="<?php _e('Align left','text_doma'); ?>"><i class="material-icons">format_align_left</i></div>
-            <div data-sek-align="center" title="<?php _e('Align center','text_doma'); ?>"><i class="material-icons">format_align_center</i></div>
-            <div data-sek-align="right" title="<?php _e('Align right','text_doma'); ?>"><i class="material-icons">format_align_right</i></div>
-          </div>
-        </div><?php // sek-h-align-wrapper ?>
-    <?php
-}
-
-function sek_set_input_tmpl___h_text_alignment( $input_id, $input_data ) {
-    ?>
-        <div class="sek-h-align-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-          <div class="sek-align-icons">
-            <div data-sek-align="left" title="<?php _e('Align left','text_doma'); ?>"><i class="material-icons">format_align_left</i></div>
-            <div data-sek-align="center" title="<?php _e('Align center','text_doma'); ?>"><i class="material-icons">format_align_center</i></div>
-            <div data-sek-align="right" title="<?php _e('Align right','text_doma'); ?>"><i class="material-icons">format_align_right</i></div>
-            <div data-sek-align="justify" title="<?php _e('Justified','text_doma'); ?>"><i class="material-icons">format_align_justify</i></div>
-          </div>
-        </div><?php // sek-h-align-wrapper ?>
-    <?php
-}
-?><?php
-/* ------------------------------------------------------------------------- *
- *  VERTICAL ALIGNMENT INPUT
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___v_alignment( $input_id, $input_data ) {
-    ?>
-        <div class="sek-v-align-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-          <div class="sek-align-icons">
-            <div data-sek-align="top" title="<?php _e('Align top','text_doma'); ?>"><i class="material-icons">vertical_align_top</i></div>
-            <div data-sek-align="center" title="<?php _e('Align center','text_doma'); ?>"><i class="material-icons">vertical_align_center</i></div>
-            <div data-sek-align="bottom" title="<?php _e('Align bottom','text_doma'); ?>"><i class="material-icons">vertical_align_bottom</i></div>
-          </div>
-        </div><?php // sek-h-align-wrapper ?>
-    <?php
-}
-
-?><?php
-/* ------------------------------------------------------------------------- *
- *  FONT AWESOME ICON PICKER INPUT
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___fa_icon_picker( $input_id, $input_data ) {
-    ?>
-        <select data-czrtype="<?php echo $input_id; ?>"></select>
-    <?php
-}
-
-
-// this dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
-// It allows us to populate the server response with the relevant module html template
-// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
-add_filter( "ac_set_ajax_czr_tmpl___fa_icon_picker_input", '\Nimble\sek_get_fa_icon_list_tmpl', 10, 3 );
-// hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
-// this dynamic filter is declared on wp_ajax_ac_get_template
-// It allows us to populate the server response with the relevant module html template
-// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
-//
-// For czr_tiny_mce_editor_module, we request the font_list tmpl
-function sek_get_fa_icon_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
-    if ( empty( $requested_tmpl ) ) {
-        wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
-    }
-
-    return wp_json_encode(
-        sek_retrieve_decoded_font_awesome_icons()
-    );//will be sent by wp_send_json_success() in ::ac_set_ajax_czr_tmpl()
-}
-
-
-
-//retrieves faicons:
-// 1) from faicons.json if needed (transient doesn't exists, or is new version => set in TC_wfc ) and decodes them
-// otherwise
-// 2) from the transient set if it exists
-function sek_retrieve_decoded_font_awesome_icons() {
-    // this file must be generated with: https://github.com/presscustomizr/nimble-builder/issues/57
-    $faicons_json_path      = NIMBLE_BASE_PATH . '/assets/faicons.json';
-    $faicons_transient_name = 'sek_font_awesome_november_2018';
-    if ( false == get_transient( $faicons_transient_name ) ) {
-        if ( file_exists( $faicons_json_path ) ) {
-            $faicons_raw      = @file_get_contents( $faicons_json_path );
-
-            if ( false === $faicons_raw ) {
-                $faicons_raw = wp_remote_fopen( $faicons_json_path );
-            }
-
-            $faicons_decoded   = json_decode( $faicons_raw, true );
-            set_transient( $faicons_transient_name , $faicons_decoded , 60*60*24*3000 );
-        } else {
-            wp_send_json_error( __FUNCTION__ . ' => the file faicons.json is missing' );
-        }
-    }
-    else {
-        $faicons_decoded = get_transient( $faicons_transient_name );
-    }
-
-    return $faicons_decoded;
-}
-
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  FONT PICKER INPUT
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___font_picker( $input_id, $input_data ) {
-    ?>
-        <select data-czrtype="<?php echo $input_id; ?>"></select>
-    <?php
-}
-
-
-// this dynamic filter is declared on wp_ajax_ac_get_template in the czr_base_fmk
-// It allows us to populate the server response with the relevant module html template
-// $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl );
-add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_list_tmpl', 10, 3 );
-// hook : ac_set_ajax_czr_tmpl___czr_tiny_mce_editor_module
-// For czr_tiny_mce_editor_module, we request the font_list tmpl
-function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
-    if ( empty( $requested_tmpl ) ) {
-        wp_send_json_error( __FUNCTION__ . ' => the requested tmpl is empty' );
-    }
-
-    return wp_json_encode( array(
-        'cfonts' => sek_get_cfonts(),
-        'gfonts' => sek_get_gfonts(),
-    ) );//will be sent by wp_send_json_success() in ::ac_set_ajax_czr_tmpl()
-}
-
-
-function sek_get_cfonts() {
-    $cfonts = array();
-    $raw_cfonts = array(
-        'Arial Black,Arial Black,Gadget,sans-serif',
-        'Century Gothic',
-        'Comic Sans MS,Comic Sans MS,cursive',
-        'Courier New,Courier New,Courier,monospace',
-        'Georgia,Georgia,serif',
-        'Helvetica Neue, Helvetica, Arial, sans-serif',
-        'Impact,Charcoal,sans-serif',
-        'Lucida Console,Monaco,monospace',
-        'Lucida Sans Unicode,Lucida Grande,sans-serif',
-        'Palatino Linotype,Book Antiqua,Palatino,serif',
-        'Tahoma,Geneva,sans-serif',
-        'Times New Roman,Times,serif',
-        'Trebuchet MS,Helvetica,sans-serif',
-        'Verdana,Geneva,sans-serif',
-    );
-    foreach ( $raw_cfonts as $font ) {
-      //no subsets for cfonts => epty array()
-      $cfonts[] = array(
-          'name'    => $font ,
-          'subsets'   => array()
-      );
-    }
-    return apply_filters( 'sek_font_picker_cfonts', $cfonts );
-}
-
-
-//retrieves gfonts:
-// 1) from webfonts.json if needed (transient doesn't exists, or is new version => set in TC_wfc ) and decodes them
-// otherwise
-// 2) from the transiet set if it exists
-//
-// => Until June 2017, the webfonts have been stored in 'tc_gfonts' transient
-// => In June 2017, the Google Fonts have been updated with a new webfonts.json
-// generated from : https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyBID8gp8nBOpWyH5MrsF7doP4fczXGaHdA
-//
-// => The transient name is now : czr_gfonts_june_2017
-function sek_retrieve_decoded_gfonts() {
-    if ( false == get_transient( 'sek_gfonts_may_2018' ) ) {
-        $gfont_raw      = @file_get_contents( NIMBLE_BASE_PATH ."/assets/webfonts.json" );
-
-        if ( $gfont_raw === false ) {
-          $gfont_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/webfonts.json" );
-        }
-
-        $gfonts_decoded   = json_decode( $gfont_raw, true );
-        set_transient( 'sek_gfonts_may_2018' , $gfonts_decoded , 60*60*24*3000 );
-    }
-    else {
-      $gfonts_decoded = get_transient( 'sek_gfonts_may_2018' );
-    }
-
-    return $gfonts_decoded;
-}
-
-
-
-//@return the google fonts
-function sek_get_gfonts( $what = null ) {
-  //checks if transient exists or has expired
-
-  $gfonts_decoded = sek_retrieve_decoded_gfonts();
-  $gfonts = array();
-  //$subsets = array();
-
-  // $subsets['all-subsets'] = sprintf( '%1$s ( %2$s %3$s )',
-  //   __( 'All languages' , 'text_doma' ),
-  //   count($gfonts_decoded['items']) + count( $this -> get_cfonts() ),
-  //   __('fonts' , 'text_doma' )
-  // );
-
-  foreach ( $gfonts_decoded['items'] as $font ) {
-    foreach ( $font['variants'] as $variant ) {
-      $name     = str_replace( ' ', '+', $font['family'] );
-      $gfonts[]   = array(
-          'name'    => $name . ':' .$variant
-          //'subsets'   => $font['subsets']
-      );
-    }
-    //generates subset list : subset => font number
-    // foreach ( $font['subsets'] as $sub ) {
-    //   $subsets[$sub] = isset($subsets[$sub]) ? $subsets[$sub]+1 : 1;
-    // }
-  }
-
-  //finalizes the subset array
-  // foreach ( $subsets as $subset => $font_number ) {
-  //   if ( 'all-subsets' == $subset )
-  //     continue;
-  //   $subsets[$subset] = sprintf('%1$s ( %2$s %3$s )',
-  //     $subset,
-  //     $font_number,
-  //     __('fonts' , 'text_doma' )
-  //   );
-  // }
-
-  return ('subsets' == $what) ? apply_filters( 'sek_font_picker_gfonts_subsets ', $subsets ) : apply_filters( 'sek_font_picker_gfonts', $gfonts )  ;
-}
-
-?><?php
-
-/* ------------------------------------------------------------------------- *
- *  FONT SIZE
-/* ------------------------------------------------------------------------- */
-// AND
-/* ------------------------------------------------------------------------- *
- *  LINE HEIGHT INPUT TMPLS
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___font_size_line_height( $input_id, $input_data ) {
-    ?>
-      <?php
-            // we save the int value + unit
-            // we want to keep only the numbers when printing the tmpl
-            // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
-          ?>
-          <#
-            var value = data['<?php echo $input_id; ?>'],
-                unit = data['<?php echo $input_id; ?>'];
-            value = _.isString( value ) ? value.replace(/px|em|%/g,'') : '';
-            unit = _.isString( unit ) ? unit.replace(/[0-9]|\.|,/g, '') : 'px';
-            unit = _.isEmpty( unit ) ? 'px' : unit;
-          #>
-        <div class="sek-font-size-line-height-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
-
-          <?php
-              printf( '<input type="number" %1$s %2$s %3$s value="{{ value }}" />',
-                  ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
-                  ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : '',
-                  ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
-                );
-          ?>
-          <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group sek-float-right" role="group">
-              <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_domain');?>" data-sek-unit="%"><?php _e('%', 'text_domain');?></button></div>
-        </div><?php // sek-font-size-wrapper ?>
-    <?php
-}
-?><?php
-/* ------------------------------------------------------------------------- *
- *  CODE EDITOR INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___code_editor( $input_id, $input_data ) {
-    /*
-    * Needed to form the correct params to pass to the code mirror editor, based on the code type
-    */
-    $code_editor_params = nimble_get_code_editor_settings( array(
-        'type' => ! empty( $input_data[ 'code_type' ] ) ? $input_data[ 'code_type' ] : 'text/html',
-    ));
-    ?>
-        <textarea data-czrtype="<?php echo $input_id; ?>" class="width-100" name="textarea" rows="10" cols="" data-editor-params="<?php echo htmlspecialchars( json_encode( $code_editor_params ) ); ?>">{{ data.value }}</textarea>
-    <?php
-}
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  CODE EDITOR INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___range_simple( $input_id, $input_data ) {
-    ?>
-    <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
-    ?>
-    <#
-      var value = data['<?php echo $input_id; ?>'],
-          unit = data['<?php echo $input_id; ?>'];
-      value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
-      unit = _.isString( unit ) ? unit.replace(/[0-9]|\.|,/g, '') : 'px';
-      unit = _.isEmpty( unit ) ? 'px' : unit;
-    #>
-    <div class="sek-range-with-unit-picker-wrapper sek-no-unit-picker">
-        <?php //<# //console.log( 'IN php::sek_set_input_tmpl___range_simple() => data range_slide => ', data ); #> ?>
-        <div class="sek-range-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
-          <?php
-          printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
-            ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
-            ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
-            ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
-            ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
-          );
-          ?>
-        </div>
-        <div class="sek-number-wrapper">
-            <input class="sek-pm-input" value="{{ value }}" type="number"  >
-        </div>
-    </div><?php // sek-spacing-wrapper ?>
-  <?php
-}
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  CODE EDITOR INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___range_with_unit_picker( $input_id, $input_data ) {
-    ?>
-    <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
-    ?>
-    <#
-      var value = data['<?php echo $input_id; ?>'],
-          unit = data['<?php echo $input_id; ?>'];
-      value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
-      unit = _.isString( unit ) ? unit.replace(/[0-9]|\.|,/g, '') : 'px';
-      unit = _.isEmpty( unit ) ? 'px' : unit;
-    #>
-    <div class="sek-range-with-unit-picker-wrapper">
-        <?php //<# //console.log( 'IN php::sek_set_input_tmpl___range_with_unit_picker() => data range_slide => ', data ); #> ?>
-        <div class="sek-range-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
-          <?php
-          printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
-            ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
-            ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
-            ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
-            ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
-          );
-          ?>
-        </div>
-        <div class="sek-number-wrapper">
-            <input class="sek-pm-input" value="{{ value }}" type="number"  >
-        </div>
-        <div class="sek-unit-wrapper">
-          <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_domain');?>" data-sek-unit="%"><?php _e('%', 'text_domain');?></button></div>
-        </div>
-    </div><?php // sek-spacing-wrapper ?>
-  <?php
-}
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  CODE EDITOR INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___range_with_unit_picker_device_switcher( $input_id, $input_data ) {
-    ?>
-    <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
-    ?>
-    <#
-      var value = data['<?php echo $input_id; ?>'],
-          unit = data['<?php echo $input_id; ?>'];
-      value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
-      unit = _.isString( unit ) ? unit.replace(/[0-9]|\.|,/g, '') : 'px';
-      unit = _.isEmpty( unit ) ? 'px' : unit;
-    #>
-    <div class="sek-range-with-unit-picker-wrapper">
-        <?php //<# //console.log( 'IN php::sek_set_input_tmpl___range_with_unit_picker_device_switcher() => data range_slide => ', data ); #> ?>
-        <div class="sek-range-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden" data-sek-unit="{{ unit }}"/>
-          <?php
-          printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
-            ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
-            ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
-            ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
-            ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
-          );
-          ?>
-        </div>
-        <div class="sek-number-wrapper">
-            <input class="sek-pm-input" value="{{ value }}" type="number"  >
-        </div>
-        <div class="sek-unit-wrapper">
-          <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_domain');?>" data-sek-unit="%"><?php _e('%', 'text_domain');?></button></div>
-        </div>
-    </div><?php // sek-spacing-wrapper ?>
-  <?php
-}
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  BORDERS INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___borders( $input_id, $input_data ) {
-    ?>
-    <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
-    ?>
-    <div class="sek-borders">
-        <?php //<# //console.log( 'IN php::sek_set_input_tmpl___borders() => data range_slide => ', data ); #> ?>
-        <div class="sek-border-type-wrapper">
-            <div aria-label="unit" class="sek-ui-button-group" role="group"><button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('All', 'text-domain');?>" data-sek-border-type="_all_"><?php _e('All', 'text-domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Left', 'text-domain');?>" data-sek-border-type="left"><?php _e('Left', 'text-domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Top', 'text-domain');?>" data-sek-border-type="top"><?php _e('Top', 'text-domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Right', 'text-domain');?>" data-sek-border-type="right"><?php _e('Right', 'text-domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Bottom', 'text-domain');?>" data-sek-border-type="bottom"><?php _e('Bottom', 'text-domain');?></button></div>
-        </div>
-        <div class="sek-range-unit-wrapper">
-            <div class="sek-range-wrapper">
-              <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-              <?php
-              printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
-                ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
-                ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
-                ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
-                ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
-              );
-              ?>
-            </div>
-            <div class="sek-number-wrapper">
-                <input class="sek-pm-input" value="{{ value }}" type="number"  >
-            </div>
-            <div class="sek-unit-wrapper">
-              <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
-                    <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button></div>
-            </div>
-        </div>
-        <div class="sek-color-wrapper">
-            <div class="sek-color-picker"><input class="sek-alpha-color-input" data-alpha="true" type="text" value=""/></div>
-            <div class="sek-reset-button"><button type="button" class="button sek-reset-button sek-float-right"><?php _e( 'Reset', 'text_domain'); ?></button></div>
-        </div>
-    </div><?php // sek-borders ?>
-  <?php
-}
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  BORDER RADIUS INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___border_radius( $input_id, $input_data ) {
-    ?>
-    <?php
-      // we save the int value + unit
-      // we want to keep only the numbers when printing the tmpl
-      // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
-    ?>
-    <div class="sek-borders">
-        <?php //<# //console.log( 'IN php::sek_set_input_tmpl___border_radius() => data range_slide => ', data ); #> ?>
-        <div class="sek-border-type-wrapper">
-            <div aria-label="unit" class="sek-ui-button-group sek-float-left" role="group"><button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('All', 'text-domain');?>" data-sek-radius-type="_all_"><?php _e('All', 'text-domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Top left', 'text-domain');?>" data-sek-radius-type="top_left"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Top right', 'text-domain');?>" data-sek-radius-type="top_right"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Bottom right', 'text-domain');?>" data-sek-radius-type="bottom_right"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Bottom left', 'text-domain');?>" data-sek-radius-type="bottom_left"><i class="material-icons">border_style</i></button></div>
-            <div class="sek-reset-button"><button type="button" class="button sek-reset-button sek-float-right"><?php _e( 'Reset', 'text_domain'); ?></button></div>
-        </div>
-        <div class="sek-range-unit-wrapper">
-            <div class="sek-range-wrapper">
-              <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-              <?php
-              printf( '<input class="sek-range-input" type="range" %1$s %2$s %3$s %4$s/>',
-                ! empty( $input_data['step'] ) ? 'step="'. $input_data['step'] .'"' : '',
-                ! empty( $input_data['unit'] ) ? 'data-unit="'. $input_data['unit'] .'"' : '',
-                ! empty( $input_data['min'] ) ? 'min="'. $input_data['min'] .'"' : 'min="0"',
-                ! empty( $input_data['max'] ) ? 'max="'. $input_data['max'] .'"' : ''
-              );
-              ?>
-            </div>
-            <div class="sek-number-wrapper">
-                <input class="sek-pm-input" value="{{ value }}" type="number"  >
-            </div>
-            <div class="sek-unit-wrapper">
-              <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group" role="group">
-                    <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_domain');?>" data-sek-unit="px"><?php _e('px', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('em', 'text_domain');?>" data-sek-unit="em"><?php _e('em', 'text_domain');?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_domain');?>" data-sek-unit="%"><?php _e('%', 'text_domain');?></button></div>
-            </div>
-        </div>
-    </div><?php // sek-borders ?>
-  <?php
-}
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  MULTIPLE BUTTON CHOICES INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___buttons_choice( $input_id, $input_data ) {
-    ?>
-      <?php //<# //console.log( 'IN php::sek_set_input_tmpl___buttons_choice() => data range_slide => ', data ); #> ?>
-      <?php
-        if ( ! is_array( $input_data ) || empty( $input_data['choices'] ) || ! is_array( $input_data['choices'] ) ) {
-            sek_error_log( __FUNCTION__ . ' error => missing choices property' );
-            return;
-        }
-      ?>
-      <div class="sek-button-choice-wrapper">
-        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-        <div aria-label="<?php _e( 'unit', 'text_domain'); ?>" class="sek-ui-button-group sek-float-right" role="group">
-            <?php
-              foreach( $input_data['choices'] as $choice => $label ) {
-                  printf('<button type="button" aria-pressed="false" class="sek-ui-button" title="%1$s" data-sek-choice="%2$s">%1$s</button>',
-                    $label,
-                    $choice
-                  );
-              }
-            ?>
-        </div>
-      </div>
-  <?php
-}
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  RESET BUTTON INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___reset_button( $input_id, $input_data ) {
-    ?>
-      <?php //<# //console.log( 'IN php::sek_set_input_tmpl___buttons_choice() => data range_slide => ', data ); #> ?>
-      <?php
-        if ( ! is_array( $input_data ) || empty( $input_data['scope'] ) ) {
-            sek_error_log( __FUNCTION__ . ' error => missing scope property' );
-            return;
-        }
-      ?>
-      <div class="sek-button-choice-wrapper">
-        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-        <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Reset', 'text-domain'); ?>" data-sek-reset-scope="<?php echo $input_data['scope']; ?>"><?php _e('Reset', 'text-domain'); ?></button>
-      </div>
-  <?php
-}
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  RESET BUTTON INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___revision_history( $input_id, $input_data ) {
-    ?>
-      <?php //<# //console.log( 'IN php::sek_set_input_tmpl___buttons_choice() => data range_slide => ', data ); #> ?>
-      <?php
-        if ( ! is_array( $input_data ) || empty( $input_data['scope'] ) ) {
-            sek_error_log( __FUNCTION__ . ' error => missing scope property' );
-            return;
-        }
-      ?>
-      <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-  <?php
-}
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  DETACHED WP EDITOR INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___detached_tinymce_editor( $input_id, $input_data ) {
-    ?>
-      <?php ////console.log( 'IN php::sek_set_input_tmpl___detached_tinymce_edito() => input data => ', data ); #> ?>
-      <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="open-tinymce-editor"><?php _e('Edit', 'text_doma' ); ?></button>&nbsp;
-      <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="close-tinymce-editor"><?php _e('Hide editor', 'text_doma' ); ?></button>
-      <input data-czrtype="<?php echo $input_id; ?>" type="hidden" value="{{ data.value }}"/>
-  <?php
-}
-
-/* ------------------------------------------------------------------------- *
- *  WP EDITOR INPUT TEMPLATE
-/* ------------------------------------------------------------------------- */
-function sek_set_input_tmpl___nimble_tinymce_editor( $input_id, $input_data ) {
-    // Added an id attribute for https://github.com/presscustomizr/nimble-builder/issues/403
-    // needed to instantiate wp.editor.initialize(...)
-    ?>
-    <?php //<# console.log( 'IN php::ac_get_default_input_tmpl() => data range_slide => ', data ); #> ?>
-      <textarea id="textarea-{{ data.control_id }}" data-czrtype="<?php echo $input_id; ?>" class="width-100" name="textarea" rows="10" cols="">{{ data.value }}</textarea>
-    <?php
-}
-?>
-<?php
-/* ------------------------------------------------------------------------- *
- *  IMPORT / EXPORT
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___imp_exp( $input_id, $input_data ) {
-    ?>
-      <?php //<# console.log( 'IN php::sek_set_input_tmpl___detached_tinymce_edito() => input data => ', data ); #> ?>
-      <?php // sek_error_log( 'INPUT DATA ??', $input_data ); ?>
-      <div class="sek-export-btn-wrap">
-        <div class="customize-control-title width-100"><?php //_e('Export', 'text_doma'); ?></div>
-        <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-export"><?php _e('Export', 'text_doma' ); ?></button>
-      </div>
-      <div class="sek-import-btn-wrap">
-        <div class="customize-control-title width-100"><?php _e('IMPORT', 'text_doma'); ?></div>
-        <span class="czr-notice"><?php _e('Select the file to import and click on Import button.', 'text_doma' ); ?></span>
-        <span class="czr-notice"><?php _e('Be sure to import a file generated with Nimble Builder export system.', 'text_doma' ); ?></span>
-        <div class="czr-import-dialog notice notice-info">
-            <div class="czr-import-message"><?php _e('Some of the imported sections need a location that is not active on this page. Sections in missing locations will not be rendered. You can continue importing or assign those sections to a contextually active location.', 'text_doma' ); ?></div>
-            <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-import-as-is"><?php _e('Import without modification', 'text_doma' ); ?></button>
-            <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-import-assign"><?php _e('Import in existing locations', 'text_doma' ); ?></button>
-            <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-cancel-import"><?php _e('Cancel import', 'text_doma' ); ?></button>
-        </div>
-        <div class="sek-uploading"><?php _e( 'Uploading...', 'text_doma' ); ?></div>
-        <input type="file" name="sek-import-file" class="sek-import-file" />
-        <input type="hidden" name="sek-skope" value="<?php echo $input_data['scope']; ?>" />
-        <button type="button" class="button disabled" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="<?php echo $input_id; ?>" data-czr-action="sek-pre-import"><?php _e('Import', 'text_doma' ); ?></button>
-
-      </div>
-      <input data-czrtype="<?php echo $input_id; ?>" type="hidden" value="{{ data.value }}"/>
-  <?php
-}
-?>
-<?php
-
-/* ------------------------------------------------------------------------- *
- *  POST GRID LAYOUT PICKER
-/* ------------------------------------------------------------------------- */
-// @fired from  sek_set_input_tmpl_content( $input_type, $input_id, $input_data )
-function sek_set_input_tmpl___grid_layout( $input_id, $input_data ) {
-    ?>
-        <div class="sek-grid-layout-wrapper">
-          <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-          <div class="sek-grid-icons">
-            <div data-sek-grid-layout="list" title="<?php _e('List layout','text_doma'); ?>"><i class="material-icons">view_list</i></div>
-            <div data-sek-grid-layout="grid" title="<?php _e('Grid layout','text_doma'); ?>"><i class="material-icons">view_module</i></div>
-          </div>
-        </div><?php // sek-h-align-wrapper ?>
-    <?php
-}
 ?>
