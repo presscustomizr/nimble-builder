@@ -235,9 +235,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
                                     // setup the initial state + initial click
                                     _control_.container.attr('data-sek-expanded', "false" );
-                                    // if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                    //       $title.trigger('click');
-                                    // }
+                                    if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
+                                          $title.trigger('click');
+                                    }
                               });
                         });//_.each()
                   };//_do_register_()
