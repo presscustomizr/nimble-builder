@@ -34,7 +34,7 @@ function sek_print_nimble_input_templates() {
             input_width = !_.isEmpty( input_data.input_width ) ? input_data.input_width : '';
         #>
 
-        <div class="{{css_attr.sub_set_wrapper}} {{width_100_class}} {{hidden_class}}" data-input-type="{{input_type}}" {{data_transport_attr}}>
+        <div class="{{css_attr.sub_set_wrapper}} {{width_100_class}} {{hidden_class}}" data-input-type="{{input_type}}" <# print(data_transport_attr); #>>
           <# if ( input_data.html_before ) { #>
             <div class="czr-html-before"><# print(input_data.html_before); #></div>
           <# } #>
@@ -51,7 +51,7 @@ function sek_print_nimble_input_templates() {
 
           <?php // nested template, see https://stackoverflow.com/questions/8938841/underscore-js-nested-templates#13649447 ?>
           <?php // about print(), see https://underscorejs.org/#template ?>
-          <div class="czr-input {{input_width}}"><# if ( _.isFunction( data.input_tmpl ) ) { print( data.input_tmpl( data ) ); } #></div>
+          <div class="czr-input {{input_width}}"><# if ( _.isFunction( data.input_tmpl ) ) { print(data.input_tmpl(data)); } #></div>
 
           <# if ( input_data.notice_after ) { #>
             <span class="czr-notice"><# print(input_data.notice_after); #></span>
@@ -91,14 +91,15 @@ function sek_print_nimble_input_templates() {
           value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
           unit = _.isString( value ) ? value.replace(/[0-9]|\.|,/g, '') : 'px';
           unit = _.isEmpty( unit ) ? 'px' : unit;
-          var _step = _.has( item_model, 'step' ) ? 'step="' + item_model.step + '"' : '',
-              _saved_unit = _.has( item_model, 'unit' ) ? 'data-unit="' + item_model.unit + '"' : '',
-              _min = _.has( item_model, 'min' ) ? 'min="' + item_model.min + '"': '',
-              _max = _.has( item_model, 'max' ) ? 'max="' + item_model.max + '"': '';
+          var _step = _.has( data.input_data, 'step' ) ? 'step="' + data.input_data.step + '"' : '',
+              _saved_unit = _.has( item_model, 'unit' ) ? 'data-unit="' + data.input_data.unit + '"' : '',
+              _min = _.has( data.input_data, 'min' ) ? 'min="' + data.input_data.min + '"': '',
+              _max = _.has( data.input_data, 'max' ) ? 'max="' + data.input_data.max + '"': '';
+          console.log('ALORS MAX ?', input_id, value, data.input_data, _max);
         #>
         <div class="sek-range-wrapper">
           <input data-czrtype="{{input_id}}" type="hidden" data-sek-unit="{{unit}}"/>
-          <input class="sek-range-input" type="range" {{_step}} {{_saved_unit}} {{_min}} {{_max}}/>
+          <input class="sek-range-input" type="range" <# print(_step); #> <# print(_saved_unit); #> <# print(_min); #> <# print(_max); #>/>
         </div>
         <div class="sek-number-wrapper">
             <input class="sek-pm-input" value="{{value}}" type="number"  >
@@ -146,7 +147,7 @@ function sek_print_nimble_input_templates() {
               value = _.has( item_model, input_id ) ? item_model[input_id] : null,
               code_type = data.input_data.code_type;
         #>
-        <textarea data-czrtype="{{input_id}}" data-editor-code-type="{{code_type}}" class="width-100" name="textarea" rows="10" cols="">{{ value }}</textarea>
+        <textarea data-czrtype="{{input_id}}" data-editor-code-type="{{code_type}}" class="width-100" name="textarea" rows="10" cols="">{{value}}</textarea>
       </script>
 
 
@@ -219,7 +220,7 @@ function sek_print_nimble_input_templates() {
           _uniqueId = wp.customize.czr_sektions.guid();
         #>
         <div class="nimblecheck-wrap">
-          <input id="nimblecheck-{{_uniqueId}}" data-czrtype="{{input_id}}" type="checkbox" {{ _checked }} class="nimblecheck-input">
+          <input id="nimblecheck-{{_uniqueId}}" data-czrtype="{{input_id}}" type="checkbox" <# print(_checked); #> class="nimblecheck-input">
           <label for="nimblecheck-{{_uniqueId}}" class="nimblecheck-label">{{sektionsLocalizedData.i18n['Switch']}}</label>
         </div>
       </script>
@@ -245,10 +246,6 @@ function sek_print_nimble_input_templates() {
           value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
           unit = _.isString( value ) ? value.replace(/[0-9]|\.|,/g, '') : 'px';
           unit = _.isEmpty( unit ) ? 'px' : unit;
-          var _step = _.has( item_model, 'step' ) ? 'step="' + item_model.step + '"' : '',
-              _saved_unit = _.has( item_model, 'unit' ) ? 'data-unit="' + item_model.unit + '"' : '',
-              _min = _.has( item_model, 'min' ) ? 'min="' + item_model.min + '"': '',
-              _max = _.has( item_model, 'max' ) ? 'max="' + item_model.max + '"': '';
         #>
         <div class="sek-font-size-line-height-wrapper">
           <input data-czrtype="{{input_id}}" type="hidden" data-sek-unit="{{unit}}"/>
@@ -401,7 +398,7 @@ function sek_print_nimble_input_templates() {
       ?>
       <script type="text/html" id="tmpl-nimble-input___text">
         <# var input_data = data.input_data; #>
-        <input data-czrtype="{{data.input_id}}" type="text" value="" placeholder="{{input_data.placeholder}}"></input>
+        <input data-czrtype="{{data.input_id}}" type="text" value="" placeholder="<# print(input_data.placeholder); #>"></input>
       </script>
 
 
@@ -573,6 +570,7 @@ function sek_print_nimble_input_templates() {
 
                 var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
                 styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
+
                 if ( !_.isEmpty(secParams['height']) ) {
                     styleAttr = styleAttr + 'height:' + secParams['height'] + ';';
                 }
