@@ -1659,18 +1659,6 @@ function sek_get_module_collection() {
           'icon' => 'Nimble_posts-list_icon.svg'
         ),
         array(
-          'content-type' => 'module',
-          'content-id' => 'czr_map_module',
-          'title' => __( 'Map', 'text_doma' ),
-          'icon' => 'Nimble_map_icon.svg'
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_social_icons_module',
-          'title' => __( 'Social Profiles', 'text_doma' ),
-          'icon' => 'Nimble_social_icon.svg'
-        ),
-        array(
           'content-type' => 'preset_section',
           'content-id' => 'two_columns',
           'title' => __( 'Two Columns', 'text_doma' ),
@@ -1688,13 +1676,32 @@ function sek_get_module_collection() {
           'title' => __( 'Four Columns', 'text_doma' ),
           'icon' => 'Nimble_4-columns_icon.svg'
         ),
-
         array(
           'content-type' => 'module',
           'content-id' => 'czr_simple_html_module',
           'title' => __( 'Html Content', 'text_doma' ),
           'icon' => 'Nimble_html_icon.svg'
         ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_map_module',
+          'title' => __( 'Map', 'text_doma' ),
+          'icon' => 'Nimble_map_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_widget_area_module',
+          'title' => __( 'WordPress widget area', 'text_doma' ),
+          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
+          //'active' => sek_are_beta_features_enabled()
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_social_icons_module',
+          'title' => __( 'Social Profiles', 'text_doma' ),
+          'icon' => 'Nimble_social_icon.svg'
+        ),
+
         array(
           'content-type' => 'module',
           'content-id' => 'czr_quote_module',
@@ -1719,13 +1726,7 @@ function sek_get_module_collection() {
           'title' => __( 'Simple Contact Form', 'text_doma' ),
           'icon' => 'Nimble_contact-form_icon.svg'
         ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_widget_area_module',
-          'title' => __( 'WordPress widget area', 'text_doma' ),
-          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
-          //'active' => sek_are_beta_features_enabled()
-        ),
+
         array(
           'content-type' => 'module',
           'content-id' => 'czr_menu_module',
