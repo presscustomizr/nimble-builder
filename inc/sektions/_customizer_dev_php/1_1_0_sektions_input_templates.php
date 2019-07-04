@@ -108,7 +108,7 @@ function sek_print_nimble_input_templates() {
 
       <script type="text/html" id="tmpl-nimble-subtemplate___unit_picker">
           <div class="sek-unit-wrapper">
-            <div aria-label="{{sektionsLocalizedData.i18n.unit}}" class="sek-ui-button-group" role="group"><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n.pixels}}" data-sek-unit="px">px</button><button type="button" aria-pressed="false" class="sek-ui-button" title="em" data-sek-unit="em">em</button><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n.percents}}" data-sek-unit="%">%</button></div>
+            <div aria-label="<?php _e('unit', 'text_doma'); ?>" class="sek-ui-button-group" role="group"><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_doma'); ?>" data-sek-unit="px">px</button><button type="button" aria-pressed="false" class="sek-ui-button" title="em" data-sek-unit="em">em</button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_doma'); ?>" data-sek-unit="%">%</button></div>
           </div>
       </script>
 
@@ -128,7 +128,6 @@ function sek_print_nimble_input_templates() {
        * CODE EDITOR
       /* ------------------------------------------------------------------------- */
       ?>
-      <?php /////////////////// range_with_unit_picker_device_switcher ?>
       <?php
       // data structure :
       // {
@@ -160,8 +159,8 @@ function sek_print_nimble_input_templates() {
               value = _.has( item_model, input_id ) ? item_model[input_id] : null,
               code_type = data.input_data.code_type;
         #>
-        <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{input_id}}" data-czr-action="open-tinymce-editor">{{sektionsLocalizedData.i18n['Edit']}}</button>&nbsp;
-        <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{input_id}}" data-czr-action="close-tinymce-editor">{{sektionsLocalizedData.i18n['Hide editor']}}</button>
+        <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{input_id}}" data-czr-action="open-tinymce-editor"><?php _e('Edit', 'text_doma'); ?></button>&nbsp;
+        <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{input_id}}" data-czr-action="close-tinymce-editor"><?php _e('Hide editor', 'text_doma'); ?></button>
         <input data-czrtype="{{input_id}}" type="hidden" value="{{value}}"/>
       </script>
 
@@ -187,9 +186,9 @@ function sek_print_nimble_input_templates() {
         <div class="sek-h-align-wrapper">
           <input data-czrtype="{{input_id}}" type="hidden"/>
           <div class="sek-align-icons">
-            <div data-sek-align="left" title="{{sektionsLocalizedData.i18n['Align left']}}"><i class="material-icons">format_align_left</i></div>
-            <div data-sek-align="center" title="{{sektionsLocalizedData.i18n['Align center']}}"><i class="material-icons">format_align_center</i></div>
-            <div data-sek-align="right" title="{{sektionsLocalizedData.i18n['Align right']}}"><i class="material-icons">format_align_right</i></div>
+            <div data-sek-align="left" title="<?php _e('Align left', 'text_doma'); ?>"><i class="material-icons">format_align_left</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center', 'text_doma'); ?>"><i class="material-icons">format_align_center</i></div>
+            <div data-sek-align="right" title="<?php _e('Align right', 'text_doma'); ?>"><i class="material-icons">format_align_right</i></div>
           </div>
         </div><?php // sek-h-align-wrapper ?>
       </script>
@@ -202,10 +201,10 @@ function sek_print_nimble_input_templates() {
         <div class="sek-h-align-wrapper">
           <input data-czrtype="{{input_id}}" type="hidden"/>
           <div class="sek-align-icons">
-            <div data-sek-align="left" title="{{sektionsLocalizedData.i18n['Align left']}}"><i class="material-icons">format_align_left</i></div>
-            <div data-sek-align="center" title="{{sektionsLocalizedData.i18n['Align center']}}"><i class="material-icons">format_align_center</i></div>
-            <div data-sek-align="right" title="{{sektionsLocalizedData.i18n['Align right']}}"><i class="material-icons">format_align_right</i></div>
-            <div data-sek-align="justify" title="{{sektionsLocalizedData.i18n['Justified']}}"><i class="material-icons">format_align_justify</i></div>
+            <div data-sek-align="left" title="<?php _e('Align left', 'text_doma'); ?>"><i class="material-icons">format_align_left</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center', 'text_doma'); ?>"><i class="material-icons">format_align_center</i></div>
+            <div data-sek-align="right" title="<?php _e('Align right', 'text_doma'); ?>"><i class="material-icons">format_align_right</i></div>
+            <div data-sek-align="justify" title="<?php _e('Justified', 'text_doma'); ?>"><i class="material-icons">format_align_justify</i></div>
           </div>
         </div><?php // sek-h-align-wrapper ?>
       </script>
@@ -226,11 +225,11 @@ function sek_print_nimble_input_templates() {
       </script>
 
 
-      <script type="text/html" id="tmpl-nimble-input___font_picker">
-        <select data-czrtype="{{data.input_id}}"></select>
-      </script>
-
-
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  FONT SIZE / LINE HEIGHT
+      /* ------------------------------------------------------------------------- */
+      ?>
       <script type="text/html" id="tmpl-nimble-input___font_size_line_height">
         <?php
           // we save the int value + unit
@@ -253,13 +252,19 @@ function sek_print_nimble_input_templates() {
         #>
         <div class="sek-font-size-line-height-wrapper">
           <input data-czrtype="{{input_id}}" type="hidden" data-sek-unit="{{unit}}"/>
-          <div aria-label="{{sektionsLocalizedData.i18n.unit}}" class="sek-ui-button-group sek-float-right" role="group">
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n.pixels}}" data-sek-unit="px">px</button><button type="button" aria-pressed="false" class="sek-ui-button" title="em" data-sek-unit="em">em</button><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n.percents}}" data-sek-unit="%">%</button></div>
+          <div aria-label="<?php _e('unit', 'text_doma'); ?>" class="sek-ui-button-group sek-float-right" role="group">
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_doma'); ?>" data-sek-unit="px">px</button><button type="button" aria-pressed="false" class="sek-ui-button" title="em" data-sek-unit="em">em</button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_doma'); ?>" data-sek-unit="%">%</button></div>
           </div>
         </div>
       </script>
 
 
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  ALPHA COLOR
+      /* ------------------------------------------------------------------------- */
+      ?>
       <script type="text/html" id="tmpl-nimble-input___wp_color_alpha">
         <#
           var item_model = data.item_model,
@@ -270,6 +275,11 @@ function sek_print_nimble_input_templates() {
       </script>
 
 
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  SIMPLE SELECT : USED FOR SELECT, FONT PICKER, ICON PICKER, ...
+      /* ------------------------------------------------------------------------- */
+      ?>
       <script type="text/html" id="tmpl-nimble-input___simpleselect">
         <select data-czrtype="{{data.input_id}}"></select>
       </script>
@@ -300,7 +310,7 @@ function sek_print_nimble_input_templates() {
               var unit_tmpl = wp.customize.CZR_Helpers.getInputSubTemplate( 'unit_picker' );
               if ( _.isFunction( unit_tmpl ) ) { print( unit_tmpl( data ) ); }
             #>
-        </div><?php // sek-spacing-wrapper ?>
+        </div>
       </script>
 
 
@@ -316,14 +326,14 @@ function sek_print_nimble_input_templates() {
         <div class="sek-spacing-wrapper">
             <div class="sek-pad-marg-inner">
               <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
-                <div class="sek-flex-center-stretch" data-sek-spacing="margin-top" title="{{sektionsLocalizedData.i18n['Margin top']}}">
+                <div class="sek-flex-center-stretch" data-sek-spacing="margin-top" title="<?php _e('Margin top', 'text_doma'); ?>">
                   <div class="sek-pm-input-parent">
                     <input class="sek-pm-input" value="" type="number"  >
                   </div>
                 </div>
               </div>
               <div class="sek-pm-middle-wrap sek-flex-justify-center">
-                <div class="sek-flex-center-stretch sek-pm-margin-left" data-sek-spacing="margin-left" title="{{sektionsLocalizedData.i18n['Margin left']}}">
+                <div class="sek-flex-center-stretch sek-pm-margin-left" data-sek-spacing="margin-left" title="<?php _e('Margin left', 'text_doma'); ?>">
                   <div class="sek-pm-input-parent">
                     <input class="sek-pm-input" value="" type="number"  >
                   </div>
@@ -331,26 +341,26 @@ function sek_print_nimble_input_templates() {
 
                 <div class="sek-pm-padding-wrapper">
                   <div class="sek-flex-justify-center">
-                    <div class="sek-flex-center-stretch" data-sek-spacing="padding-top" title="{{sektionsLocalizedData.i18n['Padding top']}}">
+                    <div class="sek-flex-center-stretch" data-sek-spacing="padding-top" title="<?php _e('Padding top', 'text_doma'); ?>">
                       <div class="sek-pm-input-parent">
                         <input class="sek-pm-input" value="" type="number"  >
                       </div>
                     </div>
                   </div>
                     <div class="sek-flex-justify-center sek-flex-space-between">
-                      <div class="sek-flex-center-stretch" data-sek-spacing="padding-left" title="{{sektionsLocalizedData.i18n['Padding left']}}">
+                      <div class="sek-flex-center-stretch" data-sek-spacing="padding-left" title="<?php _e('Padding left', 'text_doma'); ?>">
                         <div class="sek-pm-input-parent">
                           <input class="sek-pm-input" value="" type="number"  >
                         </div>
                       </div>
-                      <div class="sek-flex-center-stretch" data-sek-spacing="padding-right" title="{{sektionsLocalizedData.i18n['Padding right']}}">
+                      <div class="sek-flex-center-stretch" data-sek-spacing="padding-right" title="<?php _e('Padding right', 'text_doma'); ?>">
                         <div class="sek-pm-input-parent">
                           <input class="sek-pm-input" value="" type="number"  >
                         </div>
                       </div>
                     </div>
                   <div class="sek-flex-justify-center">
-                    <div class="sek-flex-center-stretch" data-sek-spacing="padding-bottom" title="{{sektionsLocalizedData.i18n['Padding bottom']}}">
+                    <div class="sek-flex-center-stretch" data-sek-spacing="padding-bottom" title="<?php _e('Padding bottom', 'text_doma'); ?>">
                       <div class="sek-pm-input-parent">
                         <input class="sek-pm-input" value="" type="number"  >
                       </div>
@@ -358,7 +368,7 @@ function sek_print_nimble_input_templates() {
                   </div>
                 </div>
 
-                <div class="sek-flex-center-stretch sek-pm-margin-right" data-sek-spacing="margin-right" title="{{sektionsLocalizedData.i18n['Margin right']}}">
+                <div class="sek-flex-center-stretch sek-pm-margin-right" data-sek-spacing="margin-right" title="<?php _e('Margin right', 'text_doma'); ?>">
                   <div class="sek-pm-input-parent">
                     <input class="sek-pm-input" value="" type="number"  >
                   </div>
@@ -366,7 +376,7 @@ function sek_print_nimble_input_templates() {
               </div>
 
               <div class="sek-pm-top-bottom-wrap sek-flex-justify-center">
-                <div class="sek-flex-center-stretch" data-sek-spacing="margin-bottom" title="{{sektionsLocalizedData.i18n['Margin bottom']}}">
+                <div class="sek-flex-center-stretch" data-sek-spacing="margin-bottom" title="<?php _e('Margin bottom', 'text_doma'); ?>">
                   <div class="sek-pm-input-parent">
                     <input class="sek-pm-input" value="" type="number"  >
                   </div>
@@ -425,7 +435,7 @@ function sek_print_nimble_input_templates() {
       <script type="text/html" id="tmpl-nimble-input___borders">
         <div class="sek-borders">
           <div class="sek-border-type-wrapper">
-            <div aria-label="unit" class="sek-ui-button-group" role="group"><button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="{{sektionsLocalizedData.i18n['All']}}" data-sek-border-type="_all_">{{sektionsLocalizedData.i18n['All']}}</button><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n['Left']}}" data-sek-border-type="left">{{sektionsLocalizedData.i18n['Left']}}</button><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n['Top']}}" data-sek-border-type="top">{{sektionsLocalizedData.i18n['Top']}}</button><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n['Right']}}" data-sek-border-type="right">{{sektionsLocalizedData.i18n['Right']}}</button><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n['Bottom']}}" data-sek-border-type="bottom">{{sektionsLocalizedData.i18n['Bottom']}}</button></div>
+            <div aria-label="unit" class="sek-ui-button-group" role="group"><button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('All', 'text_doma'); ?>" data-sek-border-type="_all_"><?php _e('All', 'text_doma'); ?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Left', 'text_doma'); ?>" data-sek-border-type="left"><?php _e('Left', 'text_doma'); ?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Top', 'text_doma'); ?>" data-sek-border-type="top"><?php _e('Top', 'text_doma'); ?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Right', 'text_doma'); ?>" data-sek-border-type="right"><?php _e('Right', 'text_doma'); ?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Bottom', 'text_doma'); ?>" data-sek-border-type="bottom"><?php _e('Bottom', 'text_doma'); ?></button></div>
           </div>
           <div class="sek-range-unit-wrapper">
             <#
@@ -437,7 +447,7 @@ function sek_print_nimble_input_templates() {
           </div>
           <div class="sek-color-wrapper">
               <div class="sek-color-picker"><input class="sek-alpha-color-input" data-alpha="true" type="text" value=""/></div>
-              <div class="sek-reset-button"><button type="button" class="button sek-reset-button sek-float-right">{{sektionsLocalizedData.i18n['Reset']}}</button></div>
+              <div class="sek-reset-button"><button type="button" class="button sek-reset-button sek-float-right"><?php _e('Reset', 'text_doma'); ?></button></div>
           </div>
         </div>
       </script>
@@ -451,8 +461,8 @@ function sek_print_nimble_input_templates() {
       <script type="text/html" id="tmpl-nimble-input___border_radius">
         <div class="sek-borders">
           <div class="sek-border-type-wrapper">
-            <div aria-label="unit" class="sek-ui-button-group sek-float-left" role="group"><button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="{{sektionsLocalizedData.i18n['All']}}" data-sek-radius-type="_all_">{{sektionsLocalizedData.i18n['All']}}</button><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n['Top left']}}" data-sek-radius-type="top_left"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n['Top right']}}" data-sek-radius-type="top_right"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n['Bottom right']}}" data-sek-radius-type="bottom_right"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n['Bottom left']}}" data-sek-radius-type="bottom_left"><i class="material-icons">border_style</i></button></div>
-            <div class="sek-reset-button"><button type="button" class="button sek-reset-button sek-float-right">{{sektionsLocalizedData.i18n['Reset']}}</button></div>
+            <div aria-label="unit" class="sek-ui-button-group sek-float-left" role="group"><button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('All', 'text_doma'); ?>" data-sek-radius-type="_all_"><?php _e('All', 'text_doma'); ?></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Top left', 'text_doma'); ?>" data-sek-radius-type="top_left"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Top right', 'text_doma'); ?>" data-sek-radius-type="top_right"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Bottom right', 'text_doma'); ?>" data-sek-radius-type="bottom_right"><i class="material-icons">border_style</i></button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Bottom left', 'text_doma'); ?>" data-sek-radius-type="bottom_left"><i class="material-icons">border_style</i></button></div>
+            <div class="sek-reset-button"><button type="button" class="button sek-reset-button sek-float-right"><?php _e('Reset', 'text_doma'); ?></button></div>
           </div>
           <div class="sek-range-unit-wrapper">
             <#
@@ -476,9 +486,9 @@ function sek_print_nimble_input_templates() {
       <script type="text/html" id="tmpl-nimble-input___content_type_switcher">
         <input data-czrtype="{{data.input_id}}" type="hidden"/>
         <div class="sek-content-type-wrapper">
-            <div aria-label="{{sektionsLocalizedData.i18n['Content type']}}" class="sek-ui-button-group" role="group">
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n['Pick a section']}}" data-sek-content-type="section">{{sektionsLocalizedData.i18n['Pick a section']}}</button>
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="{{sektionsLocalizedData.i18n['Pick a module']}}" data-sek-content-type="module">{{sektionsLocalizedData.i18n['Pick a module']}}</button>
+            <div aria-label="<?php _e('Content type', 'text_doma'); ?>" class="sek-ui-button-group" role="group">
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a section', 'text_doma'); ?>" data-sek-content-type="section"><?php _e('Pick a section', 'text_doma'); ?></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a module', 'text_doma'); ?>" data-sek-content-type="module"><?php _e('Pick a module', 'text_doma'); ?></button>
             </div>
         </div>
       </script>
@@ -514,11 +524,11 @@ function sek_print_nimble_input_templates() {
                 } else if ( ! _.isEmpty( modData['font_icon'] ) ) {
                     icon_img_html = modData['font_icon'];
                 }
-                var title_attr = sektionsLocalizedData.i18n['Drag and drop or double-click to insert in your chosen target element.'],
+                var title_attr = "<?php _e('Drag and drop or double-click to insert in your chosen target element.', 'text_doma'); ?>",
                     font_icon_class = !_.isEmpty( modData['font_icon'] ) ? 'is-font-icon' : '',
                     is_draggable = true !== modData['active'] ? 'false' : 'true';
                 if ( true !== modData['active'] ) {
-                    title_attr = sektionsLocalizedData.i18n['Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features'];
+                    title_attr = "<?php _e('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'); ?>";
                 }
                 #>
                 <div draggable="{{is_draggable}}" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div></div>
@@ -574,8 +584,221 @@ function sek_print_nimble_input_templates() {
             #>
         </div>
       </script>
+
+
+
       <?php
-}
+      /* ------------------------------------------------------------------------- *
+       *  BACKGROUND POSITION INPUT
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___bg_position">
+        <div class="sek-bg-pos-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="top_left">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M14.96 16v-1h-1v-1h-1v-1h-1v-1h-1v-1.001h-1V14h-1v-4-1h5v1h-3v.938h1v.999h1v1h1v1.001h1v1h1V16h-1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="top">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M14.969 12v-1h-1v-1h-1v7h-1v-7h-1v1h-1v1h-1v-1.062h1V9.937h1v-1h1V8h1v.937h1v1h1v1.001h1V12h-1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="top_right">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M9.969 16v-1h1v-1h1v-1h1v-1h1v-1.001h1V14h1v-4-1h-1-4v1h3v.938h-1v.999h-1v1h-1v1.001h-1v1h-1V16h1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="left">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M11.469 9.5h-1v1h-1v1h7v1h-7v1h1v1h1v1h-1.063v-1h-1v-1h-1v-1h-.937v-1h.937v-1h1v-1h1v-1h1.063v1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="center">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="right">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M12.469 14.5h1v-1h1v-1h-7v-1h7v-1h-1v-1h-1v-1h1.062v1h1v1h1v1h.938v1h-.938v1h-1v1h-1v1h-1.062v-1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="bottom_left">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M14.969 9v1h-1v1h-1v1h-1v1h-1v1.001h-1V11h-1v5h5v-1h-3v-.938h1v-.999h1v-1h1v-1.001h1v-1h1V9h-1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="bottom">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M9.969 13v1h1v1h1V8h1v7h1v-1h1v-1h1v1.063h-1v.999h-1v1.001h-1V17h-1v-.937h-1v-1.001h-1v-.999h-1V13h1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+          <label class="sek-bg-pos">
+            <input type="radio" name="sek-bg-pos" value="bottom_right">
+            <span>
+              <svg width="24" height="24">
+                <path id="sek-pth" fill-rule="evenodd" d="M9.969 9v1h1v1h1v1h1v1h1v1.001h1V11h1v5h-1-4v-1h3v-.938h-1v-.999h-1v-1h-1v-1.001h-1v-1h-1V9h1z" class="sek-svg-bg-pos">
+                </path>
+              </svg>
+            </span>
+          </label>
+        </div><?php // sek-bg-pos-wrapper ?>
+      </script>
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  BUTTON CHOICE
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___buttons_choice">
+        <div class="sek-button-choice-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <div aria-label="<?php _e('unit', 'text_doma'); ?>" class="sek-ui-button-group sek-float-right" role="group">
+              <#
+                var input_data = data.input_data;
+                if ( _.isEmpty( input_data.choices ) || !_.isObject( input_data.choices ) ) {
+                    wp.customize.errare( 'Error in buttons_choice js tmpl => missing or invalid input_data.choices');
+                } else {
+                    _.each( input_data.choices, function( label, choice ) {
+                        #><button type="button" aria-pressed="false" class="sek-ui-button" title="{{label}}" data-sek-choice="{{choice}}">{{label}}</button><#
+                    });
+                }
+              #>
+          </div>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  MULTISELECT, CATEGORY PICKER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___multiselect">
+        <select multiple="multiple" data-czrtype="{{data.input_id}}"></select>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  GRID LAYOUT
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___grid_layout">
+        <div class="sek-grid-layout-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <div class="sek-grid-icons">
+            <div data-sek-grid-layout="list" title="<?php _e('List layout', 'text_doma'); ?>"><i class="material-icons">view_list</i></div>
+            <div data-sek-grid-layout="grid" title="<?php _e('Grid layout', 'text_doma'); ?>"><i class="material-icons">view_module</i></div>
+          </div>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  VERTICAL ALIGNMENT
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___v_alignment">
+        <div class="sek-v-align-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <div class="sek-align-icons">
+            <div data-sek-align="top" title="<?php _e('Align top', 'text_doma'); ?>"><i class="material-icons">vertical_align_top</i></div>
+            <div data-sek-align="center" title="<?php _e('Align center', 'text_doma'); ?>"><i class="material-icons">vertical_align_center</i></div>
+            <div data-sek-align="bottom" title="<?php _e('Align bottom', 'text_doma'); ?>"><i class="material-icons">vertical_align_bottom</i></div>
+          </div>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  RESET BUTTON
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___reset_button">
+        <div class="sek-button-choice-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Reset', 'text_doma'); ?>" data-sek-reset-scope="{{data.input_data.scope}}"><?php _e('Reset', 'text_doma'); ?></button>
+        </div>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  REVISION HISTORY / HIDDEN
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___revision_history">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
+      </script>
+
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  IMPORT / EXPORT
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___import_export">
+        <div class="sek-export-btn-wrap">
+          <div class="customize-control-title width-100"><?php //_e('Export', 'text_doma'); ?></div>
+          <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-export"><?php _e('Export', 'text_doma' ); ?></button>
+        </div>
+        <div class="sek-import-btn-wrap">
+          <div class="customize-control-title width-100"><?php _e('IMPORT', 'text_doma'); ?></div>
+          <span class="czr-notice"><?php _e('Select the file to import and click on Import button.', 'text_doma' ); ?></span>
+          <span class="czr-notice"><?php _e('Be sure to import a file generated with Nimble Builder export system.', 'text_doma' ); ?></span>
+          <div class="czr-import-dialog notice notice-info">
+              <div class="czr-import-message"><?php _e('Some of the imported sections need a location that is not active on this page. Sections in missing locations will not be rendered. You can continue importing or assign those sections to a contextually active location.', 'text_doma' ); ?></div>
+              <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-import-as-is"><?php _e('Import without modification', 'text_doma' ); ?></button>
+              <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-import-assign"><?php _e('Import in existing locations', 'text_doma' ); ?></button>
+              <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-cancel-import"><?php _e('Cancel import', 'text_doma' ); ?></button>
+          </div>
+          <div class="sek-uploading"><?php _e( 'Uploading...', 'text_doma' ); ?></div>
+          <input type="file" name="sek-import-file" class="sek-import-file" />
+          <input type="hidden" name="sek-skope" value="{{data.input_data.scope}}" />
+          <button type="button" class="button disabled" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-pre-import"><?php _e('Import', 'text_doma' ); ?></button>
+
+        </div>
+        <input data-czrtype="{{data.input_id}}" type="hidden" value="{{data.value}}"/>
+      </script>
+      <?php
+}//sek_print_nimble_input_templates() @hook 'customize_controls_print_footer_scripts'
 
 
 

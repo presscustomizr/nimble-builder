@@ -17,6 +17,7 @@
                   case 'select' ://<= used in the customizr and hueman theme
                   case 'simpleselect' ://<=used in Nimble Builder
                   case 'fa_icon_picker' :
+                  case 'font_picker':
                         template_name = 'simpleselect';
                   break;
 
@@ -53,6 +54,20 @@
                   case 'upload' :
                   case 'upload_url' :
                         template_name = 'upload';
+                  break;
+
+                  case 'bg_position' :
+                  case 'bgPositionWithDeviceSwitcher' :
+                        template_name = 'bg_position';
+                  break;
+
+                  case 'multiselect':
+                  case 'category_picker':
+                        template_name = 'multiselect';
+                  break;
+
+                  case 'verticalAlignWithDeviceSwitcher' :
+                        template_name = 'v_alignment';
                   break;
             }
             if ( $('#tmpl-nimble-input___' + template_name ).length > 0 ) {
@@ -93,7 +108,6 @@
                   dfd.reject( 'api.CZR_Helpers.getModuleTmpl => missing tmpl or module_type param' );
             }
 
-            console.log('ARGS ?', args );
             if ( ! api.czr_sektions.isModuleRegistered( args.module_type ) ) {
                   dfd.reject( 'api.CZR_Helpers.getModuleTmpl => module type not registered' );
                   dfd.resolve();
@@ -139,22 +153,62 @@
             // Loop on the item input map and render the input
             // the rendering uses a nested _ template mechanism
             // see https://stackoverflow.com/questions/8938841/underscore-js-nested-templates#13649447
-            _.each( item_input_map, function( input_data, input_id ){
-                  input_type = input_data.input_type;
-                  // render generic input wrapper
-                  try { input_html +=  wp.template( 'nimble-input-wrapper' )( {
-                      input_type : input_type,
-                      input_data : input_data,
-                      input_id : input_id,
-                      item_model : item_model,
-                      input_tmpl : getInputTemplate( input_type ),
-                      control_id : args.control_id //<= needed for some modules like tiny_mce_editor
-                  }); } catch( er ) {
-                        api.errare( 'getModuleTmpl => Error when parsing the nimble-input-wrapper template', er );
-                        dfd.reject( 'getModuleTmpl => Error when parsing the nimble-input-wrapper template');
-                        return false;
-                  }
-            });
+            var renderInputCollection = function( inputCollection ) {
+                  var _html = '';
+                  _.each( inputCollection, function( input_data, input_id ){
+                        input_type = input_data.input_type;
+                        // render generic input wrapper
+                        try { _html +=  wp.template( 'nimble-input-wrapper' )( {
+                            input_type : input_type,
+                            input_data : input_data,
+                            input_id : input_id,
+                            item_model : item_model,
+                            input_tmpl : getInputTemplate( input_type ),
+                            control_id : args.control_id //<= needed for some modules like tiny_mce_editor
+                        }); } catch( er ) {
+                              api.errare( 'getModuleTmpl => Error when parsing the nimble-input-wrapper template', er );
+                              dfd.reject( 'getModuleTmpl => Error when parsing the nimble-input-wrapper template');
+                              return false;
+                        }
+                  });
+                  return _html;
+            };//renderInputCollection
+
+
+            // GENERATE MODULE HTML : two cases, with or without tabs
+            if ( item_input_map.tabs ) {
+                  var _tabNavHtml = '', _tabContentHtml ='';
+
+                  _.each( item_input_map.tabs, function( rawTabData, tabKey ) {
+                        // normalizes
+                        var tabData = $.extend( true, {}, rawTabData );
+                        tabData = $.extend( { inputs : {}, title : '' }, tabData );
+                        // generate tab nav html
+                        var _attributes = !_.isEmpty( tabData.attributes ) ? tabData.attributes : '';
+                        _tabNavHtml += '<li data-tab-id="section-topline-' + ( +tabKey+1 ) +'" '+ _attributes +'><a href="#" title="' + tabData.title + '"><span>' + tabData.title +'</span></a></li>';
+                        // generate tab content html
+                        var _inputCollectionHtml = renderInputCollection( tabData.inputs );
+                        _tabContentHtml += '<section id="section-topline-' + ( +tabKey+1 ) +'">' + _inputCollectionHtml +'</section>';
+                  });
+
+
+                  // put it all together
+                  input_html += [
+                      '<div class="tabs tabs-style-topline">',
+                        '<nav>',
+                          '<ul>',
+                            _tabNavHtml,
+                          '</ul>',
+                        '</nav>',
+                        '<div class="content-wrap">',
+                          _tabContentHtml,
+                        '</div>',
+                      '</div>',
+                  ].join('');
+
+            } else {
+                  input_html = renderInputCollection(item_input_map);
+            }
 
 
 

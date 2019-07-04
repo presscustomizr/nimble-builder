@@ -838,6 +838,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // "this" is the input
             maybeSetupDeviceSwitcherForInput : function() {
                   var input = this;
+                  // If this has already been done, let's stop now
+                  if ( input.previewedDevice )
+                    return;
                   // render the device switcher before the input title
                   var deviceSwitcherHtml = [
                         '<span class="sek-input-device-switcher">',
@@ -847,7 +850,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         '</span>'
                   ].join(' ');
 
-                  input.container.find('.customize-control-title').prepend( deviceSwitcherHtml );
+                  input.container.find('.customize-control-title').first().prepend( deviceSwitcherHtml );
                   input.previewedDevice = new api.Value( api.previewedDevice() );
 
 
