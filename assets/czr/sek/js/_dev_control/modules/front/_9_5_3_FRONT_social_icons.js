@@ -107,7 +107,7 @@
                         api.CZRItem.prototype.ready.call( item );
                   },
 
-                  //
+
                   _buildTitle : function( title, icon, color ) {
                           var item = this,
                               module     = item.module;
@@ -153,6 +153,10 @@
                         });
                   },
 
+                  // Overrides the default fmk method in order to disable the remove dialog box
+                  toggleRemoveAlert : function() {
+                        this.removeItem();
+                  },
 
                   // Overrides the default fmk method, to disable the default preview refresh
                   //fired on click dom event
@@ -160,6 +164,7 @@
                   //@return void()
                   //@param params : { dom_el : {}, dom_event : {}, event : {}, model {} }
                   removeItem : function( params ) {
+                        params = params || {};
                         var item = this,
                             module = this.module,
                             _new_collection = _.clone( module.itemCollection() );
