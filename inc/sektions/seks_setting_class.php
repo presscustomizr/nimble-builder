@@ -149,14 +149,16 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
           'skope_id' => $this->skope_id
       ) );
 
-      // Try to write the CSS
-      new Sek_Dyn_CSS_Handler( array(
-          'id'             => $this->skope_id,
-          'skope_id'       => $this->skope_id,
-          'mode'           => Sek_Dyn_CSS_Handler::MODE_FILE,
-          'customizer_save' => true,//<= indicating that we are in a customizer_save scenario will tell the dyn css class to only write the css file + save the google fonts, not schedule the enqueuing
-          'force_rewrite'  => true //<- write even if the file exists
-      ) );
+      if ( NIMBLE_GLOBAL_SKOPE_ID !== $this->skope_id ) {
+          // Try to write the CSS
+          new Sek_Dyn_CSS_Handler( array(
+              'id'             => $this->skope_id,
+              'skope_id'       => $this->skope_id,
+              'mode'           => Sek_Dyn_CSS_Handler::MODE_FILE,
+              'customizer_save' => true,//<= indicating that we are in a customizer_save scenario will tell the dyn css class to only write the css file + save the google fonts, not schedule the enqueuing
+              'force_rewrite'  => true //<- write even if the file exists
+          ) );
+      }
 
       // sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => $seks_collection', $seks_collection);
 

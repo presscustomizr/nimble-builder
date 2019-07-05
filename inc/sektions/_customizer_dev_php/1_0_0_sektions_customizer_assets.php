@@ -17,6 +17,19 @@ function sek_update_most_used_gfonts( $manager ) {
 }
 
 
+add_action('customize_save_after', '\Nimble\sek_maybe_write_global_stylesheet');
+function sek_maybe_write_global_stylesheet( $manager ) {
+    // Try to write the CSS
+    new Sek_Dyn_CSS_Handler( array(
+        'id'             => NIMBLE_GLOBAL_SKOPE_ID,
+        'skope_id'       => NIMBLE_GLOBAL_SKOPE_ID,
+        'mode'           => Sek_Dyn_CSS_Handler::MODE_FILE,
+        'customizer_save' => true,//<= indicating that we are in a customizer_save scenario will tell the dyn css class to only write the css file + save the google fonts, not schedule the enqueuing
+        'force_rewrite'  => true, //<- write even if the file exists
+        'is_global_stylesheet' => true
+    ) );
+}
+
 // @return array of all gfonts used in the site
 // the duplicates are not removed, because we order the fonts by number of occurences in javascript.
 // @see js control::font_picker in api.czrInputMap
