@@ -115,7 +115,6 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
 
         // @param params = array( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) )
         private function _instantiate_css_handler( $params = array() ) {
-            sek_error_log('instantiate css handler', $params );
             $params = wp_parse_args( $params, array( 'skope_id' => '', 'is_global_stylesheet' => false ) );
             $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
                 'id'             => $params['skope_id'],

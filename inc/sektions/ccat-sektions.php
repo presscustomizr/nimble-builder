@@ -1659,18 +1659,6 @@ function sek_get_module_collection() {
           'icon' => 'Nimble_posts-list_icon.svg'
         ),
         array(
-          'content-type' => 'module',
-          'content-id' => 'czr_map_module',
-          'title' => __( 'Map', 'text_doma' ),
-          'icon' => 'Nimble_map_icon.svg'
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_social_icons_module',
-          'title' => __( 'Social Profiles', 'text_doma' ),
-          'icon' => 'Nimble_social_icon.svg'
-        ),
-        array(
           'content-type' => 'preset_section',
           'content-id' => 'two_columns',
           'title' => __( 'Two Columns', 'text_doma' ),
@@ -1688,13 +1676,32 @@ function sek_get_module_collection() {
           'title' => __( 'Four Columns', 'text_doma' ),
           'icon' => 'Nimble_4-columns_icon.svg'
         ),
-
         array(
           'content-type' => 'module',
           'content-id' => 'czr_simple_html_module',
           'title' => __( 'Html Content', 'text_doma' ),
           'icon' => 'Nimble_html_icon.svg'
         ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_map_module',
+          'title' => __( 'Map', 'text_doma' ),
+          'icon' => 'Nimble_map_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_widget_area_module',
+          'title' => __( 'WordPress widget area', 'text_doma' ),
+          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
+          //'active' => sek_are_beta_features_enabled()
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_social_icons_module',
+          'title' => __( 'Social Profiles', 'text_doma' ),
+          'icon' => 'Nimble_social_icon.svg'
+        ),
+
         array(
           'content-type' => 'module',
           'content-id' => 'czr_quote_module',
@@ -1719,13 +1726,7 @@ function sek_get_module_collection() {
           'title' => __( 'Simple Contact Form', 'text_doma' ),
           'icon' => 'Nimble_contact-form_icon.svg'
         ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_widget_area_module',
-          'title' => __( 'WordPress widget area', 'text_doma' ),
-          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
-          //'active' => sek_are_beta_features_enabled()
-        ),
+
         array(
           'content-type' => 'module',
           'content-id' => 'czr_menu_module',
@@ -2379,7 +2380,7 @@ function sek_add_customize_link() {
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
           __('Nimble Builder','text_domain_to_replace'),
           __('Add sections in live preview with Nimble Builder', 'text_domain'),
-          __( 'Nimble Builder', 'text_domain' )
+          __( 'Build with Nimble Builder', 'text_domain' )
       ),
       'href'   => $customize_url,
       'meta'   => array(
@@ -2398,20 +2399,23 @@ function sek_get_customize_url_when_is_admin( $ajax_server_request_uri = '') {
     $current_screen = get_current_screen();
     $post = get_post();
 
-    if ( 'post' == $current_screen->base
-        && 'add' != $current_screen->action
-        && ( $post_type_object = get_post_type_object( $post->post_type ) )
-        && current_user_can( 'read_post', $post->ID )
-        && ( $post_type_object->public )
-        && ( $post_type_object->show_in_admin_bar ) )
-    {
-        if ( 'draft' == $post->post_status ) {
-            $preview_link = get_preview_post_link( $post );
-            $customize_url = esc_url( $preview_link );
-        } else {
-            $customize_url = get_permalink( $post->ID );
-        }
-    } elseif ( 'edit' == $current_screen->base
+    // July 2019 => Don't display the admin button in post and pages, where we already have the edit button next to the post title
+    // if ( 'post' == $current_screen->base
+    //     && 'add' != $current_screen->action
+    //     && ( $post_type_object = get_post_type_object( $post->post_type ) )
+    //     && current_user_can( 'read_post', $post->ID )
+    //     && ( $post_type_object->public )
+    //     && ( $post_type_object->show_in_admin_bar ) )
+    // {
+    //     if ( 'draft' == $post->post_status ) {
+    //         $preview_link = get_preview_post_link( $post );
+    //         $customize_url = esc_url( $preview_link );
+    //     } else {
+    //         $customize_url = get_permalink( $post->ID );
+    //     }
+    // } else
+
+    if ( 'edit' == $current_screen->base
         && ( $post_type_object = get_post_type_object( $current_screen->post_type ) )
         && ( $post_type_object->public )
         && ( $post_type_object->show_in_admin_bar )
@@ -6377,7 +6381,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
 
     // DEFAULT TEXT OPTIONS
     // Font Family
-    if ( !empty( $text_options['default_font_family'] ) ) {
+    if ( !empty( $text_options['default_font_family'] ) && 'none' !== $text_options['default_font_family'] ) {
         $rules[] = array(
             'selector'    => $default_text_selector,
             'css_rules'   => sprintf( '%1$s:%2$s;', 'font-family', sek_extract_css_font_family_from_customizer_option( $text_options['default_font_family'] ) ),
@@ -6454,7 +6458,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
 
     // HEADINGS OPTIONS
     // Font Family
-    if ( !empty( $text_options['headings_font_family'] ) ) {
+    if ( !empty( $text_options['headings_font_family'] ) && 'none' !== $text_options['headings_font_family'] ) {
         $rules[] = array(
             'selector'    => $headings_selector,
             'css_rules'   => sprintf( '%1$s:%2$s;', 'font-family', sek_extract_css_font_family_from_customizer_option( $text_options['headings_font_family'] ) ),
@@ -6466,8 +6470,6 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
 
 
     $global_text_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
-
-    //sek_error_log('ALORS CSS ?', $global_text_options_css );
 
     return is_string( $global_text_options_css ) ? $css . $global_text_options_css : $css;
 
@@ -12557,15 +12559,19 @@ class Sek_Dyn_CSS_Handler {
 
         //hook setup for printing or enqueuing
         //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
-        if ( ! $this->customizer_save ) {
-            $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
-        } else {
-            //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
-            if ( $this->css_string_to_enqueue_or_print ) {
-                $this->sek_dyn_css_maybe_write_css_file();
+        //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
+
+        // Do we have any rules to print / enqueue ?
+        // If yes, print in the dom or enqueue depending on the current context ( customization or front )
+        // If not, delete any previouly created stylesheet
+        if ( $this->css_string_to_enqueue_or_print ) {
+            if ( ! $this->customizer_save ) {
+                $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
             } else {
-                $this->sek_dyn_css_maybe_delete_file();
+                $this->sek_dyn_css_maybe_write_css_file();
             }
+        } else {
+            $this->sek_dyn_css_maybe_delete_file();
         }
     }//__construct
 
@@ -16092,11 +16098,8 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 // LOCAL SECTIONS STYLESHEET
                 $this->_instantiate_css_handler( array( 'skope_id' => skp_build_skope_id() ) );
                 // GLOBAL SECTIONS STYLESHEET
-                // always printed when customizing
-                // otherwise, printed if !is_null( sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID ) )
-                if ( sek_has_global_sections() ) {
-                    $this->_instantiate_css_handler( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) );
-                }
+                // Can hold rules for global sections and global styling
+                $this->_instantiate_css_handler( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) );
             }
             $google_fonts_print_candidates = $this->sek_get_gfont_print_candidates( $local_skope_id );
 

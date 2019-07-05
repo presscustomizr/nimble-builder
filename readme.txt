@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.7-beta
+Stable tag: 1.8.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -15,8 +15,8 @@ Powerful drag and drop page builder using the native WordPress customizer.
 
 == Description ==
 = What is Nimble Page Builder ? =
-**[Nimble Page Builder](https://nimblebuilder.com/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** is an easy to use yet powerful page builder plugin for WordPress. Nimble Builder uses the live customizer which is the native WordPress interface for real-time design.
-The plugin allows you to drag-and-drop modules like text-editor, post grids, images, contact forms, maps, icons, or beautiful pre-built sections with a [parallax background](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), into any page of your site. You can edit your sections in real-time, and then click "publish" when you are happy with the result, or save for later.
+**[Nimble Page Builder](https://nimblebuilder.com/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** is a fast and agile page builder plugin for WordPress. Nimble Builder uses the live customizer which is the native and powerful WordPress interface for real-time design.
+The plugin allows you to easily drag-and-drop modules like text-editor, post grids, images, contact forms, maps, icons, or beautiful pre-built sections with a [parallax background](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), into any page of your site. You can edit your sections in real-time, and then click "publish" when you are happy with the result, or save for later.
 
 Watch the video below to see how this [demo page](https://demo.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) has been built !
 
@@ -109,10 +109,15 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.6 =
-Fixes minor problems in the social icons module and the grid module.
+= 1.8.7 =
+This release brings significant speed improvements of the customizing user interface. It also fixes a problem with the global styling options.
 
 == Changelog ==
+= 1.8.7 : July 5th 2019 =
+* fixed : global stylesheet ( for global styling ) might not be printed when the page has no global sections
+* fixed : preview not refreshed on page reset
+* improved : significant performance improvements of the the customizing user interface
+
 = 1.8.6 : July 1st 2019 =
 * fixed : the preview frame should not be refreshed when removing an item of the social icons module
 * fixed : Grid Module => when customizing, the post in "draft" status are showing up

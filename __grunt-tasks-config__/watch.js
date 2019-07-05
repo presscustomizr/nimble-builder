@@ -143,7 +143,7 @@ module.exports = {
     ],
     tasks : [
       'concat:czr_sektions_front_php',
-      'comments:sektions_front_php'
+      //'comments:sektions_front_php'
     ],
   },
 
@@ -158,7 +158,7 @@ module.exports = {
     ],
     tasks : [
       'concat:czr_sektions_customizer_php',
-      'comments:sektions_customizer_php'
+      //'comments:sektions_customizer_php'
     ],
   },
 
@@ -198,7 +198,7 @@ module.exports = {
     tasks : [
       'jshint:sektion_customizer_js',
       'concat:czr_sektions_customizer_control_js',
-      'comments:czr_base_control_js'
+      //'comments:czr_base_control_js'
     ],
   },
 
@@ -226,7 +226,7 @@ module.exports = {
     tasks : [
       'jshint:sektion_customizer_js',
       'concat:czr_sektions_customizer_preview_js',
-      'comments:czr_base_preview_js'
+      //'comments:czr_base_preview_js'
     ],
   },
 

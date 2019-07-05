@@ -17,6 +17,19 @@ function sek_update_most_used_gfonts( $manager ) {
 }
 
 
+add_action('customize_save_after', '\Nimble\sek_maybe_write_global_stylesheet');
+function sek_maybe_write_global_stylesheet( $manager ) {
+    // Try to write the CSS
+    new Sek_Dyn_CSS_Handler( array(
+        'id'             => NIMBLE_GLOBAL_SKOPE_ID,
+        'skope_id'       => NIMBLE_GLOBAL_SKOPE_ID,
+        'mode'           => Sek_Dyn_CSS_Handler::MODE_FILE,
+        'customizer_save' => true,//<= indicating that we are in a customizer_save scenario will tell the dyn css class to only write the css file + save the google fonts, not schedule the enqueuing
+        'force_rewrite'  => true, //<- write even if the file exists
+        'is_global_stylesheet' => true
+    ) );
+}
+
 // @return array of all gfonts used in the site
 // the duplicates are not removed, because we order the fonts by number of occurences in javascript.
 // @see js control::font_picker in api.czrInputMap
@@ -925,7 +938,7 @@ function sek_print_nimble_input_templates() {
             input_width = !_.isEmpty( input_data.input_width ) ? input_data.input_width : '';
         #>
 
-        <div class="{{css_attr.sub_set_wrapper}} {{width_100_class}} {{hidden_class}}" data-input-type="{{input_type}}" {{data_transport_attr}}>
+        <div class="{{css_attr.sub_set_wrapper}} {{width_100_class}} {{hidden_class}}" data-input-type="{{input_type}}" <# print(data_transport_attr); #>>
           <# if ( input_data.html_before ) { #>
             <div class="czr-html-before"><# print(input_data.html_before); #></div>
           <# } #>
@@ -942,7 +955,7 @@ function sek_print_nimble_input_templates() {
 
           <?php // nested template, see https://stackoverflow.com/questions/8938841/underscore-js-nested-templates#13649447 ?>
           <?php // about print(), see https://underscorejs.org/#template ?>
-          <div class="czr-input {{input_width}}"><# if ( _.isFunction( data.input_tmpl ) ) { print( data.input_tmpl( data ) ); } #></div>
+          <div class="czr-input {{input_width}}"><# if ( _.isFunction( data.input_tmpl ) ) { print(data.input_tmpl(data)); } #></div>
 
           <# if ( input_data.notice_after ) { #>
             <span class="czr-notice"><# print(input_data.notice_after); #></span>
@@ -955,10 +968,40 @@ function sek_print_nimble_input_templates() {
 
 
 
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  PARTS FOR MULTI-ITEMS MODULES
+       *  fixes https://github.com/presscustomizr/nimble-builder/issues/473
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-crud-module-part">
+        <# var css_attr = serverControlParams.css_attr; #>
+        <button class="{{css_attr.open_pre_add_btn}}"><?php _e('Add New', 'text_doma'); ?> <span class="fas fa-plus-square"></span></button>
+        <div class="{{css_attr.pre_add_wrapper}}">
+          <div class="{{css_attr.pre_add_success}}"><p></p></div>
+          <div class="{{css_attr.pre_add_item_content}}">
 
+            <span class="{{css_attr.cancel_pre_add_btn}} button"><?php _e('Cancel', 'text_doma'); ?></span> <span class="{{css_attr.add_new_btn}} button"><?php _e('Add it', 'text_doma'); ?></span>
+          </div>
+        </div>
+      </script>
 
-
-
+      <script type="text/html" id="tmpl-nimble-rud-item-part">
+        <# var css_attr = serverControlParams.css_attr, is_sortable_class ='';
+          if ( data.is_sortable ) {
+              is_sortable_class = css_attr.item_sort_handle;
+          }
+        #>
+        <div class="{{css_attr.item_header}} {{is_sortable_class}} czr-custom-model">
+          <# if ( ( true === data.is_sortable ) ) { #>
+            <div class="{{css_attr.item_title}} "><h4>{{ data.title }}</h4></div>
+          <# } else { #>
+            <div class="{{css_attr.item_title}}"><h4>{{ data.title }}</h4></div>
+          <# } #>
+          <div class="{{css_attr.item_btns}}"><a title="<?php _e('Edit', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt {{css_attr.edit_view_btn}}"></a>&nbsp;<a title="<?php _e('Remove', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-trash {{css_attr.display_alert_btn}}"></a></div>
+          <div class="{{css_attr.remove_alert_wrapper}}"></div>
+        </div>
+      </script>
 
 
 
@@ -982,14 +1025,14 @@ function sek_print_nimble_input_templates() {
           value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
           unit = _.isString( value ) ? value.replace(/[0-9]|\.|,/g, '') : 'px';
           unit = _.isEmpty( unit ) ? 'px' : unit;
-          var _step = _.has( item_model, 'step' ) ? 'step="' + item_model.step + '"' : '',
-              _saved_unit = _.has( item_model, 'unit' ) ? 'data-unit="' + item_model.unit + '"' : '',
-              _min = _.has( item_model, 'min' ) ? 'min="' + item_model.min + '"': '',
-              _max = _.has( item_model, 'max' ) ? 'max="' + item_model.max + '"': '';
+          var _step = _.has( data.input_data, 'step' ) ? 'step="' + data.input_data.step + '"' : '',
+              _saved_unit = _.has( item_model, 'unit' ) ? 'data-unit="' + data.input_data.unit + '"' : '',
+              _min = _.has( data.input_data, 'min' ) ? 'min="' + data.input_data.min + '"': '',
+              _max = _.has( data.input_data, 'max' ) ? 'max="' + data.input_data.max + '"': '';
         #>
         <div class="sek-range-wrapper">
           <input data-czrtype="{{input_id}}" type="hidden" data-sek-unit="{{unit}}"/>
-          <input class="sek-range-input" type="range" {{_step}} {{_saved_unit}} {{_min}} {{_max}}/>
+          <input class="sek-range-input" type="range" <# print(_step); #> <# print(_saved_unit); #> <# print(_min); #> <# print(_max); #>/>
         </div>
         <div class="sek-number-wrapper">
             <input class="sek-pm-input" value="{{value}}" type="number"  >
@@ -1037,7 +1080,7 @@ function sek_print_nimble_input_templates() {
               value = _.has( item_model, input_id ) ? item_model[input_id] : null,
               code_type = data.input_data.code_type;
         #>
-        <textarea data-czrtype="{{input_id}}" data-editor-code-type="{{code_type}}" class="width-100" name="textarea" rows="10" cols="">{{ value }}</textarea>
+        <textarea data-czrtype="{{input_id}}" data-editor-code-type="{{code_type}}" class="width-100" name="textarea" rows="10" cols="">{{value}}</textarea>
       </script>
 
 
@@ -1110,7 +1153,7 @@ function sek_print_nimble_input_templates() {
           _uniqueId = wp.customize.czr_sektions.guid();
         #>
         <div class="nimblecheck-wrap">
-          <input id="nimblecheck-{{_uniqueId}}" data-czrtype="{{input_id}}" type="checkbox" {{ _checked }} class="nimblecheck-input">
+          <input id="nimblecheck-{{_uniqueId}}" data-czrtype="{{input_id}}" type="checkbox" <# print(_checked); #> class="nimblecheck-input">
           <label for="nimblecheck-{{_uniqueId}}" class="nimblecheck-label">{{sektionsLocalizedData.i18n['Switch']}}</label>
         </div>
       </script>
@@ -1136,10 +1179,6 @@ function sek_print_nimble_input_templates() {
           value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
           unit = _.isString( value ) ? value.replace(/[0-9]|\.|,/g, '') : 'px';
           unit = _.isEmpty( unit ) ? 'px' : unit;
-          var _step = _.has( item_model, 'step' ) ? 'step="' + item_model.step + '"' : '',
-              _saved_unit = _.has( item_model, 'unit' ) ? 'data-unit="' + item_model.unit + '"' : '',
-              _min = _.has( item_model, 'min' ) ? 'min="' + item_model.min + '"': '',
-              _max = _.has( item_model, 'max' ) ? 'max="' + item_model.max + '"': '';
         #>
         <div class="sek-font-size-line-height-wrapper">
           <input data-czrtype="{{input_id}}" type="hidden" data-sek-unit="{{unit}}"/>
@@ -1292,7 +1331,7 @@ function sek_print_nimble_input_templates() {
       ?>
       <script type="text/html" id="tmpl-nimble-input___text">
         <# var input_data = data.input_data; #>
-        <input data-czrtype="{{data.input_id}}" type="text" value="" placeholder="{{input_data.placeholder}}"></input>
+        <input data-czrtype="{{data.input_id}}" type="text" value="" placeholder="<# print(input_data.placeholder); #>"></input>
       </script>
 
 
@@ -1464,6 +1503,7 @@ function sek_print_nimble_input_templates() {
 
                 var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
                 styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
+
                 if ( !_.isEmpty(secParams['height']) ) {
                     styleAttr = styleAttr + 'height:' + secParams['height'] + ';';
                 }
