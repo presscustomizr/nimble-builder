@@ -36,11 +36,8 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 // LOCAL SECTIONS STYLESHEET
                 $this->_instantiate_css_handler( array( 'skope_id' => skp_build_skope_id() ) );
                 // GLOBAL SECTIONS STYLESHEET
-                // always printed when customizing
-                // otherwise, printed if !is_null( sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID ) )
-                if ( sek_has_global_sections() ) {
-                    $this->_instantiate_css_handler( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) );
-                }
+                // Can hold rules for global sections and global styling
+                $this->_instantiate_css_handler( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) );
             }
             $google_fonts_print_candidates = $this->sek_get_gfont_print_candidates( $local_skope_id );
 
@@ -118,6 +115,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
 
         // @param params = array( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) )
         private function _instantiate_css_handler( $params = array() ) {
+            sek_error_log('instantiate css handler', $params );
             $params = wp_parse_args( $params, array( 'skope_id' => '', 'is_global_stylesheet' => false ) );
             $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
                 'id'             => $params['skope_id'],
