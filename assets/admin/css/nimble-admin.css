@@ -111,11 +111,16 @@ a.czr-rating-link:hover {
   position:absolute;
   top: 2px;
 }
-#wpadminbar .sek-nimble-icon .sek-nimble-admin-bar-title {
+#wpadminbar .sek-nimble-icon .sek-nimble-admin-bar-title{
   padding-left:30px
 }
 
-
+/* Style for the edit button with classical editor */
+#post-body-content .sek-nimble-icon .sek-nimble-mobile-admin-bar-title { display: none; }
+@media (max-width: 960px) {
+  #post-body-content .sek-nimble-icon .sek-nimble-admin-bar-title{ display: none;}
+  #post-body-content .sek-nimble-icon .sek-nimble-mobile-admin-bar-title{ display: inline-block;}
+}
 
 
 
@@ -287,8 +292,13 @@ body .block-editor #sek-edit-with-nimble .sek-nimble-icon img {
   position: absolute;
 }
 
-body .block-editor .sek-nimble-admin-bar-title {
+body .block-editor .sek-nimble-admin-bar-title, body .block-editor .sek-nimble-mobile-admin-bar-title {
   padding-left: 22px;
+}
+body .block-editor .sek-nimble-mobile-admin-bar-title { display: none; }
+@media (max-width: 960px) {
+  body .block-editor .sek-nimble-admin-bar-title{ display: none;}
+  body .block-editor .sek-nimble-mobile-admin-bar-title{ display: inline-block;}
 }
 /* Classic editor style */
 #sek-edit-with-nimble .sek-nimble-icon img {
