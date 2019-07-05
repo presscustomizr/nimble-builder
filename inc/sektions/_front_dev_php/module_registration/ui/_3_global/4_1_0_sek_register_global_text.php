@@ -146,7 +146,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
 
     // DEFAULT TEXT OPTIONS
     // Font Family
-    if ( !empty( $text_options['default_font_family'] ) ) {
+    if ( !empty( $text_options['default_font_family'] ) && 'none' !== $text_options['default_font_family'] ) {
         $rules[] = array(
             'selector'    => $default_text_selector,
             'css_rules'   => sprintf( '%1$s:%2$s;', 'font-family', sek_extract_css_font_family_from_customizer_option( $text_options['default_font_family'] ) ),
@@ -223,7 +223,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
 
     // HEADINGS OPTIONS
     // Font Family
-    if ( !empty( $text_options['headings_font_family'] ) ) {
+    if ( !empty( $text_options['headings_font_family'] ) && 'none' !== $text_options['headings_font_family'] ) {
         $rules[] = array(
             'selector'    => $headings_selector,
             'css_rules'   => sprintf( '%1$s:%2$s;', 'font-family', sek_extract_css_font_family_from_customizer_option( $text_options['headings_font_family'] ) ),
@@ -235,8 +235,6 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
 
 
     $global_text_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
-
-    //sek_error_log('ALORS CSS ?', $global_text_options_css );
 
     return is_string( $global_text_options_css ) ? $css . $global_text_options_css : $css;
 
