@@ -44,7 +44,7 @@ function sek_add_customize_link() {
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
           __('Nimble Builder','text_domain_to_replace'),
           __('Add sections in live preview with Nimble Builder', 'text_domain'),
-          __( 'Nimble Builder', 'text_domain' )
+          __( 'Build with Nimble Builder', 'text_domain' )
       ),
       'href'   => $customize_url,
       'meta'   => array(
@@ -63,20 +63,23 @@ function sek_get_customize_url_when_is_admin( $ajax_server_request_uri = '') {
     $current_screen = get_current_screen();
     $post = get_post();
 
-    if ( 'post' == $current_screen->base
-        && 'add' != $current_screen->action
-        && ( $post_type_object = get_post_type_object( $post->post_type ) )
-        && current_user_can( 'read_post', $post->ID )
-        && ( $post_type_object->public )
-        && ( $post_type_object->show_in_admin_bar ) )
-    {
-        if ( 'draft' == $post->post_status ) {
-            $preview_link = get_preview_post_link( $post );
-            $customize_url = esc_url( $preview_link );
-        } else {
-            $customize_url = get_permalink( $post->ID );
-        }
-    } elseif ( 'edit' == $current_screen->base
+    // July 2019 => Don't display the admin button in post and pages, where we already have the edit button next to the post title
+    // if ( 'post' == $current_screen->base
+    //     && 'add' != $current_screen->action
+    //     && ( $post_type_object = get_post_type_object( $post->post_type ) )
+    //     && current_user_can( 'read_post', $post->ID )
+    //     && ( $post_type_object->public )
+    //     && ( $post_type_object->show_in_admin_bar ) )
+    // {
+    //     if ( 'draft' == $post->post_status ) {
+    //         $preview_link = get_preview_post_link( $post );
+    //         $customize_url = esc_url( $preview_link );
+    //     } else {
+    //         $customize_url = get_permalink( $post->ID );
+    //     }
+    // } else
+
+    if ( 'edit' == $current_screen->base
         && ( $post_type_object = get_post_type_object( $current_screen->post_type ) )
         && ( $post_type_object->public )
         && ( $post_type_object->show_in_admin_bar )
