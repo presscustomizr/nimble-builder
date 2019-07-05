@@ -64,10 +64,40 @@ function sek_print_nimble_input_templates() {
 
 
 
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  PARTS FOR MULTI-ITEMS MODULES
+       *  fixes https://github.com/presscustomizr/nimble-builder/issues/473
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-crud-module-part">
+        <# var css_attr = serverControlParams.css_attr; #>
+        <button class="{{css_attr.open_pre_add_btn}}"><?php _e('Add New', 'text_doma'); ?> <span class="fas fa-plus-square"></span></button>
+        <div class="{{css_attr.pre_add_wrapper}}">
+          <div class="{{css_attr.pre_add_success}}"><p></p></div>
+          <div class="{{css_attr.pre_add_item_content}}">
 
+            <span class="{{css_attr.cancel_pre_add_btn}} button"><?php _e('Cancel', 'text_doma'); ?></span> <span class="{{css_attr.add_new_btn}} button"><?php _e('Add it', 'text_doma'); ?></span>
+          </div>
+        </div>
+      </script>
 
-
-
+      <script type="text/html" id="tmpl-nimble-rud-item-part">
+        <# var css_attr = serverControlParams.css_attr, is_sortable_class ='';
+          if ( data.is_sortable ) {
+              is_sortable_class = css_attr.item_sort_handle;
+          }
+        #>
+        <div class="{{css_attr.item_header}} {{is_sortable_class}} czr-custom-model">
+          <# if ( ( true === data.is_sortable ) ) { #>
+            <div class="{{css_attr.item_title}} "><h4>{{ data.title }}</h4></div>
+          <# } else { #>
+            <div class="{{css_attr.item_title}}"><h4>{{ data.title }}</h4></div>
+          <# } #>
+          <div class="{{css_attr.item_btns}}"><a title="<?php _e('Edit', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt {{css_attr.edit_view_btn}}"></a>&nbsp;<a title="<?php _e('Remove', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-trash {{css_attr.display_alert_btn}}"></a></div>
+          <div class="{{css_attr.remove_alert_wrapper}}"></div>
+        </div>
+      </script>
 
 
 
@@ -95,7 +125,6 @@ function sek_print_nimble_input_templates() {
               _saved_unit = _.has( item_model, 'unit' ) ? 'data-unit="' + data.input_data.unit + '"' : '',
               _min = _.has( data.input_data, 'min' ) ? 'min="' + data.input_data.min + '"': '',
               _max = _.has( data.input_data, 'max' ) ? 'max="' + data.input_data.max + '"': '';
-          console.log('ALORS MAX ?', input_id, value, data.input_data, _max);
         #>
         <div class="sek-range-wrapper">
           <input data-czrtype="{{input_id}}" type="hidden" data-sek-unit="{{unit}}"/>
