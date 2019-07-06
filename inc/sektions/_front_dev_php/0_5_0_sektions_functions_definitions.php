@@ -1085,6 +1085,34 @@ function sek_front_needs_magnific_popup( $bool = false, $recursive_data = null )
     return true === $bool;
 }
 
+// @return bool
+// Fired in 'wp_enqueue_scripts'
+// Recursively sniff the local and global sections to find a 'img-lightbox' string
+// @see sek_get_module_params_for_czr_image_main_settings_child
+function sek_front_needs_swiper( $bool = false, $recursive_data = null ) {
+    if ( !$bool ) {
+        if ( is_null( $recursive_data ) ) {
+            $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+            $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+            $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+            $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+
+            $recursive_data = array_merge( $local_collection, $global_collection );
+        }
+
+        $swiper_dependant_modules = array( 'czr_img_slider_module' );
+
+        foreach ($recursive_data as $key => $value) {
+            if ( is_array( $value ) && array_key_exists('module_type', $value) && in_array($value['module_type'], $swiper_dependant_modules ) ) {
+                $bool = true;
+                break;
+            } else if ( is_array( $value ) ) {
+                $bool = sek_front_needs_swiper( $bool, $value );
+            }
+        }
+    }
+    return true === $bool;
+}
 
 
 
@@ -1681,6 +1709,12 @@ function sek_get_module_collection() {
           'content-id' => 'czr_simple_html_module',
           'title' => __( 'Html Content', 'text_doma' ),
           'icon' => 'Nimble_html_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_img_slider_module',
+          'title' => __( 'Image carousel', 'text_doma' ),
+          'icon' => 'Nimble_slideshow_icon.svg'
         ),
         array(
           'content-type' => 'module',

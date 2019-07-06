@@ -75,6 +75,26 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 );
             }
 
+
+            // Swiper js + css is needed for the czr_img_slider_module
+            if ( sek_front_needs_swiper() ) {
+                wp_enqueue_style(
+                    'czr-swiper',
+                    NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    $media = 'all'
+                );
+                wp_enqueue_script(
+                    'czr-swiper',
+                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.min.js',
+                    array( 'jquery'),
+                    NIMBLE_ASSETS_VERSION,
+                    true
+                );
+            }
+
+
             // Google reCAPTCHA
             $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
             $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
@@ -92,7 +112,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : ''
                 )
             );
-        }
+
+        }//sek_enqueue_front_assets
 
 
         // enqueue / print customize preview assets

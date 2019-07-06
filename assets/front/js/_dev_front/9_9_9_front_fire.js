@@ -532,3 +532,49 @@ jQuery( function($){
             });
     });
 });
+
+
+/* ------------------------------------------------------------------------- *
+ *  SWIPER
+/* ------------------------------------------------------------------------- */
+jQuery( function($){
+    var mySwipers = [];
+    var doSwiperInstantiation = function() {
+          console.log('MY SWIPER ??', mySwipers );
+          mySwipers.push( new Swiper(
+              $(this),//$(this)[0],
+              {
+                  // spaceBetween: 30,
+                  // effect: 'fade',
+                  // pagination: {
+                  //   el: '.swiper-pagination',
+                  //   clickable: true,
+                  // },
+                  navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                  }
+              }
+          ));
+    };
+
+    // Delegate instantiation
+    $( 'body').on( 'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed', '[data-sek-level="location"]',
+          function() {
+            if ( ! _utils_.isEmpty( mySwipers ) ) {
+                  _utils_.each( mySwipers, function( _swiperInstance ){
+                        _swiperInstance.destroy();
+                  });
+            }
+            mySwipers = [];
+            $('.sektion-wrapper').find('.swiper-container').each( function() {
+                  doSwiperInstantiation.call($(this));
+            });
+          }
+    );
+
+    // on load
+    $('.sektion-wrapper').find('.swiper-container').each( function() {
+          doSwiperInstantiation.call($(this));
+    });
+});
