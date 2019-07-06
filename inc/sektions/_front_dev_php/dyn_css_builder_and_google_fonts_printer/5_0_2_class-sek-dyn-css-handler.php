@@ -311,24 +311,24 @@ class Sek_Dyn_CSS_Handler {
             $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $this->is_global_stylesheet );
 
             // now that the stylesheet is ready let's cache it
-            $this->css_string_to_enqueue_or_print = (string)$this->builder-> get_stylesheet();
+            $this->css_string_to_enqueue_or_print = (string)$this->builder->get_stylesheet();
         }
-
-        //hook setup for printing or enqueuing
-        //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
-        //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
 
         // Do we have any rules to print / enqueue ?
         // If yes, print in the dom or enqueue depending on the current context ( customization or front )
         // If not, delete any previouly created stylesheet
-        if ( $this->css_string_to_enqueue_or_print ) {
-            if ( ! $this->customizer_save ) {
-                $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
-            } else {
-                $this->sek_dyn_css_maybe_write_css_file();
-            }
+
+        //hook setup for printing or enqueuing
+        //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
+        if ( ! $this->customizer_save ) {
+            $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
         } else {
-            $this->sek_dyn_css_maybe_delete_file();
+            //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
+            if ( $this->css_string_to_enqueue_or_print ) {
+                $this->sek_dyn_css_maybe_write_css_file();
+            } else {
+                $this->sek_dyn_css_maybe_delete_file();
+            }
         }
     }//__construct
 
